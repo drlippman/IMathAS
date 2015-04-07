@@ -20,6 +20,9 @@ use Yii;
  * @property integer $showhints
  * @property integer $extracredit
  * @property string $withdrawn
+ *
+ * @property ImasQuestionset $questionset
+ * @property ImasAssessments $assessment
  */
 class BaseImasQuestions extends \yii\db\ActiveRecord
 {
@@ -64,5 +67,21 @@ class BaseImasQuestions extends \yii\db\ActiveRecord
             'extracredit' => 'Extracredit',
             'withdrawn' => 'Withdrawn',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getQuestionset()
+    {
+        return $this->hasOne(ImasQuestionset::className(), ['id' => 'questionsetid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAssessment()
+    {
+        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
     }
 }

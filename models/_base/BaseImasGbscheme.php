@@ -16,6 +16,8 @@ use Yii;
  * @property integer $stugbmode
  * @property integer $usersort
  * @property string $colorize
+ *
+ * @property ImasCourses $course
  */
 class BaseImasGbscheme extends \yii\db\ActiveRecord
 {
@@ -56,5 +58,13 @@ class BaseImasGbscheme extends \yii\db\ActiveRecord
             'usersort' => 'Usersort',
             'colorize' => 'Colorize',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

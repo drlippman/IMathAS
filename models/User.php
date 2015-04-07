@@ -43,9 +43,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
 
 
-    public static function findUser($username, $password)
+    public static function findUser($username)
     {
-        $user = static::findOne(['SID' => $username, 'password' => $password]);
+        $user = static::findOne(['SID' => $username]);
         if($user)
         {
             return $user;

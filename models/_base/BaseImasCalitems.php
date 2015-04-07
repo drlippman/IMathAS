@@ -12,6 +12,8 @@ use Yii;
  * @property string $date
  * @property string $title
  * @property string $tag
+ *
+ * @property ImasCourses $course
  */
 class BaseImasCalitems extends \yii\db\ActiveRecord
 {
@@ -47,5 +49,13 @@ class BaseImasCalitems extends \yii\db\ActiveRecord
             'title' => 'Title',
             'tag' => 'Tag',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

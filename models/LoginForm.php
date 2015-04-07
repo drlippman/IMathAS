@@ -79,8 +79,16 @@ class LoginForm extends Model
     public function validateUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findUser($this->username, $this->password);
+
+            $this->_user = User::findUser($this->username);
+            if($this->_user)
+            {
+                require("../components/password.php");
+            }
         }
-        return $this->_user;
+        if(password_verify($this->password, $this->_user->password))
+            return $this->_user;
+
+        return false;
     }
 }

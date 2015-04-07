@@ -10,6 +10,9 @@ use Yii;
  * @property string $id
  * @property integer $grouptype
  * @property string $name
+ *
+ * @property ImasAssessmentSessions[] $imasAssessmentSessions
+ * @property ImasExternalTools[] $imasExternalTools
  */
 class BaseImasGroups extends \yii\db\ActiveRecord
 {
@@ -43,5 +46,21 @@ class BaseImasGroups extends \yii\db\ActiveRecord
             'grouptype' => 'Grouptype',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasAssessmentSessions()
+    {
+        return $this->hasMany(ImasAssessmentSessions::className(), ['agroupid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasExternalTools()
+    {
+        return $this->hasMany(ImasExternalTools::className(), ['groupid' => 'id']);
     }
 }

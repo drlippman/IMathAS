@@ -11,6 +11,9 @@ use Yii;
  * @property string $userid
  * @property string $courseid
  * @property string $section
+ *
+ * @property ImasCourses $course
+ * @property ImasUsers $user
  */
 class BaseImasTutors extends \yii\db\ActiveRecord
 {
@@ -45,5 +48,21 @@ class BaseImasTutors extends \yii\db\ActiveRecord
             'courseid' => 'Courseid',
             'section' => 'Section',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

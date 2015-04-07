@@ -19,6 +19,8 @@ use Yii;
  * @property string $caltag
  * @property integer $isplaylist
  * @property string $outcomes
+ *
+ * @property ImasCourses $course
  */
 class BaseImasInlinetext extends \yii\db\ActiveRecord
 {
@@ -62,5 +64,13 @@ class BaseImasInlinetext extends \yii\db\ActiveRecord
             'isplaylist' => 'Isplaylist',
             'outcomes' => 'Outcomes',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

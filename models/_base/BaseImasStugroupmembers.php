@@ -10,6 +10,9 @@ use Yii;
  * @property string $id
  * @property string $stugroupid
  * @property string $userid
+ *
+ * @property ImasUsers $user
+ * @property ImasStugroups $stugroup
  */
 class BaseImasStugroupmembers extends \yii\db\ActiveRecord
 {
@@ -42,5 +45,21 @@ class BaseImasStugroupmembers extends \yii\db\ActiveRecord
             'stugroupid' => 'Stugroupid',
             'userid' => 'Userid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStugroup()
+    {
+        return $this->hasOne(ImasStugroups::className(), ['id' => 'stugroupid']);
     }
 }

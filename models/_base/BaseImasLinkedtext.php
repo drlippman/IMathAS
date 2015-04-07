@@ -20,6 +20,8 @@ use Yii;
  * @property string $caltag
  * @property integer $points
  * @property string $outcomes
+ *
+ * @property ImasCourses $course
  */
 class BaseImasLinkedtext extends \yii\db\ActiveRecord
 {
@@ -64,5 +66,13 @@ class BaseImasLinkedtext extends \yii\db\ActiveRecord
             'points' => 'Points',
             'outcomes' => 'Outcomes',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

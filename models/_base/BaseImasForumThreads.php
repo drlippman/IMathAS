@@ -13,6 +13,12 @@ use Yii;
  * @property string $lastposttime
  * @property string $lastpostuser
  * @property string $views
+ *
+ * @property ImasForumLikes[] $imasForumLikes
+ * @property ImasForumPosts[] $imasForumPosts
+ * @property ImasStugroups $stugroup
+ * @property ImasForums $forum
+ * @property ImasForumViews[] $imasForumViews
  */
 class BaseImasForumThreads extends \yii\db\ActiveRecord
 {
@@ -48,5 +54,45 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
             'lastpostuser' => 'Lastpostuser',
             'views' => 'Views',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasForumLikes()
+    {
+        return $this->hasMany(ImasForumLikes::className(), ['threadid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasForumPosts()
+    {
+        return $this->hasMany(ImasForumPosts::className(), ['threadid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStugroup()
+    {
+        return $this->hasOne(ImasStugroups::className(), ['id' => 'stugroupid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getForum()
+    {
+        return $this->hasOne(ImasForums::className(), ['id' => 'forumid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasForumViews()
+    {
+        return $this->hasMany(ImasForumViews::className(), ['threadid' => 'id']);
     }
 }

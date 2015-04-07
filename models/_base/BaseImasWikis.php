@@ -17,6 +17,9 @@ use Yii;
  * @property integer $settings
  * @property string $groupsetid
  * @property integer $avail
+ *
+ * @property ImasWikiViews[] $imasWikiViews
+ * @property ImasCourses $course
  */
 class BaseImasWikis extends \yii\db\ActiveRecord
 {
@@ -58,5 +61,21 @@ class BaseImasWikis extends \yii\db\ActiveRecord
             'groupsetid' => 'Groupsetid',
             'avail' => 'Avail',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasWikiViews()
+    {
+        return $this->hasMany(BaseImasWikiViews::className(), ['wikiid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

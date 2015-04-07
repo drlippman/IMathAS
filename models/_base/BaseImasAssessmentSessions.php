@@ -31,6 +31,10 @@ use Yii;
  * @property string $reviewlastanswers
  * @property string $reviewreattempting
  * @property string $feedback
+ *
+ * @property ImasGroups $agroup
+ * @property ImasUsers $user
+ * @property ImasAssessments $assessment
  */
 class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
 {
@@ -87,5 +91,29 @@ class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
             'reviewreattempting' => 'Reviewreattempting',
             'feedback' => 'Feedback',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAgroup()
+    {
+        return $this->hasOne(ImasGroups::className(), ['id' => 'agroupid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAssessment()
+    {
+        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
     }
 }

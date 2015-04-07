@@ -24,6 +24,8 @@ use Yii;
  * @property string $entryformat
  * @property string $forceregen
  * @property integer $reentrytime
+ *
+ * @property ImasUsers $owner
  */
 class BaseImasDiags extends \yii\db\ActiveRecord
 {
@@ -74,5 +76,13 @@ class BaseImasDiags extends \yii\db\ActiveRecord
             'forceregen' => 'Forceregen',
             'reentrytime' => 'Reentrytime',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
     }
 }

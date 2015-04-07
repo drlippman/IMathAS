@@ -12,6 +12,9 @@ use Yii;
  * @property string $userid
  * @property string $name
  * @property string $value
+ *
+ * @property ImasUsers $user
+ * @property ImasCourses $course
  */
 class BaseImasBookmarks extends \yii\db\ActiveRecord
 {
@@ -48,5 +51,21 @@ class BaseImasBookmarks extends \yii\db\ActiveRecord
             'name' => 'Name',
             'value' => 'Value',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

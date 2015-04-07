@@ -13,6 +13,9 @@ use Yii;
  * @property integer $score
  * @property string $scoredet
  * @property integer $timespent
+ *
+ * @property ImasQuestionset $qset
+ * @property ImasCourses $course
  */
 class BaseImasFirstscores extends \yii\db\ActiveRecord
 {
@@ -49,5 +52,21 @@ class BaseImasFirstscores extends \yii\db\ActiveRecord
             'scoredet' => 'Scoredet',
             'timespent' => 'Timespent',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getQset()
+    {
+        return $this->hasOne(ImasQuestionset::className(), ['id' => 'qsetid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

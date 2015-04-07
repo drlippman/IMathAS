@@ -11,6 +11,8 @@ use Yii;
  * @property string $description
  * @property string $filename
  * @property string $itemid
+ *
+ * @property ImasItems $item
  */
 class BaseImasInstrFiles extends \yii\db\ActiveRecord
 {
@@ -46,5 +48,13 @@ class BaseImasInstrFiles extends \yii\db\ActiveRecord
             'filename' => 'Filename',
             'itemid' => 'Itemid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItem()
+    {
+        return $this->hasOne(ImasItems::className(), ['id' => 'itemid']);
     }
 }

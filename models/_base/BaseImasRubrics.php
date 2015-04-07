@@ -13,6 +13,8 @@ use Yii;
  * @property string $name
  * @property integer $rubrictype
  * @property string $rubric
+ *
+ * @property ImasUsers $owner
  */
 class BaseImasRubrics extends \yii\db\ActiveRecord
 {
@@ -50,5 +52,13 @@ class BaseImasRubrics extends \yii\db\ActiveRecord
             'rubrictype' => 'Rubrictype',
             'rubric' => 'Rubric',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
     }
 }

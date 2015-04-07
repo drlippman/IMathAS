@@ -17,6 +17,8 @@ use Yii;
  * @property integer $dropn
  * @property integer $weight
  * @property integer $hidden
+ *
+ * @property ImasCourses $course
  */
 class BaseImasGbcats extends \yii\db\ActiveRecord
 {
@@ -58,5 +60,13 @@ class BaseImasGbcats extends \yii\db\ActiveRecord
             'weight' => 'Weight',
             'hidden' => 'Hidden',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

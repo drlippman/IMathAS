@@ -12,6 +12,9 @@ use Yii;
  * @property string $threadid
  * @property string $lastview
  * @property integer $tagged
+ *
+ * @property ImasForumThreads $thread
+ * @property ImasUsers $user
  */
 class BaseImasForumViews extends \yii\db\ActiveRecord
 {
@@ -46,5 +49,21 @@ class BaseImasForumViews extends \yii\db\ActiveRecord
             'lastview' => 'Lastview',
             'tagged' => 'Tagged',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getThread()
+    {
+        return $this->hasOne(ImasForumThreads::className(), ['id' => 'threadid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

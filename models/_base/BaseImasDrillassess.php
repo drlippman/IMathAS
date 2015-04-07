@@ -18,6 +18,9 @@ use Yii;
  * @property integer $n
  * @property string $classbests
  * @property integer $showtostu
+ *
+ * @property ImasCourses $course
+ * @property ImasDrillassessSessions[] $imasDrillassessSessions
  */
 class BaseImasDrillassess extends \yii\db\ActiveRecord
 {
@@ -61,5 +64,21 @@ class BaseImasDrillassess extends \yii\db\ActiveRecord
             'classbests' => 'Classbests',
             'showtostu' => 'Showtostu',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasDrillassessSessions()
+    {
+        return $this->hasMany(ImasDrillassessSessions::className(), ['drillassessid' => 'id']);
     }
 }

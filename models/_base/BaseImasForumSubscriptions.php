@@ -10,6 +10,9 @@ use Yii;
  * @property string $id
  * @property string $forumid
  * @property string $userid
+ *
+ * @property ImasUsers $user
+ * @property ImasForums $forum
  */
 class BaseImasForumSubscriptions extends \yii\db\ActiveRecord
 {
@@ -42,5 +45,21 @@ class BaseImasForumSubscriptions extends \yii\db\ActiveRecord
             'forumid' => 'Forumid',
             'userid' => 'Userid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getForum()
+    {
+        return $this->hasOne(ImasForums::className(), ['id' => 'forumid']);
     }
 }

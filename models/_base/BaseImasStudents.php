@@ -21,6 +21,9 @@ use Yii;
  * @property string $timelimitmult
  * @property integer $stutype
  * @property string $custominfo
+ *
+ * @property ImasCourses $course
+ * @property ImasUsers $user
  */
 class BaseImasStudents extends \yii\db\ActiveRecord
 {
@@ -68,5 +71,21 @@ class BaseImasStudents extends \yii\db\ActiveRecord
             'stutype' => 'Stutype',
             'custominfo' => 'Custominfo',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

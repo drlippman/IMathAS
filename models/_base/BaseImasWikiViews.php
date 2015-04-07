@@ -2,6 +2,7 @@
 
 namespace app\models\_base;
 
+use Faker\Provider\Base;
 use Yii;
 
 /**
@@ -12,6 +13,9 @@ use Yii;
  * @property string $wikiid
  * @property string $lastview
  * @property string $stugroupid
+ *
+ * @property ImasWikis $wiki
+ * @property ImasUsers $user
  */
 class BaseImasWikiViews extends \yii\db\ActiveRecord
 {
@@ -46,5 +50,21 @@ class BaseImasWikiViews extends \yii\db\ActiveRecord
             'lastview' => 'Lastview',
             'stugroupid' => 'Stugroupid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWiki()
+    {
+        return $this->hasOne(BaseImasWikis::className(), ['id' => 'wikiid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 }

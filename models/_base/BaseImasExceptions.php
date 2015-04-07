@@ -14,6 +14,9 @@ use Yii;
  * @property string $enddate
  * @property integer $islatepass
  * @property integer $waivereqscore
+ *
+ * @property ImasAssessments $assessment
+ * @property ImasUsers $user
  */
 class BaseImasExceptions extends \yii\db\ActiveRecord
 {
@@ -50,5 +53,21 @@ class BaseImasExceptions extends \yii\db\ActiveRecord
             'islatepass' => 'Islatepass',
             'waivereqscore' => 'Waivereqscore',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAssessment()
+    {
+        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

@@ -52,6 +52,11 @@ use Yii;
  * @property string $calrtag
  * @property integer $tutoredit
  * @property string $ancestors
+ *
+ * @property ImasAssessmentSessions[] $imasAssessmentSessions
+ * @property ImasCourses $course
+ * @property ImasExceptions[] $imasExceptions
+ * @property ImasQuestions[] $imasQuestions
  */
 class BaseImasAssessments extends \yii\db\ActiveRecord
 {
@@ -133,5 +138,37 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
             'tutoredit' => 'Tutoredit',
             'ancestors' => 'Ancestors',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasAssessmentSessions()
+    {
+        return $this->hasMany(ImasAssessmentSessions::className(), ['assessmentid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasExceptions()
+    {
+        return $this->hasMany(ImasExceptions::className(), ['assessmentid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasQuestions()
+    {
+        return $this->hasMany(ImasQuestions::className(), ['assessmentid' => 'id']);
     }
 }

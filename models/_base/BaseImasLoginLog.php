@@ -12,6 +12,9 @@ use Yii;
  * @property string $courseid
  * @property string $logintime
  * @property string $lastaction
+ *
+ * @property ImasCourses $course
+ * @property ImasUsers $user
  */
 class BaseImasLoginLog extends \yii\db\ActiveRecord
 {
@@ -46,5 +49,21 @@ class BaseImasLoginLog extends \yii\db\ActiveRecord
             'logintime' => 'Logintime',
             'lastaction' => 'Lastaction',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

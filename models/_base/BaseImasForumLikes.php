@@ -12,6 +12,10 @@ use Yii;
  * @property string $threadid
  * @property string $postid
  * @property integer $type
+ *
+ * @property ImasForumPosts $post
+ * @property ImasUsers $user
+ * @property ImasForumThreads $thread
  */
 class BaseImasForumLikes extends \yii\db\ActiveRecord
 {
@@ -46,5 +50,29 @@ class BaseImasForumLikes extends \yii\db\ActiveRecord
             'postid' => 'Postid',
             'type' => 'Type',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPost()
+    {
+        return $this->hasOne(ImasForumPosts::className(), ['id' => 'postid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getThread()
+    {
+        return $this->hasOne(ImasForumThreads::className(), ['id' => 'threadid']);
     }
 }

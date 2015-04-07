@@ -13,6 +13,8 @@ use Yii;
  * @property integer $tzoffset
  * @property string $tzname
  * @property string $sessiondata
+ *
+ * @property ImasUsers $user
  */
 class BaseImasSessions extends \yii\db\ActiveRecord
 {
@@ -51,5 +53,13 @@ class BaseImasSessions extends \yii\db\ActiveRecord
             'tzname' => 'Tzname',
             'sessiondata' => 'Sessiondata',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

@@ -14,6 +14,9 @@ use Yii;
  * @property string $typeid
  * @property string $viewtime
  * @property string $info
+ *
+ * @property ImasCourses $course
+ * @property ImasUsers $user
  */
 class BaseImasContentTrack extends \yii\db\ActiveRecord
 {
@@ -51,5 +54,21 @@ class BaseImasContentTrack extends \yii\db\ActiveRecord
             'viewtime' => 'Viewtime',
             'info' => 'Info',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

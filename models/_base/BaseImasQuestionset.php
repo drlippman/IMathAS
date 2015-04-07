@@ -33,6 +33,12 @@ use Yii;
  * @property string $replaceby
  * @property integer $broken
  * @property integer $solutionopts
+ *
+ * @property ImasFirstscores[] $imasFirstscores
+ * @property ImasLibraryItems[] $imasLibraryItems
+ * @property ImasQimages[] $imasQimages
+ * @property ImasQuestions[] $imasQuestions
+ * @property ImasUsers $owner
  */
 class BaseImasQuestionset extends \yii\db\ActiveRecord
 {
@@ -91,5 +97,45 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
             'broken' => 'Broken',
             'solutionopts' => 'Solutionopts',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasFirstscores()
+    {
+        return $this->hasMany(ImasFirstscores::className(), ['qsetid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasLibraryItems()
+    {
+        return $this->hasMany(ImasLibraryItems::className(), ['qsetid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasQimages()
+    {
+        return $this->hasMany(ImasQimages::className(), ['qsetid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasQuestions()
+    {
+        return $this->hasMany(ImasQuestions::className(), ['questionsetid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
     }
 }

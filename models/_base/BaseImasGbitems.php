@@ -17,6 +17,8 @@ use Yii;
  * @property integer $cntingb
  * @property integer $tutoredit
  * @property string $outcomes
+ *
+ * @property ImasCourses $course
  */
 class BaseImasGbitems extends \yii\db\ActiveRecord
 {
@@ -58,5 +60,13 @@ class BaseImasGbitems extends \yii\db\ActiveRecord
             'tutoredit' => 'Tutoredit',
             'outcomes' => 'Outcomes',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

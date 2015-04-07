@@ -15,6 +15,8 @@ use Yii;
  * @property string $curscores
  * @property string $starttime
  * @property string $scorerec
+ *
+ * @property ImasDrillassess $drillassess
  */
 class BaseImasDrillassessSessions extends \yii\db\ActiveRecord
 {
@@ -53,5 +55,13 @@ class BaseImasDrillassessSessions extends \yii\db\ActiveRecord
             'starttime' => 'Starttime',
             'scorerec' => 'Scorerec',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDrillassess()
+    {
+        return $this->hasOne(ImasDrillassess::className(), ['id' => 'drillassessid']);
     }
 }

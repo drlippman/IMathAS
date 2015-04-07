@@ -11,6 +11,9 @@ use Yii;
  * @property string $courseid
  * @property string $itemtype
  * @property string $typeid
+ *
+ * @property ImasInstrFiles[] $imasInstrFiles
+ * @property ImasCourses $course
  */
 class BaseImasItems extends \yii\db\ActiveRecord
 {
@@ -45,5 +48,21 @@ class BaseImasItems extends \yii\db\ActiveRecord
             'itemtype' => 'Itemtype',
             'typeid' => 'Typeid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasInstrFiles()
+    {
+        return $this->hasMany(ImasInstrFiles::className(), ['itemid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

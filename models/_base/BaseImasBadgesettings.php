@@ -14,6 +14,8 @@ use Yii;
  * @property string $longdescription
  * @property string $courseid
  * @property string $requirements
+ *
+ * @property ImasCourses $course
  */
 class BaseImasBadgesettings extends \yii\db\ActiveRecord
 {
@@ -53,5 +55,13 @@ class BaseImasBadgesettings extends \yii\db\ActiveRecord
             'courseid' => 'Courseid',
             'requirements' => 'Requirements',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

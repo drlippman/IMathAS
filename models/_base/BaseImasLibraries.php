@@ -17,6 +17,8 @@ use Yii;
  * @property integer $sortorder
  * @property string $parent
  * @property string $groupid
+ *
+ * @property ImasUsers $owner
  */
 class BaseImasLibraries extends \yii\db\ActiveRecord
 {
@@ -57,5 +59,13 @@ class BaseImasLibraries extends \yii\db\ActiveRecord
             'parent' => 'Parent',
             'groupid' => 'Groupid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
     }
 }

@@ -11,6 +11,8 @@ use Yii;
  * @property string $courseid
  * @property string $name
  * @property integer $delempty
+ *
+ * @property ImasCourses $course
  */
 class BaseImasStugroupset extends \yii\db\ActiveRecord
 {
@@ -45,5 +47,13 @@ class BaseImasStugroupset extends \yii\db\ActiveRecord
             'name' => 'Name',
             'delempty' => 'Delempty',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

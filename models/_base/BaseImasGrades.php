@@ -14,6 +14,8 @@ use Yii;
  * @property string $userid
  * @property string $score
  * @property string $feedback
+ *
+ * @property ImasUsers $user
  */
 class BaseImasGrades extends \yii\db\ActiveRecord
 {
@@ -53,5 +55,13 @@ class BaseImasGrades extends \yii\db\ActiveRecord
             'score' => 'Score',
             'feedback' => 'Feedback',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

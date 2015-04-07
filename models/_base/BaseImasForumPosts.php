@@ -21,6 +21,11 @@ use Yii;
  * @property string $tag
  * @property integer $isanon
  * @property string $replyby
+ *
+ * @property ImasForumLikes[] $imasForumLikes
+ * @property ImasUsers $user
+ * @property ImasForums $forum
+ * @property ImasForumThreads $thread
  */
 class BaseImasForumPosts extends \yii\db\ActiveRecord
 {
@@ -66,5 +71,37 @@ class BaseImasForumPosts extends \yii\db\ActiveRecord
             'isanon' => 'Isanon',
             'replyby' => 'Replyby',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasForumLikes()
+    {
+        return $this->hasMany(ImasForumLikes::className(), ['postid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getForum()
+    {
+        return $this->hasOne(ImasForums::className(), ['id' => 'forumid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getThread()
+    {
+        return $this->hasOne(ImasForumThreads::className(), ['id' => 'threadid']);
     }
 }

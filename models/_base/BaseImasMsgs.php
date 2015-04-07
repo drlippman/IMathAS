@@ -18,6 +18,9 @@ use Yii;
  * @property integer $replied
  * @property string $parent
  * @property string $baseid
+ *
+ * @property ImasUsers $msgfrom0
+ * @property ImasUsers $msgto0
  */
 class BaseImasMsgs extends \yii\db\ActiveRecord
 {
@@ -60,5 +63,21 @@ class BaseImasMsgs extends \yii\db\ActiveRecord
             'parent' => 'Parent',
             'baseid' => 'Baseid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMsgfrom0()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'msgfrom']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMsgto0()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'msgto']);
     }
 }

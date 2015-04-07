@@ -10,6 +10,10 @@ use Yii;
  * @property string $id
  * @property string $groupsetid
  * @property string $name
+ *
+ * @property ImasForumThreads[] $imasForumThreads
+ * @property ImasStugroupmembers[] $imasStugroupmembers
+ * @property ImasWikiRevisions[] $imasWikiRevisions
  */
 class BaseImasStugroups extends \yii\db\ActiveRecord
 {
@@ -43,5 +47,29 @@ class BaseImasStugroups extends \yii\db\ActiveRecord
             'groupsetid' => 'Groupsetid',
             'name' => 'Name',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasForumThreads()
+    {
+        return $this->hasMany(ImasForumThreads::className(), ['stugroupid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasStugroupmembers()
+    {
+        return $this->hasMany(ImasStugroupmembers::className(), ['stugroupid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImasWikiRevisions()
+    {
+        return $this->hasMany(ImasWikiRevisions::className(), ['stugroupid' => 'id']);
     }
 }

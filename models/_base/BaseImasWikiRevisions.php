@@ -13,6 +13,9 @@ use Yii;
  * @property string $userid
  * @property string $time
  * @property string $revision
+ *
+ * @property ImasUsers $user
+ * @property ImasStugroups $stugroup
  */
 class BaseImasWikiRevisions extends \yii\db\ActiveRecord
 {
@@ -32,7 +35,8 @@ class BaseImasWikiRevisions extends \yii\db\ActiveRecord
         return [
             [['wikiid', 'userid', 'time', 'revision'], 'required'],
             [['wikiid', 'stugroupid', 'userid', 'time'], 'integer'],
-            [['revision'], 'string']
+            [['revision'], 'string'],
+            [['userid'], 'unique']
         ];
     }
 
@@ -49,5 +53,21 @@ class BaseImasWikiRevisions extends \yii\db\ActiveRecord
             'time' => 'Time',
             'revision' => 'Revision',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStugroup()
+    {
+        return $this->hasOne(BaseImasStugroups::className(), ['id' => 'stugroupid']);
     }
 }

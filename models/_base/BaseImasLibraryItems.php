@@ -12,6 +12,8 @@ use Yii;
  * @property string $qsetid
  * @property string $ownerid
  * @property integer $junkflag
+ *
+ * @property ImasQuestionset $qset
  */
 class BaseImasLibraryItems extends \yii\db\ActiveRecord
 {
@@ -46,5 +48,13 @@ class BaseImasLibraryItems extends \yii\db\ActiveRecord
             'ownerid' => 'Ownerid',
             'junkflag' => 'Junkflag',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getQset()
+    {
+        return $this->hasOne(ImasQuestionset::className(), ['id' => 'qsetid']);
     }
 }

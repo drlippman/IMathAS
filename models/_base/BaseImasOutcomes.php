@@ -11,6 +11,8 @@ use Yii;
  * @property string $courseid
  * @property string $name
  * @property string $ancestors
+ *
+ * @property ImasCourses $course
  */
 class BaseImasOutcomes extends \yii\db\ActiveRecord
 {
@@ -46,5 +48,13 @@ class BaseImasOutcomes extends \yii\db\ActiveRecord
             'name' => 'Name',
             'ancestors' => 'Ancestors',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }

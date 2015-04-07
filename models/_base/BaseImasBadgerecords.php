@@ -11,6 +11,8 @@ use Yii;
  * @property string $userid
  * @property string $badgeid
  * @property string $data
+ *
+ * @property ImasUsers $user
  */
 class BaseImasBadgerecords extends \yii\db\ActiveRecord
 {
@@ -45,5 +47,13 @@ class BaseImasBadgerecords extends \yii\db\ActiveRecord
             'badgeid' => 'Badgeid',
             'data' => 'Data',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
     }
 }

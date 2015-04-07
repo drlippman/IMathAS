@@ -12,6 +12,8 @@ use Yii;
  * @property string $var
  * @property string $filename
  * @property string $alttext
+ *
+ * @property ImasQuestionset $qset
  */
 class BaseImasQimages extends \yii\db\ActiveRecord
 {
@@ -49,5 +51,13 @@ class BaseImasQimages extends \yii\db\ActiveRecord
             'filename' => 'Filename',
             'alttext' => 'Alttext',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getQset()
+    {
+        return $this->hasOne(ImasQuestionset::className(), ['id' => 'qsetid']);
     }
 }

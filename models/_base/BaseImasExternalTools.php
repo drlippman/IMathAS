@@ -16,6 +16,9 @@ use Yii;
  * @property integer $privacy
  * @property string $courseid
  * @property string $groupid
+ *
+ * @property ImasGroups $group
+ * @property ImasCourses $course
  */
 class BaseImasExternalTools extends \yii\db\ActiveRecord
 {
@@ -55,5 +58,21 @@ class BaseImasExternalTools extends \yii\db\ActiveRecord
             'courseid' => 'Courseid',
             'groupid' => 'Groupid',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroup()
+    {
+        return $this->hasOne(ImasGroups::className(), ['id' => 'groupid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCourse()
+    {
+        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
     }
 }
