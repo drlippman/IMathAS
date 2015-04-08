@@ -152,6 +152,11 @@ if (isset($CFG['GEN']['headerscriptinclude'])) {
 if (isset($CFG['GEN']['translatewidgetID'])) {
 	echo '<meta name="google-translate-customization" content="'.$CFG['GEN']['translatewidgetID'].'"></meta>';
 }
+if (isset($sessiondata['ltiitemtype'])) {
+	echo '<script type="text/javascript">
+	$(function(){parent.postMessage(JSON.stringify({subject:\'lti.frameResize\', height: $(document).height()+"px"}), \'*\');});
+	</script>';
+}
 echo '</head><body>';
 
 $insertinheaderwrapper = ' ';
