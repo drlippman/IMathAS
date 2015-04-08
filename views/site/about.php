@@ -8,6 +8,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 
+
     <p>IMathAS is a web based mathematics assessment and course management platform.  </p>
     <img style="float: left; margin-right: 20px;" src="http://localhost/open-math/web/img/screens.jpg" alt="Computer screens"/>
 
@@ -18,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>If you already have an account, you can log on using the box to the right.</p>
     <p>If you are a new student to the system, <a href="#">Register as a new student</a></p>
-    <p>If you are an instructor, you can <a href="#">request an account</a></p>
+    <p>If you are an instructor, you can <a href="http://localhost/open-math/web/site/registration">request an account</a></p>
 
     <p>Also available:
     <ul>

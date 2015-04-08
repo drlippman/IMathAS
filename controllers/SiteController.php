@@ -2,7 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\_base\BaseImasUsers;
+use app\models\RegistrationForm;
+use app\models\User;
 use Yii;
+use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -95,4 +99,32 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionRegistration()
+    {
+        $model = new RegistrationForm();
+        if($model->load(Yii::$app->request->post()))
+        {
+            $params =$_REQUEST;
+            $user= new User();
+
+            $password = $params['RegistrationForm']['password'];
+
+            require("../components/password.php");
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+            $user->FirstName= $params['RegistrationForm']['FirstName'];
+            $user->LastName= $params['RegistrationForm']['LastName'];
+            $user->email= $params['RegistrationForm']['email'];
+            $user->SID= $params['RegistrationForm']['username'];
+            $user->password= $password_hash;
+            $user->hideonpostswidget = '0';
+            $user->save();
+        }
+
+        return $this->render('registration',[
+            'model'=> $model,
+        ]);
+    }
+
 }
