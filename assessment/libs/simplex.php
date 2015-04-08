@@ -3,6 +3,8 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
+//            to the maximization problem.
 // 2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
 //            updated the slove to stop when no more multiple solutions are found.
 // 2015-03-11 Fixed bug in simplex for the "min" option - was not transposing correctly.
@@ -232,28 +234,22 @@ function simplex($type,$objective,$constraints) {
 	    $lasttemprow = count($temp);
 	    $temp[$lasttemprow] =$objective;                      // Last row is the objective function
 	    //$temp[$lasttemprow][count($objective)] = 0;           // add a zero to make it the same size as the constraints
-	   // set up the tranpose matrix
+	    
+	    // set up the tranpose matrix
 	    $temp2  = array();
+	    // dont try to access the nonexistant element
+	    $lastcol = count($temp[0])-1;
+	    $lastrow = count($temp)-1;
+	    
 	    for($c=0;$c<count($temp[0]);$c++) {
-		  $temp2[$c] = array();	
+		    $temp2[$c] = array();	
+		    for($r=0;$r<count($temp);$r++) {
+		    	if(($r!=$lastrow)||($c!=$lastcol)) {
+	      	  		$temp2[$c][$r] = $temp[$r][$c];  // now switch the elements
+			    }
+	        }
 		}
 		
-		// now switch the elements
-	    for($r=0;$r<count($temp);$r++) {
-	      for($c=0;$c<count($temp[$r]);$c++){
-	      	  if($r==$lasttemprow){
-	      	  	if($c<count($temp)-1) {
-	      	  		$temp2[$c][$r] = $temp[$r][$c];
-	      	  	} else {
-					// don't try and switch a non existant element
-				}
-			  } else {
-			  	$temp2[$c][$r] = $temp[$r][$c];
-			  }
-		        
-	      }
-	    }
-
 	    // now write the transpose back to the 
 	    // the number of items in  the first row becomes the first column
 	    $lastrow = count($temp2)-1;
@@ -1303,7 +1299,7 @@ function simplexfindpivotpoint($sm) {
           $ratiotest[$j][$r] = $value;
         }
             
-            if($numberofnonzeroenteries > 1) {
+        if($numberofnonzeroenteries > 1) {
           // check for miniman value since this is a valid column
           for ($r=0;$r<$lastrow; $r++) {
             if (($ratiotest[$j][$r][0] > 0)&&($sm[$r][$c][0] > 0)) {
