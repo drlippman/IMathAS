@@ -2,18 +2,15 @@
 
 namespace app\controllers;
 
-use app\models\_base\BaseImasUsers;
 use app\models\RegistrationForm;
+use app\models\StudentRegisterForm;
 use app\models\User;
 use Yii;
-use yii\db\Exception;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-use app\components\AppUtility;
-
 class SiteController extends Controller
 {
     public function behaviors()
@@ -127,4 +124,13 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionStudentRegister()
+    {
+        $model = new StudentRegisterForm();
+        if ($model->load(Yii::$app->request->post()))
+        {
+            StudentRegisterForm::Submit();
+        }
+        return $this->render('studentRegister',['model'=> $model,]);
+    }
 }
