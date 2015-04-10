@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\components\AppConstant;
+use app\models\_base\BaseImasSessions;
+use app\models\LoginForm;
 use app\models\RegistrationForm;
 use app\models\StudentRegisterForm;
 use app\models\User;
@@ -9,8 +12,10 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
+use app\models\LoginkForm;
 use app\models\ContactForm;
+use app\components\AppUtility;
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -51,7 +56,6 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-
         return $this->render('index');
     }
 
@@ -63,10 +67,45 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            if(AppUtility::isOldSiteSupported())
+            {
+                //Set session data
+                ini_set('session.gc_maxlifetime',AppConstant::MAX_SESSION_TIME);
+                ini_set('auto_detect_line_endings',true);
+                $sessionid = session_id();
+
+                $session_data['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+                $session_data['ip'] = $_SERVER['REMOTE_ADDR'];
+                $session_data['secsalt'] = AppUtility::generateRandomString();
+
+                $session_data['mathdisp'] = 1;
+                $session_data['graphdisp'] = 1;
+                $session_data['useed'] = AppUtility::checkEditOrOk();
+                $enc = base64_encode(serialize($session_data));
+
+                $session = new BaseImasSessions();
+                if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
+
+                } else {
+                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+                    $session->sessionid = $sessionid;
+                    $session->userid = Yii::$app->getUser()->id;
+                    $session->time = time();
+                    $session->tzoffset = '-330';
+                    $session->tzname = "Asia/calcutta";
+                    $session->sessiondata = $enc;
+                }
+                $session->save();
+               return Yii::$app->getResponse()->redirect('http://localhost/IMathAS');
+            }
             return $this->goBack();
         } else {
+            $challenge = base64_encode(microtime() . rand(0,9999));
+            $this->getView()->registerJsFile('../../mathjax/MathJax.js');
+            $this->getView()->registerJsFile('../js/jstz_min.js');
             return $this->render('login', [
-                'model' => $model,
+                'model' => $model, 'challenge' => $challenge,
             ]);
         }
     }
@@ -92,11 +131,19 @@ class SiteController extends Controller
         }
     }
 
+    /**
+     * @return string
+     * Controller for about us page
+     */
     public function actionAbout()
     {
         return $this->render('about');
     }
 
+    /**
+     * @return string
+     * Instructor registration controller
+     */
     public function actionRegistration()
     {
         $model = new RegistrationForm();
@@ -115,10 +162,9 @@ class SiteController extends Controller
             $user->email= $params['RegistrationForm']['email'];
             $user->SID= $params['RegistrationForm']['username'];
             $user->password= $password_hash;
-            $user->hideonpostswidget = '0';
+            $user->hideonpostswidget = AppConstant::ZERO_VALUE;
             $user->save();
         }
-
         return $this->render('registration',[
             'model'=> $model,
         ]);
@@ -133,4 +179,14 @@ class SiteController extends Controller
         }
         return $this->render('studentRegister',['model'=> $model,]);
     }
+
+    /**
+     * @return string
+     * Controller for general work progress page
+     */
+    public function actionWorkInProgress()
+    {
+        return $this->render('progress');
+    }
+
 }
