@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppConstant;
 use Yii;
 use yii\base\Model;
 use app\components\AppUtility;
@@ -44,7 +45,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->validateUser();
             if (!$user) {
-                $this->addError('', 'Incorrect username or password.');
+                $this->addError('', AppConstant::INVALID_USERNAME_PASSWORD);
             }
         }
     }
@@ -56,9 +57,9 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? AppConstant::REMEMBER_ME_TIME : AppConstant::ZERO_VALUE);
         } else {
-            Yii::$app->session->setFlash('error', 'Invalid username or password.');
+            Yii::$app->session->setFlash('error', AppConstant::INVALID_USERNAME_PASSWORD);
             return false;
         }
     }

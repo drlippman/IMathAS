@@ -17,8 +17,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
      */
     public static function findIdentity($id)
     {
-  //      echo'dfgfg';die;
-        //  return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
         return static::findOne($id);
     }
 

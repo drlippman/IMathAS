@@ -89,3 +89,28 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
+
+.navbar-inverse {
+    background-color: #003366;
+    border-color: #00339a;
+}
+
+.navbar-brand{
+    font-size: 30px;
+    color: #00CC00 !important;
+    font-style: italic;
+}
+
+.navbar-inverse .navbar-nav > li > a{
+    color: #f5f5f5;
+}
+
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+    color: #FFFFFF;
+    background-color: #004466;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+    color: #FFF;
+    background-color: rgba(0, 0, 0, 0);
+}
