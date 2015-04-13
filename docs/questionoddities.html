@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>Question Writing Oddities</title>
+
+<script src="../javascript/ASCIIMathML.js" type="text/javascript"></script>
+<script src="../javascript/ASCIIsvg.js" type="text/javascript"></script>
+<script src="../course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
+<link rel="stylesheet" href="docs.css" type="text/css">
+</head>
+<body>
+<div class=title>
+<h1>Question Writing Oddities</h1>
+</div>
+
+<h2>Purpose of this document</h2>
+<p>This document describes some of the common pitfalls and oddities of the IMathAS question language.  
+For detailed question language reference, please refer to the 
+<a href="../help.html">help file</a>.</p>
+
+<h2>IMathAS Question Writing Oddities</h2>
+
+<h4>Fractional Exponent Display</h4>
+<p>
+Fractional exponents do not seem to display well with MathML.  For example, x^(2/3) will display as `x^(2/3)`.
+The best approach is to try x^(2//3), which renders as `x^(2//3)`.  If you want to raise up the exponent higher, 
+a silly trick to try is x^({::}^(2/3)).  The {::} creates an invisible item.  This renders as `x^({::}^(2/3))`.  
+</p>
+
+<h4>Curly Braces</h4>
+<p>
+Beware of using curly braces {}.  While curly braces can be used for display or for grouping, like in the TeX-style
+\frac{3}{5}, strange things can happen if you place variables inside the curly braces.  This is because PHP, the back-end
+interpreter, uses curly braces to isolate variables from surrounding text.
+</p><p>
+For example, if you wanted to display `3x` rather than `3*x`, then you need to enter 3x rather than 3*x.  With a 
+variable coefficient, writing $ax doesn't work, since the interpreter thinks that "$ax" is the variable.  Curly braces
+can avoid this, allowing you to write {$a}x to achieve the desired result.  Alternatively, writing $a x works as well.  In
+rendered math (inside backticks), extra spaces are removed.
+</p><p>
+As a side effect, writing \frac{$a}{$b} causes problems, since the interpreter essentially removes the curly braces 
+during variable interpolation, leaving \frac34 (if $a=3,$b=4).  A simple way to avoid this is to add spaces:  enter 
+\frac{ $a }{ $b } instead, and the interpreter will leave the curly braces alone, leaving \frac{ 3 }{ 4 }, which will
+correctly display as the desired `3/4`.
+</p>
+
+<h4>Dollar sign</h4>
+<p>
+Because dollar signs are used for variables, entering a dollar sign in question text requires caution.  
+If $a=5, entering $$a will display correctly as $5, but entering ${$a} will not (it's something called a "variable variable" in
+PHP).  To be extra safe, entering $ $a is recommended, or \$$a (the backslash says "don't try to interpret the next symbol").
+</p>
+
+<h4>Array Variables</h4>
+<p>
+You can define array variables, like $a = rands(1,5,3).  $a is now an array of three numbers; 
+the elements can be accessed as $a[0], $a[1], and $a[2] (note that arrays are zero-indexed). 
+If you use this approach, enclose the variable reference in parenthesis in calculations, like 
+$new = ($a[0])^2, and in curly brackets inside strings, like $string = "there were {$a[0]} people".
+</p>
+
+<h4>Variables with numbers in the name</h4>
+<p>Variables like $a1 are fine to use, but like array variables, should be enclosed in parentheses to prevent
+misinterpretation.  For example, use ($a1)^($a2) instead of $a1^$a2</p>
+
+<h4>Function type $variables that share letters with functions</h4>
+<p>When defining variables for Function type answer, beware that if the variable shares a letter with a function being
+used, you have to be a bit careful.  For example, if $variables="r", and you typed $answer = "rsqrt(2)", the system will
+get confused.  This can be solved by putting an explicit multiplication between the r and the square root:  $answer = "r*sqrt(2)".  
+Students in their entry will also need to either put an explicit multiplication sign, or at least leave a space between the variable
+and the function name</p>
+
+<h4>Makepretty</h4>
+<p>
+If you define:
+<pre>
+$a,$b,$c = rand(-5,5,3)
+$eqn = "$a x^2 + $b x + $c"
+</pre>
+<p>then there is potential your $eqn would display as `4x^2+-3x+2` (that's 4x^2+-3x+2).  To clean up the 
+double sign issue, use the makepretty function:</p>
+<pre>
+$eqn = makepretty("$a x^2 + $b x + $c")
+</pre>
+</p>
+<p>Makepretty is automatically run on $answer for Function type problems</p>
+
+<h4>Less than and Greater than signs</h4>
+<p>Because HTML uses angle brackets to denote HTML tags, and since IMathAS allows HTML tags for formatting
+purposes, the use of &lt; and &gt; in problem text can sometimes be problematic.  The system attempts to
+differential between HTML tags and inequalities, but does not always do so successfully.</p>
+
+<p>Generally, same direction inequalities are handled okay, such as 3 &lt; x &lt 5.  But mixed inequalities, such
+as "x &lt; 3 and x &gt; 1" are sometimes mishandled.  To avoid this, it is recommended that you use the HTML &amp;lt; and &amp;gt; 
+in place of &lt; and &gt;.  Inside backticks (rendered as math), lt and gt are sufficient to denote &lt; and &gt;.  You can also
+use le and ge or leq and geq inside backticks for `le` and `ge`.</p>
+
+<hr/><p>&copy; 2006 David Lippman<br/>This guide was written with development grant support from the WA State Distance Learning Council</p>
+</body>
+</html>
+

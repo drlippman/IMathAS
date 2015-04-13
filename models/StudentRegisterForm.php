@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
 use Yii;
 use yii\base\Model;
 class StudentRegisterForm extends Model
@@ -59,7 +60,8 @@ class StudentRegisterForm extends Model
 
     public static function Submit()
     {
-        $params =  $_POST;
+        $params =  Yii::$app->request->getBodyParams();
+//        AppUtility::dump($params);
         require("../components/password.php");
         $params = $params['StudentRegisterForm'];
         $params['SID'] = $params['username'];

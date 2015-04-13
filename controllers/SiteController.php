@@ -12,7 +12,6 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\LoginkForm;
 use app\models\ContactForm;
 use app\components\AppUtility;
 
@@ -67,6 +66,7 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
             if(AppUtility::isOldSiteSupported())
             {
                 //Set session data
@@ -99,7 +99,7 @@ class SiteController extends Controller
                 $session->save();
                return Yii::$app->getResponse()->redirect('http://localhost/IMathAS');
             }
-            return $this->goBack();
+            $this->redirect('dashboard');
         } else {
             $challenge = base64_encode(microtime() . rand(0,9999));
             $this->getView()->registerJsFile('../../mathjax/MathJax.js');
@@ -187,6 +187,16 @@ class SiteController extends Controller
     public function actionWorkInProgress()
     {
         return $this->render('progress');
+    }
+
+    public function actionDashboard()
+    {
+        return $this->render('adminDashboard');
+    }
+    public function actionStudentEnrollCourse()
+    {
+        $model = new studentEnrollCourseForm();
+        return $this->render('studentEnrollCourse',['model'=> $model,]);
     }
 
 }

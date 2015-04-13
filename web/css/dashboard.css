@@ -1,0 +1,44 @@
+div {
+    zoom: 1;
+}
+
+.clearlooks2, .clearlooks2 div {
+    zoom: normal;
+}
+
+.clear {
+    line-height: 0;
+}
+
+#GB_overlay, #GB_window {
+    position: absolute;
+    top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
+    left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');
+}
+
+div.breadcrumb {
+    display: none;
+}
+
+#headerlogo {
+    display: none;
+}
+
+span.AM {
+    font-size: 105%;
+}
+
+
+div.pagetitle h2 {
+    margin-top: 0px;
+}
+
+div {
+    zoom: 1;
+}
+.clearlooks2, .clearlooks2 div {
+    zoom: normal;
+}
+.clear {
+    line-height: 0;
+}

@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>Diagnostics</title>
+
+
+<link rel="stylesheet" href="docs.css" type="text/css">
+</head>
+<body>
+<div class=title>
+<h1>Diagnostics</h1>
+</div>
+
+
+<h2>Purpose of this document</h2>
+<p>This document contains information on setting up diagnostic logins in IMathAS</p>
+
+<h2>What Are Diagnostics</h2>
+<p>Diagnostics allow you to create a special login page for larger-scale diagnostic assessment. 
+This provides a way for students to access and take the diagnostic without needing
+to register and enroll in a course.  Also, it delivers them the correct assessment based
+on a selection from a list of options, such as course they want to place into, their grade level, etc.</p>
+
+<p>Diagnostics are linked with courses, and grades are recorded into that course.  A special diagnostic gradebook
+view is available, tailored for use by testing centers to look up the most recent takers of the diagnostic.  The diagnostic
+can also be integrated with the tutor system in IMathAS to allow individual instructors access to view only their 
+students' scores in a multi-instructor shared diagnostic.</p>
+
+<h2>Setting Up Diagnostics</h2>
+<p>If you have sufficient rights (Diagnostic Creator or Group/Full Admin), click the "Add New Diagnostic" button to set up
+a new diagnostic.  Diagnostics are linked with assessments in a course, so you should first
+create a course and add your diagnostic assessments to that course.</p>
+
+<p>On the first page, you will be asked for:
+<ul>
+ <li>Diagnostic name: the name of your diagnostic to display to students on the login page</li>
+ <li>Term designator: Can be changed each term for ongoing assessments to keep track of which term an assessment was taken in.  
+   Also will create a unique record for each term+student, so same student ID could take the assessment again in the different term.  As a consequence, if you
+   choose to "Use Day" as the designator, than a student would not be able to continue a diagnostic the next day; they'd start over under a new
+   unique receord.</li>
+ <li>Linked with course:  What course contains your diagnostic assessments.  You must be listed as a teacher for the course</li>
+ <li>Available:  Whether students can take the diagnostic</li>
+ <li>Public:  Whether the diagnostic should be listed on the main Diagnostics list page.  If set to no,
+     students will have to be provided with the direct link to the diagnostic.</li>
+ <li>Allow Reentry:  Whether students should be forced to complete the diagnostic in one sitting, or whether you'll allow them
+     to reaccess the test at a later time.  If Yes, you can set a testing window that limits the number of minutes after first accessing
+     the diagnostic they can reenter the diagnostic.  This is convenient in case a student accidently exits the assessment or there is an internet
+     issue.</li>
+ <li>Unique ID prompt:  How you want to word the prompt for a unique user id.  A student ID number, phone number, or email address could work.</li>
+ <li>ID entry format &amp; number of characters:  Lets you specify the format of the unique ID, so ensure valid IDs</li>
+ <li>Allow access IP addresses:  IP addressed for which the diagnostic can be taken without a password.  If you want to
+     allow access from anywhere, enter "*".  You can use "*" for a wildcard as well, e.g. 123.45.* to allow any IP beginning
+     with 123.45.  If you are only going to use password access, leave this part blank.</li>
+ <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.  Passwords are not case sensitive.  These
+     passwords could be shared directly with a room full of testers (then removed later), or used by proctors to sign students into the diagnostic.</li>
+ <li>Super passwords:  These passwords will override the "allow reentry" time limit, if you specified one earlier.  These passwords would be intended 
+     for use by instructors or proctors, and generally would not be shared directly with students.</li>
+ <li>First level selector name:  Students will be asked to select two items from pull-down lists, with the values in the second
+     depending upon the values in the first.  The choice in the first list also dictates which assessment is delivered.  For
+     selector name, specify what this selection should be called, filling in the blank "Please enter your ______".  In many cases
+     the two selectors will be Course and Instructor, or Course and Section</li>
+ <li>First level selector options:  Add options for the first level selector.</li>
+</ul>
+For a placement-type test, the first level selector might be "course you want to place into" and the second level selector
+might be some demographic info like "when was the last math class you took?"</p>
+<p>
+On the second page, you will be asked for:
+<ul>
+ <li>Second level selector name:  Secondary selection, with values depending upon the first-level selector choice.  Fill in the blank
+	"Enter your _________".  Second level selectors will be become the student's section identifier in the course, allowing you to
+	use the tutor system with diagnostics.  If you are running a multi-instructor diagnostic, using instructor names as the second
+	level selector is appropriate.</li>
+ <li>Deliver assessment:  For each first-level selector, specify which assessment should be delivered if the student
+     selects that option.  You have the option to "force regen on reentry", which, if reentry is allowed, will on reentry delete the student's 
+     previous attempt and generate a new version of the diagnostic.</li>
+ <li>Second level selector options:  For each first-level selector, specify the options for the second level selector.  There is a checkbox
+     that will enable automatic alphabetization of the selectors after submitting.  If your second-level selector list will be the same for
+     every first-level selector, you can save time by clicking the "Use these second-level selectors for all first-level selectors?" option.</li>
+</ul>
+<p>You must submit both pages before any changes are saved.  After submitting the second page, you will be provided with the 
+direct access link to the diagnostic, which you can provide to students or use to create a link from another website.  </p>
+
+<p>In courses for which a diagnostic has been set up, the gradebook will display differently, showing the student unique ID, 
+the term, and the first and second selector values in addition to the students' names and scores</p>
+
+<p>If you are doing a mass-testing situation, don't want proctors to have to enter passwords, and don't want to annouce a mass password for
+everyone to use, you can use the "One Time Passwords" link on the Admin page to generate a list of one-time-use passwords that can be
+distributed individually to students.</p>
+
+<hr/><p>&copy; 2009 David Lippman</p>
+</body>
+</html>
+
+

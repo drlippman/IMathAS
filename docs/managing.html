@@ -1,0 +1,137 @@
+<html>
+<head>
+<title>Managing Questions and Libraries in IMathAS</title>
+
+<script src="../javascript/ASCIIMathML.js" type="text/javascript"></script>
+<script src="../javascript/ASCIIsvg.js" type="text/javascript"></script>
+<script src="../course/editor/plugins/AsciiSvg/ASCIIsvgAddon.js" type="text/javascript"></script>
+<link rel="stylesheet" href="docs.css" type="text/css">
+</head>
+<body>
+<div class=title>
+<h1>Managing Questions and Libraries in IMathAS</h1>
+</div>
+
+<h2>Purpose of this document</h2>
+<p>This document will guide you through managing questions and libraries in IMathAS.  
+These tasks are commonly done when you are writing new questions or recategorizing
+existing questions.  This is not a comprehensive
+guide; please refer to the <a href="../help.html">help file</a> for more
+detailed information.</p>
+
+<h2>Managing Libraries</h2>
+<p>The question libraries categorize questions on the IMathAS system.  Having a
+clear library structure makes it easier for instructors to find the questions they
+need when writing assessments</p>
+
+<p>On busy systems with many instructors who write questions, it is advisable for each
+instructor to create a Private "scratch" library in which they can create and test questions before
+making them available by assignment into public libraries</p>
+
+<p>Additionally, an instructor might find it useful to create a library for each of their classes, and
+assign to those libraries the questions they feel might be useful in assessments</p>
+
+<h4>Accessing Library Management</h4>
+<p>Click on the "Manage Libraries" link in the grey control box on the course page.  The
+entire library structure will be displayed</p>
+
+<h4>Adding Libraries</h4>
+<p>You can add a library by clicking the "Add New Library" button.  Enter a name for the library.  Then
+select the library Rights.  There are six levels of library rights:</p>
+<ul>
+<li>Private: Only the library owner can access the library.  It is not displayed on other instructor's
+    library lists.</li>
+<li>Closed to group, private to others: Anyone from the owner's group can view and access the library, but only the owner can
+    add new questions.  The library is hidden from instructors outside the owner's group.</li>
+<li>Open to group, private to others:  Anyone from the owner's group can view, access, or add new questions to the library.
+     The library is hidden from instructors outside the owner's group.</li>
+<li>Closed to all: Anyone can view and access the library, but only the owner can add new questions to the library</li>
+<li>Open to group, closed to others: Anyone from the owner's group can view, access, or add new questions to the library.
+    Anyone from outside the owner's group can view and access the library, but can not add new questions to the library.</li>
+<li>Open to all:  Anyone can view, access, or add new questions to the library</li>
+</ul>
+<p>Library rights are also influenced by child libraries.  For example, if a child library has Open rights and the parent
+is set as Private, the parent library will still be displayed so that users can access the child library.</p>
+
+<p>Depending upon the system configuration, you may be limited to creating libraries that are private
+to others outside their group.  If this is the case, a you will need to contact your Group Administrator to create a library
+that is closed or open to all.</p>
+
+<p>After selecting Rights, select the Parent library.  Click the "Select Library" button to pop up a list of libraries. 
+Only parent libraries and empty libraries can act as parents.  The new library will be created as a child library inside 
+the selected parent library (like a subdirectory in your computer file system)</p>
+
+<h4>Modifying Libraries</h4>
+<p>To change a library's name, its rights, or its parent, click the "Modify" link next to the library's name.  If you
+move a library with children, the children will remain inside the parent after it is moved.</p>
+
+<p>You can change the parent of several libraries at once by clicking the checkboxes next the libraries' names and clicking the
+"Change Parent" button near the top of the page</p>
+
+<h4>Deleting Libraries</h4>
+<p>You can delete a library by clicking the "Delete" link next the library's name, or by selecting the checkboxes next to
+several libraries and clicking the "Delete" button near the top of the page.  When you delete a library, you will be
+given the option to delete the contained questions, or move them to the unassigned library.  A couple notes:</p>
+<ul>
+<li>A library with children cannot be deleted until the children libraries are deleted</li>
+<li>If a question is contained in more than one library, deleting the library will never delete the question.</li>
+</ul>
+
+<h4>Transferring Libraries</h4>
+<p>If you are the owner of a library and want to transfer that ownership to another user, you can do so by clicking the "Transfer" 
+link next the library's name, or by selecting the checkboxes next to several libraries and clicking the "Transfer"
+button near the top of the page.</p>
+
+<h2>Managing Questions</h2>
+<p>The Question Set contains the actual IMathAS questions.  The Question Set Manager allows you to
+browse the question set, add new questions, reassign questions to libraries, and make other changes.</p>
+
+<h4>Browsing the Question Set</h4>
+<p>Begin a search by clicking the "Select Libraries" button.  You can select one or more libraries to view
+at a time.  The contents of the library will not actually be displayed until you click the "Search" button.  You
+can optionally add a search term in the search box to limit the questions displayed.  Currently the search box can
+only handle single word search terms</p>
+
+<p>In addition to the question description, the question type, how many assessments the question is current being used in,
+and the ownership of the question is displayed.  You can click any of the column headers to sort the table by that value</p> 
+
+<h4>Previewing Questions</h4>
+<p>Click the "Preview" button next to the question's description to pop up a window allowing you to preview and test
+out the question</p>
+
+<h4>Adding Questions</h4>
+<p>To start a new question from scratch, click the "Add New Question" button.  By default, the question will be
+assigned to the libraries you are currently viewing, but you can the assignment in the question writing form</p>
+
+<p>To create a new question based on an existing question, click the "Template" button next the question's description.
+This will create a new question, leaving the original untouched, copying the code from the original</p>
+
+<h4>Modifying/Viewing Questions</h4>
+<p>Click the "Modify" link next to a question's description to modify its code.  If you see a "View" link instead of a "Modify" link, 
+then the question owner has not given permissions that allow you to modify the question.  You can view the question's code
+by clicking the "View" link.</p>
+
+<p>The "Modify / View" link also allows you to change a question's library assignment.  Click "Modify" or "View", then change the
+"My Library Assignments:" selection.  Note that library assignments can be made by anyone, but only the person who made the assignment
+can remove the question from that library.</p>
+
+<h4>Assigning Libraries</h4>
+<p>As mentioned above, you can change a question's library assignment by clicking the "Modify" or "View" link.</p>
+
+<p>Alternatively, click the checkbox
+next to the question(s) description, and click the "Library Assignment" button near the top of the page.  Select the
+library/libraries you wish to assign the question to.  You can deselect libraries to remove the
+questions from existing library assignments you've made.</p>
+
+<h4>Deleting a Question</h4>
+<p>You can delete a question by clicking the "Delete" link next the question's name, or by selecting the checkboxes next to
+several questions and clicking the "Delete" button near the top of the page.</p> 
+
+<h4>Transferring Ownership</h4>
+<p>If you are the owner of a question and want to transfer that ownership to another user, you can do so by clicking the "Transfer" 
+link next the question's name, or by selecting the checkboxes next to several questions and clicking the "Transfer"
+button near the top of the page.</p>
+
+<hr/><p>&copy; 2006 David Lippman<br/>This guide was written with development grant support from the WA State Distance Learning Council</p>
+</body>
+</html>
