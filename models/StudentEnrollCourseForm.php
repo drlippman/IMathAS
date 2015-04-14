@@ -1,7 +1,9 @@
 <?php
 
 namespace app\models;
+
 use yii\base\Model;
+
 class studentEnrollCourseForm extends Model
 {
     public $courseId;
@@ -9,6 +11,9 @@ class studentEnrollCourseForm extends Model
 
     public function rules()
     {
+        return [
+            [['courseId', 'enrollmentKey'], 'required'],
+        ];
 
     }
 
@@ -16,9 +21,8 @@ class studentEnrollCourseForm extends Model
     {
         return
             [
-                'courseId'=>'Course ID',
-                'enrollmentKey'=>'Enrollment Key',
-
+                'courseId' => 'Course ID',
+                'enrollmentKey' => 'Enrollment Key',
             ];
     }
 

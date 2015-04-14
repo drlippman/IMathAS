@@ -20,7 +20,15 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
     ];
+    public $jsOptions = array(
+        'position' => \yii\web\View::POS_HEAD
+    );
     public $js = [
+        'js/jquery.min.js',
+//        'js/general.js?ver=012115',
+        '../mathjax/MathJax.js?config=AM_HTMLorMML',
+        '../mathjax/config/AM_HTMLorMML.js?rev=2.5.0',
+        'js/mathgraphcheck.js?v=021215',
     ];
     public $depends = [
         'yii\web\YiiAsset',
