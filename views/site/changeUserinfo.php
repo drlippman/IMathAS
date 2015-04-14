@@ -19,6 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php echo Yii::$app->session->getFlash('error') ?>
         </div>
     <?php endif; ?>
+    <?php
+    $model->FirstName = isset($user['FirstName'])?$user['FirstName']:null;
+    $model->LastName = isset($user['LastName'])?$user['LastName']:null;
+    $model->email =isset($user['email'])?$user['email']:null;
+    ?>
 
     <fieldset>
         <legend>Profile Settings:</legend>
@@ -74,13 +79,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 } ?>
                 </select>
     </fieldset>
-    <?php ActiveForm::end(); ?>
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>
-
+    <?php ActiveForm::end(); ?>
 
 </div>

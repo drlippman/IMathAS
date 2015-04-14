@@ -11,4 +11,5 @@ class AdminController extends AppController
     {
         return $this->render('index');
     }
+
 }

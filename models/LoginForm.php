@@ -81,7 +81,6 @@ class LoginForm extends Model
     public function validateUser()
     {
         if ($this->_user === false) {
-
             $user = User::findUser($this->username);
             if($user)
             {

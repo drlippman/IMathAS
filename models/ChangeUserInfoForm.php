@@ -22,6 +22,7 @@ class ChangeUserInfoForm extends Model
 
     private $_user = false;
 
+
     /**
      * @return array the validation rules.
      */
@@ -29,7 +30,7 @@ class ChangeUserInfoForm extends Model
     {
         return [
 
-            ['rePassword', 'compare', 'compareAttribute'=>'password'],
+//            ['rePassword', 'compare', 'compareAttribute'=>'password'],
             [['FirstName', 'LastName'], 'string'],
             ['email','email'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
@@ -52,4 +53,5 @@ class ChangeUserInfoForm extends Model
             'homepage'=>'Show on home page',
         ];
     }
+
 }

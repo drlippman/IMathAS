@@ -75,4 +75,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return $this->authKey === $authKey;
     }
+
+    public static function saveUserRecord($params)
+    {
+        require("../components/Password.php");
+        $password = isset($params['password'])?$params['password']:\Yii::$app->user->identity->password;
+        $params['password'] = password_hash($password, PASSWORD_DEFAULT);
+        $user = User::findByUsername(\Yii::$app->user->identity->SID);
+        $user->attributes = $params;
+        $user->save();
+    }
 }

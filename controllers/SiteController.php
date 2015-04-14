@@ -4,8 +4,12 @@ namespace app\controllers;
 
 use app\components\AppConstant;
 use app\models\_base\BaseImasSessions;
+use app\models\ChangeUserInfoForm;
+use app\models\CourseSettingForm;
+use app\models\DiagnosticForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
+use app\models\studentEnrollCourseForm;
 use app\models\StudentRegisterForm;
 use app\models\User;
 use Yii;
@@ -15,9 +19,7 @@ use yii\filters\VerbFilter;
 use app\models\ContactForm;
 use app\components\AppUtility;
 use app\models\ChangePasswordForm;
-use app\models\ChangeUserInfoForm;
 use app\models\MessageForm;
-use app\models\StudentEnrollCourseForm;
 
 class SiteController extends AppController
 {
@@ -74,9 +76,7 @@ class SiteController extends AppController
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-
             if (AppUtility::isOldSiteSupported()) {
-                AppUtility::dump('if');
                 //Set session data
                 ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
                 ini_set('auto_detect_line_endings', true);
@@ -192,8 +192,6 @@ class SiteController extends AppController
     {
         $user = Yii::$app->user->identity;
         if ($user) {
-            Yii::$app->homeUrl = Yii::$app->homeUrl.'site/dashboard';
-//            AppUtility::dump(Yii::$app->homeUrl);
             if ($user->rights === 100)
                 return $this->render('adminDashboard', ['user' => $user]);
             elseif ($user->rights === 5)
@@ -218,15 +216,46 @@ class SiteController extends AppController
         }
        return $this->redirect('login');
     }
+//    public function actionChangeUserInfo()
+//    {
+//        $user = Yii::$app->user->identity;
+//        $model = new changeUserInfoForm();
+//        if($model->load(Yii::$app->request->post()))
+//        {
+//            $params = Yii::$app->request->getBodyParams();
+//            $params = $params['changeUserInfoForm'];
+//            $params['password'] = isset($params['changeUserInfoForm']['password'])?$params['changeUserInfoForm']['password']:Yii::$app->user->identity->password;
+//            User::saveUserRecord($params);
+//        }
+//        return $this->render('changeuserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null]);
+//    }
+    public function actionCourseSetting()
+    {
+        $model = new CourseSettingForm();
+        return $this->render('courseSetting',['model'=>$model]);
+    }
+    public function actionDiagnostic()
+    {
+        $model = new DiagnosticForm();
+        return $this->render('diagnostic',['model'=>$model]);
+    }
 
 
     public function actionChangeUserInfo()
     {
         if( Yii::$app->user->identity)
         {
-            $model = new ChangeUserInfoForm();
             $tzname = "Asia/Kolkata";
-            return $this->render('changeUserinfo', ['model' => $model, 'tzname' => $tzname]);
+
+            $user = Yii::$app->user->identity;
+            $model = new ChangeUserInfoForm();
+            if($model->load(Yii::$app->request->post()))
+            {
+                $params = Yii::$app->request->getBodyParams();
+                $params = $params['ChangeUserInfoForm'];
+                User::saveUserRecord($params);
+            }
+            return $this->render('changeUserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null,'tzname' => $tzname]);
         }
         return $this->redirect('login');
     }

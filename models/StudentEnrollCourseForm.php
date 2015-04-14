@@ -9,13 +9,13 @@ class studentEnrollCourseForm extends Model
     public $courseId;
     public $enrollmentKey;
 
-    public function rules()
+   /* public function rules()
     {
         return [
             [['courseId', 'enrollmentKey'], 'required'],
         ];
 
-    }
+    }*/
 
     public function attributeLabels()
     {
