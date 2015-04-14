@@ -5,8 +5,6 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Enroll In Course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="/open-math/web/css/imascore.css?ver=030415" type="text/css"/>
-<link rel="stylesheet" href="/open-math/web/css/default.css?v=121713" type="text/css"/>
 <div class="site-login">
 
     <?php if (Yii::$app->session->hasFlash('error')): ?>

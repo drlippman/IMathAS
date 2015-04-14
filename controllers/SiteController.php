@@ -11,7 +11,7 @@ use app\models\ForgetPasswordForm;
 use app\models\ForgetUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
-use app\models\studentEnrollCourseForm;
+use app\models\StudentEnrollCourseForm;
 use app\models\StudentRegisterForm;
 use app\models\User;
 use Yii;
@@ -196,6 +196,11 @@ class SiteController extends AppController
     {
         $user = Yii::$app->user->identity;
         if ($user) {
+            $this->getView()->registerCssFile('../css/dashboard.css');
+            $this->getView()->registerJsFile('../js/dashboard.js');
+            $this->getView()->registerJsFile('../js/ASCIIsvg_min.js?ver=012314');
+            $this->getView()->registerJs('var usingASCIISvg = true;');
+            $this->getView()->registerJsFile('../js/tablesorter.js');
             if ($user->rights === AppConstant::ADMIN_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
             elseif ($user->rights === AppConstant::GUEST_RIGHT)

@@ -19,6 +19,9 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        '/css/imascore.css?ver=030415',
+        'css/default.css?v=121713',
+        'css/handheld.css',
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD

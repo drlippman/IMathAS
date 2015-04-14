@@ -5,8 +5,6 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Messages';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="/open-math/web/css/imascore.css?ver=030415" type="text/css"/>
-<link rel="stylesheet" href="/open-math/web/css/default.css?v=121713" type="text/css"/>
 <div><a href="">Limit to Tagged</a> | <a href="">Sent Messages</a>
     | <?= Html::submitButton('picture', ['class' => 'class="col-lg-offset-1 col-lg-11"', 'name' => 'login-button']) ?>
 </div>
@@ -37,5 +35,4 @@ $this->params['breadcrumbs'][] = $this->title;
         </table>
         </div>
     </select>
-
 </p>
