@@ -113,6 +113,8 @@ class SiteController extends AppController
         } else {
             $challenge = base64_encode(microtime() . rand(0, 9999));
             $this->getView()->registerCssFile('../css/login.css');
+            $this->getView()->registerJsFile('../js/jstz_min.js');
+            $this->getView()->registerJsFile('../js/login.js');
             return $this->render('login', [
                 'model' => $model, 'challenge' => $challenge,
             ]);

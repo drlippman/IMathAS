@@ -51,6 +51,3 @@ $this->params['breadcrumbs'][] = $this->title;
     <p><a href="work-in-progress">Browser check</a></p>
 
 </div>
-
-<script type="text/javascript" src="../../web/js/jstz_min.js"></script>
-<script type="text/javascript" src="../../web/js/login.js"></script>
