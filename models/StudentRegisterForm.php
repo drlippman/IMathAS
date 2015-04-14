@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use app\components\AppUtility;
 use Yii;
 use yii\base\Model;
+
 class StudentRegisterForm extends Model
 {
     public $username;
@@ -13,7 +13,7 @@ class StudentRegisterForm extends Model
     public $password;
     public $rePassword;
     public $email;
-    public $NotifyMeByEmailWhenIReceiveANewMessage= true;
+    public $NotifyMeByEmailWhenIReceiveANewMessage = true;
     public $courseID;
     public $EnrollmentKey;
     public $isUserNameExist;
@@ -29,12 +29,13 @@ class StudentRegisterForm extends Model
     {
         return [
 
-            [['username', 'password','email'], 'required'],
-            ['username', 'match' ,'pattern'=>'/^[A-Za-z0-9_]+$/u','message'=> 'Username can contain only alphanumeric characters and hyphens(-).'],
-            ['rePassword', 'compare', 'compareAttribute'=>'password'],
+            [['username', 'password', 'email', 'FirstName', 'LastName'], 'required'],
+            ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens(-).'],
+            ['rePassword', 'compare', 'compareAttribute' => 'password'],
             [['FirstName', 'LastName'], 'string'],
-            ['email','email'],
+            ['email', 'email'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
+            /*[['NotifyMeByEmailWhenIReceiveANewMessage'],'requiredValue' => 1, 'message' => 'ghg'],*/
             [['courseID', 'EnrollmentKey'], 'string'],
         ];
 
@@ -47,21 +48,20 @@ class StudentRegisterForm extends Model
     {
         return [
             'SID' => 'Enter username',
-            'password' => 'Choose Password',
-            'rePassword'=>'confirm Password',
-            'FirstName' => 'FirstName',
-            'LastName' => 'LastName',
+            'password' => 'Choose password',
+            'rePassword' => 'Confirm password',
+            'FirstName' => 'First name',
+            'LastName' => 'Last name',
             'email' => 'Email',
-            'CourseId'=>'Course Id',
-            'EnrollmentKey'=>'Enrollment Key',
-            'NotifyMeByEmailWhenIReceiveANewMessage'=>'$Notify me by email when I receive a new message'
+            'CourseId' => 'Course Id',
+            'EnrollmentKey' => 'Enrollment Key',
+            'NotifyMeByEmailWhenIReceiveANewMessage' => 'Notify me by email when I receive a new message'
         ];
     }
 
     public static function Submit()
     {
-        $params =  Yii::$app->request->getBodyParams();
-//        AppUtility::dump($params);
+        $params = $_POST;
         require("../components/password.php");
         $params = $params['StudentRegisterForm'];
         $params['SID'] = $params['username'];

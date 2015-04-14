@@ -36,11 +36,14 @@ AppAsset::register($this);
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
-                    ['label' => 'Home', 'url' => ['/site/index']],
-                    ['label' => 'About', 'url' => ['/site/about']],
+                    Yii::$app->user->isGuest ?
+                    ['label' => 'Home', 'url' => ['/site/index']]:
+                        ['label' => 'Home', 'url' => ['/site/dashboard']],
+                    Yii::$app->user->isGuest ?
+                    ['label' => 'About', 'url' => ['/site/about']]:'',
                     Yii::$app->user->isGuest ?
                         ['label' => 'Login', 'url' => ['/site/login']] :
-                        ['label' => 'Logout (' . Yii::$app->user->identity->SID . ')',
+                        ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
                             'url' => ['/site/logout'],
                             'linkOptions' => ['data-method' => 'post']],
                 ],
@@ -59,7 +62,7 @@ AppAsset::register($this);
     <footer class="footer">
         <div class="container">
             <p class="pull-left">&copy; IMathAS <?= date('Y') ?></p>
-            <p class="pull-right">powered by <a href="http://www.imathas.com">IMathAS</a> &copy; 2006-2013 David Lippman</p>
+            <p class="pull-right">Powered by <a href="#">IMathAS</a> &copy; 2006-2015 | David Lippman</p>
         </div>
     </footer>
 

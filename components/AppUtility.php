@@ -8,13 +8,22 @@ use yii\base\Component;
 
 class AppUtility extends Component {
 
-	public static function dump($data){
+    /**
+     * Function to print data and exit the process.
+     * It prints the data value which is passed as argument.
+     * @param $data
+     */
+    public static function dump($data){
 		echo "<pre>";
 		print_r($data);
 		echo "</pre>";
 		die;
 	}
 
+    /**
+     * This is utility function to generate random string.
+     * @return string
+     */
     public static function generateRandomString() {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $pass = '';

@@ -17,27 +17,13 @@
 <div class=mainbody>
     <div class="headerwrapper"></div>
     <div class="midwrapper">
-        <div class="floatright" id="homelinkbox"><a href="work-in-progress">Change User Info</a> |
-            <a href="work-in-progress">Change Password</a> |
-            <a href="work-in-progress">Messages</a> | <a href="work-in-progress">Documentation</a>
-        </div>
-        <div class="pagetitle" id="headerhome"><h2>Welcome to IMathAS, admin admin123</h2><span class="red"></span>
+        <?php echo $this->render('_fullMenu'); ?>
+        <div class="pagetitle" id="headerhome"><h2>Welcome to
+                IMathAS, <?php print_r(ucfirst($user->FirstName) . ' ' . ucfirst($user->LastName)); ?><span class="red"></span>
         </div>
         <div id="homefullwidth">
-            <div class="block"><h3>Courses you're teaching</h3></div>
-            <div class="blockitems">
-                <ul class="nomark courselist">
-
-                </ul>
-                <div class="center"><a class="btn btn-primary" href="/open-math/web/admin/index">Admin Page</a></div>
-            </div>
-            <div class="block"><h3>Courses you're taking</h3></div>
-            <div class="blockitems">
-                <ul class="nomark courselist"></ul>
-                <div class="center"><a class="btn btn-primary" href="work-in-progress">Enroll in a New Class</a><br><a
-                        id="unhidelink" style="display:none" class="small" href="admin/unhidefromcourselist.php">Unhide
-                        hidden courses</a></div>
-            </div>
+            <?php echo $this->render('_adminCourseTeaching'); ?>
+            <?php echo $this->render('_courseTaking'); ?>
         </div>
         <div class="clear"></div>
     </div>

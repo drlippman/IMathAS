@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-min-width', 'name' => 'login-button']) ?>
         </div>
     </div>
 
@@ -52,45 +52,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </div>
 
-<script type="text/javascript">var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;</script>
-<script type="text/javascript" src="../../mathjax/MathJax.js?config=AM_HTMLorMML"></script>
-<script type="text/javascript">
-    var thedate = new Date();
-    document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
-//    var tz = jstz.determine();
-    console.log('hi');
-//    console.log(tz.name());
-//    document.getElementById("tzname").value = tz.name();
-
-    function updateloginarea() {
-        setnode = document.getElementById("settings");
-        var html = "";
-        html += '<div style="margin-top: 0px; margin-bottom: 10px; margin-right:0px;text-align:left;padding:0px">Accessibility: <select name="access"><option value="0">Use defaults</option>';
-        html += '<option value="3">Force image-based display</option>';
-        html += '<option value="1">Use text-based display</option></select> ';
-        html += "<a href='#' onClick=\"window.open('/open-math/web/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\">Help</a> </div>";
-
-  //      if (!MathJaxCompatible) {
-     //       html += '<input type=hidden name="mathdisp" value="0">';
-   //     } else {
-            html += '<input type=hidden name="mathdisp" value="1">';
-//        }
-        if (ASnoSVG) {
-            html += '<input type=hidden name="graphdisp" value="2">';
-        } else {
-            html += '<input type=hidden name="graphdisp" value="1">';
-        }
- //       if (MathJaxCompatible && !ASnoSVG) {
-            html += '<input type=hidden name="isok" value=1>';
- //       }
-   //     html += '<div class=textright><input type="submit" value="Login"></div>';
-        setnode.innerHTML = html;
-    //    document.getElementById("username").focus();
-    }
-    var existingonload = window.onload;
-    if (existingonload) {
-        window.onload = function() {existingonload(); updateloginarea();}
-    } else {
-        window.onload = updateloginarea;
-    }
-</script>
+<script type="text/javascript" src="../../web/js/jstz_min.js"></script>
+<script type="text/javascript" src="../../web/js/login.js"></script>

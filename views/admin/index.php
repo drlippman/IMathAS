@@ -44,9 +44,6 @@ $this->title = 'OpenMath';
         <div class=breadcrumb><a href="/IMathAS/index.php">Home</a> &gt; Admin
         </div>
         <div id="headeradmin" class="pagetitle"><h2>IMathAS Administration</h2></div>
-        <b>Hello admin</b>
-
-
         <h3>Courses</h3>
 
         <div class=item>

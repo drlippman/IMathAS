@@ -4,7 +4,7 @@ if (!window.jQuery) {
 
 var imasroot = '/IMathAS'; var cid = 0;
 
-initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
+// initSortTable('myTable',Array('S','S','S','S',false,false,false),true);
 
 var usingASCIISvg = true;
 

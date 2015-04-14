@@ -5,13 +5,13 @@ use yii\bootstrap\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\RegisterModel */
 
-$this->title = 'New User SignUp';
+$this->title = 'New Use Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to SignUp:</p>
+    <p>Please fill out the following fields to signUp:</p>
 
     <?php if (Yii::$app->session->hasFlash('error')): ?>
         <div class="alert alert-danger">

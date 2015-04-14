@@ -14,8 +14,12 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\ContactForm;
 use app\components\AppUtility;
+use app\models\ChangePasswordForm;
+use app\models\ChangeUserInfoForm;
+use app\models\MessageForm;
+use app\models\StudentEnrollCourseForm;
 
-class SiteController extends Controller
+class SiteController extends AppController
 {
     public function behaviors()
     {
@@ -55,7 +59,11 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        if(Yii::$app->user->isGuest)
+            return $this->render('index');
+        else
+            $this->redirect('site/dashboard');
+
     }
 
     public function actionLogin()
@@ -67,11 +75,11 @@ class SiteController extends Controller
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
 
-            if(AppUtility::isOldSiteSupported())
-            {
+            if (AppUtility::isOldSiteSupported()) {
+                AppUtility::dump('if');
                 //Set session data
-                ini_set('session.gc_maxlifetime',AppConstant::MAX_SESSION_TIME);
-                ini_set('auto_detect_line_endings',true);
+                ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
+                ini_set('auto_detect_line_endings', true);
                 $sessionid = session_id();
 
                 $session_data['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -84,7 +92,7 @@ class SiteController extends Controller
                 $enc = base64_encode(serialize($session_data));
 
                 $session = new BaseImasSessions();
-                if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
+                if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
                     //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
 
                 } else {
@@ -97,13 +105,12 @@ class SiteController extends Controller
                     $session->sessiondata = $enc;
                 }
                 $session->save();
-               return Yii::$app->getResponse()->redirect('http://localhost/IMathAS');
+                return Yii::$app->getResponse()->redirect(Yii::$app->homeUrl.'IMathAS');
             }
             $this->redirect('dashboard');
         } else {
-            $challenge = base64_encode(microtime() . rand(0,9999));
-            $this->getView()->registerJsFile('../../mathjax/MathJax.js');
-            $this->getView()->registerJsFile('../js/jstz_min.js');
+            $challenge = base64_encode(microtime() . rand(0, 9999));
+            $this->getView()->registerCssFile('../css/login.css');
             return $this->render('login', [
                 'model' => $model, 'challenge' => $challenge,
             ]);
@@ -113,7 +120,6 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 
@@ -147,37 +153,30 @@ class SiteController extends Controller
     public function actionRegistration()
     {
         $model = new RegistrationForm();
-        if($model->load(Yii::$app->request->post()))
-        {
-            $params =$_REQUEST;
-            $user= new User();
-
-            $password = $params['RegistrationForm']['password'];
-
+        if ($model->load(Yii::$app->request->post())) {
             require("../components/password.php");
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $params = Yii::$app->request->getBodyParams();
+            $params = $params['RegistrationForm'];
+            $params['SID'] = $params['username'];
+            $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
+            $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
 
-            $user->FirstName= $params['RegistrationForm']['FirstName'];
-            $user->LastName= $params['RegistrationForm']['LastName'];
-            $user->email= $params['RegistrationForm']['email'];
-            $user->SID= $params['RegistrationForm']['username'];
-            $user->password= $password_hash;
-            $user->hideonpostswidget = AppConstant::ZERO_VALUE;
+            $user = new User();
+            $user->attributes = $params;
             $user->save();
         }
-        return $this->render('registration',[
-            'model'=> $model,
+        return $this->render('registration', [
+            'model' => $model,
         ]);
     }
 
     public function actionStudentRegister()
     {
         $model = new StudentRegisterForm();
-        if ($model->load(Yii::$app->request->post()))
-        {
+        if ($model->load(Yii::$app->request->post())) {
             StudentRegisterForm::Submit();
         }
-        return $this->render('studentRegister',['model'=> $model,]);
+        return $this->render('studentRegister', ['model' => $model,]);
     }
 
     /**
@@ -191,12 +190,64 @@ class SiteController extends Controller
 
     public function actionDashboard()
     {
-        return $this->render('adminDashboard');
-    }
-    public function actionStudentEnrollCourse()
-    {
-        $model = new studentEnrollCourseForm();
-        return $this->render('studentEnrollCourse',['model'=> $model,]);
+        $user = Yii::$app->user->identity;
+        if ($user) {
+            Yii::$app->homeUrl = Yii::$app->homeUrl.'site/dashboard';
+//            AppUtility::dump(Yii::$app->homeUrl);
+            if ($user->rights === 100)
+                return $this->render('adminDashboard', ['user' => $user]);
+            elseif ($user->rights === 5)
+                return $this->render('adminDashboard', ['user' => $user]);
+            elseif ($user->rights === 10)
+                return $this->render('studentDashboard', ['user' => $user]);
+            elseif ($user->rights === 20)
+                return $this->render('instructorDashboard', ['user' => $user]);
+            elseif ($user->rights === 75)
+                return $this->render('adminDashboard', ['user' => $user]);
+        }
+        Yii::$app->session->setFlash('error', AppConstant::LOGIN_FIRST);
+        return $this->redirect('login');
     }
 
+    public function actionChangePassword()
+    {
+        if( Yii::$app->user->identity)
+        {
+            $model = new ChangePasswordForm();
+            return $this->render('changePassword', ['model' => $model,]);
+        }
+       return $this->redirect('login');
+    }
+
+
+    public function actionChangeUserInfo()
+    {
+        if( Yii::$app->user->identity)
+        {
+            $model = new ChangeUserInfoForm();
+            $tzname = "Asia/Kolkata";
+            return $this->render('changeUserinfo', ['model' => $model, 'tzname' => $tzname]);
+        }
+        return $this->redirect('login');
+    }
+
+    public function actionMessages()
+    {
+        if( Yii::$app->user->identity)
+        {
+            $model = new MessageForm();
+            return $this->render('messages', ['model' => $model,]);
+        }
+       return $this->redirect('login');
+    }
+
+    public function actionStudentEnrollCourse()
+    {
+        if( Yii::$app->user->identity)
+        {
+            $model = new StudentEnrollCourseForm();
+            return $this->render('studentEnrollCourse', ['model' => $model,]);
+        }
+        return $this->redirect('login');
+    }
 }

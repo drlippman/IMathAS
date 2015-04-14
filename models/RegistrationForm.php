@@ -66,15 +66,7 @@ class RegistrationForm extends Model
             [['phoneno'], 'string','max'=> 10,'min'=> 10],
             [['confirmPassword'],'compare','compareAttribute'=>'password'],
             ['terms','boolean']
-
-
-
-
         ];
-       /* return array(
-            'attributes'=>'SID',
-            'errorMessage'=>'User already exist'
-        );*/
     }
 
 

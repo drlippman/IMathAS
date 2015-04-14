@@ -114,3 +114,14 @@ a.desc:after {
     color: #FFF;
     background-color: rgba(0, 0, 0, 0);
 }
+
+.btn-min-width{
+    width: 100px;
+}
+.help-block-error{
+    color:#FF0000;
+}
+.gb{
+ width: 100% !important;
+ margin-bottom: 10px !important;
+}

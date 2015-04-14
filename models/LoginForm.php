@@ -26,9 +26,6 @@ class LoginForm extends Model
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
-            // rememberMe must be a boolean value
-            ['rememberMe', 'boolean'],
-            // password is validated by validatePassword()
             [['username', 'password'], 'validateLogin'],
         ];
     }
@@ -43,8 +40,7 @@ class LoginForm extends Model
     public function validateLogin($attribute, $params)
     {
         if (!$this->hasErrors()) {
-            $user = $this->validateUser();
-            if (!$user) {
+            if (!$this->validateUser()) {
                 $this->addError('', AppConstant::INVALID_USERNAME_PASSWORD);
             }
         }
@@ -71,25 +67,31 @@ class LoginForm extends Model
      */
     public function getUser()
     {
-        if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
-        }
-        return $this->_user;
+        $this->_user = User::findByUsername($this->username);
+        if($this->_user)
+            return $this->_user;
+
+        return false;
     }
 
+    /**
+     * @return bool|null|static
+     * Checks user's authentication by username and password.
+     */
     public function validateUser()
     {
         if ($this->_user === false) {
 
-            $this->_user = User::findUser($this->username);
-            if($this->_user)
+            $user = User::findUser($this->username);
+            if($user)
             {
-                require("../components/password.php");
+                require("../components/Password.php");
+                if(password_verify($this->password, $user->password))
+                {
+                    $this->_user = $user;
+                }
             }
         }
-        if(password_verify($this->password, $this->_user->password))
-            return $this->_user;
-
-        return false;
+        return $this->_user;
     }
 }
