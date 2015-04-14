@@ -3,6 +3,7 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+// 2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of just equations for for all inequalities strings.
 // 2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
 //            to the maximization problem.
 // 2015-03-18 Fixed bub in simplexfindpivotpoint - did not look at all non-basic rows for multiple solutions.
@@ -581,16 +582,16 @@ function simplexcreateinequalities() {
   
    // objectivevariable
   if(is_null($args[1])) {
-    echo "Supplied object variable was null which is not valid.  Valid values are any function name.<br/>\r\n";
-    return $simplexestring;
+    //echo "Supplied object variable was null which is not valid.  Valid values are any function name.<br/>\r\n";
+    //return $simplexestring;
+    $objectivevariable = "";
   } 
   else { 
-    $objectivevariable = $args[1]; 
-    
-    if($objectivevariable=="") {
-      if($type=="max") { $objectivevariable= "f"; } else { $objectivevariable= "g"; }
-      echo "Objective function name must not be blank. Using $objectivevariable.<br/>\r\n";
-    }
+    $objectivevariable = $args[1];
+    //if($objectivevariable=="") {
+    //  if($type=="max") { $objectivevariable= "f"; } else { $objectivevariable= "g"; }
+    //  echo "Objective function name must not be blank. Using $objectivevariable.<br/>\r\n";
+    //}
   }
   
   // objective
@@ -660,14 +661,18 @@ function simplexcreateinequalities() {
     // Done processing arguments ---------------------------------------
     $simplexestring = array();
     $isfirst = true;
-    if($type=="max") { 
-      $simplexestring[0] = "Maximize "; 
+    if($objectivevariable=="") {
+      $simplexestring[0] = $tick; 
     } 
     else { 
-      $simplexestring[0] = "Minimize "; 
+      if($type=="max") { 
+        $simplexestring[0] = "Maximize "; 
+      } 
+      else { 
+        $simplexestring[0] = "Minimize "; 
+      }
+      $simplexestring[0] .= $tick.$objectivevariable." = ";
     }
-    $simplexestring[0] .= $tick.$objectivevariable." = ";
-  
   
   // objective
   for($j=0;$j<count($objective);$j++) {
@@ -705,7 +710,12 @@ function simplexcreateinequalities() {
       $simplexestring[0] .= $headers[$j];
     }
   }
-  $simplexestring[0] .= $tick." subject to";
+  if($objectivevariable=="") {
+    $simplexestring[0] .= $tick;
+  } 
+  else { 
+    $simplexestring[0] .= $tick." subject to";
+  }
   
   // now create the inequalities from the constraints
   for($r=0;$r<count($constraints);$r++) {
