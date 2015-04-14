@@ -85,4 +85,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user->attributes = $params;
         $user->save();
     }
+
+    public static function findByEmail($email)
+    {
+        $user = static::findOne(['email' => $email]);
+        return $user;
+    }
 }

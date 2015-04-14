@@ -26,8 +26,8 @@ class AppAsset extends AssetBundle
     public $js = [
         'js/jquery.min.js',
 //        'js/general.js?ver=012115',
-        '../mathjax/MathJax.js?config=AM_HTMLorMML',
-        '../mathjax/config/AM_HTMLorMML.js?rev=2.5.0',
+        'js/mathjax/MathJax.js?config=AM_HTMLorMML',
+        'js/mathjax/config/AM_HTMLorMML.js?rev=2.5.0',
         'js/mathgraphcheck.js?v=021215',
     ];
     public $depends = [

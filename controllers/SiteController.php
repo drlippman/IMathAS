@@ -7,6 +7,8 @@ use app\models\_base\BaseImasSessions;
 use app\models\ChangeUserInfoForm;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
+use app\models\ForgetPasswordForm;
+use app\models\ForgetUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
 use app\models\studentEnrollCourseForm;
@@ -192,15 +194,15 @@ class SiteController extends AppController
     {
         $user = Yii::$app->user->identity;
         if ($user) {
-            if ($user->rights === 100)
+            if ($user->rights === AppConstant::ADMIN_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
-            elseif ($user->rights === 5)
+            elseif ($user->rights === AppConstant::GUEST_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
-            elseif ($user->rights === 10)
+            elseif ($user->rights === AppConstant::STUDENT_RIGHT)
                 return $this->render('studentDashboard', ['user' => $user]);
-            elseif ($user->rights === 20)
+            elseif ($user->rights === AppConstant::TEACHER_RIGHT)
                 return $this->render('instructorDashboard', ['user' => $user]);
-            elseif ($user->rights === 75)
+            elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
         }
         Yii::$app->session->setFlash('error', AppConstant::LOGIN_FIRST);
@@ -212,23 +214,27 @@ class SiteController extends AppController
         if( Yii::$app->user->identity)
         {
             $model = new ChangePasswordForm();
-            return $this->render('changePassword', ['model' => $model,]);
+            if ($model->load(Yii::$app->request->post()))
+            {
+                $param = Yii::$app->request->getBodyParams();
+                $oldPass=$param['ChangePasswordForm']['oldPassword'];
+                $newPass=$param['ChangePasswordForm']['newPassword'];
+                require("../components/Password.php");
+                if(password_verify($oldPass,Yii::$app->user->identity->password))
+                {
+                    $user = User::findByUsername(Yii::$app->user->identity->SID);
+                    $password = password_hash($newPass, PASSWORD_DEFAULT);
+                    $user->password = $password;
+                    $user->save();
+                }
+                $this->redirect(array('site/dashboard'));
+
+            }
+            return $this->render('changePassword',['model' => $model]);
         }
        return $this->redirect('login');
     }
-//    public function actionChangeUserInfo()
-//    {
-//        $user = Yii::$app->user->identity;
-//        $model = new changeUserInfoForm();
-//        if($model->load(Yii::$app->request->post()))
-//        {
-//            $params = Yii::$app->request->getBodyParams();
-//            $params = $params['changeUserInfoForm'];
-//            $params['password'] = isset($params['changeUserInfoForm']['password'])?$params['changeUserInfoForm']['password']:Yii::$app->user->identity->password;
-//            User::saveUserRecord($params);
-//        }
-//        return $this->render('changeuserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null]);
-//    }
+
     public function actionCourseSetting()
     {
         $model = new CourseSettingForm();
@@ -278,5 +284,68 @@ class SiteController extends AppController
             return $this->render('studentEnrollCourse', ['model' => $model,]);
         }
         return $this->redirect('login');
+    }
+
+    public function actionForgetPassword()
+    {
+        $model = new ForgetPasswordForm();
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $param = Yii::$app->request->getBodyParams();
+            $username = $param['ForgetPasswordForm']['username'];
+
+            $user = User::findByUsername($username);
+            $code = AppUtility::generateRandomString();
+            $user->remoteaccess= $code;
+            $user->save();
+
+            $toEmail = $user->email;
+            $id = $user->id;
+
+            $message  = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
+            $message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
+            $message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
+            $message .= "will then be prompted to choose a new password.</p>";
+            $message .= "<a href=\"" .AppUtility::urlMode(). $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
+            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
+
+            $email = Yii::$app->mailer->compose();
+            $email->setTo($toEmail)
+                ->setSubject(AppConstant::FORGOT_PASS_MAIL_SUBJECT)
+                ->setHtmlBody($message)
+                ->send();
+        }
+
+        return $this->render('forgetPassword',['model'=> $model,]);
+    }
+
+    public function actionForgetUsername()
+    {
+        $model = new ForgetUsernameForm();
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $param = Yii::$app->request->getBodyParams();
+            $toEmail = $param['ForgetUsernameForm']['email'];
+
+            $user = User::findByEmail($toEmail);
+            if($user)
+            {
+                $message  = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>";
+                $message .= "<p>Your email was entered in the Username Lookup page on OpenMath.  If you did not do this, you may ignore and delete this message.  ";
+                $message .= "All usernames using this email address are listed below</p><p>";
+                $message .= "Username: <b>".$user->SID." </b> <br/>.";
+
+                $email = Yii::$app->mailer->compose();
+                $email->setTo($toEmail)
+                    ->setSubject(AppConstant::FORGOT_USER_MAIL_SUBJECT)
+                    ->setHtmlBody($message)
+                    ->send();
+            }
+            else
+            {
+                Yii::$app->session->setFlash('error', AppConstant::INVALID_EMAIL);
+            }
+        }
+        return $this->render('forgetUsername',['model'=> $model,]);
     }
 }

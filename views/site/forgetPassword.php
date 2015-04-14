@@ -2,12 +2,10 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Change Password';
+$this->title = 'Forget Password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <?php if (Yii::$app->session->hasFlash('error')): ?>
         <div class="alert alert-danger">
             <?php echo Yii::$app->session->getFlash('error') ?>
@@ -23,13 +21,12 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'oldPassword')->passwordInput() ?>
-    <?= $form->field($model, 'newPassword')->passwordInput() ?>
-    <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
+    <p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will reset your password.</p>
+    <?= $form->field($model, 'username') ?>
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'changepassword-button']) ?>
+            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'forgetpassword-button']) ?>
         </div>
     </div>
 

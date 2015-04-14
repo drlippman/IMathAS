@@ -11,22 +11,22 @@ class ChangePasswordForm extends Model
     public function rules()
     {
         return
-        [
-            [['oldPassword', 'newPassword'], 'required'],
-            ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword'],
-        ];
+            [
+                [['oldPassword','confirmPassword','newPassword'],'required'],
+                ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword'],
+            ];
 
     }
 
     public function attributeLabels()
     {
         return
-         [
-            'oldPassword' => 'Old Password',
-            'newPassword' => 'New Password',
-            'confirmPassword'=>'Confirm Password',
+            [
+                'oldPassword' => 'Old Password',
+                'newPassword' => 'New Password',
+                'confirmPassword'=>'Confirm Password',
 
-        ];
+            ];
     }
 
 }

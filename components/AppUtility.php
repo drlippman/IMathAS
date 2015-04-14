@@ -70,6 +70,17 @@ class AppUtility extends Component {
         }
     }
 
+    public static function urlMode()
+    {
+        $urlmode = '';
+        if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+            $urlmode = 'https://';
+        } else {
+            $urlmode = 'http://';
+        }
+        return $urlmode;
+    }
+
 }
 
 ?>
