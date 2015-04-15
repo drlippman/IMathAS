@@ -118,9 +118,13 @@ a.desc:after {
 .btn-min-width{
     width: 100px;
 }
-.help-block-error{
+.has-error .help-block, .has-error .control-label, .has-error .radio, .has-error .checkbox, .has-error .radio-inline, .has-error .checkbox-inline{
     color:#FF0000;
 }
+.has-error .form-control {
+border-color:#FF0000;
+}
+
 .gb{
  width: 100% !important;
  margin-bottom: 10px !important;
