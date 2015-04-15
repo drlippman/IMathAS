@@ -22,6 +22,7 @@ use app\models\ContactForm;
 use app\components\AppUtility;
 use app\models\ChangePasswordForm;
 use app\models\MessageForm;
+use yii\web\View;
 
 class SiteController extends AppController
 {
@@ -112,7 +113,7 @@ class SiteController extends AppController
             $this->redirect('dashboard');
         } else {
             $challenge = base64_encode(microtime() . rand(0, 9999));
-            $this->getView()->registerCssFile('../css/login.css');
+            $this->getView()->registerCssFile('../css/login.css'/*, View::POS_HEAD*/);
             $this->getView()->registerJsFile('../js/jstz_min.js');
             $this->getView()->registerJsFile('../js/login.js');
             return $this->render('login', [
@@ -212,7 +213,7 @@ class SiteController extends AppController
             elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
         }
-        Yii::$app->session->setFlash('error', AppConstant::LOGIN_FIRST);
+        Yii::$app->session->setFlash('danger', AppConstant::LOGIN_FIRST);
         return $this->redirect('login');
     }
 
@@ -227,15 +228,21 @@ class SiteController extends AppController
                 $oldPass=$param['ChangePasswordForm']['oldPassword'];
                 $newPass=$param['ChangePasswordForm']['newPassword'];
                 require("../components/Password.php");
-                if(password_verify($oldPass,Yii::$app->user->identity->password))
+                if(password_verify($oldPass, Yii::$app->user->identity->password))
                 {
                     $user = User::findByUsername(Yii::$app->user->identity->SID);
                     $password = password_hash($newPass, PASSWORD_DEFAULT);
                     $user->password = $password;
                     $user->save();
-                }
-                $this->redirect(array('site/dashboard'));
 
+                    Yii::$app->session->setFlash('success', 'Your password has been changed.');
+                    return $this->redirect('change-password');
+                }
+                else
+                {
+                    Yii::$app->session->setFlash('danger', 'Old password did nit match.');
+                    return $this->redirect('change-password');
+                }
             }
             return $this->render('changePassword',['model' => $model]);
         }
@@ -313,8 +320,8 @@ class SiteController extends AppController
             $message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
             $message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
             $message .= "will then be prompted to choose a new password.</p>";
-            $message .= "<a href=\"" .AppUtility::urlMode(). $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code\">";
-            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/actions.php?action=resetpw&id=$id&code=$code</a>\r\n";
+            $message .= "<a href=\"" .AppUtility::urlMode(). $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl ."site/reset-password?id=$id&code=$code\">";
+            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
 
             $email = Yii::$app->mailer->compose();
             $email->setTo($toEmail)

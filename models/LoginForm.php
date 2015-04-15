@@ -55,7 +55,7 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? AppConstant::REMEMBER_ME_TIME : AppConstant::ZERO_VALUE);
         } else {
-            Yii::$app->session->setFlash('error', AppConstant::INVALID_USERNAME_PASSWORD);
+            Yii::$app->session->setFlash('danger', AppConstant::INVALID_USERNAME_PASSWORD);
             return false;
         }
     }

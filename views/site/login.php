@@ -14,11 +14,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>Please fill out the following fields to login:</p>
 
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
+   <!-- <?php /*if (Yii::$app->session->hasFlash('error')): */?>
         <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
+            <?php /*echo Yii::$app->session->getFlash('error') */?>
         </div>
-    <?php endif; ?>
+    --><?php /*endif; */?>
+
+    <?= $this->render('_flashMessage')?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
