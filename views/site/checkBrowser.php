@@ -33,7 +33,7 @@
     <A HREF="http://www.mozilla.org/projects/mathml/fonts/">download Math fonts</a>.</p>
 
 <h3>Graph Display</h3>
-<embed src="<?php echo Yii::$app->homeUrl;?>/javascript/d.svg" width="200" height="200" script='setBorder(0);initPicture(-5,5,-5,5);axes(1,1,1,1,1);plot("x^2",-5,5);' />
+<embed src="<?php echo Yii::$app->homeUrl;?>js/d.svg" width="200" height="200" script='setBorder(0);initPicture(-5,5,-5,5);axes(1,1,1,1,1);plot("x^2",-5,5);' />
 <p>You should see a graph of `y=x^2` shown above.  If you do not see the graph and just see a box,
     you need to install SVG support.  If you're using Internet Explorer,
     <A HREF="http://www.adobe.com/svg/viewer/install/main.html">download Adobe SVG Viewer</a></p>
@@ -52,4 +52,4 @@
 </script>
 
 <h3>Is it working?</h3>
-When everything is working, <A href="index.php">Return to Login Page</a>
+When everything is working, <A href="<?php echo Yii::$app->homeUrl;?>">Return to Login Page</a>

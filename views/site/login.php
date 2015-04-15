@@ -14,12 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>Please fill out the following fields to login:</p>
 
-   <!-- <?php /*if (Yii::$app->session->hasFlash('error')): */?>
-        <div class="alert alert-danger">
-            <?php /*echo Yii::$app->session->getFlash('error') */?>
-        </div>
-    --><?php /*endif; */?>
-
     <?= $this->render('_flashMessage')?>
 
     <?php $form = ActiveForm::begin([
@@ -50,6 +44,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <p><a href="<?php echo Yii::$app->homeUrl?>site/student-register">Register as a new student</a></p>
     <p><a href="<?php echo Yii::$app->homeUrl?>site/forget-password">Forgot Password</a></p>
     <p><a href="<?php echo Yii::$app->homeUrl?>site/forget-username">Forgot Username</a></p>
-    <p><a href="work-in-progress">Browser check</a></p>
+    <p><a href="<?php echo Yii::$app->homeUrl?>site/check-browser">Browser check</a></p>
 
 </div>
