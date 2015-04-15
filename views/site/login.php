@@ -47,9 +47,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
-    <p><a href="work-in-progress">Register as a new student</a></p>
-    <p><a href="work-in-progress">Forgot Password</a></p>
-    <p><a href="work-in-progress">Forgot Username</a></p>
+    <p><a href="<?php echo Yii::$app->homeUrl?>site/student-register">Register as a new student</a></p>
+    <p><a href="<?php echo Yii::$app->homeUrl?>site/forget-password">Forgot Password</a></p>
+    <p><a href="<?php echo Yii::$app->homeUrl?>site/forget-username">Forgot Username</a></p>
     <p><a href="work-in-progress">Browser check</a></p>
 
 </div>

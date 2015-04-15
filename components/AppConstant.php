@@ -18,5 +18,6 @@ class AppConstant {
     const TEACHER_RIGHT = 20;
     const GUEST_RIGHT = 5;
     const GROUP_ADMIN_RIGHT = 75;
+    const INSTALL_NAME = 'OpenMath';
 
 }

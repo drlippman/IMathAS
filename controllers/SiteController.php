@@ -362,4 +362,10 @@ class SiteController extends AppController
         }
         return $this->render('forgetUsername',['model'=> $model,]);
     }
+
+    public function actionCheckBrowser()
+    {
+        return $this->render('checkBrowser');
+
+    }
 }
