@@ -14,11 +14,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="vcenter"><h1>Instructor Account Request</h1></div>
 
 <div class="registration col-lg-5">
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
+
+    <?= $this->render('_flashMessage')?>
 
     <?php $form = ActiveForm::begin(); ?>
 

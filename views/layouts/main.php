@@ -43,7 +43,7 @@ AppAsset::register($this);
                     ['label' => 'About', 'url' => ['/site/about']]:'',
                     Yii::$app->user->isGuest ?
                         ['label' => 'Login', 'url' => ['/site/login']] :
-                        ['label' => 'Logout (' . ucfirst(Yii::$app->session->get('user.identity')->FirstName) .' '.ucfirst(Yii::$app->session->get('user.identity')->LastName) .')',
+                        ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
                             'url' => ['/site/logout'],
                             'linkOptions' => ['data-method' => 'post']],
                 ],
