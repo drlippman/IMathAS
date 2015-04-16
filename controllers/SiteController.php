@@ -79,6 +79,7 @@ class SiteController extends AppController
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+//            AppUtility::dump(Yii::$app->session->get('user.identity'));
             if (AppUtility::isOldSiteSupported()) {
                 //Set session data
                 ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
@@ -195,7 +196,7 @@ class SiteController extends AppController
 
     public function actionDashboard()
     {
-        $user = Yii::$app->user->identity;
+        $user = Yii::$app->session->get('user.identity');
         if ($user) {
             $this->getView()->registerCssFile('../css/dashboard.css');
             $this->getView()->registerJsFile('../js/dashboard.js');
@@ -219,7 +220,7 @@ class SiteController extends AppController
 
     public function actionChangePassword()
     {
-        if( Yii::$app->user->identity)
+        if( Yii::$app->session->get('user.identity'))
         {
             $model = new ChangePasswordForm();
             if ($model->load(Yii::$app->request->post()))
@@ -228,9 +229,9 @@ class SiteController extends AppController
                 $oldPass=$param['ChangePasswordForm']['oldPassword'];
                 $newPass=$param['ChangePasswordForm']['newPassword'];
                 require("../components/Password.php");
-                if(password_verify($oldPass, Yii::$app->user->identity->password))
+                if(password_verify($oldPass, Yii::$app->session->get('user.identity')->password))
                 {
-                    $user = User::findByUsername(Yii::$app->user->identity->SID);
+                    $user = User::findByUsername(Yii::$app->session->get('user.identity')->SID);
                     $password = password_hash($newPass, PASSWORD_DEFAULT);
                     $user->password = $password;
                     $user->save();
@@ -263,11 +264,11 @@ class SiteController extends AppController
 
     public function actionChangeUserInfo()
     {
-        if( Yii::$app->user->identity)
+        if( Yii::$app->session->get('user.identity'))
         {
             $tzname = "Asia/Kolkata";
 
-            $user = Yii::$app->user->identity;
+            $user = Yii::$app->session->get('user.identity');
             $model = new ChangeUserInfoForm();
             if($model->load(Yii::$app->request->post()))
             {
@@ -282,7 +283,7 @@ class SiteController extends AppController
 
     public function actionMessages()
     {
-        if( Yii::$app->user->identity)
+        if( Yii::$app->session->get('user.identity'))
         {
             $model = new MessageForm();
             return $this->render('messages', ['model' => $model,]);
@@ -292,7 +293,7 @@ class SiteController extends AppController
 
     public function actionStudentEnrollCourse()
     {
-        if( Yii::$app->user->identity)
+        if( Yii::$app->session->get('user.identity'))
         {
             $model = new StudentEnrollCourseForm();
             return $this->render('studentEnrollCourse', ['model' => $model,]);

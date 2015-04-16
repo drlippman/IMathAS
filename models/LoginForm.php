@@ -88,6 +88,9 @@ class LoginForm extends Model
                 if(password_verify($this->password, $user->password))
                 {
                     $this->_user = $user;
+
+                    Yii::$app->session->set('user.identity',$user);
+//                    Yii::$app->user->identity = $user;
                 }
             }
         }
