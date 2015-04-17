@@ -20,5 +20,6 @@ class AppConstant {
     const GROUP_ADMIN_RIGHT = 75;
     const INSTALL_NAME = 'OpenMath';
     const INSTRUCTOR_REQUEST_SUCCESS = 'Your new account request has been sent.';
+    const ADD_NEW_USER = 'Added new user.';
 
 }

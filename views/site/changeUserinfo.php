@@ -1,6 +1,8 @@
+<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css" />
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use yii\widgets\FileInput;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
@@ -26,14 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
 
     <fieldset>
-        <legend>Profile Settings:</legend>
+        <legend>Profile Settings</legend>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal'],
+            'options' => ['class' => 'form-horizontal','enctype'=>'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-1 control-label'],
+                'labelOptions' => ['class' => 'col-lg-2 control-label'],
             ],
         ]); ?>
 
@@ -41,21 +43,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'LastName')->textInput() ?>
 
-        <?=
-        $form->field($model, 'password',
-            ['template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ])->checkbox() ?>
-        <?= $form->field($model, 'password')->passwordInput() ?>
+        <div class="row password_checkbox">
+        <?= $form->field($model, 'changePassword')->checkbox(['id'=>'pwd']) ?>
+        </div>
+        <div class="row change-password-content">
 
-        <?= $form->field($model, 'rePassword')->passwordInput() ?>
+        <?= $form->field($model, 'oldPassword')->passwordInput(['id'=>'password']) ?>
 
+        <?= $form->field($model, 'password')->passwordInput(['id'=>'password']) ?>
+
+        <?= $form->field($model, 'rePassword')->passwordInput(['id'=>'confirm-password']) ?>
+        </div>
         <?= $form->field($model, 'email') ?>
 
-        <?=
-        $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
-            ['template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ])->checkbox() ?>
-        <?= $form->field($model, 'uploadPicture')->fileInput() ?>
+        <div class="notify_checkbox">
+        <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
+        </div>
+        <?= $form->field($model, 'file')->fileInput() ?>
 
         <?= $form->field($model, 'message')->dropDownList(array(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) ?>
 
@@ -79,7 +83,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 } ?>
                 </select>
     </fieldset>
-
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>

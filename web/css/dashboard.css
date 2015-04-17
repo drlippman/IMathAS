@@ -41,3 +41,18 @@ div {
 .clear {
     line-height: 0;
 }
+.password_checkbox{
+    width: 36%;
+    margin-left: -19px;
+    text-align: right;
+}
+.notify_checkbox{
+    width: 64%;
+    text-align: center;
+    margin-left: -3px;
+}
+.change-password-content{
+    display: block;
+    margin-left: 0px;
+    width: 100%;
+}

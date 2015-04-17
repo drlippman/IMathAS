@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\components\AppConstant;
 use app\models\_base\BaseImasSessions;
+use app\models\AddNewUserForm;
 use app\models\ChangeUserInfoForm;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
@@ -22,6 +23,7 @@ use app\models\ContactForm;
 use app\components\AppUtility;
 use app\models\ChangePasswordForm;
 use app\models\MessageForm;
+use yii\web\UploadedFile;
 use yii\web\View;
 
 class SiteController extends AppController
@@ -79,6 +81,38 @@ class SiteController extends AppController
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            //            AppUtility::dump(Yii::$app->session->get('user.identity'));
+            if (AppUtility::isOldSiteSupported()) {
+                //Set session data
+                ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
+                ini_set('auto_detect_line_endings', true);
+                $sessionid = session_id();
+
+                $session_data['useragent'] = $_SERVER['HTTP_USER_AGENT'];
+                $session_data['ip'] = $_SERVER['REMOTE_ADDR'];
+                $session_data['secsalt'] = AppUtility::generateRandomString();
+
+                $session_data['mathdisp'] = 1;
+                $session_data['graphdisp'] = 1;
+                $session_data['useed'] = AppUtility::checkEditOrOk();
+                $enc = base64_encode(serialize($session_data));
+
+                $session = new BaseImasSessions();
+                if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
+                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
+
+                } else {
+                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+                    $session->sessionid = $sessionid;
+                    $session->userid = Yii::$app->getUser()->id;
+                    $session->time = time();
+                    $session->tzoffset = '-330';
+                    $session->tzname = "Asia/calcutta";
+                    $session->sessiondata = $enc;
+                }
+                $session->save();
+                return Yii::$app->getResponse()->redirect(Yii::$app->homeUrl.'IMathAS');
+            }
             return $this->redirect('dashboard');
         } else {
             $challenge = base64_encode(microtime() . rand(0, 9999));
@@ -230,17 +264,59 @@ class SiteController extends AppController
 
     public function actionChangeUserInfo()
     {
-        if (Yii::$app->user->identity) {
+        if( Yii::$app->session->get('user.identity'))
+        {
             $tzname = "Asia/Kolkata";
 
-            $user = Yii::$app->user->identity;
+            $user = Yii::$app->session->get('user.identity');
             $model = new ChangeUserInfoForm();
-            if ($model->load(Yii::$app->request->post())) {
+            if($model->load(Yii::$app->request->post()))
+            {
                 $params = Yii::$app->request->getBodyParams();
+                //     AppUtility::dump($params);
+
                 $params = $params['ChangeUserInfoForm'];
-                User::saveUserRecord($params);
+                $userRecord = array();
+                $record = isset($params['FirstName']) ? $params['FirstName'] : null;
+                if($record)
+                {
+                    $userRecord['FirstName'] = $params['FirstName'];
+                }
+
+                $record = isset($params['LastName']) ? $params['LastName'] : null;
+                if($record)
+                {
+                    $userRecord['LastName'] = $params['LastName'];
+                }
+                $record = isset($params['password']) ? $params['password'] : null;
+                if($record)
+                {
+                    $userRecord['password'] = $params['password'];
+
+                }
+
+                $record = isset($params['email']) ? $params['email'] : null;
+                if($record)
+                {
+                    $userRecord['email'] = $params['email'];
+                }
+                $record = isset($params['file']) ? $params['file'] : null;
+                if($record)
+                {
+                    $userRecord['file'] = $params['file'];
+                }
+
+
+                $model->file = UploadedFile::getInstance($model,'file');
+
+                if($model->file)
+                    $model->file->saveAs('Uploads/'. $user->id.'.jpg');
+
+                User::saveUserRecord($userRecord);
+
             }
-            return $this->render('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname]);
+            $this->getView()->registerJsFile('../js/changeUserInfo.js');
+            return $this->render('changeUserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null,'tzname' => $tzname]);
         }
         return $this->redirect('login');
     }
@@ -319,6 +395,25 @@ class SiteController extends AppController
             }
         }
         return $this->render('forgetUsername', ['model' => $model,]);
+    }
+    public function actionAddNewUser()
+    {
+        $model = new AddNewUserForm();
+        if ($model->load(Yii::$app->request->post())) {
+            require("../components/Password.php");
+            $params = Yii::$app->request->getBodyParams();
+            $params = $params['AddNewUserForm'];
+            $params['SID'] = $params['username'];
+            $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
+            $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
+
+            $user = new User();
+            $user->attributes = $params;
+            $user->save();
+
+            Yii::$app->session->setFlash('success', AppConstant::ADD_NEW_USER);
+        }
+        return $this->render('addNewUser',['model'=>$model]);
     }
 
     public function actionCheckBrowser()

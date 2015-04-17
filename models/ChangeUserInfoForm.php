@@ -12,8 +12,10 @@ class ChangeUserInfoForm extends Model
     public $rePassword;
     public $email;
     public $NotifyMeByEmailWhenIReceiveANewMessage= true;
-    public $uploadPicture;
+    public $file;
     public $message;
+    public $oldPassword;
+    public $changePassword;
     public $homepage;
     public $NewMessagesWidget;
     public $NewForumPostsWidget;
@@ -31,10 +33,13 @@ class ChangeUserInfoForm extends Model
         return [
 
 //            ['rePassword', 'compare', 'compareAttribute'=>'password'],
-            [['FirstName', 'LastName'], 'string'],
+            [['FirstName', 'LastName','oldPassword'], 'string'],
             ['email','email'],
+            ['changePassword','boolean'],
+            ['rePassword', 'compare', 'compareAttribute'=>'password'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
-            ['uploadPicture','file'],
+            ['file','safe'],
+            [['file'],'file'],
         ];
 
     }
@@ -42,13 +47,15 @@ class ChangeUserInfoForm extends Model
     public function attributeLabels()
     {
         return [
+            'oldPassword' => 'Old Password',
             'password' => 'Change Password',
-            'rePassword'=>'confirm Password',
-            'FirstName' => 'Enter FirstName',
-            'LastName' => 'Enter LastName',
+            'rePassword'=>'Confirm Password',
+            'changePassword'=>'Click here to change password',
+            'FirstName' => 'Enter First Name',
+            'LastName' => 'Enter Last Name',
             'email' => 'Email',
             'NotifyMeByEmailWhenIReceiveANewMessage'=>'Notify me by email when I receive a new message',
-            'uploadPicture'=>'Picture',
+            'file'=>'Picture',
             'message'=>'Messages/Posts per page',
             'homepage'=>'Show on home page',
         ];
