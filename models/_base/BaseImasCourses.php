@@ -76,12 +76,13 @@ class BaseImasCourses extends \yii\db\ActiveRecord
     {
         return [
             [['ownerid', 'hideicons', 'allowunenroll', 'copyrights', 'blockcnt', 'msgset', 'toolset', 'chatset', 'showlatepass', 'cploc', 'available', 'lockaid', 'latepasshrs', 'picicons', 'newflag', 'istemplate', 'deflatepass', 'deftime'], 'integer'],
-            [['name', 'enrollkey', 'itemorder', 'outcomes', 'ancestors', 'ltisecret'], 'required'],
+            [['name', 'enrollkey'], 'required'],
             [['itemorder', 'outcomes', 'ancestors'], 'string'],
             [['name'], 'string', 'max' => 254],
             [['enrollkey'], 'string', 'max' => 100],
             [['topbar', 'theme'], 'string', 'max' => 32],
             [['ltisecret'], 'string', 'max' => 10]
+
         ];
     }
 

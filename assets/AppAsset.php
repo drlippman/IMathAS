@@ -18,9 +18,13 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/site.css',
         'css/imascore.css?ver=030415',
         'css/default.css?v=121713',
+        'css/site.css',
+        'css/jquery-ui.css',
+        'css/jquery-ui.min.css',
+        'css/jquery-ui.structure.css',
+        'css/jquery-ui.structure.min.css',
         'css/handheld.css',
     ];
     public $jsOptions = array(
@@ -32,6 +36,9 @@ class AppAsset extends AssetBundle
         'js/mathjax/MathJax.js?config=AM_HTMLorMML',
         'js/ASCIIsvg_min.js?ver=012314',
         'js/mathgraphcheck.js?v=021215',
+        'js/jquery-ui.js',
+        'js/jquery-ui.min.js',
+
     ];
     public $depends = [
         'yii\web\YiiAsset',

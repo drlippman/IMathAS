@@ -1,0 +1,39 @@
+.first
+{
+    float: left;
+}
+.second
+{
+    float: left;
+}
+.abc{
+    width: 100%;
+}
+.bootstrap-timepicker{
+    width: 65%;
+}
+
+.start
+{
+    float: left;
+    margin-right: 12px;
+    margin-top: 7px;
+    margin-left: 20px;
+}
+.end
+{
+    float: left;
+    margin-right: 12px;
+    margin-top: 7px;
+    margin-left: -67px;
+}
+.blackTextField
+{
+    float: left;
+    margin-left: 200px;
+}
+
+.font
+{
+    font: bold;
+}

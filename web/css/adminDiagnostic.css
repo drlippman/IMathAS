@@ -1,0 +1,46 @@
+.col-lg-1 {
+    width: 15.333%;
+}
+.form-lable-discription
+{
+    margin-top: 10px;
+    margin-left: 25.71%;
+}
+
+.form-checkbox-description
+{
+    margin-top: 10px;
+    margin-left: 27%;
+
+}
+
+.form-label-alignment
+{
+    margin-left: 10px;
+}
+
+.text-align-left{
+    text-align: left !important;
+}
+
+.form-radio-alignment
+{
+    margin-left: 14px !important;
+}
+
+.radio-div label{
+    margin-left: 15px;
+    font-weight: normal !important;
+}
+
+.btn-continue{
+    margin-left: 8px;
+}
+
+.clear-both{
+    clear: both;
+}
+
+.form-group {
+     margin-bottom: 0px;
+}

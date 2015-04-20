@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use kartik\time\TimePicker;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
@@ -10,15 +11,8 @@ $this->title = 'Course Settings';
 
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<link rel="stylesheet" href="../../web/css/courseSetting.css" />
 <div class="site-login">
-
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
-
     <fieldset>
         <legend>Course Settings</legend>
         <?php $form = ActiveForm::begin([
@@ -38,6 +32,35 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'enrollmentKey')->textInput() ?>
 
+<div class="abc">
+        <?php
+        echo '<label class="start"> Start Time </label>';
+        echo '<div style="float: left">';
+        echo TimePicker::widget([
+          'name' => 'start_time',
+           'value' => '11:24 AM',
+           'pluginOptions' => [
+           'showSeconds' => true
+                            ]
+            ]);
+        echo '</div>';
+        ?>
+       <?php
+        echo '<label class="end"> End Time </label>';
+        echo'<div style="float: left">';
+        echo TimePicker::widget([
+            'name' => 'start_time',
+            'value' => '11:24 AM',
+            'pluginOptions' => [
+                'showSeconds' => true,
+                'class' => 'time'
+            ]
+        ]);
+
+        echo'</div>';
+        ?>
+</div>
+        <div style="clear: both"></div>
         <?= $form->field($model, 'available')->checkboxList(['AvailableToStudents' => 'Available to students', 'ShowOnInstructorsHomePage' => 'Show on instructors home page',]) ?>
 
         <?= $form->field($model, 'theme')->dropDownList(array('Facebookish','Mordern','Default','Angelish','Angelishmore'),['prompt'=>'Default']) ?>
@@ -66,15 +89,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'studentLink')->checkboxList(['1' => 'Bottom of page', '2' => 'Left side bar',]) ?>
         <?= $form->field($model, 'courseAsTemplate')->checkboxList(['1' => 'Mark as group template course', '2' => 'Mark as global template course', '3' => 'Mark as self-enroll course']) ?>
     </fieldset>
-
-
-    <?php ActiveForm::end(); ?>
-
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
         </div>
     </div>
+
+    <?php ActiveForm::end(); ?>
+
+
 
 
 </div>

@@ -38,6 +38,10 @@ div {
 .clearlooks2, .clearlooks2 div {
     zoom: normal;
 }
+.dropdown
+{
+    height: 2.5em;
+}
 .clear {
     line-height: 0;
 }
@@ -56,3 +60,8 @@ div {
     margin-left: 0px;
     width: 100%;
 }
+
+table.gb thead th{
+    text-align: left;
+}
+

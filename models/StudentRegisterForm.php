@@ -62,7 +62,7 @@ class StudentRegisterForm extends Model
     public static function Submit()
     {
         $params = $_POST;
-        require("../components/password.php");
+        require("../components/Password.php");
         $params = $params['StudentRegisterForm'];
         $params['SID'] = $params['username'];
         $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);

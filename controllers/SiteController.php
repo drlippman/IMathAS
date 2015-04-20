@@ -3,8 +3,11 @@
 namespace app\controllers;
 
 use app\components\AppConstant;
+use app\models\_base\BaseImasCourses;
+use app\models\_base\BaseImasDiags;
 use app\models\_base\BaseImasSessions;
 use app\models\AddNewUserForm;
+use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
@@ -185,6 +188,8 @@ class SiteController extends AppController
         $model = new StudentRegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             StudentRegisterForm::Submit();
+            return $this->redirect('student-register');
+            $this-Yii::$app->session->setFlash('success','Successfully login');
         }
         return $this->render('studentRegister', ['model' => $model,]);
     }
@@ -247,12 +252,6 @@ class SiteController extends AppController
             return $this->render('changePassword', ['model' => $model]);
         }
         return $this->redirect('login');
-    }
-
-    public function actionCourseSetting()
-    {
-        $model = new CourseSettingForm();
-        return $this->render('courseSetting', ['model' => $model]);
     }
 
     public function actionDiagnostic()
@@ -421,4 +420,48 @@ class SiteController extends AppController
         return $this->render('checkBrowser');
 
     }
+
+    public function actionAdminDiagnostic()
+    {
+        $model = new AdminDiagnosticForm();
+
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $params = Yii::$app->request->getBodyParams();
+
+            $params = $params['AdminDiagnosticForm'];
+            $params['ownerid'] = Yii::$app->user->identity->SID;
+            $params['name'] = $params['DiagnosticName'];
+            $params['term'] = $params['TermDesignator'];
+            $diag = new BaseImasDiags();
+            $diag->attributes = $params;
+            $diag->save();
+        }
+        return $this->render('adminDiagnostic',['model'=>$model]);
+    }
+
+    public function actionCourseSetting()
+    {
+            $model = new CourseSettingForm();
+
+            if ($model->load(Yii::$app->request->post()))
+            {
+                $params = Yii::$app->request->getBodyParams();
+
+                $params = $params['CourseSettingForm'];
+                $params['ownerid'] = Yii::$app->user->identity->SID;
+                $params['name']= $params['courseName'];
+                $params['enrollkey']= $params['enrollmentKey'];
+                $params['available']= 1;
+                $params['hideicons']= 1;
+                $params['picicons']= 1;
+
+                $courseSetting = new BaseImasCourses();
+                $courseSetting->attributes = $params;
+                $courseSetting->save();
+
+                $params = $params['CourseSettingForm'];
+            }
+            return $this->render('courseSetting', ['model' => $model]);
+        }
 }

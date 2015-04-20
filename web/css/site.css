@@ -129,3 +129,7 @@ border-color:#FF0000;
  width: 100% !important;
  margin-bottom: 10px !important;
 }
+
+.bootstrap-timepicker{
+    width: 65%;
+}

@@ -37,18 +37,11 @@ class CourseSettingForm extends Model
     /**
      * @return array the validation rules.
      */
-    public function rules()
+    /*public function rules()
     {
-        return [
 
-           /* ['rePassword', 'compare', 'compareAttribute'=>'password'],
-            [['FirstName', 'LastName'], 'string'],
-            ['email','email'],
-            ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
-            ['uploadPicture','file'],*/
-        ];
 
-    }
+    }*/
 
     public function attributeLabels()
     {

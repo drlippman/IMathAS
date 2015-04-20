@@ -59,14 +59,15 @@ AppAsset::register($this);
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <p class="pull-left">&copy; IMathAS <?= date('Y') ?></p>
-            <p class="pull-right">Powered by <a href="#">IMathAS</a> &copy; 2006-2015 | David Lippman</p>
-        </div>
-    </footer>
+
 
 <?php $this->endBody() ?>
 </body>
+<footer class="footer">
+    <div class="container">
+        <p class="pull-left">&copy; IMathAS <?= date('Y') ?></p>
+        <p class="pull-right">Powered by <a href="#">IMathAS</a> &copy; 2006-2015 | David Lippman</p>
+    </div>
+</footer>
 </html>
 <?php $this->endPage() ?>

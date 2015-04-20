@@ -9,16 +9,9 @@ $this->title = 'New Use Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <p>Please fill out the following fields to signUp</p>
 
-    <p>Please fill out the following fields to signUp:</p>
-
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
-
+    <?= $this->render('_flashMessage')?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
