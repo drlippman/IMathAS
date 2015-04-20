@@ -58,18 +58,4 @@ class StudentRegisterForm extends Model
             'NotifyMeByEmailWhenIReceiveANewMessage' => 'Notify me by email when I receive a new message'
         ];
     }
-
-    public static function Submit()
-    {
-        $params = $_POST;
-        require("../components/Password.php");
-        $params = $params['StudentRegisterForm'];
-        $params['SID'] = $params['username'];
-        $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
-        $params['hideonpostswidget'] = '0';
-
-        $user = new User();
-        $user->attributes = $params;
-        $user->save();
-    }
 }

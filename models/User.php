@@ -3,6 +3,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasUsers;
 use app\models\_base\BaseUsers;
 use yii\db\ActiveRecord;
@@ -78,10 +79,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function saveUserRecord($params)
     {
-        require("../components/Password.php");
-        $password = isset($params['password'])?$params['password']:\Yii::$app->user->identity->password;
-        $params['password'] = password_hash($password, PASSWORD_DEFAULT);
+        $params = AppUtility::removeEmptyAttributes($params);
         $user = User::findByUsername(\Yii::$app->user->identity->SID);
+        if(isset($params['password']))
+        {
+            $params['password'] = AppUtility::passwordHash($params['password']);
+        }
         $user->attributes = $params;
         $user->save();
     }
@@ -91,4 +94,19 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = static::findOne(['email' => $email]);
         return $user;
     }
+
+    public static function createStudentAccount()
+    {
+        $params = $_POST;
+        //require("../components/password.php");
+        $params = $params['StudentRegisterForm'];
+        $params['SID'] = $params['username'];
+        $params['password'] = AppUtility::passwordHash($params['password']);
+        $params['hideonpostswidget'] = '0';
+        $user = new User();
+        $user->attributes = $params;
+        $user->save();
+    }
+
+
 }

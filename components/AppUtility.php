@@ -81,6 +81,39 @@ class AppUtility extends Component {
         return $urlmode;
     }
 
+    public static function removeEmptyAttributes($params)
+    {
+        if(!empty($params) && is_array($params)){
+            if(is_object($params)){
+                $params = (array)$params;
+            }
+
+            foreach($params as $key => $singleParam){
+                if(empty($singleParam)){
+                   unset($params[$key]);
+                }
+            }
+        }
+        return $params;
+    }
+
+    public static function verifyPassword($newPassword, $oldPassword)
+    {
+ //       AppUtility::dump($newPassword);
+        require_once("Password.php");
+        if(password_verify($newPassword, $oldPassword)){
+            return true;
+        }
+        return false;
+//        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    public static function passwordHash($password)
+    {
+        require_once("Password.php");
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
 }
 
 ?>

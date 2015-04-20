@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css"/>
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -11,27 +11,23 @@ use yii\widgets\FileInput;
 $this->title = 'Profile Settings';
 
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
+
+<?= $this->render('_flashMessage')?>
+
 <div class="site-login">
 
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
     <?php
-    $model->FirstName = isset($user['FirstName'])?$user['FirstName']:null;
-    $model->LastName = isset($user['LastName'])?$user['LastName']:null;
-    $model->email =isset($user['email'])?$user['email']:null;
+    $model->FirstName = isset($user['FirstName']) ? $user['FirstName'] : null;
+    $model->LastName = isset($user['LastName']) ? $user['LastName'] : null;
+    $model->email = isset($user['email']) ? $user['email'] : null;
     ?>
 
     <fieldset>
         <legend>Profile Settings</legend>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal','enctype'=>'multipart/form-data'],
+            'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
@@ -44,20 +40,21 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'LastName')->textInput() ?>
 
         <div class="row password_checkbox">
-        <?= $form->field($model, 'changePassword')->checkbox(['id'=>'pwd']) ?>
+            <?= $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
+
         <div class="row change-password-content">
 
-        <?= $form->field($model, 'oldPassword')->passwordInput(['id'=>'password']) ?>
+            <?= $form->field($model, 'oldPassword')->passwordInput() ?>
 
-        <?= $form->field($model, 'password')->passwordInput(['id'=>'password']) ?>
+            <?= $form->field($model, 'password')->passwordInput() ?>
 
-        <?= $form->field($model, 'rePassword')->passwordInput(['id'=>'confirm-password']) ?>
+            <?= $form->field($model, 'rePassword')->passwordInput() ?>
         </div>
         <?= $form->field($model, 'email') ?>
 
         <div class="notify_checkbox">
-        <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
+            <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
         </div>
         <?= $form->field($model, 'file')->fileInput() ?>
 
@@ -79,12 +76,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php
                 $timezones = array('Etc/GMT+12', 'Pacific/Pago_Pago', 'America/Adak', 'Pacific/Honolulu', 'Pacific/Marquesas', 'Pacific/Gambier', 'America/Anchorage', 'America/Los_Angeles', 'Pacific/Pitcairn', 'America/Phoenix', 'America/Denver', 'America/Guatemala', 'America/Chicago', 'Pacific/Easter', 'America/Bogota', 'America/New_York', 'America/Caracas', 'America/Halifax', 'America/Santo_Domingo', 'America/Santiago', 'America/St_Johns', 'America/Godthab', 'America/Argentina/Buenos_Aires', 'America/Montevideo', 'Etc/GMT+2', 'Etc/GMT+2', 'Atlantic/Azores', 'Atlantic/Cape_Verde', 'Etc/UTC', 'Europe/London', 'Europe/Berlin', 'Africa/Lagos', 'Africa/Windhoek', 'Asia/Beirut', 'Africa/Johannesburg', 'Asia/Baghdad', 'Europe/Moscow', 'Asia/Tehran', 'Asia/Dubai', 'Asia/Baku', 'Asia/Kabul', 'Asia/Yekaterinburg', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kathmandu', 'Asia/Dhaka', 'Asia/Omsk', 'Asia/Rangoon', 'Asia/Krasnoyarsk', 'Asia/Jakarta', 'Asia/Shanghai', 'Asia/Irkutsk', 'Australia/Eucla', 'Australia/Eucla', 'Asia/Yakutsk', 'Asia/Tokyo', 'Australia/Darwin', 'Australia/Adelaide', 'Australia/Brisbane', 'Asia/Vladivostok', 'Australia/Sydney', 'Australia/Lord_Howe', 'Asia/Kamchatka', 'Pacific/Noumea', 'Pacific/Norfolk', 'Pacific/Auckland', 'Pacific/Tarawa', 'Pacific/Chatham', 'Pacific/Tongatapu', 'Pacific/Apia', 'Pacific/Kiritimati');
                 foreach ($timezones as $tz) {
-                echo '<option value="'.$tz.'" '.($tz==$tzname?'selected':'').'>'.$tz.'</option>';
+                    echo '<option value="' . $tz . '" ' . ($tz == $tzname ? 'selected' : '') . '>' . $tz . '</option>';
                 } ?>
-                </select>
+            </select>
     </fieldset>
     <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
+        <div class="col-lg-offset-2 col-lg-8 display_field">
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>

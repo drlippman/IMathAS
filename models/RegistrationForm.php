@@ -79,7 +79,6 @@ class RegistrationForm extends Model
             'id' => 'ID',
             'SID' => 'User Name',
             'password' => 'Password',
-
             'FirstName' => 'First Name',
             'LastName' => 'Last Name',
             'email' => 'Email Address',

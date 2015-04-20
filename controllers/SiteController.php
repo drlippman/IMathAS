@@ -165,12 +165,12 @@ class SiteController extends AppController
     {
         $model = new RegistrationForm();
         if ($model->load(Yii::$app->request->post())) {
-            require("../components/Password.php");
+
             $params = Yii::$app->request->getBodyParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
-            $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
+            $params['password'] = AppUtility::passwordHash($params['password']);
 
             $user = new User();
             $user->attributes = $params;
@@ -187,9 +187,7 @@ class SiteController extends AppController
     {
         $model = new StudentRegisterForm();
         if ($model->load(Yii::$app->request->post())) {
-            StudentRegisterForm::Submit();
-            return $this->redirect('student-register');
-            $this-Yii::$app->session->setFlash('success','Successfully login');
+            User::createStudentAccount();
         }
         return $this->render('studentRegister', ['model' => $model,]);
     }
@@ -222,6 +220,9 @@ class SiteController extends AppController
                 return $this->render('instructorDashboard', ['user' => $user]);
             elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT)
                 return $this->render('adminDashboard', ['user' => $user]);
+            else
+                return $this->render('adminDashboard', ['user' => $user]);
+
         }
         Yii::$app->session->setFlash('danger', AppConstant::LOGIN_FIRST);
         return $this->redirect('login');
@@ -235,10 +236,9 @@ class SiteController extends AppController
                 $param = Yii::$app->request->getBodyParams();
                 $oldPass = $param['ChangePasswordForm']['oldPassword'];
                 $newPass = $param['ChangePasswordForm']['newPassword'];
-                require("../components/Password.php");
-                if (password_verify($oldPass, Yii::$app->user->identity->password)) {
+                if (AppUtility::verifyPassword($oldPass, Yii::$app->user->identity->password)) {
                     $user = User::findByUsername(Yii::$app->user->identity->SID);
-                    $password = password_hash($newPass, PASSWORD_DEFAULT);
+                    $password = AppUtility::passwordHash($newPass);
                     $user->password = $password;
                     $user->save();
 
@@ -269,50 +269,17 @@ class SiteController extends AppController
 
             $user = Yii::$app->session->get('user.identity');
             $model = new ChangeUserInfoForm();
-            if($model->load(Yii::$app->request->post()))
+            if($model->load(Yii::$app->request->post()) && $model->checkPassword())
             {
-                $params = Yii::$app->request->getBodyParams();
-                //     AppUtility::dump($params);
-
+                $params = Yii::$app->request->getBodyParams() ;
                 $params = $params['ChangeUserInfoForm'];
-                $userRecord = array();
-                $record = isset($params['FirstName']) ? $params['FirstName'] : null;
-                if($record)
-                {
-                    $userRecord['FirstName'] = $params['FirstName'];
-                }
-
-                $record = isset($params['LastName']) ? $params['LastName'] : null;
-                if($record)
-                {
-                    $userRecord['LastName'] = $params['LastName'];
-                }
-                $record = isset($params['password']) ? $params['password'] : null;
-                if($record)
-                {
-                    $userRecord['password'] = $params['password'];
-
-                }
-
-                $record = isset($params['email']) ? $params['email'] : null;
-                if($record)
-                {
-                    $userRecord['email'] = $params['email'];
-                }
-                $record = isset($params['file']) ? $params['file'] : null;
-                if($record)
-                {
-                    $userRecord['file'] = $params['file'];
-                }
-
 
                 $model->file = UploadedFile::getInstance($model,'file');
-
                 if($model->file)
+                {
                     $model->file->saveAs('Uploads/'. $user->id.'.jpg');
-
-                User::saveUserRecord($userRecord);
-
+                }
+                User::saveUserRecord($params);
             }
             $this->getView()->registerJsFile('../js/changeUserInfo.js');
             return $this->render('changeUserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null,'tzname' => $tzname]);

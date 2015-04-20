@@ -84,8 +84,9 @@ class LoginForm extends Model
             $user = User::findUser($this->username);
             if($user)
             {
-                require("../components/Password.php");
-                if(password_verify($this->password, $user->password))
+
+//                require("../components/Password.php");
+                if(AppUtility::verifyPassword($this->password, $user->password))
                 {
                     $this->_user = $user;
 

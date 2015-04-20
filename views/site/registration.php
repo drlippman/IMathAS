@@ -13,11 +13,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="vcenter"><h1>Instructor Account Request</h1></div>
 
-<div class="registration col-lg-5">
+<div class="registration col-lg-6">
 
     <?= $this->render('_flashMessage')?>
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'id' => 'login-form',
+        'options' => ['class' => 'form-horizontal'],
+        'action' => '',
+        'fieldConfig' => [
+            'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+            'labelOptions' => ['class' => 'col-lg-4 control-label'],
+        ],
+    ]); ?>
 
     <?= $form->field($model, 'FirstName') ?>
     <?= $form->field($model, 'LastName') ?>
@@ -27,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username') ?>
     <?= $form->field($model, 'password')->passwordInput() ?>
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-    <?= $form->field($model, 'terms')->checkbox() ?>
+    <?= $form->field($model, 'terms')->checkbox()?>
 
     <div class="form-group">
         <?= Html::submitButton('Request Account', ['class' => 'btn btn-primary']) ?>
