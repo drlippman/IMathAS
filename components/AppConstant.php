@@ -17,9 +17,14 @@ class AppConstant {
     const STUDENT_RIGHT = 10;
     const TEACHER_RIGHT = 20;
     const GUEST_RIGHT = 5;
+    const LIMITED_COURSE_CREATOR_RIGHT = 40;
+    const DIAGNOSTIC_CREATOR_RIGHT = 60;
     const GROUP_ADMIN_RIGHT = 75;
     const INSTALL_NAME = 'OpenMath';
     const INSTRUCTOR_REQUEST_SUCCESS = 'Your new account request has been sent.';
     const ADD_NEW_USER = 'Added new user.';
+    const INSTRUCTOR_REQUEST_MAIL_SUBJECT = 'New Instructor Account Request';
+    const STUDENT_REQUEST_MAIL_SUBJECT = 'New Student Account Request';
+    const STUDENT_REQUEST_SUCCESS = 'Your new account request has been sent.';
 
 }

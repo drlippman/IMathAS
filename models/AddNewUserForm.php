@@ -6,12 +6,12 @@ use Yii;
 use yii\base\Model;
 class AddNewUserForm extends Model
 {
-    public $SID;
+    public $username;
     public $FirstName;
     public $LastName;
     public $email;
     public $password;
-    public $SetUserRights;
+    public $rights;
     public $AssignToGroup;
 
     private $_user = false;
@@ -22,7 +22,8 @@ class AddNewUserForm extends Model
     public function rules()
     {
         return [
-            [['FirstName', 'LastName','SID','password','email'],'required'],
+            [['FirstName', 'LastName','username','password','email'],'required'],
+            ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens(-).'],
              [['FirstName', 'LastName'], 'string'],
              ['email','email'],
         ];
@@ -37,7 +38,7 @@ class AddNewUserForm extends Model
             'LastName'=>'Last Name',
             'email'=>'Email',
             'password'=>'Password',
-            'SetUserRights'=>'Set User Rights to',
+            'rights'=>'Set User Rights to',
             'AssignToGroup'=>'Assign To Group',
 
         ];

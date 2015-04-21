@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
 
-        <?= $form->field($model, 'SID')->textInput() ?>
+        <?= $form->field($model, 'username')->textInput() ?>
 
         <?= $form->field($model, 'FirstName')->textInput() ?>
 
@@ -42,7 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'password')->passwordInput() ?>
 
-        <?= $form->field($model, 'SetUserRights')->inline()->radioList(['1' => 'Guest User','<>', '2' => 'Student','3' => 'Limited Course Creator','4' => 'Diagnostic Creator ','5' => 'Group Admin ','6' => 'Full Admin',]) ?>
+        <?= $form->field($model, 'rights')->inline()->radioList([\app\components\AppConstant::GUEST_RIGHT => 'Guest User',
+            \app\components\AppConstant::STUDENT_RIGHT => 'Student',
+            \app\components\AppConstant::TEACHER_RIGHT => 'Teacher',
+            \app\components\AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
+            \app\components\AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
+            \app\components\AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
+            \app\components\AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
 
         <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''),['prompt'=>'Default']) ?>
 

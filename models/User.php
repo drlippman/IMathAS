@@ -6,7 +6,9 @@ namespace app\models;
 use app\components\AppUtility;
 use app\models\_base\BaseImasUsers;
 use app\models\_base\BaseUsers;
+use app\components\AppConstant;
 use yii\db\ActiveRecord;
+use Yii;
 
 class User extends BaseImasUsers implements \yii\web\IdentityInterface
 {
@@ -106,6 +108,19 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = new User();
         $user->attributes = $params;
         $user->save();
+        $toEmail = $user->email;
+        $message = 'First Name: '.$user->FirstName.  "<br/>\n";
+        $message .= 'Last Name: '.$user->LastName.  "<br/>\n";
+        $message .= 'Email Name: '.$user->email.  "<br/>\n";
+        $message .= 'User Name: '.$user->SID. "<br/>\n";
+
+        $email = Yii::$app->mailer->compose();
+        $email->setTo($toEmail)
+            ->setSubject(AppConstant::STUDENT_REQUEST_MAIL_SUBJECT)
+            ->setHtmlBody($message)
+            ->send();
+        Yii::$app->session->setFlash('success', AppConstant::STUDENT_REQUEST_SUCCESS);
+
     }
 
 

@@ -6,7 +6,6 @@ use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
 use app\models\_base\BaseImasSessions;
-use app\models\AddNewUserForm;
 use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
 use app\models\CourseSettingForm;
@@ -169,13 +168,26 @@ class SiteController extends AppController
             $params = Yii::$app->request->getBodyParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
+            $toEmail = $params['email'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
+
 
             $user = new User();
             $user->attributes = $params;
             $user->save();
 
+            $toEmail = $user->email;
+            $message = 'First Name: '.$user->FirstName.  "<br/>\n";
+            $message .= 'Last Name: '.$user->LastName.  "<br/>\n";
+            $message .= 'Email Name: '.$user->email.  "<br/>\n";
+            $message .= 'User Name: '.$user->SID. "<br/>\n";
+
+            $email = Yii::$app->mailer->compose();
+            $email->setTo($toEmail)
+                ->setSubject(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT)
+                ->setHtmlBody($message)
+                ->send();
             Yii::$app->session->setFlash('success', AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
         }
         return $this->render('registration', [
@@ -188,6 +200,8 @@ class SiteController extends AppController
         $model = new StudentRegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             User::createStudentAccount();
+            $user = new User();
+
         }
         return $this->render('studentRegister', ['model' => $model,]);
     }
@@ -362,25 +376,7 @@ class SiteController extends AppController
         }
         return $this->render('forgetUsername', ['model' => $model,]);
     }
-    public function actionAddNewUser()
-    {
-        $model = new AddNewUserForm();
-        if ($model->load(Yii::$app->request->post())) {
-            require("../components/Password.php");
-            $params = Yii::$app->request->getBodyParams();
-            $params = $params['AddNewUserForm'];
-            $params['SID'] = $params['username'];
-            $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
-            $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
 
-            $user = new User();
-            $user->attributes = $params;
-            $user->save();
-
-            Yii::$app->session->setFlash('success', AppConstant::ADD_NEW_USER);
-        }
-        return $this->render('addNewUser',['model'=>$model]);
-    }
 
     public function actionCheckBrowser()
     {
