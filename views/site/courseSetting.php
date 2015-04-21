@@ -26,13 +26,13 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
 
-        <?php  echo'Course ID: Will be assigned when the course is created'?>
+        <?php  echo '12: Will be assigned when the course is created'?>
 
         <?= $form->field($model, 'courseName')->textInput() ?>
 
         <?= $form->field($model, 'enrollmentKey')->textInput() ?>
 
-<div class="abc">
+<div class="datetime">
         <?php
         echo '<label class="start"> Start Time </label>';
         echo '<div style="float: left">';
@@ -61,16 +61,16 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 </div>
         <div style="clear: both"></div>
-        <?= $form->field($model, 'available')->checkboxList(['AvailableToStudents' => 'Available to students', 'ShowOnInstructorsHomePage' => 'Show on instructors home page',]) ?>
+        <?= $form->field($model, 'available')->checkboxList(['1' => 'Available to students','2' => 'Show on instructors home page'],['checked' => '1']) ?>
 
         <?= $form->field($model, 'theme')->dropDownList(array('Facebookish','Mordern','Default','Angelish','Angelishmore'),['prompt'=>'Default']) ?>
 
         <?= $form->field($model, 'icons')->inline()->radioList(['1' => 'Text-based', '2' => 'Images']) ?>
-        <?= $form->field($model, 'showIcons')->inline()->label('Assessments:')->radioList(['1' => 'Show', '2' => 'Hide']) ?>
-        <?= $form->field($model, 'showIcons')->inline()->label('Inline Text:')->radioList(['1' => 'Show', '2' => 'Hide']) ?>
-        <?= $form->field($model, 'showIcons')->inline()->label('Linked Text:')->radioList(['1' => 'Show', '2' => 'Hide']) ?>
-        <?= $form->field($model, 'showIcons')->inline()->label('Forums:')->radioList(['1' => 'Show', '2' => 'Hide']) ?>
-        <?= $form->field($model, 'showIcons')->inline()->label('Blocks:')->radioList(['1' => 'Show', '2' => 'Hide']) ?>
+        <?= $form->field($model, 'showIcons')->inline()->label('Assessments:')->radioList(['1' => 'Show','values'=>'asse', '2' => 'Hide'], ['class' => 'radio-assesments']) ?>
+        <?= $form->field($model, 'showIcons')->inline()->label('Inline Text:')->radioList(['1' => 'Show', '2' => 'Hide'], ['class' => 'radio-inline']) ?>
+        <?= $form->field($model, 'showIcons')->inline()->label('Linked Text:')->radioList(['1' => 'Show', '2' => 'Hide'], ['class' => 'radio-linked']) ?>
+        <?= $form->field($model, 'showIcons')->inline()->label('Forums:')->radioList(['1' => 'Show', '2' => 'Hide'], ['class' => 'radio-forums']) ?>
+        <?= $form->field($model, 'showIcons')->inline()->label('Blocks:')->radioList(['1' => 'Show', '2' => 'Hide'], ['class' => 'radio-blocks']) ?>
 
         <?= $form->field($model, 'selfUnenroll')->inline()->radioList(['1' => 'No', '2' => 'Yes']) ?>
         <?= $form->field($model, 'selfEnroll')->inline()->radioList(['1' => 'No', '2' => 'Yes']) ?>
