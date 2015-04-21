@@ -7,8 +7,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <html>
 <head>
     <title>OpenMath - OpenMathAdministration</title>
-    <link rel="stylesheet" type="text/css" href="../../web/css/dashboard.css" />
-    <script type="text/javascript" src="../../web/js/general.js?ver=012115"></script>
+    <link rel="stylesheet" type="text/css" href="<? echo Yii::$app->homeUrl ?>css/dashboard.css"/>
+    <script type="text/javascript" src="<? echo Yii::$app->homeUrl ?>js/general.js?ver=012115"></script>
 </head>
 <body>
 <div class=mainbody>
@@ -42,7 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </tbody>
             </table>
-            <input type=button class="btn btn-primary" value="Add New Course" onclick="window.location='forms.php?action=addcourse'"/>
+            <input type=button class="btn btn-primary" value="Add New Course"
+                   onclick="window.location='forms.php?action=addcourse'"/>
             Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
                 <option value="0" selected>Select a user..</option>
             </select>
@@ -52,33 +53,34 @@ $this->params['breadcrumbs'][] = $this->title;
         <h3>Administration</h3>
 
         <div class=cp>
-            <A HREF="work-in-progress">Change my password</a><BR>
-            <A HREF="work-in-progress">Help</a><BR>
-            <A HREF="work-in-progress">Log Out</a><BR>
+            <A HREF="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Change my password</a><BR>
+            <A HREF="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Help</a><BR>
+            <A HREF="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Log Out</a><BR>
         </div>
         <div class=cp>
-	<span class=column>
-	<a href="work-in-progress">Manage Question Set</a><BR>
-	<a href="work-in-progress">Export Question Set</a><BR>
-	<a href="work-in-progress">Import Question Set</a><BR>
-	</span>
-	<span class=column>
-	<a href="work-in-progress">Manage Libraries</a><br>
-	<a href="work-in-progress">Export Libraries</a><BR>
-	<a href="work-in-progress">Import Libraries</a></span>
+            <span class=column>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Manage Question Set</a><BR>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Export Question Set</a><BR>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Question Set</a><BR>
+            </span>
+            <span class=column>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Manage Libraries</a><br>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Export Libraries</a><BR>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Libraries</a></span>
 
-	<span class=column>
-	<a href="work-in-progress">Edit Groups</a><br/>
-	<a href="work-in-progress">Delete Old Users</a><br/>
-	<a href="work-in-progress">Import Students from File</a>
-	</span>
-	<span class="column"><a href="work-in-progress">Install Macro File</a><br/>
-<a href="work-in-progress">Install Question Images</a><br/>
-<a href="work-in-progress">Install Course Files</a><br/>
-</span><span class="column"><a href="work-in-progress">LTI Provider Creds</a><br/>
-<a href="work-in-progress">External Tools</a><br/>
-<a href="work-in-progress">Admin Utilities</a><br/>
-</span>
+            <span class=column>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Edit Groups</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Delete Old Users</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Students from File</a>
+            </span>
+            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Macro File</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Question Images</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Course Files</a><br/>
+            </span>
+            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">LTI Provider Creds</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">External Tools</a><br/>
+                <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Admin Utilities</a><br/>
+            </span>
 
             <div class=clear></div>
         </div>
@@ -100,16 +102,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 <tbody>
                 <tr class=odd>
 
-                    <td><a href="work-in-progress">Check Here</a></td>
+                    <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Check Here</a></td>
                     <td class=c>Yes</td>
                     <td class=c>Yes</td>
-                    <td><a href="work-in-progress">Modify</a></td>
-                    <td><a href=work-in-progress">Remove</a></td>
-                    <td><a href="work-in-progress">One-time Passwords</a></td>
+                    <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Modify</a></td>
+                    <td><a href=<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Remove</a></td>
+                    <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">One-time Passwords</a></td>
                 </tr>
                 </tbody>
             </table>
-            <input type=button class="btn btn-primary" value="Add New Diagnostic" onclick="window.location='/IMathAS/admin/diagsetup.php'">
+<!--            <input type=button class="btn btn-primary" value="Add New Diagnostic"-->
+<!--                   onclick="window.location='/IMathAS/admin/diagsetup.php'">-->
+
+            <input type=button class="btn btn-primary" value="Add New Diagnostic">
         </div>
 
         <h3>Pending Users</h3>
@@ -138,7 +143,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
             </table>
 
-            <input type=button class="btn btn-primary" value="Add New User" onclick="window.location='forms.php?action=newadmin'">
+            <input type=button class="btn btn-primary" value="Add New User"
+                   onclick="window.location='<? echo(Yii::$app->homeUrl) ?>site/add-new-user'">
         </div>
 
         <div class="clear"></div>

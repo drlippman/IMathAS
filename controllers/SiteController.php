@@ -71,7 +71,7 @@ class SiteController extends AppController
         if (Yii::$app->user->isGuest)
             return $this->render('index');
         else
-            $this->redirect('site/dashboard');
+            return $this->redirect('site/dashboard');
 
     }
 

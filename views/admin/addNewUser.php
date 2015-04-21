@@ -58,9 +58,5 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </fieldset>
-
-
     <?php ActiveForm::end(); ?>
-
-
 </div>

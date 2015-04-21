@@ -8,7 +8,7 @@
     </div>
     <div class="blockitems">
         <div class="center">
-            <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl?>site/work-in-progress">Admin Page</a>
+            <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl?>admin/index">Admin Page</a>
         </div>
     </div>
 </div>
