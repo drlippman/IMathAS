@@ -5,7 +5,10 @@ namespace app\controllers;
 use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
+use app\models\_base\BaseImasGbscheme;
 use app\models\_base\BaseImasSessions;
+use app\models\_base\BaseImasTeachers;
+use app\models\AddNewUserForm;
 use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
 use app\models\CourseSettingForm;
@@ -400,6 +403,7 @@ class SiteController extends AppController
             $diag->attributes = $params;
             $diag->save();
         }
+        $this->getView()->registerJsFile("../js/adminDiagnostic.js");
         return $this->render('adminDiagnostic',['model'=>$model]);
     }
 
@@ -409,22 +413,41 @@ class SiteController extends AppController
 
             if ($model->load(Yii::$app->request->post()))
             {
-                $params = Yii::$app->request->getBodyParams();
 
+                $params = Yii::$app->request->getBodyParams();
                 $params = $params['CourseSettingForm'];
-                $params['ownerid'] = Yii::$app->user->identity->SID;
+                $params['ownerid'] = Yii::$app->user->identity->id;
                 $params['name']= $params['courseName'];
                 $params['enrollkey']= $params['enrollmentKey'];
-                $params['available']= 1;
-                $params['hideicons']= 1;
-                $params['picicons']= 1;
+                //$params['available']= $params['available'];
+               // $params['hideicons']= isset($params['showIcons']) ? $params['showIcons'] : 0;
+               /* $params['picicons']= $params['icons'];
+                $params['allowunenroll']=$params['selfUnenroll'];
+                $params['copyrights']= $params['copyCourse'];
+                $params['msgset']= $params['messageSystem'];
+                $params['toolset']= $params['navigationLink'];
+                $params['showlatepass']= $params['remainingLatePasses'];*/
 
                 $courseSetting = new BaseImasCourses();
                 $courseSetting->attributes = $params;
                 $courseSetting->save();
+                $courseSetting->id;
+         
+                $params1['userid'] = Yii::$app->user->identity->id;
+               // $params1['courseid']= $courseSetting->id;
 
-                $params = $params['CourseSettingForm'];
+                $teacher = new BaseImasTeachers();
+                $teacher->attributes = $params1;
+                $teacher->save();
+
+                $params2['courseid']= Yii::$app->user->identity->id;
+
+                $gbScheme = new BaseImasGbscheme();
+                $gbScheme->attributes = $params2;
+                $gbScheme->save();
+
             }
+            $this->getView()->registerJsFile("../js/courseSetting.js");
             return $this->render('courseSetting', ['model' => $model]);
         }
 }

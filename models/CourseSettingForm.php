@@ -39,8 +39,9 @@ class CourseSettingForm extends Model
      */
     /*public function rules()
     {
-
-
+        return [
+            [['available', 'boolean'],
+        ];
     }*/
 
     public function attributeLabels()
