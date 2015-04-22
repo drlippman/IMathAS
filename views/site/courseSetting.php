@@ -61,9 +61,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 </div>
         <div style="clear: both"></div>
-        <?= $form->field($model, 'available')->checkboxList(['1' => 'Available to students','2' => 'Show on instructors home page'],['checked' => '1']) ?>
+        <?= $form->field($model, 'available')->checkboxList(['2' => 'Available to students','1' => 'Show on instructors home page'],['checked' => '1']) ?>
 
-        <?= $form->field($model, 'theme')->dropDownList(array('Facebookish','Mordern','Default','Angelish','Angelishmore'),['prompt'=>'Default']) ?>
+        <?= $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish','modern.css' => 'Mordern','default.css' => 'Default','angelish.css' => 'Angelish','angelishmore.css' => 'Angelishmore'],['prompt'=>'Default']) ?>
 
         <?= $form->field($model, 'icons')->inline()->radioList(['1' => 'Text-based', '2' => 'Images']) ?>
         <?= $form->field($model, 'showIcons')->inline()->label('Assessments:')->radioList(['1' => 'Show','values'=>'asse', '2' => 'Hide'], ['class' => 'radio-assesments']) ?>
@@ -77,17 +77,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'copyCourse')->radioList(['1' => 'Require enrollment key from everyone', '2' => 'No key required for group members, require key from others ', '3' => 'No key required from anyone']) ?>
         <?= $form->field($model, 'messageSystem')->radioList(['1' => 'On for send and receive', '2' => 'On for receive, students can only send to instructor', '3' => 'On for receive, students can only send to students', '4' => 'On for receive, students cannot send', '5' => 'Off ']) ?>
 
-        <?= $form->field($model, 'navigationLink')->checkboxList(['1' => 'Calender', '2' => 'Forum List',]) ?>
-        <?= $form->field($model, 'courseReordering')->checkboxList(['1' => 'Show']) ?>
+        <?= $form->field($model, 'navigationLink')->checkboxList(['1' => 'Calender', '2' => 'Forum List','3' => 'Show']) ?>
         <?= $form->field($model, 'latePasses')->textInput(); ?>
         <?= $form->field($model, 'remainingLatePasses')->checkboxList(['1' => '']) ?>
-        <?= $form->field($model, 'studentQuickPick')->checkboxList(['1' => 'Messages', '2' => 'Forums ', '3' => ' Gradebook ', '4' => 'Calendar ', '5' => 'Log Out',]) ?>
-        <?= $form->field($model, 'instructorQuickPick')->checkboxList(['1' => 'Messages', '2' => 'Forums ', '3' => ' Gradebook ', '4' => 'Calendar ', '5' => 'Roster', '6' => 'Groups', '7' => 'Calendar', '8' => 'Quick View', '9' => 'Log Out',]) ?>
-        <?= $form->field($model, 'quickPickBar')->checkboxList(['1' => 'Top of course page', '2' => 'Top of all pages',]) ?>
-        <?= $form->field($model, 'courseManagement')->checkboxList(['1' => 'Bottom of page', '2' => 'Left side bar',]) ?>
-        <?= $form->field($model, 'viewControl')->checkboxList(['1' => 'With other course management links', '2' => 'Buttons at top right',]) ?>
-        <?= $form->field($model, 'studentLink')->checkboxList(['1' => 'Bottom of page', '2' => 'Left side bar',]) ?>
-        <?= $form->field($model, 'courseAsTemplate')->checkboxList(['1' => 'Mark as group template course', '2' => 'Mark as global template course', '3' => 'Mark as self-enroll course']) ?>
+        <?= $form->field($model, 'studentQuickPick')->checkboxList(['0' => 'Messages', '3' => 'Forums ', '1' => ' Gradebook ', '2' => 'Calendar ', '9' => 'Log Out',]) ?>
+        <?= $form->field($model, 'instructorQuickPick')->checkboxList(['0' => 'Messages', '6' => 'Forums ', '1'=>'Student View','2' => ' Gradebook ', '3' => 'Roster ', '7' => 'Group', '4' => 'Calender', '5' => 'Quick View', '9' => 'Log Out',]) ?>
+        <?= $form->field($model, 'quickPickBar')->inline()->radioList(['1' => 'Top of course page', '2' => 'Top of all pages',]) ?>
+        <?= $form->field($model, 'courseManagement')->inline()->radioList(['1' => 'Bottom of page', '2' => 'Left side bar',]) ?>
+        <?= $form->field($model, 'viewControl')->inline()->radioList(['1' => 'With other course management links', '2' => 'Buttons at top right',]) ?>
+        <?= $form->field($model, 'studentLink')->inline()->radioList(['1' => 'Bottom of page', '2' => 'Left side bar',]) ?>
+        <?= $form->field($model, 'courseAsTemplate')->checkboxList(['2' => 'Mark as group template course', '1' => 'Mark as global template course', '4' => 'Mark as self-enroll course']) ?>
     </fieldset>
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
