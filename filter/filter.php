@@ -27,9 +27,9 @@
 			}
 			if ($sessiondata['texdisp']==true) {
 				if (isset($sessiondata['texdoubleescape'])) {
-					return '\\\\('.htmlentities($tex).'\\\\)';
+					return ' \\\\('.htmlentities($tex).'\\\\) ';
 				} else {
-					return htmlentities($tex);
+					return ' '.htmlentities($tex).' ';
 				}
 			} else {
 				return ('<img style="vertical-align: middle;" src="'.$mathimgurl.'?'.rawurlencode($tex).'" alt="'.str_replace('"','&quot;',$arr[1]).'">');
