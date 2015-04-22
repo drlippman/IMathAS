@@ -35,6 +35,7 @@
 					       //strip out all existing html tags.
 					       existing = existing.replace(/<([^>]*)>/g,"");
 					       existing = existing.replace(/&(m|n)dash;/g,"-");
+					       existing = existing.replace(/&?nbsp;?/g," ");
 					       existing = existing.replace(/&(.*?);/g,"$1");
 					       if (val) {
 						       existing = val;
@@ -114,6 +115,7 @@
 						       //strip out all existing html tags.
 						       existing = existing.replace(/<([^>]*)>/g,"");
 						       existing = existing.replace(/&(m|n)dash;/g,"-");
+						       existing = existing.replace(/&?nbsp;?/g," ");
 						       existing = existing.replace(/&(.*?);/g,"$1");
 						       entity = '<span class="AMedit">`'+existing+'<span id="removeme"></span>`</span>&nbsp;';
 						       
@@ -173,7 +175,7 @@
 			});
 			
 			ed.onPreProcess.add(function(ed,o) {
-				if (o.get) {
+				//if (o.get) {    //commented out to trigger preprocess on paste
 					AMtags = ed.dom.select('span.AM', o.node);
 					for (var i=0; i<AMtags.length; i++) {
 						t.math2ascii(AMtags[i]); 
@@ -185,8 +187,7 @@
 						AMtags[i].innerHTML = myAM;
 						AMtags[i].className = "AM";
 					}
-				} 
-				
+				//} 
 				
 			});
 
@@ -329,8 +330,9 @@
 		
 		math2ascii : function(el) {
 			var myAM = el.innerHTML;
+	
 			if (myAM.indexOf("`") == -1) {
-				if (myAM.indexOf('math')==-1 && myAM.indexOf('img')==-1 && el.title!='') {
+				if (el.title!='') { //myAM.indexOf('math')==-1 && myAM.indexOf('img')==-1 && 
 					myAM = el.title;  //if cut-and-paste, grab eqn from title if there
 				} else if (myAM.indexOf('title')==-1) {
 					myAM = myAM.replace(/.+alt=\"(.*?)\".+/g,"$1");

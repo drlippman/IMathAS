@@ -2687,20 +2687,30 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 							
 							if (isset($reqsigfigs)) {
 								if ($givenans*$anans < 0) { continue;} //move on if opposite signs
-								
-								if (!$exactsigfig) {
-									if ($anans!=0) {
-										$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
+								if ($anans!=0) {
+									$v = -1*floor(-log10(abs($anans))-1e-12) - $reqsigfigs;
+								}
+								if (strpos($givenans,'E')!==false) {  //handle computer-style scientific notation
+									preg_match('/^-?[1-9]\.?(\d*)E/', $givenans, $matches);
+									$gasigfig = 1+strlen($matches[1]);
+									if ($exactsigfig) {
+										if ($gasigfig != $reqsigfigs) {continue;}
+									} else {
+										if ($gasigfig < $reqsigfigs) {continue;}
 									}
-									//this line will reject 0.25 if the answer is 0.250 with 3 sigfigs
-									$gadploc = strpos($givenans,'.');
-									if ($gadploc===false) {$gadploc = strlen($givenans);}
-									if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { continue; } //not enough decimal places
-									
 									if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								} else {
-									if (ltrim(prettysigfig($anans,$reqsigfigs,''),'0')===ltrim($givenans,'0')) {
-										$correct += 1; $foundloc = $j; break 2;
+									if (!$exactsigfig) {
+										//this line will reject 0.25 if the answer is 0.250 with 3 sigfigs
+										$gadploc = strpos($givenans,'.');
+										if ($gadploc===false) {$gadploc = strlen($givenans);}
+										if ($anans != 0 && $v < 0 && strlen($givenans) - $gadploc-1 + $v < 0) { continue; } //not enough decimal places
+										
+										if (abs($anans-$givenans)< pow(10,$v)/2+1E-12) {$correct += 1; $foundloc = $j; break 2;}
+									} else {
+										if (ltrim(prettysigfig($anans,$reqsigfigs,''),'0')===ltrim($givenans,'0')) {
+											$correct += 1; $foundloc = $j; break 2;
+										}
 									}
 								}
 								
