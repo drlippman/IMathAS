@@ -600,6 +600,7 @@
 		
 	}
 	$qi = getquestioninfo($questions,$testsettings);
+	srand();
 	
 	//check for withdrawn
 	for ($i=0; $i<count($questions); $i++) {
