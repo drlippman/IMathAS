@@ -417,56 +417,17 @@ class SiteController extends AppController
                 $params = Yii::$app->request->getBodyParams();
                 $params = $params['CourseSettingForm'];
                 $params['ownerid'] = Yii::$app->user->identity->id;
-                $params['name']= $params['courseName'];
-                $params['enrollkey']= $params['enrollmentKey'];
-
+                $params['name'] = $params['courseName'];
+                $params['enrollkey'] = $params['enrollmentKey'];
                 $availables = isset($params['available']) ? $params['available'] : 3;
-                if(is_array($availables))
-                {
-                    if(count($availables) == 2)
-                    {
-                        $params['available'] = 0;
-                    }else{
-                        if($availables[0] == 1)
-                        {
-                            $params['available'] = 1;
-                        }else{
-                            $params['available'] = 2;
-                        }
-                    }
-                }else{
-                    $params['available'] = 3;
-                }
-
-                $params['picicons']= $params['icons'];
-                $params['allowunenroll']=$params['selfUnenroll'];
-                $params['copyrights']= $params['copyCourse'];
-                $params['msgset']= $params['messageSystem'];
-
+                $params['available'] = AppUtility::makeAvailable($availables);
+                $params['picicons'] = $params['icons'];
+                $params['allowunenroll'] = $params['selfUnenroll'];
+                $params['copyrights'] = $params['copyCourse'];
+                $params['msgset'] = $params['messageSystem'];
                 $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : 7;
-//AppUtility::dump($params);
-                if(is_array($toolsets))
-                {
-                    if(count($toolsets) == 3)
-                    {
-                        $params['toolset'] = 0;
-                    }elseif(count($toolsets) == 2){
-                        if($toolsets[0] == 1)
-                        {
-                            $params['toolset'] = 6;
+                $params['toolset']  = AppUtility::makeToolset($toolsets);
 
-                        }elseif($toolsets[1] == 2)
-                        {
-                            $params['toolset'] = 5;
-                        }else{
-
-                            $params['toolset'] = 3;
-                        }
-                    }
-
-                }else{
-                    $params['toolset'] = 7;
-                }
 
                 //$params['toolset']= $params['navigationLink'];
 
@@ -475,14 +436,14 @@ class SiteController extends AppController
                 $params['cploc']= $params['courseManagement'];
                 $params['deflatepass']= $params['latePasses'];
                 $params['theme']= $params['theme'];
-AppUtility::dump($params);
+//AppUtility::dump($params);
                 $courseSetting = new BaseImasCourses();
                 $params = AppUtility::removeEmptyAttributes($params);
                 AppUtility::dump($params);
                 $courseSetting->attributes = $params;
                 $courseSetting->save();
                 /*$courseSetting->id;
-         
+
                 $params1['userid'] = Yii::$app->user->identity->id;
                // $params1['courseid']= $courseSetting->id;
 

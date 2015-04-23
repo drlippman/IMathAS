@@ -114,6 +114,67 @@ class AppUtility extends Component {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
+    public static function makeToolset($params)
+    {
+        if(is_array($params))
+        {
+            if(count($params) == 3)
+            {
+                return 0;
+            }
+            elseif(count($params) == 1)
+            {
+                if($params[0] == 1)
+                {
+                    return 6;
+                }
+                elseif($params[0] == 2)
+                {
+                    return 5;
+                }
+                else{
+                    return 3;
+                }
+            }
+            elseif(count($params) == 2)
+            {
+                if(($params[0] == 1) && $params[1] == 2)
+                {
+                    return 4;
+                }
+                elseif(($params[0] == 1) && $params[1] == 3)
+                {
+                    return 2;
+                }else{
+                return 1;
+            }
+            }
+        }else{
+            return $params;
+        }
+    }
+
+
+    public static function makeAvailable($availables)
+    {
+        if(is_array($availables))
+        {
+            if(count($availables) == 2)
+            {
+                return 0;
+            }else{
+                if($availables[0] == 1)
+                {
+                    return 1;
+                }else{
+                    return 2;
+                }
+            }
+        }else{
+            return 3;
+        }
+    }
+
 }
 
 ?>
