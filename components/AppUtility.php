@@ -90,7 +90,8 @@ class AppUtility extends Component {
 
             foreach($params as $key => $singleParam){
                 if(empty($singleParam)){
-                   unset($params[$key]);
+                    if($singleParam != '0')
+                        unset($params[$key]);
                 }
             }
         }

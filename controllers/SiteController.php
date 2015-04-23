@@ -7,18 +7,23 @@ use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
 use app\models\_base\BaseImasGbscheme;
 use app\models\_base\BaseImasSessions;
+use app\models\_base\BaseImasStudents;
 use app\models\_base\BaseImasTeachers;
 use app\models\AddNewUserForm;
 use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
+use app\models\Course;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
 use app\models\ForgetPasswordForm;
 use app\models\ForgetUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
+use app\models\Student;
 use app\models\StudentEnrollCourseForm;
 use app\models\StudentRegisterForm;
+use app\models\Teacher;
+use app\models\Tutor;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -86,7 +91,7 @@ class SiteController extends AppController
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            //            AppUtility::dump(Yii::$app->session->get('user.identity'));
+
             if (AppUtility::isOldSiteSupported()) {
                 //Set session data
                 ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
@@ -104,10 +109,10 @@ class SiteController extends AppController
 
                 $session = new BaseImasSessions();
                 if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
-                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','{$_POST['tzname']}','$enc')";
+
 
                 } else {
-                    //$query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$enc')";
+
                     $session->sessionid = $sessionid;
                     $session->userid = Yii::$app->getUser()->id;
                     $session->time = time();
@@ -313,15 +318,6 @@ class SiteController extends AppController
         return $this->redirect('login');
     }
 
-    public function actionStudentEnrollCourse()
-    {
-        if (Yii::$app->user->identity) {
-            $model = new StudentEnrollCourseForm();
-            return $this->render('studentEnrollCourse', ['model' => $model,]);
-        }
-        return $this->redirect('login');
-    }
-
     public function actionForgetPassword()
     {
         $model = new ForgetPasswordForm();
@@ -406,7 +402,6 @@ class SiteController extends AppController
         $this->getView()->registerJsFile("../js/adminDiagnostic.js");
         return $this->render('adminDiagnostic',['model'=>$model]);
     }
-
     public function actionCourseSetting()
     {
             $model = new CourseSettingForm();
@@ -436,7 +431,7 @@ class SiteController extends AppController
                 $params['cploc']= $params['courseManagement'];
                 $params['deflatepass']= $params['latePasses'];
                 $params['theme']= $params['theme'];
-//AppUtility::dump($params);
+                AppUtility::dump($params);
                 $courseSetting = new BaseImasCourses();
                 $params = AppUtility::removeEmptyAttributes($params);
                 AppUtility::dump($params);

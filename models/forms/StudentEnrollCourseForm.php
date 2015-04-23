@@ -1,21 +1,22 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
 
 use yii\base\Model;
 
-class studentEnrollCourseForm extends Model
+class StudentEnrollCourseForm extends Model
 {
     public $courseId;
     public $enrollmentKey;
+    public $selectCourse;
 
-   /* public function rules()
+    public function rules()
     {
         return [
             [['courseId', 'enrollmentKey'], 'required'],
         ];
 
-    }*/
+    }
 
     public function attributeLabels()
     {

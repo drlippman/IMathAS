@@ -2,17 +2,11 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Enroll In Course';
+$this->title = 'Enroll in a course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
-
+    <?= $this->render('../../site/_flashMessage') ?>
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
@@ -21,6 +15,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
+    <?php echo "Select the course you'd like to enroll in" ?>
+    <?= $form->field($model, 'selectCourse')->dropDownList(['1' => 'Self study courses'],['prompt'=>'My teacher gave me a course ID (enter below)']) ?>
     <?= $form->field($model, 'courseId') ?>
     <?= $form->field($model, 'enrollmentKey') ?>
     <div class="form-group">

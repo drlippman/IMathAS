@@ -42,7 +42,6 @@ class BaseImasStudents extends \yii\db\ActiveRecord
     {
         return [
             [['userid', 'courseid', 'latepass', 'lastaccess', 'locked', 'hidefromcourselist', 'stutype'], 'integer'],
-            [['gbcomment', 'gbinstrcomment', 'custominfo'], 'required'],
             [['gbcomment', 'gbinstrcomment', 'custominfo'], 'string'],
             [['timelimitmult'], 'number'],
             [['section'], 'string', 'max' => 40],
