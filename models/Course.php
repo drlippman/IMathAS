@@ -24,4 +24,9 @@ class Course extends BaseImasCourses {
     {
        return static::findOne(['id' =>$id, 'enrollkey' => $enroll]);
     }
+
+    public static function getByCourseName($name)
+    {
+        return static::findAll(['name' => $name]);
+    }
 } 

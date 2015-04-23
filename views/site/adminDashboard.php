@@ -11,21 +11,31 @@
 <div class=mainbody>
     <div class="headerwrapper"></div>
     <div class="midwrapper">
-        <?php echo $this->render('_fullMenu'); ?>
+        <?php
+            if($user->rights > \app\components\AppConstant::GUEST_RIGHT){
+                echo $this->render('_fullMenu');
+            }else{
+                echo $this->render('_guestMenu');
+            } ?>
         <div class="pagetitle" id="headerhome"><h2>Welcome to
                 IMathAS, <?php print_r(ucfirst($user->FirstName) . ' ' . ucfirst($user->LastName)); ?><span class="red"></span>
         </div>
         <div id="homefullwidth">
-            <?php echo $this->render('_adminCourseTeaching'); ?>
-            <?php echo $this->render('_courseTaking'); ?>
+            <?php
+
+                if($user->rights > \app\components\AppConstant::GUEST_RIGHT){
+                    if($user->rights == \app\components\AppConstant::ADMIN_RIGHT)
+                    {
+                        echo $this->render('_adminCourseTeaching');
+                    }
+                    echo $this->render('_courseTaking', ['students' => $students]);
+                } ?>
+
         </div>
         <div class="clear"></div>
     </div>
     <div class="footerwrapper"></div>
 </div>
 </body>
-
-<!--<script type="text/javascript">var usingASCIISvg = true;</script>-->
-<!--<script type="text/javascript" src="../../web/js/tablesorter.js"></script>-->
 
 </html>

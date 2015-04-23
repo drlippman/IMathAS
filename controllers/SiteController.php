@@ -7,12 +7,14 @@ use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
 use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
+use app\models\Course;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
 use app\models\ForgetPasswordForm;
 use app\models\ForgetUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
+use app\models\Student;
 use app\models\StudentEnrollCourseForm;
 use app\models\StudentRegisterForm;
 use app\models\User;
@@ -255,32 +257,16 @@ class SiteController extends AppController
     public function actionDashboard()
     {
         $user = Yii::$app->user->identity;
+
+        $students = Student::getByUserId(\Yii::$app->user->identity->id);
+
         if ($user) {
             $this->includeCSS(['css/dashboard.css']);
-
             $this->getView()->registerJs('var usingASCIISvg = true;');
             $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
 
-            $userData = ['user' => $user];
-
-            if ($user->rights === AppConstant::ADMIN_RIGHT){
-                return $this->render('adminDashboard', $userData);
-            }
-            elseif ($user->rights === AppConstant::GUEST_RIGHT){
-                return $this->render('adminDashboard', $userData);
-            }
-            elseif ($user->rights === AppConstant::STUDENT_RIGHT){
-                return $this->render('studentDashboard', $userData);
-            }
-            elseif ($user->rights === AppConstant::TEACHER_RIGHT){
-                return $this->render('instructorDashboard', $userData);
-            }
-            elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT){
-                return $this->render('adminDashboard', $userData);
-            }
-            else{
-                return $this->render('adminDashboard', $userData);
-            }
+            $userData = ['user' => $user, 'students' => $students];
+            return $this->render('adminDashboard', $userData);
         }
         Yii::$app->session->setFlash('danger', AppConstant::LOGIN_FIRST);
         return $this->redirect('login');

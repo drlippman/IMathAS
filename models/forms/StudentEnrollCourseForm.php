@@ -14,6 +14,7 @@ class StudentEnrollCourseForm extends Model
     {
         return [
             [['courseId', 'enrollmentKey'], 'required'],
+            [['courseId'], 'number'],
         ];
 
     }
