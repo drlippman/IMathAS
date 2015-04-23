@@ -140,10 +140,28 @@ class SiteController extends AppController
 
     public function actionStudentRegister()
     {
+
         $model = new StudentRegisterForm();
         if ($model->load(Yii::$app->request->post())) {
-            User::createStudentAccount();
-            $user = new User();
+            $params = Yii::$app->request->getBodyParams();
+            $params = $params['StudentRegisterForm'];
+            $status = User::createStudentAccount($params);
+            if ($status)
+            {
+                $message = 'First Name: '.$params['FirstName'].  "<br/>\n";
+                $message .= 'Last Name: '.$params['LastName'].  "<br/>\n";
+                $message .= 'Email Name: '.$params['email'].  "<br/>\n";
+                $message .= 'User Name: '.$params['username']. "<br/>\n";
+
+                $email = Yii::$app->mailer->compose();
+                $email->setTo($params['email'])
+                    ->setSubject(AppConstant::STUDENT_REQUEST_MAIL_SUBJECT)
+                    ->setHtmlBody($message)
+                    ->send();
+                Yii::$app->session->setFlash('success', AppConstant::STUDENT_REQUEST_SUCCESS);
+
+            }
+
 
         }
         return $this->render('studentRegister', ['model' => $model,]);
@@ -332,24 +350,13 @@ class SiteController extends AppController
         return $this->redirect('login');
     }
 
-    public function actionAdminDiagnostic()
+    public function actionStudentEnrollCourse()
     {
-        $model = new AdminDiagnosticForm();
-
-        if ($model->load(Yii::$app->request->post()))
-        {
-            $params = $this->getBodyParams();
-
-            $params = $params['AdminDiagnosticForm'];
-            $params['ownerid'] = Yii::$app->user->identity->SID;
-            $params['name'] = $params['DiagnosticName'];
-            $params['term'] = $params['TermDesignator'];
-            $diag = new BaseImasDiags();
-            $diag->attributes = $params;
-            $diag->save();
+        if (Yii::$app->user->identity) {
+            $model = new StudentEnrollCourseForm();
+            return $this->render('studentEnrollCourse', ['model' => $model,]);
         }
-        $this->includeJS(["js/adminDiagnostic.js"]);
-        return $this->render('adminDiagnostic',['model'=>$model]);
+        return $this->redirect('login');
     }
 
     public function actionCourseSetting()

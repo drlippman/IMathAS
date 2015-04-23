@@ -28,4 +28,6 @@ class AppConstant {
     const STUDENT_REQUEST_SUCCESS = 'Your new account request has been sent.';
     const DEFAULT_TIME_ZONE = 'Asia/Kolkata';
     const UPLOAD_DIRECTORY = 'Uploads/';
+    const DESCENDING = SORT_DESC;
+    const ASCENDING = SORT_ASC;
 }
