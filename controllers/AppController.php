@@ -37,9 +37,14 @@ class AppController extends Controller
 
     function unauthorizedAccessHandler()
     {
-        if (!\Yii::$app->user->isGuest) {
+        if (!$this->isGuestUser()) {
             return $this->goHome();
+            exit;
         }
+    }
+
+    function isGuestUser(){
+        return \Yii::$app->user->isGuest;
     }
 
     function getUserTimezone(){

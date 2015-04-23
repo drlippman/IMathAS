@@ -64,10 +64,11 @@ class SiteController extends AppController
 
     public function actionIndex()
     {
-        if(!$this->unauthorizedAccessHandler()){
-
+        if(!$this->isGuestUser()){
+            return $this->redirect('site/dashboard');
+        }else{
+            return $this->render('index');
         }
-        return $this->redirect('site/dashboard');
     }
 
     public function actionLogin()
@@ -223,6 +224,7 @@ class SiteController extends AppController
     //////////////////////////////////////////////////////////////
     ////////////////// Logged in user functions //////////////////
     //////////////////////////////////////////////////////////////
+
     public function actionLogout()
     {
         if($this->getAuthenticatedUser()){
