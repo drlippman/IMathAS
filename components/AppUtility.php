@@ -120,35 +120,24 @@ class AppUtility extends Component {
         if(is_array($params))
         {
             if(count($params) == 3)
-            {
                 return 0;
-            }
             elseif(count($params) == 1)
             {
                 if($params[0] == 1)
-                {
                     return 6;
-                }
                 elseif($params[0] == 2)
-                {
                     return 5;
-                }
-                else{
+                else
                     return 3;
-                }
             }
             elseif(count($params) == 2)
             {
                 if(($params[0] == 1) && $params[1] == 2)
-                {
                     return 4;
-                }
                 elseif(($params[0] == 1) && $params[1] == 3)
-                {
                     return 2;
-                }else{
-                return 1;
-            }
+                else
+                    return 1;
             }
         }else{
             return $params;
@@ -161,19 +150,59 @@ class AppUtility extends Component {
         if(is_array($availables))
         {
             if(count($availables) == 2)
-            {
                 return 0;
-            }else{
+            else{
                 if($availables[0] == 1)
-                {
                     return 1;
-                }else{
+                else
                     return 2;
-                }
             }
-        }else{
+        }else
             return 3;
+    }
+
+    public static function createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar)
+    {
+        $studentTopBar = "";
+        $instructorTopBar = "";
+        if($studentQuickPick)
+        {
+            $studentTopBar = "";
+            foreach($studentQuickPick as $key => $item)
+            {
+                if($studentTopBar == "")
+                    $studentTopBar .= $item;
+                else
+                    $studentTopBar .= ','.$item;
+            }
         }
+
+        if($instructorQuickPick)
+        {
+            $instructorTopBar = "";
+            foreach($instructorQuickPick as $key => $item)
+            {
+                if($instructorTopBar == "")
+                    $instructorTopBar .= $item;
+                else
+                    $instructorTopBar .= ','.$item;
+            }
+        }
+        $quickPickTopBar = isset($quickPickBar) ? $quickPickBar : 0;
+        $topbar = $studentTopBar.'|'.$instructorTopBar.'|'.$quickPickTopBar;
+        return $topbar;
+    }
+
+    public static function sendMail($subject, $message, $to){
+        $email = Yii::$app->mailer->compose();
+        $email->setTo($to)
+            ->setSubject($subject)
+            ->setHtmlBody($message)
+            ->send();
+    }
+
+    public static function getChallenge(){
+        return base64_encode(microtime() . rand(0, 9999));
     }
 
 }

@@ -31,35 +31,34 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'courseName')->textInput() ?>
 
         <?= $form->field($model, 'enrollmentKey')->textInput() ?>
-
-<div class="datetime">
-        <?php
-        echo '<label class="start"> Start Time </label>';
-        echo '<div style="float: left">';
-        echo TimePicker::widget([
-          'name' => 'start_time',
-           'value' => '11:24 AM',
-           'pluginOptions' => [
-           'showSeconds' => true
-                            ]
+        <?= $form->field($model, 'time')->textInput() ?>
+        <div class="datetime form-group">
+            <?php
+            echo '<label class="start col-lg-2 pull-left"> Start Time </label>';
+            echo '<div class = "pull-left">';
+            echo TimePicker::widget([
+              'name' => 'start_time',
+               'value' => '10:00 AM',
+               'pluginOptions' => [
+               'showSeconds' => true
+                                ]
+                ]);
+            echo '</div>';?>
+           <?php
+            echo '<label class="end"> End Time </label>';
+            echo'<div style="float: left">';
+            echo TimePicker::widget([
+                'name' => 'end_time',
+                'value' => '10:00 PM',
+                'pluginOptions' => [
+                    'showSeconds' => true,
+                    'class' => 'time'
+                ]
             ]);
-        echo '</div>';
-        ?>
-       <?php
-        echo '<label class="end"> End Time </label>';
-        echo'<div style="float: left">';
-        echo TimePicker::widget([
-            'name' => 'start_time',
-            'value' => '11:24 AM',
-            'pluginOptions' => [
-                'showSeconds' => true,
-                'class' => 'time'
-            ]
-        ]);
 
-        echo'</div>';
-        ?>
-</div>
+            echo'</div>';?>
+        </div>
+
         <div style="clear: both"></div>
         <?= $form->field($model, 'available')->checkboxList(['2' => 'Available to students','1' => 'Show on instructors home page'],['checked' => '1']) ?>
 

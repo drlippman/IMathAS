@@ -5,36 +5,24 @@ namespace app\controllers;
 use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
-use app\models\_base\BaseImasGbscheme;
-use app\models\_base\BaseImasSessions;
-use app\models\_base\BaseImasStudents;
-use app\models\_base\BaseImasTeachers;
-use app\models\AddNewUserForm;
 use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
-use app\models\Course;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
 use app\models\ForgetPasswordForm;
 use app\models\ForgetUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
-use app\models\Student;
 use app\models\StudentEnrollCourseForm;
 use app\models\StudentRegisterForm;
-use app\models\Teacher;
-use app\models\Tutor;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
-use app\models\ContactForm;
 use app\components\AppUtility;
 use app\models\ChangePasswordForm;
 use app\models\MessageForm;
 use yii\web\UploadedFile;
-use yii\web\View;
 
 class SiteController extends AppController
 {
@@ -76,83 +64,32 @@ class SiteController extends AppController
 
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest)
-            return $this->render('index');
-        else
-            return $this->redirect('site/dashboard');
+        if(!$this->unauthorizedAccessHandler()){
 
+        }
+        return $this->redirect('site/dashboard');
     }
 
     public function actionLogin()
     {
-        if (!\Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
+        $this->unauthorizedAccessHandler();
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-
-            if (AppUtility::isOldSiteSupported()) {
-                //Set session data
-                ini_set('session.gc_maxlifetime', AppConstant::MAX_SESSION_TIME);
-                ini_set('auto_detect_line_endings', true);
-                $sessionid = session_id();
-
-                $session_data['useragent'] = $_SERVER['HTTP_USER_AGENT'];
-                $session_data['ip'] = $_SERVER['REMOTE_ADDR'];
-                $session_data['secsalt'] = AppUtility::generateRandomString();
-
-                $session_data['mathdisp'] = 1;
-                $session_data['graphdisp'] = 1;
-                $session_data['useed'] = AppUtility::checkEditOrOk();
-                $enc = base64_encode(serialize($session_data));
-
-                $session = new BaseImasSessions();
-                if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']), 'upgrade.php') === false) {
-
-
-                } else {
-
-                    $session->sessionid = $sessionid;
-                    $session->userid = Yii::$app->getUser()->id;
-                    $session->time = time();
-                    $session->tzoffset = '-330';
-                    $session->tzname = "Asia/calcutta";
-                    $session->sessiondata = $enc;
-                }
-                $session->save();
-                return Yii::$app->getResponse()->redirect(Yii::$app->homeUrl.'IMathAS');
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->login()) {
+                return $this->redirect('dashboard');
+            } else {
+                $this->setErrorFlash(AppConstant::INVALID_USERNAME_PASSWORD);
             }
-            return $this->redirect('dashboard');
-        } else {
-            $challenge = base64_encode(microtime() . rand(0, 9999));
-            $this->getView()->registerCssFile('../css/login.css' /*, View::POS_HEAD*/);
-            $this->getView()->registerJsFile('../js/jstz_min.js');
-            $this->getView()->registerJsFile('../js/login.js');
-            return $this->render('login', [
-                'model' => $model, 'challenge' => $challenge,
-            ]);
         }
-    }
+        $challenge = AppUtility::getChallenge();
 
-    public function actionLogout()
-    {
-        Yii::$app->user->logout();
-        return $this->goHome();
-    }
+        $this->includeCSS(['../css/login.css']);
+        $this->includeJS(['../js/jstz_min.js', '../js/login.js']);
 
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        } else {
-            return $this->render('contact', [
-                'model' => $model,
-            ]);
-        }
+        return $this->render('login', [
+            'model' => $model, 'challenge' => $challenge,
+        ]);
     }
 
     /**
@@ -176,7 +113,7 @@ class SiteController extends AppController
             $params = Yii::$app->request->getBodyParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
-            $toEmail = $params['email'];
+
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
 
@@ -191,12 +128,9 @@ class SiteController extends AppController
             $message .= 'Email Name: '.$user->email.  "<br/>\n";
             $message .= 'User Name: '.$user->SID. "<br/>\n";
 
-            $email = Yii::$app->mailer->compose();
-            $email->setTo($toEmail)
-                ->setSubject(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT)
-                ->setHtmlBody($message)
-                ->send();
-            Yii::$app->session->setFlash('success', AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
+            AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
+
+            $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
         }
         return $this->render('registration', [
             'model' => $model,
@@ -215,36 +149,118 @@ class SiteController extends AppController
     }
 
     /**
+     * Method that redirects to a generic work in progress page
      * @return string
-     * Controller for general work progress page
      */
     public function actionWorkInProgress()
     {
         return $this->render('progress');
     }
 
+    public function actionDiagnostic()
+    {
+        $model = new DiagnosticForm();
+        return $this->render('diagnostic', ['model' => $model]);
+    }
+
+
+    public function actionForgotPassword()
+    {
+        $model = new ForgetPasswordForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $param = $this->getBodyParams();
+            $username = $param['ForgetPasswordForm']['username'];
+
+            $user = User::findByUsername($username);
+            $code = AppUtility::generateRandomString();
+            $user->remoteaccess = $code;
+            $user->save();
+
+            $toEmail = $user->email;
+            $id = $user->id;
+
+            $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
+            $message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
+            $message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
+            $message .= "will then be prompted to choose a new password.</p>";
+            $message .= "<a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
+            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
+
+            AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
+        }
+
+        return $this->render('forgetPassword', ['model' => $model,]);
+    }
+
+    public function actionForgotUsername()
+    {
+        $model = new ForgetUsernameForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $param = $this->getBodyParams();
+            $toEmail = $param['ForgetUsernameForm']['email'];
+
+            $user = User::findByEmail($toEmail);
+            if ($user) {
+                $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>";
+                $message .= "<p>Your email was entered in the Username Lookup page on OpenMath.  If you did not do this, you may ignore and delete this message.  ";
+                $message .= "All usernames using this email address are listed below</p><p>";
+                $message .= "Username: <b>" . $user->SID . " </b> <br/>.";
+                AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
+            } else {
+                $this->setErrorFlash(AppConstant::INVALID_EMAIL);
+            }
+        }
+        return $this->render('forgetUsername', ['model' => $model,]);
+    }
+
+
+    public function actionCheckBrowser()
+    {
+        return $this->render('checkBrowser');
+
+    }
+
+    //////////////////////////////////////////////////////////////
+    ////////////////// Logged in user functions //////////////////
+    //////////////////////////////////////////////////////////////
+    public function actionLogout()
+    {
+        if($this->getAuthenticatedUser()){
+            Yii::$app->user->logout();
+            return $this->goHome();
+        }
+    }
+
+
     public function actionDashboard()
     {
         $user = Yii::$app->user->identity;
         if ($user) {
-            $this->getView()->registerCssFile('../css/dashboard.css');
-            $this->getView()->registerJsFile('../js/dashboard.js');
-            $this->getView()->registerJsFile('../js/ASCIIsvg_min.js?ver=012314');
-            $this->getView()->registerJs('var usingASCIISvg = true;');
-            $this->getView()->registerJsFile('../js/tablesorter.js');
-            if ($user->rights === AppConstant::ADMIN_RIGHT)
-                return $this->render('adminDashboard', ['user' => $user]);
-            elseif ($user->rights === AppConstant::GUEST_RIGHT)
-                return $this->render('adminDashboard', ['user' => $user]);
-            elseif ($user->rights === AppConstant::STUDENT_RIGHT)
-                return $this->render('studentDashboard', ['user' => $user]);
-            elseif ($user->rights === AppConstant::TEACHER_RIGHT)
-                return $this->render('instructorDashboard', ['user' => $user]);
-            elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT)
-                return $this->render('adminDashboard', ['user' => $user]);
-            else
-                return $this->render('adminDashboard', ['user' => $user]);
+            $this->includeCSS(['css/dashboard.css']);
 
+            $this->getView()->registerJs('var usingASCIISvg = true;');
+            $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
+
+            $userData = ['user' => $user];
+
+            if ($user->rights === AppConstant::ADMIN_RIGHT){
+                return $this->render('adminDashboard', $userData);
+            }
+            elseif ($user->rights === AppConstant::GUEST_RIGHT){
+                return $this->render('adminDashboard', $userData);
+            }
+            elseif ($user->rights === AppConstant::STUDENT_RIGHT){
+                return $this->render('studentDashboard', $userData);
+            }
+            elseif ($user->rights === AppConstant::TEACHER_RIGHT){
+                return $this->render('instructorDashboard', $userData);
+            }
+            elseif ($user->rights === AppConstant::GROUP_ADMIN_RIGHT){
+                return $this->render('adminDashboard', $userData);
+            }
+            else{
+                return $this->render('adminDashboard', $userData);
+            }
         }
         Yii::$app->session->setFlash('danger', AppConstant::LOGIN_FIRST);
         return $this->redirect('login');
@@ -256,8 +272,10 @@ class SiteController extends AppController
             $model = new ChangePasswordForm();
             if ($model->load(Yii::$app->request->post())) {
                 $param = Yii::$app->request->getBodyParams();
+
                 $oldPass = $param['ChangePasswordForm']['oldPassword'];
                 $newPass = $param['ChangePasswordForm']['newPassword'];
+
                 if (AppUtility::verifyPassword($oldPass, Yii::$app->user->identity->password)) {
                     $user = User::findByUsername(Yii::$app->user->identity->SID);
                     $password = AppUtility::passwordHash($newPass);
@@ -276,18 +294,11 @@ class SiteController extends AppController
         return $this->redirect('login');
     }
 
-    public function actionDiagnostic()
-    {
-        $model = new DiagnosticForm();
-        return $this->render('diagnostic', ['model' => $model]);
-    }
-
-
     public function actionChangeUserInfo()
     {
         if( Yii::$app->session->get('user.identity'))
         {
-            $tzname = "Asia/Kolkata";
+            $tzname = $this->getUserTimezone();
 
             $user = Yii::$app->session->get('user.identity');
             $model = new ChangeUserInfoForm();
@@ -299,11 +310,12 @@ class SiteController extends AppController
                 $model->file = UploadedFile::getInstance($model,'file');
                 if($model->file)
                 {
-                    $model->file->saveAs('Uploads/'. $user->id.'.jpg');
+                    $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY. $user->id.'.jpg');
                 }
                 User::saveUserRecord($params);
             }
-            $this->getView()->registerJsFile('../js/changeUserInfo.js');
+            $this->includeJS(['js/changeUserInfo.js']);
+
             return $this->render('changeUserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null,'tzname' => $tzname]);
         }
         return $this->redirect('login');
@@ -311,76 +323,11 @@ class SiteController extends AppController
 
     public function actionMessages()
     {
-        if (Yii::$app->user->identity) {
+        if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             return $this->render('messages', ['model' => $model,]);
         }
         return $this->redirect('login');
-    }
-
-    public function actionForgetPassword()
-    {
-        $model = new ForgetPasswordForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $param = Yii::$app->request->getBodyParams();
-            $username = $param['ForgetPasswordForm']['username'];
-
-            $user = User::findByUsername($username);
-            $code = AppUtility::generateRandomString();
-            $user->remoteaccess = $code;
-            $user->save();
-
-            $toEmail = $user->email;
-            $id = $user->id;
-
-            $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
-            $message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
-            $message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
-            $message .= "will then be prompted to choose a new password.</p>";
-            $message .= "<a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
-            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
-
-            $email = Yii::$app->mailer->compose();
-            $email->setTo($toEmail)
-                ->setSubject(AppConstant::FORGOT_PASS_MAIL_SUBJECT)
-                ->setHtmlBody($message)
-                ->send();
-        }
-
-        return $this->render('forgetPassword', ['model' => $model,]);
-    }
-
-    public function actionForgetUsername()
-    {
-        $model = new ForgetUsernameForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $param = Yii::$app->request->getBodyParams();
-            $toEmail = $param['ForgetUsernameForm']['email'];
-
-            $user = User::findByEmail($toEmail);
-            if ($user) {
-                $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>";
-                $message .= "<p>Your email was entered in the Username Lookup page on OpenMath.  If you did not do this, you may ignore and delete this message.  ";
-                $message .= "All usernames using this email address are listed below</p><p>";
-                $message .= "Username: <b>" . $user->SID . " </b> <br/>.";
-
-                $email = Yii::$app->mailer->compose();
-                $email->setTo($toEmail)
-                    ->setSubject(AppConstant::FORGOT_USER_MAIL_SUBJECT)
-                    ->setHtmlBody($message)
-                    ->send();
-            } else {
-                Yii::$app->session->setFlash('error', AppConstant::INVALID_EMAIL);
-            }
-        }
-        return $this->render('forgetUsername', ['model' => $model,]);
-    }
-
-
-    public function actionCheckBrowser()
-    {
-        return $this->render('checkBrowser');
-
     }
 
     public function actionAdminDiagnostic()
@@ -389,7 +336,7 @@ class SiteController extends AppController
 
         if ($model->load(Yii::$app->request->post()))
         {
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getBodyParams();
 
             $params = $params['AdminDiagnosticForm'];
             $params['ownerid'] = Yii::$app->user->identity->SID;
@@ -399,16 +346,17 @@ class SiteController extends AppController
             $diag->attributes = $params;
             $diag->save();
         }
-        $this->getView()->registerJsFile("../js/adminDiagnostic.js");
+        $this->includeJS(["js/adminDiagnostic.js"]);
         return $this->render('adminDiagnostic',['model'=>$model]);
     }
+
     public function actionCourseSetting()
     {
             $model = new CourseSettingForm();
 
             if ($model->load(Yii::$app->request->post()))
             {
-
+                AppUtility::dump($_POST);
                 $params = Yii::$app->request->getBodyParams();
                 $params = $params['CourseSettingForm'];
                 $params['ownerid'] = Yii::$app->user->identity->id;
@@ -423,11 +371,11 @@ class SiteController extends AppController
                 $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : 7;
                 $params['toolset']  = AppUtility::makeToolset($toolsets);
 
+                $studentQuickPick = isset($params['studentQuickPick']) ? $params['studentQuickPick'] : null;
+                $instructorQuickPick = isset($params['instructorQuickPick']) ? $params['instructorQuickPick'] : null;
+                $quickPickBar = isset($params['quickPickBar']) ? $params['quickPickBar'] : null;
+                $params['topbar'] = AppUtility::createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar);
 
-                //$params['toolset']= $params['navigationLink'];
-
-               // $params['showlatepass']= $params['remainingLatePasses'];
-                //$params['topbar']= $params['studentQuickPick'];
                 $params['cploc']= $params['courseManagement'];
                 $params['deflatepass']= $params['latePasses'];
                 $params['theme']= $params['theme'];
@@ -437,23 +385,8 @@ class SiteController extends AppController
                 AppUtility::dump($params);
                 $courseSetting->attributes = $params;
                 $courseSetting->save();
-                /*$courseSetting->id;
-
-                $params1['userid'] = Yii::$app->user->identity->id;
-               // $params1['courseid']= $courseSetting->id;
-
-                $teacher = new BaseImasTeachers();
-                $teacher->attributes = $params1;
-                $teacher->save();
-
-                $params2['courseid']= Yii::$app->user->identity->id;
-
-                $gbScheme = new BaseImasGbscheme();
-                $gbScheme->attributes = $params2;
-                $gbScheme->save();*/
-
             }
-            $this->getView()->registerJsFile("../js/courseSetting.js");
+            $this->includeJS(["js/courseSetting.js"]);
             return $this->render('courseSetting', ['model' => $model]);
         }
 }

@@ -4,13 +4,12 @@ namespace app\models;
 
 use app\components\AppConstant;
 use Yii;
-use yii\base\Model;
 use app\components\AppUtility;
 
 /**
  * LoginForm is the model behind the login form.
  */
-class LoginForm extends Model
+class LoginForm extends AppModel
 {
     public $username;
     public $password;
@@ -55,7 +54,6 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? AppConstant::REMEMBER_ME_TIME : AppConstant::ZERO_VALUE);
         } else {
-            Yii::$app->session->setFlash('danger', AppConstant::INVALID_USERNAME_PASSWORD);
             return false;
         }
     }
@@ -68,9 +66,9 @@ class LoginForm extends Model
     public function getUser()
     {
         $this->_user = User::findByUsername($this->username);
-        if($this->_user)
+        if($this->_user){
             return $this->_user;
-
+        }
         return false;
     }
 
@@ -84,14 +82,9 @@ class LoginForm extends Model
             $user = User::findUser($this->username);
             if($user)
             {
-
-//                require("../components/Password.php");
-                if(AppUtility::verifyPassword($this->password, $user->password))
+               if(AppUtility::verifyPassword($this->password, $user->password))
                 {
                     $this->_user = $user;
-
-                    Yii::$app->session->set('user.identity',$user);
-//                    Yii::$app->user->identity = $user;
                 }
             }
         }

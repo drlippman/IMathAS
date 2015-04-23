@@ -26,5 +26,6 @@ class AppConstant {
     const INSTRUCTOR_REQUEST_MAIL_SUBJECT = 'New Instructor Account Request';
     const STUDENT_REQUEST_MAIL_SUBJECT = 'New Student Account Request';
     const STUDENT_REQUEST_SUCCESS = 'Your new account request has been sent.';
-
+    const DEFAULT_TIME_ZONE = 'Asia/Kolkata';
+    const UPLOAD_DIRECTORY = 'Uploads/';
 }

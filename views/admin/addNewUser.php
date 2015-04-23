@@ -42,6 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'password')->passwordInput() ?>
 
+
         <?= $form->field($model, 'rights')->inline()->radioList([\app\components\AppConstant::GUEST_RIGHT => 'Guest User',
             \app\components\AppConstant::STUDENT_RIGHT => 'Student',
             \app\components\AppConstant::TEACHER_RIGHT => 'Teacher',

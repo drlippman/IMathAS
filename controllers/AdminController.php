@@ -20,15 +20,18 @@ class AdminController extends AppController
     {
         $model = new AddNewUserForm();
         if ($model->load(Yii::$app->request->post())){
-            $params = Yii::$app->request->getBodyParams();
+
+            $params = $this->getBodyParams();
             $params = $params['AddNewUserForm'];
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
+
             $user = new User();
             $user->attributes = $params;
             $user->save();
-            Yii::$app->session->setFlash('success', AppConstant::ADD_NEW_USER);
+
+            $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
         }
         return $this->render('addNewUser', ['model' => $model,]);
     }
