@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'action' => '',
         'fieldConfig' => [
             'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-4 control-label'],
+            'labelOptions' => ['class' => 'col-lg-4'],
         ],
     ]); ?>
 

@@ -7,7 +7,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <link rel="stylesheet" href="../../web/css/adminDiagnostic.css"/>
 <div class="site-login">
-    <?= $this->render('_flashMessage') ?>
+    <?= $this->render("_flashMessage") ?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],

@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
 
     <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
+        <div class="col-lg-offset-2 col-lg-11">
             <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'resetpassword-button']) ?>
         </div>
     </div>

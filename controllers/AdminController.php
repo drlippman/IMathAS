@@ -8,12 +8,16 @@ use app\models\AddNewUserForm;
 use app\components\AppUtility;
 use app\models\User;
 use app\components\AppConstant;
+use app\models\AdminDiagnosticForm;
 
 class AdminController extends AppController
 {
     public function actionIndex()
     {
-        return $this->render('index');
+        $sortBy = 'FirstName';
+        $order = AppConstant::ASCENDING;
+       $users = User::findAllUser($sortBy, $order);
+       return $this->render('index',array('users'=>$users));
     }
 
     public function actionAddNewUser()
@@ -34,6 +38,25 @@ class AdminController extends AppController
             $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
         }
         return $this->render('addNewUser', ['model' => $model,]);
+    }
+
+    public function actionAdminDiagnostic()
+    {
+        $model = new AdminDiagnosticForm();
+
+        if ($model->load(Yii::$app->request->post()))
+        {
+            $params = Yii::$app->request->getBodyParams();
+
+            $params = $params['AdminDiagnosticForm'];
+            $params['ownerid'] = Yii::$app->user->identity->SID;
+            $params['name'] = $params['DiagnosticName'];
+            $params['term'] = $params['TermDesignator'];
+            $diag = new BaseImasDiags();
+            $diag->attributes = $params;
+            $diag->save();
+        }
+        return $this->render('adminDiagnostic',['model'=>$model]);
     }
 
 }

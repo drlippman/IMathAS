@@ -96,31 +96,20 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = static::findOne(['email' => $email]);
         return $user;
     }
-
-    public static function createStudentAccount()
+    public static function findAllUser($sortBy, $order)
     {
-        $params = $_POST;
-        //require("../components/password.php");
-        $params = $params['StudentRegisterForm'];
+        return User::find()->orderBy([$sortBy => $order])->all();
+    }
+
+    public static function createStudentAccount($params)
+    {
         $params['SID'] = $params['username'];
         $params['password'] = AppUtility::passwordHash($params['password']);
         $params['hideonpostswidget'] = '0';
         $user = new User();
         $user->attributes = $params;
         $user->save();
-        $toEmail = $user->email;
-        $message = 'First Name: '.$user->FirstName.  "<br/>\n";
-        $message .= 'Last Name: '.$user->LastName.  "<br/>\n";
-        $message .= 'Email Name: '.$user->email.  "<br/>\n";
-        $message .= 'User Name: '.$user->SID. "<br/>\n";
-
-        $email = Yii::$app->mailer->compose();
-        $email->setTo($toEmail)
-            ->setSubject(AppConstant::STUDENT_REQUEST_MAIL_SUBJECT)
-            ->setHtmlBody($message)
-            ->send();
-        Yii::$app->session->setFlash('success', AppConstant::STUDENT_REQUEST_SUCCESS);
-
+        return true;
     }
 
 

@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
@@ -27,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'action' => '',
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-5\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 control-label'],
+                'labelOptions' => ['class' => 'col-lg-2 '],
             ],
         ]); ?>
 

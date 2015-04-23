@@ -88,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </fieldset>
 </div>
 <div class="form-group">
-    <div class="col-lg-offset-1 col-lg-11">
+    <div class="col-lg-offset-2  col-lg-11">
         <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
     </div>
 </div>

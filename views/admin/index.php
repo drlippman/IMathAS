@@ -1,8 +1,8 @@
-<?php
+    <?php
 /* @var $this yii\web\View */
 $this->title = 'Admin';
 $this->params['breadcrumbs'][] = $this->title;
-?>
+    ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,7 +46,11 @@ $this->params['breadcrumbs'][] = $this->title;
                    onclick="window.location='../site/course-setting'"/>
             Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
                 <option value="0" selected>Select a user..</option>
+               <?php foreach($users as $user){ ?>
+                <option value="<?php echo $user['id']?>"><?php echo $user['FirstName']." ".$user['LastName']."(".$user['SID'].")";?></option>
+                <?php } ?>
             </select>
+
         </div>
 
 
