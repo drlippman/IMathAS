@@ -4,10 +4,7 @@ namespace app\controllers;
 
 use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
-use app\models\_base\BaseImasDiags;
-use app\models\AdminDiagnosticForm;
 use app\models\ChangeUserInfoForm;
-use app\models\Course;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
 use app\models\ForgotPasswordForm;
