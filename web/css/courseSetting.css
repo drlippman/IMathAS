@@ -6,11 +6,14 @@
 {
     float: left;
 }
+.time-input{
+    margin-left: 8%;
+}
 .datetime{
     width: 100%;
 }
 .bootstrap-timepicker{
-    width: 65%;
+    width: 82%;
 }
 
 .start
@@ -18,7 +21,6 @@
     float: left;
     margin-right: 12px;
     margin-top: 7px;
-    margin-left: 20px;
 }
 .end
 {
@@ -36,4 +38,11 @@
 .font
 {
     font: bold;
+}
+.radio-inline{
+    padding-top: 0px !important;
+}
+
+#coursesettingform-showicons{
+    padding: 0px;
 }

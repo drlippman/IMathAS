@@ -17,7 +17,7 @@ class AppController extends Controller
 
     function getBodyParams()
     {
-        return Yii::$app->request->getBodyParams();
+        return \Yii::$app->request->getBodyParams();
     }
 
     function setSuccessFlash($message)

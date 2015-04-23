@@ -10,8 +10,8 @@ use app\models\ChangeUserInfoForm;
 use app\models\Course;
 use app\models\CourseSettingForm;
 use app\models\DiagnosticForm;
-use app\models\ForgetPasswordForm;
-use app\models\ForgetUsernameForm;
+use app\models\ForgotPasswordForm;
+use app\models\ForgotUsernameForm;
 use app\models\LoginForm;
 use app\models\RegistrationForm;
 use app\models\Student;
@@ -187,10 +187,10 @@ class SiteController extends AppController
 
     public function actionForgotPassword()
     {
-        $model = new ForgetPasswordForm();
+        $model = new ForgotPasswordForm();
         if ($model->load(Yii::$app->request->post())) {
             $param = $this->getBodyParams();
-            $username = $param['ForgetPasswordForm']['username'];
+            $username = $param['ForgotPasswordForm']['username'];
 
             $user = User::findByUsername($username);
             $code = AppUtility::generateRandomString();
@@ -210,15 +210,15 @@ class SiteController extends AppController
             AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
         }
 
-        return $this->render('forgetPassword', ['model' => $model,]);
+        return $this->render('forgotPassword', ['model' => $model,]);
     }
 
     public function actionForgotUsername()
     {
-        $model = new ForgetUsernameForm();
+        $model = new ForgotUsernameForm();
         if ($model->load(Yii::$app->request->post())) {
             $param = $this->getBodyParams();
-            $toEmail = $param['ForgetUsernameForm']['email'];
+            $toEmail = $param['ForgotUsernameForm']['email'];
 
             $user = User::findByEmail($toEmail);
             if ($user) {
@@ -231,7 +231,7 @@ class SiteController extends AppController
                 $this->setErrorFlash(AppConstant::INVALID_EMAIL);
             }
         }
-        return $this->render('forgetUsername', ['model' => $model,]);
+        return $this->render('forgotUsername', ['model' => $model,]);
     }
 
 
@@ -302,7 +302,7 @@ class SiteController extends AppController
 
     public function actionChangeUserInfo()
     {
-        if( Yii::$app->session->get('user.identity'))
+        if( Yii::$app->user->identity)
         {
             $tzname = $this->getUserTimezone();
 
@@ -347,41 +347,41 @@ class SiteController extends AppController
 
     public function actionCourseSetting()
     {
-            $model = new CourseSettingForm();
+        $model = new CourseSettingForm();
 
-            if ($model->load(Yii::$app->request->post()))
-            {
-                AppUtility::dump($_POST);
-                $params = Yii::$app->request->getBodyParams();
-                $params = $params['CourseSettingForm'];
-                $params['ownerid'] = Yii::$app->user->identity->id;
-                $params['name'] = $params['courseName'];
-                $params['enrollkey'] = $params['enrollmentKey'];
-                $availables = isset($params['available']) ? $params['available'] : 3;
-                $params['available'] = AppUtility::makeAvailable($availables);
-                $params['picicons'] = $params['icons'];
-                $params['allowunenroll'] = $params['selfUnenroll'];
-                $params['copyrights'] = $params['copyCourse'];
-                $params['msgset'] = $params['messageSystem'];
-                $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : 7;
-                $params['toolset']  = AppUtility::makeToolset($toolsets);
+        if ($model->load(Yii::$app->request->post()))
+        {
+            AppUtility::dump($_POST);
+            $params = Yii::$app->request->getBodyParams();
+            $params = $params['CourseSettingForm'];
+            $params['ownerid'] = Yii::$app->user->identity->id;
+            $params['name'] = $params['courseName'];
+            $params['enrollkey'] = $params['enrollmentKey'];
+            $availables = isset($params['available']) ? $params['available'] : 3;
+            $params['available'] = AppUtility::makeAvailable($availables);
+            $params['picicons'] = $params['icons'];
+            $params['allowunenroll'] = $params['selfUnenroll'];
+            $params['copyrights'] = $params['copyCourse'];
+            $params['msgset'] = $params['messageSystem'];
+            $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : 7;
+            $params['toolset']  = AppUtility::makeToolset($toolsets);
 
-                $studentQuickPick = isset($params['studentQuickPick']) ? $params['studentQuickPick'] : null;
-                $instructorQuickPick = isset($params['instructorQuickPick']) ? $params['instructorQuickPick'] : null;
-                $quickPickBar = isset($params['quickPickBar']) ? $params['quickPickBar'] : null;
-                $params['topbar'] = AppUtility::createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar);
+            $studentQuickPick = isset($params['studentQuickPick']) ? $params['studentQuickPick'] : null;
+            $instructorQuickPick = isset($params['instructorQuickPick']) ? $params['instructorQuickPick'] : null;
+            $quickPickBar = isset($params['quickPickBar']) ? $params['quickPickBar'] : null;
+            $params['topbar'] = AppUtility::createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar);
 
-                $params['cploc']= $params['courseManagement'];
-                $params['deflatepass']= $params['latePasses'];
-                $params['theme']= $params['theme'];
-                AppUtility::dump($params);
-                $courseSetting = new BaseImasCourses();
-                $params = AppUtility::removeEmptyAttributes($params);
-                AppUtility::dump($params);
-                $courseSetting->attributes = $params;
-                $courseSetting->save();
-            }
-            $this->includeJS(["js/courseSetting.js"]);
-            return $this->render('courseSetting', ['model' => $model]);
+            $params['cploc']= $params['courseManagement'];
+            $params['deflatepass']= $params['latePasses'];
+            $params['theme']= $params['theme'];
+            AppUtility::dump($params);
+            $courseSetting = new BaseImasCourses();
+            $params = AppUtility::removeEmptyAttributes($params);
+            AppUtility::dump($params);
+            $courseSetting->attributes = $params;
+            $courseSetting->save();
         }
+        $this->includeJS(["js/courseSetting.js"]);
+        return $this->render('courseSetting', ['model' => $model]);
+    }
 }

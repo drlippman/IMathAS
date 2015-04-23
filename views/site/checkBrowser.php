@@ -52,4 +52,4 @@
 </script>
 
 <h3>Is it working?</h3>
-When everything is working, <A href="<?php echo Yii::$app->homeUrl;?>">Return to Login Page</a>
+When everything is working, <A href="<?php echo Yii::$app->homeUrl;?>site/login">Return to Login Page</a>

@@ -2,16 +2,15 @@
 
 namespace app\models;
 use yii\base\Model;
-class ForgetUsernameForm extends Model
+class ForgotPasswordForm extends Model
 {
-    public $email;
+    public $username;
 
     public function rules()
     {
         return
             [
-                [['email'],'required'],
-                [['email'],'email'],
+                [['username'],'required'],
             ];
     }
 
@@ -19,7 +18,7 @@ class ForgetUsernameForm extends Model
     {
         return
             [
-                'email' => 'Email',
+                'username' => 'Username',
             ];
     }
 }

@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tbody>
             </table>
             <input type=button class="btn btn-primary" value="Add New Course"
-                   onclick="window.location='forms.php?action=addcourse'"/>
+                   onclick="window.location='../site/course-setting'"/>
             Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
                 <option value="0" selected>Select a user..</option>
             </select>

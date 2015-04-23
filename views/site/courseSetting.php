@@ -26,19 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
         <div class="form-label-alignment">
-            <?php echo 'Id: Will be assigned when the course is created' ?>
 
-            <?= $form->field($model, 'courseName')->textInput(); ?>
+        <?= $form->field($model, 'courseName')->textInput(); ?>
 
-            <?= $form->field($model, 'enrollmentKey')->textInput() ?>
-
-<<<<<<< Updated upstream
         <?= $form->field($model, 'enrollmentKey')->textInput() ?>
         <?= $form->field($model, 'time')->textInput() ?>
         <div class="datetime form-group">
             <?php
-            echo '<label class="start col-lg-2 pull-left"> Start Time </label>';
-            echo '<div class = "pull-left">';
+            echo '<label class="start col-lg-2 pull-left "> Start Time </label>';
+            echo '<div class = "pull-left col-lg-4 time-input">';
             echo TimePicker::widget([
               'name' => 'start_time',
                'value' => '10:00 AM',
@@ -48,8 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]);
             echo '</div>';?>
            <?php
-            echo '<label class="end"> End Time </label>';
-            echo'<div style="float: left">';
+            echo '<label class="end pull-left col-lg-1"> End Time </label>';
+            echo'<div class="pull-left col-lg-4">';
             echo TimePicker::widget([
                 'name' => 'end_time',
                 'value' => '10:00 PM',
@@ -62,36 +58,6 @@ $this->params['breadcrumbs'][] = $this->title;
             echo'</div>';?>
         </div>
 
-=======
-        <div class="datetime">
-            <?php
-            echo '<label class="start"> Start Time </label>';
-            echo '<div style="float: left">';
-            echo TimePicker::widget([
-                'name' => 'start_time',
-                'value' => '11:24 AM',
-                'pluginOptions' => [
-                    'showSeconds' => true
-                ]
-            ]);
-            echo '</div>';
-            ?>
-            <?php
-            echo '<label class="end"> End Time </label>';
-            echo '<div style="float: left">';
-            echo TimePicker::widget([
-                'name' => 'start_time',
-                'value' => '11:24 AM',
-                'pluginOptions' => [
-                    'showSeconds' => true,
-                    'class' => 'time'
-                ]
-            ]);
-
-            echo '</div>';
-            ?>
-        </div>
->>>>>>> Stashed changes
         <div style="clear: both"></div>
         <?= $form->field($model, 'available')->checkboxList(['2' => 'Available to students', '1' => 'Show on instructors home page'], ['checked' => '1']) ?>
 
