@@ -7,8 +7,16 @@ $this->params['breadcrumbs'][] = $this->title;
 <html>
 <head>
     <title>OpenMath - OpenMathAdministration</title>
-    <link rel="stylesheet" type="text/css" href="<? echo Yii::$app->homeUrl ?>css/dashboard.css"/>
-    <script type="text/javascript" src="<? echo Yii::$app->homeUrl ?>js/general.js?ver=012115"></script>
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::$app->homeUrl ?>css/dashboard.css"/>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+
+    <script type="text/javascript" src="<?php echo Yii::$app->homeUrl ?>js/general.js?ver=012115"></script>
+    <!-- jQuery -->
+    <script type="text/javascript" charset="utf8" src="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+
+    <!-- DataTables -->
+    <script type="text/javascript" charset="utf8" src="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
 <body>
 <div class=mainbody>
@@ -21,7 +29,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <h3>Courses</h3>
 
         <div class=item>
-            <table class=gb border=0 width="100%">
+
+
+            <table id="course_table" class="display">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -75,6 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ?>
                 </tbody>
             </table>
+
             <input type=button class="btn btn-primary" value="Add New Course"
                    onclick="window.location='../site/course-setting'"/>
             Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
@@ -151,8 +162,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </tbody>
             </table>
-            <!--            <input type=button class="btn btn-primary" value="Add New Diagnostic"-->
-            <!--                   onclick="window.location='/IMathAS/admin/diagsetup.php'">-->
 
             <input type=button class="btn btn-primary" value="Add New Diagnostic">
         </div>
@@ -160,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <h3>Pending Users</h3>
 
         <div class=item>
-            <table class=gb width="100%" id="myTable">
+            <table id="user_table" class="display">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -176,48 +185,43 @@ $this->params['breadcrumbs'][] = $this->title;
                 <tbody>
                 <?php
                 foreach ($users as $key => $user) {
-                $even = 'even';
-                $odd = 'odd'; ?>
-                    <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
+                    if($user->rights == 0)
+                    {
+                        $even = 'even';
+                        $odd = 'odd'; ?>
+                        <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
 
-                        <td>
-                            <?php echo(ucfirst($user->FirstName)); ?>
-                            &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
-                        </td>
+                            <td>
+                                <?php echo(ucfirst($user->FirstName)); ?>
+                                &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
+                            </td>
 
-                        <td>
-                            <?php echo $user->SID; ?>
-                        </td>
-                        <td>
-                            <?php echo $user->email; ?>
-                        </td>
-                        <td>
-                            <?php echo $user->rights; ?>
-                        </td>
-                        <td>
-                            <?php echo $user->lastaccess; ?>
-                        </td>
-                        <td>
-                            <a href="#"><?php echo 'Change';?></a>
-                        </td>
-                        <td>
-                            <a href="#"><?php echo 'Reset';?></a>
-                        </td>
-                        <td>
-                            <a href="#"><?php echo 'Delete';?></a>
-                        </td>
-                    </tr>
-
-
-                <?php
+                            <td>
+                                <?php echo $user->SID; ?>
+                            </td>
+                            <td>
+                                <?php echo $user->email; ?>
+                            </td>
+                            <td>
+                                <?php echo \app\components\AppUtility::getRight($user->rights); ?>
+                            </td>
+                            <td>
+                                <?php echo $user->lastaccess; ?>
+                            </td>
+                            <td>
+                                <a href="#"><?php echo 'Change';?></a>
+                            </td>
+                            <td>
+                                <a href="#"><?php echo 'Reset';?></a>
+                            </td>
+                            <td>
+                                <a href="#"><?php echo 'Delete';?></a>
+                            </td>
+                        </tr>
+                    <?php
+                    }
                 }
                 ?>
-                <!--<tr class=even>
-
-                </tr>
-                <tr class=odd>
-
-                </tr>-->
                 </tbody>
             </table>
 
@@ -231,3 +235,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready( function () {
+        $('#course_table').DataTable();
+        $('#user_table').DataTable();
+    } );
+</script>

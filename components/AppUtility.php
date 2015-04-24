@@ -205,6 +205,42 @@ class AppUtility extends Component {
         return base64_encode(microtime() . rand(0, 9999));
     }
 
+    public static function getRight($right)
+    {
+        $returnRight = "";
+        switch($right)
+        {
+            case 100:
+                $returnRight = 'Admin';
+                break;
+
+            case 75:
+                $returnRight = 'Group Admin';
+                break;
+
+            case 60:
+                $returnRight = 'Diagnostic Creator';
+                break;
+
+            case 40:
+                $returnRight = 'Limited Course Creator';
+                break;
+
+            case 20:
+                $returnRight = 'Instructor';
+                break;
+
+            case 10:
+                $returnRight = 'Student';
+                break;
+
+            case 5:
+                $returnRight = 'Guest';
+                break;
+        }
+        return $returnRight;
+    }
+
 }
 
 ?>
