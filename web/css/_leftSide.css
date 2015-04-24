@@ -1,0 +1,22 @@
+.needed
+{
+    background-color: #cdddeb;
+
+    width: 15%;
+    border:1px;
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    border-color: #000000;
+    margin-left: -30px;
+}
+a{
+    margin-left: 15px;
+}
+
+.centercontent
+{
+    margin-left:18%;
+    background-color: #cdddeb;
+    height: 20%;
+}

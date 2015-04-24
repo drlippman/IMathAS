@@ -27,10 +27,5 @@ class Student extends BaseImasStudents {
     public static function getByUserId($id)
     {
         return static::findAll(['userid' => $id]);
-
-//        $query = BaseImasStudents::find()
-//            ->joinWith(['BaseImasCourses'])
-//            ->where(['BaseImasCourses.id'=>$id])
-//            ->all();
     }
 } 

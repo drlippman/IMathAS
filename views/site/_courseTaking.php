@@ -8,9 +8,11 @@
         <ul class="nomark courselist">
             <?php
                 foreach($students as $student)
-                {?>
-                    <li><a><?php echo $student->course->name ?></a></li>
+                {
+                    if($student){?>
+                    <li><a href="<?php echo Yii::$app->homeUrl.'course/course/index?cid='.$student->courseid?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a></li>
                 <?php }
+                }
             ?>
         </ul>
         <div class="center">

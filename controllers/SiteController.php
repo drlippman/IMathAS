@@ -256,6 +256,7 @@ class SiteController extends AppController
         $user = Yii::$app->user->identity;
 
         $students = Student::getByUserId(\Yii::$app->user->identity->id);
+//        AppUtility::dump($students);
 
         if ($user) {
             $this->includeCSS(['css/dashboard.css']);
