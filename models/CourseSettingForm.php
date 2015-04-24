@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use app\components\AppUtility;
+use app\models\_base\BaseImasCourses;
 use Yii;
 use yii\base\Model;
 class CourseSettingForm extends Model
@@ -71,5 +73,9 @@ class CourseSettingForm extends Model
     'studentLink'=>'Student links location',
     'courseAsTemplate'=>'Mark course as template?',
         ];
+    }
+    public static function findCourseData($sortBy, $order)
+    {
+        return BaseImasCourses::find()->orderBy([$sortBy => $order])->all();
     }
 }

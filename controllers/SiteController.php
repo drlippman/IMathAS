@@ -349,7 +349,7 @@ class SiteController extends AppController
 
         if ($model->load(Yii::$app->request->post()))
         {
-            AppUtility::dump($_POST);
+//            AppUtility::dump($_POST);
             $params = Yii::$app->request->getBodyParams();
             $params = $params['CourseSettingForm'];
             $params['ownerid'] = Yii::$app->user->identity->id;
@@ -372,14 +372,13 @@ class SiteController extends AppController
             $params['cploc']= $params['courseManagement'];
             $params['deflatepass']= $params['latePasses'];
             $params['theme']= $params['theme'];
-            AppUtility::dump($params);
             $courseSetting = new BaseImasCourses();
             $params = AppUtility::removeEmptyAttributes($params);
-            AppUtility::dump($params);
             $courseSetting->attributes = $params;
             $courseSetting->save();
         }
         $this->includeJS(["js/courseSetting.js"]);
+
         return $this->render('courseSetting', ['model' => $model]);
     }
 }

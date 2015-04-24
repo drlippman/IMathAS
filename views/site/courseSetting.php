@@ -6,7 +6,6 @@ use kartik\time\TimePicker;
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
-
 $this->title = 'Course Settings';
 
 $this->params['breadcrumbs'][] = $this->title;

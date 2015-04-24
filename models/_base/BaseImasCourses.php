@@ -127,7 +127,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasAssessments()
     {
-        return $this->hasMany(ImasAssessments::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasAssessments::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -135,7 +135,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasBadgesettings()
     {
-        return $this->hasMany(ImasBadgesettings::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasBadgesettings::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -143,7 +143,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasBookmarks()
     {
-        return $this->hasMany(ImasBookmarks::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasBookmarks::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -151,7 +151,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasCalitems()
     {
-        return $this->hasMany(ImasCalitems::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasCalitems::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -159,7 +159,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasContentTracks()
     {
-        return $this->hasMany(ImasContentTrack::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasContentTrack::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -167,7 +167,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getOwner()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'ownerid']);
     }
 
     /**
@@ -175,7 +175,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasDrillassesses()
     {
-        return $this->hasMany(ImasDrillassess::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasDrillassess::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -183,7 +183,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasExternalTools()
     {
-        return $this->hasMany(ImasExternalTools::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasExternalTools::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -191,7 +191,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasFirstscores()
     {
-        return $this->hasMany(ImasFirstscores::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasFirstscores::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -199,7 +199,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasForums()
     {
-        return $this->hasMany(ImasForums::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasForums::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -207,7 +207,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasGbcats()
     {
-        return $this->hasMany(ImasGbcats::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasGbcats::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -215,7 +215,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasGbitems()
     {
-        return $this->hasMany(ImasGbitems::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasGbitems::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -223,7 +223,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasGbschemes()
     {
-        return $this->hasMany(ImasGbscheme::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasGbscheme::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -231,7 +231,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasInlinetexts()
     {
-        return $this->hasMany(ImasInlinetext::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasInlinetext::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -239,7 +239,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasItems()
     {
-        return $this->hasMany(ImasItems::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasItems::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -247,7 +247,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasLinkedtexts()
     {
-        return $this->hasMany(ImasLinkedtext::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasLinkedtext::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -255,7 +255,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasLoginLogs()
     {
-        return $this->hasMany(ImasLoginLog::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasLoginLog::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -263,7 +263,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasOutcomes()
     {
-        return $this->hasMany(ImasOutcomes::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasOutcomes::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -271,7 +271,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasStudents()
     {
-        return $this->hasMany(ImasStudents::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasStudents::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -279,7 +279,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasStugroupsets()
     {
-        return $this->hasMany(ImasStugroupset::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasStugroupset::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -287,7 +287,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasTeachers()
     {
-        return $this->hasMany(ImasTeachers::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasTeachers::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -295,7 +295,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasTutors()
     {
-        return $this->hasMany(ImasTutors::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasTutors::className(), ['courseid' => 'id']);
     }
 
     /**
@@ -303,6 +303,6 @@ class BaseImasCourses extends \yii\db\ActiveRecord
      */
     public function getImasWikis()
     {
-        return $this->hasMany(ImasWikis::className(), ['courseid' => 'id']);
+        return $this->hasMany(BaseImasWikis::className(), ['courseid' => 'id']);
     }
 }

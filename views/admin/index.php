@@ -1,8 +1,8 @@
-    <?php
+<?php
 /* @var $this yii\web\View */
 $this->title = 'Admin';
 $this->params['breadcrumbs'][] = $this->title;
-    ?>
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,20 +34,54 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </thead>
                 <tbody>
-                <tr class=even>
+                <?php
+                foreach ($courseData as $key => $course) {
+                    $even = 'even';
+                    $odd = 'odd'; ?>
 
-                </tr>
-                <tr class=odd>
+                    <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
+                        <td>
+                            <a href="#"><?php echo ucfirst($course->name); ?></a>
+                        </td>
+                        <td>
+                            <?php echo $course->id; ?>
+                        </td>
 
-                </tr>
+                        <td>
+                            <?php echo(ucfirst($course->owner->FirstName)); ?>
+                            &nbsp;&nbsp;<?php echo(ucfirst($course->owner->LastName)); ?>
+                        </td>
+
+                        <td>
+                            <a href=""><?php echo 'Setting'; ?></a>
+                        </td>
+
+                        <td>
+                            <a href=""><?php echo 'Add/Remove'; ?></a>
+                        </td>
+
+                        <td>
+                            <a href=""><?php echo 'Transfer'; ?></a>
+                        </td>
+
+                        <td>
+                            <a href=""><?php echo 'Delete'; ?></a>
+                        </td>
+                    </tr>
+
+
+                <?php
+                }
+                ?>
                 </tbody>
             </table>
             <input type=button class="btn btn-primary" value="Add New Course"
                    onclick="window.location='../site/course-setting'"/>
             Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
                 <option value="0" selected>Select a user..</option>
-               <?php foreach($users as $user){ ?>
-                <option value="<?php echo $user['id']?>"><?php echo $user['FirstName']." ".$user['LastName']."(".$user['SID'].")";?></option>
+                <?php foreach ($users as $user) { ?>
+                    <option
+                        value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName'] . "(" . $user['SID'] . ")"; ?></option>
                 <?php } ?>
             </select>
 
@@ -77,11 +111,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Delete Old Users</a><br/>
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Students from File</a>
             </span>
-            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Macro File</a><br/>
+            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Macro
+                    File</a><br/>
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Question Images</a><br/>
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Course Files</a><br/>
             </span>
-            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">LTI Provider Creds</a><br/>
+            <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">LTI Provider
+                    Creds</a><br/>
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">External Tools</a><br/>
                 <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Admin Utilities</a><br/>
             </span>
@@ -115,8 +151,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </tbody>
             </table>
-<!--            <input type=button class="btn btn-primary" value="Add New Diagnostic"-->
-<!--                   onclick="window.location='/IMathAS/admin/diagsetup.php'">-->
+            <!--            <input type=button class="btn btn-primary" value="Add New Diagnostic"-->
+            <!--                   onclick="window.location='/IMathAS/admin/diagsetup.php'">-->
 
             <input type=button class="btn btn-primary" value="Add New Diagnostic">
         </div>
@@ -138,12 +174,50 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </thead>
                 <tbody>
-                <tr class=even>
+                <?php
+                foreach ($users as $key => $user) {
+                $even = 'even';
+                $odd = 'odd'; ?>
+                    <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
+
+                        <td>
+                            <?php echo(ucfirst($user->FirstName)); ?>
+                            &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
+                        </td>
+
+                        <td>
+                            <?php echo $user->SID; ?>
+                        </td>
+                        <td>
+                            <?php echo $user->email; ?>
+                        </td>
+                        <td>
+                            <?php echo $user->rights; ?>
+                        </td>
+                        <td>
+                            <?php echo $user->lastaccess; ?>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Change';?></a>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Reset';?></a>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Delete';?></a>
+                        </td>
+                    </tr>
+
+
+                <?php
+                }
+                ?>
+                <!--<tr class=even>
 
                 </tr>
                 <tr class=odd>
 
-                </tr>
+                </tr>-->
                 </tbody>
             </table>
 

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\CourseSettingForm;
 use Yii;
 use yii\web\Controller;
 use app\models\AddNewUserForm;
@@ -17,7 +18,13 @@ class AdminController extends AppController
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
        $users = User::findAllUser($sortBy, $order);
-       return $this->render('index',array('users'=>$users));
+
+        $sortBy = 'name';
+        $order = AppConstant::ASCENDING;
+        $courseData = CourseSettingForm::findCourseData($sortBy, $order);
+
+        $this->includeCSS(['css/dashboard.css']);
+       return $this->render('index',array('users' => $users, 'courseData' => $courseData));
     }
 
     public function actionAddNewUser()
