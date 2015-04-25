@@ -422,6 +422,11 @@ function setuptracklinks(i,el) {
 				setTimeout('window.location.href = "'+jQuery(this).attr('href')+'"',100);
 				return false;
 			}
+		}).mousedown(function(e) {
+			if (e.which==3) { //right click
+				var inf = jQuery(this).attr('data-base').split('-');
+				recclick(inf[0], inf[1], jQuery(this).attr("href"), jQuery(this).text());
+			}
 		});
 	}
 }
