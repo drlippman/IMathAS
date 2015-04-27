@@ -24,9 +24,11 @@
             <?php
 
                 if($user->rights > \app\components\AppConstant::GUEST_RIGHT){
-                    if($user->rights == \app\components\AppConstant::ADMIN_RIGHT)
+                    if($user->rights > \app\components\AppConstant::TEACHER_RIGHT)
                     {
                         echo $this->render('_adminCourseTeaching');
+                    }else{
+                        echo $this->render('_courseTeaching');
                     }
                     echo $this->render('_courseTaking', ['students' => $students]);
                 } ?>

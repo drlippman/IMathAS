@@ -30,4 +30,13 @@ class AppConstant {
     const UPLOAD_DIRECTORY = 'Uploads/';
     const DESCENDING = SORT_DESC;
     const ASCENDING = SORT_ASC;
+    const HIDE_ICONS_VALUE = 0;
+    const CPLOC_VALUE = 7;
+    const CHATSET_VALUE = 0;
+    const SHOWLATEPASS = 1;
+    const UNENROLL_VALUE = 0;
+    const PIC_ICONS_VALUE = 1;
+    const TOPBAR_VALUE = '0,1,2,3,9|0,2,3,4,6,9|0';
+    const AVAILABLE_NOT_CHECKED_VALUE = 3;
+    const NAVIGATION_NOT_CHECKED_VALUE = 7;
 }

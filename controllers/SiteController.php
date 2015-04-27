@@ -3,24 +3,22 @@
 namespace app\controllers;
 
 use app\components\AppConstant;
-use app\models\_base\BaseImasCourses;
-use app\models\ChangeUserInfoForm;
-use app\models\CourseSettingForm;
-use app\models\DiagnosticForm;
-use app\models\ForgotPasswordForm;
-use app\models\ForgotUsernameForm;
-use app\models\LoginForm;
-use app\models\RegistrationForm;
+use app\models\forms\ChangeUserInfoForm;
+use app\models\forms\DiagnosticForm;
+use app\models\forms\ForgotPasswordForm;
+use app\models\forms\ForgotUsernameForm;
+use app\models\forms\LoginForm;
+use app\models\forms\RegistrationForm;
 use app\models\Student;
-use app\models\StudentEnrollCourseForm;
-use app\models\StudentRegisterForm;
+use app\models\forms\StudentEnrollCourseForm;
+use app\models\forms\StudentRegisterForm;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\components\AppUtility;
-use app\models\ChangePasswordForm;
-use app\models\MessageForm;
+use app\models\forms\ChangePasswordForm;
+use app\models\forms\MessageForm;
 use yii\web\UploadedFile;
 
 class SiteController extends AppController
@@ -110,13 +108,11 @@ class SiteController extends AppController
         $model = new RegistrationForm();
         if ($model->load(Yii::$app->request->post())) {
 
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getBodyParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
-
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
-
 
             $user = new User();
             $user->attributes = $params;
@@ -127,9 +123,7 @@ class SiteController extends AppController
             $message .= 'Last Name: '.$user->LastName.  "<br/>\n";
             $message .= 'Email Name: '.$user->email.  "<br/>\n";
             $message .= 'User Name: '.$user->SID. "<br/>\n";
-
             AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
-
             $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
         }
         return $this->render('registration', [
@@ -142,7 +136,7 @@ class SiteController extends AppController
 
         $model = new StudentRegisterForm();
         if ($model->load(Yii::$app->request->post())) {
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getBodyParams();
             $params = $params['StudentRegisterForm'];
             $status = User::createStudentAccount($params);
             if ($status)
@@ -157,7 +151,7 @@ class SiteController extends AppController
                     ->setSubject(AppConstant::STUDENT_REQUEST_MAIL_SUBJECT)
                     ->setHtmlBody($message)
                     ->send();
-                Yii::$app->session->setFlash('success', AppConstant::STUDENT_REQUEST_SUCCESS);
+                $this->setSuccessFlash(AppConstant::STUDENT_REQUEST_SUCCESS);
 
             }
 
@@ -253,43 +247,47 @@ class SiteController extends AppController
 
     public function actionDashboard()
     {
-        $user = Yii::$app->user->identity;
+        if(!$this->isGuestUser())
+        {
+            $user = $this->getAuthenticatedUser();
+            $students = Student::getByUserId($user->id);
+            if ($user) {
+                $this->includeCSS(['css/dashboard.css']);
+                $this->getView()->registerJs('var usingASCIISvg = true;');
+                $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
 
-        $students = Student::getByUserId(\Yii::$app->user->identity->id);
-//        AppUtility::dump($students);
-
-        if ($user) {
-            $this->includeCSS(['css/dashboard.css']);
-            $this->getView()->registerJs('var usingASCIISvg = true;');
-            $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
-
-            $userData = ['user' => $user, 'students' => $students];
-            return $this->render('adminDashboard', $userData);
+                $userData = ['user' => $user, 'students' => $students];
+                return $this->render('dashboard', $userData);
+            }
         }
-        Yii::$app->session->setFlash('danger', AppConstant::LOGIN_FIRST);
+
+        $this->setErrorFlash(AppConstant::LOGIN_FIRST);
         return $this->redirect('login');
     }
 
     public function actionChangePassword()
     {
-        if (Yii::$app->user->identity) {
+        if(!$this->isGuestUser())
+        {
             $model = new ChangePasswordForm();
             if ($model->load(Yii::$app->request->post())) {
-                $param = Yii::$app->request->getBodyParams();
+                $param = $this->getBodyParams();
 
                 $oldPass = $param['ChangePasswordForm']['oldPassword'];
                 $newPass = $param['ChangePasswordForm']['newPassword'];
 
-                if (AppUtility::verifyPassword($oldPass, Yii::$app->user->identity->password)) {
-                    $user = User::findByUsername(Yii::$app->user->identity->SID);
+                $user = $this->getAuthenticatedUser();
+
+                if (AppUtility::verifyPassword($oldPass, $user->password)) {
+                    $user = User::findByUsername($user->SID);
                     $password = AppUtility::passwordHash($newPass);
                     $user->password = $password;
                     $user->save();
 
-                    Yii::$app->session->setFlash('success', 'Your password has been changed.');
+                    $this->setSuccessFlash('Your password has been changed.');
                     return $this->redirect('change-password');
                 } else {
-                    Yii::$app->session->setFlash('danger', 'Old password did nit match.');
+                    $this->setErrorFlash('Old password did not match.');
                     return $this->redirect('change-password');
                 }
             }
@@ -300,11 +298,11 @@ class SiteController extends AppController
 
     public function actionChangeUserInfo()
     {
-        if( Yii::$app->user->identity)
+        if(!$this->isGuestUser())
         {
             $tzname = $this->getUserTimezone();
 
-            $user = Yii::$app->session->get('user.identity');
+            $user = $this->getAuthenticatedUser();
             $model = new ChangeUserInfoForm();
             if($model->load(Yii::$app->request->post()) && $model->checkPassword())
             {
@@ -317,9 +315,9 @@ class SiteController extends AppController
                     $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY. $user->id.'.jpg');
                 }
                 User::saveUserRecord($params);
+                $this->setSuccessFlash('Changes updated successfully.');
             }
             $this->includeJS(['js/changeUserInfo.js']);
-
             return $this->render('changeUserinfo',['model'=> $model, 'user' => isset($user->attributes)?$user->attributes:null,'tzname' => $tzname]);
         }
         return $this->redirect('login');
@@ -327,58 +325,23 @@ class SiteController extends AppController
 
     public function actionMessages()
     {
-        if ($this->getAuthenticatedUser()) {
-            $model = new MessageForm();
-            return $this->render('messages', ['model' => $model,]);
+        if(!$this->isGuestUser())
+        {
+            if ($this->getAuthenticatedUser()) {
+                $model = new MessageForm();
+                return $this->render('messages', ['model' => $model,]);
+            }
+            return $this->redirect('login');
         }
-        return $this->redirect('login');
     }
 
     public function actionStudentEnrollCourse()
     {
-        if (Yii::$app->user->identity) {
+        if(!$this->isGuestUser())
+        {
             $model = new StudentEnrollCourseForm();
             return $this->render('studentEnrollCourse', ['model' => $model,]);
         }
         return $this->redirect('login');
-    }
-
-    public function actionCourseSetting()
-    {
-        $model = new CourseSettingForm();
-
-        if ($model->load(Yii::$app->request->post()))
-        {
-//            AppUtility::dump($_POST);
-            $params = Yii::$app->request->getBodyParams();
-            $params = $params['CourseSettingForm'];
-            $params['ownerid'] = Yii::$app->user->identity->id;
-            $params['name'] = $params['courseName'];
-            $params['enrollkey'] = $params['enrollmentKey'];
-            $availables = isset($params['available']) ? $params['available'] : 3;
-            $params['available'] = AppUtility::makeAvailable($availables);
-            $params['picicons'] = $params['icons'];
-            $params['allowunenroll'] = $params['selfUnenroll'];
-            $params['copyrights'] = $params['copyCourse'];
-            $params['msgset'] = $params['messageSystem'];
-            $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : 7;
-            $params['toolset']  = AppUtility::makeToolset($toolsets);
-
-            $studentQuickPick = isset($params['studentQuickPick']) ? $params['studentQuickPick'] : null;
-            $instructorQuickPick = isset($params['instructorQuickPick']) ? $params['instructorQuickPick'] : null;
-            $quickPickBar = isset($params['quickPickBar']) ? $params['quickPickBar'] : null;
-            $params['topbar'] = AppUtility::createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar);
-
-            $params['cploc']= $params['courseManagement'];
-            $params['deflatepass']= $params['latePasses'];
-            $params['theme']= $params['theme'];
-            $courseSetting = new BaseImasCourses();
-            $params = AppUtility::removeEmptyAttributes($params);
-            $courseSetting->attributes = $params;
-            $courseSetting->save();
-        }
-        $this->includeJS(["js/courseSetting.js"]);
-
-        return $this->render('courseSetting', ['model' => $model]);
     }
 }

@@ -205,6 +205,7 @@ class AppUtility extends Component {
         return base64_encode(microtime() . rand(0, 9999));
     }
 
+
     public static function getRight($right)
     {
         $returnRight = "";
@@ -239,6 +240,31 @@ class AppUtility extends Component {
                 break;
         }
         return $returnRight;
+    }
+
+    public static function calculateTimeDefference($startTime, $endTime)
+    {
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$endTime, $tmatches);
+        if (count($tmatches)==0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/',$endTime, $tmatches);
+            $tmatches[3] = $tmatches[2];
+            $tmatches[2] = 0;
+        }
+        $tmatches[1] = $tmatches[1]%12;
+        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+        $deftime = $tmatches[1]*60 + $tmatches[2];
+
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$startTime, $tmatches);
+        if (count($tmatches)==0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/',$startTime, $tmatches);
+            $tmatches[3] = $tmatches[2];
+            $tmatches[2] = 0;
+        }
+        $tmatches[1] = $tmatches[1]%12;
+        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+        $deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
+
+        return $deftime;
     }
 
 }

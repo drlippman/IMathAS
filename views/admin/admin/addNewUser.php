@@ -13,12 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
 
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
-
-        <div class="alert alert-danger">
-            <?php echo Yii::$app->session->getFlash('error') ?>
-        </div>
-    <?php endif; ?>
+    <?= $this->render('_flashMessage')?>
 
     <fieldset>
         <legend>New User</legend>
@@ -32,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]); ?>
 
-
         <?= $form->field($model, 'username')->textInput() ?>
 
         <?= $form->field($model, 'FirstName')->textInput() ?>
@@ -43,7 +37,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'password')->passwordInput() ?>
 
-        <?= $form->field($model, 'rights')->inline()->radioList([\app\components\AppConstant::GUEST_RIGHT => 'Guest User',
+        <?=
+        $form->field($model, 'rights')->inline()->radioList([\app\components\AppConstant::GUEST_RIGHT => 'Guest User',
             \app\components\AppConstant::STUDENT_RIGHT => 'Student',
             \app\components\AppConstant::TEACHER_RIGHT => 'Teacher',
             \app\components\AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
@@ -51,10 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
             \app\components\AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
             \app\components\AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
 
-        <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''),['prompt'=>'Default']) ?>
+        <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
 
         <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
+            <div class="col-lg-offset-2 col-lg-5">
                 <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
             </div>
         </div>

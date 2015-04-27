@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasCourses;
@@ -39,17 +39,17 @@ class CourseSettingForm extends Model
     /**
      * @return array the validation rules.
      */
-    /*public function rules()
+    public function rules()
     {
         return [
-            [['available', 'boolean'],
+            [['courseName', 'enrollmentKey'], 'required'],
+            ['latePasses', 'number']
         ];
-    }*/
+    }
 
     public function attributeLabels()
     {
         return [
-    'courseId'=>'Course ID:',
     'courseName'=>'Enter Course name',
     'enrollmentKey'=>' Enter Enrollment key',
     'available'=>'Available?',

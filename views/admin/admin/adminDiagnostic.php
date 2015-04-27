@@ -5,7 +5,7 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Diagnostic Setup';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="../../web/css/adminDiagnostic.css"/>
+<link rel="stylesheet" href="../../../web/css/adminDiagnostic.css"/>
 <div class="site-login">
     <?= $this->render("_flashMessage") ?>
     <?php $form = ActiveForm::begin([

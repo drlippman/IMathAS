@@ -40,10 +40,6 @@
     font: bold;
 }
 
-.radio-inline{
+.radio, .checkbox{
     padding-top: 0px !important;
-}
-
-#coursesettingform-showicons{
-    padding: 0px;
 }

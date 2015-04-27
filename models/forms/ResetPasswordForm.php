@@ -1,10 +1,9 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
 use yii\base\Model;
-class ChangePasswordForm extends Model
+class ResetPasswordForm extends Model
 {
-    public $oldPassword;
     public $confirmPassword;
     public $newPassword;
 
@@ -12,7 +11,7 @@ class ChangePasswordForm extends Model
     {
         return
             [
-                [['oldPassword','confirmPassword','newPassword'],'required'],
+                [['confirmPassword','newPassword'],'required'],
                 ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword'],
             ];
 
@@ -22,11 +21,15 @@ class ChangePasswordForm extends Model
     {
         return
             [
-                'oldPassword' => 'Old Password',
                 'newPassword' => 'New Password',
                 'confirmPassword'=>'Confirm Password',
 
             ];
+    }
+
+    public static function Update()
+    {
+
     }
 
 }

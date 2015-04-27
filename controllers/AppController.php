@@ -17,7 +17,8 @@ class AppController extends Controller
 
     function getBodyParams()
     {
-        return \Yii::$app->request->getBodyParams();
+        return $_POST;
+//        return \Yii::$app->request->getBodyParams();
     }
 
     function setSuccessFlash($message)
@@ -69,9 +70,7 @@ class AppController extends Controller
 
     private function _setFlash($type, $message)
     {
-        Yii::$app->session->setFlash($type, $message);
+        \Yii::$app->session->setFlash($type, $message);
     }
-
-
 
 }

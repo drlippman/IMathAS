@@ -1,8 +1,10 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
 
 use app\components\AppConstant;
+use app\models\AppModel;
+use app\models\User;
 use Yii;
 use app\components\AppUtility;
 
