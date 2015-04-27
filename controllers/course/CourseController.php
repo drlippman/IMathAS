@@ -5,6 +5,7 @@ namespace app\controllers\course;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\Course;
+use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use Yii;
 use app\controllers\AppController;
@@ -16,7 +17,15 @@ class CourseController extends AppController
     {
         if(!$this->isGuestUser())
         {
-            return $this->render('index');
+            $cid = Yii::$app->request->get('cid');
+
+            $assessment = Assessments::getById($cid);
+            //AppUtility::dump($assessment);
+
+
+
+
+            return $this->render('index', ['assessment' => $assessment]);
         }else{
             return $this->redirect(Yii::$app->homeUrl.'site/login');
         }

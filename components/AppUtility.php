@@ -267,6 +267,24 @@ class AppUtility extends Component {
         return $deftime;
     }
 
+    public static function tzdate($string,$time)
+    {
+        global $tzoffset, $tzname;
+        if ($tzname != '')
+        {
+            return date($string, $time);
+        } else
+        {
+            $serveroffset = date('Z') + $tzoffset*60;
+            return date($string, $time-$serveroffset);
+        }
+    }
+    public static function formatDate($date)
+    {
+        return AppUtility::tzdate("D n/j/y, g:i a",$date);
+    }
+
+
 }
 
 ?>

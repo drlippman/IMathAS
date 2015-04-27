@@ -329,7 +329,7 @@ class SiteController extends AppController
         {
             if ($this->getAuthenticatedUser()) {
                 $model = new MessageForm();
-                return $this->render('messages', ['model' => $model,]);
+                return $this->render('messages', ['model' => $model]);
             }
             return $this->redirect('login');
         }
@@ -340,7 +340,7 @@ class SiteController extends AppController
         if(!$this->isGuestUser())
         {
             $model = new StudentEnrollCourseForm();
-            return $this->render('studentEnrollCourse', ['model' => $model,]);
+            return $this->render('studentEnrollCourse', ['model' => $model]);
         }
         return $this->redirect('login');
     }

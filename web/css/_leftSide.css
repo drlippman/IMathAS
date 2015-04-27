@@ -1,13 +1,11 @@
 .needed
 {
-    background-color: #cdddeb;
-
+    background-color: #ddddff;
     width: 15%;
     border:1px;
     box-sizing: border-box;
     display: block;
     position: absolute;
-    border-color: #000000;
     margin-left: -30px;
 }
 a{
@@ -17,6 +15,6 @@ a{
 .centercontent
 {
     margin-left:18%;
-    background-color: #cdddeb;
+    background-color: #ddddff;
     height: 20%;
 }

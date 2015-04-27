@@ -27,7 +27,7 @@
                     if($user->rights > \app\components\AppConstant::TEACHER_RIGHT)
                     {
                         echo $this->render('_adminCourseTeaching');
-                    }else{
+                    }elseif($user->rights > \app\components\AppConstant::STUDENT_RIGHT){
                         echo $this->render('_courseTeaching');
                     }
                     echo $this->render('_courseTaking', ['students' => $students]);
