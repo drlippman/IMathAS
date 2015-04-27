@@ -15,7 +15,9 @@
 
 if (isset($_GET['public'])) {
 	require("../config.php");
-
+	if (isset($sessionpath) && $sessionpath!='') { session_save_path($sessionpath);}
+	ini_set('session.gc_maxlifetime',86400);
+	ini_set('auto_detect_line_endings',true);
 	header('P3P: CP="ALL CUR ADM OUR"');
 	session_start();
 	$_SESSION['publicquickdrill'] = true;

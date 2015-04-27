@@ -390,10 +390,10 @@ function matrixprod($m,$n) {
 		echo 'matrix sizes do not allow product';
 		return $m;
 	}
-	if (count($m)>10 || count($m[0])>10) {
+	if (count($m)*count($m[0])*count($n[0])>1000) {
 		global $myrights;
 		if ($myrights>10) {
-			echo "You really shouldn't use matrixprod for matrices bigger than 10x10.";
+			echo "matrixprod: You really shouldn't do products of very large matrices. ";
 		}
 	}
 	$o = array();

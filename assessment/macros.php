@@ -148,6 +148,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 	} else {
 		$commands .= ');';
 	}
+	if (isset($lbl) && count($lbl)>3) {
+		$commands .= "text([{$settings[1]},0],\"{$lbl[2]}\",\"aboveleft\");";
+		$commands .= "text([0,{$settings[3]}],\"{$lbl[3]}\",\"belowright\");";
+	}
 	$absymin = 1E10;
 	$absymax = -1E10;	
 	foreach ($funcs as $function) {
