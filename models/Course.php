@@ -29,4 +29,9 @@ class Course extends BaseImasCourses {
     {
         return static::findAll(['name' => $name]);
     }
+
+    public static function getById($cid)
+    {
+        return static::findOne(['id' => $cid]);
+    }
 } 

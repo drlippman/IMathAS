@@ -26,7 +26,7 @@ class AdminController extends AppController
             $order = AppConstant::ASCENDING;
             $courseData = CourseSettingForm::findCourseData($sortBy, $order);
 
-            $this->includeCSS(['css/dashboard.css']);
+            $this->includeCSS(['../css/dashboard.css']);
             return $this->render('index',array('users' => $users, 'courseData' => $courseData));
         }else{
             return $this->redirect(Yii::$app->homeUrl.'site/login');

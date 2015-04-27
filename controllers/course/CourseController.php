@@ -4,6 +4,7 @@ namespace app\controllers\course;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\models\AppModel;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
@@ -31,7 +32,7 @@ class CourseController extends AppController
         }
     }
 
-    public function actionCourseSetting()
+    public function actionAddNewCourse()
     {
         if(!$this->isGuestUser())
         {
@@ -68,8 +69,53 @@ class CourseController extends AppController
                 $courseSetting->attributes = $course;
                 $courseSetting->save();
             }
-            $this->includeJS(["js/courseSetting.js"]);
-            return $this->render('courseSetting', ['model' => $model]);
+            $this->includeCSS(["../css/courseSetting.css"]);
+            $this->includeJS(["../js/courseSetting.js"]);
+            return $this->render('addNewCourse', ['model' => $model]);
+        }else{
+            return $this->redirect('login');
+        }
+    }
+
+    public function actionCourseSetting()
+    {
+        if(!$this->isGuestUser())
+        {
+            $cid = Yii::$app->request->get('cid');
+            $user = $this->getAuthenticatedUser();
+            $course = Course::getById($cid);
+            if($course)
+            {
+                $model = new CourseSettingForm();
+
+                if ($model->load(Yii::$app->request->post()))
+                {
+                    $bodyParams = $this->getBodyParams();
+                    $params = $bodyParams['CourseSettingForm'];
+                    $courseSetting['name'] = $params['courseName'];
+                    $courseSetting['enrollkey'] = $params['enrollmentKey'];
+                    $availables = isset($params['available']) ? $params['available'] : AppConstant::AVAILABLE_NOT_CHECKED_VALUE;
+                    $courseSetting['available'] = AppUtility::makeAvailable($availables);
+                    $courseSetting['copyrights'] = $params['copyCourse'];
+                    $courseSetting['msgset'] = $params['messageSystem'];
+                    $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : AppConstant::NAVIGATION_NOT_CHECKED_VALUE;
+                    $courseSetting['toolset']  = AppUtility::makeToolset($toolsets);
+                    $courseSetting['deflatepass']= $params['latePasses'];
+                    $courseSetting['theme']= $params['theme'];
+                    $courseSetting['deftime'] = AppUtility::calculateTimeDefference($bodyParams['start_time'],$bodyParams['end_time']);
+                    $courseSetting['end_time'] = $bodyParams['end_time'];
+                    $courseSetting = AppUtility::removeEmptyAttributes($courseSetting);
+                    $course->attributes = $courseSetting;
+                    $course->save();
+                }
+                $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
+                $this->includeCSS(["../css/courseSetting.css"]);
+                return $this->render('courseSetting', ['model' => $model, 'course' => $course, 'selectionList' => $selectionList]);
+
+            }else{
+                return $this->redirect(Yii::$app->homeUrl.'admin/admin');
+            }
+
         }else{
             return $this->redirect('login');
         }

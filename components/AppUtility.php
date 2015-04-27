@@ -134,7 +134,7 @@ class AppUtility extends Component {
             {
                 if(($params[0] == 1) && $params[1] == 2)
                     return 4;
-                elseif(($params[0] == 1) && $params[1] == 3)
+                elseif(($params[0] == 1) && $params[1] == 4)
                     return 2;
                 else
                     return 1;
@@ -267,6 +267,7 @@ class AppUtility extends Component {
         return $deftime;
     }
 
+
     public static function tzdate($string,$time)
     {
         global $tzoffset, $tzname;
@@ -284,6 +285,61 @@ class AppUtility extends Component {
         return AppUtility::tzdate("D n/j/y, g:i a",$date);
     }
 
+    public static function calculateTimeToDisplay($deftime)
+    {
+        $defetime = $deftime%10000;
+        $hr = floor($defetime/60)%12;
+        $min = $defetime%60;
+        $am = ($defetime<12*60)?'am':'pm';
+        $deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+        if ($deftime>10000) {
+            $defstime = floor($deftime/10000);
+            $hr = floor($defstime/60)%12;
+            $min = $defstime%60;
+            $am = ($defstime<12*60)?'am':'pm';
+            $defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+        } else {
+            $defstimedisp = $deftimedisp;
+        }
+
+        return array('startTime' => $defstimedisp, 'endTime' => $deftimedisp);
+    }
+
+    public static function prepareSelectedItemOfCourseSetting($course)
+    {
+        $availablel = array();
+        $toolset = array();
+        $isTemplate = array();
+        if (($course->available & 1) == 0) {
+            array_push($availablel, 1);
+        }
+        if (($course->available & 2) == 0) {
+            array_push($availablel, 2);
+        }
+
+        if (($course->toolset & 1) == 0) {
+            array_push($toolset, 1);
+        }
+        if (($course->toolset & 2) == 0) {
+            array_push($toolset, 2);
+        }
+        if (($course->toolset & 4) == 0) {
+            array_push($toolset, 4);
+        }
+
+        if (($course->istemplate & 2) == 0) {
+            array_push($isTemplate, 2);
+        }
+        if (($course->istemplate & 1) == 0) {
+            array_push($isTemplate, 1);
+        }
+        if (($course->istemplate & 4) == 0) {
+            array_push($isTemplate, 4);
+
+        }
+
+        return $ckeckList = array('availablel' => $availablel, 'toolset' => $toolset, 'isTemplate' => $isTemplate);
+    }
 
 }
 

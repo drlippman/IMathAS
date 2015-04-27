@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl ?>course/course/course-setting">Add New Course</a>
+    <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl ?>course/course/add-new-course">Add New Course</a>
     Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
         <option value="0" selected>Select a user..</option>
         <?php foreach ($users as $user) { ?>
