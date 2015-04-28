@@ -21,12 +21,12 @@ class CourseController extends AppController
             $cid = Yii::$app->request->get('cid');
 
             $assessment = Assessments::getById($cid);
+            $course = Course::getById($cid);
+
             //AppUtility::dump($assessment);
 
 
-
-
-            return $this->render('index', ['assessment' => $assessment]);
+            return $this->render('index', ['assessments' => $assessment, 'course' => $course]);
         }else{
             return $this->redirect(Yii::$app->homeUrl.'site/login');
         }

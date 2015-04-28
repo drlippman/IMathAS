@@ -1,9 +1,6 @@
-.toolbar
+.centercontent
 {
-    height: 41px;
-
-    display: inline-block;
-    margin-left: 23%;
-    background-color: #cdddeb;
-    margin-top: 20px;
+    background-color: #ddddff;
+    height: 20%;
+    width: 100%;
 }

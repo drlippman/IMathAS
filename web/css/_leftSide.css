@@ -1,20 +1,21 @@
 .needed
 {
+    display: inline-block;
+    margin-top: 10px;
     background-color: #ddddff;
     width: 15%;
-    border:1px;
     box-sizing: border-box;
-    display: block;
     position: absolute;
-    margin-left: -30px;
+    border-radius:10px;
+    border: 2px solid #000000;
+    padding: 20px;
 }
 a{
     margin-left: 15px;
 }
-
-.centercontent
+.course
 {
-    margin-left:18%;
-    background-color: #ddddff;
-    height: 20%;
+    margin-left: 19%;
 }
+
+

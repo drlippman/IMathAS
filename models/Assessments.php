@@ -8,7 +8,7 @@ class Assessments extends BaseImasAssessments
 {
     public static function getById($courseId)
     {
-        return static::findOne(['courseid' => $courseId]);
+        return static::findAll(['courseid' => $courseId]);
     }
 
     public static function getByAssessment($courseId)
