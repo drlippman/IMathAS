@@ -58,7 +58,7 @@ class BaseImasBookmarks extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 
     /**
@@ -66,6 +66,6 @@ class BaseImasBookmarks extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

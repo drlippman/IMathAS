@@ -55,7 +55,7 @@ class BaseImasItems extends \yii\db\ActiveRecord
      */
     public function getImasInstrFiles()
     {
-        return $this->hasMany(ImasInstrFiles::className(), ['itemid' => 'id']);
+        return $this->hasMany(BaseImasInstrFiles::className(), ['itemid' => 'id']);
     }
 
     /**
@@ -63,6 +63,6 @@ class BaseImasItems extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

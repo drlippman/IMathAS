@@ -52,7 +52,7 @@ class BaseImasStugroupmembers extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 
     /**
@@ -60,6 +60,6 @@ class BaseImasStugroupmembers extends \yii\db\ActiveRecord
      */
     public function getStugroup()
     {
-        return $this->hasOne(ImasStugroups::className(), ['id' => 'stugroupid']);
+        return $this->hasOne(BaseImasStugroups::className(), ['id' => 'stugroupid']);
     }
 }

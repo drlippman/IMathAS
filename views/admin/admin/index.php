@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
 
                 <td>
-                    <a href=""><?php echo 'Delete'; ?></a>
+                    <a href="<?php echo Yii::$app->homeUrl.'course/course/delete-course?id=' .$course->id; ?>"><?php echo 'Delete'; ?></a>
                 </td>
             </tr>
         <?php

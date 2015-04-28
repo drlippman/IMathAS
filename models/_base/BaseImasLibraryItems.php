@@ -55,6 +55,6 @@ class BaseImasLibraryItems extends \yii\db\ActiveRecord
      */
     public function getQset()
     {
-        return $this->hasOne(ImasQuestionset::className(), ['id' => 'qsetid']);
+        return $this->hasOne(BaseImasQuestionset::className(), ['id' => 'qsetid']);
     }
 }

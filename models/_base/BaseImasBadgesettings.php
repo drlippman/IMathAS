@@ -62,6 +62,6 @@ class BaseImasBadgesettings extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

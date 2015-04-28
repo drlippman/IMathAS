@@ -61,7 +61,7 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
      */
     public function getImasForumLikes()
     {
-        return $this->hasMany(ImasForumLikes::className(), ['threadid' => 'id']);
+        return $this->hasMany(BaseImasForumLikes::className(), ['threadid' => 'id']);
     }
 
     /**
@@ -69,7 +69,7 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
      */
     public function getImasForumPosts()
     {
-        return $this->hasMany(ImasForumPosts::className(), ['threadid' => 'id']);
+        return $this->hasMany(BaseImasForumPosts::className(), ['threadid' => 'id']);
     }
 
     /**
@@ -77,7 +77,7 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
      */
     public function getStugroup()
     {
-        return $this->hasOne(ImasStugroups::className(), ['id' => 'stugroupid']);
+        return $this->hasOne(BaseImasStugroups::className(), ['id' => 'stugroupid']);
     }
 
     /**
@@ -85,7 +85,7 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
      */
     public function getForum()
     {
-        return $this->hasOne(ImasForums::className(), ['id' => 'forumid']);
+        return $this->hasOne(BaseImasForums::className(), ['id' => 'forumid']);
     }
 
     /**
@@ -93,6 +93,6 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
      */
     public function getImasForumViews()
     {
-        return $this->hasMany(ImasForumViews::className(), ['threadid' => 'id']);
+        return $this->hasMany(BaseImasForumViews::className(), ['threadid' => 'id']);
     }
 }

@@ -55,6 +55,6 @@ class BaseImasInstrFiles extends \yii\db\ActiveRecord
      */
     public function getItem()
     {
-        return $this->hasOne(ImasItems::className(), ['id' => 'itemid']);
+        return $this->hasOne(BaseImasItems::className(), ['id' => 'itemid']);
     }
 }

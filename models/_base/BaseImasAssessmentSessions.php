@@ -98,7 +98,7 @@ class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
      */
     public function getAgroup()
     {
-        return $this->hasOne(ImasGroups::className(), ['id' => 'agroupid']);
+        return $this->hasOne(BaseImasGroups::className(), ['id' => 'agroupid']);
     }
 
     /**
@@ -106,7 +106,7 @@ class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 
     /**
@@ -114,6 +114,6 @@ class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
      */
     public function getAssessment()
     {
-        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
+        return $this->hasOne(BaseImasAssessments::className(), ['id' => 'assessmentid']);
     }
 }

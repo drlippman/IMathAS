@@ -62,6 +62,6 @@ class BaseImasDrillassessSessions extends \yii\db\ActiveRecord
      */
     public function getDrillassess()
     {
-        return $this->hasOne(ImasDrillassess::className(), ['id' => 'drillassessid']);
+        return $this->hasOne(BaseImasDrillassess::className(), ['id' => 'drillassessid']);
     }
 }

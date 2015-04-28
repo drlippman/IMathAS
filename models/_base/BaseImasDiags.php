@@ -83,6 +83,6 @@ class BaseImasDiags extends \yii\db\ActiveRecord
      */
     public function getOwner()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'ownerid']);
     }
 }

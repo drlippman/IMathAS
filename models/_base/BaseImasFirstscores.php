@@ -59,7 +59,7 @@ class BaseImasFirstscores extends \yii\db\ActiveRecord
      */
     public function getQset()
     {
-        return $this->hasOne(ImasQuestionset::className(), ['id' => 'qsetid']);
+        return $this->hasOne(BaseImasQuestionset::className(), ['id' => 'qsetid']);
     }
 
     /**
@@ -67,6 +67,6 @@ class BaseImasFirstscores extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

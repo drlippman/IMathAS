@@ -57,7 +57,7 @@ class BaseImasForumLikes extends \yii\db\ActiveRecord
      */
     public function getPost()
     {
-        return $this->hasOne(ImasForumPosts::className(), ['id' => 'postid']);
+        return $this->hasOne(BaseImasForumPosts::className(), ['id' => 'postid']);
     }
 
     /**
@@ -65,7 +65,7 @@ class BaseImasForumLikes extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 
     /**
@@ -73,6 +73,6 @@ class BaseImasForumLikes extends \yii\db\ActiveRecord
      */
     public function getThread()
     {
-        return $this->hasOne(ImasForumThreads::className(), ['id' => 'threadid']);
+        return $this->hasOne(BaseImasForumThreads::className(), ['id' => 'threadid']);
     }
 }

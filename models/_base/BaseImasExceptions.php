@@ -60,7 +60,7 @@ class BaseImasExceptions extends \yii\db\ActiveRecord
      */
     public function getAssessment()
     {
-        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
+        return $this->hasOne(BaseImasAssessments::className(), ['id' => 'assessmentid']);
     }
 
     /**
@@ -68,6 +68,6 @@ class BaseImasExceptions extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'userid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
 }

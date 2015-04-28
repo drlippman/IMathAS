@@ -3,6 +3,7 @@
 namespace app\models\_base;
 
 use Yii;
+use yii\debug\components\search\matchers\Base;
 
 /**
  * This is the model class for table "imas_assessments".
@@ -145,7 +146,7 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
      */
     public function getImasAssessmentSessions()
     {
-        return $this->hasMany(ImasAssessmentSessions::className(), ['assessmentid' => 'id']);
+        return $this->hasMany(BaseImasAssessmentSessions::className(), ['assessmentid' => 'id']);
     }
 
     /**
@@ -153,7 +154,7 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 
     /**
@@ -161,7 +162,7 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
      */
     public function getImasExceptions()
     {
-        return $this->hasMany(ImasExceptions::className(), ['assessmentid' => 'id']);
+        return $this->hasMany(BaseImasExceptions::className(), ['assessmentid' => 'id']);
     }
 
     /**
@@ -169,6 +170,6 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
      */
     public function getImasQuestions()
     {
-        return $this->hasMany(ImasQuestions::className(), ['assessmentid' => 'id']);
+        return $this->hasMany(BaseImasQuestions::className(), ['assessmentid' => 'id']);
     }
 }

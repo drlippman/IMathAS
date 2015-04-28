@@ -53,7 +53,7 @@ class BaseImasGroups extends \yii\db\ActiveRecord
      */
     public function getImasAssessmentSessions()
     {
-        return $this->hasMany(ImasAssessmentSessions::className(), ['agroupid' => 'id']);
+        return $this->hasMany(BaseImasAssessmentSessions::className(), ['agroupid' => 'id']);
     }
 
     /**
@@ -61,6 +61,6 @@ class BaseImasGroups extends \yii\db\ActiveRecord
      */
     public function getImasExternalTools()
     {
-        return $this->hasMany(ImasExternalTools::className(), ['groupid' => 'id']);
+        return $this->hasMany(BaseImasExternalTools::className(), ['groupid' => 'id']);
     }
 }

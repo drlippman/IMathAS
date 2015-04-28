@@ -71,7 +71,7 @@ class BaseImasDrillassess extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 
     /**
@@ -79,6 +79,6 @@ class BaseImasDrillassess extends \yii\db\ActiveRecord
      */
     public function getImasDrillassessSessions()
     {
-        return $this->hasMany(ImasDrillassessSessions::className(), ['drillassessid' => 'id']);
+        return $this->hasMany(BaseImasDrillassessSessions::className(), ['drillassessid' => 'id']);
     }
 }

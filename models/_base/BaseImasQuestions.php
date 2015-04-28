@@ -74,7 +74,7 @@ class BaseImasQuestions extends \yii\db\ActiveRecord
      */
     public function getQuestionset()
     {
-        return $this->hasOne(ImasQuestionset::className(), ['id' => 'questionsetid']);
+        return $this->hasOne(BaseImasQuestionset::className(), ['id' => 'questionsetid']);
     }
 
     /**
@@ -82,6 +82,6 @@ class BaseImasQuestions extends \yii\db\ActiveRecord
      */
     public function getAssessment()
     {
-        return $this->hasOne(ImasAssessments::className(), ['id' => 'assessmentid']);
+        return $this->hasOne(BaseImasAssessments::className(), ['id' => 'assessmentid']);
     }
 }

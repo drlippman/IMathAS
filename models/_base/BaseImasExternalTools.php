@@ -65,7 +65,7 @@ class BaseImasExternalTools extends \yii\db\ActiveRecord
      */
     public function getGroup()
     {
-        return $this->hasOne(ImasGroups::className(), ['id' => 'groupid']);
+        return $this->hasOne(BaseImasGroups::className(), ['id' => 'groupid']);
     }
 
     /**
@@ -73,6 +73,6 @@ class BaseImasExternalTools extends \yii\db\ActiveRecord
      */
     public function getCourse()
     {
-        return $this->hasOne(ImasCourses::className(), ['id' => 'courseid']);
+        return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
 }

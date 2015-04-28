@@ -104,7 +104,7 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
      */
     public function getImasFirstscores()
     {
-        return $this->hasMany(ImasFirstscores::className(), ['qsetid' => 'id']);
+        return $this->hasMany(BaseImasFirstscores::className(), ['qsetid' => 'id']);
     }
 
     /**
@@ -112,7 +112,7 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
      */
     public function getImasLibraryItems()
     {
-        return $this->hasMany(ImasLibraryItems::className(), ['qsetid' => 'id']);
+        return $this->hasMany(BaseImasLibraryItems::className(), ['qsetid' => 'id']);
     }
 
     /**
@@ -120,7 +120,7 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
      */
     public function getImasQimages()
     {
-        return $this->hasMany(ImasQimages::className(), ['qsetid' => 'id']);
+        return $this->hasMany(BaseImasQimages::className(), ['qsetid' => 'id']);
     }
 
     /**
@@ -128,7 +128,7 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
      */
     public function getImasQuestions()
     {
-        return $this->hasMany(ImasQuestions::className(), ['questionsetid' => 'id']);
+        return $this->hasMany(BaseImasQuestions::className(), ['questionsetid' => 'id']);
     }
 
     /**
@@ -136,6 +136,6 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
      */
     public function getOwner()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'ownerid']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'ownerid']);
     }
 }

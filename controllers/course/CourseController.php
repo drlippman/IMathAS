@@ -10,6 +10,9 @@ use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use Yii;
 use app\controllers\AppController;
+use app\models\forms\DeleteCourseForm;
+use yii\db\Exception;
+use yii\helpers\Html;
 
 
 class CourseController extends AppController
@@ -119,6 +122,52 @@ class CourseController extends AppController
         }else{
             return $this->redirect('login');
         }
+    }
+
+    public function actionDeleteCourse()
+    {
+        $model = new DeleteCourseForm();
+        $cid = Yii::$app->request->get('id');
+        $course = Course::getById($cid);
+        if($course)
+        {
+
+            $connection = Yii::$app->getDb();
+            $transaction = $connection->beginTransaction();
+            try {
+                $connection->createCommand()->delete('imas_courses', 'id ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_assessments', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_badgesettings', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_calitems', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_content_track', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_diags', 'cid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_external_tools', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_drillassess', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_firstscores', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_forums', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_gbcats', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_gbitems', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_gbscheme', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_inlinetext', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_items', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_linkedtext', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_login_log', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_lti_courses', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_msgs', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_outcomes', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_students', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_stugroupset', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_teachers', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_tutors', 'courseid ='.$cid)->execute();
+                $connection->createCommand()->delete('imas_wikis', 'courseid ='.$cid)->execute();
+                //.... other SQL executions
+                $transaction->commit();
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
+        }
+
+
     }
 
 }

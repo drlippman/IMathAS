@@ -70,7 +70,7 @@ class BaseImasMsgs extends \yii\db\ActiveRecord
      */
     public function getMsgfrom0()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'msgfrom']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'msgfrom']);
     }
 
     /**
@@ -78,6 +78,6 @@ class BaseImasMsgs extends \yii\db\ActiveRecord
      */
     public function getMsgto0()
     {
-        return $this->hasOne(ImasUsers::className(), ['id' => 'msgto']);
+        return $this->hasOne(BaseImasUsers::className(), ['id' => 'msgto']);
     }
 }

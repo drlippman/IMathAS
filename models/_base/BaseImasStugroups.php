@@ -54,7 +54,7 @@ class BaseImasStugroups extends \yii\db\ActiveRecord
      */
     public function getImasForumThreads()
     {
-        return $this->hasMany(ImasForumThreads::className(), ['stugroupid' => 'id']);
+        return $this->hasMany(BaseImasForumThreads::className(), ['stugroupid' => 'id']);
     }
 
     /**
@@ -62,7 +62,7 @@ class BaseImasStugroups extends \yii\db\ActiveRecord
      */
     public function getImasStugroupmembers()
     {
-        return $this->hasMany(ImasStugroupmembers::className(), ['stugroupid' => 'id']);
+        return $this->hasMany(BaseImasStugroupmembers::className(), ['stugroupid' => 'id']);
     }
 
     /**
@@ -70,6 +70,6 @@ class BaseImasStugroups extends \yii\db\ActiveRecord
      */
     public function getImasWikiRevisions()
     {
-        return $this->hasMany(ImasWikiRevisions::className(), ['stugroupid' => 'id']);
+        return $this->hasMany(BaseImasWikiRevisions::className(), ['stugroupid' => 'id']);
     }
 }
