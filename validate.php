@@ -313,7 +313,7 @@
 	//$username = $_COOKIE['username'];
 	$query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
 	if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-		$query .= ',listperpage,hasuserimg';
+		$query .= ',listperpage,hasuserimg,theme';
 	}
 	$query .= " FROM imas_users WHERE id='$userid'"; 
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -324,6 +324,10 @@
 	$userdeflib = $line['deflib'];
 	$listperpage = $line['listperpage'];
 	$selfhasuserimg = $line['hasuserimg'];
+	$usertheme = $line['theme'];
+	if (isset($usertheme) && $usertheme!='') {
+		$coursetheme = $usertheme;
+	}
 	$userfullname = $line['FirstName'] . ' ' . $line['LastName'];
 	$previewshift = -1;
 	$basephysicaldir = rtrim(dirname(__FILE__), '/\\');
@@ -466,6 +470,9 @@
 			$crow = mysql_fetch_row($result);
 			$coursename = $crow[0]; //mysql_result($result,0,0);
 			$coursetheme = $crow[5]; //mysql_result($result,0,5);
+			if (isset($usertheme) && $usertheme!='') {
+				$coursetheme = $usertheme;
+			}
 			$coursenewflag = $crow[6]; //mysql_result($result,0,6);
 			$coursemsgset = $crow[7]%5;
 			$coursetopbar = explode('|',$crow[8]);

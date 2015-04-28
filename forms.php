@@ -177,6 +177,19 @@ switch($_GET['action']) {
 			echo '</span><br class="form" />';
 			
 		}
+		echo '<span class="form">'._('Overwrite default course theme on all pages:').'</span><span class="formright">';
+		echo '<select name="theme">';
+		echo '<option value="" '.($line['theme']==''?'selected':'').'>'._('Use course default theme').'</option>';
+		if (isset($CFG['GEN']['stuthemes'])) {
+			foreach ($CFG['GEN']['stuthemes'] as $k=>$v) {
+				echo '<option value="'.$k.'" '.($line['theme']==$k?'selected':'').'>'._($v).'</option>';					
+			} 
+		} else {
+			echo '<option value="highcontrast.css" '.($line['theme']=='highcontrast.css'?'selected':'').'>'._('High contrast, dark on light').'</option>';
+			echo '<option value="highcontrast_dark.css" '.($line['theme']=='highcontrast_dark.css'?'selected':'').'>'._('High contrast, light on dark').'</option>';
+		}
+		echo '</select><br class="form" />';
+		
 		if (isset($CFG['GEN']['translatewidgetID'])) {
 			echo '<span class="form">Attempt to translate pages into another language:</span>';
 			echo '<span class="formright">';

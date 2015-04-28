@@ -286,6 +286,9 @@
 			$sessiondata['courseid'] = intval($_GET['cid']);
 			$sessiondata['coursename'] = mysql_result($result,0,0);
 			$sessiondata['coursetheme'] = mysql_result($result,0,1);
+			if (isset($usertheme) && $usertheme!='') {
+				$sessiondata['coursetheme'] = $usertheme;
+			}
 			$sessiondata['coursetopbar'] =  mysql_result($result,0,2);
 			$sessiondata['msgqtoinstr'] = (floor( mysql_result($result,0,3)/5))&2;
 			$sessiondata['coursetoolset'] = mysql_result($result,0,4);

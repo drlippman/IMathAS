@@ -1,0 +1,253 @@
+/*General settings - fonts, overall page background, etc*/
+body {
+	font-family: "Trebuchet MS", "Arial", "Helvetica", sans-serif;
+	font-size: 90%;
+	color: #fff;
+	background: #000;
+}
+
+select {
+	background-color: #000;
+	color: #fff;
+}
+/*Link styles*/
+a:link {
+	text-decoration: none;
+	color: #ffeeee;
+}
+a:visited {
+	text-decoration: none;
+	color: #ffeeee;
+}
+a:hover {
+	text-decoration: underline;
+	color: #ffeeee;
+}
+
+/*Container for course items*/
+div.item {
+	/*border: 1px solid #000;*/
+	background-color: #000;
+}
+
+/*Container for editor*/
+div.editor {
+	border: 1px solid #000;
+}
+
+/*Default block container*/
+div.block, div.blockitems div.blockitems div.block {
+	border: 1px solid #ddf;
+	background-color: #000;
+}
+
+/*Default block item container*/
+div.blockitems, div.blockitems div.blockitems div.blockitems {
+	border: 1px solid #eef;
+	border-top: 0px;
+	background-color: #000;
+}
+
+/*Second level default block container*/
+div.blockitems div.block {
+	border: 1px solid #dfd;
+	background-color: #000;
+}
+
+/*Second level default block item container */
+div.blockitems div.blockitems {
+	border: 1px solid #efe;
+	border-top: 0px;
+	background-color: #000;
+}
+
+/*Icons*/
+div.icon {
+	color:#00d;	
+	border: 1px solid #00f;
+	font-weight: bolder;
+}
+
+/*Breadcrumb bar*/
+div.breadcrumb {
+	border: 1px solid #ddf;
+	background-color: #000;
+}
+
+/*Control panels*/
+div.cp {
+	border: 1px solid #ddd;
+	background-color: #000;
+}
+div.cpmid {
+	border: 1px solid #ddd;
+	background-color: #000;
+}
+
+
+
+
+table thead th {
+	font-weight:bold;
+	cursor:pointer;
+}
+
+/*Tables */
+table.gb thead th, table.gbl thead th, table.gbl thead th.locked {
+	border-bottom: 2px solid #00f;
+	background-color: #000;
+}
+tr.even {
+	background-color: #000;	
+}
+tr.odd {
+	background-color: #101;
+}
+tr.bordered  td {
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+tr.highlight {
+	background-color: #224;
+}
+tr.grid td {
+	border: 1px solid #ccc;
+}
+tr.dbltop td {
+	border-top: 3px double #ccc;
+}
+
+table.gbl td.locked, table.gbl th.locked {
+	border-right: 2px solid #00f;
+}
+
+/*Category header colors*/
+table.gb .catdf {
+	background-color: #001;
+}
+table.gb .cat0 {
+	background-color: #002;
+}
+table.gb .cat1 {
+	background-color: #020;
+}
+table.gb .cat2 {
+	background-color: #200;
+}
+table.gb .cat3 {
+	background-color: #022;
+}
+table.gb .cat4 {
+	background-color: #002;
+}
+table.gb .cat5 {
+	background-color: #202;
+}
+table.gb .cat6 {
+	background-color: #004;
+}
+table.gb .cat7 {
+	background-color: #040;
+}
+table.gb .cat8 {
+	background-color: #400;
+}
+table.gb .cat9 {
+	background-color: #044;
+}
+.cattothdr {
+	font-variant: small-caps
+}
+
+/*Fake look of links for Javascript onclicks*/
+span.link {
+	text-decoration: underline;
+	color: #ffeeee;
+	cursor: pointer;
+}
+
+
+/*Containers for instructor leftbar, main content*/
+#leftcontent {
+		background:#000;
+		border:1px solid #ddd;
+		color:#fff;
+}
+
+#centercontent {
+		background:#000;
+}
+
+div.ddmenu {
+	padding: 5px;
+	background: #010;
+}
+
+/*colors and borders for assessments*/
+/*seq question css*/
+div.curquestion {
+
+}
+div.inactive {
+	border: 1px solid #bbd;
+}
+div.prequestion {
+	border: 1px solid #bbd;
+}
+hr.seq {
+
+}
+div.seqqinfocur {
+
+}
+div.seqqinfocur span.current{
+
+}
+div.seqqinfoavail {
+
+}
+div.seqqinfoinactive {
+
+}
+div.todoquestion {
+	background-color: #221; 
+	border: 0px; 
+}
+/*all questions*/
+div.question {
+	background-color: #000; 
+	border: 1px solid #bbd;
+}
+
+
+div.review { /*info bar*/
+	margin-top: -6px;
+	background-color: #000;
+	border: 1px solid #bbd;
+}
+div.intro {
+	border: 0px;
+	background-color: #000;
+}
+div.navbar {
+	background:#000;
+	border: 1px solid #bbb;
+	color:#fff;
+}
+div.navbar a {
+	color: #ffeeee;
+}
+div#viewbuttoncont {
+	background: #000;
+}
+span.current {
+	background-color: #330;
+}
+span.done {
+	text-decoration: line-through;
+}
+a.newnote {
+	font-size: 90%;
+}
+
+
