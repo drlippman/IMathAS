@@ -293,7 +293,7 @@ Viewer3D.prototype.rotate = function() {
 	            
 		t.vert1[i][2] = (m00*x + m01*y + m02*z)/t.scale;
 		t.vert1[i][0] = (m10*x + m11*y + m12*z)*(1/(1-t.vert1[i][2]/t.cam));
-		t.vert1[i][1] = m20*x + m21*y + m22*z*(1/(1-t.vert1[i][2]/t.cam));
+		t.vert1[i][1] = (m20*x + m21*y + m22*z)*(1/(1-t.vert1[i][2]/t.cam));
 	}
 
 	//rotate bounding box
