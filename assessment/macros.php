@@ -2898,9 +2898,13 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 	}
 	if ($xmax - $xmin>0) {
 		$newwidth = ($xmax - $xmin)*(round($snapparts[0]*($width-2*$imgborder)/($xmax - $xmin))/$snapparts[0]) + 2*$imgborder;
+	} else {
+		$newwidth = $width;
 	}
 	if ($ymax - $ymin>0) {
 		$newheight = ($ymax - $ymin)*(round($snapparts[1]*($height-2*$imgborder)/($ymax - $ymin))/$snapparts[1]) + 2*$imgborder;
+	} else {
+		$newheight = $height;
 	}
 	return array($newwidth,$newheight);
 }
