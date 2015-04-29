@@ -9,11 +9,11 @@ $this->params['breadcrumbs'][] = $this->title;
     | <?= Html::submitButton('picture', ['class' => 'class="col-lg-offset-1 col-lg-11"', 'name' => 'login-button']) ?>
 </div>
 
-<p>Filter by course: <select id="filtercid" onchange="chgfilter()">
+<p>Filter by course: <select id="filtercid">
         <option value="0" selected=1>All courses</option>
         <option value="4"></option>
     </select> By sender:
-    <select id="filteruid" onchange="chgfilter()">
+    <select id="filteruid">
 
         With Selected: <input type=submit name="unread" value="Mark as Unread">
         <input type=submit name="markread" value="Mark as Read">

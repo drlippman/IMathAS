@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppConstant;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
@@ -12,8 +13,6 @@ $this->title = 'Add new user';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-
-    <?= $this->render('_flashMessage')?>
 
     <fieldset>
         <legend>New User</legend>
@@ -38,13 +37,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'password')->passwordInput() ?>
 
         <?=
-        $form->field($model, 'rights')->inline()->radioList([\app\components\AppConstant::GUEST_RIGHT => 'Guest User',
-            \app\components\AppConstant::STUDENT_RIGHT => 'Student',
-            \app\components\AppConstant::TEACHER_RIGHT => 'Teacher',
-            \app\components\AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
-            \app\components\AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
-            \app\components\AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
-            \app\components\AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
+        $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User',
+            AppConstant::STUDENT_RIGHT => 'Student',
+            AppConstant::TEACHER_RIGHT => 'Teacher',
+            AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
+            AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
+            AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
+            AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
 
         <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
 

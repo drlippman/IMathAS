@@ -10,7 +10,7 @@ namespace app\controllers;
 
 use app\components\AppConstant;
 use yii\web\Controller;
-
+use Yii;
 
 class AppController extends Controller
 {
@@ -18,7 +18,6 @@ class AppController extends Controller
     function getBodyParams()
     {
         return $_POST;
-//        return \Yii::$app->request->getBodyParams();
     }
 
     function setSuccessFlash($message)
@@ -48,6 +47,13 @@ class AppController extends Controller
         return \Yii::$app->user->isGuest;
     }
 
+    function guestUserHandler(){
+        if(self::isGuestUser())
+        {
+            return $this->redirect(Yii::$app->homeUrl.'site/login');
+        }
+    }
+
     function getUserTimezone(){
         return AppConstant::DEFAULT_TIME_ZONE;
     }
@@ -61,6 +67,14 @@ class AppController extends Controller
     function includeJS($jsFileArray){
         for($i=0; $i<count($jsFileArray); $i++){
             $this->getView()->registerJsFile("../" . $jsFileArray[$i]);
+        }
+    }
+
+    public function renderWithData($viewName, $data = array()){
+        if(isset($data)){
+            return $this->render($viewName, $data);
+        }else{
+            return $this->render($viewName);
         }
     }
 

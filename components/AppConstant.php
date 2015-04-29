@@ -36,7 +36,18 @@ class AppConstant {
     const SHOWLATEPASS = 1;
     const UNENROLL_VALUE = 0;
     const PIC_ICONS_VALUE = 1;
-    const TOPBAR_VALUE = '0,1,2,3,9|0,2,3,4,6,9|0';
+    const TOPBAR_VALUE = '0,1,2,3,9|0,2,3,4,6,9|1';
     const AVAILABLE_NOT_CHECKED_VALUE = 3;
     const NAVIGATION_NOT_CHECKED_VALUE = 7;
+
+    const NUMERIC_ZERO = 0;
+    const NUMERIC_ONE = 1;
+    const NUMERIC_TWO = 2;
+    const NUMERIC_THREE = 3;
+    const NUMERIC_FOUR = 4;
+    const NUMERIC_FIVE = 5;
+    const NUMERIC_SIX = 6;
+    const NUMERIC_SEVEN = 7;
+    const NUMERIC_EIGHT = 8;
+    const NUMERIC_NINE = 9;
 }

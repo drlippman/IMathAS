@@ -15,7 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="registration col-lg-6">
 
-    <?= $this->render('_flashMessage')?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -35,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username') ?>
     <?= $form->field($model, 'password')->passwordInput() ?>
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-    <?= $form->field($model, 'terms')->checkbox()?>
+    <?= $form->field($model, 'terms')->checkbox() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Request Account', ['class' => 'btn btn-primary']) ?>
@@ -47,12 +46,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="col-lg-12">
     <h4>Terms of Use</h4>
+
     <p><em>This software is made available with <strong>no warranty</strong> and <strong>no guarantees</strong>. The
             server or software might crash or mysteriously lose all your data. Your account or this service may be
             terminated without warning. No official support is provided. </em></p>
+
     <p><em>Copyrighted materials should not be posted or used in questions without the permission of the copyright
             owner. You shall be solely responsible for your own user created content and the consequences of posting or
             publishing them. This site expressly disclaims any and all liability in connection with user created
             content.</em></p>
+
     <div class="clear"></div>
 </div>

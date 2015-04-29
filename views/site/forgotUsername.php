@@ -6,7 +6,6 @@ $this->title = 'Forget Username';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <?= $this->render('_flashMessage')?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -17,7 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <p>If you can't remember your username, enter your email address below. An email will be sent to your email address with your username. </p>
+    <p>If you can't remember your username, enter your email address below. An email will be sent to your email address
+        with your username. </p>
     <?= $form->field($model, 'email') ?>
 
     <div class="form-group">

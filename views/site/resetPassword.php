@@ -6,7 +6,6 @@ $this->title = 'Reset Password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <?= $this->render('_flashMessage')?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],

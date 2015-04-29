@@ -27,6 +27,7 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
     <div class="wrap">
         <?php
+        $basePath = '/site/';
             NavBar::begin([
                 'brandLabel' => 'IMathAS',
                 'brandUrl' => Yii::$app->homeUrl,
@@ -38,12 +39,12 @@ AppAsset::register($this);
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
                     Yii::$app->user->isGuest ?
-                    ['label' => 'Home', 'url' => ['/site/index']]:
-                        ['label' => 'Home', 'url' => ['/site/dashboard']],
+                    ['label' => 'Home', 'url' => [$basePath.'index']]:
+                        ['label' => 'Home', 'url' => [$basePath.'dashboard']],
                     Yii::$app->user->isGuest ?
-                    ['label' => 'About', 'url' => ['/site/about']]:'',
+                    ['label' => 'About', 'url' => [$basePath.'about']]:'',
                     Yii::$app->user->isGuest ?
-                        ['label' => 'Login', 'url' => ['/site/login']] :
+                        ['label' => 'Login', 'url' => [$basePath.'login']] :
                         ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
                             'url' => ['/site/logout'],
                             'linkOptions' => ['data-method' => 'post']],
@@ -57,6 +58,15 @@ AppAsset::register($this);
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
 
             ]) ?>
+            <?php
+            $flashes = Yii::$app->session->getAllFlashes();
+            if (isset($flashes)) {
+                foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                    echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+                }
+            }
+            ?>
+
             <?= $content ?>
         </div>
     </div>

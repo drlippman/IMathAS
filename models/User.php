@@ -109,7 +109,11 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = new User();
         $user->attributes = $params;
         $user->save();
-        return true;
+        if($user->id)
+        {
+            return true;
+        }
+        return false;
     }
 
 

@@ -13,7 +13,7 @@ use yii\bootstrap\ActiveForm;
         <div class="pagetitle" id="headerhome">
             <h2>Welcome to IMathAS, <?php print_r(ucfirst($user->FirstName) . ' ' . ucfirst($user->LastName)); ?></h2>
         </div>
-        <?php echo $this->render('_courseTaking',['students' => $students]); ?>
+        <?php echo $this->render('_courseTaking', ['students' => $students]); ?>
 
         <div class="clear"></div>
     </div>

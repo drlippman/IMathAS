@@ -3,24 +3,22 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\widgets\FileInput;
+use app\components\AppUtility;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
 
 $this->title = 'Profile Settings';
-
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-<?= $this->render('_flashMessage')?>
 
 <div class="site-login">
 
     <?php
-    $model->FirstName = isset($user['FirstName']) ? $user['FirstName'] : null;
-    $model->LastName = isset($user['LastName']) ? $user['LastName'] : null;
-    $model->email = isset($user['email']) ? $user['email'] : null;
+    $model->FirstName = AppUtility::getStringVal($user['FirstName']);
+    $model->LastName = AppUtility::getStringVal($user['LastName']);
+    $model->email = AppUtility::getStringVal($user['email']);
     ?>
 
     <fieldset>

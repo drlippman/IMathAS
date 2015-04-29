@@ -11,19 +11,16 @@ $(document).ready(function(){
     //show icon
     $(".radio-assesments label input").first().prop('checked', true);
     $(".radio-inline label input").first().prop('checked', true);
-//    $(".radio-linked :radio:last").prop('checked', true);
-//    $(".radio-forums :radio:first").prop('checked', true);
-//    $(".radio-blocks :radio:last").prop('checked', true);
 
-    //selfunenroll
+    //self-unenroll
     $("#coursesettingform-selfunenroll :radio:first").prop('checked', true);
 
-    //selfenroll
+    //self-enroll
     $("#coursesettingform-selfenroll :radio:last").prop('checked', true);
 
-    //copycourseitem
+    //copy-course-item
     $("#coursesettingform-copycourse :radio:first").prop('checked', true);
 
-    //msgsystem
+    //msg-system
     $("#coursesettingform-messagesystem :radio:first").prop('checked', true);
 })

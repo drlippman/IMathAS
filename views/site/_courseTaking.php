@@ -1,4 +1,5 @@
 <?php
+use app\components\AppUtility;
 ?>
 <div id="homefullwidth">
     <div class="block">
@@ -7,19 +8,20 @@
     <div class="blockitems">
         <ul class="nomark courselist">
             <?php
-                foreach($students as $student)
-                {
-                    if($student){?>
-                    <li><a href="<?php echo Yii::$app->homeUrl.'course/course/index?cid='.$student->courseid?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a></li>
-                <?php }
+            foreach ($students as $student) {
+                if ($student) {
+                    ?>
+                    <li>
+                        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
+                    </li>
+                <?php
                 }
+            }
             ?>
         </ul>
         <div class="center">
-            <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl?>student/student/student-enroll-course">Enroll in a New
-                Class</a><br>
-            <a id="unhidelink" style="display:none" class="small" href="work-in-progress">Unhide hidden
-                courses</a>
+            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
+            <a id="unhidelink" style="display:none" class="small" href="work-in-progress">Unhide hidden courses</a>
         </div>
     </div>
 </div>

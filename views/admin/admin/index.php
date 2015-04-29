@@ -1,5 +1,6 @@
 <?php
 /* @var $this yii\web\View */
+use app\components\AppUtility;
 $this->title = 'Admin';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -7,25 +8,22 @@ $this->params['breadcrumbs'][] = $this->title;
 <html>
 <head>
     <title>OpenMath - OpenMathAdministration</title>
-    <link rel="stylesheet" type="text/css" href="<?php echo Yii::$app->homeUrl ?>css/dashboard.css"/>
+    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css"
-          href="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-    <script type="text/javascript" src="<?php echo Yii::$app->homeUrl ?>js/general.js?ver=012115"></script>
+          href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
     <!-- jQuery -->
     <script type="text/javascript" charset="utf8"
-            src="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
     <!-- DataTables -->
     <script type="text/javascript" charset="utf8"
-            src="<?php echo Yii::$app->homeUrl ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
 <body>
 <div class=mainbody>
 <div class="headerwrapper"></div>
 <div class="midwrapper">
-<div id="headerlogo" class="hideinmobile" onclick="mopen('homemenu',0)" onmouseout="mclosetime()"></div>
-<div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"></div>
-
 <div id="headeradmin" class="pagetitle"><h2>OpenMath Administration</h2></div>
 <h3>Courses</h3>
 
@@ -83,7 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 
-    <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl ?>course/course/add-new-course">Add New Course</a>
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('course','course/add-new-course');?>">Add New Course</a>
     Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
         <option value="0" selected>Select a user..</option>
         <?php foreach ($users as $user) { ?>
@@ -98,35 +96,35 @@ $this->params['breadcrumbs'][] = $this->title;
 <h3>Administration</h3>
 
 <div class=cp>
-    <a HREF="<?php echo Yii::$app->homeUrl ?>site/change-password">Change my password</a><BR>
-    <a HREF="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Help</a><BR>
-    <a HREF="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Log Out</a><BR>
+    <a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a><BR>
+    <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
+    <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Log Out</a><BR>
 </div>
 <div class=cp>
     <span class=column>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Manage Question Set</a><BR>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Export Question Set</a><BR>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Question Set</a><BR>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Question Set</a><BR>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Question Set</a><BR>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Question Set</a><BR>
     </span>
     <span class=column>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Manage Libraries</a><br>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Export Libraries</a><BR>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Libraries</a></span>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Libraries</a><br>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Libraries</a><BR>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Libraries</a></span>
 
     <span class=column>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Edit Groups</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Delete Old Users</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Import Students from File</a>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Edit Groups</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Delete Old Users</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Students from File</a>
     </span>
-    <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Macro
+    <span class="column"><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Macro
             File</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Question Images</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Install Course Files</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Question Images</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
     </span>
-    <span class="column"><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">LTI Provider
+    <span class="column"><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
             Creds</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">External Tools</a><br/>
-        <a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Admin Utilities</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">External Tools</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Admin Utilities</a><br/>
     </span>
 
     <div class=clear></div>
@@ -149,17 +147,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <tbody>
         <tr class=odd>
 
-            <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Check Here</a></td>
+            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Check Here</a></td>
             <td class=c>Yes</td>
             <td class=c>Yes</td>
-            <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Modify</a></td>
-            <td><a href=<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">Remove</a></td>
-            <td><a href="<? echo(Yii::$app->homeUrl) ?>site/work-in-progress">One-time Passwords</a></td>
+            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
+            <td><a href=<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
+            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">One-time Passwords</a></td>
         </tr>
         </tbody>
     </table>
 
-    <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl ?>admin/admin/admin-diagnostic">Add New
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/admin-diagnostic') ?>">Add New
         Diagnostic</a>
 </div>
 
@@ -220,7 +218,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         </tbody>
     </table>
-    <a class="btn btn-primary" href="<?php echo Yii::$app->homeUrl ?>admin/admin/add-new-user">Add New User</a>
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add New User</a>
 </div>
 
 <div class="clear"></div>

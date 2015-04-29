@@ -6,8 +6,6 @@ $this->title = 'Forget Password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <?= $this->render('_flashMessage')?>
-
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
@@ -17,7 +15,8 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <p>Enter your User Name below and click Submit.  An email will be sent to your email address on file.  A link in that email will reset your password.</p>
+    <p>Enter your User Name below and click Submit. An email will be sent to your email address on file. A link in that
+        email will reset your password.</p>
     <?= $form->field($model, 'username') ?>
 
     <div class="form-group">

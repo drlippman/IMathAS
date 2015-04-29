@@ -8,30 +8,33 @@
 
 </head>
 <body>
+<?php
+use app\components\AppConstant;
+?>
 <div class=mainbody>
     <div class="headerwrapper"></div>
     <div class="midwrapper">
         <?php
-            if($user->rights > \app\components\AppConstant::GUEST_RIGHT){
-                echo $this->render('_fullMenu');
-            }else{
-                echo $this->render('_guestMenu');
-            } ?>
+        if ($user->rights > AppConstant::GUEST_RIGHT) {
+            echo $this->render('_fullMenu');
+        } else {
+            echo $this->render('_guestMenu');
+        } ?>
         <div class="pagetitle" id="headerhome"><h2>Welcome to
-                IMathAS, <?php print_r(ucfirst($user->FirstName) . ' ' . ucfirst($user->LastName)); ?><span class="red"></span>
+                IMathAS, <?php print_r(ucfirst($user->FirstName) . ' ' . ucfirst($user->LastName)); ?><span
+                    class="red"></span>
         </div>
         <div id="homefullwidth">
             <?php
 
-                if($user->rights > \app\components\AppConstant::GUEST_RIGHT){
-                    if($user->rights > \app\components\AppConstant::TEACHER_RIGHT)
-                    {
-                        echo $this->render('_adminCourseTeaching');
-                    }elseif($user->rights > \app\components\AppConstant::STUDENT_RIGHT){
-                        echo $this->render('_courseTeaching');
-                    }
-                    echo $this->render('_courseTaking', ['students' => $students]);
-                } ?>
+            if ($user->rights > AppConstant::GUEST_RIGHT) {
+                if ($user->rights > AppConstant::TEACHER_RIGHT) {
+                    echo $this->render('_adminCourseTeaching');
+                } elseif ($user->rights > AppConstant::STUDENT_RIGHT) {
+                    echo $this->render('_courseTeaching');
+                }
+                echo $this->render('_courseTaking', ['students' => $students]);
+            } ?>
 
         </div>
         <div class="clear"></div>

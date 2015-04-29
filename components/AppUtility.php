@@ -27,27 +27,29 @@ class AppUtility extends Component {
     public static function generateRandomString() {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $pass = '';
-        for ($i=0;$i<10;$i++) {
+        for ($i=0; $i<10; $i++) {
             $pass .= substr($chars,rand(0,61),1);
         }
         return $pass;
     }
 
-    /**
-     * This is a utility method to find out if we are supporting the old site.
-     * Based on the value of this method a bunch of additional code would be executed to support the old site.
-     * If we toggle the is_old_site_supported flag in the params.php file, this method would change the return value.
-     * Also the default value (i.e. if is_old_site_supported is not specified in the params.php file), is true.
-     * @return boolean
-     */
-    public static function isOldSiteSupported(){
-        $is_old_site_supported = false;
-        $is_old_site_supported_val = Yii::$app->params['is_old_site_supported'];
-        if($is_old_site_supported_val){
-            $is_old_site_supported = true;
-        }
-        return $is_old_site_supported;
+    public static function getStringVal($str){
+        return isset($str) ? $str : null;
     }
+
+    public static function getIntVal($str){
+        return isset($str) ? $str : 0;
+    }
+
+    public static function getURLFromHome($controllerName, $shortURL){
+        return Yii::$app->homeUrl.$controllerName . "/".$shortURL;
+    }
+
+    public static function getHomeURL()
+    {
+        return Yii::$app->homeUrl;
+    }
+
 
     public static function checkEditOrOk() {
         $ua = $_SERVER['HTTP_USER_AGENT'];
@@ -100,13 +102,11 @@ class AppUtility extends Component {
 
     public static function verifyPassword($newPassword, $oldPassword)
     {
- //       AppUtility::dump($newPassword);
         require_once("Password.php");
         if(password_verify($newPassword, $oldPassword)){
             return true;
         }
         return false;
-//        return password_hash($password, PASSWORD_DEFAULT);
     }
 
     public static function passwordHash($password)
@@ -307,14 +307,15 @@ class AppUtility extends Component {
 
     public static function prepareSelectedItemOfCourseSetting($course)
     {
-        $availablel = array();
+        $available = array();
         $toolset = array();
         $isTemplate = array();
+
         if (($course->available & 1) == 0) {
-            array_push($availablel, 1);
+            array_push($available, 1);
         }
         if (($course->available & 2) == 0) {
-            array_push($availablel, 2);
+            array_push($available, 2);
         }
 
         if (($course->toolset & 1) == 0) {
@@ -337,8 +338,7 @@ class AppUtility extends Component {
             array_push($isTemplate, 4);
 
         }
-
-        return $ckeckList = array('availablel' => $availablel, 'toolset' => $toolset, 'isTemplate' => $isTemplate);
+        return $ckeckList = array('available' => $available, 'toolset' => $toolset, 'isTemplate' => $isTemplate);
     }
 
     public static function parsedatetime($date, $time) {
@@ -362,5 +362,4 @@ class AppUtility extends Component {
 
 
 }
-
 ?>

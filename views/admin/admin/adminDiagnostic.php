@@ -1,13 +1,13 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppConstant;
 
 $this->title = 'Diagnostic Setup';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <link rel="stylesheet" href="../../../web/css/adminDiagnostic.css"/>
 <div class="site-login">
-    <?= $this->render("_flashMessage") ?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
@@ -20,15 +20,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-label-alignment">
         <?= $form->field($model, 'DiagnosticName') ?>
 
-        <?= $form->field($model, 'TermDesignator')->inline()->radioList(['1' => 'Use Month' , '2' => 'Use Day', '3' => 'use'], ['class' => 'radio-div']) ?>
+        <?= $form->field($model, 'TermDesignator')->inline()->radioList([AppConstant::NUMERIC_ONE => 'Use Month', AppConstant::NUMERIC_TWO => 'Use Day', AppConstant::NUMERIC_THREE => 'use'], ['class' => 'radio-div']) ?>
 
         <?= $form->field($model, 'LinkedWithCourse')->dropDownList(array(''), ['prompt' => 'Default']) ?>
 
-        <?= $form->field($model, 'Available')->inline()->radioList(['1' => 'Yes', '2' => 'No'], ['class' => 'radio-div']) ?>
+        <?= $form->field($model, 'Available')->inline()->radioList([AppConstant::NUMERIC_ONE => 'Yes', AppConstant::NUMERIC_ONE => 'No'], ['class' => 'radio-div']) ?>
 
-        <?= $form->field($model, 'IncludeInPublicListing')->inline()->radioList(['1' => 'Yes', '2' => 'No'], ['class' => 'radio-div']) ?>
+        <?= $form->field($model, 'IncludeInPublicListing')->inline()->radioList([AppConstant::NUMERIC_ONE => 'Yes', AppConstant::NUMERIC_TWO => 'No'], ['class' => 'radio-div']) ?>
 
-        <?= $form->field($model, 'AllowReentry')->inline()->radioList(['1' => 'No', '2' => 'Yes'], ['class' => 'radio-div']) ?>
+        <?= $form->field($model, 'AllowReentry')->inline()->radioList([AppConstant::NUMERIC_ONE => 'No', AppConstant::NUMERIC_TWO => 'Yes'], ['class' => 'radio-div']) ?>
 
         <?= $form->field($model, 'UniqueIDPrompt') ?>
 

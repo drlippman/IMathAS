@@ -2,23 +2,23 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use kartik\time\TimePicker;
-
+use app\components\AppUtility;
+use app\components\AppConstant;
 
 $this->title = 'Course';
 $this->params['breadcrumbs'][] = $this->title;
 
-$model->courseName = isset($course->name) ? $course->name : null;
-$model->enrollmentKey = isset($course->enrollkey) ? $course->enrollkey : null;
-$model->theme = isset($course->theme) ? $course->theme : null;
-$model->copyCourse = isset($course->copyrights) ? $course->copyrights : 0;
-$model->messageSystem = isset($course->msgset) ? $course->msgset : 0;
-$model->latePasses = isset($course->deflatepass) ? $course->deflatepass : 0;
-
-$model->available = $selectionList['availablel'];
+$model->courseName = AppUtility::getStringVal($course->name);
+$model->enrollmentKey = AppUtility::getStringVal($course->enrollkey);
+$model->theme = AppUtility::getStringVal($course->theme);
+$model->copyCourse = AppUtility::getIntVal($course->copyrights);
+$model->messageSystem = AppUtility::getIntVal($course->msgset);
+$model->latePasses = AppUtility::getIntVal($course->deflatepass);
+$model->available = $selectionList['available'];
 $model->navigationLink = $selectionList['toolset'];
 $model->courseAsTemplate = $selectionList['isTemplate'];
 
-$dispTime = \app\components\AppUtility::calculateTimeToDisplay($course->deftime);
+$dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
 
 ?>
 
@@ -69,16 +69,14 @@ $dispTime = \app\components\AppUtility::calculateTimeToDisplay($course->deftime)
             </div>
 
             <div style="clear: both"></div>
-            <?= $form->field($model, 'available')->checkboxList(['2' => 'Available to students', '1' => 'Show on instructors home page'], array('checked' => '2')) ?>
-
+            <?= $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
             <?= $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default', 'angelish.css' => 'Angelish', 'angelishmore.css' => 'Angelishmore'], ['prompt' => 'Default']) ?>
-
-            <?= $form->field($model, 'copyCourse')->radioList(['1' => 'Require enrollment key from everyone', '2' => 'No key required for group members, require key from others ', '3' => 'No key required from anyone']) ?>
-            <?= $form->field($model, 'messageSystem')->radioList(['1' => 'On for send and receive', '2' => 'On for receive, students can only send to instructor', '3' => 'On for receive, students can only send to students', '4' => 'On for receive, students cannot send', '5' => 'Off ']) ?>
-
-            <?= $form->field($model, 'navigationLink')->checkboxList(['1' => 'Calender', '2' => 'Forum List', '4' => 'Show']) ?>
+            <?= $form->field($model, 'selfEnroll')->radioList([AppConstant::NUMERIC_ONE => 'No', AppConstant::NUMERIC_TWO => 'Yes']) ?>
+            <?= $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
+            <?= $form->field($model, 'messageSystem')->radioList([AppConstant::NUMERIC_ONE => 'On for send and receive', AppConstant::NUMERIC_TWO => 'On for receive, students can only send to instructor', AppConstant::NUMERIC_THREE => 'On for receive, students can only send to students', AppConstant::NUMERIC_FOUR => 'On for receive, students cannot send', AppConstant::NUMERIC_FIVE => 'Off ']) ?>
+            <?= $form->field($model, 'navigationLink')->checkboxList([AppConstant::NUMERIC_ONE => 'Calender', AppConstant::NUMERIC_TWO => 'Forum List', AppConstant::NUMERIC_FOUR => 'Show']) ?>
             <?= $form->field($model, 'latePasses')->textInput(); ?>
-            <?= $form->field($model, 'courseAsTemplate')->checkboxList(['2' => 'Mark as group template course', '1' => 'Mark as global template course', '4' => 'Mark as self-enroll course']) ?>
+            <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
     </fieldset>
 </div>
 <div class="form-group">
@@ -88,5 +86,3 @@ $dispTime = \app\components\AppUtility::calculateTimeToDisplay($course->deftime)
 </div>
 
 <?php ActiveForm::end(); ?>
-
-

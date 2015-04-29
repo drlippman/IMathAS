@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use \app\components\AppUtility;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
@@ -14,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>Please fill out the following fields to login:</p>
 
-    <?= $this->render('_flashMessage')?>
+<!--    --><?//= $this->render('_flashMessage') ?>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -30,7 +31,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <input type="hidden" id="tzoffset" name="tzoffset" value="">
     <input type="hidden" id="tzname" name="tzname" value="">
-    <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>" />
+    <input type="hidden" id="challenge" name="challenge" value="<?php echo $challenge; ?>"/>
+
     <div id="settings"></div>
 
     <div class="form-group">
@@ -41,9 +43,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
-    <p><a href="<?php echo Yii::$app->homeUrl?>site/student-register">Register as a new student</a></p>
-    <p><a href="<?php echo Yii::$app->homeUrl?>site/forgot-password">Forgot Password</a></p>
-    <p><a href="<?php echo Yii::$app->homeUrl?>site/forgot-username">Forgot Username</a></p>
-    <p><a href="<?php echo Yii::$app->homeUrl?>site/check-browser">Browser check</a></p>
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'student-register');?>">Register as a new student</a></p>
+
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-password');?>">Forgot Password</a></p>
+
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-username');?>">Forgot Username</a></p>
+
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'check-browser');?>">Browser check</a></p>
 
 </div>

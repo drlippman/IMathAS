@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\RegisterModel */
@@ -11,7 +12,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-login">
     <p>Please fill out the following fields to signUp</p>
 
-    <?= $this->render('_flashMessage')?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
@@ -34,9 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'email') ?>
 
-    <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
+    <?=
+    $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
         ['template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-    ])->checkbox() ?>
+        ])->checkbox() ?>
 
     <?php echo "If you already know your course ID, you can enter it now. Otherwise, leave this blank and you can enroll later." ?>
 

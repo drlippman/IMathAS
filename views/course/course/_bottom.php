@@ -1,6 +1,3 @@
-<?php
-
-?>
 <div>
     <ul>
         <li><a href="#">Calender</a></li>

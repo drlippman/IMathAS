@@ -16,7 +16,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 <?php echo $this->render('_toolbar');?>
 
 <div class="needed">
-<?php echo $this->render('_leftSide');?>
+    <?php echo $this->render('_leftSide'); ?>
 </div>
 <div class="course">
     <h3><b><?php echo $course->name ?></b></h3>
@@ -59,4 +59,4 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <?php }?>
         <?php } ?>
     </div>
-
+</div>
