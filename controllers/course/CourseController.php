@@ -8,6 +8,7 @@ use app\models\AppModel;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
+use app\models\Forums;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\DeleteCourseForm;
@@ -23,8 +24,10 @@ class CourseController extends AppController
         $cid = Yii::$app->request->get('cid');
         $assessment = Assessments::getById($cid);
         $course = Course::getById($cid);
-        return $this->render('index', ['assessments' => $assessment, 'course' => $course]);
+        $forum = Forums::getByCourseId($cid);
+        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum]);
     }
+
 
     public function actionAddNewCourse()
     {
@@ -102,7 +105,7 @@ class CourseController extends AppController
             return $this->renderWithData('courseSetting', ['model' => $model, 'course' => $course, 'selectionList' => $selectionList]);
 
         }else{
-            return $this->redirect(Yii::$app->homeUrl.'admin/admin');
+            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
         }
     }
 
