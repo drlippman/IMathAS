@@ -297,10 +297,10 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			$xrnd = 6;
 			$yrnd = 6;
 		} else {
-			$xrnd = floor(-log10($xmax-$xmin)-1e-12)+4;
-			$yrnd = floor(-log10($ymax-$ymin)-1e-12)+4;
+			$xrnd = floor(-log10(abs($xmax-$xmin))-1e-12)+4;
+			$yrnd = floor(-log10(abs($ymax-$ymin))-1e-12)+4;
 		}
-	
+
 		$lasty = 0;
 		$lastl = 0;
 		$px = null;
@@ -316,7 +316,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$y = round($evalyfunc($t),$yrnd);//round(eval("return ($yfunc);"),3);
 				$alt .= "<tr><td>$x</td><td>$y</td></tr>";
 			} else {
-				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - ($domainlimited?0:5*($xmax-$xmin)/$settings[6]);
+				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - ($domainlimited?0:5*abs($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
 				$y = round($evalfunc($x),$xrnd);//round(eval("return ($func);"),3);
