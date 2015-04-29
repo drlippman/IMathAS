@@ -87,7 +87,7 @@ function Viewer3D(paramObj, targetel) {
 	t.w2 = t.swidth/2;
 	t.h2 = t.sheight/2;
 
-	t.scale = 1.0*Math.min(t.w2,t.h2) / (1.8*Math.min(t.xmax-t.centr[0],t.ymax-t.centr[0],t.zmax-t.centr[2]));
+	t.scale = 1.0*Math.min(t.w2,t.h2) / (1.8*Math.min(t.xmax-t.centr[0],t.ymax-t.centr[1],t.zmax-t.centr[2]));
 	
 	//set up bounding box.  Corners:
 	// 0:(t.xmin,t.ymin,t.zmin), 1:(t.xmax,t.ymin,t.zmin), 2:(t.xmin,t.ymax,t.zmin), 3:(t.xmax,t.ymax,t.zmin)
