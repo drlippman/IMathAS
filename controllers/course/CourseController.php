@@ -9,6 +9,7 @@ use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use app\models\Forums;
+use app\models\Wiki;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\DeleteCourseForm;
@@ -25,7 +26,9 @@ class CourseController extends AppController
         $assessment = Assessments::getById($cid);
         $course = Course::getById($cid);
         $forum = Forums::getByCourseId($cid);
-        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum]);
+        $wiki = Wiki::getByCourseId($cid);
+
+        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki]);
     }
 
 

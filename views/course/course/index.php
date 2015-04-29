@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <link rel="stylesheet" href="../../../web/css/_leftSide.css"/>
 <link rel="stylesheet" href="../../../web/css/assessment.css"/>
 
@@ -19,11 +20,13 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php echo $this->render('_leftSide'); ?>
 </div>
 
-<!--Assessment here-->
+<!--Course name-->
 
 <div class="course">
     <h3><b><?php echo $course->name ?></b></h3>
 </div>
+
+<!--Assessment here-->
 
 <div class="margin-top">
     <div class="inactivewrapper " onmouseover="this.className='activewrapper' "onmouseout="this.className='inactivewrapper'">
@@ -62,20 +65,53 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <?php }?>
         <?php } ?>
     </div>
+
     <!--Forum here-->
 
     <?php foreach($forums as $key => $forum ) {?>
-    <div class=item>
-        </a><img alt="forum" class="floatleft" src="/IMathAS/img/forum.png"/>
-        <div class=title>
-            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$forum->courseid)?>">
-            <?php echo $forum->name ?></a></b>
-        </div>
-        <div class=itemsum><p>
-            <p>&nbsp;<?php echo $forum->description ?></p></p></div>
-    </div>
-
+       <?php if($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime){?>
+          <?php if($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
+              <div class=item>
+                        <img alt="forum" class="floatleft" src="/IMathAS/img/forum.png"/>
+                    <div class=title>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$forum->courseid)?>">
+                        <?php echo $forum->name ?></a></b>
+                    </div>
+                    <div class=itemsum><p>
+                        <p>&nbsp;<?php echo $forum->description ?></p></p>
+                    </div>
+                </div>
+            <?php }elseif($forum->avail == 2) {?>
+                <div class=item>
+                    <img alt="forum" class="floatleft" src="/IMathAS/img/forum.png"/>
+                    <div class=title>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$forum->courseid)?>">
+                                <?php echo $forum->name ?></a></b>
+                    </div>
+                    <div class=itemsum><p>
+                        <p>&nbsp;<?php echo $forum->description ?></p></p>
+                    </div>
+                </div>
+            <?php } ?>
     <?php }?>
 
-</div>
 
+
+<!--wiki here-->
+
+<?php foreach($wiki as $key => $wikis ) {?>
+<div class=item>
+    <img alt="wiki" class="floatleft" src="/IMathAS/img/wiki.png"/>
+
+    <div class=title>
+        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$wikis->courseid)?>">
+                <?php echo $wikis->name ?></a></b>
+        <span style="color:red">New Revisions</span>
+    </div>
+    <div class=itemsum><p>
+
+        <p>&nbsp;<?php echo $wikis->description ?></p></p>
+    </div>
+    <div class="clear"></div>
+</div>
+<?php } ?>

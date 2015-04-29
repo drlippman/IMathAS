@@ -9,11 +9,11 @@ use yii\bootstrap\ActiveForm;
         <div id="navlistcont">
             <ul id="navlist">
                 <li><a class="activetab" href="#">Course</a></li>
-                <li><a href="#">Messages</a></li>
-                <li><a href="#">Forums</a></li>
-                <li><a href="#">Calendar</a></li>
-                <li><a href="#">Gradebook</a></li>
-                <li><a href="#">Log Out</a></li>
+                <li><a class="ahrefAlign" href="#">Messages</a></li>
+                <li><a class="ahrefAlign" href="#">Forums</a></li>
+                <li><a class="ahrefAlign" href="#">Calendar</a></li>
+                <li><a class="ahrefAlign" href="#">Gradebook</a></li>
+                <li><a class="ahrefAlign" href="#">Log Out</a></li>
             </ul>
             <br class="clear"/>
         </div>
