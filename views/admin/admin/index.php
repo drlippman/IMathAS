@@ -66,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
 
                 <td>
-                    <a href=""><?php echo 'Transfer'; ?></a>
+                    <a href="<?php echo Yii::$app->homeUrl.'course/course/transfer-course?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
                 </td>
 
                 <td>

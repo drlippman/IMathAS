@@ -25,3 +25,4 @@ $(function() {
 $('#ConfirmDelete').onClick(function() {
     $('#messageBox').toggle();
 });
+

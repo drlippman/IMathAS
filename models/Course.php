@@ -35,8 +35,8 @@ class Course extends BaseImasCourses {
         return static::findOne(['id' => $cid]);
     }
 
-    public static function deleteCourse($cid)
+    public static function getByIdandOwnerId($id, $ownerId)
     {
-         static ::delete(['id' => $cid]);
+        return static::findOne(['id' =>$id, 'ownerid' => $ownerId]);
     }
 } 

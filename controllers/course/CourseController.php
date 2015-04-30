@@ -10,6 +10,7 @@ use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use app\models\forms\Links;
 use app\models\Forums;
+use app\models\Teacher;
 use app\models\Wiki;
 use app\models\User;
 use Yii;
@@ -21,6 +22,9 @@ use yii\helpers\Html;
 
 class CourseController extends AppController
 {
+
+    public $enableCsrfValidation = false;
+
     public function actionIndex()
     {
         $this->guestUserHandler();
@@ -163,15 +167,61 @@ class CourseController extends AppController
 
         $this->includeJS(["../js/dashboard.js"]);
     }
-        public function actionTransferCourse()
+    public function actionTransferCourse()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $sortBy = 'FirstName';
+        $order = AppConstant::ASCENDING;
+        $users = User::findAllUsers($sortBy, $order);
+        $course = Course::getById($cid);
+        $this->includeCSS(['../css/dashboard.css']);
+        return $this->renderWithData('transferCourse', array('users' => $users, 'course' => $course));
+    }
+    public function actionUpdateOwner()
+    {
+        if (Yii::$app->request->post())
         {
-            $this->guestUserHandler();
-            $sortBy = 'FirstName';
-            $order = AppConstant::ASCENDING;
-            $users = User::findAllUser($sortBy, $order);
+            $params = $this->getBodyParams();
 
-            $this->includeCSS(['../css/dashboard.css']);
 
-            return $this->renderWithData('transferCourse', array('users' => $users));
+            if(Yii::$app->user->identity->rights == 75)
+            {
+
+            }
+
+            elseif(Yii::$app->user->identity->rights > 75)
+            {
+                $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
+                if($course)
+                {
+                    $course->ownerid = $params['newOwner'];
+                    $course->save();
+
+                    $teacher = Teacher::getByUserId($params['oldOwner'],$params['cid']);
+                    if($teacher)
+                    {
+                        $teacher->delete();
+                    }
+
+                    $newTeacher = new Teacher();
+                    $newTeacher->create($params);
+                }
+            }
+            elseif(Yii::$app->user->identity->rights > 40)
+            {
+                if($params['oldOwner'] == Yii::$app->user->identity->id)
+                {
+                    $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
+                    if($course)
+                    {
+                        $course->ownerid = $params['newOwner'];
+                        $course->save();
+                    }
+                }
+            }
         }
+
+        return json_encode(array('status' => '0'));
+    }
 }

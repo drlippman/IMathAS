@@ -100,6 +100,11 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return User::find()->orderBy([$sortBy => $order])->all();
     }
+    public static function findAllUsers($sortBy, $order)
+    {
+        return User::find()->orderBy([$sortBy => $order])->where(['rights' => [20,40,60,75,100] ])->all();
+    }
+
 
     public static function createStudentAccount($params)
     {
