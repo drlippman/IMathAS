@@ -57,8 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 var data = JSON.parse(response);
                 if(data.status)
                 {
-                    alert('ok');
-                    window.location = "admin/admin/index";
+                    window.location = "../../admin/admin/index";
                 }
             },
             error: function(xhRequest, ErrorText, thrownError) {

@@ -35,7 +35,7 @@ class BaseImasGbscheme extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'colorize'], 'required'],
+            ['courseid', 'required'],
             [['courseid', 'useweights', 'orderby', 'defgbmode', 'stugbmode', 'usersort'], 'integer'],
             [['defaultcat'], 'string', 'max' => 254],
             [['colorize'], 'string', 'max' => 20]

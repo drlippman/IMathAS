@@ -161,6 +161,37 @@ class AppUtility extends Component {
             return 3;
     }
 
+    public static function createIsTemplate($isTemplates)
+    {
+        $isTemplate = 0;
+        if(is_array($isTemplates))
+        {
+
+            foreach($isTemplates as $item)
+            {
+                if(self::myRight() == AppConstant::ADMIN_RIGHT)
+                {
+                    if($item == 1)
+                    {
+                        $isTemplate += 1;
+                    }
+                    if($item == 4)
+                    {
+                        $isTemplate += 4;
+                    }
+                }
+                if(self::myRight() >= AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    if($item == 2)
+                    {
+                        $isTemplate += 2;
+                    }
+                }
+            }
+        }
+        return $isTemplate;
+    }
+
     public static function createTopBarString($studentQuickPick, $instructorQuickPick, $quickPickBar)
     {
         $studentTopBar = "";
@@ -328,13 +359,13 @@ class AppUtility extends Component {
             array_push($toolset, 4);
         }
 
-        if (($course->istemplate & 2) == 0) {
+        if (($course->istemplate & 2) == 2) {
             array_push($isTemplate, 2);
         }
-        if (($course->istemplate & 1) == 0) {
+        if (($course->istemplate & 1) == 1) {
             array_push($isTemplate, 1);
         }
-        if (($course->istemplate & 4) == 0) {
+        if (($course->istemplate & 4) == 4) {
             array_push($isTemplate, 4);
 
         }
@@ -358,6 +389,11 @@ class AppUtility extends Component {
             $tmatches[2] += $serveroffset;
         }
         return mktime($tmatches[1],$tmatches[2],0,$dmatches[1],$dmatches[2],$dmatches[3]);
+    }
+
+    public static function myRight()
+    {
+        return Yii::$app->user->identity->rights;
     }
 
 

@@ -10,6 +10,7 @@ use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use app\models\forms\Links;
 use app\models\Forums;
+use app\models\GbScheme;
 use app\models\Teacher;
 use app\models\Wiki;
 use app\models\User;
@@ -49,32 +50,23 @@ class CourseController extends AppController
         {
             $bodyParams = $this->getBodyParams();
             $user = $this->getAuthenticatedUser();
-
-            $params = $bodyParams['CourseSettingForm'];
-            $course['ownerid'] = $user->id;
-            $course['name'] = $params['courseName'];
-            $course['enrollkey'] = $params['enrollmentKey'];
-            $availables = isset($params['available']) ? $params['available'] : AppConstant::AVAILABLE_NOT_CHECKED_VALUE;
-            $course['available'] = AppUtility::makeAvailable($availables);
-            $course['picicons'] = AppConstant::PIC_ICONS_VALUE;
-            $course['allowunenroll'] = AppConstant::UNENROLL_VALUE;
-            $course['copyrights'] = $params['copyCourse'];
-            $course['msgset'] = $params['messageSystem'];
-            $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : AppConstant::NAVIGATION_NOT_CHECKED_VALUE;
-            $course['toolset']  = AppUtility::makeToolset($toolsets);
-            $course['cploc']= AppConstant::CPLOC_VALUE;
-            $course['deflatepass']= $params['latePasses'];
-            $course['showlatepass']= AppConstant::SHOWLATEPASS;
-            $course['theme']= $params['theme'];
-            $course['deftime'] = AppUtility::calculateTimeDefference($bodyParams['start_time'],$bodyParams['end_time']);
-            $course['end_time'] = $bodyParams['end_time'];
-            $course['chatset'] = AppConstant::CHATSET_VALUE;
-            $course['topbar'] = AppConstant::TOPBAR_VALUE;
-            $course['hideicons'] = AppConstant::HIDE_ICONS_VALUE;
-            $courseSetting = new Course();
-            $course = AppUtility::removeEmptyAttributes($course);
-            $courseSetting->attributes = $course;
-            $courseSetting->save();
+            $course = new Course();
+            $courseId = $course->create($user, $bodyParams);
+            if($courseId){
+                $teacher = new Teacher();
+                $teacherId = $teacher->create($user->id, $courseId);
+                $gbScheme = new GbScheme();
+                $gbSchemeId = $gbScheme->create($courseId);
+                if($teacherId && $gbSchemeId){
+                    $this->setSuccessFlash('Course added successfully. Course id: '.$courseId.' and Enrollment key: '.$bodyParams['CourseSettingForm']['enrollmentKey']);
+                    $model = new CourseSettingForm();
+                }
+                else{
+                    $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
+                }
+            }else{
+                $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
+            }
         }
         $this->includeCSS(["../css/courseSetting.css"]);
         $this->includeJS(["../js/courseSetting.js"]);
@@ -127,45 +119,16 @@ class CourseController extends AppController
         $course = Course::getById($cid);
         if($course)
         {
-
-            $connection = Yii::$app->getDb();
-            $transaction = $connection->beginTransaction();
-            try {
-                $connection->createCommand()->delete('imas_courses', 'id ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_assessments', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_badgesettings', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_calitems', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_content_track', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_diags', 'cid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_external_tools', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_drillassess', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_firstscores', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_forums', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_gbcats', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_gbitems', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_gbscheme', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_inlinetext', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_items', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_linkedtext', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_login_log', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_lti_courses', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_msgs', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_outcomes', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_students', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_stugroupset', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_teachers', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_tutors', 'courseid ='.$cid)->execute();
-                $connection->createCommand()->delete('imas_wikis', 'courseid ='.$cid)->execute();
-                //.... other SQL executions
-                $transaction->commit();
-
-                $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
-            } catch (Exception $e) {
-                $transaction->rollBack();
+            $status = Course::deleteCourse($course->id);
+            if($status){
+                $this->setSuccessFlash('Deleted successfully.');
+            }else{
+                $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
             }
+        }else{
+            $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
         }
-
-        $this->includeJS(["../js/dashboard.js"]);
+        $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
     public function actionTransferCourse()
     {
@@ -205,7 +168,7 @@ class CourseController extends AppController
                     }
 
                     $newTeacher = new Teacher();
-                    $newTeacher->create($params);
+                    $newTeacher->create($params['oldOwner'], $params['cid']);
                 }
             }
             elseif(Yii::$app->user->identity->rights > 40)

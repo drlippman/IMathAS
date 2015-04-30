@@ -1,6 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 use app\components\AppUtility;
+
 $this->title = 'Admin';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -14,7 +15,8 @@ $this->params['breadcrumbs'][] = $this->title;
           href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
@@ -22,83 +24,91 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class=mainbody>
 <div class="headerwrapper"></div>
 <div class="midwrapper">
-<div id="headeradmin" class="pagetitle"><h2>OpenMath Administration</h2></div>
-<h3>Courses</h3>
+    <div id="headeradmin" class="pagetitle"><h2>OpenMath Administration</h2></div>
+    <h3>Courses</h3>
 
-<div class=item>
-    <table id="course_table" class="display">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Course ID</th>
-            <th>Owner</th>
-            <th>Settings</th>
-            <th>Teachers</th>
-            <th>Transfer</th>
-            <th>Delete</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        foreach ($courseData as $key => $course) {
-            $even = 'even';
-            $odd = 'odd'; ?>
-
-            <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
-                <td>
-                    <a href="#"><?php echo ucfirst($course->name); ?></a>
-                </td>
-                <td>
-                    <?php echo $course->id; ?>
-                </td>
-
-                <td>
-                    <?php echo(ucfirst($course->owner->FirstName)); ?>
-                    &nbsp;&nbsp;<?php echo(ucfirst($course->owner->LastName)); ?>
-                </td>
-
-                <td>
-                    <a href=""><?php echo 'Setting'; ?></a>
-                </td>
-
-                <td>
-                    <a href=""><?php echo 'Add/Remove'; ?></a>
-                </td>
-
-                <td>
-                    <a href="<?php echo Yii::$app->homeUrl.'course/course/transfer-course?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
-                </td>
-
-                <td>
-                    <a href="<?php echo Yii::$app->homeUrl.'course/course/delete-course?cid=' .$course->id; ?>" class="deleteCourse"><?php echo 'Delete'; ?></a>
-                </td>
+    <div class=item>
+        <table id="course_table" class="display">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Course ID</th>
+                <th>Owner</th>
+                <th>Settings</th>
+                <th>Teachers</th>
+                <th>Transfer</th>
+                <th>Delete</th>
             </tr>
-        <?php
-        }
-        ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($courseData as $key => $course) {
+                $even = 'even';
+                $odd = 'odd'; ?>
 
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('course','course/add-new-course');?>">Add New Course</a>
-    Show courses of: <select name="seluid" class="dropdown" id="seluid" onchange="showcourses()">
-        <option value="0" selected>Select a user..</option>
-        <?php foreach ($users as $user) { ?>
-            <option
-                value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName'] . "(" . $user['SID'] . ")"; ?></option>
-        <?php } ?>
-    </select>
+                <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
+                    <td>
+                        <a href="#"><?php echo ucfirst($course->name); ?></a>
+                    </td>
+                    <td>
+                        <?php echo $course->id; ?>
+                    </td>
 
-</div>
+                    <td>
+                        <?php echo(ucfirst($course->owner->FirstName)); ?>
+                        &nbsp;&nbsp;<?php echo(ucfirst($course->owner->LastName)); ?>
+                    </td>
+
+                    <td>
+                        <a href=""><?php echo 'Setting'; ?></a>
+                    </td>
+
+                    <td>
+                        <a href=""><?php echo 'Add/Remove'; ?></a>
+                    </td>
+
+                    <td>
+                        <a href="<?php echo Yii::$app->homeUrl.'course/course/transfer-course?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
+                    </td>
+
+                    <td>
+                        <a href="<?php echo Yii::$app->homeUrl . 'course/course/delete-course?cid=' . $course->id; ?>"
+                           class="deleteCourse"><?php echo 'Delete'; ?></a>
+                    </td>
+                </tr>
+            <?php
+            }
+            ?>
+            </tbody>
+        </table>
+        <div class="lg-col-2 pull-left">
+        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-new-course'); ?>">Add
+            New Course</a>
+        </div>
+        <div class="lg-col-2 pull-left select-text-margin">
+        &nbsp;&nbsp;Show courses of:&nbsp;&nbsp;
+        </div>
+        <div class="lg-col-3 pull-left">
+            <select name="seluid" class="dropdown form-control" id="seluid" onchange="showcourses()">
+                <option value="0" selected>Select a user..</option>
+                <?php foreach ($users as $user) { ?>
+                    <option
+                        value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName'] . "(" . $user['SID'] . ")"; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+
+    </div>
 
 
-<h3>Administration</h3>
+    <h3>Administration</h3>
 
-<div class=cp>
-    <a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a><BR>
-    <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
-    <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Log Out</a><BR>
-</div>
-<div class=cp>
+    <div class=cp>
+        <a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a><BR>
+        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
+        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Log Out</a><BR>
+    </div>
+    <div class=cp>
     <span class=column>
         <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Question Set</a><BR>
         <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Question Set</a><BR>
@@ -125,101 +135,103 @@ $this->params['breadcrumbs'][] = $this->title;
         <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Admin Utilities</a><br/>
     </span>
 
-    <div class=clear></div>
-</div>
+        <div class=clear></div>
+    </div>
 
-<h3>Diagnostics</h3>
+    <h3>Diagnostics</h3>
 
-<div class=item>
-    <table class=gb width="90%" id="diagTable">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Available</th>
-            <th>Public</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-            <th>&nbsp;</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr class=odd>
+    <div class=item>
+        <table class=gb width="90%" id="diagTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Available</th>
+                <th>Public</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class=odd>
 
-            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Check Here</a></td>
-            <td class=c>Yes</td>
-            <td class=c>Yes</td>
-            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
-            <td><a href=<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
+                <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Check Here</a></td>
+                <td class=c>Yes</td>
+                <td class=c>Yes</td>
+                <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
+                <td><a href=<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
             <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">One-time Passwords</a></td>
-        </tr>
-        </tbody>
-    </table>
+            </tr>
+            </tbody>
+        </table>
 
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/admin-diagnostic') ?>">Add New
-        Diagnostic</a>
-</div>
+        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/admin-diagnostic') ?>">Add
+            New
+            Diagnostic</a>
+    </div>
 
-<h3>Pending Users</h3>
+    <h3>Pending Users</h3>
 
-<div class=item>
-    <table id="user_table" class="display">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Rights</th>
-            <th>Last Login</th>
-            <th>Rights</th>
-            <th>Password</th>
-            <th>Delete</th>
-        </tr>
-        </thead>
-        <tbody>
-        <?php
-        foreach ($users as $key => $user) {
-            if ($user->rights == 0) {
-                $even = 'even';
-                $odd = 'odd'; ?>
-                <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
-
-                    <td>
-                        <?php echo(ucfirst($user->FirstName)); ?>
-                        &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
-                    </td>
-
-                    <td>
-                        <?php echo $user->SID; ?>
-                    </td>
-                    <td>
-                        <?php echo $user->email; ?>
-                    </td>
-                    <td>
-                        <?php echo \app\components\AppUtility::getRight($user->rights); ?>
-                    </td>
-                    <td>
-                        <?php echo $user->lastaccess; ?>
-                    </td>
-                    <td>
-                        <a href="#"><?php echo 'Change'; ?></a>
-                    </td>
-                    <td>
-                        <a href="#"><?php echo 'Reset'; ?></a>
-                    </td>
-                    <td>
-                        <a href="#"><?php echo 'Delete'; ?></a>
-                    </td>
-                </tr>
+    <div class=item>
+        <table id="user_table" class="display">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Rights</th>
+                <th>Last Login</th>
+                <th>Rights</th>
+                <th>Password</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
             <?php
-            }
-        }
-        ?>
-        </tbody>
-    </table>
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add New User</a>
-</div>
+            foreach ($users as $key => $user) {
+                if ($user->rights == 0) {
+                    $even = 'even';
+                    $odd = 'odd'; ?>
+                    <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
 
-<div class="clear"></div>
+                        <td>
+                            <?php echo(ucfirst($user->FirstName)); ?>
+                            &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
+                        </td>
+
+                        <td>
+                            <?php echo $user->SID; ?>
+                        </td>
+                        <td>
+                            <?php echo $user->email; ?>
+                        </td>
+                        <td>
+                            <?php echo \app\components\AppUtility::getRight($user->rights); ?>
+                        </td>
+                        <td>
+                            <?php echo $user->lastaccess; ?>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Change'; ?></a>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Reset'; ?></a>
+                        </td>
+                        <td>
+                            <a href="#"><?php echo 'Delete'; ?></a>
+                        </td>
+                    </tr>
+                <?php
+                }
+            }
+            ?>
+            </tbody>
+        </table>
+        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add
+            New User</a>
+    </div>
+
+    <div class="clear"></div>
 </div>
 <div class="footerwrapper"></div>
 </div>
@@ -231,30 +243,30 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#user_table').DataTable();
 
 //Show pop dialog for delete the course.
-    $(".deleteCourse").on("click", function(e) {
-        var html = "<div>Are you sure to delete your course?</div>";
-        var cancelUrl = $(this).attr('href');
-        e.preventDefault();
-        $('<div></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Confirm": function () {
-                    window.location = cancelUrl;
-                    $(this).dialog("close");
-                    return true;
+        $(".deleteCourse").on("click", function (e) {
+            var html = "<div>Are you sure to delete your course?</div>";
+            var cancelUrl = $(this).attr('href');
+            e.preventDefault();
+            $('<div></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Confirm": function () {
+                        window.location = cancelUrl;
+                        $(this).dialog("close");
+                        return true;
+                    },
+                    "Cancel": function () {
+                        $(this).dialog("close");
+                        return false;
+                    }
                 },
-                "Cancel": function () {
-                    $(this).dialog("close");
-                    return false;
+                close: function (event, ui) {
+                    $(this).remove();
                 }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
+            });
         });
-    });
 
     });
 

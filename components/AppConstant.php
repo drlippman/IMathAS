@@ -39,6 +39,7 @@ class AppConstant {
     const TOPBAR_VALUE = '0,1,2,3,9|0,2,3,4,6,9|1';
     const AVAILABLE_NOT_CHECKED_VALUE = 3;
     const NAVIGATION_NOT_CHECKED_VALUE = 7;
+    const ITEM_ORDER = 'a:0:{}';
 
     const NUMERIC_ZERO = 0;
     const NUMERIC_ONE = 1;
@@ -50,4 +51,11 @@ class AppConstant {
     const NUMERIC_SEVEN = 7;
     const NUMERIC_EIGHT = 8;
     const NUMERIC_NINE = 9;
+
+    const GB_USE_WEIGHT = 0;
+    const GB_ORDERED_BY = 0;
+    const GB_DEF_GB_MODE = 21;
+    const GB_USER_SORT = 0;
+
+    const SOMETHING_WENT_WRONG = 'Something went wrong, please try latter.';
 }

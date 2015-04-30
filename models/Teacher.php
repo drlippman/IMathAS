@@ -18,10 +18,11 @@ class Teacher extends BaseImasTeachers
         return static::findOne( ['userid' => $userid,'courseid' => $courseid]);
     }
 
-    public function create($params)
+    public function create($userid, $courseid)
     {
-        $this->userid = $params['newOwner'];
-        $this->courseid = $params['cid'];
+        $this->userid = $userid;
+        $this->courseid = $courseid;
         $this->save();
+        return $this->id;
     }
 }
