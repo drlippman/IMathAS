@@ -2,7 +2,6 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <link rel="stylesheet" href="../../../web/css/_leftSide.css"/>
 <link rel="stylesheet" href="../../../web/css/assessment.css"/>
 
@@ -66,7 +65,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <?php } ?>
     </div>
 
-    <!--Forum here-->
+<!--Forum here-->
 
     <?php foreach($forums as $key => $forum ) {?>
        <?php if($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime){?>
@@ -99,19 +98,130 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
 <!--wiki here-->
 
-<?php foreach($wiki as $key => $wikis ) {?>
-<div class=item>
-    <img alt="wiki" class="floatleft" src="/IMathAS/img/wiki.png"/>
+   <?php foreach($wiki as $key => $wikis ) {?>
+            <!--Hide wiki-->
+    <?php if($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
+    <?php if($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
+        <div class=item>
+                <img alt="wiki" class="floatleft" src="/IMathAS/img/wiki.png"/>
 
-    <div class=title>
-        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$wikis->courseid)?>">
+            <div class=title>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$wikis->courseid)?>">
                 <?php echo $wikis->name ?></a></b>
-        <span style="color:red">New Revisions</span>
-    </div>
-    <div class=itemsum><p>
+                <span style="color:red">New Revisions</span>
+            </div>
+            <div class=itemsum><p>
 
-        <p>&nbsp;<?php echo $wikis->description ?></p></p>
+                 <p>&nbsp;<?php echo $wikis->description ?></p></p>
+            </div>
+            <div class="clear">
+
+            </div>
+        </div>
+
+       <?php } elseif($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
+           <div class=item>
+               <img alt="wiki" class="floatleft" src="/IMathAS/img/wiki.png"/>
+
+               <div class=title>
+                   <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$wikis->courseid)?>">
+                           <?php echo $wikis->name ?></a></b>
+                   <span style="color:red">New Revisions</span>
+               </div>
+               <div class=itemsum><p>
+
+                   <p>&nbsp;<?php echo $wikis->description ?></p></p>
+               </div>
+               <div class="clear">
+
+               </div>
+           </div>
+        <?php } ?>
+   <?php } ?>
+
+
+<!-- Link-text here-->
+
+    <?php foreach($links as $key => $link) {?>
+            <!--Hide linked text-->
+    <?php if($link->avail != 0 && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
+            <!--Link type : http-->
+    <?php if((substr($link->text, 0,4) == 'http'))  {?>
+        <div class=item>
+            <img alt="link to web" class="floatleft" src="/IMathAS/img/web.png" />
+
+            <div class=title>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$link->courseid)?>">
+                <?php echo $link->title ?></a></b>
+            </div>
+        <div class=itemsum><p>
+            <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+        <div class="clear"></div>
     </div>
-    <div class="clear"></div>
-</div>
-<?php } ?>
+
+             <!--Link type : file-->
+
+        <?php } elseif((substr($link->text,0,5) == 'file:')) { ?>
+        <div class=item>
+            <img alt="link to doc" class="floatleft" src="/IMathAS/img/doc.png" />
+
+            <div class=title>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$link->courseid)?>">
+                        <?php echo $link->title ?></a></b>
+            </div>
+            <div class=itemsum><p>
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+
+             <!--Link type : external tool-->
+
+    <?php } elseif(substr($link->text,0,8)=='exttool:')  { ?>
+        <div class=item>
+            <img alt="link to html" class="floatleft" src="/IMathAS/img/html.png" />
+
+            <div class=title>
+
+                        <!--open on new window or on same window-->
+
+                <?php if($link->target != 0) {?>
+                    <?php echo "<li><a href=\" target=\"_blank\"></a></li>" ?>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$link->courseid)?>">
+                        <?php } ?>
+                        <?php echo $link->title ?></a></b>
+            </div>
+            <div class=itemsum><p>
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+        <?php } else {?>
+        <div class=item>
+            <img alt="link to html" class="floatleft" src="/IMathAS/img/html.png" />
+
+            <div class=title>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$link->courseid)?>">
+                        <?php echo $link->title ?></a></b>
+            </div>
+            <div class=itemsum><p>
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+        <?php } ?>
+        <!--Hide ends-->
+        <?php } elseif($link->avail == 2 && $link->enddate == 2000000000) { ?>
+        <div class=item>
+            <img alt="link to html" class="floatleft" src="/IMathAS/img/html.png" />
+
+            <div class=title>
+                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid='.$link->courseid)?>">
+                        <?php echo $link->title ?></a></b>
+            </div>
+            <div class=itemsum><p>
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+         <?php } ?> <!--Show always-->
+        <?php } ?>
+
+ <!--Block here-->
+    

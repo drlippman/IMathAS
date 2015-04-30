@@ -8,6 +8,7 @@ use app\models\AppModel;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
+use app\models\forms\Links;
 use app\models\Forums;
 use app\models\Wiki;
 use app\models\User;
@@ -28,8 +29,10 @@ class CourseController extends AppController
         $course = Course::getById($cid);
         $forum = Forums::getByCourseId($cid);
         $wiki = Wiki::getByCourseId($cid);
+        $link = Links::getByCourseId($cid);
+        //AppUtility::dump($link);
 
-        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki]);
+        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link]);
     }
 
 
