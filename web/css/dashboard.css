@@ -64,4 +64,8 @@ div {
 table.gb thead th{
     text-align: left;
 }
+.buttonAlignment{
+    margin-top: 10px;
+    margin-left: 185px;
+}
 

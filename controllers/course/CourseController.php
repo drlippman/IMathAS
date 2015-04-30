@@ -10,6 +10,7 @@ use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
 use app\models\Forums;
 use app\models\Wiki;
+use app\models\User;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\DeleteCourseForm;
@@ -115,7 +116,7 @@ class CourseController extends AppController
     public function actionDeleteCourse()
     {
         $model = new DeleteCourseForm();
-        $cid = Yii::$app->request->get('id');
+        $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
         if($course)
         {
@@ -150,12 +151,24 @@ class CourseController extends AppController
                 $connection->createCommand()->delete('imas_wikis', 'courseid ='.$cid)->execute();
                 //.... other SQL executions
                 $transaction->commit();
+
+                $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
             } catch (Exception $e) {
                 $transaction->rollBack();
             }
         }
 
-
+        $this->includeJS(["../js/dashboard.js"]);
     }
+        public function actionTransferCourse()
+        {
+            $this->guestUserHandler();
+            $sortBy = 'FirstName';
+            $order = AppConstant::ASCENDING;
+            $users = User::findAllUser($sortBy, $order);
 
+            $this->includeCSS(['../css/dashboard.css']);
+
+            return $this->renderWithData('transferCourse', array('users' => $users));
+        }
 }

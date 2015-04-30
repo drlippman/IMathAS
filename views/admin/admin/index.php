@@ -13,10 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <link rel="stylesheet" type="text/css"
           href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
-    <!-- jQuery -->
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-    <!-- DataTables -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
@@ -72,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
 
                 <td>
-                    <a href="<?php echo Yii::$app->homeUrl.'course/course/delete-course?id=' .$course->id; ?>"><?php echo 'Delete'; ?></a>
+                    <a href="<?php echo Yii::$app->homeUrl.'course/course/delete-course?cid=' .$course->id; ?>" class="deleteCourse"><?php echo 'Delete'; ?></a>
                 </td>
             </tr>
         <?php
@@ -231,5 +229,33 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         $('#course_table').DataTable();
         $('#user_table').DataTable();
+
+//Show pop dialog for delete the course.
+    $(".deleteCourse").on("click", function(e) {
+        var html = "<div>Are you sure to delete your course?</div>";
+        var cancelUrl = $(this).attr('href');
+        e.preventDefault();
+        $('<div></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Confirm": function () {
+                    window.location = cancelUrl;
+                    $(this).dialog("close");
+                    return true;
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
     });
+
+    });
+
 </script>

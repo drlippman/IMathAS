@@ -137,3 +137,28 @@ border-color:#FF0000;
 table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc, table.dataTable thead .sorting_asc_disabled, table.dataTable thead .sorting_desc_disabled {
     background-position: center left !important;
 }
+
+.ui-dialog-titlebar-close{
+    display: none;
+}
+
+
+.ui-widget-header {
+    border: 1px solid #aaaaaa !important;
+    background: none !important;
+    background-color: #003366 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+.ui-dialog-buttonset button{
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+
+.ui-dialog-buttonset button:hover{
+    color: #fff;
+    background-color: #3071a9;
+    border-color: #285e8e;
+}
