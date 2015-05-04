@@ -5,6 +5,7 @@ namespace app\controllers\course;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\AppModel;
+use app\models\Blocks;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
@@ -12,6 +13,7 @@ use app\models\forms\Links;
 use app\models\Forums;
 use app\models\GbScheme;
 use app\models\Teacher;
+use app\models\InlineText;
 use app\models\Wiki;
 use app\models\User;
 use Yii;
@@ -35,9 +37,11 @@ class CourseController extends AppController
         $forum = Forums::getByCourseId($cid);
         $wiki = Wiki::getByCourseId($cid);
         $link = Links::getByCourseId($cid);
-        //AppUtility::dump($link);
+        $block = Blocks::getById($cid);
+        $inline = InlineText::getByCourseId($cid);
+        //AppUtility::dump($inline);
 
-        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link]);
+        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }
 
 

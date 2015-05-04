@@ -21,7 +21,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <h3><b><?php echo $course->name ?></b></h3>
 </div>
 
-<!--Assessment here-->
+<!-- ////////////////// Assessment here //////////////////-->
 
 <div class="margin-top">
     <div class="inactivewrapper " onmouseover="this.className='activewrapper' "
@@ -63,7 +63,9 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <?php } ?>
     </div>
 
-    <!--Forum here-->
+
+    <!-- ////////////////// Forum here //////////////////-->
+
 
     <?php foreach ($forums as $key => $forum) { ?>
         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
@@ -96,8 +98,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php } ?>
 
 
-
-    <!--wiki here-->
+   <!-- ////////////////// Wiki here //////////////////-->
 
     <?php foreach ($wiki as $key => $wikis) { ?>
         <!--Hide wiki-->
@@ -141,7 +142,8 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php } ?>
 
 
-    <!-- Link-text here-->
+    <!-- ////////////////// Linked text here //////////////////-->
+
 
     <?php foreach ($links as $key => $link) { ?>
         <!--Hide linked text-->
@@ -229,4 +231,68 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <?php } ?> <!--Show always-->
     <?php } ?>
 
-    
+
+    <!-- ////////////////// Block here //////////////////-->
+
+    <div class=block>
+        <span class=left>
+            <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="/IMathAS/img/expand.gif" onClick="toggleblock('3','0-1')"/></span>
+
+        <div class=title>
+            <span class="right"><a href="course.php?cid=1&folder=0-1">Isolate</a></span>
+            <span class=pointer onClick="toggleblock('3','0-1')"><b>
+                    <a href="#" onclick="return false;">first block here</a></b></span>
+        </div>
+    </div>
+    <div class=hidden id="block3">Loading content...</div>
+
+
+    <!-- ////////////////// Inline text here //////////////////-->
+
+    <?php foreach($inlineText as $key => $inline) {?>
+        <!--Hide functionality-->
+    <?php if($inline->avail != 0 && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
+            <div class=item>
+                <!--Hide title and icon-->
+                <?php if($inline->title != '##hidden##') {?>
+                <img alt="text item" class="floatleft" src="/IMathAS/img/inline.png"/>
+                    <div class=title><b><?php echo $inline->title ?></b>
+                    </div>
+                <?php } ?>
+
+                <div class=itemsum><p>
+
+                    <p><?php echo $inline->text ?></p></p>
+                 </div>
+                <?php foreach($inline->instrFiles as $key => $instrFile) {?>
+                    <ul class="fileattachlist">
+                        <li><a href="/open-math/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a></li>
+                    </ul>
+                <?php } ?>
+                 </div>
+            <?php ?>
+            <div class="clear"></div>
+        <?php }elseif($inline->avail == 2 ) {?> <!--Hide ends and displays show always-->
+            <div class=item>
+                <!--Hide title and icon-->
+                <?php if($inline->title != '##hidden##') {?>
+                    <img alt="text item" class="floatleft" src="/IMathAS/img/inline.png"/>
+                    <div class=title><b><?php echo $inline->title ?></b>
+                    </div>
+                <?php } ?>
+
+                <div class=itemsum><p>
+
+                    <p><?php echo $inline->text ?></p></p>
+                </div>
+                <?php foreach($inline->instrFiles as $key => $instrFile) {?>
+                    <ul class="fileattachlist">
+                        <li><a href="/open-math/files/<?php echo $instrFile->filename ?>" target="_blank"><?php echo $instrFile->filename ?></a></li>
+                    </ul>
+                <?php } ?>
+            </div>
+            <?php ?>
+            <div class="clear"></div>
+        <?php } ?>
+    <?php } ?> <!--foreach ends-->
+

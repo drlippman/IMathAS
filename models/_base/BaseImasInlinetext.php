@@ -73,4 +73,9 @@ class BaseImasInlinetext extends \yii\db\ActiveRecord
     {
         return $this->hasOne(BaseImasCourses::className(), ['id' => 'courseid']);
     }
+
+    public function getInstrFiles()
+    {
+        return $this->hasMany(BaseImasInstrFiles::className(), ['itemid' => 'id']);
+    }
 }
