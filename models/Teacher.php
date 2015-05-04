@@ -26,8 +26,8 @@ class Teacher extends BaseImasTeachers
         $this->save();
         return $this->id;
     }
-    public static function getAllTeachers()
+    public static function getAllTeachers($cid)
     {
-        return static::find()->all();
+        return static::find()->where(['courseid' => $cid])->asArray()->all();
     }
 }

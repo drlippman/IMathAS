@@ -205,10 +205,42 @@ class CourseController extends AppController
 
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
-//        $users = User::findAllTeachers($sortBy, $order);
-        $course = Course::getById($cid);
+        $users = User::findAllTeachers($sortBy, $order);
+        $teachers = Teacher::getAllTeachers($cid);
+        $nonTeacher = array();
+        $teacherIds = array();
+        $teacherList = array();
+        foreach($teachers as $teacher)
+        {
+            $teacherIds[$teacher['userid']] = true;
+        }
+        foreach($users as $user)
+        {
+            if(isset($teacherIds[$user['id']]))
+            {
+                array_push($teacherList, $user);
+            }else{
+                array_push($nonTeacher, $user);
+            }
+        }
+        return json_encode(array('status' =>0, 'data' => array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher)));
 
-        return json_encode($course->teachersAsArray);
+    }
+
+    public function actionAddTeacherAjax()
+    {
+        if (Yii::$app->request->post())
+        {
+            $params = $this->getBodyParams();
+
+            AppUtility::dump($params);
+
+            $teacher = new Teacher();
+
+            $teacher->create($params['userId'], $params['cid']);
+
+            return json_encode(array('status' => 0));
+        }
 
     }
 }

@@ -162,3 +162,11 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     background-color: #3071a9;
     border-color: #285e8e;
 }
+
+.addRemoveTable{
+    margin-top: 20px;
+}
+
+.select-text-margin{
+    margin-top: 7px;
+}
