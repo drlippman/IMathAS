@@ -711,6 +711,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 	if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
 	if (isset($reqsigfigs)) {$options['reqsigfigs'] = $reqsigfigs;}
 	if (isset($grid)) {$options['grid'] = $grid;}
+	if (isset($snaptogrid)) {$options['snaptogrid'] = $snaptogrid;}
 	if (isset($partweights)) {$options['partweights'] = $partweights;}
 	if (isset($partialcredit)) {$options['partialcredit'] = $partialcredit;}
 	if (isset($anstypes)) {$options['anstypes'] = $anstypes;}
@@ -4013,10 +4014,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 	} else if ($anstype=='draw') {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
+			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 			if (isset($options['partweights'][$qn])) {$partweights = $options['partweights'][$qn];}
 		} else {
 			if (isset($options['grid'])) { $grid = $options['grid'];}
+			if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['answers'])) {$answers = $options['answers'];}
 			if (isset($options['partweights'])) {$partweights = $options['partweights'];}
 		}
@@ -4059,6 +4062,15 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($answerformat[0]=='numberline') {
 			$settings[2] = -0.5;
 			$settings[3] = 0.5;
+		}
+		if ($snaptogrid>0) {
+			list($newwidth,$newheight) = getsnapwidthheight($settings[0],$settings[1],$settings[2],$settings[3],$settings[6],$settings[7],$snaptogrid);
+			if (($newwidth - $settings[6])/$settings[6]<.1) {
+				$settings[6] = $newwidth;
+			}
+			if (($newheight- $settings[7])/$settings[7]<.1) {
+				$settings[7] = $newheight;
+			}
 		}
 		$pixelsperx = ($settings[6] - 2*$imgborder)/($settings[1]-$settings[0]);
 		$pixelspery = ($settings[7] - 2*$imgborder)/($settings[3]-$settings[2]);
