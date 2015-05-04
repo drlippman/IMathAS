@@ -191,4 +191,24 @@ class CourseController extends AppController
 
         return json_encode(array('status' => '0'));
     }
+
+    public function actionAddRemoveCourse()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        return $this->renderWithData('addRemoveCourse', ['cid' => $cid]);
+    }
+
+    public function actionGetTeachers()
+    {
+        $cid = Yii::$app->request->get('cid');
+
+        $sortBy = 'FirstName';
+        $order = AppConstant::ASCENDING;
+//        $users = User::findAllTeachers($sortBy, $order);
+        $course = Course::getById($cid);
+
+        return json_encode($course->teachersAsArray);
+
+    }
 }

@@ -289,6 +289,12 @@ class BaseImasCourses extends \yii\db\ActiveRecord
         return $this->hasMany(BaseImasTeachers::className(), ['courseid' => 'id']);
     }
 
+
+    public function getTeachersAsArray()
+    {
+        return $this->hasMany(BaseImasTeachers::className(), ['courseid' => 'id'])->asArray();
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

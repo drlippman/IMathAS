@@ -122,4 +122,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
 
 
+    public static function findAllTeachers($sortBy, $order)
+    {
+        return User::find()->where(['rights' => [20,40,60,75,100]])->orderBy([$sortBy => $order])->asArray()->all();
+    }
 }

@@ -15,6 +15,8 @@ use Yii;
 class AppController extends Controller
 {
 
+    public $enableCsrfValidation = false;
+
     function getBodyParams()
     {
         return $_POST;

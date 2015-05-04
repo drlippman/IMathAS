@@ -58,21 +58,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php echo(ucfirst($course->owner->FirstName)); ?>
                         &nbsp;&nbsp;<?php echo(ucfirst($course->owner->LastName)); ?>
                     </td>
-
                     <td>
-                        <a href=""><?php echo 'Setting'; ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/course-setting').'?cid=' .$course->id; ?>"><?php echo 'Setting'; ?></a>
                     </td>
 
                     <td>
-                        <a href=""><?php echo 'Add/Remove'; ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/add-remove-course').'?cid=' .$course->id; ?>"><?php echo 'Add/Remove'; ?></a>
                     </td>
 
                     <td>
-                        <a href="<?php echo Yii::$app->homeUrl.'course/course/transfer-course?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/transfer-course').'?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
                     </td>
 
                     <td>
-                        <a href="<?php echo Yii::$app->homeUrl . 'course/course/delete-course?cid=' . $course->id; ?>"
+                        <a href="<?php echo AppUtility::getURLFromHome('course','course/delete-course').'?cid='  . $course->id; ?>"
                            class="deleteCourse"><?php echo 'Delete'; ?></a>
                     </td>
                 </tr>
@@ -106,7 +105,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class=cp>
         <a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a><BR>
         <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
-        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Log Out</a><BR>
+        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress')  ?>">Log Out</a><BR>
     </div>
     <div class=cp>
     <span class=column>

@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasTeachers;
 
 class Teacher extends BaseImasTeachers
@@ -24,5 +25,9 @@ class Teacher extends BaseImasTeachers
         $this->courseid = $courseid;
         $this->save();
         return $this->id;
+    }
+    public static function getAllTeachers()
+    {
+        return static::find()->all();
     }
 }
