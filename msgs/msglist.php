@@ -578,7 +578,7 @@ function chgfilter() {
 			echo 'class="tagged" ';
 		}
 		echo "><td><input type=checkbox name=\"checked[]\" value=\"{$line['id']}\"/></td><td>";
-		echo "<a href=\"viewmsg.php?page$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
+		echo "<a href=\"viewmsg.php?page=$page&cid=$cid&filtercid=$filtercid&filteruid=$filteruid&type=msg&msgid={$line['id']}\">";
 		if (($line['isread']&1)==0) {
 			echo "<b>{$line['title']}</b>";
 		} else {
