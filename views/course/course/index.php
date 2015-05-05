@@ -232,22 +232,8 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php } ?>
 
 
-    <!-- ////////////////// Block here //////////////////-->
-
-    <div class=block>
-        <span class=left>
-            <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="/IMathAS/img/expand.gif" onClick="toggleblock('3','0-1')"/></span>
-
-        <div class=title>
-            <span class="right"><a href="course.php?cid=1&folder=0-1">Isolate</a></span>
-            <span class=pointer onClick="toggleblock('3','0-1')"><b>
-                    <a href="#" onclick="return false;">first block here</a></b></span>
-        </div>
-    </div>
-    <div class=hidden id="block3">Loading content...</div>
-
-
     <!-- ////////////////// Inline text here //////////////////-->
+
 
     <?php foreach($inlineText as $key => $inline) {?>
         <!--Hide functionality-->
@@ -295,4 +281,87 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class="clear"></div>
         <?php } ?>
     <?php } ?> <!--foreach ends-->
+
+
+    <!-- ////////////////// Block here //////////////////-->
+
+    <?php foreach($blocks as $key => $block) {
+    $itemList = unserialize($block->itemorder);
+    ?>
+          <!--Fixedheight-->
+    <?php
+    $style = '';
+    if (isset($itemList[8]['fixedheight']) && $itemList[8]['fixedheight']>0) {
+
+    if (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE 6')!==false) {
+    $style .= 'overflow: auto; height: expression( this.offsetHeight > '.$itemList[8]['fixedheight'].' ? \''.$itemList[8]['fixedheight'].'px\' : \'auto\' );';
+    } else {
+    $style .= 'overflow: auto; max-height:'.$itemList[8]['fixedheight'].'px;';
+    }
+    }
+    ?>
+            <!--Public-->
+
+    <?php
+    $turnOnPublic = false;
+
+    if (isset($itemList[8]['public']) && $itemList[8]['public']==1) {
+        $turnOnPublic = true;
+    } else {
+        continue;
+    }
+    //AppUtility::dump($turnOnPublic);
+    ?>
+    <?php /*AppUtility::dump($itemList);*/?>
+        <!-- Hide Block-->
+
+    <?php if($itemList[8]['avail'] != 0 && $itemList[8]['SH'][0] == 'S' && $itemList[8]['startdate'] < $currentTime && $itemList[8]['enddate'] > $currentTime){?>
+        <div class=block>
+            <?php if(strlen($itemList[8]['SH']) > 1 && $itemList[8]['SH'][1] == 'F'){?>
+                <span class=left>
+            <img alt="folder" src="/IMathAS/img/folder2.gif">
+        </span>
+            <?php }elseif(strlen($itemList[8]['SH']) > 1 && $itemList[8]['SH'][1] == 'T') {?>
+                <span class=left>
+            <img alt="folder" src="/IMathAS/img/folder_tree.png">
+        </span>
+            <?php } else { ?>
+            <span class=left>
+                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="/IMathAS/img/expand.gif" onClick="toggleblock('3','0-9')" />
+                </span>
+            <?php }?>
+            <div class=title>
+                <span class="right"><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $block->id) ?>">Isolate</a></span>
+            <span class=pointer onClick="toggleblock('3','0-1')"><b>
+                    <a href="#" onclick="return false;"><?php print_r($itemList[8]['name']);?></a></b></span>
+            </div>
+        </div>
+        <div class=hidden id="block3">Loading content...</div>
+    <?php } elseif($itemList[8]['avail'] == 2 ) {?> <!--Hide block ends-->
+                 <!--Show Always-->
+        <div class=block>
+            <?php if(strlen($itemList[8]['SH']) > 1 && $itemList[8]['SH'][1] == 'F'){?>
+                <span class=left>
+            <img alt="folder" src="/IMathAS/img/folder2.gif">
+                    </span>
+            <?php }elseif(strlen($itemList[8]['SH']) > 1 && $itemList[8]['SH'][1] == 'T') {?>
+                <span class=left>
+            <img alt="folder" src="/IMathAS/img/folder_tree.png">
+                    </span>
+            <?php } else { ?>
+                <span class=left>
+                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="/IMathAS/img/expand.gif" onClick="toggleblock('3','0-9')" />
+                </span>
+            <?php }?>
+            <div class=title>
+                <span class="right"><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $block->id) ?>">Isolate</a></span>
+            <span class=pointer onClick="toggleblock('3','0-1')"><b>
+                    <a href="#" onclick="return false;"><?php print_r($itemList[8]['name']);?></a></b></span>
+            </div>
+        </div>
+        <div class=hidden id="block3">Loading content...</div>
+
+    <?php }?> <!--Show always ends-->
+
+    <?php }?><!--foreach ends-->
 
