@@ -21,14 +21,12 @@ class AdminController extends AppController
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
+//        $courseData = CourseSettingForm::findCourseDataArray($sortBy, $order);
+//        AppUtility::dump($courseData);
 
-        $sortBy = 'name';
-        $order = AppConstant::ASCENDING;
-        $courseData = CourseSettingForm::findCourseData($sortBy, $order);
 
         $this->includeCSS(['../css/dashboard.css']);
-
-        return $this->renderWithData('index', array('users' => $users, 'courseData' => $courseData));
+        return $this->renderWithData('index', ['users' => $users]);
     }
 
     public function actionAddNewUser()
@@ -71,5 +69,16 @@ class AdminController extends AppController
                 $diag->save();
             }
             return $this->renderWithData('adminDiagnostic',['model'=>$model]);
+    }
+
+
+    public function actionGetAllCourseAjax()
+    {
+        $cid = Yii::$app->request->get('cid');
+        $sortBy = 'name';
+        $order = AppConstant::ASCENDING;
+        $courseData = CourseSettingForm::findCourseDataArray($sortBy, $order);
+//        AppUtility::dump($courseData);
+        return json_encode(array('status' => 0, 'courses' => $courseData));
     }
 }

@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Courses</h3>
 
     <div class=item>
-        <table id="course_table" class="display">
+        <table id="course-table displayCourse" class="display course-table">
             <thead>
             <tr>
                 <th>Name</th>
@@ -40,44 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Delete</th>
             </tr>
             </thead>
-            <tbody>
-            <?php
-            foreach ($courseData as $key => $course) {
-                $even = 'even';
-                $odd = 'odd'; ?>
-
-                <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
-                    <td>
-                        <a href="#"><?php echo ucfirst($course->name); ?></a>
-                    </td>
-                    <td>
-                        <?php echo $course->id; ?>
-                    </td>
-
-                    <td>
-                        <?php echo(ucfirst($course->owner->FirstName)); ?>
-                        &nbsp;&nbsp;<?php echo(ucfirst($course->owner->LastName)); ?>
-                    </td>
-                    <td>
-                        <a href="<?php echo AppUtility::getURLFromHome('course','course/course-setting').'?cid=' .$course->id; ?>"><?php echo 'Setting'; ?></a>
-                    </td>
-
-                    <td>
-                        <a href="<?php echo AppUtility::getURLFromHome('course','course/add-remove-course').'?cid=' .$course->id; ?>"><?php echo 'Add/Remove'; ?></a>
-                    </td>
-
-                    <td>
-                        <a href="<?php echo AppUtility::getURLFromHome('course','course/transfer-course').'?cid=' .$course->id; ?>"><?php echo 'Transfer'; ?></a>
-                    </td>
-
-                    <td>
-                        <a href="<?php echo AppUtility::getURLFromHome('course','course/delete-course').'?cid='  . $course->id; ?>"
-                           class="deleteCourse"><?php echo 'Delete'; ?></a>
-                    </td>
-                </tr>
-            <?php
-            }
-            ?>
+            <tbody class="course-table-body">
             </tbody>
         </table>
         <div class="lg-col-2 pull-left">
@@ -172,7 +135,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Pending Users</h3>
 
     <div class=item>
-        <table id="user_table" class="display">
+        <table id="user-table" class="display">
             <thead>
             <tr>
                 <th>Name</th>
@@ -238,8 +201,26 @@ $this->params['breadcrumbs'][] = $this->title;
 </html>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#course_table').DataTable();
-        $('#user_table').DataTable();
+        $.ajax({
+            type: "POST",
+            url: "get-all-course-ajax",
+            data:{
+            },
+            success: function (response){
+                console.log(response);
+                var result = JSON.parse(response);
+                if(result.status == 0)
+                {
+                    var courses = result.courses;
+                    createCourseTable(courses);
+                }
+            },
+            error: function(xhRequest, ErrorText, thrownError) {
+                console.log(ErrorText);
+            }
+        });
+
+
 
 //Show pop dialog for delete the course.
         $(".deleteCourse").on("click", function (e) {
@@ -268,5 +249,43 @@ $this->params['breadcrumbs'][] = $this->title;
         });
 
     });
+
+    function createCourseTable(courses)
+    {
+        var html = "";
+        $.each(courses, function(index, course){
+            html += "<tr> <td><a href='#'>"+capitalizeFirstLetter(course.name)+"</a></td>";
+            html += "<td>"+course.courseid+"</td>";
+            html += "<td>"+capitalizeFirstLetter(course.FirstName)+" "+capitalizeFirstLetter(course.LastName)+"</td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid=')?>"+course.courseid+"'>Setting</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid=') ?>"+course.courseid+"'>Add/Remove</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/transfer-course?cid=') ?>"+course.courseid+"'>Transfer</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/delete-course?cid=') ?>"+course.courseid+"'>Delete</a></td></tr>";
+        });
+        $(".course-table-body").append(html);
+        $('.course-table').DataTable();
+        $('#user-table').DataTable();
+    }
+
+    function isElementExist(element)
+    {
+        if ($(element).length){
+            return true;
+        }
+        return false;
+    }
+
+    function capitalizeFirstLetter(str)
+    {
+        return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
+            return letter.toUpperCase();
+        });
+
+    }
+
+
+
+
+
 
 </script>

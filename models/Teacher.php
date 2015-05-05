@@ -8,7 +8,8 @@
 
 namespace app\models;
 
-
+use Yii;
+use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasTeachers;
 
@@ -29,5 +30,11 @@ class Teacher extends BaseImasTeachers
     public static function getAllTeachers($cid)
     {
         return static::find()->where(['courseid' => $cid])->asArray()->all();
+    }
+
+    public static function removeTeacher($userid, $courseid)
+    {
+        $teacher = static::findone(['courseid' => $courseid, 'userid' => $userid]);
+        $teacher->delete();
     }
 }

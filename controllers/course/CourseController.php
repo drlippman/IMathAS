@@ -233,14 +233,67 @@ class CourseController extends AppController
         {
             $params = $this->getBodyParams();
 
-            AppUtility::dump($params);
-
             $teacher = new Teacher();
 
-            $teacher->create($params['userId'], $params['cid']);
+            if ($params['userId'] != null && $params['cid'] != null)
+            {
+                $teacher->create($params['userId'], $params['cid']);
+            }
 
             return json_encode(array('status' => 0));
         }
 
+    }
+
+    public function actionRemoveTeacherAjax()
+    {
+        if (Yii::$app->request->post())
+        {
+            $params = $this->getBodyParams();
+
+            $teacher = new Teacher();
+
+            if ($params['userId'] != null && $params['cid'] != null)
+            {
+                $teacher->removeTeacher($params['userId'], $params['cid']);
+            }
+            return json_encode(array('status' => 0));
+        }
+    }
+
+    public function actionAddAllAsTeacherAjax()
+    {
+        if (Yii::$app->request->post())
+        {
+            $params = $this->getBodyParams();
+            $cid = $params['cid'];
+            $usersId = json_decode($params['usersId']);
+
+            for($i = 0; $i < count($usersId); $i++)
+            {
+                $teacher = new Teacher();
+                $teacher->create($usersId[$i], $cid);
+            }
+
+            return json_encode(array('status' => 0));
+        }
+    }
+
+    public function actionRemoveAllAsTeacherAjax()
+    {
+        if (Yii::$app->request->post())
+        {
+            $params = $this->getBodyParams();
+            $cid = $params['cid'];
+            $usersId = json_decode($params['usersId']);
+
+            for($i = 0; $i < count($usersId); $i++)
+            {
+                $teacher = new Teacher();
+                $teacher->removeTeacher($usersId[$i], $cid);
+            }
+
+            return json_encode(array('status' => 0));
+        }
     }
 }
