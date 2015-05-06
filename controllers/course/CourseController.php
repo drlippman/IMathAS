@@ -9,9 +9,10 @@ use app\models\Blocks;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\forms\CourseSettingForm;
-use app\models\forms\Links;
+use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
+use app\models\Items;
 use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Wiki;
@@ -39,8 +40,10 @@ class CourseController extends AppController
         $link = Links::getByCourseId($cid);
         $block = Blocks::getById($cid);
         $inline = InlineText::getByCourseId($cid);
-        //AppUtility::dump($inline);
+        $item = Items::getByCourseId($cid);
+        //AppUtility::dump($item);
 
+        $this->includeJS(['../js/course.js']);
         return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }
 

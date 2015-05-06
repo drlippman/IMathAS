@@ -2,16 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: tudip
- * Date: 30/4/15
- * Time: 3:59 PM
+ * Date: 6/5/15
+ * Time: 12:34 PM
  */
 
-namespace app\models\forms;
+namespace app\models;
 
 
-use app\models\_base\BaseImasLinkedtext;
+use app\models\_base\BaseImasItems;
 
-class Links extends BaseImasLinkedtext
+class Items extends BaseImasItems
 {
     public static function getByCourseId($courseId)
     {

@@ -396,6 +396,65 @@ class AppUtility extends Component {
         return Yii::$app->user->identity->rights;
     }
 
+    /*Show Calender*/
+   public static function showCalendar($refpage) {
+
+        global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
+
+        $now = time();
+        if ($previewshift!=-1) {
+            $now = $now + $previewshift;
+        }
+        if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
+            $today = $now;
+        } else {
+            $today = $_COOKIE['calstart'.$cid];
+        }
+
+        if (isset($_GET['calpageshift'])) {
+            $pageshift = $_GET['calpageshift'];
+        } else {
+            $pageshift = 0;
+        }
+        if (!isset($_COOKIE['callength'.$cid])) {
+            $callength = 4;
+        } else {
+            $callength = $_COOKIE['callength'.$cid];
+        }
+
+        $today = $today + $pageshift*7*$callength*24*60*60;
+
+        $dayofweek = tzdate('w',$today);
+        $curmonum = tzdate('n',$today);
+        $dayofmo = tzdate('j',$today);
+        $curyr = tzdate('Y',$today);
+        if ($tzname=='') {
+            $serveroffset = date('Z') + $tzoffset*60;
+        } else {
+            $serveroffset = 0; //don't need this if user's timezone has been set
+        }
+        $midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr)+$serveroffset;
+
+
+        $hdrs = array();
+        $ids = array();
+
+        $lastmo = '';
+        for ($i=0;$i<7*$callength;$i++) {
+            $row = floor($i/7);
+            $col = $i%7;
+
+            list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
+            if ($thismo==$lastmo) {
+                $hdrs[$row][$col] = $thisday;
+            } else {
+                $hdrs[$row][$col] = "$thismo $thisday";
+                $lastmo = $thismo;
+            }
+            $ids[$row][$col] = "$thismonum-$thisday";
+
+            $dates[$ids[$row][$col]] = $datestr;
+        }
+    }
 
 }
-?>
