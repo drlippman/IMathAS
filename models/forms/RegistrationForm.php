@@ -56,16 +56,15 @@ class RegistrationForm extends Model
     {
 
         return [
-            [['username', 'password','email'], 'required'],
+            [['FirstName', 'LastName', 'username', 'password','email'], 'required'],
             ['email','email'],
             [['password'], 'string', 'max' => 254],
             [['FirstName', 'LastName'], 'string', 'max' => 20],
             [['email'], 'string', 'max' => 100],
-            [['SID'], 'unique'],
             ['phoneno','number'],
             [['phoneno'], 'string','max'=> 10,'min'=> 10],
             [['confirmPassword'],'compare','compareAttribute'=>'password'],
-            ['terms','boolean']
+            ['terms', 'compare', 'compareValue' => 1, 'message' => 'You should accept term to use our service']
         ];
     }
 
@@ -84,7 +83,6 @@ class RegistrationForm extends Model
             'email' => 'Email Address',
             'phoneno'=>'Phone Number',
             'terms'=>'I have read and agree to the Terms of Use (below)'
-
         ];
     }
 }

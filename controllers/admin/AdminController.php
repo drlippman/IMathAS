@@ -22,10 +22,6 @@ class AdminController extends AppController
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
-//        $courseData = CourseSettingForm::findCourseDataArray($sortBy, $order);
-//        AppUtility::dump($courseData);
-
-
         $this->includeCSS(['../css/dashboard.css']);
         return $this->renderWithData('index', ['users' => $users]);
     }

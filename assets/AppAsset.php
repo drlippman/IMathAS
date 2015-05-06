@@ -35,6 +35,7 @@ class AppAsset extends AssetBundle
         'js/ASCIIsvg_min.js',
         'js/mathgraphcheck.js',
         'js/jquery-ui.min.js',
+        'js/common.js',
 
     ];
     public $depends = [

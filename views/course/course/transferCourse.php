@@ -15,55 +15,48 @@ $this->params['breadcrumbs'][] = $this->title;
 <body>
 <div class=mainbody>
     <div id="headeradmin" class="pagetitle"><h2>Transfer Course Owner</h2></div>
-
-<div>
-    Transfer course ownership to <select name="seluid" class="dropdown" id="seluid">
-        <option value="0" >Select a user..</option>
-        <?php foreach ($users as $user) { ?>
-            <option
-                value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName']; ?></option>
-        <?php } ?>
-    </select>
-</div>
-
-    <div class="buttonAlignment">
-        <a class="btn btn-primary transfer">Transfer</a>
-        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin','admin/index');?>" >Cancel</a>
+    <div class="form-group">
+        <label class="col-lg-3 label-text-margin pull-left">Transfer course ownership to</label>
+        <div class="col-lg-3 pull-left">
+            <select name="seluid" class="dropdown form-control" id="seluid">
+                <option value="0">Select a user..</option>
+                <?php foreach ($users as $user) { ?>
+                    <option
+                        value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
     </div>
-<input type="hidden" id="courseId" value="<?php echo $course['id'] ?>">
-<input type="hidden" id="userId" value="<?php echo $course->ownerid ?>">
+    <div class="clear-both"></div>
+    <div class="col-lg-offset-3 buttonAlignment">
+        <a class="btn btn-primary transfer">Transfer</a>
+        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index'); ?>">Back</a>
+    </div>
+    <input type="hidden" id="courseId" value="<?php echo $course['id'] ?>">
+    <input type="hidden" id="userId" value="<?php echo $course->ownerid ?>">
 </div>
 
 
 </body>
 </html>
 <script>
-    $(".transfer").click(function(){
-
+$( document ).ready(function() {
+    $(".transfer").click(function () {
         var transferTo = $("#seluid option:selected").val();
         var courseId = $("#courseId").val();
         var ownerId = $("#userId").val();
-
-        $.ajax({
-            type: "POST",
-            url: "update-owner",
-            data:{
-                newOwner:transferTo,
-                cid:courseId,
-                oldOwner:ownerId
-            },
-            success: function (response){
-                console.log(response);
-                var data = JSON.parse(response);
-                if(data.status)
-                {
-                    window.location = "../../admin/admin/index";
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+        var transferData = {newOwner: transferTo,cid: courseId,oldOwner: ownerId};
+        jQuerySubmit('update-owner', transferData, 'updateSuccess');
 
     });
+});
+
+function updateSuccess(response) {
+    console.log(response);
+    var data = JSON.parse(response);
+    if (data.status) {
+        $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');
+    }
+}
+
 </script>

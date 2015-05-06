@@ -58,14 +58,16 @@ AppAsset::register($this);
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
 
             ]) ?>
-            <?php
-            $flashes = Yii::$app->session->getAllFlashes();
-            if (isset($flashes)) {
-                foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
-                    echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+            <div id="flash-message">
+                <?php
+                $flashes = Yii::$app->session->getAllFlashes();
+                if (isset($flashes)) {
+                    foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                        echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+                    }
                 }
-            }
             ?>
+            </div>
 
             <?= $content ?>
         </div>

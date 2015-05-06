@@ -89,4 +89,8 @@ class AppController extends Controller
         \Yii::$app->session->setFlash($type, $message);
     }
 
+    public function isPost(){
+        return Yii::$app->request->getMethod() == 'POST';
+    }
+
 }

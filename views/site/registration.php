@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'options' => ['class' => 'form-horizontal'],
         'action' => '',
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+            'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-8 col-lg-offset-4\">{error}</div>",
             'labelOptions' => ['class' => 'col-lg-4'],
         ],
     ]); ?>
@@ -34,10 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username') ?>
     <?= $form->field($model, 'password')->passwordInput() ?>
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-    <?= $form->field($model, 'terms')->checkbox() ?>
+    <?= $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label']]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Request Account', ['class' => 'btn btn-primary']) ?>
+        <div class="col-lg-offset-4"><?= Html::submitButton('Request Account', ['class' => 'btn btn-primary']) ?></div>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -163,10 +163,23 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     border-color: #285e8e;
 }
 
+<<<<<<< Updated upstream
 .addRemoveTable{
     margin-top: 20px;
 }
 
 .select-text-margin{
     margin-top: 7px;
+=======
+.clear-both{
+    clear: both;
+}
+
+.register-terms-label{
+    font-weight: normal;
+}
+
+.form-group{
+    margin-bottom: 0px;
+>>>>>>> Stashed changes
 }

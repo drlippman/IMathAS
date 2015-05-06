@@ -41,7 +41,6 @@ class CourseController extends AppController
         $block = Blocks::getById($cid);
         $inline = InlineText::getByCourseId($cid);
         $item = Items::getByCourseId($cid);
-        //AppUtility::dump($item);
 
         $this->includeJS(['../js/course.js']);
         return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
@@ -150,10 +149,10 @@ class CourseController extends AppController
     }
     public function actionUpdateOwner()
     {
-        if (Yii::$app->request->post())
+//        return json_encode(array('status' => '0'));
+        if ($this->isPost())
         {
             $params = $this->getBodyParams();
-
 
             if(Yii::$app->user->identity->rights == 75)
             {
@@ -190,9 +189,8 @@ class CourseController extends AppController
                     }
                 }
             }
+            return json_encode(array('status' => '0'));
         }
-
-        return json_encode(array('status' => '0'));
     }
 
     public function actionAddRemoveCourse()
