@@ -5,6 +5,7 @@ namespace app\controllers\admin;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use app\models\_base\BaseImasDiags;
+use app\models\forms\ChangeRightsForm;
 use app\models\forms\CourseSettingForm;
 use Yii;
 use app\models\forms\AddNewUserForm;
@@ -81,4 +82,18 @@ class AdminController extends AppController
 //        AppUtility::dump($courseData);
         return json_encode(array('status' => 0, 'courses' => $courseData));
     }
+
+    public function actionChangeRights()
+    {
+        $this->guestUserHandler();
+        $user = Yii::$app->request->get('id');
+        AppUtility::dump($user);
+        $users = User::findUser($user);
+        AppUtility::dump($users);
+
+         return $this->renderWithData('changeRights',$users);
+    }
+
+
+
 }
