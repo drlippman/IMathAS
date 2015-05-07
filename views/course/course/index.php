@@ -1,19 +1,23 @@
+<link href='../../../web/css/fullcalendar.min.css' rel='stylesheet' />
+<link href='../../../web/css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<script src='../../../web/js/moment.min.js'></script>
+<script src='../../../web/js/jquery.min.js'></script>
+<script src='../../../web/js/fullcalendar.min.js'></script>
+
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
 
 ?>
-    <link rel="stylesheet" href="../../../web/css/_leftSide.css"/>
-    <link rel="stylesheet" href="../../../web/css/assessment.css"/>
-
-
+    <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 ?>
+
 <?php echo $this->render('_toolbar'); ?>
 
     <div class="needed">
-        <?php echo $this->render('_leftSide'); ?>
+        <?php echo $this->render('_leftSide');?>
     </div>
 
     <!--Course name-->
@@ -21,6 +25,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <div class="course">
         <h3><b><?php echo $course->name ?></b></h3>
     </div>
+
 
     <!-- ////////////////// Assessment here //////////////////-->
 
@@ -35,6 +40,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $assessment->courseid) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+
                     <?php } ?>
                 </div>
                 <div class=itemsum>
@@ -359,7 +365,58 @@ $itemList = unserialize($block->itemorder);
 <?php } ?> <!--Show always ends-->
 
 <?php } ?><!--foreach ends-->
-
+</div>
 
 <!--Calender here -->
+<script>
+
+    $(document).ready(function() {
+
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            defaultDate: '2015-05-07',
+            businessHours: true, // display business hours
+            editable: true,
+            events: [
+                {
+                    title: 'Business Lunch',
+                    start: '2015-02-03T13:00:00',
+                    constraint: 'businessHours'
+                },
+                {
+                    title: 'Meeting',
+                    start: '2015-02-13T11:00:00',
+                    constraint: 'availableForMeeting', // defined below
+                    color: '#257e4a'
+                }
+            ]
+        });
+
+    });
+
+</script>
+<style>
+
+    body {
+        margin: 20px 5px;
+        font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+        font-size: 14px;
+    }
+
+    #calendar {
+       margin-left: 20%;
+    }
+
+</style>
+<body>
+
+<div id='calendar'></div>
+
+</body>
+
+
 
