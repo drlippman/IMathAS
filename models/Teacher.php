@@ -37,4 +37,8 @@ class Teacher extends BaseImasTeachers
         $teacher = static::findone(['courseid' => $courseid, 'userid' => $userid]);
         $teacher->delete();
     }
+    public static function getTeacherByUserId($userid)
+    {
+        return static::findAll( ['userid' => $userid]);
+    }
 }

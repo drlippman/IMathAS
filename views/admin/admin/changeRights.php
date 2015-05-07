@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
             AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
 
-        <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
+        <?= $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
 
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-5">

@@ -96,16 +96,23 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = static::findOne(['email' => $email]);
         return $user;
     }
+
     public static function findAllUser($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->all();
     }
+
     public static function findAllUsers($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => [20,40,60,75,100] ])->all();
 
     }
 
+    public static function findAllUsersArray($sortBy, $order)
+    {
+        return User::find()->orderBy([$sortBy => $order])->where(['rights' => 0 ])->asArray()->all();
+
+    }
 
     public static function createStudentAccount($params)
     {
@@ -128,8 +135,16 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return User::find()->where(['rights' => [20,40,60,75,100]])->orderBy([$sortBy => $order])->asArray()->all();
     }
 
-    public static function findUsers($id)
+    public static function findUsers($params)
     {
-        return static::findAll($id);
+        return static::findAll($params);
+    }
+
+    public static function updateRights($id, $rights, $groupId = 0)
+    {
+       $user = static::findOne(['id' =>$id]);
+        $user->rights = $rights;
+        $user->groupid = $groupId;
+        $user->save();
     }
 }

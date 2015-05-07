@@ -7,7 +7,7 @@ use yii\base\Model;
 class ChangeRightsForm extends Model
 {
     public $rights;
-    public $AssignToGroup;
+    public $groupid;
 
     private $_user = false;
 
@@ -17,8 +17,9 @@ class ChangeRightsForm extends Model
     public function rules()
     {
         return [
-                'rights',
-            'AssignToGroup',
+
+
+            ['groupid', 'string'],
         ];
 
     }
@@ -28,7 +29,7 @@ class ChangeRightsForm extends Model
         return
             [
                 'rights' => 'Set User rights  to',
-                'AssignToGroup' => 'Assign To Group'
+                'groupid' => 'Assign To Group'
             ];
     }
 

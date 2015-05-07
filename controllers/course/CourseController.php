@@ -41,7 +41,6 @@ class CourseController extends AppController
         $block = Blocks::getById($cid);
         $inline = InlineText::getByCourseId($cid);
         $item = Items::getByCourseId($cid);
-
         $this->includeJS(['../js/course.js']);
         return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }

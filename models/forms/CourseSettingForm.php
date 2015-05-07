@@ -6,7 +6,6 @@ use app\components\AppUtility;
 use app\models\_base\BaseImasCourses;
 use Yii;
 use yii\base\Model;
-use yii\db\Query;
 
 class CourseSettingForm extends Model
 {
@@ -81,20 +80,4 @@ class CourseSettingForm extends Model
         return BaseImasCourses::find()->orderBy([$sortBy => $order])->all();
     }
 
-    public static function findCourseDataArray($sortBy, $order)
-    {
-       // return BaseImasCourses::find()->joinwith('BaseImasUsers')->orderBy([$sortBy => $order])->asArray()->all();
-
-        $query = new Query();
-        $query	->select(['imas_users.id as userid','imas_users.FirstName', 'imas_users.LastName', 'imas_courses.name', 'imas_courses.id as courseid'])
-            ->from('imas_courses')
-            ->join(	'LEFT OUTER JOIN',
-                'imas_users',
-                'imas_users.id = imas_courses.ownerid'
-            );
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-
-        return $data;
-    }
 }

@@ -5,8 +5,8 @@ namespace app\controllers\admin;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use app\models\_base\BaseImasDiags;
+use app\models\Course;
 use app\models\forms\ChangeRightsForm;
-use app\models\forms\CourseSettingForm;
 use Yii;
 use app\models\forms\AddNewUserForm;
 use app\components\AppUtility;
@@ -69,25 +69,31 @@ class AdminController extends AppController
     }
 
 
-    public function actionGetAllCourseAjax()
+    public function actionGetAllCourseUserAjax()
     {
         $cid = Yii::$app->request->get('cid');
-        $sortBy = 'name';
+
+        $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
-        $courseData = CourseSettingForm::findCourseDataArray($sortBy, $order);
-//        AppUtility::dump($courseData);
-        return json_encode(array('status' => 0, 'courses' => $courseData));
+        $courseData = Course::findCourseDataArray();
+        $user = User::findAllUsersArray($sortBy, $order);
+
+        return json_encode(array('status' => 0, 'courses' => $courseData, 'users' => $user));
     }
 
     public function actionChangeRights()
     {
+        $id = Yii::$app->request->get('id');
         $this->guestUserHandler();
-        $user = Yii::$app->request->get('id');
-        AppUtility::dump($user);
-        $users = User::findUser($user);
-        AppUtility::dump($users);
-
-         return $this->renderWithData('changeRights',$users);
+        $model = new ChangeRightsForm();
+        if ($model->load(Yii::$app->request->post())) {
+            $params = $this->getBodyParams();
+            $params = $params['ChangeRightsForm'];
+            User::updateRights($id, $params['rights'], $params['groupid']);
+            $this->setSuccessFlash('User confirmed successfully.');
+            return $this->redirect(AppUtility::getURLFromHome('admin','admin/index'));
+        }
+        return $this->renderWithData('changeRights', ['model' => $model]);
     }
 
 

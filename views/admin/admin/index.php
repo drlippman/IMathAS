@@ -136,7 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Pending Users</h3>
 
     <div class=item>
-        <table id="user-table" class="display">
+        <table id="user-table displayCourse" class="display user-table">
             <thead>
             <tr>
                 <th>Name</th>
@@ -149,45 +149,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Delete</th>
             </tr>
             </thead>
-            <tbody>
-            <?php
-            foreach ($users as $key => $user) {
-                if ($user->rights == 0) {
-                    $even = 'even';
-                    $odd = 'odd'; ?>
-                    <tr class="<?php echo (($key % 2) != 0) ? 'even' : 'odd'; ?>">
+            <tbody class="user-table-body">
 
-                        <td>
-                            <?php echo(ucfirst($user->FirstName)); ?>
-                            &nbsp;&nbsp;<?php echo(ucfirst($user->LastName)); ?>
-                        </td>
-
-                        <td>
-                            <?php echo $user->SID; ?>
-                        </td>
-                        <td>
-                            <?php echo $user->email; ?>
-                        </td>
-                        <td>
-                            <?php echo \app\components\AppUtility::getRight($user->rights); ?>
-                        </td>
-                        <td>
-                            <?php echo $user->lastaccess; ?>
-                        </td>
-                        <td>
-                            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id='.$user->id) ?>"><?php echo 'Change'; ?></a>
-                        </td>
-                        <td>
-                            <a href="#"><?php echo 'Reset'; ?></a>
-                        </td>
-                        <td>
-                            <a href="#"><?php echo 'Delete'; ?></a>
-                        </td>
-                    </tr>
-                <?php
-                }
-            }
-            ?>
             </tbody>
         </table>
         <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add
@@ -202,32 +165,30 @@ $this->params['breadcrumbs'][] = $this->title;
 </html>
 <script type="text/javascript">
     $(document).ready(function () {
-        $.ajax({
-            type: "POST",
-            url: "get-all-course-ajax",
-            data:{
-            },
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    var courses = result.courses;
-                    createCourseTable(courses);
-                    bindEvent();
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+
+        jQuerySubmit('get-all-course-user-ajax',{},'getAllCourseSuccess');
+
     });
+
+    function getAllCourseSuccess(response)
+    {
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var courses = result.courses;
+            var users = result.users;
+            createCourseTable(courses);
+            createUsersTable(users);
+        }
+    }
 
     function bindEvent(){
         //Show pop dialog for delete the course.
-        $(document).on('click', '#delete-link',  function(){
+        $(document).on('click', '#delete-link',  function(e){
             var html = "<div>Are you sure to delete your course?</div>";
-            var cancelUrl = $(this).attr('<?php echo AppUtility::getURLFromHome('admin', 'admin/index.php') ?>');
+            var cancelUrl = $('.delete-link').attr('href');
+            e.preventDefault();
             $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
@@ -260,27 +221,28 @@ $this->params['breadcrumbs'][] = $this->title;
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid=')?>"+course.courseid+"'>Setting</a></td>";
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid=') ?>"+course.courseid+"'>Add/Remove</a></td>";
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/transfer-course?cid=') ?>"+course.courseid+"'>Transfer</a></td>";
-            html += "<td id='delete-link'><a class='deleteCourse_1' href='#'>Delete</a></td></tr>";
+            html += "<td id='delete-link'><a class='delete-link' href='<?php echo AppUtility::getURLFromHome('course', 'course/delete-course?cid=') ?>"+course.courseid+"'>Delete</a></td></tr>";
             bindEvent();
         });
         $(".course-table-body").append(html);
         $('.course-table').DataTable();
-        $('#user-table').DataTable();
     }
 
-    function isElementExist(element)
-    {
-        if ($(element).length){
-            return true;
-        }
-        return false;
-    }
 
-    function capitalizeFirstLetter(str)
-    {
-        return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-            return letter.toUpperCase();
+    function createUsersTable(users)
+    { var html = "";
+        $.each(users, function(index, users){
+            html += "<tr> <td>"+capitalizeFirstLetter(users.FirstName)+" "+capitalizeFirstLetter(users.LastName)+"</td>";
+            html += "<td>"+users.SID+"</td>";
+            html += "<td>"+users.email+"</td>";
+            html += "<td>"+users.rights+"</td>";
+            html += "<td>"+users.lastaccess+"</td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
+            html += "<td><a href='#'>Reset</a></td>";
+            html += "<td ><a href='#'>Delete</a></td></tr>";
+ //           bindEvent();
         });
-
+        $(".user-table-body").append(html);
+        $('.user-table').DataTable();
     }
 </script>

@@ -45,6 +45,7 @@ $( document ).ready(function() {
         var transferTo = $("#seluid option:selected").val();
         var courseId = $("#courseId").val();
         var ownerId = $("#userId").val();
+
         var transferData = {newOwner: transferTo,cid: courseId,oldOwner: ownerId};
         jQuerySubmit('update-owner', transferData, 'updateSuccess');
 

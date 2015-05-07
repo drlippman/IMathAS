@@ -7,6 +7,7 @@ use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
 use Yii;
 use yii\db\Exception;
+use yii\db\Query;
 
 class Course extends BaseImasCourses {
 
@@ -102,5 +103,19 @@ class Course extends BaseImasCourses {
             $transaction->rollBack();
             return false;
         }
+    }
+
+    public static function findCourseDataArray()
+    {
+        $query = new Query();
+        $query	->select(['imas_users.id as userid','imas_users.FirstName', 'imas_users.LastName', 'imas_courses.name', 'imas_courses.id as courseid'])
+            ->from('imas_courses')
+            ->join(	'LEFT OUTER JOIN',
+                'imas_users',
+                'imas_users.id = imas_courses.ownerid'
+            );
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 

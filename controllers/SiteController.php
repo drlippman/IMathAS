@@ -12,6 +12,7 @@ use app\models\forms\RegistrationForm;
 use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentRegisterForm;
+use app\models\Teacher;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -247,12 +248,13 @@ class SiteController extends AppController
         if (!$this->isGuestUser()) {
             $user = $this->getAuthenticatedUser();
             $students = Student::getByUserId($user->id);
+            $teachers = Teacher::getTeacherByUserId($user->id);
             if ($user) {
                 $this->includeCSS(['css/dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
 
-                $userData = ['user' => $user, 'students' => $students];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers];
                 return $this->renderWithData('dashboard', $userData);
             }
         }
