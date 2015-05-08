@@ -7,7 +7,6 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 ?>
     <!--Get current time-->
 <?php
@@ -371,29 +370,39 @@ $itemList = unserialize($block->itemorder);
 <script>
 
     $(document).ready(function() {
+        var startDate = '2015-05-05';
+        var endDate = '2015-05-04';
+        var reviewDate = '2015-05-09';
+
 
         $('#calendar').fullCalendar({
+            height: 400,
             header: {
+
                 left: 'prev,next today',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            defaultDate: '2015-05-07',
-            businessHours: true, // display business hours
-            editable: true,
+            businessHours: false, // display business hours
+            editable: false,
             events: [
                 {
-                    title: 'Business Lunch',
-                    start: '2015-02-03T13:00:00',
-                    constraint: 'businessHours'
+                    title: 'Assessment',
+                    start: endDate
                 },
                 {
-                    title: 'Meeting',
-                    start: '2015-02-13T11:00:00',
-                    constraint: 'availableForMeeting', // defined below
+                    title: 'Review Assessment',
+                    start: reviewDate,
                     color: '#257e4a'
                 }
-            ]
+            ],
+            eventClick: function(calEvent, jsEvent, view) {
+
+                alert('Event: ' + calEvent.start);
+
+
+            }
+
         });
 
     });
@@ -417,6 +426,3 @@ $itemList = unserialize($block->itemorder);
 <div id='calendar'></div>
 
 </body>
-
-
-
