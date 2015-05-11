@@ -5,7 +5,6 @@
     background-color: #ddddff;
     width: 15%;
     box-sizing: border-box;
-    position: absolute;
     border-radius:10px;
     border: 2px solid #000000;
     padding: 20px;
@@ -21,4 +20,19 @@
 .courseText
 {
     margin-left: 20%;
+}
+.buttonAlignment
+{
+    float: right;
+    margin-top: -5%;
+    margin-right: -3%;
+}
+.view
+{
+    float: left;
+    margin-left: -12%;
+}
+.addDropdown
+{
+    margin-left: 16%;
 }

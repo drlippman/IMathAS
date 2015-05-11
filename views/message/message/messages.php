@@ -1,12 +1,14 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 
 $this->title = 'Messages';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div><a href="">Limit to Tagged</a> | <a href="">Sent Messages</a>
-    | <?= Html::submitButton('picture', ['class' => 'class="col-lg-offset-1 col-lg-11"', 'name' => 'login-button']) ?>
+<div><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id); ?>" class="btn btn-primary ">Send New Message</a>
+    | <a href="">Limit to Tagged</a> | <a href="">Sent Messages</a>
+    | <a onclick="sendMessage()" class="btn btn-primary ">Picture</a>
 </div>
 
 <p>Filter by course: <select id="filtercid">
@@ -36,3 +38,17 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </select>
 </p>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        jQuerySubmit('',{},'');
+    });
+
+
+
+    function sendMessage()
+    {
+
+    }
+</script>

@@ -41,37 +41,30 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <script type="text/javascript">
     $(document).ready(function(){
-
         var cid = $(".course-id").val();
-        $.ajax({
-            type: "GET",
-            url: "get-teachers",
-            data:{
-                cid:cid
-            },
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    var teachers = result.data.teachers;
-
-                    var nonTeachers = result.data.nonTeachers;
-
-                    $.each(nonTeachers, function(index, nonTeacher){
-                        displayNonTeacher(nonTeacher);
-                    })
-
-                    $.each(teachers, function(index, teacher){
-                        displayTeacher(teacher);
-                    })
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+        var courseTeacher = {cid: cid};
+        jQuerySubmit('get-teachers', courseTeacher, 'displayTeacherSuccess');
     });
+
+    function displayTeacherSuccess(response)
+    {
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var teachers = result.data.teachers;
+            var nonTeachers = result.data.nonTeachers;
+
+            $.each(nonTeachers, function(index, nonTeacher){
+                displayNonTeacher(nonTeacher);
+            });
+
+            $.each(teachers, function(index, teacher){
+                displayTeacher(teacher);
+            });
+        }
+
+    }
+
 
     function displayTeacher(teacher)
     {
@@ -94,51 +87,33 @@ $this->params['breadcrumbs'][] = $this->title;
     function addTeacher(userId)
     {
         var cid = $(".course-id").val();
-
-        $.ajax({
-            type: "POST",
-            url: "add-teacher-ajax",
-            data:{
-                cid: cid,
-                userId: userId
-            },
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    window.location = "add-remove-course?cid="+cid;
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+        jQuerySubmit('add-teacher-ajax',{cid:cid, userId:userId },'addTeacherSuccess');
     }
+
+    function addTeacherSuccess(response)
+    {
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            window.location = "add-remove-course?cid="+cid;
+        }
+    }
+
 
     function removeTeacher(userId)
     {
         var cid = $(".course-id").val();
+        jQuerySubmit('remove-teacher-ajax',{cid:cid, userId:userId },'removeTeacherSuccess');
+    }
 
-        $.ajax({
-            type: "POST",
-            url: "remove-teacher-ajax",
-            data:{
-                cid: cid,
-                userId: userId
-            },
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    window.location = "add-remove-course?cid="+cid;
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+    function removeTeacherSuccess(response)
+    {
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            window.location = "add-remove-course?cid="+cid;
+        }
     }
 
     function addAllAsTeacher()
@@ -149,23 +124,17 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             nonTeachers.push($(this).val());
         });
+        jQuerySubmit('add-all-as-teacher-ajax',{'usersId':JSON.stringify(nonTeachers), 'cid':cid},'addAllAsTeacherSuccess');
+    }
 
-        $.ajax({
-            type: "POST",
-            url: "add-all-as-teacher-ajax",
-            data:{'usersId':JSON.stringify(nonTeachers), 'cid':cid},
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    window.location = "add-remove-course?cid="+cid;
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+    function addAllAsTeacherSuccess(response)
+    {
+        var cid = $(".course-id").val();
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            window.location = "add-remove-course?cid="+cid;
+        }
     }
 
     function removeAllAsTeacher()
@@ -176,30 +145,16 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             teachers.push($(this).val());
         });
-        $.ajax({
-            type: "POST",
-            url: "remove-all-as-teacher-ajax",
-            data:{'usersId':JSON.stringify(teachers), 'cid':cid},
-            success: function (response){
-                console.log(response);
-                var result = JSON.parse(response);
-                if(result.status == 0)
-                {
-                    window.location = "add-remove-course?cid="+cid;
-                }
-            },
-            error: function(xhRequest, ErrorText, thrownError) {
-                console.log(ErrorText);
-            }
-        });
+        jQuerySubmit('remove-all-as-teacher-ajax',{'usersId':JSON.stringify(teachers), 'cid':cid},'removeAllAsTeacherSuccess');
     }
-
-    function capitalizeFirstLetter(str)
+    function removeAllAsTeacherSuccess(response)
     {
-        return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
-            return letter.toUpperCase();
-        });
-
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var cid = $(".course-id").val();
+            window.location = "add-remove-course?cid="+cid;
+        }
     }
 
 </script>

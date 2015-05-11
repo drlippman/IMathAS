@@ -147,4 +147,5 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user->groupid = $groupId;
         $user->save();
     }
+
 }

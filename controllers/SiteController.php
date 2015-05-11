@@ -313,16 +313,6 @@ class SiteController extends AppController
         return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname]);
     }
 
-    public function actionMessages()
-    {
-        $this->guestUserHandler();
-        if ($this->getAuthenticatedUser()) {
-            $model = new MessageForm();
-            return $this->renderWithData('messages', ['model' => $model]);
-        }
-
-    }
-
     public function actionStudentEnrollCourse()
     {
         $this->guestUserHandler();

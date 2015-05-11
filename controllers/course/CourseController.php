@@ -198,13 +198,14 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
+        $this->includeCSS('../css/');
         return $this->renderWithData('addRemoveCourse', ['cid' => $cid]);
     }
 
     public function actionGetTeachers()
     {
-        $cid = Yii::$app->request->get('cid');
-
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->getBodyParams();
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllTeachers($sortBy, $order);
@@ -212,21 +213,24 @@ class CourseController extends AppController
         $nonTeacher = array();
         $teacherIds = array();
         $teacherList = array();
-        foreach($teachers as $teacher)
+
+        if($teachers)
         {
-            $teacherIds[$teacher['userid']] = true;
-        }
-        foreach($users as $user)
-        {
-            if(isset($teacherIds[$user['id']]))
+            foreach($teachers as $teacher)
             {
-                array_push($teacherList, $user);
-            }else{
-                array_push($nonTeacher, $user);
+                $teacherIds[$teacher['userid']] = true;
+            }
+            foreach($users as $user)
+            {
+                if(isset($teacherIds[$user['id']]))
+                {
+                    array_push($teacherList, $user);
+                }else{
+                    array_push($nonTeacher, $user);
+                }
             }
         }
         return json_encode(array('status' =>0, 'data' => array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher)));
-
     }
 
     public function actionAddTeacherAjax()
