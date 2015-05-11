@@ -26,7 +26,8 @@
         "yiisoft/yii2-debug": "*",
         "yiisoft/yii2-gii": "*",
         "yiisoft/yii2-faker": "*",
-        "squizzlabs/php_codesniffer":"2.*"
+        "squizlabs/php_codesniffer": "2.*"
+
     },
     "config": {
         "process-timeout": 1800

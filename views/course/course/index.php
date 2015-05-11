@@ -1,8 +1,4 @@
-<link href='../../../web/css/fullcalendar.min.css' rel='stylesheet' />
 <link href='../../../web/css/fullcalendar.print.css' rel='stylesheet' media='print' />
-<script src='../../../web/js/moment.min.js'></script>
-<script src='../../../web/js/jquery.min.js'></script>
-<script src='../../../web/js/fullcalendar.min.js'></script>
 
 <?php
 use yii\helpers\Html;
@@ -17,11 +13,12 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <div class="needed">
         <?php echo $this->render('_leftSide');?>
-    </div>
+    </div>-->-->
 
-    <!--Course name-->
+<!--    <!--Course name-->-->
 
     <div class="course">
+
         <h3><b><?php echo $course->name ?></b></h3>
     </div>
 
@@ -36,7 +33,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $assessment->courseid) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
 
@@ -52,7 +49,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $assessment->courseid) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->reviewdate == 2000000000) { ?>
                         <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
                         <BR>This assessment is in review mode - no scores will be saved.
@@ -69,7 +66,6 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php } ?>
 </div>
 
-
 <!-- ////////////////// Forum here //////////////////-->
 
 
@@ -79,7 +75,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
             <img alt="forum" class="floatleft" src="/IMathAS/img/forum.png"/>
             <div class=title>
-            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
+            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
         <?php echo $forum->name ?></a></b>
         </div>
         <div class=itemsum><p>
@@ -366,6 +362,10 @@ $itemList = unserialize($block->itemorder);
 <?php } ?><!--foreach ends-->
 </div>
 
+
+<div id="dialog" title="Basic dialog">
+</div>
+
 <!--Calender here -->
 <script>
 
@@ -389,6 +389,7 @@ $itemList = unserialize($block->itemorder);
                 {
                     title: 'Assessment',
                     start: endDate
+
                 },
                 {
                     title: 'Review Assessment',
@@ -396,13 +397,32 @@ $itemList = unserialize($block->itemorder);
                     color: '#257e4a'
                 }
             ],
-            eventClick: function(calEvent, jsEvent, view) {
-
-                alert('Event: ' + calEvent.start);
-
-
+            eventClick: function(e) {
+                //alert('ndkvn');
+                var html = "<p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>";
+               // $("#dialog").append(html);
+               // e.preventDefault();
+                $( "#dialog" ).dialog();
+                //event.preventDefault();
             }
 
+             /*  Used*/
+//            eventClick:  function(event) {
+//
+//               // alert('Event: ' + event.start);
+//                $("#eventInfo").html(event.description);
+//                $("#eventLink").attr('href', event.url);
+//                $("#eventContent").dialog({ modal: true, title: event.title });
+//            }
+
+
+            /*eventClick:  function(event, jsEvent, view) {
+                //set the values and open the modal
+
+
+                window.location = "http://www.domain.com?start=" + event.start;
+            }
+*/
         });
 
     });
@@ -425,4 +445,12 @@ $itemList = unserialize($block->itemorder);
 
 <div id='calendar'></div>
 
+<div id="eventContent" title="Event Details">
+    <div id="eventInfo">
+            <ul>
+                <li>Hello</li>
+            </ul>
+    </div>
+    <p><strong><a id="eventLink"></a></strong></p>
+</div>
 </body>

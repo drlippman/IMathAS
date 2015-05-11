@@ -47,6 +47,20 @@ class CourseController extends AppController
         return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }
 
+    public function actionShowAssessment()
+    {
+        $this->guestUserHandler();
+
+        $id = Yii::$app->request->get('id');
+        //AppUtility::dump($id);
+        $assessment = Assessments::getByAssessmentId($id);
+       // $assessmentSession = AssessmentSession::getById($id);
+        //AppUtility::dump($assessmentSession);
+
+        $this->includeCSS(['../css/mathtest.css']);
+        $this->includeCSS(['../css/default.css']);
+        return $this->render('ShowAssessment', ['assessments' => $assessment]);
+    }
 
     public function actionAddNewCourse()
     {

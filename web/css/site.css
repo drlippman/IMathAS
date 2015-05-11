@@ -162,7 +162,6 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     background-color: #3071a9;
     border-color: #285e8e;
 }
-
 .addRemoveTable{
     margin-top: 20px;
 }
@@ -180,4 +179,39 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 
 .form-group{
     margin-bottom: 0px;
+}
+
+    /*Left side css*/
+.needed
+{
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #ddddff;
+    width: 15%;
+    box-sizing: border-box;
+    position: absolute;
+    border-radius:10px;
+    border: 2px solid #000000;
+    padding: 20px;
+}
+.ahref-align
+{
+    margin-left: 12px;
+}
+.course
+{
+    margin-left: 21%;
+}
+.courseText
+{
+    margin-left: 20%;
+}
+
+
+
+    /*Assessment*/
+.margin-top
+{
+    margin-top: 20px;
+    margin-left: 20%;
 }

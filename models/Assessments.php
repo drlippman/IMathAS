@@ -15,4 +15,9 @@ class Assessments extends BaseImasAssessments
     {
         return static::findAll(['courseid' => $courseId]);
     }
+
+    public static function getByAssessmentId($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
 } 
