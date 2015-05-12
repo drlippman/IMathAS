@@ -5,6 +5,7 @@ namespace app\controllers\course;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\AppModel;
+use app\models\AssessmentSession;
 use app\models\Blocks;
 use app\models\Course;
 use app\models\Assessments;
@@ -13,6 +14,8 @@ use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
 use app\models\Items;
+use app\models\Questions;
+use app\models\QuestionSet;
 use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Wiki;
@@ -52,14 +55,15 @@ class CourseController extends AppController
         $this->guestUserHandler();
 
         $id = Yii::$app->request->get('id');
-        //AppUtility::dump($id);
         $assessment = Assessments::getByAssessmentId($id);
-       // $assessmentSession = AssessmentSession::getById($id);
-        //AppUtility::dump($assessmentSession);
+        $question = Questions::getByAssessmentId($id);
+        $questionSet = QuestionSet::getByQuesSetId($id);
+
+       //AppUtility::dump($questionSet);
 
         $this->includeCSS(['../css/mathtest.css']);
         $this->includeCSS(['../css/default.css']);
-        return $this->render('ShowAssessment', ['assessments' => $assessment]);
+        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $question, 'questionSets' => $questionSet]);
     }
 
     public function actionAddNewCourse()

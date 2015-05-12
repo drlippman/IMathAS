@@ -13,12 +13,11 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <div class="needed">
         <?php echo $this->render('_leftSide');?>
-    </div>-->-->
+    </div>
 
-<!--    <!--Course name-->-->
+<!--    <!--Course name-->
 
     <div class="course">
-
         <h3><b><?php echo $course->name ?></b></h3>
     </div>
 
@@ -33,7 +32,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
 
@@ -49,7 +48,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->reviewdate == 2000000000) { ?>
                         <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
                         <BR>This assessment is in review mode - no scores will be saved.
@@ -447,9 +446,7 @@ $itemList = unserialize($block->itemorder);
 
 <div id="eventContent" title="Event Details">
     <div id="eventInfo">
-            <ul>
-                <li>Hello</li>
-            </ul>
+
     </div>
     <p><strong><a id="eventLink"></a></strong></p>
 </div>

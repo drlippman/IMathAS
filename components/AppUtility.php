@@ -372,6 +372,7 @@ class AppUtility extends Component {
         return $ckeckList = array('available' => $available, 'toolset' => $toolset, 'isTemplate' => $isTemplate);
     }
 
+//        Displays date and time
     public static function parsedatetime($date, $time) {
         global $tzoffset, $tzname;
         preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
@@ -389,6 +390,25 @@ class AppUtility extends Component {
             $tmatches[2] += $serveroffset;
         }
         return mktime($tmatches[1],$tmatches[2],0,$dmatches[1],$dmatches[2],$dmatches[3]);
+    }
+
+//    Displays only time
+    public static function parsetime($time) {
+        global $tzoffset, $tzname;
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$tmatches);
+        if (count($tmatches)==0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/',$time,$tmatches);
+            $tmatches[3] = $tmatches[2];
+            $tmatches[2] = 0;
+        }
+        $tmatches[1] = $tmatches[1]%12;
+        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+
+        if ($tzname=='') {
+            $serveroffset = date('Z')/60 + $tzoffset;
+            $tmatches[2] += $serveroffset;
+        }
+        return mktime($tmatches[1],$tmatches[2],0);
     }
 
     public static function myRight()
@@ -456,5 +476,38 @@ class AppUtility extends Component {
             $dates[$ids[$row][$col]] = $datestr;
         }
     }
+
+    function basicshowq($qn,$seqinactive=false,$colors=array()) {
+
+        global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores;
+        $qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
+        $qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
+
+
+        if (canimprove($qn)) {
+            if ($qshowansduring && $attempts[$qn]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
+        } else {
+            $showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);
+        }
+
+        $regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
+        $thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
+        if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
+            //$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+            if (strpos($rawscores[$qn],'~')!==false) {
+                $colors = explode('~',$rawscores[$qn]);
+            } else {
+                $colors = array($rawscores[$qn]);
+            }
+        }
+        if (!$seqinactive) {
+
+            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
+        } else {
+            //print_r('hhh'); die;
+            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
+        }
+    }
+
 
 }

@@ -52,7 +52,6 @@ class BaseImasAssessmentSessions extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['userid', 'assessmentid', 'lti_sourcedid', 'questions', 'seeds', 'scores', 'attempts', 'lastanswers', 'reattempting', 'starttime', 'endtime', 'timeontask', 'bestseeds', 'bestscores', 'bestattempts', 'bestlastanswers', 'reviewseeds', 'reviewscores', 'reviewattempts', 'reviewlastanswers', 'reviewreattempting', 'feedback'], 'required'],
             [['userid', 'assessmentid', 'agroupid', 'starttime', 'endtime'], 'integer'],
             [['lti_sourcedid', 'questions', 'seeds', 'scores', 'attempts', 'lastanswers', 'timeontask', 'bestseeds', 'bestscores', 'bestattempts', 'bestlastanswers', 'reviewseeds', 'reviewscores', 'reviewattempts', 'reviewlastanswers', 'feedback'], 'string'],
             [['reattempting', 'reviewreattempting'], 'string', 'max' => 255],
