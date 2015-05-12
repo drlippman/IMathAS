@@ -45,8 +45,11 @@ class CourseController extends AppController
         $inline = InlineText::getByCourseId($cid);
         $item = Items::getByCourseId($cid);
 
-        $this->includeCSS(['../css/_leftSide.css']);
-        $this->includeCSS(['../css/assessment.css']);
+        $this->includeCSS(['../css/fullcalendar.min.css']);
+        $this->includeCSS(['../css/calendar.css']);
+        $this->includeJS(['../js/moment.min.js']);
+        $this->includeJS(['../js/fullcalendar.min.js']);
+        $this->includeJS(['../js/student.js']);
         return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }
 
@@ -63,6 +66,8 @@ class CourseController extends AppController
 
         $this->includeCSS(['../css/mathtest.css']);
         $this->includeCSS(['../css/default.css']);
+        $this->includeCSS(['../css/showAssessment.css']);
+        $this->includeJS(['../js/timer.js']);
         return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $question, 'questionSets' => $questionSet]);
     }
 

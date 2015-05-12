@@ -1,9 +1,17 @@
 <link href='../../../web/css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
+<?php
+//AppUtility::dump($assessments);
+/*Conversion into hour, minute and seconds*/
+//$hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
+//$min = floor((abs($assessments->timelimit)%3600)/60);
+?>
+<!--<input type="hidden" id="show-timer" name="showtimer" value="--><?php //echo $hour .' hour, ' .$min .' minutes.'?><!--">-->
     <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -32,7 +40,9 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
+                    <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
 
@@ -48,7 +58,8 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             <div class=item>
                 <div class=icon style="background-color: #1f0;">?</div>
                 <div class=title>
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link"><?php echo $assessment->name ?></a></b>
+                    <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                     <?php if ($assessment->reviewdate == 2000000000) { ?>
                         <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
                         <BR>This assessment is in review mode - no scores will be saved.
@@ -362,84 +373,7 @@ $itemList = unserialize($block->itemorder);
 </div>
 
 
-<div id="dialog" title="Basic dialog">
-</div>
-
-<!--Calender here -->
-<script>
-
-    $(document).ready(function() {
-        var startDate = '2015-05-05';
-        var endDate = '2015-05-04';
-        var reviewDate = '2015-05-09';
-
-
-        $('#calendar').fullCalendar({
-            height: 400,
-            header: {
-
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            businessHours: false, // display business hours
-            editable: false,
-            events: [
-                {
-                    title: 'Assessment',
-                    start: endDate
-
-                },
-                {
-                    title: 'Review Assessment',
-                    start: reviewDate,
-                    color: '#257e4a'
-                }
-            ],
-            eventClick: function(e) {
-                //alert('ndkvn');
-                var html = "<p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>";
-               // $("#dialog").append(html);
-               // e.preventDefault();
-                $( "#dialog" ).dialog();
-                //event.preventDefault();
-            }
-
-             /*  Used*/
-//            eventClick:  function(event) {
-//
-//               // alert('Event: ' + event.start);
-//                $("#eventInfo").html(event.description);
-//                $("#eventLink").attr('href', event.url);
-//                $("#eventContent").dialog({ modal: true, title: event.title });
-//            }
-
-
-            /*eventClick:  function(event, jsEvent, view) {
-                //set the values and open the modal
-
-
-                window.location = "http://www.domain.com?start=" + event.start;
-            }
-*/
-        });
-
-    });
-
-</script>
-<style>
-
-    body {
-        margin: 20px 5px;
-        font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
-        font-size: 14px;
-    }
-
-    #calendar {
-       margin-left: 20%;
-    }
-
-</style>
+<!-- Calender Here-->
 <body>
 
 <div id='calendar'></div>

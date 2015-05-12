@@ -1,0 +1,10 @@
+
+body {
+    margin: 20px 5px;
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 14px;
+}
+
+#calendar {
+    margin-left: 20%;
+}

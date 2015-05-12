@@ -3,43 +3,31 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 ?>
-<?php
-$currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-//AppUtility::dump($questionSets->qtext);
-?>
-
 <?php echo $this->render('_toolbar');
-//AppUtility::dump($assessments->id);
 ?>
-
+<!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
+<input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessments->timelimit)?>">
 
 <html>
-<style type="text/css">
-    div {
-        zoom: 1;
-    }
+<!--    Show total time and remaining time-->
+<div class=right id=timelimitholder>
+<?php
+        /*Conversion into hour, minute and seconds*/
+    $hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
+    $min = floor((abs($assessments->timelimit)%3600)/60);
+?>
+    <span id="timercontent"><b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
+        <span id="timerwrap"><b>
+            <span id='timer'></span>
 
-    .clear {
-        line-height: 0;
-    }
+            remaining.</span>
+    </b></span>
 
-    #mqarea {
-        height: 2em;
-    }
-
-    #GB_overlay, #GB_window {
-        position: absolute;
-        top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
-        left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');
-    }
-
-    }
-</style>
-
+</div>
 <div class=intro>
 
-    <p>Total Points Possible:<?php //echo $totalpoints ?><!--</p>-->
+    <p>Total Points Possible:10</p>
 </div>
 <a href="#beginquestions">
     <img class=skipnav src="/IMathAS/img/blank.gif" alt="Skip Navigation"/>
@@ -55,6 +43,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     $totalpoints += $question->points; /*Total possible points*/
     $grade += $question->points; //Grade
     ?>
+<!--        Display left side: question list-->
     <ul class=qlist>
         <li>
 
@@ -66,9 +55,8 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     </ul>
     <?php }?>
     <br />
-    <p>Grade: 0/<?php echo $grade?></p>
-
-    <p><br /><br />
+<!--    Display total points: Grade-->
+    <p>Grade: 0/<?php echo $grade?></p><p><br /><br />
         <a href="#" onclick="window.open('/IMathAS/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;">
             Print Version
         </a>
@@ -125,3 +113,9 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 </div>
 </body>
 </html>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var timer = $('#timerlimit').val();
+        window.onload = CreateTimer("timer",timer);
+    });
+</script>
