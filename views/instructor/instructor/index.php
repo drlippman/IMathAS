@@ -11,9 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="needed pull-left">
         <?php echo $this->render('_leftSideTeacher',['course'=> $course]); ?>
     </div>
-
-
-
 <!--Course name-->
 <div class="courseText">
     <h3><b><?php echo ucfirst($course->name) ?></b></h3>

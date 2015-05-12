@@ -5,11 +5,12 @@ use app\components\AppUtility;
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php //echo $this->render('_toolbarTeacher'); ?>
+<?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
 
 <div class="">
     <h2><b>New Message</b></h2>
-
+    <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
+    <input type="hidden" class="msg-sender" value="<?php echo $course->ownerid ?>">
     <div class="drop-down">
         <span class="col-md-2"><b>To</b></span>
         <span class="col-md-8">
@@ -26,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-8"><?php echo '<input class="textbox" type="text">'; ?></span>
+        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text">'; ?></span>
     </div>
     <br><br><br>
 
@@ -39,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="col-lg-offset-2 col-md-8">
         <br>
-        <a class="btn btn-primary ">Send Message</a>
+        <a class="btn btn-primary" id="mess">Send Message</a>
     </div>
 </div>
 <script>
@@ -48,5 +49,29 @@ $this->params['breadcrumbs'][] = $this->title;
             selector: "textarea",
             toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
         });
+
+        $("#mess").click(function()
+        {
+            tinyMCE.triggerSave();
+            var cid = $(".send-msg").val();
+            var sender = $(".msg-sender").val();
+            var receiver = $("#seluid").val();
+            var subject = $(".subject").val();
+            var body = $("#message").val();
+            jQuerySubmit('confirm-message',{cid: cid , sender: sender, receiver: receiver, subject: subject, body: body},'sendMessage');
+        });
+
     });
+
+    function sendMessage(response)
+    {
+        var cid = $(".send-msg").val();
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            window.location = "index?cid="+cid;
+        }
+    }
+
 </script>

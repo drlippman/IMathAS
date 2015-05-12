@@ -13,11 +13,18 @@ use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasMsgs;
 
-class Teacher extends BaseImasMsgs
+class Message extends BaseImasMsgs
 {
-    public function create($courseid)
+    public function create($params)
     {
-        $this->courseid = $courseid;
+        $this->courseid = $params['cid'];
+        $this->msgfrom = $params['sender'];
+        $this->msgto = $params['receiver'];
+        $this->title = $params['subject'];
+        $this->message = $params['body'];
+        $sendDate = strtotime(date('F d, o g:i a'));
+        $this->senddate = $sendDate;
+
         $this->save();
         return $this->id;
     }

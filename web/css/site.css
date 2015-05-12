@@ -180,7 +180,6 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 .form-group{
     margin-bottom: 0px;
 }
-
     /*Left side css*/
 .needed
 {
@@ -214,4 +213,11 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 {
     margin-top: 20px;
     margin-left: 20%;
+}
+
+ul#navlist a {
+    border-bottom: none;
+}
+.message-container{
+    margin-top: 20px;
 }
