@@ -185,6 +185,11 @@ class BaseImasCourses extends \yii\db\ActiveRecord
         return $this->hasMany(BaseImasExternalTools::className(), ['courseid' => 'id']);
     }
 
+    public function getImasMsgs()
+    {
+        return $this->hasMany(BaseImasMsgs::className(), ['courseid' => 'id']);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

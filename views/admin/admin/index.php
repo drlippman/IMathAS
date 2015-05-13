@@ -240,7 +240,6 @@ $this->params['breadcrumbs'][] = $this->title;
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
             html += "<td><a href='#'>Reset</a></td>";
             html += "<td ><a href='#'>Delete</a></td></tr>";
- //           bindEvent();
         });
         $(".user-table-body").append(html);
         $('.user-table').DataTable();

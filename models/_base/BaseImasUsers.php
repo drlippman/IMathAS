@@ -232,7 +232,7 @@ class BaseImasUsers extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getImasMsgs()
+    public function getImasMsg()
     {
         return $this->hasMany(BaseImasMsgs::className(), ['msgto' => 'id']);
     }

@@ -11,6 +11,7 @@ use app\models\User;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\MessageForm;
+use yii\db\Query;
 
 
 class MessageController extends AppController
@@ -25,7 +26,13 @@ class MessageController extends AppController
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($cid);
-            return $this->renderWithData('messages', ['model' => $model, 'course' => $course]);
+            $sortBy = 'FirstName';
+            $order = AppConstant::ASCENDING;
+            $users = User::findAllUser($sortBy, $order);
+            $teacher = Teacher::getTeachersById($cid);
+            $messages = Message::getByCourseId($cid);
+            $senders = Message::getSenders($cid);
+            return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher]);
         }
 
     }
@@ -66,4 +73,42 @@ class MessageController extends AppController
         }
     }
 
+    public function actionDisplayMessageAjax()
+    {
+     if (!$this->isGuestUser())
+     {
+        $user = $this->getAuthenticatedUser();
+        $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
+        $userId = $params['userId'];
+        $messageResponse = array();
+        $teachers = Teacher::getTeacherByUserId($userId);
+        foreach($teachers as $teacher)
+        {
+            $messages = Message::getByCourseId($teacher->courseid);
+            foreach($messages as $key => $message)
+            {
+                $fromUser = User::getById($message->msgfrom);
+                $toUser = User::getById($message->msgto);
+
+                $tempArray = array('msgId' => $message->title,
+                    'title' => $message->title,
+                    'replied' => $message->replied,
+                    'msgFrom' => isset($fromUser) ? $fromUser->FirstName : ''.''.isset($fromUser) ? $fromUser->LastName : '',
+                    'msgFromId' => isset($fromUser) ? $fromUser->id : '',
+                    'courseId' => $message->courseid,
+                    'courseName' => $message->course->name,
+                    'msgDate' => $message->senddate,
+                    'isReade' => $message->isread,
+                    'parent' => $message->parent,
+                    'baseId' => $message->baseid,
+                    'msgBody' => $message->message
+                );
+
+                array_push($messageResponse, $tempArray);
+            }
+        }
+        return json_encode(array('status' => 0, 'messageData' => $messageResponse));
+    }
+   }
 }

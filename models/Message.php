@@ -29,8 +29,18 @@ class Message extends BaseImasMsgs
         return $this->id;
     }
 
-    public static function getByUserId($id)
+    public static function getByCourseId($cid)
     {
-        return static::findAll(['id' => $id]);
+        return static::find()->where(['courseid' => $cid])->all();
+    }
+
+    public static function getSenders($cid)
+    {
+        return static::find()->where(['courseid' => $cid])->groupBy(['msgfrom'])->all();
+    }
+
+    public static function getByCourseIdAsArray($cid)
+    {
+        return static::find()->where(['courseid' => $cid])->asArray()->all();
     }
 }
