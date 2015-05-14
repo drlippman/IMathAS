@@ -4,7 +4,6 @@ use app\components\AppUtility;
 
 
 
-
 <p>Communication</p>
 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a><br>
 <a href="">Forums</a><br>
@@ -35,3 +34,6 @@ use app\components\AppUtility;
 <a href="">Course Settings</a><br>
 <a href="">Help</a><br>
 <a href="">Log Out</a>
+
+
+

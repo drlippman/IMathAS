@@ -73,40 +73,45 @@ class MessageController extends AppController
 
     public function actionDisplayMessageAjax()
     {
-        if (!$this->isGuestUser()) {
-            $user = $this->getAuthenticatedUser();
-            $params = Yii::$app->request->getBodyParams();
-            $cid = $params['cid'];
-            $userId = $params['userId'];
-            $messageResponse = array();
-            $teachers = Teacher::getTeacherByUserId($userId);
-            foreach ($teachers as $teacher) {
-                $messages = Message::getByCourseId($teacher->courseid);
-                foreach ($messages as $key => $message) {
-                    $fromUser = User::getById($message->msgfrom);
-                    $toUser = User::getById($message->msgto);
 
-                    $tempArray = array('msgId' => $message->title,
-                        'title' => $message->title,
-                        'replied' => $message->replied,
-                        'msgFrom' => isset($fromUser) ? $fromUser->FirstName : '' . '' . isset($fromUser) ? $fromUser->LastName : '',
-                        'msgFromId' => isset($fromUser) ? $fromUser->id : '',
-                        'courseId' => $message->courseid,
-                        'courseName' => $message->course->name,
-                        'msgDate' => $message->senddate,
-                        'isRead' => $message->isread,
-                        'parent' => $message->parent,
-                        'baseId' => $message->baseid,
-                        'msgBody' => $message->message
-                    );
+     if (!$this->isGuestUser())
+     {
+        $user = $this->getAuthenticatedUser();
+        $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
+        $userId = $params['userId'];
+        $messageResponse = array();
+        $teachers = Teacher::getTeacherByUserId($userId);
+        foreach($teachers as $teacher)
+        {
+            $messages = Message::getByCourseId($teacher->courseid);
+            foreach($messages as $key => $message)
+            {
+                $fromUser = User::getById($message->msgfrom);
+                $toUser = User::getById($message->msgto);
+                $tempArray = array('msgId' => $message->title,
+                    'title' => $message->title,
+                    'replied' => $message->replied,
+                    'msgFrom' => isset($fromUser) ? $fromUser->FirstName : ''.''.isset($fromUser) ? $fromUser->LastName : '',
+                    'msgFromId' => isset($fromUser) ? $fromUser->id : '',
+                    'msgTo' => isset($toUser) ? $toUser->FirstName : ''.''.isset($toUser) ? $toUser->LastName : '',
+                    'msgToId' => isset($toUser) ? $toUser->id : '',
+                    'courseId' => $message->courseid,
+                    'courseName' => $message->course->name,
+                    'msgDate' => $message->senddate,
+                    'isReade' => $message->isread,
+                    'parent' => $message->parent,
+                    'baseId' => $message->baseid,
+                    'msgBody' => $message->message
+                );
 
-                    array_push($messageResponse, $tempArray);
-                }
+                array_push($messageResponse, $tempArray);
             }
             return json_encode(array('status' => 0, 'messageData' => $messageResponse));
         }
 
     }
+ }
 
     public function actionSentMessage()
     {
@@ -164,4 +169,24 @@ class MessageController extends AppController
 
     }
 
+
+   public function actionGetCourseAjax()
+   {
+       $this->guestUserHandler();
+
+           $user = $this->getAuthenticatedUser();
+           $params = Yii::$app->request->getBodyParams();
+           $cid = $params['cid'];
+           $userId = $params['userId'];
+           $teachers = Teacher::getTeacherByUserId($userId);
+           $teacherArray = array();
+          foreach ($teachers as $teacher)
+          {
+              $tempArray = array('courseId' => $teacher->course->id,
+              'courseName' => $teacher->course->name);
+
+              array_push($teacherArray, $tempArray);
+          }
+       return json_encode(array('status' => 0, 'courseData' => $teacherArray));
+   }
 }

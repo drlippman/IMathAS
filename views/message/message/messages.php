@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div>
     <p><span class="col-md-2" align="center"><b>Filter By Course :</b></span>
         <span class="col-md-3">
-        <select name="seluid" class="dropdown form-control" id="seluid">
+        <select name="seluid" class="show-course form-control" id="seluid">
             <option value="0">All Courses</option>
 
         </select>
@@ -41,19 +41,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </span> <span class="col-md-2" align="center"><b>By Sender :</b></span>
 
         <span class="col-md-3">
-        <select name="seluid" class="dropdown form-control" id="seluid">
-            <option value="0">Select a user..</option>
-            <?php foreach ($users as $user) { ?>
-                <option
-                    value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName']; ?></option>
-            <?php } ?>
+        <select name="seluid" class="show-users form-control" id="seluid">
+            <option value="0">Select a user</option>
         </select>
-
-
-
         </span></p>
 </div><br><br>
     <div>
+
         <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
             <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
@@ -84,14 +78,32 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-msg").val();
         var userId = $(".send-userId").val();
-        alert(userId);
         var allMessage = {cid: cid, userId: userId};
         jQuerySubmit('display-message-ajax',allMessage, 'showMessageSuccess');
         selectCheckBox();
+        jQuerySubmit('get-course-ajax',  allMessage, 'getCourseSuccess')
     });
 
     function showMessageSuccess(response)
-    {console.log(response);
+    {
+        var filterArrayForUser = [];
+        $.each(JSON.parse(response), function(index, messageData){
+            $.each(messageData, function(index, msgData){
+                filterArrayForUser.push(msgData.msgFrom);
+            });
+
+        });
+        var uniqueUserForFilter = filterArrayForUser.filter(function(itm,i,a){
+            return i==a.indexOf(itm);
+        });
+
+        var htmlCourse = '';
+        for(i = 0; i<uniqueUserForFilter.length; i++){
+            htmlCourse += "<option value = messageData.msgFrom>"+uniqueUserForFilter[i]+"</option>"
+
+        }
+        $(".show-users").append(htmlCourse);
+
         var result = JSON.parse(response);
         if(result.status == 0)
         {
@@ -103,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
     function showMessage(messageData)
     {
         var html = "";
+        var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             html += "<td>"+messageData.title+"</td>";
@@ -130,5 +143,23 @@ $this->params['breadcrumbs'][] = $this->title;
         });
     }
 
+    function    getCourseSuccess(response)
+    {
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var courseData = result.courseData;
+            courseDisplay(courseData);
+        }
+    }
+
+    function courseDisplay(courseData)
+    {
+        var html = "";
+        $.each(courseData,function(index, courseData){
+            html += "<option value = courseData.courseId>"+courseData.courseName+"</option>"
+        });
+        $(".show-course").append(html);
+    }
 
 </script>
