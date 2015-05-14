@@ -27,7 +27,6 @@ $(".delete-confirmation").on("click", function (e) {
 });
 
 function jQuerySubmit(url, data, successCallBack) {
-    alert(data);
     $.post(
         url,
         data,

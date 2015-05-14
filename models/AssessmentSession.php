@@ -17,4 +17,12 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         return static::findAll(['assessmentid' => $id]);
     }
+
+    public static function createSessionForAssessment($params)
+    {
+        $params['starttime'] = '0';
+        $assessmentSession = new AssessmentSession();
+        $assessmentSession->attributes = $params;
+        $assessmentSession->save();
+    }
 } 

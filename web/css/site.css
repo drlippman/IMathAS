@@ -205,9 +205,6 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 {
     margin-left: 20%;
 }
-
-
-
     /*Assessment*/
 .margin-top
 {
@@ -218,6 +215,13 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 ul#navlist a {
     border-bottom: none;
 }
-.message-container{
+.message-container {
     margin-top: 20px;
+}
+.datepicker table tr td, .datepicker table tr th {
+    text-align: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 0px;
+    border: none;
 }

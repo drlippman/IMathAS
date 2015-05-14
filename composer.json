@@ -19,7 +19,8 @@
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "kartik-v/yii2-widget-datetimepicker": "*",
-        "kartik-v/yii2-widget-timepicker": "*"
+        "kartik-v/yii2-widget-timepicker": "*",
+        "kartik-v/yii2-widget-datepicker": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

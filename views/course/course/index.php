@@ -32,7 +32,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <!-- ////////////////// Assessment here //////////////////-->
 <div class="margin-top">
-<?php if($courseDetail){
+<?php if(count($courseDetail)){
     foreach($courseDetail as $key => $item){
         switch(key($item)):
             case 'Assessment': ?>
@@ -47,6 +47,14 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                                 <?php if ($assessment->enddate != 2000000000) { ?>
                                     <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+
+                                       <!-- Use Late Pass here-->
+                                    <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
+                                        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
+                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
+
+                                    <?php } ?>
 
                                 <?php } ?>
                             </div>
@@ -297,6 +305,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 <?php } ?>
                 <?php break; ?>
 
+            <!-- Calender Here-->
             <?php case 'Calendar': ?>
 
                 <div id='calendar'></div>
@@ -318,7 +327,36 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php }
 }?>
 
+<script>
+    $('.confirmation-late-pass').click(function(e){
+        var linkId = $(this).attr('id');
+        var latePass = $('#late-pass'+linkId).val();
+        var latePassHrs = $('#late-pass-hrs'+linkId).val();
+        var useLatePass = latePass%10 - 1;
+        var html = '<div><p>You may use up to '+useLatePass+' more LatePass(es) on this assessment.</p>' +
+            '<p>You have ' +latePass+'  LatePass(es) remaining.  You can redeem one LatePass for a '+latePassHrs+' hour extension on this assessment.</p> ' +
+            '<p>Are you sure you want to redeem a LatePass?</p></div>';
+        var cancelUrl = $(this).attr('href');
+        e.preventDefault();
+        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    window.location = cancelUrl;
+                    $(this).dialog("close");
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+    });
+</script>
 
-
-
-<!-- Calender Here-->

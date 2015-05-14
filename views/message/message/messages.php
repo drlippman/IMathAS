@@ -27,33 +27,29 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="message-container">
 <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary ">Send New Message</a>
-    | <a href="">Limit to Tagged</a> | <a href="">Sent Messages</a>
+    | <a href="">Limit to Tagged</a> | <a href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$course->id.'&userid='.$course->ownerid); ?>">Sent Messages</a>
     | <a class="btn btn-primary ">Picture</a></p>
 </div>
 <div>
-    <p><span class="col-md-1"><b>Filter By</b></span>
+    <p><span class="col-md-2" align="center"><b>Filter By Course :</b></span>
         <span class="col-md-3">
-        <select name="seluid" class="dropdown form-control" id="seluid">
+        <select name="seluid" class="show-course form-control" id="seluid">
             <option value="0">All Courses</option>
 
         </select>
 
-        </span> <span class="col-md-1"><b>To</b></span>
+        </span> <span class="col-md-2" align="center"><b>By Sender :</b></span>
 
         <span class="col-md-3">
-        <select name="seluid" class="dropdown form-control" id="seluid">
-            <option value="0">Select a user..</option>
-            <?php foreach ($users as $user) { ?>
-                <option
-                    value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName']; ?></option>
-            <?php } ?>
+        <select name="seluid" class="show-users form-control" id="seluid">
+            <option value="0">Select a user</option>
         </select>
-
         </span></p>
 </div><br><br>
     <div>
-        <p>check: <a href="">None</a>
-            <a href="">All</a>
+
+        <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
+            <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
             <a class="btn btn-primary ">Mark as Unread</a>
             <a class="btn btn-primary ">Mark as Read</a>
@@ -82,13 +78,32 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-msg").val();
         var userId = $(".send-userId").val();
-        alert(userId);
         var allMessage = {cid: cid, userId: userId};
         jQuerySubmit('display-message-ajax',allMessage, 'showMessageSuccess');
+        selectCheckBox();
+        jQuerySubmit('get-course-ajax',  allMessage, 'getCourseSuccess')
     });
 
     function showMessageSuccess(response)
-    {console.log(response);
+    {
+        var filterArrayForUser = [];
+        $.each(JSON.parse(response), function(index, messageData){
+            $.each(messageData, function(index, msgData){
+                filterArrayForUser.push(msgData.msgFrom);
+            });
+
+        });
+        var uniqueUserForFilter = filterArrayForUser.filter(function(itm,i,a){
+            return i==a.indexOf(itm);
+        });
+
+        var htmlCourse = '';
+        for(i = 0; i<uniqueUserForFilter.length; i++){
+            htmlCourse += "<option value = messageData.msgFrom>"+uniqueUserForFilter[i]+"</option>"
+
+        }
+        $(".show-users").append(htmlCourse);
+
         var result = JSON.parse(response);
         if(result.status == 0)
         {
@@ -100,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
     function showMessage(messageData)
     {
         var html = "";
+        var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             html += "<td>"+messageData.title+"</td>";
@@ -112,4 +128,38 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
     }
+
+    function selectCheckBox(){
+        $('.check-all').click(function(){
+            $('.message-table-body input:checkbox').each(function(){
+                $(this).prop('checked',true);
+            })
+        });
+
+        $('.uncheck-all').click(function(){
+            $('.message-table-body input:checkbox').each(function(){
+                $(this).prop('checked',false);
+            })
+        });
+    }
+
+    function    getCourseSuccess(response)
+    {
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var courseData = result.courseData;
+            courseDisplay(courseData);
+        }
+    }
+
+    function courseDisplay(courseData)
+    {
+        var html = "";
+        $.each(courseData,function(index, courseData){
+            html += "<option value = courseData.courseId>"+courseData.courseName+"</option>"
+        });
+        $(".show-course").append(html);
+    }
+
 </script>
