@@ -17,7 +17,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <select name="seluid" class="dropdown form-control" id="seluid">
             <option value="0">Select a user..</option>
             <?php foreach ($teachers as $teacher) { ?>
-            <option value="<?php echo $teacher['id'] ?>">
+            <option value="<?php echo $teacher->user->id ?>">
+
                 <?php echo ucfirst($teacher->user->FirstName) . " " . ucfirst($teacher->user->LastName); ?>
             </option><?php } ?>
         </select>

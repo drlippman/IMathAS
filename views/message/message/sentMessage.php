@@ -31,14 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>
     </div>
     <div>
-        <p><span class="col-md-2" align="center"><b>Filter By Courses :</b></span>
+        <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Courses :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="dropdown form-control" id="seluid">
             <option value="0">All Courses</option>
 
         </select>
 
-        </span> <span class="col-md-2" align="center"><b>By Recipient :</b></span>
+        </span> <span class="col-md-2 select-text-margin" align="center"><b>By Recipient :</b></span>
 
         <span class="col-md-3">
         <select name="seluid" class="dropdown form-control" id="seluid">
@@ -102,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var html = "";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
-            html += "<td>"+messageData.title+"</td>";
+            html += "<td><a href='#'>"+messageData.title+"</a></td>";
             html += "<td>"+messageData.msgTo+"</td>";
             html += "<td>"+messageData.isRead+"</td>";
             html += "<td>"+messageData.msgDate+"</td>";

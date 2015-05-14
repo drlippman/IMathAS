@@ -31,14 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
     | <a class="btn btn-primary ">Picture</a></p>
 </div>
 <div>
-    <p><span class="col-md-2" align="center"><b>Filter By Course :</b></span>
+    <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Course :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="show-course form-control" id="seluid">
             <option value="0">All Courses</option>
 
         </select>
 
-        </span> <span class="col-md-2" align="center"><b>By Sender :</b></span>
+        </span> <span class="col-md-2 select-text-margin" align="center"><b>By Sender :</b></span>
 
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="seluid">
@@ -118,9 +118,9 @@ $this->params['breadcrumbs'][] = $this->title;
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
-            html += "<td>"+messageData.title+"</td>";
+            html += "<td><a href='#'> "+messageData.title+"</a></td>";
             html += "<td>"+messageData.replied+"</td>";
-            html += "<td>abc</td>";
+            html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
             html += "<td>"+messageData.msgFrom+"</td>";
             html += "<td>"+messageData.courseName+"</td>";
             html += "<td>"+messageData.msgDate+"</td>";

@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php echo $this->render('_toolbarTeacher'); ?>
 
 
-    <div class="needed pull-left">
+    <div class="col-lg-3 needed pull-left">
         <?php echo $this->render('_leftSideTeacher',['course'=> $course]); ?>
     </div>
 </div>
