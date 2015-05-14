@@ -16,6 +16,7 @@ use app\models\GbScheme;
 use app\models\Items;
 use app\models\Questions;
 use app\models\QuestionSet;
+use app\models\Student;
 use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Wiki;
@@ -52,9 +53,9 @@ class CourseController extends AppController
                     {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
+                        $tempItemList = array();
                         if(count($blockItems))
                         {
-                            $tempItemList = array();
                             foreach($blockItems as $blockKey => $blockItem)
                             {
                                 $tempItem = array();
@@ -134,30 +135,22 @@ class CourseController extends AppController
                         }
                     }
                 }
-          //      AppUtility::dump($responseData);
             }
 
         }else{
 
         }
 
-
-
-        $assessment = Assessments::getById($cid);
+//        $assessment = Assessments::getById($cid);
         $course = Course::getById($cid);
-        $forum = Forums::getByCourseId($cid);
-        $wiki = Wiki::getByCourseId($cid);
-        $link = Links::getByCourseId($cid);
-        $block = Blocks::getById($cid);
-        $inline = InlineText::getByCourseId($cid);
-        $item = Items::getByCourseId($cid);
-
+        $student = Student::getByCId($cid);
+//AppUtility::dump($responseData);
         $this->includeCSS(['../css/fullcalendar.min.css']);
         $this->includeCSS(['../css/calendar.css']);
         $this->includeJS(['../js/moment.min.js']);
         $this->includeJS(['../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
-        return $this->render('index', ['courseDetail' => $responseData, 'assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
+        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student]);
     }
 
     public function actionShowAssessment()
@@ -169,8 +162,6 @@ class CourseController extends AppController
         $question = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
 
-       //AppUtility::dump($questionSet);
-
         $this->includeCSS(['../css/mathtest.css']);
         $this->includeCSS(['../css/default.css']);
         $this->includeCSS(['../css/showAssessment.css']);
@@ -178,6 +169,19 @@ class CourseController extends AppController
         return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $question, 'questionSets' => $questionSet]);
     }
 
+    public function actionLatePass()
+    {
+        $this->guestUserHandler();
+        $assessmentId = Yii::$app->request->get('id');
+        $courseId = Yii::$app->request->get('cid');
+        $studentId = Yii::$app->user->identity->id;
+
+        $student = Student::getByCourseId($courseId, $studentId);
+        $latepass = $student->latepass;
+        $student->latepass = $latepass - 1;
+        $student->save();
+        $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+    }
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();

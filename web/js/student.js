@@ -1,4 +1,7 @@
 $(document).ready(function(){
+
+//    Display Calender
+
     var startDate = '2015-05-05';
     var endDate = '2015-05-04';
     var reviewDate = '2015-05-09';
@@ -33,6 +36,7 @@ $(document).ready(function(){
         }
     });
 
+//        Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
         var linkId = $(this).attr('id')
