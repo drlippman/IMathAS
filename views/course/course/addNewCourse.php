@@ -4,7 +4,8 @@ use yii\bootstrap\ActiveForm;
 use kartik\time\TimePicker;
 use app\components\AppConstant;
 
-$this->title = 'Course Settings';
+$this->title = 'New Course';
+$this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

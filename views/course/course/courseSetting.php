@@ -5,7 +5,8 @@ use kartik\time\TimePicker;
 use app\components\AppUtility;
 use app\components\AppConstant;
 
-$this->title = 'Course';
+$this->title = 'Course Setting';
+$this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $model->courseName = AppUtility::getStringVal($course->name);
