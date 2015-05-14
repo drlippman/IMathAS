@@ -17,4 +17,9 @@ class Wiki extends BaseImasWikis
     {
         return static::findAll(['courseid' => $courseId]);
     }
+
+    public static function getById($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
 } 

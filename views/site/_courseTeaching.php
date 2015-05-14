@@ -19,6 +19,6 @@ use app\components\AppUtility;
             }
         }
         ?>
-    </ul>
     </div>
+    </ul>
 </div>

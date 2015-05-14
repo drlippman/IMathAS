@@ -36,6 +36,113 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
+
+        $responseData = array();
+
+        $course = Course::getById($cid);
+        if($course)
+        {
+            $itemOrders = unserialize($course->itemorder);
+            if(count($itemOrders))
+            {
+                foreach($itemOrders as $key => $itemOrder)
+                {
+                    $tempAray = array();
+                    if(is_array($itemOrder))
+                    {
+                        $tempAray['Block'] = $itemOrder;
+                        $blockItems = $itemOrder['items'];
+                        if(count($blockItems))
+                        {
+                            $tempItemList = array();
+                            foreach($blockItems as $blockKey => $blockItem)
+                            {
+                                $tempItem = array();
+                                $item = Items::getById($blockItem);
+                                switch($item->itemtype)
+                                {
+                                    case 'Assessment':
+                                        $assessment = Assessments::getByAssessmentId($item->typeid);
+                                        $tempItem[$item->itemtype] = $assessment;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                    case 'Calendar':
+                                        $tempItem[$item->itemtype] = 1;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                    case 'Forum':
+                                        $form = Forums::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $form;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                    case 'Wiki':
+                                        $wiki = Wiki::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $wiki;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                    case 'LinkedText':
+                                        $linkedText = Links::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $linkedText;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                    case 'InlineText':
+                                        $inlineText = InlineText::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $inlineText;
+                                        array_push($tempItemList, $tempItem);
+                                        break;
+                                }
+
+                            }
+                        }
+                        $tempAray['itemList'] = $tempItemList;
+                        array_push($responseData, $tempAray);
+
+                    }
+                    else{
+                        $item = Items::getById($itemOrder);
+                        switch($item->itemtype)
+                        {
+                            case 'Assessment':
+                                $assessment = Assessments::getByAssessmentId($item->typeid);
+                                $tempAray[$item->itemtype] = $assessment;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Calendar':
+                                $tempAray[$item->itemtype] = 1;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Forum':
+                                $form = Forums::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $form;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Wiki':
+                                $wiki = Wiki::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $wiki;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'InlineText':
+                                $inlineText = InlineText::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $inlineText;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'LinkedText':
+                                $linkedText = Links::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $linkedText;
+                                array_push($responseData, $tempAray);
+                                break;
+                        }
+                    }
+                }
+          //      AppUtility::dump($responseData);
+            }
+
+        }else{
+
+        }
+
+
+
         $assessment = Assessments::getById($cid);
         $course = Course::getById($cid);
         $forum = Forums::getByCourseId($cid);
@@ -50,7 +157,7 @@ class CourseController extends AppController
         $this->includeJS(['../js/moment.min.js']);
         $this->includeJS(['../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
-        return $this->render('index', ['assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
+        return $this->render('index', ['courseDetail' => $responseData, 'assessments' => $assessment, 'course' => $course, 'forums' => $forum, 'wiki' => $wiki, 'links' => $link, 'blocks' => $block, 'inlineText' => $inline]);
     }
 
     public function actionShowAssessment()

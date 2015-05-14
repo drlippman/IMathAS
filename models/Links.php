@@ -17,4 +17,9 @@ class Links extends BaseImasLinkedtext
     {
         return static::findAll(['courseid' => $courseId]);
     }
+
+    public static function getById($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
 } 
