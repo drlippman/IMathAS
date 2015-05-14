@@ -6,8 +6,8 @@ use app\components\AppUtility;
     <div class="block">
         <h3>Courses you're teaching</h3>
     </div>
-    <ul class="nomark courselist">
     <div class="blockitems">
+    <ul class="nomark courselist">
         <?php
         foreach ($teachers as $teacher) {
             if ($teacher) {
@@ -19,6 +19,6 @@ use app\components\AppUtility;
             }
         }
         ?>
-    </div>
     </ul>
+    </div>
 </div>

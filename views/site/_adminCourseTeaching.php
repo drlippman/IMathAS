@@ -6,8 +6,8 @@ use app\components\AppUtility;
     <div class="block">
         <h3>Courses you're teaching</h3>
     </div>
-    <ul class="nomark courselist">
-        <div class="blockitems">
+    <div class="blockitems">
+        <ul class="nomark courselist">
             <?php
             foreach ($teachers as $teacher) {
                 if ($teacher) {
@@ -19,10 +19,10 @@ use app\components\AppUtility;
                 }
             }
             ?>
-            <div class="center">
-                <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin
-                    Page</a>
-            </div>
+        </ul>
+        <div class="center">
+            <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index') ?>">Admin
+                Page</a>
         </div>
-    </ul>
+    </div>
 </div>
