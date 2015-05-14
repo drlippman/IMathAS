@@ -83,8 +83,7 @@ class SiteController extends AppController
         }
         $challenge = AppUtility::getChallenge();
 
-        $this->includeCSS(['../css/login.css']);
-        $this->includeJS(['../js/jstz_min.js', '../js/login.js']);
+        $this->includeJS(['js/jstz_min.js', 'js/login.js']);
 
         return $this->renderWithData('login', [
             'model' => $model, 'challenge' => $challenge,
