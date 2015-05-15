@@ -2,7 +2,8 @@
 /* @var $this yii\web\View */
 use app\components\AppUtility;
 
-$this->title = 'Admin';
+$this->title = 'Transfer Course';
+$this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!DOCTYPE html>

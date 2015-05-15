@@ -371,14 +371,14 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
-        $this->includeCSS('../css/');
         return $this->renderWithData('addRemoveCourse', ['cid' => $cid]);
     }
 
     public function actionGetTeachers()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->getBodyParams();
+        $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllTeachers($sortBy, $order);
@@ -393,6 +393,10 @@ class CourseController extends AppController
             {
                 $teacherIds[$teacher['userid']] = true;
             }
+        }
+
+        if($users)
+        {
             foreach($users as $user)
             {
                 if(isset($teacherIds[$user['id']]))

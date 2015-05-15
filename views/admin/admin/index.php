@@ -121,8 +121,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Check Here</a></td>
                 <td class=c>Yes</td>
                 <td class=c>Yes</td>
-                <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
-                <td><a href=<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
+                <td><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
+                <td><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
             <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">One-time Passwords</a></td>
             </tr>
             </tbody>

@@ -16,6 +16,7 @@ return array(
     'yii\\' => array($vendorDir . '/yiisoft/yii2'),
     'kartik\\time\\' => array($vendorDir . '/kartik-v/yii2-widget-timepicker'),
     'kartik\\datetime\\' => array($vendorDir . '/kartik-v/yii2-widget-datetimepicker'),
+    'kartik\\date\\' => array($vendorDir . '/kartik-v/yii2-widget-datepicker'),
     'kartik\\base\\' => array($vendorDir . '/kartik-v/yii2-krajee-base'),
     'cebe\\markdown\\' => array($vendorDir . '/cebe/markdown'),
 );
