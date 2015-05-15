@@ -5,13 +5,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
-<?php
-//AppUtility::dump($assessments);
-/*Conversion into hour, minute and seconds*/
-//$hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
-//$min = floor((abs($assessments->timelimit)%3600)/60);
-?>
-<!--<input type="hidden" id="show-timer" name="showtimer" value="--><?php //echo $hour .' hour, ' .$min .' minutes.'?><!--">-->
+
     <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -19,11 +13,12 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
 <?php echo $this->render('_toolbar'); ?>
 
-    <div class="needed">
+    <div class="col-lg-3 needed">
         <?php echo $this->render('_leftSide');?>
     </div>
 
 <!--    <!--Course name-->
+<div class="col-lg-9 container">
 
     <div class="course">
         <h3><b><?php echo $course->name ?></b></h3>
@@ -31,7 +26,6 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
 
     <!-- ////////////////// Assessment here //////////////////-->
-<div class="margin-top">
 <?php if(count($courseDetail)){
     foreach($courseDetail as $key => $item){
         switch(key($item)):
@@ -326,7 +320,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <?php }
 }?>
-
+</div>
 <script>
     $('.confirmation-late-pass').click(function(e){
         var linkId = $(this).attr('id');

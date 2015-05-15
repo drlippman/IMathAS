@@ -183,15 +183,15 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     /*Left side css*/
 .needed
 {
-    display: inline-block;
-    margin-top: 10px;
-    background-color: #ddddff;
-    width: 15%;
-    box-sizing: border-box;
-    position: absolute;
-    border-radius:10px;
-    border: 2px solid #000000;
-    padding: 20px;
+    /*display: inline-block;*/
+    /*margin-top: 10px;*/
+    /*background-color: #ddddff;*/
+    /*width: 15%;*/
+    /*box-sizing: border-box;*/
+    /*position: absolute;*/
+    /*border-radius:10px;*/
+    /*border: 2px solid #000000;*/
+    /*padding: 20px;*/
 }
 .ahref-align
 {

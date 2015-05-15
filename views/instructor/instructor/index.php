@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="courseText">
-    <p><strong>Welcome to your course!</p></strong></p>
+    <p><strong>Welcome to your course!</strong></p>
     <p> To start by copying from another course, use the <a href="#">Course Items: Copy link</a> along the left side of the screen. </p>
     <p> If you want to build from scratch, use the "Add An Item" pulldown below to get started. </p>
 </div>

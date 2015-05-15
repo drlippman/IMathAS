@@ -25,4 +25,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $assessmentSession->attributes = $params;
         $assessmentSession->save();
     }
+    public static function getById($id)
+    {
+        return static::findOne(['assessmentid' => $id]);
+    }
 } 

@@ -159,14 +159,52 @@ class CourseController extends AppController
 
         $id = Yii::$app->request->get('id');
         $assessment = Assessments::getByAssessmentId($id);
-        $question = Questions::getByAssessmentId($id);
+        $assessmentSession = AssessmentSession::getById($id);
+        $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
+        $assessmentclosed = false;
+
+        if ($assessment->avail == 0) {
+            $assessmentclosed = true;
+        }
+
+        list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) =AppUtility::generateAssessmentData($assessment->itemorder,$assessment->shuffle, $assessment->id);
+
+        $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;  //bestscores;bestrawscores;firstscores
+        $scorelist = $scorelist.';'.$scorelist;  //scores;rawscores  - also used as reviewscores;rawreviewscores
+        $bestattemptslist = $attemptslist;
+        $bestseedslist = $seedlist;
+        $bestlalist = $lalist;
+        $starttime = time();
+        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
+        $ltisourcedid = '';
+
+        $param['questions'] = $qlist;
+        $param['seeds'] = $seedlist;
+        //AppUtility::dump($seedlist);
+        $param['assessmentid'] = $id;
+        $param['attempts'] = $attemptslist;
+        $param['lastanswers'] = $lalist;
+        $param['reviewscores'] = $scorelist;
+        $param['reviewseeds'] = $reviewseedlist;
+        $param['bestscores'] = $bestscorelist;
+        $param['scores'] = $scorelist;
+        $param['bestattempts'] = $bestattemptslist;
+        $param['bestseeds'] = $bestseedslist;
+        $param['bestlastanswers'] = $bestlalist;
+        $param['starttime'] = $starttime;
+        $param['feedback'] = $deffeedbacktext;
+        $param['lti_sourcedid'] = $ltisourcedid;
+
+        $assessmentSession = new AssessmentSession();
+        $assessmentSession->attributes = $param;
+        $assessmentSession->save();
 
         $this->includeCSS(['../css/mathtest.css']);
         $this->includeCSS(['../css/default.css']);
         $this->includeCSS(['../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $question, 'questionSets' => $questionSet]);
+        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
     }
 
     public function actionLatePass()
@@ -182,6 +220,7 @@ class CourseController extends AppController
         $student->save();
         $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
     }
+
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
