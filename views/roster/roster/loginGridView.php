@@ -7,54 +7,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!DOCTYPE html>
 
-
-<script language="javascript">
-
-    $( document ).ready(function() {
-
-        $("#go-button").click(function () {
-            var startDate = $( "#datepicker-id input" ).val();
-            var endDate = $( "#datepicker-id1 input" ).val();
-            var course_id =  $( "#course-id" ).val();
-
-            var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
-
-            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
-
-
-        });
-    });
-
-    function loginGridViewSuccess(response) {
-//        console.log(JSON.parse(response));
-//        alert(response.status);
-        var data = JSON.parse(response);
-
-        var end=data.endDate;
-        var start=data.startDate;
-      //  console.log(start);
-
-        if (data.status) {
-
-        }
-        <?php
-        $start =  strtotime($start);
-        $end = strtotime($end);
-
-        $dates = array();
-        for ($time=$start;$time<$end;$time+=1) {
-        $dates[] = tzdate("n/d",$time);
-        }
-        ?>
-    <tr>
-        <th>Name</th>
-        <?php
-            foreach ($dates as $currentDate1) {
-                echo '<th>'.$currentDate1.'</th>';
-//            }?>
-  }
-</script>
-
+<p id="demo"></p>
 <body>
 
 <div class=mainbody>
@@ -65,8 +18,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
       <div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
+
       <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-      <p>Showing Number of Logins May 5, 2015, 12:00 am through May 11, 2015, 5:46 pm</p>
+
+      <p>Showing Number of Logins May 5,2015 through May 17,2015
+
+<!--          <input id="startlogincounter">-->
+
+<!--           through  <input id="endlogincounter" > </p>-->
 
       <div class="pull-left select-text-margin">
           <a>Show previous week.</a>&nbsp;&nbsp;<a>Show following week.</a> &nbsp;&nbsp;
@@ -80,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
           echo DatePicker::widget([
               'name' => 'dp_3',
               'type' => DatePicker::TYPE_COMPONENT_APPEND,
-              'value' => date("d-M-Y"),
+              'value' => date("d-M-Y",strtotime("-1 week")),
               'pluginOptions' => [
                   'autoclose' => true,
                   'format' => 'dd-M-yyyy'
@@ -114,18 +73,11 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <table class="gb logingrid" id="myTable">
-        <thead>
-        <?php
-?>
-<!--            <th>5/05</th>-->
-<!--            <th>5/06</th>-->
-<!--            <th>5/07</th>-->
-<!--            <th>5/08</th>-->
-<!--            <th>5/09</th>-->
-<!--            <th>5/10</th>-->
-<!--            <th>5/11</th>-->
-        </tr>
+        <thead class="log-table-head">
         </thead>
+            <tbody class="log-table-body">
+
+            </tbody>
     </table>
 
 
@@ -137,4 +89,66 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="footerwrapper"></div>
 </div>
 </body>
+
+
+<script language="javascript" type="text/javascript">
+
+    $( document ).ready(function() {
+
+        $("#go-button").click(function () {
+            var startDate = $( "#datepicker-id input" ).val();
+            var endDate = $( "#datepicker-id1 input" ).val();
+
+            var course_id =  $( "#course-id" ).val();
+            var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
+
+            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
+
+
+        });
+    });
+
+    function loginGridViewSuccess(response) {
+     //   console.log(JSON.parse(response));
+        var data = JSON.parse(response);
+
+        var start = data.startDate;
+        var end = data.endDate;
+
+        var startDateLabel = new Date(start*1000);
+        var endDateLabel = new Date(end*1000);
+        $('#startlogincounter').val(startDateLabel);
+        $('#endlogincounter').val(endDateLabel);
+
+        if (data.status == 0) {
+            var html = "";
+            var i;
+            html += "<tr><th>Name</th>"
+            for (i = start  ; i <= end; i = (i + 86400)) {
+                var date = new Date(i*1000);
+                var  month = ('0' + (date.getMonth() + 1)).slice(-2);
+                var day = ('0' + date.getDate()).slice(-2);
+
+                html += "<th>"+day+"/"+month+"</th>";
+            }
+            html += "</tr>";
+            $('.log-table-head tr').remove();
+            $('.log-table-head').append(html);
+
+            var htmlData = '';
+            var logs = data.loginLog;
+            $.each(logs, function(index, log){
+
+                htmlData += "<tr>"
+                $.each(log, function(index, value) {
+                    htmlData += "<td>" + value + "</td>";
+                });
+                htmlData += "<tr>";
+            });
+            $('.log-table-body').append(htmlData);
+        }
+
+    }
+
+</script>
 </html>

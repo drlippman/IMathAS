@@ -11,7 +11,8 @@ class LoginGrid extends BaseImasLoginLog
 
     public static function getById($cid, $newStartDate, $NewEndDate)
     {
-        return static::find(['courseid' => $cid])->where(['>=', 'logintime', $newStartDate])
+        return static::find(['courseid' => $cid])->orderBy('userid')
+            ->where(['>=', 'logintime', $newStartDate])
             ->andWhere(['<=', 'logintime', $NewEndDate])
             ->all();
         ;

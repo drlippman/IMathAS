@@ -11,7 +11,7 @@ use app\components\AppUtility;
 //$hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
 //$min = floor((abs($assessments->timelimit)%3600)/60);
 ?>
-<!--<input type="hidden" id="show-timer" name="showtimer" value="--><?php //echo $hour .' hour, ' .$min .' minutes.'?><!--">-->
+<!--<input type="34" id="show-timer" name="showtimer" value="--><?php //echo $hour .' hour, ' .$min .' minutes.'?><!--">-->
     <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
