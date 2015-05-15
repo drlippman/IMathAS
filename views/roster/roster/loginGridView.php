@@ -114,7 +114,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         var start = data.startDate;
         var end = data.endDate;
-
         var startDateLabel = new Date(start*1000);
         var endDateLabel = new Date(end*1000);
         $('#startlogincounter').val(startDateLabel);

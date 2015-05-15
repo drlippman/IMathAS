@@ -89,7 +89,7 @@ class MessageController extends AppController
             {
                 $fromUser = User::getById($message->msgfrom);
                 $toUser = User::getById($message->msgto);
-                $tempArray = array('msgId' => $message->title,
+                $tempArray = array('msgId' => $message->id,
                     'title' => $message->title,
                     'replied' => $message->replied,
                     'msgFrom' => ucfirst($fromUser->FirstName).' '.ucfirst($fromUser->LastName),
@@ -189,4 +189,35 @@ class MessageController extends AppController
           }
        return json_encode(array('status' => 0, 'courseData' => $teacherArray));
    }
+
+    public function actionMarkAsUnreadAjax()
+    {
+        $this->guestUserHandler();
+        if(Yii::$app->request->post())
+        {
+
+            $params = $this->getBodyParams();
+            $msgIds = $params['checkedMsg'];
+            foreach ($msgIds as $msgId)
+            {
+                Message::updateUnread($msgId);
+
+            }
+            return json_encode(array('status' => 0));
+        }
+
+    }
+    public function actionMarkAsReadAjax()
+    {
+        $this->guestUserHandler();
+        if (Yii::$app->request->post()) {
+            $params = $this->getBodyParams();
+            $msgIds = $params['checkedMsg'];
+            foreach ($msgIds as $msgId)
+            {
+                Message::updateRead($msgId);
+            }
+            return json_encode(array('status' => 0));
+        }
+    }
 }

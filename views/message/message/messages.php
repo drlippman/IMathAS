@@ -51,8 +51,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
             <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
-            <a class="btn btn-primary ">Mark as Unread</a>
-            <a class="btn btn-primary ">Mark as Read</a>
+            <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
+            <a class="btn btn-primary" id="mark-read">Mark as Read</a>
             <a class="btn btn-primary ">Delete</a>
     </div>
 
@@ -78,10 +78,13 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-msg").val();
         var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId};
+        var allMessage = {cid: cid, userId: userId};-
         jQuerySubmit('display-message-ajax',allMessage, 'showMessageSuccess');
         selectCheckBox();
-        jQuerySubmit('get-course-ajax',  allMessage, 'getCourseSuccess')
+        jQuerySubmit('get-course-ajax',  allMessage, 'getCourseSuccess');
+        markAsRead();
+        markAsRead();
+
     });
 
     function showMessageSuccess(response)
@@ -117,7 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var html = "";
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
-            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
+            html += "<tr> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
             html += "<td><a href='#'> "+messageData.title+"</a></td>";
             html += "<td>"+messageData.replied+"</td>";
             html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
@@ -127,6 +130,7 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
+
     }
 
     function selectCheckBox(){
@@ -161,5 +165,52 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         $(".show-course").append(html);
     }
+    function markAsUnread()
+    {
+        $('#mark-as-unread').click(function(){
+            var markArray = [];
+            $('.message-table-body input[name="msg-check"]:checked').each(function(){
+                markArray.push($(this).val());
+                $(this).prop('checked',false);
+
+            });
+
+            var readMsg = {checkedMsg: markArray};
+            jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+        });
+    }
+
+    function markAsUnreadSuccess(response)
+    {
+
+    }
+
+    function markAsRead(){
+        $("#mark-read").click(function(){
+            var markArray = [];
+            $('.message-table-body input[name="mark-unmark"]:checked').each(function() {
+
+
+                markArray.push($(this).val());
+                // console.log("msgid= " + markArray.join(" "));
+                $(this).prop('checked',false);
+
+
+
+            });
+            var readMsg={checkedMsg: markArray};
+            jQuerySubmit('mark-as-read-ajax',readMsg,'markAsReadSuccess');
+
+        });
+
+
+    }
+    function markAsReadSuccess(response)
+    {
+        //console.log(response);
+
+
+    }
+
 
 </script>

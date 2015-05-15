@@ -43,4 +43,23 @@ class Message extends BaseImasMsgs
     {
         return static::find()->where(['courseid' => $cid])->asArray()->all();
     }
+
+    public static function updateUnread($msgId)
+    {
+         $message  = static::getById($msgId);
+        $message -> isread = 0;
+        $message -> save();
+    }
+    public static function updateRead($msgId)
+    {
+        $message = static::getById($msgId);
+        $message->isread = 1;
+        $message->save();
+    }
+    Public static function getById($id)
+    {
+        return static::findOne($id);
+    }
+
+
 }

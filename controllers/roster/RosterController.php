@@ -37,14 +37,17 @@ class RosterController extends AppController
         $cid = $pramas['cid'];
 
         $newStartDate = strtotime($pramas['newStartDate']);
-        $NewEndDate = strtotime($pramas['newEndDate']);
+        $newEndDate = strtotime($pramas['newEndDate']);
         $this->guestUserHandler();
 
-
-        $loginLogs = LoginGrid::getById($cid, $newStartDate, $NewEndDate);
++
+        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
         $loginLogArray =array();
         $userId = 0;
         $tempArray = array();
+
+       // AppUtility::dump($n);
+
         foreach($loginLogs as $key => $loginLog)
         {
             if($userId != $loginLog->userid)
@@ -58,11 +61,9 @@ class RosterController extends AppController
                 array_push($tempArray,$loginLog->user->FirstName.' '.$loginLog->user->LastName);
             }
 
-            $extraTime = (86400 - $NewEndDate % 86400);
-            $cnt = 0;
-            for($i = $newStartDate; $i < ($NewEndDate + $extraTime); $i += 86400)
+            $extraTime = (86400 - $newEndDate % 86400);
+            for($i = $newStartDate; $i < ($newEndDate + $extraTime); $i += 86400)
             {
-                $cnt++;
                 if(($loginLog->logintime - $i) <= 86400)
                 {
                     array_push($tempArray, 1);
@@ -73,8 +74,8 @@ class RosterController extends AppController
             }
         }
 
-//        AppUtility::dump($loginLogArray);
-        $test = array('status' => '0' , 'loginLog' => $loginLogArray, 'startDate' => $newStartDate,'endDate' => $NewEndDate);
+       // AppUtility::dump($loginLogArray);
+        $test = array('status' => '0' , 'loginLog' => $loginLogArray, 'startDate' => $newStartDate,'endDate' => $newEndDate);
         return json_encode($test);
     }
 
