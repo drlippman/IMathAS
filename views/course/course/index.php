@@ -25,7 +25,6 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <h3><b><?php echo $course->name ?></b></h3>
     </div>
 
-
     <!-- ////////////////// Assessment here //////////////////-->
 <?php if(count($courseDetail)){
 foreach($courseDetail as $key => $item){
@@ -44,12 +43,15 @@ case 'Assessment': ?>
                     <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
 
                     <!-- Use Late Pass here-->
+                    <?php if($students->latepass != 0) {?>
                     <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
                         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
-
                     <?php } ?>
+                     <?php } else {?>
+                            <?php echo "<p>You have no late passes remaining.</p>";?>
+                        <?php }?>
 
                 <?php } ?>
             </div>
@@ -331,7 +333,6 @@ case 'Assessment': ?>
 <?php }?>
 
 <?php }?>
-
 
 <script>
     $('.confirmation-late-pass').click(function(e){

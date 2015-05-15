@@ -9,13 +9,15 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasExceptions;
 
 class Exceptions extends BaseImasExceptions
 {
     public static function getByAssessmentId($id)
     {
-        return static::findAll(['assessmentid' => $id]);
+        return static::findOne(['assessmentid' => $id]);
+
     }
 
     public function create($param)
@@ -23,4 +25,5 @@ class Exceptions extends BaseImasExceptions
         $this->attributes = $param;
         $this->save();
     }
+
 } 

@@ -171,8 +171,8 @@ class CourseController extends AppController
 
         list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) =AppUtility::generateAssessmentData($assessment->itemorder,$assessment->shuffle, $assessment->id);
 
-        $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;  //bestscores;bestrawscores;firstscores
-        $scorelist = $scorelist.';'.$scorelist;  //scores;rawscores  - also used as reviewscores;rawreviewscores
+        $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;
+        $scorelist = $scorelist.';'.$scorelist;
         $bestattemptslist = $attemptslist;
         $bestseedslist = $seedlist;
         $bestlalist = $lalist;
@@ -182,7 +182,7 @@ class CourseController extends AppController
 
         $param['questions'] = $qlist;
         $param['seeds'] = $seedlist;
-        //AppUtility::dump($seedlist);
+        $param['userid'] = $id;
         $param['assessmentid'] = $id;
         $param['attempts'] = $attemptslist;
         $param['lastanswers'] = $lalist;
@@ -214,12 +214,18 @@ class CourseController extends AppController
         $assessmentId = Yii::$app->request->get('id');
         $courseId = Yii::$app->request->get('cid');
         $studentId = Yii::$app->user->identity->id;
-        //$exception = Exceptions::getByAssessmentId($assessmentId);
+        $exception = Exceptions::getByAssessmentId($assessmentId);
+
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
+        $course = Course::getById($courseId);
 
+        $addtime = $course->latepasshrs * 60 * 60;
+        $hasexception = true;
+        $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+        $usedlatepasses = round(($assessment->allowlate - $assessment->enddate)/($course->latepasshrs * 3600));
         $startdate = $assessment->startdate;
-        $enddate = $assessment->enddate;
+        $enddate = $assessment->enddate + $addtime;
         $wave = 0;
 
         $param['assessmentid'] = $assessmentId;
@@ -227,16 +233,36 @@ class CourseController extends AppController
         $param['startdate'] = $startdate;
         $param['enddate'] = $enddate;
         $param['waivereqscore'] = $wave;
+        $param['islatepass'] = 1;
+
+        if($exception)
+        {
+
+        if($assessment->allowlate != 0 && $assessment->enddate != 0 && $assessment->startdate != 0)
+        {
+
+            $hasException = true;
+        }
+
+
+        if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate)< $course->latepasshrs * 3600)))
+        {
         $latepass = $student->latepass;
         $student->latepass = $latepass - 1;
-//        $exception = new Exceptions();
-//        $exception->attributes = $param;
-//        $exception->save();
+        $exception->enddate = $exception->enddate + $addtime;
+        $exception->islatepass = $exception->islatepass + 1;
+        }
+        $exception->attributes = $param;
+        $exception->save();
         $student->save();
 
-
-
             $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+        }
+
+        if($exception->islatepass != 0)
+        {
+            echo "<p> Un-use late pass</p>";
+        }
     }
 
     public function actionAddNewCourse()
