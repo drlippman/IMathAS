@@ -510,7 +510,7 @@ class AppUtility extends Component {
         }
     }
 
-
+  /*Generate assessment data*/
 
    public static function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
         $ioquestions = explode(",",$itemorder);

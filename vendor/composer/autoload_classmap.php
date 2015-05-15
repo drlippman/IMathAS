@@ -103,7 +103,7 @@ return array(
     'PHP_CodeSniffer_DocGenerators_HTML' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/DocGenerators/HTML.php',
     'PHP_CodeSniffer_DocGenerators_Markdown' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/DocGenerators/Markdown.php',
     'PHP_CodeSniffer_DocGenerators_Text' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/DocGenerators/Text.php',
-    'PHP_CodeSniffer_Exception' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Exception.php',
+    'PHP_CodeSniffer_Exception' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Exceptions.php',
     'PHP_CodeSniffer_File' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/File.php',
     'PHP_CodeSniffer_Fixer' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Fixer.php',
     'PHP_CodeSniffer_Report' => $vendorDir . '/squizlabs/php_codesniffer/CodeSniffer/Report.php',

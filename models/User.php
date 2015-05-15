@@ -153,4 +153,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return static::findOne($id);
     }
 
+    public static function getByIdAndCode($id, $code)
+    {
+        return static::findOne(['id' => $id, 'remoteaccess' => $code]);
+    }
+
+
 }

@@ -9,6 +9,7 @@ use app\models\forms\ForgotPasswordForm;
 use app\models\forms\ForgotUsernameForm;
 use app\models\forms\LoginForm;
 use app\models\forms\RegistrationForm;
+use app\models\forms\ResetPasswordForm;
 use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentRegisterForm;
@@ -222,12 +223,40 @@ class SiteController extends AppController
         return $this->renderWithData('forgotUsername', ['model' => $model,]);
     }
 
-
     public function actionCheckBrowser()
     {
         return $this->renderWithData('checkBrowser');
 
     }
+
+
+    public function actionResetPassword()
+    {
+        $id = Yii::$app->request->get('id');
+        $code = Yii::$app->request->get('code');
+        $model = new ResetPasswordForm();
+        $user = User::getByIdAndCode($id, $code);
+
+        if($user)
+        {
+            if(Yii::$app->request->post())
+            {
+                $params = $this->getBodyParams();
+                $newPassword = $params['ResetPasswordForm']['newPassword'];
+                $password = AppUtility::passwordHash($newPassword);
+                $user->password = $password;
+                $user->remoteaccess = null;
+                $user->save();
+                $this->setSuccessFlash('Your password is changed successfully.');
+            }
+
+        }else{
+            $this->setErrorFlash('Reset Link has been expired.');
+        }
+
+        return $this->renderWithData('resetPassword', ['model' => $model]);
+    }
+
 
     //////////////////////////////////////////////////////////////
     ////////////////// Logged in user functions //////////////////

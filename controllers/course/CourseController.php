@@ -9,6 +9,7 @@ use app\models\AssessmentSession;
 use app\models\Blocks;
 use app\models\Course;
 use app\models\Assessments;
+use app\models\Exceptions;
 use app\models\forms\CourseSettingForm;
 use app\models\Links;
 use app\models\Forums;
@@ -213,12 +214,29 @@ class CourseController extends AppController
         $assessmentId = Yii::$app->request->get('id');
         $courseId = Yii::$app->request->get('cid');
         $studentId = Yii::$app->user->identity->id;
-
+        //$exception = Exceptions::getByAssessmentId($assessmentId);
+        $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
+
+        $startdate = $assessment->startdate;
+        $enddate = $assessment->enddate;
+        $wave = 0;
+
+        $param['assessmentid'] = $assessmentId;
+        $param['userid'] = $studentId;
+        $param['startdate'] = $startdate;
+        $param['enddate'] = $enddate;
+        $param['waivereqscore'] = $wave;
         $latepass = $student->latepass;
         $student->latepass = $latepass - 1;
+//        $exception = new Exceptions();
+//        $exception->attributes = $param;
+//        $exception->save();
         $student->save();
-        $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+
+
+
+            $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
     }
 
     public function actionAddNewCourse()
@@ -323,7 +341,6 @@ class CourseController extends AppController
     }
     public function actionUpdateOwner()
     {
-//        return json_encode(array('status' => '0'));
         if ($this->isPost())
         {
             $params = $this->getBodyParams();

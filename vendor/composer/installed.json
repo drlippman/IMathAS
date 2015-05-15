@@ -1163,7 +1163,7 @@
             "classmap": [
                 "CodeSniffer.php",
                 "CodeSniffer/CLI.php",
-                "CodeSniffer/Exception.php",
+                "CodeSniffer/Exceptions.php",
                 "CodeSniffer/File.php",
                 "CodeSniffer/Fixer.php",
                 "CodeSniffer/Report.php",

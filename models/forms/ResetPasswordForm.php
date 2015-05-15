@@ -27,9 +27,4 @@ class ResetPasswordForm extends Model
             ];
     }
 
-    public static function Update()
-    {
-
-    }
-
 }
