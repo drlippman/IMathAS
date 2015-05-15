@@ -29,35 +29,49 @@ class ForumController extends AppController{
 
         return $this->renderWithData('forum',['model' => $model,'forum' =>$forum, 'cid' =>$cid, 'users' => $user]);
     }
-
     public function actionGetForumNameAjax(){
 
         $this->guestUserHandler();
         $param = $this->getBodyParams();
         $search = $param['search'];
-
         $query= Yii::$app->db->createCommand("SELECT * from imas_forums where name LIKE '$search%'")->queryAll();
-        AppUtility::dump($query);
-   // return json_encode(array('status' => 0, 'query' => $query));
-
-
+    return json_encode(array('status' => 0, 'query' => $query));
     }
 
-    public function actionForumSearch()
+    public function actionGetForumsAjax()
     {
         $this->guestUserHandler();
 
-        $cid = $this->getBodyParams();
-        $forum = Forums::getByCourseId($cid);
-        $user = Yii::$app->user->identity;
-        $model = new ForumForm();
-        if ($model->load(Yii::$app->request->post()))
-        {
-            $param = $this->getBodyParams();
-            $search = $param['ForumForm']['search'];
-        }
-        $this->includeCSS(['../css/forums.css']);
+        $param = $this->getBodyParams();
+        $cid = $param['cid'];
+        $forums = Forums::getByCourseId($cid);
 
-        return $this->renderWithData('forum',['model' => $model,'forum' =>$forum, 'cid' =>$cid]);
+            if($forums)
+            {
+                $forumArray = array();
+                foreach($forums as $key => $forum)
+                {
+                    $threadCount = count($forum->imasForumThreads);
+                    $postCount = count($forum->imasForumPosts);
+                    $lastObject = '';
+                    if($postCount > 0)
+                    {
+                        $lastObject = $forum->imasForumPosts[$postCount-1];
+                    }
+                    $tempArray = array
+                    (
+                        'forumId' => $forum->id,
+                        'forumname' => $forum->name,
+                        'threads' => $threadCount,
+                        'posts' => $postCount,
+                        'lastPostDate' => ($lastObject != '') ? date('M-d-Y h:i s', $lastObject->postdate) : ''
+                    );
+                    array_push($forumArray, $tempArray);
+                }
+                $this->includeCSS(['../css/forums.css']);
+                return json_encode(array('status' => 0, 'forum' =>$forumArray ));
+            }else{
+                return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+            }
     }
 }

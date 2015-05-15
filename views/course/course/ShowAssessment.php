@@ -1,3 +1,4 @@
+
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
@@ -22,9 +23,15 @@ use app\components\AppUtility;
             <span id='timer'></span>
 
             remaining.</span>
-    </b></span>
+    </b>
+        <span onclick="toggletimer()" style="color:#aaa;" class="clickable" id="timerhide" title="Hide">[x]</span>
+
+    </span>
 
 </div>
+<div style="margin-left: 96%">
+<span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
+    </div>
 <div class=intro>
 
     <p>Total Points Possible:10</p>
@@ -114,8 +121,26 @@ use app\components\AppUtility;
 </body>
 </html>
 <script type="text/javascript">
-    $(document).ready(function(){
-        var timer = $('#timerlimit').val();
-        window.onload = CreateTimer("timer",timer);
+    $(document).ready(function()
+    {
+       var timer = $('#timerlimit').val();
+       window.onload = CreateTimer("timer",timer);
+       $('#timershow').hide();
+       $('#timerhide').show();
+
+        $('#timerhide').click(function()
+        {
+            $('#timercontent').hide();
+            $('#timershow').show();
+        });
+
+        $('#timershow').click(function()
+        {
+            $('#timercontent').show();
+            $('#timerhide').show();
+            $('#timershow').hide();
+        });
+
+
     });
 </script>
