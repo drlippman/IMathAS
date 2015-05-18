@@ -53,7 +53,6 @@ $this->params['breadcrumbs'][] = $this->title;
             With Selected:
             <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
-
             <a class="btn btn-primary  btn-danger" id="mark-delete">Delete</a>
     </div>
 
@@ -244,19 +243,6 @@ $this->params['breadcrumbs'][] = $this->title;
             });
     }
 
-    function filterByUser()
-    {
-        $('#user-id').on('change', function() {
-            var filteredArray = [];
-            var selectedUserId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedUserId == messageData.msgFromId){
-                    filteredArray.push(messageData);
-                }
-                showMessage(filteredArray);
-            });
-        });
-    }
     function getUserSuccess(response)
     {
         console.log(response);
@@ -274,7 +260,6 @@ $this->params['breadcrumbs'][] = $this->title;
         var html = "";
         $.each(userData,function(index, userData){
             html += "<option value = "+userData.id+">"+userData.FirstName+" "+userData.LastName+"</option>"
-
         });
         $(".show-users").append(html);
     }
@@ -295,5 +280,20 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     function markAsDeleteSuccess(){
         console.log("success");
+    }
+
+    function filterByUser()
+    {
+        $('#user-id').on('change', function() {alert(this.value);
+            var filteredArray = [];
+            var selectedUserId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedUserId == messageData.msgFromId){
+                    filteredArray.push(messageData);
+                }
+                console.log(JSON.stringify(filteredArray));
+                showMessage(filteredArray);
+            });
+        });
     }
 </script>

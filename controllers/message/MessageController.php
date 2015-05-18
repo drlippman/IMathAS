@@ -145,7 +145,6 @@ class MessageController extends AppController
                 foreach ($messages as $key => $message) {
                     $fromUser = User::getById($message->msgfrom);
                     $toUser = User::getById($message->msgto);
-
                     $tempArray = array('msgId' => $message->id,
                         'title' => $message->title,
                         'replied' => $message->replied,
@@ -165,7 +164,9 @@ class MessageController extends AppController
                     array_push($messageResponse, $tempArray);
                 }
             }
+//            $responseArray = array('messageData' => $messageResponse);
             return json_encode(array('status' => 0, 'messageData' => $messageResponse));
+//            return $this->successResponse();
         }
 
     }
@@ -246,6 +247,7 @@ class MessageController extends AppController
             return $this->renderWithData('viewMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
     }
+
     public function actionMarkAsDeleteAjax()
     {
         $this->guestUserHandler();
@@ -258,6 +260,18 @@ class MessageController extends AppController
             }
             return json_encode(array('status' => 0));
 
+        }
+    }
+
+    public function actionReplyMessage()
+    {
+        $this->guestUserHandler();
+        $msgId = Yii::$app->request->get('id');
+        if ($this->getAuthenticatedUser()) {
+            $messages = Message::getByMsgId($msgId);
+            $fromUser = User::getById($messages->msgfrom);
+            $this->includeJS(["../js/editor/tiny_mce.js"]);
+            return $this->renderWithData('replyMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
     }
 }

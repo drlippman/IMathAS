@@ -78,13 +78,14 @@ $this->params['breadcrumbs'][] = $this->title;
         var cid = $(".send-course-id").val();
         var userId = $(".send-user-id").val();
         var inputData = {cid: cid, userId: userId};
+
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
         jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess');        // alldata-inputdata-->
     });
 
     function showMessageSuccess(response)
-    {
+    {console.log(response);
         var filterArrayForUser = [];
         $.each(JSON.parse(response), function(index, messageData){
             $.each(messageData, function(index, msgData){
@@ -114,7 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     function showMessage(messageData)
-    {
+    {console.log(messageData);
         var html = "";
         var htmlCourse ="";                                       //extra
         $.each(messageData, function(index, messageData){

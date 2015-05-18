@@ -93,4 +93,14 @@ class AppController extends Controller
         return Yii::$app->request->getMethod() == 'POST';
     }
 
+    public function successResponse($data)
+    {
+        return json_encode(array('status' => 0, 'result' => $data));
+    }
+
+    public function terminateResponse($msg)
+    {
+        return json_encode(array('status' => 0, 'message' => $msg));
+    }
+
 }
