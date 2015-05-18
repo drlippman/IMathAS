@@ -107,6 +107,7 @@ class MessageController extends AppController
 
                 array_push($messageResponse, $tempArray);
             }
+
             return json_encode(array('status' => 0, 'messageData' => $messageResponse));
         }
 
@@ -148,9 +149,9 @@ class MessageController extends AppController
                     $tempArray = array('msgId' => $message->id,
                         'title' => $message->title,
                         'replied' => $message->replied,
-                        'msgFrom' => isset($fromUser) ? $fromUser->FirstName : '' . '' . isset($fromUser) ? $fromUser->LastName : '',
+                        'msgFrom' => ucfirst($fromUser->FirstName).' '.ucfirst($fromUser->LastName),
                         'msgFromId' => isset($fromUser) ? $fromUser->id : '',
-                        'msgTo' => isset($toUser) ? $toUser->FirstName : '' . '' . isset($toUser) ? $toUser->LastName : '',
+                        'msgTo' => ucfirst($toUser->FirstName).' '.ucfirst($toUser->LastName),
                         'msgToId' => isset($toUser) ? $toUser->id : '',
                         'courseId' => $message->courseid,
                         'courseName' => $message->course->name,
@@ -221,6 +222,7 @@ class MessageController extends AppController
         }
     }
 
+
     public function actionGetUserAjax()
     {
         $this->guestUserHandler();
@@ -242,6 +244,20 @@ class MessageController extends AppController
             $messages = Message::getByMsgId($msgId);
             $fromUser = User::getById($messages->msgfrom);
             return $this->renderWithData('viewMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
+        }
+    }
+    public function actionMarkAsDeleteAjax()
+    {
+        $this->guestUserHandler();
+        if (Yii::$app->request->post()) {
+            $params = $this->getBodyParams();
+            $msgIds = $params['checkedMsg'];
+            foreach ($msgIds as $msgId)
+            {
+               // Message::updateRead($msgId);
+            }
+            return json_encode(array('status' => 0));
+
         }
     }
 }

@@ -53,7 +53,8 @@ $this->params['breadcrumbs'][] = $this->title;
             With Selected:
             <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
-            <a class="btn btn-primary btn-sm btn-danger">Delete</a>
+
+            <a class="btn btn-primary  btn-danger" id="mark-delete">Delete</a>
     </div>
 
     <table id="message-table display-message-table" class="message-table display-message-table">
@@ -66,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>From</th>
             <th>Course</th>
             <th>Sent</th>
-        </tr>
+        </tr
         </thead>
         <tbody class="message-table-body">
         </tbody>
@@ -86,6 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
         markAsRead();
         filterByUser();
         markAsUnread();
+        markAsDel();
     });
     var messageData;
     function showMessageSuccess(response)
@@ -111,16 +113,16 @@ $this->params['breadcrumbs'][] = $this->title;
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-            var messageDatas = result.messageData;
-            showMessage(messageDatas);
+             messageData = result.messageData;
+            showMessage(messageData);
         }
     }
 
-    function showMessage(messageDatas)
+    function showMessage(messageData)
     {
         var html = " ";
         var htmlCourse ="";
-        $.each(messageDatas, function(index, messageData){
+        $.each(messageData, function(index, messageData){
             if(messageData.isRead == 1)
             {
                 html += "<tr class='read-message message-row message-row-'"+messageData.msgId+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
@@ -271,109 +273,27 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         var html = "";
         $.each(userData,function(index, userData){
-            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
+            html += "<option value = "+userData.id+">"+userData.FirstName+" "+userData.LastName+"</option>"
+
         });
         $(".show-users").append(html);
     }
 
-    function filterByCourse()
-    {
-        $('#course-id').on('change', function() {
-            var filteredArray = [];
-            var selectedCourseId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedCourseId == messageData.courseId ){
-                    filteredArray.push(messageData);
-                }
-                console.log(JSON.stringify(filteredArray));
-                showMessage(filteredArray);
-            });
-            });
-    }
+    function markAsDel(){
+        $("#mark-delete").click(function(){
 
-    function filterByUser()
-    {
-        $('#user-id').on('change', function() {alert(this.value);
-            var filteredArray = [];
-            var selectedUserId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedUserId == messageData.msgFromId){
-                    filteredArray.push(messageData);
-                }
-                console.log(JSON.stringify(filteredArray));
-                showMessage(filteredArray);
+            var markArray = [];
+            $('.message-table-body input[name="msg-check"]:checked').each(function() {
+                markArray.push($(this).val());
+                $(this).prop('checked',false);
             });
+            var readMsg={checkedMsg: markArray};
+            jQuerySubmit('mark-as-delete-ajax',readMsg,'markAsDeleteSuccess');
+
         });
-    }
-    function getUserSuccess(response)
-    {
-        console.log(response);
-        var result = JSON.parse(response);
-        if(result.status == 0)
-        {
-            var userData = result.userData;
-            userDisplay(userData);
 
-        }
     }
-
-    function userDisplay(userData)
-    {
-        var html = "";
-        $.each(userData,function(index, userData){
-            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
-        });
-        $(".show-users").append(html);
+    function markAsDeleteSuccess(){
+        console.log("success");
     }
-
-    function filterByCourse()
-    {
-        $('#course-id').on('change', function() {
-            var filteredArray = [];
-            var selectedCourseId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedCourseId == messageData.courseId ){
-                    filteredArray.push(messageData);
-                }
-                console.log(JSON.stringify(filteredArray));
-                showMessage(filteredArray);
-            });
-            });
-    }
-
-    function filterByUser()
-    {
-        $('#user-id').on('change', function() {alert(this.value);
-            var filteredArray = [];
-            var selectedUserId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedUserId == messageData.msgFromId){
-                    filteredArray.push(messageData);
-                }
-                console.log(JSON.stringify(filteredArray));
-                showMessage(filteredArray);
-            });
-        });
-    }
-    function getUserSuccess(response)
-    {
-        console.log(response);
-        var result = JSON.parse(response);
-        if(result.status == 0)
-        {
-            var userData = result.userData;
-            userDisplay(userData);
-
-        }
-    }
-
-    function userDisplay(userData)
-    {
-        var html = "";
-        $.each(userData,function(index, userData){
-            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
-        });
-        $(".show-users").append(html);
-    }
-
 </script>
