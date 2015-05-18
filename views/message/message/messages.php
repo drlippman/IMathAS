@@ -85,6 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
         selectCheckBox();
         markAsRead();
         filterByUser();
+        markAsUnread();
     });
     var messageData;
     function showMessageSuccess(response)
@@ -110,19 +111,32 @@ $this->params['breadcrumbs'][] = $this->title;
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-             messageData = result.messageData;
-            showMessage(messageData);
+            var messageDatas = result.messageData;
+            showMessage(messageDatas);
         }
     }
 
-    function showMessage(messageData)
+    function showMessage(messageDatas)
     {
         var html = " ";
         var htmlCourse ="";
-        $.each(messageData, function(index, messageData){
-            html += "<tr> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
+        $.each(messageDatas, function(index, messageData){
+            if(messageData.isRead == 1)
+            {
+                html += "<tr class='read-message message-row message-row-'"+messageData.msgId+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
+            }
+            else{
+                html += "<tr class='unread-message message-row message-row-"+messageData.msgId+"'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
+            }
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.msgId+"'> "+messageData.title+"</a></td>";
-            html += "<td>"+messageData.replied+"</td>";
+            if(messageData.replied == 1)
+            {
+                html += "<th>Yes</th>";
+            }
+            else{
+                html += "<th>No</th>";
+            }
+
             html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
             html += "<td>"+messageData.msgFrom+"</td>";
             html += "<td>"+messageData.courseName+"</td>";
@@ -172,6 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#mark-as-unread').click(function(){
             var markArray = [];
             $('.message-table-body input[name="msg-check"]:checked').each(function(){
+                $(this).closest('tr').css('font-weight', 'bold');
                 markArray.push($(this).val());
                 $(this).prop('checked',false);
 
@@ -190,10 +205,9 @@ $this->params['breadcrumbs'][] = $this->title;
     function markAsRead(){
         $("#mark-read").click(function(){
             var markArray = [];
-            $('.message-table-body input[name="mark-unmark"]:checked').each(function() {
-
-
+            $('.message-table-body input[name="msg-check"]:checked').each(function() {
                 markArray.push($(this).val());
+                $(this).closest('tr').css('font-weight', 'normal');
                 $(this).prop('checked',false);
 
 
