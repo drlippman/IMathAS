@@ -145,7 +145,7 @@ class MessageController extends AppController
                     $fromUser = User::getById($message->msgfrom);
                     $toUser = User::getById($message->msgto);
 
-                    $tempArray = array('msgId' => $message->title,
+                    $tempArray = array('msgId' => $message->id,
                         'title' => $message->title,
                         'replied' => $message->replied,
                         'msgFrom' => isset($fromUser) ? $fromUser->FirstName : '' . '' . isset($fromUser) ? $fromUser->LastName : '',
@@ -218,6 +218,30 @@ class MessageController extends AppController
                 Message::updateRead($msgId);
             }
             return json_encode(array('status' => 0));
+        }
+    }
+
+    public function actionGetUserAjax()
+    {
+        $this->guestUserHandler();
+
+        $user = $this->getAuthenticatedUser();
+        $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
+        $userId = $params['userId'];
+        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgfrom=imas_users.id WHERE imas_msgs.msgto='$userId'")->queryAll();
+
+        return json_encode(array('status' => 0, 'userData' => $query));
+    }
+
+    public function actionViewMessage()
+    {
+        $this->guestUserHandler();
+        $msgId = Yii::$app->request->get('id');
+        if ($this->getAuthenticatedUser()) {
+            $messages = Message::getByMsgId($msgId);
+            $fromUser = User::getById($messages->msgfrom);
+            return $this->renderWithData('viewMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
     }
 }

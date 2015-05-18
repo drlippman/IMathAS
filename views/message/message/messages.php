@@ -26,14 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
 </div>
 <div class="message-container">
-<div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary ">Send New Message</a>
+<div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary btn-sm">Send New Message</a>
     | <a href="">Limit to Tagged</a> | <a href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$course->id.'&userid='.$course->ownerid); ?>">Sent Messages</a>
-    | <a class="btn btn-primary ">Picture</a></p>
+    | <a class="btn btn-primary btn-sm">Picture</a></p>
 </div>
 <div>
     <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Course :</b></span>
         <span class="col-md-3">
-        <select name="seluid" class="show-course form-control" id="seluid">
+        <select name="seluid" class="show-course form-control" id="course-id">
             <option value="0">All Courses</option>
 
         </select>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </span> <span class="col-md-2 select-text-margin" align="center"><b>By Sender :</b></span>
 
         <span class="col-md-3">
-        <select name="seluid" class="show-users form-control" id="seluid">
+        <select name="seluid" class="show-users form-control" id="user-id">
             <option value="0">Select a user</option>
         </select>
         </span></p>
@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
             With Selected:
             <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
-            <a class="btn btn-primary ">Delete</a>
+            <a class="btn btn-primary btn-sm btn-danger">Delete</a>
     </div>
 
     <table id="message-table display-message-table" class="message-table display-message-table">
@@ -78,15 +78,15 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-msg").val();
         var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId};-
+        var allMessage = {cid: cid, userId: userId};
         jQuerySubmit('display-message-ajax',allMessage, 'showMessageSuccess');
-        selectCheckBox();
         jQuerySubmit('get-course-ajax',  allMessage, 'getCourseSuccess');
+        jQuerySubmit('get-user-ajax',  allMessage, 'getUserSuccess');
+        selectCheckBox();
         markAsRead();
-        markAsRead();
-
+        filterByUser();
     });
-
+    var messageData;
     function showMessageSuccess(response)
     {
         var filterArrayForUser = [];
@@ -102,32 +102,33 @@ $this->params['breadcrumbs'][] = $this->title;
 
         var htmlCourse = '';
         for(i = 0; i<uniqueUserForFilter.length; i++){
-            htmlCourse += "<option value = messageData.msgFrom>"+uniqueUserForFilter[i]+"</option>"
+            htmlCourse += "<option value = "+uniqueUserForFilter+">"+uniqueUserForFilter[i]+"</option>"
 
         }
-        $(".show-users").append(htmlCourse);
+        $(".show-user").append(htmlCourse);
 
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-            var messageData = result.messageData;
+             messageData = result.messageData;
             showMessage(messageData);
         }
     }
 
     function showMessage(messageData)
     {
-        var html = "";
+        var html = " ";
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
-            html += "<td><a href='#'> "+messageData.title+"</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.msgId+"'> "+messageData.title+"</a></td>";
             html += "<td>"+messageData.replied+"</td>";
             html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
             html += "<td>"+messageData.msgFrom+"</td>";
             html += "<td>"+messageData.courseName+"</td>";
             html += "<td>"+messageData.msgDate+"</td>";
         });
+        $(".message-table-body tr").remove();
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
 
@@ -154,6 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             var courseData = result.courseData;
             courseDisplay(courseData);
+            filterByCourse();
         }
     }
 
@@ -161,7 +163,7 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         var html = "";
         $.each(courseData,function(index, courseData){
-            html += "<option value = courseData.courseId>"+courseData.courseName+"</option>"
+            html += "<option value = "+courseData.courseId+">"+courseData.courseName+"</option>"
         });
         $(".show-course").append(html);
     }
@@ -192,7 +194,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                 markArray.push($(this).val());
-                // console.log("msgid= " + markArray.join(" "));
                 $(this).prop('checked',false);
 
 
@@ -207,10 +208,158 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     function markAsReadSuccess(response)
     {
-        //console.log(response);
+
 
 
     }
 
+
+    function filterByCourse()
+    {
+        $('#course-id').on('change', function() {
+            var filteredArray = [];
+            var selectedCourseId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedCourseId == messageData.courseId ){
+                    filteredArray.push(messageData);
+                }
+                showMessage(filteredArray);
+            });
+            });
+    }
+
+    function filterByUser()
+    {
+        $('#user-id').on('change', function() {
+            var filteredArray = [];
+            var selectedUserId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedUserId == messageData.msgFromId){
+                    filteredArray.push(messageData);
+                }
+                showMessage(filteredArray);
+            });
+        });
+    }
+    function getUserSuccess(response)
+    {
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var userData = result.userData;
+            userDisplay(userData);
+
+        }
+    }
+
+    function userDisplay(userData)
+    {
+        var html = "";
+        $.each(userData,function(index, userData){
+            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
+        });
+        $(".show-users").append(html);
+    }
+
+    function filterByCourse()
+    {
+        $('#course-id').on('change', function() {
+            var filteredArray = [];
+            var selectedCourseId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedCourseId == messageData.courseId ){
+                    filteredArray.push(messageData);
+                }
+                console.log(JSON.stringify(filteredArray));
+                showMessage(filteredArray);
+            });
+            });
+    }
+
+    function filterByUser()
+    {
+        $('#user-id').on('change', function() {alert(this.value);
+            var filteredArray = [];
+            var selectedUserId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedUserId == messageData.msgFromId){
+                    filteredArray.push(messageData);
+                }
+                console.log(JSON.stringify(filteredArray));
+                showMessage(filteredArray);
+            });
+        });
+    }
+    function getUserSuccess(response)
+    {
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var userData = result.userData;
+            userDisplay(userData);
+
+        }
+    }
+
+    function userDisplay(userData)
+    {
+        var html = "";
+        $.each(userData,function(index, userData){
+            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
+        });
+        $(".show-users").append(html);
+    }
+
+    function filterByCourse()
+    {
+        $('#course-id').on('change', function() {
+            var filteredArray = [];
+            var selectedCourseId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedCourseId == messageData.courseId ){
+                    filteredArray.push(messageData);
+                }
+                console.log(JSON.stringify(filteredArray));
+                showMessage(filteredArray);
+            });
+            });
+    }
+
+    function filterByUser()
+    {
+        $('#user-id').on('change', function() {alert(this.value);
+            var filteredArray = [];
+            var selectedUserId = this.value;
+            $.each(messageData, function(index, messageData){
+                if(selectedUserId == messageData.msgFromId){
+                    filteredArray.push(messageData);
+                }
+                console.log(JSON.stringify(filteredArray));
+                showMessage(filteredArray);
+            });
+        });
+    }
+    function getUserSuccess(response)
+    {
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            var userData = result.userData;
+            userDisplay(userData);
+
+        }
+    }
+
+    function userDisplay(userData)
+    {
+        var html = "";
+        $.each(userData,function(index, userData){
+            html += "<option value = "+userData.id+">"+userData.FirstName+"</option>"
+        });
+        $(".show-users").append(html);
+    }
 
 </script>

@@ -24,7 +24,6 @@ class Message extends BaseImasMsgs
         $this->message = $params['body'];
         $sendDate = strtotime(date('F d, o g:i a'));
         $this->senddate = $sendDate;
-
         $this->save();
         return $this->id;
     }
@@ -56,10 +55,14 @@ class Message extends BaseImasMsgs
         $message->isread = 1;
         $message->save();
     }
-    Public static function getById($id)
+    public static function getById($id)
     {
         return static::findOne($id);
     }
 
+    public static function getByMsgId($msgId)
+    {
+        return static::findOne($msgId);
+    }
 
 }

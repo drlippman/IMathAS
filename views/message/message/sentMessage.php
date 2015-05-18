@@ -51,8 +51,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
             <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
-            <a class="btn btn-primary ">Remove From Sent Message List</a>
-            <a class="btn btn-primary ">Unsend</a>
+            <a class="btn btn-primary btn-sm">Remove From Sent Message List</a>
+            <a class="btn btn-primary btn-sm">Unsend</a>
         </p>
 
     </div>
@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var inputData = {cid: cid, userId: userId};
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
-        jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess')        // alldata-inputdata-->
+        jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess');        // alldata-inputdata-->
     });
 
     function showMessageSuccess(response)
