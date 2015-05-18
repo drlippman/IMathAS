@@ -82,8 +82,8 @@ $this->params['breadcrumbs'][] = $this->title;
             $('#forum_search').click(function () {
                 var search = $('#search_text').val();
                 var courseId = $('.courseId').val();
-                var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
-                var allData = {search: search, cid: courseId,value:val}
+              //  var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
+                var allData = {search: search, cid: courseId}
                 jQuerySubmit('get-forum-name-ajax', allData, 'getTextSuccess');
             });
         });
@@ -99,8 +99,6 @@ $this->params['breadcrumbs'][] = $this->title;
                var forumData = result.forum;
                var queryData = result.searchData;
                var subjectData = result.subjectResult;
-               alert(JSON.stringify(subjectData[0].subject));
-
                searchByForum(forumData, queryData);
            }
         }

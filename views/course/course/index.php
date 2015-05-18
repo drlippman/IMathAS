@@ -80,8 +80,8 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             </div>
         </div>
     <?php } ?>
-</div>
 
+</div>
 <?php break; ?>
 
 
@@ -96,7 +96,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <div class="item">
         <img alt="forum" class="floatleft" src="/IMathAS/img/forum.png"/>
         <div class="title">
-        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
+        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
     <?php echo $forum->name ?></a></b>
     </div>
     <div class="itemsum"><p>

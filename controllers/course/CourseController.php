@@ -38,9 +38,7 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
-
         $responseData = array();
-
         $course = Course::getById($cid);
         if($course)
         {
@@ -161,6 +159,7 @@ class CourseController extends AppController
         $assessmentSession = AssessmentSession::getById($id);
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
+
         $assessmentclosed = false;
 
         if ($assessment->avail == 0) {
@@ -177,7 +176,6 @@ class CourseController extends AppController
         $starttime = time();
         $deffeedbacktext = addslashes($assessment->deffeedbacktext);
         $ltisourcedid = '';
-
         $param['questions'] = $qlist;
         $param['seeds'] = $seedlist;
         $param['userid'] = $id;
@@ -198,12 +196,16 @@ class CourseController extends AppController
         $assessmentSession = new AssessmentSession();
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
+        $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+        $toremaining = ($assessment->timelimit)-($currentTime-($param['starttime']));
+        $isreview = false;
+        $timelimitkickout = ($assessment->timelimit < 0);
 
         $this->includeCSS(['../css/mathtest.css']);
         $this->includeCSS(['../css/default.css']);
         $this->includeCSS(['../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
+        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'toremaining' => $toremaining,'isreview' => $isreview,'timelimitkickout' => $timelimitkickout]);
     }
 
     public function actionLatePass()
@@ -292,7 +294,17 @@ class CourseController extends AppController
             $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
         }
 
+    public function actionQuestion()
+    {
+        $this->guestUserHandler();
 
+        $questionId = Yii::$app->request->get('to');
+//        AppUtility::dump($questionId);
+//        AppUtility::basicShowQuestions($questionId);
+
+        $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$questionId));
+
+    }
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
@@ -549,20 +561,6 @@ class CourseController extends AppController
 
             return json_encode(array('status' => 0));
         }
-    }
-
-
-    public function actionShowLicense()
-    {
-        $this->guestUserHandler();
-
-        $user=Yii::$app->user->identity;
-        AppUtility::dump($user);
-
-        $query= Yii::$app->db->createCommand("SELECT * FROM imas_questionset ")->queryAll();
-
-        return json_encode(array('status' => 0, 'showLicense' => $query));
-
     }
 
 }

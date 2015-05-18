@@ -57,8 +57,11 @@ $(document).ready(function(){
                 },
                 "Confirm": function () {
                     window.location = cancelUrl;
-                    $(this).dialog("close");
+                   var toremaining = $("toremainingId").val();
+                    alert(toremaining);
+//                    $(this).dialog("close");
                     return true;
+
                 }
             },
             close: function (event, ui) {

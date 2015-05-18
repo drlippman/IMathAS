@@ -1,8 +1,8 @@
-
+<link href='../../../web/css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 ?>
 <?php echo $this->render('_toolbar');
 ?>
@@ -56,8 +56,9 @@ use app\components\AppUtility;
 
 <!--            <span class=current>-->
                 <img alt="untried" src="/IMathAS/img/te_blue_arrow.png"/>
-                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?to=' . $question->id) ?>">Q <?php echo $key+1?></a> (0/<?php echo $question->points ?>)
-<!--            </span>-->
+                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/question?to=' . $question->id) ?>">Q <?php echo $key+1?></a> (0/<?php echo $question->points ?>)
+                <input type="hidden" id="questionSet" class="questionId" value="<?php echo $question->id ?>">
+            <!--            </span>-->
         </li>
     </ul>
     <?php }?>
@@ -78,7 +79,6 @@ use app\components\AppUtility;
         <input type="hidden" name="disptime" value="1431096254"/>
         <input type="hidden" name="isreview" value="0"/>
         <a name="beginquestions"></a>
-
         <div class="question">
             <?php foreach($questionSets as $key => $questionSet) {?>
             <div> <?php echo $questionSet->qtext?>
@@ -97,10 +97,13 @@ use app\components\AppUtility;
         </div>
         <div class="review clearfix">
         <span style="float:right;font-size:70%">
-            <a target="license" id="LicensePopup">License</a>
+            <a  id="LicensePopup">License</a>
         </span>Points possible: <?php echo $question->points?><br/>This is attempt 1 of <?php echo $question->id?>.
             <input type=hidden id="verattempts" name="verattempts" value="0"/>
-        </div>
+            <input type="hidden" id="toremainingId" value="<?php echo $toremaining ?>">
+            <input type="hidden" id="isreviewid" value="<?php echo $isreview ?>">
+            <input type="hidden" id="timelimitkickoutid" value="<?php echo $timelimitkickout ?>">
+    </div>
         <input type="submit" class="btn" value="Submit"/>
     </form>
 </div>
@@ -118,6 +121,9 @@ use app\components\AppUtility;
 <div id="eh" class="eh">
 
 </div>
+
+
+
 </body>
 </html>
 <script type="text/javascript">
@@ -125,16 +131,17 @@ use app\components\AppUtility;
     {
        var timer = $('#timerlimit').val();
        window.onload = CreateTimer("timer",timer);
+
        $('#timershow').hide();
        $('#timerhide').show();
 
-        $('#timerhide').click(function()
+       $('#timerhide').click(function()
         {
             $('#timercontent').hide();
             $('#timershow').show();
         });
 
-        $('#timershow').click(function()
+       $('#timershow').click(function()
         {
             $('#timercontent').show();
             $('#timerhide').show();
@@ -142,48 +149,28 @@ use app\components\AppUtility;
         });
 
 
+        $('#LicensePopup').click(function(e)
+        {
+            var questionId= $("#questionSet").val();
+            var html = '<div><p><Strong>Question License</Strong></p>' +
+                '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
+                '<p> This question was written by Lippman, David. This work is licensed under the<a href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
+                +'<p>The code that generated this question can be obtained by instructors by emailing akash.more@tudip.nl</p></div>';
+            e.preventDefault();
+            $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Show License', zIndex: 10, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Cancel": function () {
+                        $(this).dialog('destroy').remove();
+                        return false;
+                    }
+                }
 
+            });
 
-         $('#LicensePopup').click(function(){
-
-
-
-//            var html = '<div><p></p>' +
-//                '<p></p> ' +
-//                '<p>    </p></div>';
-//
-//            $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
-//                modal: true, title: 'Message', zIndex: 10, autoOpen: true,
-//                width: 'auto', resizable: false,
-//                closeText: "hide",
-//                buttons: {
-//                    "Cancel": function () {
-//                        $(this).dialog('destroy').remove();
-//                        return false;
-//                    }
-//                }
-//
-//            });
-
-
-
-            jQuerySubmit('showLicense','showLicenseSuccess');
         });
 });
-
-
-    function showLicenseSuccess()
-    {
-
-        console.log(response);
-
-        var result = JSON.parse(response);
-        if (result.status == 0)
-        {
-
-
-        }
-
-    }
 
 </script>

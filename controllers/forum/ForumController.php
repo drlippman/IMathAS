@@ -35,9 +35,9 @@ class ForumController extends AppController{
         $param = $this->getBodyParams();
         $search = $param['search'];
         $cid = $param['cid'];
-        $value=$param['value'];
+ //       $value=$param['value'];
         $query= Yii::$app->db->createCommand("SELECT * from imas_forums where name LIKE '$search%'")->queryAll();
-        $queryResult= Yii::$app->db->createCommand("SELECT subject from imas_forum_posts")->queryAll();
+      //  $queryResult= Yii::$app->db->createCommand("SELECT subject from imas_forum_posts")->queryAll();
      //   AppUtility::dump($queryResult);
 
         $forums = Forums::getByCourseId($cid);
@@ -65,7 +65,7 @@ class ForumController extends AppController{
                 array_push($forumArray, $tempArray);
             }
 
-            return json_encode(array('status' => 0, 'forum' =>$forumArray, 'searchData' => $query ,'subjectResult' => $queryResult));
+            return json_encode(array('status' => 0, 'forum' =>$forumArray, 'searchData' => $query ));
         }else{
             return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
         }
