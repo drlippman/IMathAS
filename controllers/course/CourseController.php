@@ -54,6 +54,7 @@ class CourseController extends AppController
                     {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
+
                         $tempItemList = array();
                         if(count($blockItems))
                         {
@@ -98,7 +99,6 @@ class CourseController extends AppController
                         }
                         $tempAray['itemList'] = $tempItemList;
                         array_push($responseData, $tempAray);
-
                     }
                     else{
                         $item = Items::getById($itemOrder);
@@ -142,10 +142,8 @@ class CourseController extends AppController
 
         }
 
-//        $assessment = Assessments::getById($cid);
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
-//AppUtility::dump($responseData);
         $this->includeCSS(['../css/fullcalendar.min.css']);
         $this->includeCSS(['../css/calendar.css']);
         $this->includeJS(['../js/moment.min.js']);
@@ -235,7 +233,7 @@ class CourseController extends AppController
         $param['waivereqscore'] = $wave;
         $param['islatepass'] = 1;
 
-        if($exception)
+        if(count($exception))
         {
 
         if($assessment->allowlate != 0 && $assessment->enddate != 0 && $assessment->startdate != 0)
@@ -252,18 +250,48 @@ class CourseController extends AppController
         $exception->enddate = $exception->enddate + $addtime;
         $exception->islatepass = $exception->islatepass + 1;
         }
-        $exception->attributes = $param;
-        $exception->save();
-        $student->save();
-
-            $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
-        }
 
         if($exception->islatepass != 0)
         {
-            echo "<p> Un-use late pass</p>";
+            echo "<p>Un-use late-pass</p>";
+
+            if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * 60 * 60)
+            {
+
+                echo '<p>Too late to un-use this LatePass</p>';
+            }
+            else {
+                if ($currentTime < $assessment->enddate)
+                {
+                    $exception->islatepass = $exception->islatepass - 1;
+                }
+                else {
+                //figure how many are unused
+                    $n = floor(($exception->enddate - $currentTime)/($course->latepasshrs * 60 * 60));
+                    $newend = $exception->enddate - $n * $course->latepasshrs * 60 * 60;
+                    if ($exception->islatepass > $n)
+                    {
+                        $exception->islatepass = $exception->islatepass - $n;
+                        $exception->enddate=$newend;
+                    } else {
+                        //dnt push anything into db.
+                    }
+                }
+                echo "<p>Returning $n LatePass".($n > 1 ? "es":"")."</p>";
+                $student->latepass = $student->latepass + $n;
+            }
         }
-    }
+        else
+        {
+            echo '<p>Invalid</p>';
+        }
+        $exception->attributes = $param;
+        $exception->save();
+        $student->save();
+        }
+            $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+        }
+
 
     public function actionAddNewCourse()
     {

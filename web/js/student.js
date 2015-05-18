@@ -6,7 +6,7 @@ $(document).ready(function(){
     var endDate = '2015-05-04';
     var reviewDate = '2015-05-09';
 
-    $('#calendar').fullCalendar({
+    $('.calendar').fullCalendar({
 
         height: 400,
         header: {
