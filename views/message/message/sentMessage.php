@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
             <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
-            <a class="btn btn-primary btn-sm">Remove From Sent Message List</a>
+            <a class="btn btn-primary btn-sm"id="mark-sent-delete">Remove From Sent Message List</a>
             <a class="btn btn-primary btn-sm">Unsend</a>
         </p>
 
@@ -81,7 +81,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
-        jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess');        // alldata-inputdata-->
+        jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess');
+        markSentDelete();
     });
 
     function showMessageSuccess(response)
@@ -117,9 +118,9 @@ $this->params['breadcrumbs'][] = $this->title;
     function showMessage(messageData)
     {console.log(messageData);
         var html = "";
-        var htmlCourse ="";                                       //extra
+        var htmlCourse ="";
         $.each(messageData, function(index, messageData){
-            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
+            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.mmsgId+"' ></td>";
             html += "<td><a href='#'>"+messageData.title+"</a></td>";
             html += "<td>"+messageData.msgTo+"</td>";
             html += "<td>"+messageData.isRead+"</td>";
@@ -160,4 +161,24 @@ $this->params['breadcrumbs'][] = $this->title;
             $(".show-course").append(html);
         }
     }
+   function markSentDelete()
+    {
+        $("#mark-sent-delete").click(function(){
+
+           var markArray = [];
+            $('.message-table-body input[name="msg-check"]:checked').each(function() {
+              markArray.push($(this).val());
+                $(this).closest('tr').remove();
+               $(this).prop('checked',false);
+            });
+            var readMsg={checkedMsgs: markArray};
+           jQuerySubmit('mark-sent-remove-ajax',readMsg,'markDeleteSuccess');
+
+        });
+
+    }
+    function markDeleteSuccess(){
+            console.log('Success');
+    }
+
 </script>

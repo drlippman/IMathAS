@@ -86,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
         markAsRead();
         filterByUser();
         markAsUnread();
-        markAsDel();
+        markAsDelete();
     });
     var messageData;
     function showMessageSuccess(response)
@@ -264,12 +264,14 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".show-users").append(html);
     }
 
-    function markAsDel(){
+    function markAsDelete(){
         $("#mark-delete").click(function(){
 
             var markArray = [];
             $('.message-table-body input[name="msg-check"]:checked').each(function() {
                 markArray.push($(this).val());
+
+
                 $(this).prop('checked',false);
             });
             var readMsg={checkedMsg: markArray};
@@ -279,7 +281,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     }
     function markAsDeleteSuccess(){
-        console.log("success");
+
     }
 
     function filterByUser()
