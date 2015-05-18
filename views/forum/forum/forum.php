@@ -8,6 +8,7 @@ $this->title = 'Forums';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
+<link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"/>
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css"
       href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
@@ -30,8 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-
+<div>
     <?= $form->field($model, 'search')->textInput(['id' => 'search_text']); ?>
+</div>
     <?= $form->field($model, 'thread')->inline()->radioList(['subject' => 'All thread subjects' , 'post' => 'All Post']) ?>
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
@@ -45,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
 
 
+    <?php if(!empty($forum)){?>
     <table id="forum-table displayforum" class="forum-table">
         <thead>
         <tr>
@@ -58,36 +61,48 @@ $this->params['breadcrumbs'][] = $this->title;
         <tbody class="forum-table-body">
         </tbody>
     </table>
+    <?php } else if($users->rights== 20){
+            echo "<p>There are no active forums at this time,you can add new using course page.</p>";
 
-
-
-    <?php ActiveForm::end(); ?>
+            }
+            else {
+                      echo "<p>There are no active forums at this time.</p>";
+             }?>
+<?php ActiveForm::end(); ?>
 </div>
 
     <script>
         $(document).ready(function () {
 
-            var courseId = $('.courseId').val();
+
+             var courseId = $('.courseId').val();
             jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
 
 
             $('#forum_search').click(function () {
                 var search = $('#search_text').val();
-                var val=$("")
-                jQuerySubmit('get-forum-name-ajax', {search: search}, 'getTextSuccess');
-
-
+                var courseId = $('.courseId').val();
+                var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
+                var allData = {search: search, cid: courseId,value:val}
+                jQuerySubmit('get-forum-name-ajax', allData, 'getTextSuccess');
             });
         });
 
-        function getTextSuccess(response) {
+        function getTextSuccess(response)
+        {
+
             console.log(response);
 
             var result = JSON.parse(response);
-            console.log(result);
-            if (result.status == 0) {
+           if (result.status == 0)
+           {
+               var forumData = result.forum;
+               var queryData = result.searchData;
+               var subjectData = result.subjectResult;
+               alert(JSON.stringify(subjectData[0].subject));
 
-            }
+               searchByForum(forumData, queryData);
+           }
         }
 
         function forumsSuccess(response) {
@@ -104,14 +119,30 @@ $this->params['breadcrumbs'][] = $this->title;
 
             var html = "";
             $.each(forums, function (index, forum) {
-                html += "<tr> <td><a href='#'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>";
+                html += "<tr> <td><a href='#'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";
             });
+            $(".forum-table-body tr").remove();
             $(".forum-table-body").append(html);
             $('.forum-table').DataTable();
 
+        }
+
+        function searchByForum(forumData, queryData)
+        {
+            var filteredArray = [];
+            $.each(queryData, function (index, queryresult) {
+                $.each(forumData, function (index, forumresult) {
+                    if (queryresult.id == forumresult.forumId)
+                    {
+                        filteredArray.push(forumresult);
+                    }
+                });
+            });
+//            alert(filteredArray);
+            showForumTable(filteredArray);
         }
 
     </script>

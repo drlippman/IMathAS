@@ -97,7 +97,7 @@ use app\components\AppUtility;
         </div>
         <div class="review clearfix">
         <span style="float:right;font-size:70%">
-            <a target="license" href="/IMathAS/course/showlicense.php?id=36">License</a>
+            <a target="license" id="LicensePopup">License</a>
         </span>Points possible: <?php echo $question->points?><br/>This is attempt 1 of <?php echo $question->id?>.
             <input type=hidden id="verattempts" name="verattempts" value="0"/>
         </div>
@@ -142,5 +142,48 @@ use app\components\AppUtility;
         });
 
 
-    });
+
+
+         $('#LicensePopup').click(function(){
+
+
+
+//            var html = '<div><p></p>' +
+//                '<p></p> ' +
+//                '<p>    </p></div>';
+//
+//            $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+//                modal: true, title: 'Message', zIndex: 10, autoOpen: true,
+//                width: 'auto', resizable: false,
+//                closeText: "hide",
+//                buttons: {
+//                    "Cancel": function () {
+//                        $(this).dialog('destroy').remove();
+//                        return false;
+//                    }
+//                }
+//
+//            });
+
+
+
+            jQuerySubmit('showLicense','showLicenseSuccess');
+        });
+});
+
+
+    function showLicenseSuccess()
+    {
+
+        console.log(response);
+
+        var result = JSON.parse(response);
+        if (result.status == 0)
+        {
+
+
+        }
+
+    }
+
 </script>

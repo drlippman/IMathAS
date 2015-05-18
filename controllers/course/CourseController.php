@@ -550,4 +550,19 @@ class CourseController extends AppController
             return json_encode(array('status' => 0));
         }
     }
+
+
+    public function actionShowLicense()
+    {
+        $this->guestUserHandler();
+
+        $user=Yii::$app->user->identity;
+        AppUtility::dump($user);
+
+        $query= Yii::$app->db->createCommand("SELECT * FROM imas_questionset ")->queryAll();
+
+        return json_encode(array('status' => 0, 'showLicense' => $query));
+
+    }
+
 }
