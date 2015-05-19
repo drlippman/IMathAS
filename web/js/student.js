@@ -39,34 +39,69 @@ $(document).ready(function(){
 //        Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
+        var assessmentsession = $("#assessmentsession").val();
+        var now = $("#now").val();
+        var timelimit = $("#timelimit").val();
+        var now_int = parseInt(now);
+        var assessmentsession_int =parseInt(assessmentsession);
+        var timelimit_int = parseInt(timelimit);
         var linkId = $(this).attr('id')
         var timelimit = Math.abs($('#time-limit'+linkId).val());
+        alert(timelimit);
         var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
         var min = Math.floor((timelimit%3600)/60);
         var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click OK to start or continue working on the assessment.</div>';
+        var msg = '<div>TIME HAS EXPIRED</div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
-        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "OK": function () {
-                    window.location = cancelUrl;
-                   var toremaining = $("toremainingId").val();
-                    alert(toremaining);
-//                    $(this).dialog("close");
-                    return true;
+        if((assessmentsession_int + timelimit_int) < now_int)
+         {
 
+                $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons: {
+                        "Cancel": function () {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "confirm": function () {
+                            window.location = cancelUrl;
+                            $(this).dialog("close");
+                            return true;
+                       }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    }
+                });
+        }
+        else
+        {
+             $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Cancel": function () {
+                        $(this).dialog('destroy').remove();
+                        return false;
+                    },
+                    "OK": function () {
+                        window.location = cancelUrl;
+                        $(this).dialog("close");
+                        return true;
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
                 }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-        });
+            });
+
+        }
+
+
     });
+
 });

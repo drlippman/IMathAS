@@ -39,6 +39,12 @@ class CourseController extends AppController
         $this->guestUserHandler();
 
         $cid = $this->getParamVal('cid');
+        $id = Yii::$app->request->get('id');
+        $uid = Yii::$app->user->identity->getId();
+        $cid = Yii::$app->request->get('cid');
+        $assessmentSession = AssessmentSession::getByUserId($uid);
+        $now = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+
         $responseData = array();
         $course = Course::getById($cid);
         if ($course) {
@@ -128,11 +134,14 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
-        $this->includeCSS(['css/fullcalendar.min.css', 'css/calendar.css']);
+        $timelimit =$assessment->timelimit;
+        $this->includeCSS(['../css/fullcalendar.min.css']);
+        $this->includeCSS(['../css/calendar.css']);
+        $this->includeJS(['../js/moment.min.js']);
+        $this->includeJS(['../js/fullcalendar.min.js']);
+        $this->includeJS(['../js/student.js']);
+        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentsession' =>$assessmentSession,'now' => $now, 'timelimit' => $timelimit ]);
 
-        $this->includeJS(['js/moment.min.js', 'js/fullcalendar.min.js', '../js/student.js']);
-
-        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student]);
     }
 
     public function actionShowAssessment()
@@ -153,8 +162,17 @@ class CourseController extends AppController
 
         $this->saveAssessmentSession($assessment, $id);
 
-        $this->includeCSS(['css/mathtest.css', 'css/default.css', 'css/showAssessment.css']);
-        $this->includeJS(['js/timer.js']);
+//
+//        $assessmentSession = new AssessmentSession();
+//        $assessmentSession->attributes = $param;
+//        $assessmentSession->save();
+
+        $this->includeCSS(['../css/mathtest.css']);
+        $this->includeCSS(['../css/default.css']);
+        $this->includeCSS(['../css/showAssessment.css']);
+        $this->includeJS(['../js/timer.js']);
+        $this->includeJS(['../js/student.js']);
+
         return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
     }
 

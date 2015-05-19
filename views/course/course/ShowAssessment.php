@@ -6,6 +6,7 @@ use app\components\AppUtility;
 ?>
 <?php $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count"); ?>
 <?php echo $this->render('_toolbar');
+//AppUtility::dump($toremaining);
 ?>
 <!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
@@ -96,10 +97,7 @@ use app\components\AppUtility;
             <a  id="LicensePopup">License</a>
         </span>Points possible: <?php echo $question->points?><br/>This is attempt 1 of <?php echo $question->id?>.
             <input type=hidden id="verattempts" name="verattempts" value="0"/>
-            <input type="hidden" id="toremainingId" value="<?php echo $toremaining ?>">
-            <input type="hidden" id="isreviewid" value="<?php echo $isreview ?>">
-            <input type="hidden" id="timelimitkickoutid" value="<?php echo $timelimitkickout ?>">
-    </div>
+             </div>
         <input type="submit" class="btn" value="Submit"/>
     </form>
 </div>
@@ -164,12 +162,15 @@ use app\components\AppUtility;
                     "Cancel": function () {
                         $(this).dialog('destroy').remove();
                         return false;
+
                     }
                 }
 
             });
 
         });
-});
+
+
+    });
 
 </script>

@@ -29,4 +29,9 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         return static::findOne(['assessmentid' => $id]);
     }
+
+    public static function getByUserId($uid)
+    {
+        return static::findOne(['userid' => $uid]);
+    }
 } 
