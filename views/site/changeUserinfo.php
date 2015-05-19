@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css"/>
+<link rel="stylesheet" href="<?php AppUtility::getHomeURL()?>css/dashboard.css" type="text/css"/>
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
