@@ -478,36 +478,12 @@ class AppUtility extends Component {
         }
     }
 
-   public static function basicshowq($qn,$seqinactive=false,$colors=array()) {
+   public static function basicShowQuestions($qn,$seqinactive=false,$colors=array()) {
 
-        global $showansduring,$questions,$testsettings,$qi,$seeds,$showhints,$attempts,$regenonreattempt,$showansafterlast,$showeachscore,$noraw, $rawscores;
-        $qshowansduring = ($showansduring && $qi[$questions[$qn]]['showans']=='0');
-        $qshowansafterlast = (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J');
+       require_once("TestUtil.php");
 
-
-        if (canimprove($qn)) {
-            if ($qshowansduring && $attempts[$qn]>=$testsettings['showans']) {$showa = true;} else {$showa=false;}
-        } else {
-            $showa = (($qshowansduring || $qshowansafterlast) && $showeachscore);
-        }
-
-        $regen = ((($regenonreattempt && $qi[$questions[$qn]]['regen']==0) || $qi[$questions[$qn]]['regen']==1)&&amreattempting($qn));
-        $thisshowhints = ($qi[$questions[$qn]]['showhints']==2 || ($qi[$questions[$qn]]['showhints']==0 && $showhints));
-        if (!$noraw && $showeachscore) { //&& $GLOBALS['questionmanualgrade'] != true) {
-            //$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
-            if (strpos($rawscores[$qn],'~')!==false) {
-                $colors = explode('~',$rawscores[$qn]);
-            } else {
-                $colors = array($rawscores[$qn]);
-            }
-        }
-        if (!$seqinactive) {
-
-            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,$thisshowhints,$attempts[$qn],false,$regen,$seqinactive,$colors);
-        } else {
-            //print_r('hhh'); die;
-            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$showa,false,$attempts[$qn],false,$regen,$seqinactive,$colors);
-        }
+       $arrayData = basicshowq($qn,$seqinactive=false,$colors=array());
+       var_dump($arrayData);
     }
 
   /*Generate assessment data*/
@@ -586,6 +562,5 @@ class AppUtility extends Component {
         }
 
     }
-
 
 }

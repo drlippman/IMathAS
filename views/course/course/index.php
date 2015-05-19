@@ -36,6 +36,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                     <div class="item">
                         <div class="icon" style="background-color: #1f0;">?</div>
                             <div class="title">
+                                <?php if($assessment->timelimit != 0) {?>
                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
 
@@ -54,6 +55,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <?php }?>
 
                 <?php } ?>
+             <?php }?>
             </div>
             <div class="itemsum">
                 <p><?php echo $assessment->summary ?></p>

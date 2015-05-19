@@ -92,7 +92,6 @@ class AppController extends Controller
     public function isPost(){
         return Yii::$app->request->getMethod() == 'POST';
     }
-
     public function successResponse($data)
     {
         return json_encode(array('status' => 0, 'result' => $data));
@@ -101,6 +100,23 @@ class AppController extends Controller
     public function terminateResponse($msg)
     {
         return json_encode(array('status' => 0, 'message' => $msg));
+    }
+
+    public function getParamVal($key){
+        return Yii::$app->request->get($key);
+    }
+
+    public function getSanitizedValue($key, $defaultVal = '')
+    {
+        isset($key) ? $key : $defaultVal;
+    }
+
+    public function isPostMethod(){
+        return Yii::$app->request->post();
+    }
+
+    public function getReturnableResponse($status, $data = ''){
+        return json_encode(array('status' =>$status, 'data' => $data));
     }
 
 }

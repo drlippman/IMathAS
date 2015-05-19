@@ -55,7 +55,7 @@ $(document).ready(function(){
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "Confirm": function () {
+                "OK": function () {
                     window.location = cancelUrl;
                    var toremaining = $("toremainingId").val();
                     alert(toremaining);

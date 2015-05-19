@@ -4,6 +4,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
+<?php $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count"); ?>
 <?php echo $this->render('_toolbar');
 ?>
 <!--    Display assessment name-->
@@ -19,19 +20,14 @@ use app\components\AppUtility;
     $min = floor((abs($assessments->timelimit)%3600)/60);
 ?>
     <span id="timercontent"><b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
-        <span id="timerwrap"><b>
-            <span id='timer'></span>
-
-            remaining.</span>
-    </b>
-        <span onclick="toggletimer()" style="color:#aaa;" class="clickable" id="timerhide" title="Hide">[x]</span>
-
+        <span id="timerwrap">
+            <b>
+            <span id='timer'></span>remaining.</span>
+             </b>
     </span>
 
 </div>
-<div style="margin-left: 96%">
-<span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
-    </div>
+
 <div class=intro>
 
     <p>Total Points Possible:10</p>
@@ -53,10 +49,10 @@ use app\components\AppUtility;
 <!--        Display left side: question list-->
     <ul class=qlist>
         <li>
-
 <!--            <span class=current>-->
                 <img alt="untried" src="/IMathAS/img/te_blue_arrow.png"/>
                 <a href="<?php echo AppUtility::getURLFromHome('course', 'course/question?to=' . $question->id) ?>">Q <?php echo $key+1?></a> (0/<?php echo $question->points ?>)
+
                 <input type="hidden" id="questionSet" class="questionId" value="<?php echo $question->id ?>">
             <!--            </span>-->
         </li>
@@ -65,7 +61,7 @@ use app\components\AppUtility;
     <br />
 <!--    Display total points: Grade-->
     <p>Grade: 0/<?php echo $grade?></p><p><br /><br />
-        <a href="#" onclick="window.open('/IMathAS/assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;">
+        <a href="#" onclick="window.open();return false;">
             Print Version
         </a>
     </p>
@@ -126,6 +122,9 @@ use app\components\AppUtility;
 
 </body>
 </html>
+
+<!--Display hide and show timer functionality-->
+
 <script type="text/javascript">
     $(document).ready(function()
     {
