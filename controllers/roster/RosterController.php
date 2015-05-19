@@ -3,10 +3,13 @@ namespace app\controllers\roster;
 use app\models\Course;
 use app\models\LoginGrid;
 use app\models\loginTime;
+use app\models\Student;
+use app\models\User;
 use Yii;
 use app\components\AppUtility;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
+use yii\db\Query;
 
 
 class RosterController extends AppController
@@ -26,6 +29,7 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
+
         return $this->render('loginGridView',['course' => $course]);
 
     }
@@ -33,50 +37,69 @@ class RosterController extends AppController
     public function actionLoginGridViewAjax()
     {
         $pramas = $this->getBodyParams();
-        //AppUtility::dump($pramas);
-        $cid = $pramas['cid'];
 
         $newStartDate = strtotime($pramas['newStartDate']);
         $newEndDate = strtotime($pramas['newEndDate']);
         $this->guestUserHandler();
+        $headsArray = array();
+        $headsArray[] = 'Name';
+        for($curDate = $newStartDate; $curDate<= $newEndDate;  ($curDate = $curDate+86400)){
+            $day = date('m/d', $curDate );
+            $headsArray[] = $day;
+        }
+        $cid = $pramas['cid'];
 
-+
         $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
-        $loginLogArray =array();
-        $userId = 0;
-        $tempArray = array();
-
-       // AppUtility::dump($n);
-
-        foreach($loginLogs as $key => $loginLog)
-        {
-            if($userId != $loginLog->userid)
-            {
-                $userId = $loginLog->userid;
-                if($key != 0)
-                {
-                    array_push($loginLogArray, $tempArray);
-                }
-                $tempArray = array();
-                array_push($tempArray,$loginLog->user->FirstName.' '.$loginLog->user->LastName);
+        $rowLogs = array();
+        $nameHash = array();
+        foreach($loginLogs as $loginLog){
+            $day = date('m/d', $loginLog['logintime']);
+            $user_id = $loginLog['userid'];
+            if(!isset($rowLogs[$user_id])){
+                $rowLogs[$user_id] = array();
             }
+            $userSpecificDaysArray = $rowLogs[$user_id];
+            if(!isset($userSpecificDaysArray[$day])){
+                $userSpecificDaysArray[$day] = 1;
+            }else{
+                $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + 1;;
+            }
+            if(!isset($nameHash[$user_id])){
+                $nameHash[$user_id] = $loginLog['LastName']. ', ' . $loginLog['FirstName'];
+            }
+            $rowLogs[$user_id] = $userSpecificDaysArray;
+        }
 
-            $extraTime = (86400 - $newEndDate % 86400);
-            for($i = $newStartDate; $i < ($newEndDate + $extraTime); $i += 86400)
-            {
-                if(($loginLog->logintime - $i) <= 86400)
-                {
-                    array_push($tempArray, 1);
-                }else{
-                    array_push($tempArray, 0);
-
+        foreach($headsArray as $headElem){
+            foreach($rowLogs as $key => $field){
+                if($headElem == 'Name'){
+                    continue;
+                }
+                if(!isset($field[$headElem])){
+                    $field[$headElem] = '';
+                    $rowLogs[$key] = $field;
                 }
             }
         }
+        $stuLogs = array();
+        foreach($rowLogs as $key => $field){
+            $stuLogs[$key]['name'] = $nameHash[$key];
+            $stuLogs[$key]['row'] = $field;
+        }
 
-       // AppUtility::dump($loginLogArray);
-        $test = array('status' => '0' , 'loginLog' => $loginLogArray, 'startDate' => $newStartDate,'endDate' => $newEndDate);
+        $retJSON = new \stdClass();
+        $retJSON->header = $headsArray;
+        $retJSON->rows = $stuLogs;
+
+        $test = array('status' => '0' , 'data' => $retJSON);
         return json_encode($test);
     }
 
+    public function actionStudentRosterAjax()
+    {
+        $params = $this->getBodyParams();
+          $id = $params['course_id'];
+        $query = Yii::$app->db->createCommand("select * from imas_users")->queryAll();
+        return json_encode(['status' => '0','query' => $query]);
+    }
 }

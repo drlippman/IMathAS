@@ -195,6 +195,7 @@ class SiteController extends AppController
             $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
 
             AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
+            $model = new ForgotPasswordForm();
             $this->setSuccessFlash('Password reset link sent to your registered email.');
         }
 

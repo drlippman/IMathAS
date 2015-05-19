@@ -225,3 +225,16 @@ ul#navlist a {
     border-radius: 0px;
     border: none;
 }
+
+.unread-message{
+    font-weight: bold;
+}
+
+.read-message{
+    font-weight: normal;
+}
+.back-button{
+    width: 72px;
+    margin-top: 2px;
+    height: 36px;
+}

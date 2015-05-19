@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 
 $this->title = 'Forget Password';
 $this->params['breadcrumbs'][] = $this->title;
@@ -22,8 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'forgetpassword-button']) ?>
+  &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
         </div>
     </div>
+    <script>
+        </script>
 
     <?php ActiveForm::end(); ?>
 

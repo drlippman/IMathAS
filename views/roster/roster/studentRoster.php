@@ -17,22 +17,23 @@ $this->title = 'Student Roster';
         <div class="cpmid">
             <span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?>">View Login Grid</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Assign Sections and/or Codes</a><br>
+                <a HREF="#">Assign Sections and/or Codes</a><br>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Manage LatePasses</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Manage Tutors</a><br/>
+                <a HREF="#">Manage LatePasses</a><br/>
+                <a HREF="#">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Enroll Student with known username</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Enroll students from another course</a><br/>
+                <a HREF="#">Enroll Student with known username</a><br/>
+                <a HREF="#">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Import Students from File</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('admin/admin', 'index') ?>">Create and Enroll new student</a><br/>
+                <a HREF="#">Import Students from File</a><br/>
+                <a HREF="#">Create and Enroll new student</a><br/>
 
             </span><br class="clear"/>
         </div>
         <form id="qform" method=post action="listusers.php?cid=2">
 
-            <p>Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',true,'locked')">Non-locked</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+            <p>check: <a  class="uncheck-all" href="#">None</a> /
+                <a   class="check-all" href="#">All</a>
                 With Selected:
                 <input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">
                 <input type=submit name=submit value="Message" title="Send a message to the selected students">
@@ -40,11 +41,10 @@ $this->title = 'Student Roster';
                 <input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
                 <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
                 <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
-
-            <table class=gb id=myTable>
+            <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
+            <table class=gb id=student-information-table>
                 <thead>
                 <tr>
-                    <th></th>
                     <th></th>
                     <th>Last</th>
                     <th>First</th>
@@ -62,8 +62,94 @@ $this->title = 'Student Roster';
 
                 </tbody>
             </table>
-            Number of students: 0<br/>		<script type="text/javascript">
-                initSortTable('myTable',Array(false,false,'S','S','S','S','D',false,false,false),true);
+            Number of Student : <input id="count">
+
+            <script type="text/javascript">
+                //initSortTable('myTable',Array(false,false,'S','S','S','S','D',false,false,false),true);
+
+                $(document).ready(function () {
+                    var course_id =  $( "#course-id" ).val();
+                    selectCheckBox();
+                    jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
+
+                });
+
+                function studentRosterSuccess(response)
+                {
+                   console.log(response);
+                    var students = JSON.parse(response);
+
+
+                    if (students.status == 0) {
+                        var students = students.query;
+
+
+                        showStudentInformation(students);
+                }
+                }
+                function showStudentInformation(students)
+                {
+                    var count = 0;
+                    var html = "";
+
+                   $.each(students, function(index, student){
+                       html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
+                       html += "<td>"+capitalizeFirstLetter(student.LastName)+"</td>";
+                       html += "<td>"+capitalizeFirstLetter(student.FirstName)+"</td>";
+                       html += "<td>"+student.email+"</td>";
+                       html += "<td>"+student.SID+"</td>";
+                       html += "<td>"+datecal(student.lastaccess)+"</td>";
+                       html += "<th><a>Grades</a></th>";
+                       html += "<th><a>Exception</a></th>";
+                       html += "<th><a>Chg</a></th>";
+                       html += "<th><a>Lock</a></th>";
+
+                       count++;
+                        });
+                    $('#count').val(count);
+                    $('#student-information-table').append(html);
+                 }
+
+                function selectCheckBox(){
+                    $('.check-all').click(function(){
+                        $('#student-information-table input:checkbox').each(function(){
+                            $(this).prop('checked',true);
+                        })
+                    });
+
+                    $('.uncheck-all').click(function(){
+                        $('#student-information-table input:checkbox').each(function(){
+                            $(this).prop('checked',false);
+                        })
+                    });
+                }
+
+                function datecal(a)
+                {
+
+                    var date = new Date(a*1000);
+                    var  month = ('0' + (date.getMonth() + 1)).slice(-2);
+                    var day = ('0' + date.getDate()).slice(-2);
+                    var year = date.getUTCFullYear();
+                    var hh = date.getHours(),
+                        h = hh,
+                        min = ('0' + date.getMinutes()).slice(-2),
+                        ampm = 'AM',
+                        time;
+
+                    if (hh > 12) {
+                        h = hh - 12;
+                        ampm = 'PM';
+                    } else if (hh === 12) {
+                        h = 12;
+                        ampm = 'PM';
+                    } else if (hh == 0) {
+                        h = 12;
+                    }
+                    time = month + '/' + day + '/' + year + '  ' + h + ':' + min + ' ' + ampm;
+
+                    return time;
+                }
             </script>
         </form>
 

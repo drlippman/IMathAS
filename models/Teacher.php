@@ -35,7 +35,7 @@ class Teacher extends BaseImasTeachers
 
     public static function removeTeacher($userid, $courseid)
     {
-        $teacher = static::findone(['courseid' => $courseid, 'userid' => $userid]);
+        $teacher = static::findOne(['courseid' => $courseid, 'userid' => $userid]);
         $teacher->delete();
     }
 
