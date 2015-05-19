@@ -32,7 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo "<div class='left col-md-11'><div class= 'editor'>
         <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'></textarea></div></div><br>"; ?>
     </div>
-
     <div class="col-lg-offset-1 col-md-8">
         <br>
         <a class="btn btn-primary" id="msg-btn">Send Message</a>
@@ -44,29 +43,28 @@ $this->params['breadcrumbs'][] = $this->title;
             selector: "textarea",
             toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
         });
-
-//        $("#msg-btn").click(function()
-//        {
-//            tinyMCE.triggerSave();
-//            var cid = $(".send-msg").val();
-//            var sender = $(".msg-sender").val();
-//            var receiver = $("#seluid").val();
-//            var subject = $(".subject").val();
-//            var body = $("#message").val();
-//            jQuerySubmit('confirm-message',{cid: cid , sender: sender, receiver: receiver, subject: subject, body: body},'sendMessage');
-//        });
+        $("#msg-btn").click(function()
+        {
+            tinyMCE.triggerSave();
+            var cid = $(".send-msg").val();
+            var sender = $(".msg-sender").val();
+            var receiver = $("#seluid").val();
+            var subject = $(".subject").val();
+            var body = $("#message").val();
+            jQuerySubmit('confirm-message',{cid: cid , sender: sender, receiver: receiver, subject: subject, body: body},'sendMessage');
+        });
 
     });
 
-//    function sendMessage(response)
-//    {
-//        var cid = $(".send-msg").val();
-//        console.log(response);
-//        var result = JSON.parse(response);
-//        if(result.status == 0)
-//        {
-//            window.location = "index?cid="+cid;
-//        }
-//    }
+    function sendMessage(response)
+    {
+        var cid = $(".send-msg").val();
+        console.log(response);
+        var result = JSON.parse(response);
+        if(result.status == 0)
+        {
+            window.location = "index?cid="+cid;
+        }
+    }
 
 </script>
