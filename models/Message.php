@@ -67,11 +67,20 @@ class Message extends BaseImasMsgs
     public static function deleteFromReceivedMsg($msgId)
     {
         $message =static::getById($msgId);
-        if($message->isread!=4) {
-            $message->isread = 3;
+        if($message->isread!=4)
+        {
+            if($message->isread==1)
+            {
+                $message->isread=3;
+            }
+            else
+            {
+                $message->isread = 2;
+            }
             $message->save();
         }
-        elseif($message->isread==4){
+        elseif($message->isread==4)
+        {
             $message->delete();
         }
 
@@ -79,14 +88,17 @@ class Message extends BaseImasMsgs
     public static function deleteFromSentMsg($msgId)
     {
         $message =static::getById($msgId);
-        if($message->isread!=3)
-        {
-            $message->isread = 4;
-            $message->save();
-        }
-        elseif($message->isread==3)
+        if($message->isread==2)
         {
             $message->delete();
+        }
+        elseif($message->isread==3) {
+            $message->delete();
+        }
+        else
+        {
+            $message->isread=4;
+            $message->save();
         }
 
     }

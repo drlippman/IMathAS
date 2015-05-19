@@ -42,7 +42,7 @@ AppAsset::register($this);
                     ['label' => 'Home', 'url' => [$basePath.'index']]:
                         ['label' => 'Home', 'url' => [$basePath.'dashboard']],
                     Yii::$app->user->isGuest ?
-                    ['label' => 'About', 'url' => [$basePath.'about']]:'',
+                    ['label' => 'About Us', 'url' => [$basePath.'about']]:'',
                     Yii::$app->user->isGuest ?
                         ['label' => 'Login', 'url' => [$basePath.'login']] :
                         ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',

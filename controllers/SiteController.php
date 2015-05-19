@@ -349,4 +349,15 @@ class SiteController extends AppController
         return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
 
     }
+
+    public function actionHelperGuide()
+    {
+        return $this->renderWithData('help');
+    }
+
+    public function actionDocumentation()
+    {
+        return $this->renderWithData('document');
+    }
+
 }

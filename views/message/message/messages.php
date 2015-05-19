@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
             htmlCourse += "<option value = "+uniqueUserForFilter+">"+uniqueUserForFilter[i]+"</option>"
 
         }
-        $(".show-user").append(htmlCourse);
+      //  $(".show-user").append(htmlCourse);
 
         var result = JSON.parse(response);
         if(result.status == 0)
@@ -121,15 +121,17 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         var html = " ";
         var htmlCourse ="";
-        $.each(messageData, function(index, messageData){
-            if(messageData.isRead == 1)
+        $.each(messageData, function(index, messageData)
+        {
+
+            if(messageData.isread == 1)
             {
-                html += "<tr class='read-message message-row message-row-'"+messageData.msgId+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
+                html += "<tr class='read-message message-row message-row-'"+messageData.id+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
             else{
-                html += "<tr class='unread-message message-row message-row-"+messageData.msgId+"'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.msgId+"' ></td>";
+                html += "<tr class='unread-message message-row message-row-"+messageData.id+"'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.msgId+"'> "+messageData.title+"</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
             if(messageData.replied == 1)
             {
                 html += "<th>Yes</th>";
@@ -139,10 +141,12 @@ $this->params['breadcrumbs'][] = $this->title;
             }
 
             html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
-            html += "<td>"+messageData.msgFrom+"</td>";
-            html += "<td>"+messageData.courseName+"</td>";
-            html += "<td>"+messageData.msgDate+"</td>";
+            html += "<td>"+messageData.FirstName+" "+messageData.LastName+"</td>";
+            html += "<td>"+messageData.name+"</td>";
+            html += "<td>"+messageData.senddate+"</td>";
+
         });
+
         $(".message-table-body tr").remove();
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
@@ -224,8 +228,6 @@ $this->params['breadcrumbs'][] = $this->title;
     function markAsReadSuccess(response)
     {
 
-
-
     }
 
 
@@ -245,7 +247,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     function getUserSuccess(response)
     {
-        console.log(response);
+
         var result = JSON.parse(response);
         if(result.status == 0)
         {
@@ -270,8 +272,7 @@ $this->params['breadcrumbs'][] = $this->title;
             var markArray = [];
             $('.message-table-body input[name="msg-check"]:checked').each(function() {
                 markArray.push($(this).val());
-
-
+                $(this).closest('tr').remove();
                 $(this).prop('checked',false);
             });
             var readMsg={checkedMsg: markArray};
@@ -286,11 +287,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     function filterByUser()
     {
-        $('#user-id').on('change', function() {alert(this.value);
+        $('#user-id').on('change', function() {
             var filteredArray = [];
             var selectedUserId = this.value;
             $.each(messageData, function(index, messageData){
                 if(selectedUserId == messageData.msgFromId){
+
                     filteredArray.push(messageData);
                 }
                 console.log(JSON.stringify(filteredArray));

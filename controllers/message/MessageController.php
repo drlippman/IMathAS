@@ -12,6 +12,7 @@ use Yii;
 use app\controllers\AppController;
 use app\models\forms\MessageForm;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 
 class MessageController extends AppController
@@ -75,39 +76,9 @@ class MessageController extends AppController
     {
 
         if (!$this->isGuestUser()) {
-            $user = $this->getAuthenticatedUser();
-            $params = Yii::$app->request->getBodyParams();
-            $cid = $params['cid'];
-            $userId = $params['userId'];
-            $messageResponse = array();
-            $teachers = Teacher::getTeacherByUserId($userId);
-            foreach ($teachers as $teacher) {
-                $messages = Message::getByCourseId($teacher->courseid);
-                foreach ($messages as $key => $message) {
-                    $fromUser = User::getById($message->msgfrom);
-                    $toUser = User::getById($message->msgto);
-                    $tempArray = array('msgId' => $message->id,
-                        'title' => $message->title,
-                        'replied' => $message->replied,
-                        'msgFrom' => ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName),
-                        'msgFromId' => isset($fromUser) ? $fromUser->id : '',
-                        'msgTo' => isset($toUser) ? $toUser->FirstName : '' . '' . isset($toUser) ? $toUser->LastName : '',
-                        'msgToId' => isset($toUser) ? $toUser->id : '',
-                        'courseId' => $message->courseid,
-                        'courseName' => ucfirst($message->course->name),
-                        'msgDate' => date('M d, o g:i a', $message->senddate),
-                        'isReade' => $message->isread,
-                        'parent' => $message->parent,
-                        'baseId' => $message->baseid,
-                        'msgBody' => $message->message
-                    );
-
-                    array_push($messageResponse, $tempArray);
-                }
-
-                return json_encode(array('status' => 0, 'messageData' => $messageResponse));
-            }
-
+           $uid = Yii::$app->user->identity->getId();
+            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE imas_msgs.msgto='$uid' AND (imas_msgs.isread&2)=0")->queryAll();// AND (imas_msgs.isread&3)=0";
+            return json_encode(array('status' => 0, 'messageData' => $query));
         }
     }
 
@@ -132,39 +103,9 @@ class MessageController extends AppController
     public function actionDisplaySentMessageAjax()
     {
         if (!$this->isGuestUser()) {
-            $user = $this->getAuthenticatedUser();
-            $params = Yii::$app->request->getBodyParams();
-            $cid = $params['cid'];
-            $userId = $params['userId'];
-            $messageResponse = array();
-            $teachers = Teacher::getTeacherByUserId($userId);
-            foreach ($teachers as $teacher) {
-                $messages = Message::getByCourseId($teacher->courseid);
-                foreach ($messages as $key => $message) {
-                    $fromUser = User::getById($message->msgfrom);
-                    $toUser = User::getById($message->msgto);
-                    $tempArray = array('msgId' => $message->id,
-                        'title' => $message->title,
-                        'replied' => $message->replied,
-                        'msgFrom' => ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName),
-                        'msgFromId' => isset($fromUser) ? $fromUser->id : '',
-                        'msgTo' => ucfirst($toUser->FirstName) . ' ' . ucfirst($toUser->LastName),
-                        'msgToId' => isset($toUser) ? $toUser->id : '',
-                        'courseId' => $message->courseid,
-                        'courseName' => $message->course->name,
-                        'msgDate' => date('M d, o g:i a', $message->senddate),
-                        'isRead' => $message->isread,
-                        'parent' => $message->parent,
-                        'baseId' => $message->baseid,
-                        'msgBody' => $message->message
-                    );
-
-                    array_push($messageResponse, $tempArray);
-                }
-            }
-//            $responseArray = array('messageData' => $messageResponse);
-            return json_encode(array('status' => 0, 'messageData' => $messageResponse));
-//            return $this->successResponse();
+            $uid = Yii::$app->user->identity->getId();
+            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.title,imas_msgs.msgTo,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$uid' AND (imas_msgs.isread&4)=0 ")->queryAll();
+            return json_encode(array('status' => 0, 'messageData' => $query));
         }
 
     }
@@ -281,5 +222,31 @@ class MessageController extends AppController
             $this->includeJS(["../js/editor/tiny_mce.js"]);
             return $this->renderWithData('replyMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
+    }
+
+    public function actionGetSentCourseAjax()
+    {
+        $this->guestUserHandler();
+
+        $user = $this->getAuthenticatedUser();
+       $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
+
+         $userId = Yii::$app->user->identity->getId();
+
+        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userId'")->queryAll();
+        return json_encode(array('status' => 0, 'courseData' => $query));
+    }
+
+    public function actionGetSentUserAjax()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $params = Yii::$app->request->getBodyParams();
+        $cid = $params['cid'];
+        $userId = Yii::$app->user->identity->getId();
+        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userId'")->queryAll();
+                return json_encode(array('status' => 0, 'userData' => $query));
+
     }
 }

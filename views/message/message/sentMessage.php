@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
-    <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
+<!--    <input type="hidden" class="send-user-id" value="--><?php //echo $course->ownerid ?><!--">-->
 </div>
 <div class="message-container">
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </span> <span class="col-md-2 select-text-margin" align="center"><b>By Recipient :</b></span>
 
         <span class="col-md-3">
-        <select name="seluid" class="show-users form-control" id="seluid">
+        <select name="seluid" class="show-users form-control" id="user-sent-id">
             <option value="0">Select a user</option>
             </select>
 
@@ -77,20 +77,23 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-course-id").val();
         var userId = $(".send-user-id").val();
-        var inputData = {cid: cid, userId: userId};
+        var inputData = {cid: cid};
 
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
-        jQuerySubmit('get-course-ajax',  inputData, 'getCourseSuccess');
+        jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
+        jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
         markSentDelete();
+        filterByUser();
     });
 
+    var messageData;
     function showMessageSuccess(response)
-    {console.log(response);
+    {
         var filterArrayForUser = [];
         $.each(JSON.parse(response), function(index, messageData){
             $.each(messageData, function(index, msgData){
-                filterArrayForUser.push(msgData.msgTo);      //msgFrom ->msgTo
+                filterArrayForUser.push(msgData.msgTo);
             });
 
         });
@@ -100,32 +103,38 @@ $this->params['breadcrumbs'][] = $this->title;
 
         var htmlCourse = '';
         for(i = 0; i<uniqueUserForFilter.length; i++){
-            htmlCourse += "<option value = messageData.msgTo>"+uniqueUserForFilter[i]+"</option>"  //msgFrom->msgTo
+            htmlCourse += "<option value = messageData.msgTo>"+uniqueUserForFilter[i]+"</option>"
 
         }
-        $(".show-users").append(htmlCourse);
+     // $(".show-users").append(htmlCourse);
 
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-            var messageData = result.messageData;
+             messageData = result.messageData;
             showMessage(messageData);
         }
     }
 
 
-
     function showMessage(messageData)
-    {console.log(messageData);
+    {
         var html = "";
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
-            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.msgId+"' class='message-checkbox-"+messageData.mmsgId+"' ></td>";
+            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             html += "<td><a href='#'>"+messageData.title+"</a></td>";
-            html += "<td>"+messageData.msgTo+"</td>";
-            html += "<td>"+messageData.isRead+"</td>";
-            html += "<td>"+messageData.msgDate+"</td>";
-        });
+            html += "<td>"+messageData.FirstName+" "+messageData.LastName+"</td>";
+            if(messageData.isread==0 || messageData.isread==2)
+            {
+                html+="<td>No</td>";
+            }
+            else{
+                html+="<td>Yes</td>"
+            }
+            html += "<td>"+messageData.senddate+"</td>";
+           });
+        $(".message-table-body tr").remove();
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
     }
@@ -143,24 +152,23 @@ $this->params['breadcrumbs'][] = $this->title;
             })
         });
     }
-    function    getCourseSuccess(response)
-    {
+
+    function    getCourseSuccess(response) {
         var result = JSON.parse(response);
-        if(result.status == 0)
-        {
+        if (result.status == 0) {
             var courseData = result.courseData;
             courseDisplay(courseData);
         }
+    }
 
         function courseDisplay(courseData)
         {
             var html = "";
             $.each(courseData,function(index, courseData){
-                html += "<option value = courseData.courseId>"+courseData.courseName+"</option>"
+                html += "<option value = courseData.id>"+courseData.name+"</option>"
             });
             $(".show-course").append(html);
         }
-    }
    function markSentDelete()
     {
         $("#mark-sent-delete").click(function(){
@@ -178,7 +186,40 @@ $this->params['breadcrumbs'][] = $this->title;
 
     }
     function markDeleteSuccess(){
-            console.log('Success');
+
+    }
+
+    function    getUserSuccess(response) {
+         var result = JSON.parse(response);
+        if (result.status == 0) {
+            var userData = result.userData;
+            userDisplay(userData);
+
+        }
+    }
+
+    function userDisplay(userData)
+    {
+        var html = "";
+        $.each(userData,function(index, userData){
+          html += "<option value = "+userData.id+">"+userData.FirstName+" "+userData.LastName+"</option>"
+        });
+        $(".show-users").append(html);
+
+    }
+    function filterByUser()
+    {
+        $('#user-sent-id').on('change', function() {
+            var filteredArray = [];
+            var selectedUserId = this.value;
+            $.each(messageData, function(index, messageData){
+              if(selectedUserId == messageData.msgTo){
+
+                    filteredArray.push(messageData);
+                }
+                showMessage(filteredArray);
+            });
+        });
     }
 
 </script>
