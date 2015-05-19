@@ -103,4 +103,28 @@ class Message extends BaseImasMsgs
 
     }
 
+    public function createReply($params)
+    {
+        $this->courseid = $params['cid'];
+        $this->msgfrom = isset($params['sender']) ? $params['sender'] : null;
+        $this->msgto = isset($params['receiver']) ? $params['receiver'] : null;
+        $this->title = isset($params['subject']) ? $params['subject'] : null;
+        $this->message = isset($params['body']) ? $params['body'] : null;
+        $this->parent = isset($params['parentId']) ? $params['parentId'] : null;
+        $baseId = isset($params['baseId']) ? $params['baseId'] : null;
+        if ($baseId != 0)
+        {
+            $this->baseid = isset($params['baseId']) ? $params['baseId'] : null;
+
+        }else{
+
+            $baseId = isset($params['parentId']) ? $params['parentId'] : null;
+            $this->baseid = $baseId;
+        }
+        $sendDate = strtotime(date('F d, o g:i a'));
+        $this->senddate = $sendDate;
+        $this->save();
+        return $this->id;
+    }
+
 }

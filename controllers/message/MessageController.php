@@ -249,4 +249,24 @@ class MessageController extends AppController
                 return json_encode(array('status' => 0, 'userData' => $query));
 
     }
+
+    public function actionReplyMessageAjax()
+    {
+        $this->guestUserHandler();
+        if (Yii::$app->request->post()) {
+        $params = Yii::$app->request->getBodyParams();
+        if ($this->getAuthenticatedUser()) {
+            if ($params['receiver'] != 0 && $params['cid'] != null) {
+                $message = new Message();
+                $message->createReply($params);
+            }
+         return json_encode(array('status' => 0));
+         }
+        }
+    }
+
+    public function actionViewConversation()
+    {
+        return $this->renderWithData('viewConversation');
+    }
 }

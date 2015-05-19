@@ -9,14 +9,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="">
     <h2><b>Reply</h2>
     <input type="hidden" class="send-msg" value="<?php echo $messages->courseid ?>">
-    <input type="hidden" class="msg-sender" value="<?php echo $messages->msgto ?>">
+    <input type="hidden" class="msg-receiver" value="<?php echo $messages->msgto ?>">
     <input type="hidden" class="msg-sender" value="<?php echo $messages->msgfrom ?>">
+    <input type="hidden" class="base-id" value="<?php echo $messages->baseid ?>">
+    <input type="hidden" class="parent-id" value="<?php echo $messages->id ?>">
+    <input type="hidden" class="is-replied" value="<?php echo $messages->replied ?>">
     <div class="drop-down">
         <div class="col-md-1"><b>To</b></div>
         <div class="col-md-11"><?php echo ucfirst($fromUser->FirstName).' '.ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a href="#">email</a>&nbsp;|&nbsp;<a href="#">gradebook</a></div>
     </div>
     <br><br>
-    <div class="drop-down">
+    <div class="sent-date">
         <div class="col-md-1"><b>Sent</b></div>
         <div class="col-md-8"><?php echo date('M d, o g:i a' ,$messages->senddate) ?></div>
     </div>
@@ -48,16 +51,21 @@ $this->params['breadcrumbs'][] = $this->title;
             tinyMCE.triggerSave();
             var cid = $(".send-msg").val();
             var sender = $(".msg-sender").val();
-            var receiver = $("#seluid").val();
+            var receiver = $(".msg-receiver").val();
             var subject = $(".subject").val();
             var body = $("#message").val();
-            jQuerySubmit('confirm-message',{cid: cid , sender: sender, receiver: receiver, subject: subject, body: body},'sendMessage');
+            var parentId = $(".parent-id").val();
+            var baseId = $(".base-id").val();
+            var isReplied = $(".is-replied").val();
+            var messageDetails = {cid: cid , sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied};
+            alert(JSON.stringify(messageDetails));
+            jQuerySubmit('reply-message-ajax',messageDetails,'replyMessage');
         });
 
     });
 
-    function sendMessage(response)
-    {
+    function replyMessage(response)
+    {console.log(response);
         var cid = $(".send-msg").val();
         console.log(response);
         var result = JSON.parse(response);
