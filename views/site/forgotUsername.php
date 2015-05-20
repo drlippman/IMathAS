@@ -24,7 +24,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <?= Html::submitButton('Submit', ['id' => 'button-username','class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
             &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
 
         </div>
