@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
+use app\components\AppUtility;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
@@ -36,6 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'password')->passwordInput() ?>
 
+    <div class="col-lg-0 pull-left">   <a href="/var/www/openmath/views/site/help.php" target="_blank"> <img src="../../../web/img/help.gif"></a></div>
         <?=
         $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User',
             AppConstant::STUDENT_RIGHT => 'Student',
@@ -49,9 +51,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-5">
-                <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+                <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
             </div>
         </div>
     </fieldset>
+    <script>
+        function myFunction() {
+            window.open("<?php AppUtility::getURLFromHome('site', 'help','top=0,width=400,height=500,scrollbars=1'); ?>");
+        }
+    </script>
     <?php ActiveForm::end(); ?>
+<!--    <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>-->
 </div>

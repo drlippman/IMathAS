@@ -217,6 +217,7 @@ class SiteController extends AppController
                 $message .= "All usernames using this email address are listed below</p><p>";
                 $message .= "Username: <b>" . $user->SID . " </b> <br/>.";
                 AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
+                $model = new ForgotUsernameForm();
                 $this->setSuccessFlash('Username sent to your registered email.');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_EMAIL);

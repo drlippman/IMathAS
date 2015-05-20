@@ -55,7 +55,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
             <a class="btn btn-primary  btn-danger" id="mark-delete">Delete</a>
     </div>
-
     <table id="message-table display-message-table" class="message-table display-message-table">
         <thead>
         <tr>
@@ -123,11 +122,13 @@ $this->params['breadcrumbs'][] = $this->title;
         $.each(messageData, function(index, messageData)
         {
 
+
             if(messageData.isread == 1 || messageData.isread == 5)
-            {
+             {
                 html += "<tr class='read-message message-row message-row-'"+messageData.id+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
-            else{
+            else
+            {
                 html += "<tr class='unread-message message-row message-row-"+messageData.id+"'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
@@ -138,10 +139,17 @@ $this->params['breadcrumbs'][] = $this->title;
             else{
                 html += "<th>No</th>";
             }
-
-            html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
+            var rowid = messageData.id;
+            if(messageData.isread == 9 || messageData.isread == 8  )
+            {
+                html += "<td><img src='../../../web/img/flagfilled.gif' onclick='changeImage(this,"+rowid+")'/></td>";
+            }
+            else if(messageData.isread == 1 || messageData.isread == 0){
+                html += "<td><img src='../../../web/img/flagempty.gif' onclick='changeImage(this,"+rowid+")'/></td>";
+            }
             html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
             html += "<td>"+messageData.name.substr(0,1).toUpperCase()+ messageData.name.substr(1)+"</td>";
+
             html += "<td>"+messageData.senddate+"</td>";
 
         });
@@ -305,5 +313,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 });
             }
         });
+    }
+
+    function changeImage(element,rowId) {
+        element.src = element.bln ? "../../../web/img/flagempty.gif" : "../../../web/img/flagfilled.gif";
+        element.bln = !element.bln;
+        var row={rowId: rowId};
+
+        jQuerySubmit('change-image-ajax', row , 'changeImageSuccess');
+
+
+    }
+    function changeImageSuccess(response)
+    {
+
+
     }
 </script>

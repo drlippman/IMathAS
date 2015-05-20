@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <p>Showing Number of Logins May 5,2015 through May 17,2015
         <div class="pull-left select-text-margin">
-            <a id="previous-link">Show previous week.</a>&nbsp;&nbsp;<a id="following-link">Show following week.</a> &nbsp;&nbsp;
+            <div id="previous-link">Show previous week.</div>&nbsp;&nbsp;<div id="following-link">Show following week.</div> &nbsp;&nbsp;
             <div class="pull-right"> Show</div>
         </div>
         <div class="col-lg-3 pull-left" id="datepicker-id">
@@ -25,11 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
             echo DatePicker::widget([
                 'name' => 'dp_3',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("d-M-Y",strtotime("-1 week")),
+                'value' => date("m-d-Y",strtotime("-1 week")),
                 'pluginOptions' => [
 
                     'autoclose' => true,
-                    'format' => 'dd-M-yyyy'
+                    'format' => 'mm-dd-yyyy'
                 ]
             ]);
             ?>
@@ -41,10 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
         echo DatePicker::widget([
             'name' => 'dp_3',
             'type' => DatePicker::TYPE_COMPONENT_APPEND,
-            'value' => date("d-M-Y"),
+            'value' => date("m-d-Y"),
             'pluginOptions' => [
                 'autoclose' => true,
-                'format' => 'dd-M-yyyy' ]
+                'format' => 'mm-dd-yyyy' ]
         ]);
         ?>
     </div>
@@ -65,7 +65,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <script language="javascript" type="text/javascript">
 
     $( document ).ready(function() {
+        var startDate = $( "#datepicker-id input" ).val();
+        var endDate = $( "#datepicker-id1 input" ).val();
 
+        var course_id =  $( "#course-id" ).val();
+        var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
+        jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
         $("#go-button").click(function () {
             var startDate = $( "#datepicker-id input" ).val();
             var endDate = $( "#datepicker-id1 input" ).val();
@@ -74,27 +79,45 @@ $this->params['breadcrumbs'][] = $this->title;
             var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
 
             jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
-
-
         });
+
     });
+
+    function pad(number, length) {
+
+        var str = '' + number;
+        while (str.length < length) {
+            str = '0' + str;
+        }
+        return str;
+    }
+
+    function toggleDate(selector, dayDiff, adjustment) {
+        inputString = $("#"+selector).val();
+        var dString = inputString.split('-');
+
+        var dt = new Date(dString[2], dString[0] - 1, dString[1]);
+        dayDiff = parseInt(dayDiff);
+        if (adjustment == 'add') {
+            dt.setDate(dt.getDate()+dayDiff);
+
+        } else{
+            dt.setDate(dt.getDate()-dayDiff);
+        }
+
+        var finalDate = pad(dt.getMonth()+1,2) + "-" + pad(dt.getDate(),2) + "-" + dt.getFullYear();
+        return finalDate;
+    }
 
     $( document ).ready(function() {
 
         $("#previous-link").click(function () {
+            finalDate = toggleDate('w0', 7, 'deduct');
+            $( "#w0").val(finalDate);
 
-            var startDate = $( "#datepicker-id input" ).val();
-            var endDate = $( "#datepicker-id1 input" ).val();
-            alert(startDate);
-            newStartDate = startDate-7;
-            newEndDate = startDate;
-
-            var course_id =  $( "#course-id" ).val();
-            var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
-
-            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewPreviousLinkSuccess');
-
-
+            finalDate = toggleDate('w1', 7, 'deduct');
+            $( "#w1").val(finalDate);
+            $('go-button').trigger('click');
         });
     });
 
@@ -144,16 +167,28 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#table_placeholder').html(tableString);
     }
 
-
     function loginGridViewPreviousLinkSuccess(response) {
-        console.log(JSON.parse(response));
-        var data = JSON.parse(response);
 
-        var start=data.startDate;
-        var end=data.endDate;
 
-        end = start - 86400;
-        start=start-(7*86400);
+//        var data = JSON.parse(response);
+//        data = data.data;
+//        //data = response;
+//        var tableString = '';
+//        headerArray = data.header;
+//        //rows = data.rows;
+//        tableString = "<table border='1px'><tr>";
+//
+//
+//        for(i=0; i<headerArray.length; i++) {
+//            tableString = tableString + "<th>" + headerArray[i] + "</th>";
+//            var start = headerArray[1];
+//            var end = headerArray[headerArray.length-1];
+//        }
+////        var start = strtotime('22-09-2008');
+//alert(start);
+
+            end = start - 86400;
+            start = start - (7 * 86400);
 
 
         var html = "";
