@@ -286,7 +286,7 @@ $this->params['breadcrumbs'][] = $this->title;
             if(selectedCourseId == 0 ){
                 showMessage(messageData);
             }else{
-                $.each(messageData, function(index, messageData){alert(messageData);
+                $.each(messageData, function(index, messageData){
                     if(selectedCourseId == messageData.courseid ){
                         filteredArray.push(messageData);
                     }
