@@ -242,3 +242,10 @@ ul#navlist a {
 #button-username{
     margin-left: 1px;
 }
+
+#sign-up-button{
+    margin-left: 1px;
+}
+.padding-zero{
+    padding: 0px;
+}

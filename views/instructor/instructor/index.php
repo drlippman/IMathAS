@@ -12,13 +12,13 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
 
-    <div class="col-lg-3 needed pull-left">
+    <div class="col-lg-2 needed pull-left">
         <?php echo $this->render('_leftSideTeacher', ['course' => $course]); ?>
     </div>
 
     <!--Course name-->
-
-    <div class="courseText">
+<div class="col-lg-10 pull-left">
+    <div class="course-title">
         <h3><b><?php echo ucfirst($course->name) ?></b></h3>
 
         <div class="col-lg-offset-3 buttonAlignment">
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary" href="#">Quick Rearrange</a>
         </div>
     </div>
-    <div class="courseText">
+    <div class="course-content">
         <p><strong>Welcome to your course!</strong></p>
 
         <p> To start by copying from another course, use the <a href="#">Course Items: Copy link</a> along the left side
@@ -38,8 +38,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p> If you want to build from scratch, use the "Add An Item" pulldown below to get started. </p>
 
-        <div class="col-lg-3 pull-left">
-            <select name="seluid" class="dropdown form-control addDropdown" id="seluid">
+        <div class="col-lg-3 pull-left padding-zero">
+            <select name="seluid" class="dropdown form-control" id="seluid">
                 <option value>Add an item...</option>
                 <option value="assessment">Add Assessment</option>
                 <option value="inlinetext">Add Inline Text</option>
@@ -51,3 +51,4 @@ $this->params['breadcrumbs'][] = $this->title;
             </select>
         </div>
     </div>
+  </div>

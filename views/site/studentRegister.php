@@ -6,11 +6,11 @@ use yii\bootstrap\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\RegisterModel */
 
-$this->title = 'New Use Registration';
+$this->title = 'New User Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <p>Please fill out the following fields to signUp</p>
+    <p>Please fill out the following fields to SignUp</p>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -36,18 +36,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?=
     $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',
-        ['template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-        ])->checkbox() ?>
+        ['template' => "<div class=\"col-lg-offset-2 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+        ])->checkboxList(['1' => 'Notify Me By Email When I Receive A New Message']) ?>
 
     <?php echo "If you already know your course ID, you can enter it now. Otherwise, leave this blank and you can enroll later." ?>
-
+<br><br>
     <?= $form->field($model, 'courseID') ?>
 
     <?= $form->field($model, 'EnrollmentKey') ?>
 
     <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('SignUp', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+        <div  class="col-lg-offset-2 col-lg-2">
+            <?= Html::submitButton('SignUp', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>
 
