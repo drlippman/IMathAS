@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Forget Username';
+$this->title = 'Forgot Username';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
+            <?= Html::submitButton('Submit', ['id' => 'button-username','class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
         </div>
     </div>
 

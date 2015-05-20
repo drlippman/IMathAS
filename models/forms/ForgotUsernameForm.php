@@ -10,8 +10,8 @@ class ForgotUsernameForm extends Model
     {
         return
             [
-                [['email'],'required'],
-                [['email'],'email'],
+                [['email'],'required', 'message' => 'Email address cannot be blank'],
+                [['email'],'email','message' => 'Enter a valid email address.'],
             ];
     }
 
