@@ -60,9 +60,9 @@ class Message extends BaseImasMsgs
         return static::findOne($id);
     }
 
-    public static function getByMsgId($msgId)
+    public static function getByMsgId($msgId,$baseId)
     {
-        return static::findOne($msgId);
+        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
     }
     public static function deleteFromReceivedMsg($msgId)
     {

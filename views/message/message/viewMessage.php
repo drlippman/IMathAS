@@ -3,7 +3,6 @@
     $this->title = 'Messages';
     $this->params['breadcrumbs'][] = $this->title;
     echo $this->render('../../instructor/instructor/_toolbarTeacher');
-
 ?>
     <div id="headerviewmsg">
         <h2>Message</h2>
@@ -35,7 +34,7 @@
         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id='.$messages->id);?>" class="btn btn-primary ">Reply</a>&nbsp;
         <a class="btn btn-primary ">Mark Unread</a>&nbsp;
         <a class="btn btn-primary  btn-danger">Delete</a>&nbsp;
-        <a href="">View Conversation</a> |
+        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>">View Conversation</a> |
         <a href="">Gradebook</a>
      </div>
 

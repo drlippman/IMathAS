@@ -267,6 +267,14 @@ class MessageController extends AppController
 
     public function actionViewConversation()
     {
-        return $this->renderWithData('viewConversation');
+        $this->guestUserHandler();
+        $baseId = Yii::$app->request->get('baseid');
+        $msgId = Yii::$app->request->get('id');
+        if ($this->getAuthenticatedUser()) {
+            $messages = Message::getByMsgId($msgId,$baseId);
+            AppUtility::dump($messages);
+            $fromUser = User::getById($messages->msgfrom);
+            return $this->renderWithData('viewConversation', ['messages' => $messages, 'fromUser' => $fromUser]);
+        }
     }
 }
