@@ -1,11 +1,10 @@
-<link href='<?php AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
-
+<link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
     <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -111,7 +110,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
     <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
         <div class="item">
-        <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
         <div class="title">
         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
     <?php echo $forum->name ?></a></b>
@@ -123,7 +122,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     </div>
 <?php } elseif ($forum->avail == 2) { ?>
     <div class="item">
-        <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
 
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -145,7 +144,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
     <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
         <div class="item">
-        <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+        <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
         <div class="title">
         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -163,7 +162,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
 <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
     <div class="item">
-        <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+        <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -193,7 +192,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <!--Link type : http-->
     <?php if ((substr($link->text, 0, 4) == 'http')) { ?>
         <div class="item">
-            <img alt="link to web" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/web.png"/>
+            <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
 
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -209,7 +208,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
         <div class="item">
-            <img alt="link to doc" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/doc.png"/>
+            <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
 
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -225,7 +224,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
     <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
         <div class="item">
-            <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+            <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
             <div class="title">
 
@@ -244,7 +243,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         </div>
         <?php } else { ?>
             <div class="item">
-                <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                 <div class="title">
                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -259,7 +258,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <!--Hide ends-->
     <?php } elseif ($link->avail == 2 && $link->enddate == 2000000000) { ?>
         <div class="item">
-            <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+            <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -283,7 +282,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') { ?>
-                <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                 <div class="title"><b><?php echo $inline->title ?></b>
                 </div>
             <?php } ?>
@@ -306,7 +305,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') { ?>
-                <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                 <div class="title"><b><?php echo $inline->title ?></b>
                 </div>
             <?php } ?>
@@ -342,20 +341,20 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         <div class=block>
             <?php if (strlen($block['SH']) == 1 || $block['SH'][1] == 'O') { ?>
                 <span class=left>
-                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php AppUtility::getHomeURL() ?>img/collapse.gif"
+                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"
                      onClick="toggleblock('3','0-9')"/>
                 </span>
             <?php } elseif (strlen($block['SH']) > 1) { ?>
                 <span class=left>
-            <img alt="folder" src="<?php AppUtility::getHomeURL() ?>img/folder2.gif">
+            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
         </span>
             <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
                 <span class=left>
-            <img alt="folder" src="<?php AppUtility::getHomeURL() ?>img/folder_tree.png">
+            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
         </span>
          <?php } else { ?>
                 <span class=left>
-                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php AppUtility::getHomeURL() ?>img/collapse.gif"
+                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"
                      onClick="toggleblock('3','0-9')"/>
                 </span>
     <?php }?>
@@ -432,7 +431,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                                 <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
                                     <div class="item">
-                                    <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+                                    <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
                                     <div class="title">
                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
                                 <?php echo $forum->name ?></a></b>
@@ -444,7 +443,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                 </div>
                             <?php } elseif ($forum->avail == 2) { ?>
                                 <div class="item">
-                                    <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+                                    <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -465,7 +464,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                                 <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
                                     <div class="item">
-                                    <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                    <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
                                     <div class="title">
                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -483,7 +482,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                             <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
                                 <div class="item">
-                                    <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                    <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -512,7 +511,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                 <!--Link type : http-->
                                 <?php if ((substr($link->text, 0, 4) == 'http')) { ?>
                                     <div class="item">
-                                        <img alt="link to web" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/web.png"/>
+                                        <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
 
                                         <div class="title">
                                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -528,7 +527,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                                 <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
                                     <div class="item">
-                                        <img alt="link to doc" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/doc.png"/>
+                                        <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
 
                                         <div class="title">
                                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -544,7 +543,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                                 <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
                                     <div class="item">
-                                        <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                        <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                         <div class="title">
 
@@ -563,7 +562,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                     </div>
                                 <?php } else { ?>
                                     <div class="item">
-                                        <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                        <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                         <div class="title">
                                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -578,7 +577,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                 <!--Hide ends-->
                             <?php } elseif ($link->avail == 2 && $link->enddate == 2000000000) { ?>
                                 <div class="item">
-                                    <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                    <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -599,7 +598,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') { ?>
-                                    <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                     <div class="title"><b><?php echo $inline->title ?></b>
                                     </div>
                                 <?php } ?>
@@ -622,7 +621,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') { ?>
-                                    <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                     <div class="title"><b><?php echo $inline->title ?></b>
                                     </div>
                                 <?php } ?>
@@ -658,15 +657,15 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <div class=block>
     <?php if (strlen($block['SH']) > 1 && $block['SH'][1] == 'F') { ?>
         <span class=left>
-            <img alt="folder" src=".<?php AppUtility::getHomeURL() ?>img/folder2.gif">
+            <img alt="folder" src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
                     </span>
     <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
         <span class=left>
-            <img alt="folder" src="<?php AppUtility::getHomeURL() ?>img/folder_tree.png">
+            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
                     </span>
     <?php } else { ?>
         <span class=left>
-                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php AppUtility::getHomeURL() ?>img/expand.gif"
+                <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php echo AppUtility::getHomeURL() ?>img/expand.gif"
                      onClick="toggleblock('3','0-9')"/>
                 </span>
     <?php } ?>
@@ -743,7 +742,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
                                 <div class="item">
-                                <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
                                 <div class="title">
                                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
                             <?php echo $forum->name ?></a></b>
@@ -755,7 +754,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             </div>
                         <?php } elseif ($forum->avail == 2) { ?>
                             <div class="item">
-                                <img alt="forum" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/forum.png"/>
+                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
 
                                 <div class="title">
                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -776,7 +775,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
                                 <div class="item">
-                                <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
                                 <div class="title">
                                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -794,7 +793,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                         <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
                             <div class="item">
-                                <img alt="wiki" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
 
                                 <div class="title">
                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -823,7 +822,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <!--Link type : http-->
                             <?php if ((substr($link->text, 0, 4) == 'http')) { ?>
                                 <div class="item">
-                                    <img alt="link to web" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/web.png"/>
+                                    <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -839,7 +838,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                             <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
                                 <div class="item">
-                                    <img alt="link to doc" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/doc.png"/>
+                                    <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -855,7 +854,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 
                             <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
                                 <div class="item">
-                                    <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                    <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                     <div class="title">
 
@@ -874,7 +873,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                 </div>
                             <?php } else { ?>
                                 <div class="item">
-                                    <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                    <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -889,7 +888,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <!--Hide ends-->
                         <?php } elseif ($link->avail == 2 && $link->enddate == 2000000000) { ?>
                             <div class="item">
-                                <img alt="link to html" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/html.png"/>
+                                <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
 
                                 <div class="title">
                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
@@ -910,7 +909,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') { ?>
-                                    <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                     <div class="title"><b><?php echo $inline->title ?></b>
                                     </div>
                                 <?php } ?>
@@ -933,7 +932,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') { ?>
-                                    <img alt="text item" class="floatleft" src="<?php AppUtility::getHomeURL() ?>img/inline.png"/>
+                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                     <div class="title"><b><?php echo $inline->title ?></b>
                                     </div>
                                 <?php } ?>
