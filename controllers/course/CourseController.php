@@ -161,7 +161,7 @@ class CourseController extends AppController
 
         $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
+        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
     }
 
     public function actionLatePass()
