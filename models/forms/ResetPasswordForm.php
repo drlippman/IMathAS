@@ -12,7 +12,7 @@ class ResetPasswordForm extends Model
         return
             [
                 [['confirmPassword','newPassword'],'required'],
-                ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword'],
+                ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword', 'message' => 'Confirm password does not match with password.' ],
             ];
 
     }

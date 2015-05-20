@@ -20,11 +20,17 @@ use app\components\AppUtility;
     $hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
     $min = floor((abs($assessments->timelimit)%3600)/60);
 ?>
-    <span id="timercontent"><b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
+
+    <span id="timercontent">
+        <?php if($assessments->timelimit != 0) {?>
+        <b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
         <span id="timerwrap">
             <b>
             <span id='timer'></span>remaining.</span>
              </b>
+        <?php }else {
+            echo 'Due ' . AppUtility::formatDate($assessments->enddate);
+         }?>
     </span>
 
 </div>
@@ -50,12 +56,14 @@ use app\components\AppUtility;
 <!--        Display left side: question list-->
     <ul class=qlist>
         <li>
+
 <!--            <span class=current>-->
                 <img alt="untried" src="/IMathAS/img/te_blue_arrow.png"/>
                 <a href="<?php echo AppUtility::getURLFromHome('course', 'course/question?to=' . $question->id) ?>">Q <?php echo $key+1?></a> (0/<?php echo $question->points ?>)
 
                 <input type="hidden" id="questionSet" class="questionId" value="<?php echo $question->id ?>">
             <!--            </span>-->
+
         </li>
     </ul>
     <?php }?>
@@ -97,7 +105,10 @@ use app\components\AppUtility;
             <a  id="LicensePopup">License</a>
         </span>Points possible: <?php echo $question->points?><br/>This is attempt 1 of <?php echo $question->id?>.
             <input type=hidden id="verattempts" name="verattempts" value="0"/>
+
              </div>
+
+
         <input type="submit" class="btn" value="Submit"/>
     </form>
 </div>

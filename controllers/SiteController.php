@@ -249,6 +249,7 @@ class SiteController extends AppController
                 $user->remoteaccess = null;
                 $user->save();
                 $this->setSuccessFlash('Your password is changed successfully.');
+                return $this->redirect('login');
             }
 
         }else{

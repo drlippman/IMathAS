@@ -195,7 +195,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 }
 .ahref-align
 {
-    margin-left: 12px;
+    margin-left: 0px;
 }
 .course
 {
@@ -248,4 +248,11 @@ ul#navlist a {
 }
 .padding-zero{
     padding: 0px;
+    margin-left: 0.5px;
+}
+
+#button-align
+{
+    margin-left: 76px;
+
 }

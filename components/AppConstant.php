@@ -61,6 +61,6 @@ class AppConstant {
     const callength = 4;
     const pageshift = 0;
 
-
+    const SET_PASSWORD_ERROR = 'Password incorrect.  Try again.';
 
 }

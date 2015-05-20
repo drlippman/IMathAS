@@ -11,6 +11,7 @@ use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\forms\CourseSettingForm;
+use app\models\forms\SetPassword;
 use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
@@ -135,12 +136,11 @@ class CourseController extends AppController
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
         $timelimit =$assessment->timelimit;
-        $this->includeCSS(['../css/fullcalendar.min.css']);
-        $this->includeCSS(['../css/calendar.css']);
-        $this->includeJS(['../js/moment.min.js']);
-        $this->includeJS(['../js/fullcalendar.min.js']);
+        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css']);
+        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
-        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentsession' =>$assessmentSession,'now' => $now, 'timelimit' => $timelimit ]);
+
+        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student]);
 
     }
 
@@ -162,17 +162,8 @@ class CourseController extends AppController
 
         $this->saveAssessmentSession($assessment, $id);
 
-//
-//        $assessmentSession = new AssessmentSession();
-//        $assessmentSession->attributes = $param;
-//        $assessmentSession->save();
-
-        $this->includeCSS(['../css/mathtest.css']);
-        $this->includeCSS(['../css/default.css']);
-        $this->includeCSS(['../css/showAssessment.css']);
+        $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
-        $this->includeJS(['../js/student.js']);
-
         return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
     }
 
@@ -257,9 +248,34 @@ class CourseController extends AppController
         $questionId = $this->getParamVal('to');
         AppUtility::basicShowQuestions($questionId);
         die;
-        $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$questionId));
+        $this->render(AppUtility::getURLFromHome('course','course/showAssessment?id='.$questionId));
 
     }
+
+    public function actionPassword()
+    {
+        $this->guestUserHandler();
+        $model = new SetPassword();
+        $assessmentId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
+        $assessment = Assessments::getByAssessmentId($assessmentId);
+
+        if ($this->isPostMethod())
+        {
+            $params = $this->getBodyParams();
+            $password = $params['SetPassword']['password'];
+            if($password == $assessment->password)
+            {
+                //return $this->redirect('show-assessment');
+            }
+            else
+            {
+                $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
+            }
+        }
+        return $this->renderWithData('setPassword', ['model' => $model, 'assessments' => $assessment]);
+    }
+
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
