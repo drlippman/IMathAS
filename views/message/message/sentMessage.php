@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
-<!--    <input type="hidden" class="send-user-id" value="--><?php //echo $course->ownerid ?><!--">-->
+    <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
 </div>
 <div class="message-container">
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Courses :</b></span>
         <span class="col-md-3">
-            <select name="seluid" class="show-course form-control" id="seluid">
+            <select name="seluid" class="show-course form-control" id="course-sent-id">
             <option value="0">All Courses</option>
 
         </select>
@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <a id="check-all-box" class="check-all" href="#">All</a>
             With Selected:
             <a class="btn btn-primary btn-sm"id="mark-sent-delete">Remove From Sent Message List</a>
-            <a class="btn btn-primary btn-sm">Unsend</a>
+            <a class="btn btn-primary btn-sm" id="mark-unsend">Unsend</a>
         </p>
 
     </div>
@@ -77,20 +77,20 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var cid = $(".send-course-id").val();
         var userId = $(".send-user-id").val();
-        var inputData = {cid: cid};
+        var inputData = {cid: cid, userId: userId};
 
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
         jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
         jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
         markSentDelete();
-        filterByUser();
+        markUnsend();
     });
 
     var messageData;
     function showMessageSuccess(response)
     {
-        var filterArrayForUser = [];
+       var filterArrayForUser = [];
         $.each(JSON.parse(response), function(index, messageData){
             $.each(messageData, function(index, msgData){
                 filterArrayForUser.push(msgData.msgTo);
@@ -124,8 +124,8 @@ $this->params['breadcrumbs'][] = $this->title;
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             html += "<td><a href='#'>"+messageData.title+"</a></td>";
-            html += "<td>"+messageData.FirstName+" "+messageData.LastName+"</td>";
-            if(messageData.isread==0 || messageData.isread==2)
+            html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
+            if(messageData.isread==0)
             {
                 html+="<td>No</td>";
             }
@@ -158,6 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
         if (result.status == 0) {
             var courseData = result.courseData;
             courseDisplay(courseData);
+            filterByCourse();
         }
     }
 
@@ -165,7 +166,7 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             var html = "";
             $.each(courseData,function(index, courseData){
-                html += "<option value = courseData.id>"+courseData.name+"</option>"
+                html += "<option value = "+courseData.id+">"+courseData.name.substr(0,1).toUpperCase()+ courseData.name.substr(1)+"</option>"
             });
             $(".show-course").append(html);
         }
@@ -189,12 +190,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     }
 
-    function    getUserSuccess(response) {
+    function getUserSuccess(response) {
          var result = JSON.parse(response);
         if (result.status == 0) {
             var userData = result.userData;
             userDisplay(userData);
-
+            filterByUser();
         }
     }
 
@@ -202,7 +203,7 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         var html = "";
         $.each(userData,function(index, userData){
-          html += "<option value = "+userData.id+">"+userData.FirstName+" "+userData.LastName+"</option>"
+          html += "<option value = "+userData.id+">"+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1)+" "+userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1)+"</option>"
         });
         $(".show-users").append(html);
 
@@ -212,13 +213,86 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#user-sent-id').on('change', function() {
             var filteredArray = [];
             var selectedUserId = this.value;
-            $.each(messageData, function(index, messageData){
-              if(selectedUserId == messageData.msgTo){
+            if (selectedUserId == 0){
+                showMessage(messageData);
+            }else {
+                $.each(messageData, function(index, messageData){
+                    if(selectedUserId == messageData.msgto){
 
-                    filteredArray.push(messageData);
+                        filteredArray.push(messageData);
+                    }
+                    showMessage(filteredArray);
+                });
+            }
+        });
+    }
+
+    function markUnsend() {
+
+       $("#mark-unsend").click(function (e) {
+
+           var html = '<div><p>Are you sure? This will delete your message from</p>'+
+               '<p>the receivers inbox and your sent list.</p></div>';
+
+           var cancelUrl = $(this).attr('href');
+            e.preventDefault();
+            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Cancel": function () {
+
+                        $(this).dialog('destroy').remove();
+                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+
+                            $(this).prop('checked', false);
+
+                        });
+                        return false;
+                    },
+                    "confirm": function () {
+//                            window.location = cancelUrl;
+                        $(this).dialog("close");
+
+                        var markArray = [];
+                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                            markArray.push($(this).val());
+                            $(this).closest('tr').remove();
+                            $(this).prop('checked', false);
+
+                        });
+                        var readMsg = {checkedMsgs: markArray};
+                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'markUnsendSuccess');
+                        return true;
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
                 }
-                showMessage(filteredArray);
+
             });
+        });
+    }
+    function markUnsendSuccess(){
+
+    }
+
+    function filterByCourse()
+    {
+        $('#course-sent-id').on('change', function() {
+            var filteredArray = [];
+            var selectedCourseId = this.value;
+            if(selectedCourseId == 0 ){
+                showMessage(messageData);
+            }else{
+                $.each(messageData, function(index, messageData){alert(messageData);
+                    if(selectedCourseId == messageData.courseid ){
+                        filteredArray.push(messageData);
+                    }
+                    showMessage(filteredArray);
+                });
+            }
         });
     }
 

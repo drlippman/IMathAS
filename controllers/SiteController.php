@@ -187,13 +187,14 @@ class SiteController extends AppController
             $toEmail = $user->email;
             $id = $user->id;
 
-            $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
-            $message .= "<p>Your username was entered in the Reset Password page.  If you did not do this, you may ignore and delete this message. ";
-            $message .= "If you did request a password reset, click the link below, or copy and paste it into your browser's address bar.  You ";
-            $message .= "will then be prompted to choose a new password.</p>";
-            $message .= "<a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
-            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
 
+            $message = "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
+            $message .= "<p>Click on the link below to reset your password using our secure server:</p>";
+            $message .= "<p><a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
+            $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
+            $message .= "<p>If you did not request to have your password reset you can safely ignore this email. Rest assured your account is safe.</p>";
+            $message .= "<p>If clicking the link does not seem to work, you can copy and paste the link into your browser's address window, or retype it there. Once you have returned to OpenMath, we will give instructions for resetting your password.</p>";
+            $message .= "</p><h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
             AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
             $model = new ForgotPasswordForm();
             $this->setSuccessFlash('Password reset link sent to your registered email.');

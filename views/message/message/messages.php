@@ -84,7 +84,6 @@ $this->params['breadcrumbs'][] = $this->title;
         jQuerySubmit('get-user-ajax',  allMessage, 'getUserSuccess');
         selectCheckBox();
         markAsRead();
-        filterByUser();
         markAsUnread();
         markAsDelete();
     });
@@ -124,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
         $.each(messageData, function(index, messageData)
         {
 
-            if(messageData.isread == 1)
+            if(messageData.isread == 1 || messageData.isread == 5)
             {
                 html += "<tr class='read-message message-row message-row-'"+messageData.id+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
@@ -141,8 +140,8 @@ $this->params['breadcrumbs'][] = $this->title;
             }
 
             html += "<td><img  src='../../../web/img/flagempty.gif'></td>";
-            html += "<td>"+messageData.FirstName+" "+messageData.LastName+"</td>";
-            html += "<td>"+messageData.name+"</td>";
+            html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
+            html += "<td>"+messageData.name.substr(0,1).toUpperCase()+ messageData.name.substr(1)+"</td>";
             html += "<td>"+messageData.senddate+"</td>";
 
         });
@@ -236,24 +235,27 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#course-id').on('change', function() {
             var filteredArray = [];
             var selectedCourseId = this.value;
+            if(selectedCourseId == 0 ){
+                    showMessage(messageData);
+            }else{
             $.each(messageData, function(index, messageData){
-                if(selectedCourseId == messageData.courseId ){
+                if(selectedCourseId == messageData.courseid ){
                     filteredArray.push(messageData);
                 }
                 showMessage(filteredArray);
             });
-            });
+            }
+        });
     }
 
     function getUserSuccess(response)
     {
-
         var result = JSON.parse(response);
         if(result.status == 0)
         {
             var userData = result.userData;
             userDisplay(userData);
-
+            filterByUser();
         }
     }
 
@@ -290,14 +292,18 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#user-id').on('change', function() {
             var filteredArray = [];
             var selectedUserId = this.value;
-            $.each(messageData, function(index, messageData){
-                if(selectedUserId == messageData.msgFromId){
+            if(selectedUserId == 0){
+                showMessage(messageData);
+            }else {
+                $.each(messageData, function(index, messageData){
+                    if(selectedUserId == messageData.msgfrom){
 
-                    filteredArray.push(messageData);
-                }
-                console.log(JSON.stringify(filteredArray));
-                showMessage(filteredArray);
-            });
+                        filteredArray.push(messageData);
+                    }
+                    console.log(JSON.stringify(filteredArray));
+                    showMessage(filteredArray);
+                });
+            }
         });
     }
 </script>

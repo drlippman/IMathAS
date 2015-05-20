@@ -48,13 +48,15 @@ class MessageController extends AppController
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
             $users = User::findAllUsers($sortBy, $order);
+            $uid = Yii::$app->user->identity->getId();
             $this->includeCSS(["../css/message.css"]);
             $this->includeJS(["../js/editor/tiny_mce.js"]);
             $this->includeJS(["../js/editor/tiny_mce_src.js"]);
             $this->includeJS(["../js/editor/themes/advanced/editor_template.js"]);
             $this->includeJS(["../js/editor/plugins/asciimath/editor_plugin.js"]);
             $this->includeJS(["../js/general.js"]);
-            return $this->renderWithData('sendMessage', ['course' => $course, 'teachers' => $teacher, 'users' => $users]);
+            return $this->renderWithData('sendMessage', ['course' => $course, 'teachers' => $teacher, 'users' => $users ,'loginid'=>$uid]);
+
         }
     }
 
@@ -63,10 +65,10 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if (Yii::$app->request->post()) {
             $params = $this->getBodyParams();
-
+            $uid = Yii::$app->user->identity->getId();
             if ($params['receiver'] != 0 && $params['cid'] != null) {
                 $message = new Message();
-                $message->create($params);
+                $message->create($params,$uid);
             }
             return json_encode(array('status' => 0));
         }
@@ -77,8 +79,17 @@ class MessageController extends AppController
 
         if (!$this->isGuestUser()) {
            $uid = Yii::$app->user->identity->getId();
-            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE imas_msgs.msgto='$uid' AND (imas_msgs.isread&2)=0")->queryAll();// AND (imas_msgs.isread&3)=0";
-            return json_encode(array('status' => 0, 'messageData' => $query));
+            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE imas_msgs.msgto='$uid' AND (imas_msgs.isread&2)=0")->queryAll();
+            $dateArray = array();
+            foreach ($query as $senddate){
+                $dateArray[] = $senddate;
+            }
+            $newArray = array();
+                foreach($dateArray as $singleDate) {
+                    $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                    $newArray[] = $singleDate;
+                }
+            return json_encode(array('status' => 0, 'messageData' => $newArray));
         }
     }
 
@@ -104,10 +115,22 @@ class MessageController extends AppController
     {
         if (!$this->isGuestUser()) {
             $uid = Yii::$app->user->identity->getId();
-            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.title,imas_msgs.msgTo,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$uid' AND (imas_msgs.isread&4)=0 ")->queryAll();
-            return json_encode(array('status' => 0, 'messageData' => $query));
-        }
+            $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.msgto,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$uid' AND (imas_msgs.isread&4)=0")->queryAll();
+            if ($query) {
 
+                foreach ($query as $senddate) {
+                    $dateArray[] = $senddate;
+                }
+                $newArray = array();
+                foreach ($dateArray as $singleDate) {
+                    $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                    $newArray[] = $singleDate;
+                }
+                return json_encode(array('status' => 0, 'messageData' => $newArray));
+            }else {
+                return json_encode(array('status' => 0, 'messageData' => $query));
+            }
+        }
     }
 
 
@@ -167,7 +190,7 @@ class MessageController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = Yii::$app->request->getBodyParams();
         $cid = $params['cid'];
-        $userId = $params['userId'];
+        $userId = Yii::$app->user->identity->getId();
         $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgfrom=imas_users.id WHERE imas_msgs.msgto='$userId'")->queryAll();
 
         return json_encode(array('status' => 0, 'userData' => $query));
@@ -277,4 +300,21 @@ class MessageController extends AppController
             return $this->renderWithData('viewConversation', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
     }
+
+    public function actionMarkSentUnsendAjax()
+    {
+        $this->guestUserHandler();
+        if (Yii::$app->request->post()) {
+             $params = $this->getBodyParams();
+            $msgIdss = $params['checkedMsgs'];
+            foreach ($msgIdss as $msgId)
+            {
+                Message::sentUnsendMsg($msgId);
+            }
+            return json_encode(array('status' => 0));
+
+        }
+    }
+
+
 }

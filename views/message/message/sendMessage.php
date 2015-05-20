@@ -1,7 +1,6 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -10,7 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="">
     <h2><b>New Message</b></h2>
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-    <input type="hidden" class="msg-sender" value="<?php echo $course->ownerid ?>">
+<!--    <input type="hidden" class="msg-sender" value="--><?php //echo $loginid ?><!--">-->
     <div class="drop-down">
         <span class="col-md-2"><b>To</b></span>
         <span class="col-md-8">
@@ -55,11 +54,11 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             tinyMCE.triggerSave();
             var cid = $(".send-msg").val();
-            var sender = $(".msg-sender").val();
+//            var sender = $(".msg-sender").val();
             var receiver = $("#seluid").val();
             var subject = $(".subject").val();
             var body = $("#message").val();
-            jQuerySubmit('confirm-message',{cid: cid , sender: sender, receiver: receiver, subject: subject, body: body},'sendMessage');
+            jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
         });
 
     });

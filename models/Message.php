@@ -15,10 +15,10 @@ use app\models\_base\BaseImasMsgs;
 
 class Message extends BaseImasMsgs
 {
-    public function create($params)
+    public function create($params,$uid)
     {
         $this->courseid = $params['cid'];
-        $this->msgfrom = $params['sender'];
+        $this->msgfrom = $uid;
         $this->msgto = $params['receiver'];
         $this->title = $params['subject'];
         $this->message = $params['body'];
@@ -45,15 +45,38 @@ class Message extends BaseImasMsgs
 
     public static function updateUnread($msgId)
     {
-         $message  = static::getById($msgId);
-        $message -> isread = 0;
+        $message = static::getById($msgId);
+        if($message->isread==1){
+            $message->isread=0;
+        }
+        elseif($message->isread == 5) {
+            $message->isread = 4;
+        }elseif($message->isread==4) {
+            $message->isread = 4;
+        }else{
+            $message->isread = 0;
+        }
         $message -> save();
     }
     public static function updateRead($msgId)
     {
         $message = static::getById($msgId);
-        $message->isread = 1;
-        $message->save();
+        if($message->isread==0)
+        {
+            $message->isread=1;
+        }
+        elseif($message->isread==1)
+        {
+            $message->isread=1;
+        }
+        elseif($message->isread== 4)
+        {
+            $message->isread = 5;
+        }
+        elseif($message->isread==5){
+                $message->isread=5;
+            }
+          $message->save();
     }
     public static function getById($id)
     {
@@ -69,20 +92,32 @@ class Message extends BaseImasMsgs
         $message =static::getById($msgId);
         if($message->isread!=4)
         {
-            if($message->isread==1)
+            if($message->isread==5)
+            {
+                $message->delete();
+            }
+            elseif($message->isread==1)
             {
                 $message->isread=3;
+                $message->save();
             }
-            else
+            elseif($message->isread==0)
             {
                 $message->isread = 2;
+                $message->save();
             }
-            $message->save();
+            else{
+                $message->isread = 3;
+                $message->save();
+            }
+
         }
         elseif($message->isread==4)
         {
             $message->delete();
         }
+
+
 
     }
     public static function deleteFromSentMsg($msgId)
@@ -101,6 +136,11 @@ class Message extends BaseImasMsgs
             $message->save();
         }
 
+    }
+    public static function sentUnsendMsg($msgId)
+    {
+        $message =static::getById($msgId);
+            $message->delete();
     }
 
     public function createReply($params)
