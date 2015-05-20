@@ -15,7 +15,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
 {
     public static function getByAssessmentSessionId($id)
     {
-        return static::findAll(['assessmentid' => $id]);
+        return AssessmentSession::findAll(['assessmentid' => $id]);
     }
 
     public static function createSessionForAssessment($params)
@@ -27,11 +27,16 @@ class AssessmentSession extends BaseImasAssessmentSessions
     }
     public static function getById($id)
     {
-        return static::findOne(['assessmentid' => $id]);
+        return AssessmentSession::findOne(['assessmentid' => $id]);
+    }
+
+    public static function getAssessmentSession($id, $aid)
+    {
+        return AssessmentSession::findOne(['userid' => $id, 'assessmentid' => $aid]);
     }
 
     public static function getByUserId($uid)
     {
-        return static::findOne(['userid' => $uid]);
+        return AssessmentSession::findOne(['userid' => $uid]);
     }
 } 

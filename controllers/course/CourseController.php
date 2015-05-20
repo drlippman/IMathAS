@@ -43,9 +43,6 @@ class CourseController extends AppController
         $id = Yii::$app->request->get('id');
         $uid = Yii::$app->user->identity->getId();
         $cid = Yii::$app->request->get('cid');
-        $assessmentSession = AssessmentSession::getByUserId($uid);
-        $now = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-
         $responseData = array();
         $course = Course::getById($cid);
         if ($course) {
@@ -135,11 +132,19 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
+<<<<<<< Updated upstream
         $timelimit =$assessment->timelimit;
         $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css']);
         $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
 
+=======
+        $this->includeCSS(['../css/fullcalendar.min.css']);
+        $this->includeCSS(['../css/calendar.css']);
+        $this->includeJS(['../js/moment.min.js']);
+        $this->includeJS(['../js/fullcalendar.min.js']);
+        $this->includeJS(['../js/student.js']);
+>>>>>>> Stashed changes
         return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student]);
 
     }
@@ -150,7 +155,7 @@ class CourseController extends AppController
 
         $id = Yii::$app->request->get('id');
         $assessment = Assessments::getByAssessmentId($id);
-        $assessmentSession = AssessmentSession::getById($id);
+        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
 
@@ -162,9 +167,24 @@ class CourseController extends AppController
 
         $this->saveAssessmentSession($assessment, $id);
 
+<<<<<<< Updated upstream
         $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
         return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
+=======
+
+//        $assessmentSession = new AssessmentSession();
+////        $assessmentSession->attributes = $param;
+//        $assessmentSession->save();
+
+        $this->includeCSS(['../css/mathtest.css']);
+        $this->includeCSS(['../css/default.css']);
+        $this->includeCSS(['../css/showAssessment.css']);
+        $this->includeJS(['../js/timer.js']);
+        $this->includeJS(['../js/student.js']);
+
+        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet, 'assessmentSession' => $assessmentSession, 'now' => time()]);
+>>>>>>> Stashed changes
     }
 
     public function actionLatePass()

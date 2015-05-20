@@ -11,6 +11,9 @@ use app\components\AppUtility;
 <!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
 <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessments->timelimit)?>">
+<input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
+<input type="hidden" id="timelimit" value="<?php echo $assessments->timelimit;?>">
+<input type="hidden" id="now" value="<?php echo $now;?>">
 
 <html>
 <!--    Show total time and remaining time-->
@@ -27,14 +30,19 @@ use app\components\AppUtility;
         <span id="timerwrap">
             <b>
             <span id='timer'></span>remaining.</span>
+
              </b>
         <?php }else {
             echo 'Due ' . AppUtility::formatDate($assessments->enddate);
          }?>
     </span>
+        <span onclick="toggletimer()" style="color:#aaa;" class="clickable" id="timerhide" title="Hide">[x]</span>
+
 
 </div>
-
+<div style="margin-left: 96%">
+<span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
+    </div>
 <div class=intro>
 
     <p>Total Points Possible:10</p>
@@ -161,10 +169,10 @@ use app\components\AppUtility;
         {
             var questionId= $("#questionSet").val();
             var html = '<div><p><Strong>Question License</Strong></p>' +
-                '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
-                '<p> This question was written by Lippman, David. This work is licensed under the<a href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
-                +'<p>The code that generated this question can be obtained by instructors by emailing akash.more@tudip.nl</p></div>';
-            e.preventDefault();
+                       '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
+                       '<p> This question was written by Lippman, David. This work is licensed under the<a href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
+                      +'<p>The code that generated this question can be obtained by instructors by emailing akash.more@tudip.nl</p></div>';
+             e.preventDefault();
             $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Show License', zIndex: 10, autoOpen: true,
                 width: 'auto', resizable: false,
@@ -181,6 +189,38 @@ use app\components\AppUtility;
 
         });
 
+
+        var assessmentsession = $("#assessmentsession").val();
+        var now = $("#now").val();
+        var timelimit = $("#timelimit").val();
+        var now_int = parseInt(now);
+        var assessmentsession_int =parseInt(assessmentsession);
+        var timelimit_int = parseInt(timelimit);
+
+        if((assessmentsession_int + timelimit_int) < now_int)
+        {
+            $("#timerwrap").hide();
+            $("#timerhide").hide();
+//            $("#msg").val().show;
+            var msg = '<div><p>Your time limit has expired </p>'+
+                '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+
+            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Okay": function () {
+                        $(this).dialog('destroy').remove();
+                        return false;
+                    }
+
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
+        }
 
     });
 

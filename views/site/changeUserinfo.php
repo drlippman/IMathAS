@@ -1,4 +1,3 @@
-
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -12,8 +11,9 @@ use app\components\AppUtility;
 $this->title = 'Profile Settings';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css"/>
+<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/dashboard.css" type="text/css"/>
 
+<!--<link rel="stylesheet" href="--><?php //AppUtility::getHomeURL()?><!--css/dashboard.css" type="text/css"/>-->
 <div class="site-login">
 
     <?php
