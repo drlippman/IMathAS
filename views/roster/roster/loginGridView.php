@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <p>Showing Number of Logins May 5,2015 through May 17,2015
         <div class="pull-left select-text-margin">
-            <div id="previous-link">Show previous week.</div>&nbsp;&nbsp;<div id="following-link">Show following week.</div> &nbsp;&nbsp;
+           <a id="previous-link">Show previous week.</a>&nbsp;&nbsp;<a id="following-link">Show following week.</a>&nbsp;&nbsp;
             <div class="pull-right"> Show</div>
         </div>
         <div class="col-lg-3 pull-left" id="datepicker-id">

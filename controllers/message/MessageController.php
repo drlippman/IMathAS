@@ -240,9 +240,10 @@ class MessageController extends AppController
     public function actionReplyMessage()
     {
         $this->guestUserHandler();
+        $baseId = Yii::$app->request->get('baseid');
         $msgId = Yii::$app->request->get('id');
         if ($this->getAuthenticatedUser()) {
-            $messages = Message::getByMsgId($msgId);
+            $messages = Message::getByMsgId($msgId,$baseId);
             $fromUser = User::getById($messages->msgfrom);
             $this->includeJS(["../js/editor/tiny_mce.js"]);
             return $this->renderWithData('replyMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
@@ -325,7 +326,6 @@ class MessageController extends AppController
 
        $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
         return json_encode(['status' => '0']);
-       // $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userid' AND id='{$_GET['threadid']}'";
 
     }
 

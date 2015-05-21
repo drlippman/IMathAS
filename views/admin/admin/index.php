@@ -229,7 +229,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
 
-    function createUsersTable(users)
+    function createUsersTable(users)http:
     { var html = "";
         $.each(users, function(index, users){
             html += "<tr> <td>"+capitalizeFirstLetter(users.FirstName)+" "+capitalizeFirstLetter(users.LastName)+"</td>";
@@ -237,9 +237,9 @@ $this->params['breadcrumbs'][] = $this->title;
             html += "<td>"+users.email+"</td>";
             html += "<td>"+users.rights+"</td>";
             html += "<td>"+users.lastaccess+"</td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
-            html += "<td><a href='#'>Reset</a></td>";
-            html += "<td ><a href='#'>Delete</a></td></tr>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('site', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>'>Reset</a></td>";
+            html += "<td ><a href='<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>'>Delete</a></td></tr>";
         });
         $(".user-table-body").append(html);
         $('.user-table').DataTable();

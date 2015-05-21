@@ -26,12 +26,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
 </div>
 <div class="message-container">
-<div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary btn-sm">Send New Message</a>
-    | <a href="">Limit to Tagged</a> | <a href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$course->id.'&userid='.$course->ownerid); ?>">Sent Messages</a>
-    | <a class="btn btn-primary btn-sm">Picture</a></p>
-</div>
-<div>
-    <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Course :</b></span>
+    <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary btn-sm">Send New Message</a>
+            | <a href="">Limit to Tagged</a> | <a href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid='.$course->id.'&userid='.$course->ownerid); ?>">Sent Messages</a>
+            | <a class="btn btn-primary btn-sm">Picture</a></p>
+    </div>
+    <div>
+        <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Course :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="show-course form-control" id="course-id">
             <option value="0">All Courses</option>
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <option value="0">Select a user</option>
         </select>
         </span></p>
-</div><br><br>
+    </div><br><br>
     <div>
 
         <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
@@ -105,12 +105,12 @@ $this->params['breadcrumbs'][] = $this->title;
             htmlCourse += "<option value = "+uniqueUserForFilter+">"+uniqueUserForFilter[i]+"</option>"
 
         }
-      //  $(".show-user").append(htmlCourse);
+        //  $(".show-user").append(htmlCourse);
 
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-             messageData = result.messageData;
+            messageData = result.messageData;
             showMessage(messageData);
         }
     }
@@ -121,8 +121,10 @@ $this->params['breadcrumbs'][] = $this->title;
         var htmlCourse ="";
         $.each(messageData, function(index, messageData)
         {
+
+
             if(messageData.isread == 1 || messageData.isread == 5 ||messageData.isread == 9 ||messageData.isread == 13)
-             {
+            {
                 html += "<tr class='read-message message-row message-row-'"+messageData.id+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
             else
@@ -138,7 +140,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 html += "<th>No</th>";
             }
             var rowid = messageData.id;
-
             if(messageData.isread < 7)
             {
                 html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif' onclick='changeImage(this,"+rowid+")'/></td>";
@@ -151,9 +152,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
             html += "<td>"+messageData.name.substr(0,1).toUpperCase()+ messageData.name.substr(1)+"</td>";
-
             html += "<td>"+messageData.senddate+"</td>";
-
         });
 
         $(".message-table-body tr").remove();
@@ -203,9 +202,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 $(this).closest('tr').css('font-weight', 'bold');
                 markArray.push($(this).val());
                 $(this).prop('checked',false);
-
             });
-
             var readMsg = {checkedMsg: markArray};
             jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
         });
@@ -246,14 +243,14 @@ $this->params['breadcrumbs'][] = $this->title;
             var filteredArray = [];
             var selectedCourseId = this.value;
             if(selectedCourseId == 0 ){
-                    showMessage(messageData);
+                showMessage(messageData);
             }else{
-            $.each(messageData, function(index, messageData){
-                if(selectedCourseId == messageData.courseid ){
-                    filteredArray.push(messageData);
-                }
-                showMessage(filteredArray);
-            });
+                $.each(messageData, function(index, messageData){
+                    if(selectedCourseId == messageData.courseid ){
+                        filteredArray.push(messageData);
+                    }
+                    showMessage(filteredArray);
+                });
             }
         });
     }
