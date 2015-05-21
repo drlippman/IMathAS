@@ -83,9 +83,9 @@ class Message extends BaseImasMsgs
         return static::findOne($id);
     }
 
-    public static function getByMsgId($msgId, $baseId)
+    public static function getByMsgId($msgId)
     {
-        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
+        return static::findOne($msgId);
     }
     public static function deleteFromReceivedMsg($msgId)
     {
@@ -165,6 +165,11 @@ class Message extends BaseImasMsgs
         $this->senddate = $sendDate;
         $this->save();
         return $this->id;
+    }
+
+    public static function getByBaseId($msgId, $baseId)
+    {
+        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
     }
 
 }
