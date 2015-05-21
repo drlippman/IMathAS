@@ -131,7 +131,7 @@ $this->params['breadcrumbs'][] = $this->title;
             {
                 html += "<tr class='unread-message message-row message-row-"+messageData.id+"'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=0&id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
             if(messageData.replied == 1)
             {
                 html += "<th>Yes</th>";

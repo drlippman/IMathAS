@@ -4,6 +4,9 @@
     $this->params['breadcrumbs'][] = $this->title;
     echo $this->render('../../instructor/instructor/_toolbarTeacher');
 ?>
+
+
+
     <div id="headerviewmsg">
         <h2>Message</h2>
     </div>
@@ -31,17 +34,22 @@
          </pre>
     </div>
     <div >
-        <?php if(Yii::$app->user->identity->getId()==$messages->msgfrom){echo "have a good day !";}
-        else{
-            echo "<div>
-                     <a class='btn btn-primary' > Mark Unread </a >
-            </div>";
-        } ?>
+        <?php $sent = $_GET['message']; if($sent != 1) { ?>
         <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id='.$messages->id);?>" class="btn btn-primary " > Reply</a >&nbsp;
-        <a class="btn btn-primary " > Mark Unread </a >&nbsp;
+        <a class="btn btn-primary "  > Mark Unread </a >&nbsp;
         <a class="btn btn-primary  btn-danger" > Delete</a >&nbsp;
-        <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>" > View Conversation </a > |
-        <a href = "" > Gradebook</a >
+        <?php }?>
+        <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>" > View Conversation </a >&nbsp;
+        <?php $sent = $_GET['message']; if($sent != 1) { ?>
+        <a href = "" id="marked" > Gradebook</a >
+        <?php }?>
 
      </div>
 
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+//                $(".btn").hide();
+//                $("#marked").hide();
+        });
+    </script>

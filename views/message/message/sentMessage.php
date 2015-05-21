@@ -123,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=1&id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
             html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
             if(messageData.isread==0)
             {
