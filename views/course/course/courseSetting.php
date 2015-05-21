@@ -78,11 +78,12 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
             <?= $form->field($model, 'latePasses')->textInput(); ?>
             <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
     </fieldset>
-</div>
-<div class="form-group">
-    <div class="col-lg-offset-2  col-lg-11">
-        <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+    <div class="form-group">
+        <div class="col-lg-offset-3 ">
+            <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+        </div>
     </div>
 </div>
+
 
 <?php ActiveForm::end(); ?>
