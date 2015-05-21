@@ -325,4 +325,5 @@ class MessageController extends AppController
        // $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userid' AND id='{$_GET['threadid']}'";
 
     }
+
 }
