@@ -123,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var htmlCourse ="";
         $.each(messageData, function(index, messageData){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
-            html += "<td><a href='#'>"+messageData.title+"</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?id=')?>"+messageData.id+"'> "+messageData.title+"</a></td>";
             html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
             if(messageData.isread==0)
             {
@@ -172,16 +172,60 @@ $this->params['breadcrumbs'][] = $this->title;
         }
    function markSentDelete()
     {
-        $("#mark-sent-delete").click(function(){
+        $("#mark-sent-delete").click(function(e){
 
-           var markArray = [];
-            $('.message-table-body input[name="msg-check"]:checked').each(function() {
-              markArray.push($(this).val());
-                $(this).closest('tr').remove();
-               $(this).prop('checked',false);
+
+            var markArray = [];
+            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                markArray.push($(this).val());
             });
-            var readMsg={checkedMsgs: markArray};
-           jQuerySubmit('mark-sent-remove-ajax',readMsg,'markDeleteSuccess');
+            if(markArray.length!=0) {
+                var html = '<div><p>Are you sure? This will delete your message from</p>' +
+                    '<p>Inbox.</p></div>';
+
+                var cancelUrl = $(this).attr('href');
+                e.preventDefault();
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons: {
+                        "Cancel": function () {
+
+                            $(this).dialog('destroy').remove();
+                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+
+                                $(this).prop('checked', false);
+
+                            });
+                            return false;
+                        },
+                        "confirm": function () {
+//                            window.location = cancelUrl;
+
+                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                                $(this).prop('checked', false);
+                                $(this).closest('tr').remove();
+                            });
+                            $(this).dialog("close");
+
+                            var readMsg = {checkedMsgs: markArray};
+                            jQuerySubmit('mark-sent-remove-ajax',readMsg,'markDeleteSuccess');
+                            return true;
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    }
+
+                });
+            }
+            else
+            {
+                alert("Nothing to delete");
+            }
+
+
 
         });
 
@@ -231,47 +275,57 @@ $this->params['breadcrumbs'][] = $this->title;
 
        $("#mark-unsend").click(function (e) {
 
-           var html = '<div><p>Are you sure? This will delete your message from</p>'+
-               '<p>the receivers inbox and your sent list.</p></div>';
+           var markArray = [];
+           $('.message-table-body input[name="msg-check"]:checked').each(function () {
+               markArray.push($(this).val());
+           });
+           if(markArray.length!=0) {
+               var html = '<div><p>Are you sure? This will delete your message from</p>'+
+                   '<p>the receivers inbox and your sent list.</p></div>';
 
-           var cancelUrl = $(this).attr('href');
-            e.preventDefault();
-            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons: {
-                    "Cancel": function () {
+               var cancelUrl = $(this).attr('href');
+               e.preventDefault();
+               $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                   modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                   width: 'auto', resizable: false,
+                   closeText: "hide",
+                   buttons: {
+                       "Cancel": function () {
 
-                        $(this).dialog('destroy').remove();
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                           $(this).dialog('destroy').remove();
+                           $('.message-table-body input[name="msg-check"]:checked').each(function () {
 
-                            $(this).prop('checked', false);
+                               $(this).prop('checked', false);
 
-                        });
-                        return false;
-                    },
-                    "confirm": function () {
+                           });
+                           return false;
+                       },
+                       "confirm": function () {
 //                            window.location = cancelUrl;
-                        $(this).dialog("close");
 
-                        var markArray = [];
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            markArray.push($(this).val());
-                            $(this).closest('tr').remove();
-                            $(this).prop('checked', false);
+                           $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                               $(this).prop('checked', false);
+                               $(this).closest('tr').remove();
+                           });
+                           $(this).dialog("close");
 
-                        });
-                        var readMsg = {checkedMsgs: markArray};
-                        jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'markUnsendSuccess');
-                        return true;
-                    }
-                },
-                close: function (event, ui) {
-                    $(this).remove();
-                }
+                           var readMsg = {checkedMsgs: markArray};
+                           jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'markUnsendSuccess');
+                           return true;
+                       }
+                   },
+                   close: function (event, ui) {
+                       $(this).remove();
+                   }
 
-            });
+               });
+           }
+           else
+           {
+               alert("Nothing to delete");
+           }
+
+
         });
     }
     function markUnsendSuccess(){

@@ -279,20 +279,63 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     function markAsDelete(){
-        $("#mark-delete").click(function(){
+        $("#mark-delete").click(function(e){
 
             var markArray = [];
-            $('.message-table-body input[name="msg-check"]:checked').each(function() {
+            $('.message-table-body input[name="msg-check"]:checked').each(function () {
                 markArray.push($(this).val());
-                $(this).closest('tr').remove();
-                $(this).prop('checked',false);
             });
-            var readMsg={checkedMsg: markArray};
-            jQuerySubmit('mark-as-delete-ajax',readMsg,'markAsDeleteSuccess');
+            if(markArray.length!=0) {
+                var html = '<div><p>Are you sure? This will delete your message from</p>' +
+                    '<p>Inbox.</p></div>';
+
+                var cancelUrl = $(this).attr('href');
+                e.preventDefault();
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons: {
+                        "Cancel": function () {
+
+                            $(this).dialog('destroy').remove();
+                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+
+                                $(this).prop('checked', false);
+
+                            });
+                            return false;
+                        },
+                        "confirm": function () {
+//                            window.location = cancelUrl;
+
+                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                                $(this).prop('checked', false);
+                                $(this).closest('tr').remove();
+                            });
+                            $(this).dialog("close");
+
+                            var readMsg = {checkedMsg: markArray};
+                            jQuerySubmit('mark-as-delete-ajax', readMsg, 'markAsDeleteSuccess');
+                            return true;
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    }
+
+                });
+            }
+            else
+            {
+                alert("Nothing to delete");
+            }
 
         });
 
     }
+
+
     function markAsDeleteSuccess(){
 
     }

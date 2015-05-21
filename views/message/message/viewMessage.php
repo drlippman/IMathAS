@@ -31,10 +31,17 @@
          </pre>
     </div>
     <div >
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id='.$messages->id);?>" class="btn btn-primary ">Reply</a>&nbsp;
-        <a class="btn btn-primary ">Mark Unread</a>&nbsp;
-        <a class="btn btn-primary  btn-danger">Delete</a>&nbsp;
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>">View Conversation</a> |
-        <a href="">Gradebook</a>
+        <?php if(Yii::$app->user->identity->getId()==$messages->msgfrom){echo "have a good day !";}
+        else{
+            echo "<div>
+                     <a class='btn btn-primary' > Mark Unread </a >
+            </div>";
+        } ?>
+        <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id='.$messages->id);?>" class="btn btn-primary " > Reply</a >&nbsp;
+        <a class="btn btn-primary " > Mark Unread </a >&nbsp;
+        <a class="btn btn-primary  btn-danger" > Delete</a >&nbsp;
+        <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>" > View Conversation </a > |
+        <a href = "" > Gradebook</a >
+
      </div>
 
