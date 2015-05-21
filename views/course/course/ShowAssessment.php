@@ -11,16 +11,13 @@ use app\components\AppUtility;
 ?>
 <!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
+<?php if(!empty($assessmentSession)){?>
 <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessments->timelimit)?>">
 <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
 <input type="hidden" id="timelimit" value="<?php echo $assessments->timelimit;?>">
+<input type="hidden" id="question" value="<?php echo $assessmentSession->questions;?>">
 <input type="hidden" id="now" value="<?php echo $now;?>">
-
 <html>
-<?php $assessmentTime = $assessmentSession->starttime;
-$assessmentTimelimit = $assessments->timelimit;
-$assessmentAdd = $assessmentTime + $assessmentTimelimit;
-?>
 <!--    Show total time and remaining time-->
 <div class=right id=timelimitholder>
 <?php
@@ -33,14 +30,15 @@ $assessmentAdd = $assessmentTime + $assessmentTimelimit;
                 <span id='timer'></span>
 
                 remaining.</span>
-        </b>
         <span onclick="toggletimer()" style="color:#aaa;" class="clickable" id="timerhide" title="Hide">[x]</span>
+        <span  style="color: #000000;" class="time" id="expired">Time Expired</span>
 
     </span>
 
 </div>
 <div style="margin-left: 96%">
     <span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
+
 </div>
 
 <div class=intro>
@@ -121,9 +119,9 @@ $assessmentAdd = $assessmentTime + $assessmentTimelimit;
     </form>
 </div>
 <div class="clear"></div>
-</div>
+
 <div class="footerwrapper"></div>
-</div>
+
 <div id="ehdd" class="ehdd">
     <span id="ehddtext">
 
@@ -132,24 +130,51 @@ $assessmentAdd = $assessmentTime + $assessmentTimelimit;
     </span>
 </div>
 <div id="eh" class="eh">
+    <?php }else{?>
+    <script type="text/javascript">
+        $(document).ready(function()
+        {
 
+            var msg = '<div><p>This Assessment does not have any questions right now</div>';
+
+            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+            ({
+                    modal: true, title: 'Warning', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Okay": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+
+                        }
+
+                    },
+                    close: function (event, ui)
+                    {
+                        $(this).remove();
+                    }
+            });
+      });
+
+
+    </script>
+    <?php }?>
 </div>
 
-
-
-</body>
-</html>
-
 <!--Display hide and show timer functionality-->
-
 <script type="text/javascript">
     $(document).ready(function()
     {
+
        var timer = $('#timerlimit').val();
        window.onload = CreateTimer("timer",timer);
 
        $('#timershow').hide();
        $('#timerhide').show();
+        $('#expired').hide();
+
 
        $('#timerhide').click(function()
         {
@@ -189,39 +214,39 @@ $assessmentAdd = $assessmentTime + $assessmentTimelimit;
 
         });
 
-
+        var question=$("#question").val();
         var assessmentsession = $("#assessmentsession").val();
         var now = $("#now").val();
         var timelimit = $("#timelimit").val();
         var now_int = parseInt(now);
         var assessmentsession_int =parseInt(assessmentsession);
         var timelimit_int = parseInt(timelimit);
+                if((assessmentsession_int + timelimit_int) < now_int)
+                {
+                    $("#timerwrap").hide();
+                    $("#timerhide").hide();
+                    $('#expired').show();
+                  var msg = '<div><p>Your time limit has expired </p>'+
+                        '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
 
-        if((assessmentsession_int + timelimit_int) < now_int)
-        {
-            $("#timerwrap").hide();
-            $("#timerhide").hide();
-//            $("#msg").val().show;
-            var msg = '<div><p>Your time limit has expired </p>'+
-                '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+                    $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
+                        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                        width: 'auto', resizable: false,
+                        closeText: "hide",
+                        buttons: {
+                            "Okay": function () {
+                                $(this).dialog('destroy').remove();
+                                return true;
+                            }
 
-            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons: {
-                    "Okay": function () {
-                        $(this).dialog('destroy').remove();
-                        return false;
-                    }
-
-                },
-                close: function (event, ui) {
-                    $(this).remove();
+                        }
+//
+                    });
                 }
-            });
-        }
 
     });
 
 </script>
+</body>
+
+</html>

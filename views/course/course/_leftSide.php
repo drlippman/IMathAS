@@ -4,9 +4,9 @@ use app\components\AppUtility;
 ?>
 
 <p>
-    <a href=""> Messages</a><br>
+    <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a><br>
     <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"> Forums</a><br>
-    <a href="">Calendar</a><br>
-    <a href="">Log Out</a><br>
-    <a href="">Help Using IMathAS</a>
+    <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Calendar</a><br>
+    <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Log Out</a><br>
+    <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Help Using IMathAS</a>
 </p>

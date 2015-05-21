@@ -17,16 +17,16 @@ $this->title = 'Student Roster';
         <div class="cpmid">
             <span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?>">View Login Grid</a><br/>
-                <a HREF="#">Assign Sections and/or Codes</a><br>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Assign Sections and/or Codes</a><br>
             </span><span class="column" style="width:auto;">
-                <a HREF="#">Manage LatePasses</a><br/>
-                <a HREF="#">Manage Tutors</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage LatePasses</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="#">Enroll Student with known username</a><br/>
-                <a HREF="#">Enroll students from another course</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Enroll Student with known username</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="#">Import Students from File</a><br/>
-                <a HREF="#">Create and Enroll new student</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Import Students from File</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Create and Enroll new student</a><br/>
 
             </span><br class="clear"/>
         </div>
