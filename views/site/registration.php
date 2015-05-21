@@ -34,10 +34,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username') ?>
     <?= $form->field($model, 'password')->passwordInput() ?>
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-    <?= $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label']]) ?>
+    <?= $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms']]) ?>
 
     <div class="form-group">
-        <div class="col-lg-offset-4"><?= Html::submitButton('Request Account', ['class' => 'btn btn-primary']) ?></div>
+        <div class="col-lg-offset-4"><?= Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
     </div>
 
     <?php ActiveForm::end(); ?>
