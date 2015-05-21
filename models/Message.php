@@ -53,7 +53,10 @@ class Message extends BaseImasMsgs
             $message->isread = 4;
         }elseif($message->isread==4) {
             $message->isread = 4;
-        }else{
+        }elseif($message->isread>=9){
+            $message->isread=$message->isread -1;
+        }
+        else{
             $message->isread = 0;
         }
         $message -> save();
@@ -76,6 +79,14 @@ class Message extends BaseImasMsgs
         elseif($message->isread==5){
                 $message->isread=5;
             }
+//        elseif($message->isread==8){
+//
+//            $message->isread=9;
+//        }
+//        elseif($message->isread==12){
+//
+//            $message->isread=13;
+      //  }
           $message->save();
     }
     public static function getById($id)
@@ -92,7 +103,7 @@ class Message extends BaseImasMsgs
         $message =static::getById($msgId);
         if($message->isread!=4)
         {
-            if($message->isread==5)
+            if($message->isread==5 )
             {
                 $message->delete();
             }
@@ -132,7 +143,13 @@ class Message extends BaseImasMsgs
         }
         else
         {
-            $message->isread=4;
+            if($message->isread>=8)
+            {
+                $message->isread=$message->isread+4;
+            }
+            else {
+                $message->isread = 4;
+            }
             $message->save();
         }
 

@@ -7,43 +7,49 @@ use app\models\Questions;
 use Yii;
 use yii\base\Component;
 
-class AppUtility extends Component {
+class AppUtility extends Component
+{
 
     /**
      * Function to print data and exit the process.
      * It prints the data value which is passed as argument.
      * @param $data
      */
-    public static function dump($data){
-		echo "<pre>";
-		print_r($data);
-		echo "</pre>";
-		die;
-	}
+    public static function dump($data)
+    {
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+        die;
+    }
 
     /**
      * This is utility function to generate random string.
      * @return string
      */
-    public static function generateRandomString() {
+    public static function generateRandomString()
+    {
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $pass = '';
-        for ($i=0; $i<10; $i++) {
-            $pass .= substr($chars,rand(0,61),1);
+        for ($i = 0; $i < 10; $i++) {
+            $pass .= substr($chars, rand(0, 61), 1);
         }
         return $pass;
     }
 
-    public static function getStringVal($str){
+    public static function getStringVal($str)
+    {
         return isset($str) ? $str : null;
     }
 
-    public static function getIntVal($str){
+    public static function getIntVal($str)
+    {
         return isset($str) ? $str : 0;
     }
 
-    public static function getURLFromHome($controllerName, $shortURL){
-        return Yii::$app->homeUrl.$controllerName . "/".$shortURL;
+    public static function getURLFromHome($controllerName, $shortURL)
+    {
+        return Yii::$app->homeUrl . $controllerName . "/" . $shortURL;
     }
 
     public static function getHomeURL()
@@ -51,19 +57,26 @@ class AppUtility extends Component {
         return Yii::$app->homeUrl;
     }
 
+    public static function getTimeStampFromDate($dateStr)
+    {
+        $a = strptime($dateStr, '%m-%d-%Y');
+        $timestamp = mktime(0, 0, 0, $a['tm_mon'] + 1, $a['tm_mday'], $a['tm_year'] + 1900);
+        return $timestamp;
+    }
 
-    public static function checkEditOrOk() {
+    public static function checkEditOrOk()
+    {
         $ua = $_SERVER['HTTP_USER_AGENT'];
-        if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
-            preg_match('/OS (\d+)_(\d+)/',$ua,$match);
-            if ($match[1]>=5) {
+        if (strpos($ua, 'iPhone') !== false || strpos($ua, 'iPad') !== false) {
+            preg_match('/OS (\d+)_(\d+)/', $ua, $match);
+            if ($match[1] >= 5) {
                 return 1;
             } else {
                 return 0;
             }
-        } else if (strpos($ua,'Android')!==false) {
-            preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match);
-            if ($match[1]>=4) {
+        } else if (strpos($ua, 'Android') !== false) {
+            preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/', $ua, $match);
+            if ($match[1] >= 4) {
                 return 1;
             } else {
                 return 0;
@@ -76,7 +89,7 @@ class AppUtility extends Component {
     public static function urlMode()
     {
         $urlmode = '';
-        if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
+        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) {
             $urlmode = 'https://';
         } else {
             $urlmode = 'http://';
@@ -86,14 +99,14 @@ class AppUtility extends Component {
 
     public static function removeEmptyAttributes($params)
     {
-        if(!empty($params) && is_array($params)){
-            if(is_object($params)){
+        if (!empty($params) && is_array($params)) {
+            if (is_object($params)) {
                 $params = (array)$params;
             }
 
-            foreach($params as $key => $singleParam){
-                if(empty($singleParam)){
-                    if($singleParam != '0')
+            foreach ($params as $key => $singleParam) {
+                if (empty($singleParam)) {
+                    if ($singleParam != '0')
                         unset($params[$key]);
                 }
             }
@@ -104,7 +117,7 @@ class AppUtility extends Component {
     public static function verifyPassword($newPassword, $oldPassword)
     {
         require_once("Password.php");
-        if(password_verify($newPassword, $oldPassword)){
+        if (password_verify($newPassword, $oldPassword)) {
             return true;
         }
         return false;
@@ -118,29 +131,25 @@ class AppUtility extends Component {
 
     public static function makeToolset($params)
     {
-        if(is_array($params))
-        {
-            if(count($params) == 3)
+        if (is_array($params)) {
+            if (count($params) == 3)
                 return 0;
-            elseif(count($params) == 1)
-            {
-                if($params[0] == 1)
+            elseif (count($params) == 1) {
+                if ($params[0] == 1)
                     return 6;
-                elseif($params[0] == 2)
+                elseif ($params[0] == 2)
                     return 5;
                 else
                     return 3;
-            }
-            elseif(count($params) == 2)
-            {
-                if(($params[0] == 1) && $params[1] == 2)
+            } elseif (count($params) == 2) {
+                if (($params[0] == 1) && $params[1] == 2)
                     return 4;
-                elseif(($params[0] == 1) && $params[1] == 4)
+                elseif (($params[0] == 1) && $params[1] == 4)
                     return 2;
                 else
                     return 1;
             }
-        }else{
+        } else {
             return $params;
         }
     }
@@ -148,43 +157,35 @@ class AppUtility extends Component {
 
     public static function makeAvailable($availables)
     {
-        if(is_array($availables))
-        {
-            if(count($availables) == 2)
+        if (is_array($availables)) {
+            if (count($availables) == 2)
                 return 0;
-            else{
-                if($availables[0] == 1)
+            else {
+                if ($availables[0] == 1)
                     return 1;
                 else
                     return 2;
             }
-        }else
+        } else
             return 3;
     }
 
     public static function createIsTemplate($isTemplates)
     {
         $isTemplate = 0;
-        if(is_array($isTemplates))
-        {
+        if (is_array($isTemplates)) {
 
-            foreach($isTemplates as $item)
-            {
-                if(self::myRight() == AppConstant::ADMIN_RIGHT)
-                {
-                    if($item == 1)
-                    {
+            foreach ($isTemplates as $item) {
+                if (self::myRight() == AppConstant::ADMIN_RIGHT) {
+                    if ($item == 1) {
                         $isTemplate += 1;
                     }
-                    if($item == 4)
-                    {
+                    if ($item == 4) {
                         $isTemplate += 4;
                     }
                 }
-                if(self::myRight() >= AppConstant::GROUP_ADMIN_RIGHT)
-                {
-                    if($item == 2)
-                    {
+                if (self::myRight() >= AppConstant::GROUP_ADMIN_RIGHT) {
+                    if ($item == 2) {
                         $isTemplate += 2;
                     }
                 }
@@ -197,35 +198,32 @@ class AppUtility extends Component {
     {
         $studentTopBar = "";
         $instructorTopBar = "";
-        if($studentQuickPick)
-        {
+        if ($studentQuickPick) {
             $studentTopBar = "";
-            foreach($studentQuickPick as $key => $item)
-            {
-                if($studentTopBar == "")
+            foreach ($studentQuickPick as $key => $item) {
+                if ($studentTopBar == "")
                     $studentTopBar .= $item;
                 else
-                    $studentTopBar .= ','.$item;
+                    $studentTopBar .= ',' . $item;
             }
         }
 
-        if($instructorQuickPick)
-        {
+        if ($instructorQuickPick) {
             $instructorTopBar = "";
-            foreach($instructorQuickPick as $key => $item)
-            {
-                if($instructorTopBar == "")
+            foreach ($instructorQuickPick as $key => $item) {
+                if ($instructorTopBar == "")
                     $instructorTopBar .= $item;
                 else
-                    $instructorTopBar .= ','.$item;
+                    $instructorTopBar .= ',' . $item;
             }
         }
         $quickPickTopBar = isset($quickPickBar) ? $quickPickBar : 0;
-        $topbar = $studentTopBar.'|'.$instructorTopBar.'|'.$quickPickTopBar;
+        $topbar = $studentTopBar . '|' . $instructorTopBar . '|' . $quickPickTopBar;
         return $topbar;
     }
 
-    public static function sendMail($subject, $message, $to){
+    public static function sendMail($subject, $message, $to)
+    {
         $email = Yii::$app->mailer->compose();
         $email->setTo($to)
             ->setSubject($subject)
@@ -233,7 +231,8 @@ class AppUtility extends Component {
             ->send();
     }
 
-    public static function getChallenge(){
+    public static function getChallenge()
+    {
         return base64_encode(microtime() . rand(0, 9999));
     }
 
@@ -241,8 +240,7 @@ class AppUtility extends Component {
     public static function getRight($right)
     {
         $returnRight = "";
-        switch($right)
-        {
+        switch ($right) {
             case 100:
                 $returnRight = 'Admin';
                 break;
@@ -276,60 +274,63 @@ class AppUtility extends Component {
 
     public static function calculateTimeDefference($startTime, $endTime)
     {
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$endTime, $tmatches);
-        if (count($tmatches)==0) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/',$endTime, $tmatches);
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $endTime, $tmatches);
+        if (count($tmatches) == 0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/', $endTime, $tmatches);
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = 0;
         }
-        $tmatches[1] = $tmatches[1]%12;
-        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
-        $deftime = $tmatches[1]*60 + $tmatches[2];
+        $tmatches[1] = $tmatches[1] % 12;
+        if ($tmatches[3] == "pm") {
+            $tmatches[1] += 12;
+        }
+        $deftime = $tmatches[1] * 60 + $tmatches[2];
 
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$startTime, $tmatches);
-        if (count($tmatches)==0) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/',$startTime, $tmatches);
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $startTime, $tmatches);
+        if (count($tmatches) == 0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/', $startTime, $tmatches);
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = 0;
         }
-        $tmatches[1] = $tmatches[1]%12;
-        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
-        $deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
+        $tmatches[1] = $tmatches[1] % 12;
+        if ($tmatches[3] == "pm") {
+            $tmatches[1] += 12;
+        }
+        $deftime += 10000 * ($tmatches[1] * 60 + $tmatches[2]);
 
         return $deftime;
     }
 
 
-    public static function tzdate($string,$time)
+    public static function tzdate($string, $time)
     {
         global $tzoffset, $tzname;
-        if ($tzname != '')
-        {
+        if ($tzname != '') {
             return date($string, $time);
-        } else
-        {
-            $serveroffset = date('Z') + $tzoffset*60;
-            return date($string, $time-$serveroffset);
+        } else {
+            $serveroffset = date('Z') + $tzoffset * 60;
+            return date($string, $time - $serveroffset);
         }
     }
+
     public static function formatDate($date)
     {
-        return AppUtility::tzdate("D n/j/y, g:i a",$date);
+        return AppUtility::tzdate("D n/j/y, g:i a", $date);
     }
 
     public static function calculateTimeToDisplay($deftime)
     {
-        $defetime = $deftime%10000;
-        $hr = floor($defetime/60)%12;
-        $min = $defetime%60;
-        $am = ($defetime<12*60)?'am':'pm';
-        $deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
-        if ($deftime>10000) {
-            $defstime = floor($deftime/10000);
-            $hr = floor($defstime/60)%12;
-            $min = $defstime%60;
-            $am = ($defstime<12*60)?'am':'pm';
-            $defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+        $defetime = $deftime % 10000;
+        $hr = floor($defetime / 60) % 12;
+        $min = $defetime % 60;
+        $am = ($defetime < 12 * 60) ? 'am' : 'pm';
+        $deftimedisp = (($hr == 0) ? 12 : $hr) . ':' . (($min < 10) ? '0' : '') . $min . ' ' . $am;
+        if ($deftime > 10000) {
+            $defstime = floor($deftime / 10000);
+            $hr = floor($defstime / 60) % 12;
+            $min = $defstime % 60;
+            $am = ($defstime < 12 * 60) ? 'am' : 'pm';
+            $defstimedisp = (($hr == 0) ? 12 : $hr) . ':' . (($min < 10) ? '0' : '') . $min . ' ' . $am;
         } else {
             $defstimedisp = $deftimedisp;
         }
@@ -374,42 +375,48 @@ class AppUtility extends Component {
     }
 
 //        Displays date and time
-    public static function parsedatetime($date, $time) {
+    public static function parsedatetime($date, $time)
+    {
         global $tzoffset, $tzname;
-        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$tmatches);
-        if (count($tmatches)==0) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/',$time,$tmatches);
+        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
+        if (count($tmatches) == 0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = 0;
         }
-        $tmatches[1] = $tmatches[1]%12;
-        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+        $tmatches[1] = $tmatches[1] % 12;
+        if ($tmatches[3] == "pm") {
+            $tmatches[1] += 12;
+        }
 
-        if ($tzname=='') {
-            $serveroffset = date('Z')/60 + $tzoffset;
+        if ($tzname == '') {
+            $serveroffset = date('Z') / 60 + $tzoffset;
             $tmatches[2] += $serveroffset;
         }
-        return mktime($tmatches[1],$tmatches[2],0,$dmatches[1],$dmatches[2],$dmatches[3]);
+        return mktime($tmatches[1], $tmatches[2], 0, $dmatches[1], $dmatches[2], $dmatches[3]);
     }
 
 //    Displays only time
-    public static function parsetime($time) {
+    public static function parsetime($time)
+    {
         global $tzoffset, $tzname;
-        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$time,$tmatches);
-        if (count($tmatches)==0) {
-            preg_match('/(\d+)\s*([a-zA-Z]+)/',$time,$tmatches);
+        preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
+        if (count($tmatches) == 0) {
+            preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
             $tmatches[3] = $tmatches[2];
             $tmatches[2] = 0;
         }
-        $tmatches[1] = $tmatches[1]%12;
-        if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+        $tmatches[1] = $tmatches[1] % 12;
+        if ($tmatches[3] == "pm") {
+            $tmatches[1] += 12;
+        }
 
-        if ($tzname=='') {
-            $serveroffset = date('Z')/60 + $tzoffset;
+        if ($tzname == '') {
+            $serveroffset = date('Z') / 60 + $tzoffset;
             $tmatches[2] += $serveroffset;
         }
-        return mktime($tmatches[1],$tmatches[2],0);
+        return mktime($tmatches[1], $tmatches[2], 0);
     }
 
     public static function myRight()
@@ -418,18 +425,19 @@ class AppUtility extends Component {
     }
 
     /*Show Calender*/
-   public static function showCalendar($refpage) {
+    public static function showCalendar($refpage)
+    {
 
-        global $imasroot,$cid,$userid,$teacherid,$previewshift,$latepasses,$urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
+        global $imasroot, $cid, $userid, $teacherid, $previewshift, $latepasses, $urlmode, $latepasshrs, $myrights, $tzoffset, $tzname, $havecalcedviewedassess, $viewedassess;
 
         $now = time();
-        if ($previewshift!=-1) {
+        if ($previewshift != -1) {
             $now = $now + $previewshift;
         }
-        if (!isset($_COOKIE['calstart'.$cid]) || $_COOKIE['calstart'.$cid] == 0) {
+        if (!isset($_COOKIE['calstart' . $cid]) || $_COOKIE['calstart' . $cid] == 0) {
             $today = $now;
         } else {
-            $today = $_COOKIE['calstart'.$cid];
+            $today = $_COOKIE['calstart' . $cid];
         }
 
         if (isset($_GET['calpageshift'])) {
@@ -437,36 +445,36 @@ class AppUtility extends Component {
         } else {
             $pageshift = 0;
         }
-        if (!isset($_COOKIE['callength'.$cid])) {
+        if (!isset($_COOKIE['callength' . $cid])) {
             $callength = 4;
         } else {
-            $callength = $_COOKIE['callength'.$cid];
+            $callength = $_COOKIE['callength' . $cid];
         }
 
-        $today = $today + $pageshift*7*$callength*24*60*60;
+        $today = $today + $pageshift * 7 * $callength * 24 * 60 * 60;
 
-        $dayofweek = tzdate('w',$today);
-        $curmonum = tzdate('n',$today);
-        $dayofmo = tzdate('j',$today);
-        $curyr = tzdate('Y',$today);
-        if ($tzname=='') {
-            $serveroffset = date('Z') + $tzoffset*60;
+        $dayofweek = tzdate('w', $today);
+        $curmonum = tzdate('n', $today);
+        $dayofmo = tzdate('j', $today);
+        $curyr = tzdate('Y', $today);
+        if ($tzname == '') {
+            $serveroffset = date('Z') + $tzoffset * 60;
         } else {
             $serveroffset = 0; //don't need this if user's timezone has been set
         }
-        $midtoday = mktime(12,0,0,$curmonum,$dayofmo,$curyr)+$serveroffset;
+        $midtoday = mktime(12, 0, 0, $curmonum, $dayofmo, $curyr) + $serveroffset;
 
 
         $hdrs = array();
         $ids = array();
 
         $lastmo = '';
-        for ($i=0;$i<7*$callength;$i++) {
-            $row = floor($i/7);
-            $col = $i%7;
+        for ($i = 0; $i < 7 * $callength; $i++) {
+            $row = floor($i / 7);
+            $col = $i % 7;
 
-            list($thismo,$thisday,$thismonum,$datestr) = explode('|',tzdate('M|j|n|l F j, Y',$midtoday - ($dayofweek - $i)*24*60*60));
-            if ($thismo==$lastmo) {
+            list($thismo, $thisday, $thismonum, $datestr) = explode('|', tzdate('M|j|n|l F j, Y', $midtoday - ($dayofweek - $i) * 24 * 60 * 60));
+            if ($thismo == $lastmo) {
                 $hdrs[$row][$col] = $thisday;
             } else {
                 $hdrs[$row][$col] = "$thismo $thisday";
@@ -478,41 +486,43 @@ class AppUtility extends Component {
         }
     }
 
-   public static function basicShowQuestions($qn,$seqinactive=false,$colors=array()) {
+    public static function basicShowQuestions($qn, $seqinactive = false, $colors = array())
+    {
 
-       require_once("TestUtil.php");
+        require_once("TestUtil.php");
 
-       $arrayData = basicshowq($qn,$seqinactive=false,$colors=array());
-       var_dump($arrayData);
+        $arrayData = basicshowq($qn, $seqinactive = false, $colors = array());
+        var_dump($arrayData);
     }
 
-  /*Generate assessment data*/
+    /*Generate assessment data*/
 
-   public static function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {
-        $ioquestions = explode(",",$itemorder);
+    public static function generateAssessmentData($itemorder, $shuffle, $aid, $arrayout = false)
+    {
+        $ioquestions = explode(",", $itemorder);
         $questions = array();
-        foreach($ioquestions as $k=>$q) {
-            if (strpos($q,'~')!==false) {
-                $sub = explode('~',$q);
-                if (strpos($sub[0],'|')===false) { //backwards compat
-                    $questions[] = $sub[array_rand($sub,1)];
+        foreach ($ioquestions as $k => $q) {
+            if (strpos($q, '~') !== false) {
+                $sub = explode('~', $q);
+                if (strpos($sub[0], '|') === false) { //backwards compat
+                    $questions[] = $sub[array_rand($sub, 1)];
                 } else {
                     $grpqs = array();
-                    $grpparts = explode('|',$sub[0]);
+                    $grpparts = explode('|', $sub[0]);
                     array_shift($sub);
-                    if ($grpparts[1]==1) { // With replacement
-                        for ($i=0; $i<$grpparts[0]; $i++) {
-                            $questions[] = $sub[array_rand($sub,1)];
+                    if ($grpparts[1] == 1) { // With replacement
+                        for ($i = 0; $i < $grpparts[0]; $i++) {
+                            $questions[] = $sub[array_rand($sub, 1)];
                         }
-                    } else if ($grpparts[1]==0) { //Without replacement
+                    } else if ($grpparts[1] == 0) { //Without replacement
                         shuffle($sub);
-                        for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
+                        for ($i = 0; $i < min($grpparts[0], count($sub)); $i++) {
                             $questions[] = $sub[$i];
                         }
                         //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
-                        if ($grpparts[0]>count($sub)) { //fix stupid inputs
-                            for ($i=count($sub); $i<$grpparts[0]; $i++) {
-                                $questions[] = $sub[array_rand($sub,1)];
+                        if ($grpparts[0] > count($sub)) { //fix stupid inputs
+                            for ($i = count($sub); $i < $grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub, 1)];
                             }
                         }
                     }
@@ -521,44 +531,46 @@ class AppUtility extends Component {
                 $questions[] = $q;
             }
         }
-        if ($shuffle&1) {shuffle($questions);}
+        if ($shuffle & 1) {
+            shuffle($questions);
+        }
 
-        if ($shuffle&2) { //all questions same random seed
-            if ($shuffle&4) { //all students same seed
-                $seeds = array_fill(0,count($questions),$aid);
-                $reviewseeds = array_fill(0,count($questions),$aid+100);
+        if ($shuffle & 2) { //all questions same random seed
+            if ($shuffle & 4) { //all students same seed
+                $seeds = array_fill(0, count($questions), $aid);
+                $reviewseeds = array_fill(0, count($questions), $aid + 100);
             } else {
-                $seeds = array_fill(0,count($questions),rand(1,9999));
-                $reviewseeds = array_fill(0,count($questions),rand(1,9999));
+                $seeds = array_fill(0, count($questions), rand(1, 9999));
+                $reviewseeds = array_fill(0, count($questions), rand(1, 9999));
             }
         } else {
-            if ($shuffle&4) { //all students same seed
-                for ($i = 0; $i<count($questions);$i++) {
+            if ($shuffle & 4) { //all students same seed
+                for ($i = 0; $i < count($questions); $i++) {
                     $seeds[] = $aid + $i;
                     $reviewseeds[] = $aid + $i + 100;
                 }
             } else {
-                for ($i = 0; $i<count($questions);$i++) {
-                    $seeds[] = rand(1,9999);
-                    $reviewseeds[] = rand(1,9999);
+                for ($i = 0; $i < count($questions); $i++) {
+                    $seeds[] = rand(1, 9999);
+                    $reviewseeds[] = rand(1, 9999);
                 }
             }
         }
 
 
-        $scores = array_fill(0,count($questions),-1);
-        $attempts = array_fill(0,count($questions),0);
-        $lastanswers = array_fill(0,count($questions),'');
+        $scores = array_fill(0, count($questions), -1);
+        $attempts = array_fill(0, count($questions), 0);
+        $lastanswers = array_fill(0, count($questions), '');
         if ($arrayout) {
-            return array($questions,$seeds,$reviewseeds,$scores,$attempts,$lastanswers);
+            return array($questions, $seeds, $reviewseeds, $scores, $attempts, $lastanswers);
         } else {
-            $qlist = implode(",",$questions);
-            $seedlist = implode(",",$seeds);
-            $reviewseedlist = implode(",",$reviewseeds);
-            $scorelist = implode(",",$scores);
-            $attemptslist = implode(",",$attempts);
-            $lalist = implode("~",$lastanswers);
-            return array($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist);
+            $qlist = implode(",", $questions);
+            $seedlist = implode(",", $seeds);
+            $reviewseedlist = implode(",", $reviewseeds);
+            $scorelist = implode(",", $scores);
+            $attemptslist = implode(",", $attempts);
+            $lalist = implode("~", $lastanswers);
+            return array($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist);
         }
 
     }

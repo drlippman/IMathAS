@@ -36,20 +36,21 @@ class RosterController extends AppController
 
     public function actionLoginGridViewAjax()
     {
-        $pramas = $this->getBodyParams();
-
-        $newStartDate = strtotime($pramas['newStartDate']);
-        $newEndDate = strtotime($pramas['newEndDate']);
         $this->guestUserHandler();
+
+        $params = $this->getBodyParams();
+        $cid = $params['cid'];
+
+        $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
+        $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
+
+        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
         $headsArray = array();
         $headsArray[] = 'Name';
         for($curDate = $newStartDate; $curDate<= $newEndDate;  ($curDate = $curDate+86400)){
             $day = date('m/d', $curDate );
             $headsArray[] = $day;
         }
-        $cid = $pramas['cid'];
-
-        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
         $rowLogs = array();
         $nameHash = array();
         foreach($loginLogs as $loginLog){

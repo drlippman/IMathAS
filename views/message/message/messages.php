@@ -123,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
         {
 
 
-            if(messageData.isread == 1 || messageData.isread == 5)
+            if(messageData.isread == 1 || messageData.isread == 5 ||messageData.isread == 9 ||messageData.isread == 13)
              {
                 html += "<tr class='read-message message-row message-row-'"+messageData.id+"> <td><input type='checkbox' id='Checkbox' name='msg-check' value='"+messageData.id+"' class='message-checkbox-"+messageData.id+"' ></td>";
             }
@@ -140,12 +140,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 html += "<th>No</th>";
             }
             var rowid = messageData.id;
-            if(messageData.isread == 9 || messageData.isread == 8  )
+            if(messageData.isread < 7)
             {
-                html += "<td><img src='../../../web/img/flagfilled.gif' onclick='changeImage(this,"+rowid+")'/></td>";
-            }
-            else if(messageData.isread == 1 || messageData.isread == 0){
                 html += "<td><img src='../../../web/img/flagempty.gif' onclick='changeImage(this,"+rowid+")'/></td>";
+            }
+            else{
+                html += "<td><img src='../../../web/img/flagfilled.gif' onclick='changeImage(this,"+rowid+")'/></td>";
             }
             html += "<td>"+messageData.FirstName.substr(0,1).toUpperCase()+ messageData.FirstName.substr(1)+" "+messageData.LastName.substr(0,1).toUpperCase()+ messageData.LastName.substr(1)+"</td>";
             html += "<td>"+messageData.name.substr(0,1).toUpperCase()+ messageData.name.substr(1)+"</td>";

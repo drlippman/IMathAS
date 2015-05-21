@@ -319,6 +319,7 @@ class MessageController extends AppController
 
         $params = $this->getBodyParams();
         $row = $params['rowId'];
+
        $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
         return json_encode(['status' => '0']);
        // $query = "UPDATE imas_msgs SET isread=(isread^8) WHERE msgto='$userid' AND id='{$_GET['threadid']}'";

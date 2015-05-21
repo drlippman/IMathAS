@@ -110,31 +110,33 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     $( document ).ready(function() {
+        previousWeekHandler();
+        nextWeekHandler();
+    });
 
+    function previousWeekHandler(){
+        var daysInAWeek = 7;
         $("#previous-link").click(function () {
-            finalDate = toggleDate('w0', 7, 'deduct');
+            finalDate = toggleDate('w0', daysInAWeek, 'deduct');
             $( "#w0").val(finalDate);
 
-            finalDate = toggleDate('w1', 7, 'deduct');
+            finalDate = toggleDate('w1', daysInAWeek, 'deduct');
             $( "#w1").val(finalDate);
-            $('go-button').trigger('click');
+            $('#go-button').trigger('click');
         });
-    });
-
-    $( document ).ready(function() {
-
+    }
+    function nextWeekHandler(){
+        var daysInAWeek = 7;
         $("#following-link").click(function () {
-            var startDate = $( "#datepicker-id input" ).val();
-            var endDate = $( "#datepicker-id1 input" ).val();
+            finalDate = toggleDate('w0', daysInAWeek, 'add');
+            $( "#w0").val(finalDate);
 
-            var course_id =  $( "#course-id" ).val();
-            var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
-
-            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewFollowingLinkSuccess');
-
-
+            finalDate = toggleDate('w1', daysInAWeek, 'add');
+            $( "#w1").val(finalDate);
+            $('#go-button').trigger('click');
         });
-    });
+    }
+
     function loginGridViewSuccess(response) {
         var data = JSON.parse(response);
         data = data.data;
