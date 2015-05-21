@@ -79,14 +79,14 @@ class Message extends BaseImasMsgs
         elseif($message->isread==5){
                 $message->isread=5;
             }
-//        elseif($message->isread==8){
-//
-//            $message->isread=9;
-//        }
-//        elseif($message->isread==12){
-//
-//            $message->isread=13;
-      //  }
+        elseif($message->isread==8){
+
+            $message->isread=9;
+        }
+        elseif($message->isread==12){
+
+            $message->isread=13;
+        }
           $message->save();
     }
     public static function getById($id)
