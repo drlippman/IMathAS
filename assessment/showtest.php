@@ -128,7 +128,11 @@
 						$query = "SELECT id FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$aid' ORDER BY id LIMIT 1";
 						$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 						if (mysql_num_rows($result)>0) {
-							echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'">', _('View your assessment'), '</p>';
+							echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.mysql_result($result,0,0).'" ';
+							if ($adata['allowlate']>10 && ($now - $adata['enddate'])<$latepasshrs*3600 && !in_array($aid,$viewedassess) && $latepasses>0 && !isset($sessiondata['stuview']) && !$actas) {
+								echo ' onclick="return confirm(\''._('If you view this scored assignment, you will not be able to use a LatePass on it').'\');"';	
+							} 
+							echo '>', _('View your scored assessment'), '</p>';
 						}
 					}
 				}
@@ -975,7 +979,11 @@ if (!isset($_POST['embedpostback'])) {
 		
 		if ($sessiondata['ltiitemid']==$testsettings['id'] && $isreview) {
 			if ($testsettings['showans']!='N') {
-				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'">', _('View your scored assessment'), '</a></p>';
+				echo '<p><a href="../course/gb-viewasid.php?cid='.$cid.'&asid='.$testid.'" ';
+				if ($isreview && !(isset($exceptionduedate) && $exceptionduedate>0) && $testsettings['allowlate']>10 && $sessiondata['latepasses']>0 && !isset($sessiondata['stuview']) && !$actas && (time() - $testsettings['enddate'])<$latepasshrs*3600 && !in_array($testsettings['id'],$viewedassess)) {
+					echo ' onclick="return confirm(\''._('If you view this scored assignment, you will not be able to use a LatePass on it').'\');"';	
+				} 		
+				echo '>', _('View your scored assessment'), '</a></p>';
 			}
 		}
 		echo '</span>';
