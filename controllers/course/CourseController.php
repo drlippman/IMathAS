@@ -331,13 +331,15 @@ class CourseController extends AppController
                 $course->attributes = $courseSetting;
                 $course->save();
             }
+            else{
             $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
             $this->includeCSS(["../css/courseSetting.css"]);
             return $this->renderWithData('courseSetting', ['model' => $model, 'course' => $course, 'selectionList' => $selectionList]);
+            }
 
-        } else {
-            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
         }
+            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
+
     }
 
     public function actionDeleteCourse()
