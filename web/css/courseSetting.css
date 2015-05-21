@@ -3,6 +3,9 @@
 }
 .datetime{
     width: 100%;
+    margin-bottom: 25px !important;
+
+
 }
 .bootstrap-timepicker{
     width: 82%;

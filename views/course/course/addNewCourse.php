@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div style="clear: both"></div>
             <?= $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
-            <?= $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default', 'angelish.css' => 'Angelish', 'angelishmore.css' => 'Angelishmore'], ['prompt' => 'Default']) ?>
+            <?= $form->field($model, 'theme')->dropDownList(['angelishmore.css' => 'Angelishmore','angelish.css' => 'Angelish' ,'facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default'], ['prompt' => 'Select Theme']) ?>
             <?= $form->field($model, 'selfEnroll')->radioList([AppConstant::NUMERIC_ONE => 'No', AppConstant::NUMERIC_TWO => 'Yes']) ?>
             <?= $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
             <?= $form->field($model, 'messageSystem')->radioList([AppConstant::NUMERIC_ONE => 'On for send and receive', AppConstant::NUMERIC_TWO => 'On for receive, students can only send to instructor', AppConstant::NUMERIC_THREE => 'On for receive, students can only send to students', AppConstant::NUMERIC_FOUR => 'On for receive, students cannot send', AppConstant::NUMERIC_FIVE => 'Off ']) ?>
@@ -67,8 +67,8 @@ $this->params['breadcrumbs'][] = $this->title;
     </fieldset>
 </div>
 <div class="form-group">
-    <div class="col-lg-11 col-lg-offset-3 display_field">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+    <div class="col-lg-11 col-lg-offset-2 display_field">
+        <?= Html::submitButton('Submit', ['id' => 'newCourse-btn','class' => 'btn btn-primary', 'name' => 'Submit']) ?>
     </div>
 </div>
 

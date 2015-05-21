@@ -9,7 +9,7 @@ use app\components\AppUtility;
 <a href="">Forums</a><br>
 
 <p>Tools</p>
-<a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"> roster</a><br>
+<a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"> Roster</a><br>
 <a href="">Gradebook</a><br>
 <a href="">Groups</a><br>
 <a href="">Outcomes</a><br>

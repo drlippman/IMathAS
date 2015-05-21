@@ -1,9 +1,10 @@
-<link href='../../../web/css/fullcalendar.print.css' rel='stylesheet' media='print' />
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
+<link href='<?php echo AppUtility::getHomeURL()?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
 <?php $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count"); ?>
 <?php echo $this->render('_toolbar');
 //AppUtility::dump($toremaining);
@@ -16,6 +17,10 @@ use app\components\AppUtility;
 <input type="hidden" id="now" value="<?php echo $now;?>">
 
 <html>
+<?php $assessmentTime = $assessmentSession->starttime;
+$assessmentTimelimit = $assessments->timelimit;
+$assessmentAdd = $assessmentTime + $assessmentTimelimit;
+?>
 <!--    Show total time and remaining time-->
 <div class=right id=timelimitholder>
 <?php
@@ -23,26 +28,21 @@ use app\components\AppUtility;
     $hour = (floor(abs($assessments->timelimit)/3600) < 10) ? '0'+floor(abs($assessments->timelimit)/3600) : floor(abs($assessments->timelimit)/3600);
     $min = floor((abs($assessments->timelimit)%3600)/60);
 ?>
+    <span id="timercontent"><b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
+        <span id="timerwrap"><b>
+                <span id='timer'></span>
 
-    <span id="timercontent">
-        <?php if($assessments->timelimit != 0) {?>
-        <b>Timelimit : <?php echo $hour .' hour, ' .$min .' minutes.'?></b>
-        <span id="timerwrap">
-            <b>
-            <span id='timer'></span>remaining.</span>
-
-             </b>
-        <?php }else {
-            echo 'Due ' . AppUtility::formatDate($assessments->enddate);
-         }?>
-    </span>
+                remaining.</span>
+        </b>
         <span onclick="toggletimer()" style="color:#aaa;" class="clickable" id="timerhide" title="Hide">[x]</span>
 
+    </span>
 
 </div>
 <div style="margin-left: 96%">
-<span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
-    </div>
+    <span  onclick="toggletimer()" style="color:#aaa;" class="timeshow" id="timershow"   title="Show">[Show]</span>
+</div>
+
 <div class=intro>
 
     <p>Total Points Possible:10</p>

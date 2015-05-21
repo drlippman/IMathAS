@@ -246,6 +246,12 @@ ul#navlist a {
 #sign-up-button{
     margin-left: 1px;
 }
+
+#newCourse-btn
+{
+
+   margin-left:87px;
+}
 .padding-zero{
     padding: 0px;
 }

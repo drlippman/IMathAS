@@ -42,6 +42,7 @@ class CourseController extends AppController
         $cid = $this->getParamVal('cid');
         $id = Yii::$app->request->get('id');
         $uid = Yii::$app->user->identity->getId();
+        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
         $cid = Yii::$app->request->get('cid');
         $responseData = array();
         $course = Course::getById($cid);
@@ -132,12 +133,10 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
-
-        $timelimit =$assessment->timelimit;
         $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css']);
         $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
-        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student]);
+        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
 
     }
 
