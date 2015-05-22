@@ -315,7 +315,7 @@ class AppUtility extends Component
 
     public static function formatDate($date)
     {
-        return AppUtility::tzdate("D n/j/y, g:i a", $date);
+        return AppUtility::tzdate("D n/j/20y, g:i a", $date);
     }
 
     public static function calculateTimeToDisplay($deftime)

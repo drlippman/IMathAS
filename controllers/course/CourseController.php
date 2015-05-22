@@ -145,10 +145,13 @@ class CourseController extends AppController
         $this->guestUserHandler();
 
         $id = Yii::$app->request->get('id');
+        $courseId = Yii::$app->request->get('cid');
         $assessment = Assessments::getByAssessmentId($id);
         $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
+        $course = Course::getById($courseId);
+//       AppUtility::dump($course);
 
         $assessmentclosed = false;
 
@@ -160,7 +163,7 @@ class CourseController extends AppController
 
         $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
+        return $this->render('ShowAssessment', ['cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
     }
 
     public function actionLatePass()
