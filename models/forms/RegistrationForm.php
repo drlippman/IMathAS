@@ -63,7 +63,7 @@ class RegistrationForm extends Model
             [['email'], 'string', 'max' => 100],
             ['phoneno','number'],
             [['phoneno'], 'string','max'=> 10,'min'=> 10],
-            [['confirmPassword'],'compare','compareAttribute'=>'password'],
+            [['confirmPassword'],'compare','compareAttribute'=>'password','message' => 'Confirm password does not match with password.'],
             ['terms', 'compare', 'compareValue' => 1, 'message' => 'You should accept term to use our service']
         ];
     }
@@ -82,7 +82,8 @@ class RegistrationForm extends Model
             'LastName' => 'Last Name',
             'email' => 'Email Address',
             'phoneno'=>'Phone Number',
-            'terms'=>'I have read and agree to the Terms of Use (below)'
+            'terms'=>'I have read and agree to the Terms of Use (below)',
+            'school' => 'School/College'
         ];
     }
 }
