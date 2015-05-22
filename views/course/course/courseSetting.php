@@ -79,7 +79,7 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
             <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
     </fieldset>
     <div class="form-group">
-        <div class="col-lg-offset-3 ">
+        <div class="col-lg-offset-3 course-btn">
             <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
         </div>
     </div>

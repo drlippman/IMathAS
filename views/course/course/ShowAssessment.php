@@ -6,8 +6,7 @@ use app\components\AppUtility;
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 
 <?php $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count"); ?>
-<?php echo $this->render('_toolbar');
-//AppUtility::dump($toremaining);
+<?php echo $this->render('_toolbar',['course'=> $cid]);
 ?>
 <!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
@@ -17,6 +16,7 @@ use app\components\AppUtility;
 <input type="hidden" id="timelimit" value="<?php echo $assessments->timelimit;?>">
 <input type="hidden" id="question" value="<?php echo $assessmentSession->questions;?>">
 <input type="hidden" id="now" value="<?php echo $now;?>">
+
 <html>
 <!--    Show total time and remaining time-->
 <div class=right id=timelimitholder>
@@ -130,12 +130,16 @@ use app\components\AppUtility;
     </span>
 </div>
 <div id="eh" class="eh">
-    <?php }else{?>
+    <?php }
+
+    else{?>
+        <input type="hidden" id="course-Id" value="<?php echo $cid->id;?>">
+        <!--    Else condition if questions are not present in the assessment -->
     <script type="text/javascript">
         $(document).ready(function()
         {
-
-            var msg = '<div><p>This Assessment does not have any questions right now</div>';
+            var courseid = $("#course-Id").val();
+            var msg = '<div><p>This assessment does not have any questions right now</div>';
 
             $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
             ({
@@ -144,9 +148,11 @@ use app\components\AppUtility;
                     closeText: "hide",
                     buttons:
                     {
-                        "Okay": function ()
+
+                        "G0 Back": function ()
                         {
-                            $(this).dialog('destroy').remove();
+                                window.location ="index?cid="+courseid;
+                                 $(this).dialog('destroy').remove();
 
                         }
 
@@ -173,7 +179,7 @@ use app\components\AppUtility;
 
        $('#timershow').hide();
        $('#timerhide').show();
-        $('#expired').hide();
+       $('#expired').hide();
 
 
        $('#timerhide').click(function()
@@ -198,12 +204,15 @@ use app\components\AppUtility;
                        '<p> This question was written by Lippman, David. This work is licensed under the<a href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
                       +'<p>The code that generated this question can be obtained by instructors by emailing akash.more@tudip.nl</p></div>';
              e.preventDefault();
-            $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+             $('<div  id="dialog"></div>').appendTo('body').html(html).dialog
+             ({
                 modal: true, title: 'Show License', zIndex: 10, autoOpen: true,
                 width: 'auto', resizable: false,
                 closeText: "hide",
-                buttons: {
-                    "Cancel": function () {
+                buttons:
+                {
+                    "Cancel": function ()
+                    {
                         $(this).dialog('destroy').remove();
                         return false;
 
@@ -223,18 +232,20 @@ use app\components\AppUtility;
         var timelimit_int = parseInt(timelimit);
                 if((assessmentsession_int + timelimit_int) < now_int)
                 {
-                    $("#timerwrap").hide();
-                    $("#timerhide").hide();
-                    $('#expired').show();
+                     $("#timerwrap").hide();
+                     $("#timerhide").hide();
+                     $('#expired').show();
                   var msg = '<div><p>Your time limit has expired </p>'+
-                        '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
-
-                    $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
+                            '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+                    $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+                    ({
                         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                         width: 'auto', resizable: false,
                         closeText: "hide",
-                        buttons: {
-                            "Okay": function () {
+                        buttons:
+                        {
+                            "Okay": function ()
+                            {
                                 $(this).dialog('destroy').remove();
                                 return true;
                             }

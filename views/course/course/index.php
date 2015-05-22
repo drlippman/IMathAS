@@ -8,9 +8,10 @@ use app\components\AppUtility;
     <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+
 ?>
 
-<?php echo $this->render('_toolbar'); ?>
+<?php echo $this->render('_toolbar',['course'=> $course]); ?>
 
     <div class=" col-lg-3 needed">
         <?php echo $this->render('_leftSide',['course'=> $course]);?>
@@ -31,7 +32,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                 <?php $assessment = $item[key($item)]; ?>
                 <?php if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) { ?>
                     <div class="item">
-                        <div class="icon" style="background-color: #1f0;">?</div>
+                        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
                             <div class="title">
                           <?php if($assessment->timelimit != 0) {?> <!--timelimit-->
                               <?php if($assessment->password == '') {?> <!--Set password-->
@@ -79,7 +80,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         </div>
     <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
         <div class="item">
-            <div class="icon" style="background-color: #1f0;">?</div>
+            <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link"><?php echo $assessment->name ?></a></b>
                 <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">

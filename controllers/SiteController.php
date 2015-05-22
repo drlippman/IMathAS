@@ -120,7 +120,8 @@ class SiteController extends AppController
             $user->save();
 
             $toEmail = $user->email;
-            $message = 'First Name: ' . $user->FirstName . "<br/>\n";
+            $message = '<p>We received a request for instructor account with following credentials.</p>';
+            $message .= 'First Name: ' . $user->FirstName . "<br/>\n";
             $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
             $message .= 'Email Name: ' . $user->email . "<br/>\n";
             $message .= 'User Name: ' . $user->SID . "<br/>\n";
@@ -143,7 +144,8 @@ class SiteController extends AppController
             $params = $params['StudentRegisterForm'];
             $status = User::createStudentAccount($params);
             if ($status) {
-                $message = 'First Name: ' . $params['FirstName'] . "<br/>\n";
+                $message = "<p>We received a request for student account with following credentials.</p> ";
+                $message .= 'First Name: ' . $params['FirstName'] . "<br/>\n";
                 $message .= 'Last Name: ' . $params['LastName'] . "<br/>\n";
                 $message .= 'Email Name: ' . $params['email'] . "<br/>\n";
                 $message .= 'User Name: ' . $params['username'] . "<br/>\n";

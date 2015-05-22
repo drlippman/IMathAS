@@ -1,29 +1,10 @@
 /**
  * Created by tudip on 4/5/15.
  */
+$(document).ready(function(){
 
-//Show pop dialog for delete the course.
-$(".delete-confirmation").on("click", function (e) {
-    var html = "<div>Are you sure?</div>";
-    e.preventDefault();
-    $('<div></div>').appendTo('body').html(html).dialog({
-        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
-        closeText: "hide",
-        buttons: {
-            "Confirm": function () {
-                $(this).dialog("close");
-                return true;
-            },
-            "Cancel": function () {
-                $(this).dialog("close");
-                return false;
-            }
-        },
-        close: function (event, ui) {
-            $(this).remove();
-        }
-    });
+//    $('.dataTables_filter input').get(0).type = 'text';
+    $('.dataTables_filter').prop('type', 'text');
 });
 
 function jQuerySubmit(url, data, successCallBack) {

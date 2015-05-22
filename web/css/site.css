@@ -175,6 +175,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 
 .register-terms-label{
     font-weight: normal;
+    margin-left: 69%;
 }
 
 .form-group{
@@ -266,4 +267,8 @@ ul#navlist a {
 }
 .instructor-save{
     margin-left: 15px;
+}
+
+table tbody tr.odd {
+    background-color: #f9f9f9 !important;
 }
