@@ -19,11 +19,11 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     </div>
 
 <!--    <!--Course name-->
+
 <div class="col-lg-9 container">
     <div class="course">
         <h3><b><?php echo $course->name ?></b></h3>
     </div>
-
     <!-- ////////////////// Assessment here //////////////////-->
     <?php if(count($courseDetail)){
         foreach($courseDetail as $key => $item){
@@ -38,7 +38,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                               <?php if($assessment->password == '') {?> <!--Set password-->
                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                            <?php if ($assessment->enddate != 2000000000) { ?>
+                           <?php if ($assessment->enddate != 2000000000) { ?>
                             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
 
                     <!-- Use Late Pass here-->

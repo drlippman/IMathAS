@@ -14,7 +14,7 @@ class ChangeUserInfoForm extends Model
     public $rePassword;
     public $email;
     public $NotifyMeByEmailWhenIReceiveANewMessage= true;
-    public $file;
+    public $image;
     public $message;
     public $oldPassword;
     public $changePassword;
@@ -40,8 +40,8 @@ class ChangeUserInfoForm extends Model
             ['email','email'],
             ['changePassword','boolean'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
-            ['file','safe'],
-            [['file'],'file'],
+            [['image'], 'safe'],
+            [['image'], 'file', 'types' => Yii::$app->controller->module->imagetype],
             [['password', 'oldPassword', 'rePassword'], 'validatePassword'],
         ];
 
@@ -58,7 +58,7 @@ class ChangeUserInfoForm extends Model
             'LastName' => 'Enter Last Name',
             'email' => 'Email',
             'NotifyMeByEmailWhenIReceiveANewMessage'=>'Notify me by email when I receive a new message',
-            'file'=>'Picture',
+            'image'=>'Picture',
             'message'=>'Messages/Posts per page',
             'homepage'=>'Show on home page',
         ];
