@@ -13,7 +13,7 @@ class ChangePasswordForm extends Model
         return
             [
                 [['oldPassword','confirmPassword','newPassword'],'required'],
-                ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword'],
+                ['confirmPassword', 'compare', 'compareAttribute'=>'newPassword','message' => 'Confirm password does not match Old password'],
             ];
 
     }

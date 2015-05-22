@@ -376,7 +376,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                                 <?php $assessment = $item[key($item)]; ?>
                                 <?php if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) { ?>
                                 <div class="item">
-                                    <div class="icon" style="background-color: #1f0;">?</div>
+                                    <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
                                     <div class="title">
                                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                                         <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
