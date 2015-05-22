@@ -57,19 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </div>
 
-    <table id="message-table display-message-table" class="message-table display-message-table">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Message</th>
-            <th>To</th>
-            <th>Read</th>
-            <th>Sent</th>
-        </tr>
-        </thead>
-        <tbody class="message-table-body">
-        </tbody>
-    </table>
+    <div class="message-div"></div>
 </div>
 </body>
 </html>
@@ -88,6 +76,13 @@ $this->params['breadcrumbs'][] = $this->title;
     });
 
     var messageData;
+    function createTableHeader()
+    {
+        var html = "<table id='message-table-show display-message-table' class='message-table-show display-message-table'>";
+        html += "<thead><tr><th></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>"
+        html += "<tbody class='message-table-body'></tbody></table>";
+        $('.message-div').append(html);
+    }
     function showMessageSuccess(response)
     {
        var filterArrayForUser = [];
@@ -134,7 +129,8 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             html += "<td>"+messageData.senddate+"</td>";
            });
-        $(".message-table-body tr").remove();
+        $('.message-div div').remove();
+        createTableHeader();
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
     }
@@ -222,7 +218,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             else
             {
-                alert("Nothing to delete");
+                alert("Nothing to Remove");
             }
 
 
@@ -265,8 +261,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         filteredArray.push(messageData);
                     }
-                    showMessage(filteredArray);
                 });
+                showMessage(filteredArray);
             }
         });
     }
@@ -322,7 +318,7 @@ $this->params['breadcrumbs'][] = $this->title;
            }
            else
            {
-               alert("Nothing to delete");
+               alert("Nothing to unsend");
            }
 
 

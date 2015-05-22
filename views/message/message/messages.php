@@ -55,21 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
             <a class="btn btn-primary  btn-danger" id="mark-delete">Delete</a>
     </div>
-    <table id="message-table display-message-table" class="message-table display-message-table">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Message</th>
-            <th>Replied</th>
-            <th>Flag</th>
-            <th>From</th>
-            <th>Course</th>
-            <th>Sent</th>
-        </tr
-        </thead>
-        <tbody class="message-table-body">
-        </tbody>
-    </table>
+    <div class="message-div"></div>
+
 </div>
 </body>
 </html>
@@ -87,6 +74,12 @@ $this->params['breadcrumbs'][] = $this->title;
         markAsDelete();
     });
     var messageData;
+    function createTableHeader(){
+    var html = "<table id='message-table display-message-table' class='message-table display-message-table'>"
+        html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>"
+        html += "</tr></thead><tbody class='message-table-body'></tbody></table>"
+        $('.message-div').append(html);
+    }
     function showMessageSuccess(response)
     {
         var filterArrayForUser = [];
@@ -155,7 +148,8 @@ $this->params['breadcrumbs'][] = $this->title;
             html += "<td>"+messageData.senddate+"</td>";
         });
 
-        $(".message-table-body tr").remove();
+        $('.message-div div').remove();
+        createTableHeader();
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
 

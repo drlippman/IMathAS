@@ -54,8 +54,6 @@ $(document).ready(function(){
             '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
-<<<<<<< Updated upstream
-=======
 
         if((assessmentsession_int + timelimit_int) < now_int)
          {
@@ -104,27 +102,26 @@ $(document).ready(function(){
 
         }
 
->>>>>>> Stashed changes
 
-                        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
-                            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                            width: 'auto', resizable: false,
-                            closeText: "hide",
-                            buttons: {
-                                "Cancel": function () {
-                                    $(this).dialog('destroy').remove();
-                                    return false;
-                                },
-                                "confirm": function () {
-                                    window.location = cancelUrl;
-                                    $(this).dialog("close");
-                                    return true;
-                               }
-                            },
-                            close: function (event, ui) {
-                                $(this).remove();
-                            }
-                        });
+//                        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+//                            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+//                            width: 'auto', resizable: false,
+//                            closeText: "hide",
+//                            buttons: {
+//                                "Cancel": function () {
+//                                    $(this).dialog('destroy').remove();
+//                                    return false;
+//                                },
+//                                "confirm": function () {
+//                                    window.location = cancelUrl;
+//                                    $(this).dialog("close");
+//                                    return true;
+//                               }
+//                            },
+//                            close: function (event, ui) {
+//                                $(this).remove();
+//                            }
+//                        });
     });
 
 });
