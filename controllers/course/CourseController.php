@@ -245,10 +245,18 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $questionId = $this->getParamVal('to');
-        AppUtility::basicShowQuestions($questionId);
-        die;
-        $this->render(AppUtility::getURLFromHome('course','course/showAssessment?id='.$questionId));
+        $pq = AppUtility::basicShowQuestions($questionId);
+        AppUtility::dump($pq);
 
+        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
+
+
+    }
+    public function actionQuestionSet()
+    {
+        $tpQuestion = QuestionSet::getById('1');
+
+        $this->renderWithData('question-set');
     }
 
     public function actionPassword()
@@ -257,15 +265,15 @@ class CourseController extends AppController
         $model = new SetPassword();
         $assessmentId = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
-
         if ($this->isPostMethod())
         {
             $params = $this->getBodyParams();
             $password = $params['SetPassword']['password'];
             if($password == $assessment->password)
             {
-                //return $this->redirect('show-assessment');
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id));
             }
             else
             {
@@ -274,6 +282,7 @@ class CourseController extends AppController
         }
         return $this->renderWithData('setPassword', ['model' => $model, 'assessments' => $assessment]);
     }
+
 
     public function actionAddNewCourse()
     {

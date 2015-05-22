@@ -490,9 +490,10 @@ class AppUtility extends Component
     {
 
         require_once("TestUtil.php");
+       $arrayData = basicshowq($qn,$seqinactive=false,$colors=array());
+       //var_dump($arrayData);
+       return $arrayData;
 
-        $arrayData = basicshowq($qn, $seqinactive = false, $colors = array());
-        var_dump($arrayData);
     }
 
     /*Generate assessment data*/
