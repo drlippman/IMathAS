@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
 
 class Student extends BaseImasStudents {
@@ -32,5 +33,9 @@ class Student extends BaseImasStudents {
     public static function getByCId($cId)
     {
         return static::findOne(['courseid' => $cId]);
+    }
+    public static function getByUsername($username)
+    {
+           return static::findAll(['SID' => $username]);
     }
 } 

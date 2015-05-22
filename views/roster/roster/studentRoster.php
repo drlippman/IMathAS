@@ -22,7 +22,7 @@ $this->title = 'Student Roster';
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage LatePasses</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Enroll Student with known username</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'enroll=student'); ?>">Enroll Student with known username</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Import Students from File</a><br/>

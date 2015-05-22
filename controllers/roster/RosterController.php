@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers\roster;
 use app\models\Course;
+use app\models\forms\StudentEnrollCourseForm;
+use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
 use app\models\Student;
@@ -10,6 +12,7 @@ use app\components\AppUtility;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\db\Query;
+
 
 
 class RosterController extends AppController
@@ -103,4 +106,66 @@ class RosterController extends AppController
         $query = Yii::$app->db->createCommand("select * from imas_users")->queryAll();
         return json_encode(['status' => '0','query' => $query]);
     }
+    public function actionStudentEnrollment()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $model = new StudentEnrollmentForm();
+        $course = Course::getById($cid);
+        if ($model->load(\Yii::$app->request->post())) {
+            $param = $this->getBodyParams();
+            $param = $param['StudentEnrollmentForm'];
+            $user = $this->getAuthenticatedUser();
+            $uid = User::findByUsername($param['usernameToEnroll']);
+            $stdreccord =Student::getByUserId($uid->id);
+            if($stdreccord){
+
+            }else {
+                $this->setErrorFlash('Invalid combinatio.');
+            }
+
+            }
+        return $this->render('studentEnrollment',['course' => $course, 'model'=>$model]);
+
+    }
+//    public function actionStudentEnrollCourse()
+//    {
+//        $this->guestUserHandler();
+//        $model = new StudentEnrollCourseForm();
+//        if ($model->load(\Yii::$app->request->post())) {
+//            $param = $this->getBodyParams();
+//            $param = $param['StudentEnrollCourseForm'];
+//            $user = $this->getAuthenticatedUser();
+//
+//            $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
+//            if ($course) {
+//                $teacher = Teacher::getByUserId($user->id, $param['courseId']);
+//                $tutor = Tutor::getByUserId($user->id, $param['courseId']);
+//                $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
+//
+//                if (!$teacher && !$tutor && !$alreadyEnroll) {
+//                    $param['userid'] = $user->id;
+//                    $param['courseid'] = $param['courseId'];
+//                    $param = AppUtility::removeEmptyAttributes($param);
+//
+//                    $student = new Student();
+//                    $student->create($param);
+//
+//                    $this->setSuccessFlash('You have been enrolled in course ' . $course->name . ' successfully');
+//                } else {
+//                    $errorMessage = 'You are already enrolled in the course.';
+//                    if ($teacher) {
+//                        $errorMessage = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
+//                    } elseif ($tutor) {
+//                        $errorMessage = 'You are a tutor for this course, and can not enroll as a student.';
+//                    }
+//                    $this->setErrorFlash($errorMessage);
+//                }
+//            } else {
+//                $this->setErrorFlash('Invalid combination of enrollment key and course id.');
+//            }
+//        }
+//        return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
+//    }
+
 }
