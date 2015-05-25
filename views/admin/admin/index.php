@@ -244,4 +244,5 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".user-table-body").append(html);
         $('.user-table').DataTable();
     }
+
 </script>

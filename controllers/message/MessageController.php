@@ -300,9 +300,14 @@ class MessageController extends AppController
         $baseId = Yii::$app->request->get('baseid');
         $msgId = Yii::$app->request->get('id');
         if ($this->getAuthenticatedUser()) {
+
             $messages = Message::getByBaseId($msgId,$baseId);
-            $fromUser = User::getById($messages->msgfrom);
-            return $this->renderWithData('viewConversation', ['messages' => $messages, 'fromUser' => $fromUser]);
+//            foreach ($messages as $message){
+//                $fromUser = User::getById($message->msgfrom);
+//                array_push($userArray);
+//               }
+            //$fromUser = User::getById($messages->msgfrom);
+            return $this->renderWithData('viewConversation', ['messages' => $messages,]);
         }
     }
 
