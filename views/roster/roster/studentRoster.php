@@ -1,14 +1,11 @@
 <?php
 use app\components\AppUtility;
-$this->title = 'Student Roster';
+$this->title = 'Roster';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-
-    <div class="breadcrumb" id="title_bar">
-        <a HREF="<?php echo AppUtility::getURLFromHome('site', 'index') ?>">Home</a><br/>
-    </div>
 </head>
 <body>
 
@@ -22,8 +19,8 @@ $this->title = 'Student Roster';
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage LatePasses</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'enroll=student'); ?>">Enroll Student with known username</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Enroll students from another course</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>">Enroll Student with known username</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Import Students from File</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Create and Enroll new student</a><br/>

@@ -1,12 +1,15 @@
 <?php
 namespace app\controllers\roster;
 use app\models\Course;
+use app\models\forms\EnrollFromOtherCourseForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
 use app\models\Student;
+use app\models\Teacher;
 use app\models\User;
+use Seld\JsonLint\JsonParser;
 use Yii;
 use app\components\AppUtility;
 use app\controllers\AppController;
@@ -112,60 +115,101 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $model = new StudentEnrollmentForm();
         $course = Course::getById($cid);
+
         if ($model->load(\Yii::$app->request->post())) {
             $param = $this->getBodyParams();
             $param = $param['StudentEnrollmentForm'];
             $user = $this->getAuthenticatedUser();
             $uid = User::findByUsername($param['usernameToEnroll']);
-            $stdreccord =Student::getByUserId($uid->id);
-            if($stdreccord){
-
+            if(!$uid)
+            {
+                $this->setErrorFlash('Student not found please enter correct username.');
             }else {
-                $this->setErrorFlash('Invalid combinatio.');
+                $stdrecord = Student::getByUserIdentity($uid->id);
+
+                $teacher = Teacher::getTeacherByUserId($uid->id);
+
+                if ($teacher) {
+                    $this->setErrorFlash('Teachers can\'t be enrolled as students - use Student View, or create a separate student account.');
+                } elseif (!$stdrecord) {
+
+                    $student = new Student();
+                    $student->createNewStudent($uid->id,$cid,$param);
+                    $this->setSuccessFlash('Student have been enrolled in course ' . $course->name . ' successfully');
+                    $model = new StudentEnrollmentForm();
+                } else{
+                    $this->setErrorFlash('This username is already enrolled in the class.');
+                }
             }
 
-            }
+
+    }
+
         return $this->render('studentEnrollment',['course' => $course, 'model'=>$model]);
 
     }
-//    public function actionStudentEnrollCourse()
-//    {
-//        $this->guestUserHandler();
-//        $model = new StudentEnrollCourseForm();
-//        if ($model->load(\Yii::$app->request->post())) {
-//            $param = $this->getBodyParams();
-//            $param = $param['StudentEnrollCourseForm'];
-//            $user = $this->getAuthenticatedUser();
-//
-//            $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
-//            if ($course) {
-//                $teacher = Teacher::getByUserId($user->id, $param['courseId']);
-//                $tutor = Tutor::getByUserId($user->id, $param['courseId']);
-//                $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
-//
-//                if (!$teacher && !$tutor && !$alreadyEnroll) {
-//                    $param['userid'] = $user->id;
-//                    $param['courseid'] = $param['courseId'];
-//                    $param = AppUtility::removeEmptyAttributes($param);
-//
-//                    $student = new Student();
-//                    $student->create($param);
-//
-//                    $this->setSuccessFlash('You have been enrolled in course ' . $course->name . ' successfully');
-//                } else {
-//                    $errorMessage = 'You are already enrolled in the course.';
-//                    if ($teacher) {
-//                        $errorMessage = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
-//                    } elseif ($tutor) {
-//                        $errorMessage = 'You are a tutor for this course, and can not enroll as a student.';
-//                    }
-//                    $this->setErrorFlash($errorMessage);
-//                }
-//            } else {
-//                $this->setErrorFlash('Invalid combination of enrollment key and course id.');
-//            }
-//        }
-//        return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
-//    }
+    public function actionEnrollFromOtherCourse()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $model = new EnrollFromOtherCourseForm();
+        $course = Course::getById($cid);
+        $teacherId=Yii::$app->user->identity->getId();
+        $list=Teacher::getTeacherByUserId($teacherId);
+        $tempArray =array();
+        foreach($list as $teacher)
+        {
+            array_push($tempArray,$teacher->course->name);
+        }
+        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$tempArray]);
+
+    }
+    public function actionGetCourseAjax()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
+        $teacherId=Yii::$app->user->identity->getId();
+        $list=Teacher::getTeacherByUserId($teacherId);
+        $tempArray =array();
+        foreach($list as $teacher)
+        {
+            array_push($tempArray,$teacher->course->name);
+        }
+        return json_encode(['status' => '0','query' => $tempArray]);
+    }
+
+    public function actionGetStudentAjax()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $params=$this->getBodyParams();
+
+        $courseId=Course::findByName($params['checkedvalue']);
+        $ids=$courseId->id;
+        $query=Student::findByCid($ids);
+
+        $studentId=array();
+        foreach($query as $record)
+        {
+           array_push($studentId,$record->userid);
+        }
+         $tempArray2=array();
+        foreach($studentId as $id)
+        {
+           $new=User::findAllById($id);
+            array_push($tempArray2,$new);
+
+        }
+         return json_encode(['status' => '0','record' => $tempArray2]);
+    }
+    public function actionEnrollStudents(){
+
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
+        return $this->render('studentEnrollment',['course' => $course]);
+
+    }
 
 }
