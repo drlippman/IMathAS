@@ -54,7 +54,9 @@ class Message extends BaseImasMsgs
         }elseif($message->isread==4) {
             $message->isread = 4;
         }elseif($message->isread>=9){
-            $message->isread=$message->isread -1;
+            $message->isread=8;
+        }elseif($message->isread>=13){
+            $message->isread=12;
         }
         else{
             $message->isread = 0;
@@ -77,8 +79,9 @@ class Message extends BaseImasMsgs
             $message->isread = 5;
         }
         elseif($message->isread==5){
+
                 $message->isread=5;
-            }
+        }
         elseif($message->isread==8){
 
             $message->isread=9;
@@ -94,9 +97,9 @@ class Message extends BaseImasMsgs
         return static::findOne($id);
     }
 
-    public static function getByMsgId($msgId)
+    public static function getByMsgId($msgId, $baseId)
     {
-        return static::findOne($msgId);
+        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
     }
     public static function deleteFromReceivedMsg($msgId)
     {
@@ -157,7 +160,7 @@ class Message extends BaseImasMsgs
     public static function sentUnsendMsg($msgId)
     {
         $message =static::getById($msgId);
-            $message->delete();
+        $message->delete();
     }
 
     public function createReply($params)
@@ -214,5 +217,12 @@ class Message extends BaseImasMsgs
         $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userId'")->queryAll();
         return $query;
     }
+    public static function updateFlagValue($row)
+    {
+        $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
+
+
+    }
 
 }
+

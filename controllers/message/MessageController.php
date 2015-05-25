@@ -330,8 +330,7 @@ class MessageController extends AppController
 
         $params = $this->getBodyParams();
         $row = $params['rowId'];
-
-       $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
+        $query =Message::updateFlagValue($row);
         return json_encode(['status' => '0']);
 
     }

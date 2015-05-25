@@ -149,8 +149,6 @@ $this->params['breadcrumbs'][] = $this->title;
         for(i=0; i<headerArray.length; i++){
             tableString = tableString + "<th>" + headerArray[i]+"</th>";
         }
-
-        console.log(rows);
         tableString = tableString+ "</tr>";
         $.each( rows, function(id, studata){
             name = studata.name;

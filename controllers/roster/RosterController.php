@@ -102,10 +102,26 @@ class RosterController extends AppController
     public function actionStudentRosterAjax()
     {
         $params = $this->getBodyParams();
-          $id = $params['course_id'];
-        $query = Yii::$app->db->createCommand("select * from imas_users")->queryAll();
-        return json_encode(['status' => '0','query' => $query]);
+          $cid = $params['course_id'];
+
+        $query = Student::findByCid($cid);
+
+        $studentArray = array();
+        foreach ($query as $abc)
+        {
+            $tempArray = array('lastname' => $abc->user->LastName,
+                'firstname' => $abc->user->FirstName,
+                'email' => $abc->user->email,
+                'username' => $abc->user->SID,
+                'lastaccess' => $abc->user->lastaccess,
+
+            );
+            array_push($studentArray, $tempArray);
+
+        }
+        return json_encode(['status' => '0','query' => $studentArray]);
     }
+
     public function actionStudentEnrollment()
     {
         $this->guestUserHandler();
@@ -128,44 +144,59 @@ class RosterController extends AppController
         return $this->render('studentEnrollment',['course' => $course, 'model'=>$model]);
 
     }
-//    public function actionStudentEnrollCourse()
-//    {
-//        $this->guestUserHandler();
-//        $model = new StudentEnrollCourseForm();
-//        if ($model->load(\Yii::$app->request->post())) {
-//            $param = $this->getBodyParams();
-//            $param = $param['StudentEnrollCourseForm'];
-//            $user = $this->getAuthenticatedUser();
-//
-//            $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
-//            if ($course) {
-//                $teacher = Teacher::getByUserId($user->id, $param['courseId']);
-//                $tutor = Tutor::getByUserId($user->id, $param['courseId']);
-//                $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
-//
-//                if (!$teacher && !$tutor && !$alreadyEnroll) {
-//                    $param['userid'] = $user->id;
-//                    $param['courseid'] = $param['courseId'];
-//                    $param = AppUtility::removeEmptyAttributes($param);
-//
-//                    $student = new Student();
-//                    $student->create($param);
-//
-//                    $this->setSuccessFlash('You have been enrolled in course ' . $course->name . ' successfully');
-//                } else {
-//                    $errorMessage = 'You are already enrolled in the course.';
-//                    if ($teacher) {
-//                        $errorMessage = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
-//                    } elseif ($tutor) {
-//                        $errorMessage = 'You are a tutor for this course, and can not enroll as a student.';
-//                    }
-//                    $this->setErrorFlash($errorMessage);
-//                }
-//            } else {
-//                $this->setErrorFlash('Invalid combination of enrollment key and course id.');
-//            }
-//        }
-//        return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
-//    }
 
+    public function actionAssignSectionsAndCodes()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
+
+        return $this->render('assignSectionsAndCodes',['course' => $course]);
+
+    }
+    public function actionAssignSectionsAndCodesAjax()
+    {
+        $params = $this->getBodyParams();
+        $cid = $params['course_id'];
+        $query = Student::findByCid($cid);
+
+        $studentArray = array();
+        foreach ($query as $abc)
+        {
+            $tempArray = array('Name' => $abc->user->FirstName.' '.$abc->user->LastName,
+            'code' => $abc->code,
+                'section' => $abc->section,
+                'studenId'=> $abc->id
+                );
+            array_push($studentArray, $tempArray);
+
+        }
+      return json_encode(['status' => '0','studentinformation' => $studentArray]);
+    }
+    public function actionManageLatePasses()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+
+        $query = Student::findByCid($cid);
+        $studentArray = array();
+        foreach ($query as $abc)
+        {
+            $tempArray = array('Name' => $abc->user->FirstName.' '.$abc->user->LastName,
+                'Section' => $abc->section,
+                'Latepass' => $abc->latepass,
+                'StudenId'=> $abc->id,
+                'latePassHrs' => $abc->course->latepasshrs
+            );
+            array_push($studentArray, $tempArray);
+
+            if(Yii::$app->request->isPost)
+            {
+                AppUtility::dump($_REQUEST);
+            }
+
+        }
+        return $this->render('manageLatePasses',['studentInformation' => $studentArray]);
+
+    }
 }

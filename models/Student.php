@@ -36,6 +36,10 @@ class Student extends BaseImasStudents {
     }
     public static function getByUsername($username)
     {
-           return static::findAll(['SID' => $username]);
+        return static::findAll(['SID' => $username]);
+    }
+    public static function findByCid($cid)
+    {
+        return static::findAll(['courseid' => $cid]);
     }
 } 

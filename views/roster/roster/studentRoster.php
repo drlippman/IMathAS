@@ -9,6 +9,13 @@ $this->title = 'Student Roster';
     <div class="breadcrumb" id="title_bar">
         <a HREF="<?php echo AppUtility::getURLFromHome('site', 'index') ?>">Home</a><br/>
     </div>
+    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" charset="utf8"
+            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
 <body>
 
@@ -17,9 +24,9 @@ $this->title = 'Student Roster';
         <div class="cpmid">
             <span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?>">View Login Grid</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Assign Sections and/or Codes</a><br>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>">Assign Sections and/or Codes</a><br>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage LatePasses</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>">Manage LatePasses</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'enroll=student'); ?>">Enroll Student with known username</a><br/>
@@ -42,32 +49,21 @@ $this->title = 'Student Roster';
                 <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
                 <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
             <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-            <table class=gb id=student-information-table>
+            <table class="student-data-table" id="student-information-table">
                 <thead>
-                <tr>
-                    <th></th>
-                    <th>Last</th>
-                    <th>First</th>
-                    <th>Email</th>
-                    <th>Username</th>
-                    <th>Last Access</th>
-                    <th>Grades</th>
-                    <th>Due Dates</th>
-                    <th>Chg Info</th>
-                    <th>Lock Out</th>
+                <tr><th></th><th>Last</th><th>First</th><th>Email</th>
+                    <th>Last Access</th><th>Grades</th><th>Due Dates</th><th>Chg Info</th><th>Lock Out</th>
                 </tr>
                 </thead>
-                <tbody>
-
-
-                </tbody>
             </table>
+
+            <div class="roster-div"></div>
             Number of Student : <input id="count">
 
             <script type="text/javascript">
-                //initSortTable('myTable',Array(false,false,'S','S','S','S','D',false,false,false),true);
 
                 $(document).ready(function () {
+                //    createRosterTableHeader();
                     var course_id =  $( "#course-id" ).val();
                     selectCheckBox();
                     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
@@ -76,9 +72,7 @@ $this->title = 'Student Roster';
 
                 function studentRosterSuccess(response)
                 {
-                   console.log(response);
                     var students = JSON.parse(response);
-
 
                     if (students.status == 0) {
                         var students = students.query;
@@ -87,17 +81,26 @@ $this->title = 'Student Roster';
                         showStudentInformation(students);
                 }
                 }
+
+//                function createRosterTableHeader(){
+//                var html = "<table class='student-data-table' id='student-information-table'>";
+//                    html += "<thead><tr><th></th><th>Last</th><th>First</th><th>Email</th><th>Username</th><th>Last Access</th>";
+//                    html += "<th>Grades</th><th>Due Dates</th><th>Chg Info</th><th>Lock Out</th></tr></thead><tbody></tbody></table>";
+//                    $('roster-div').append(html);
+//                }
+
                 function showStudentInformation(students)
                 {
                     var count = 0;
                     var html = "";
 
                    $.each(students, function(index, student){
+
                        html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
-                       html += "<td>"+capitalizeFirstLetter(student.LastName)+"</td>";
-                       html += "<td>"+capitalizeFirstLetter(student.FirstName)+"</td>";
+                       html += "<td>"+capitalizeFirstLetter(student.lastname)+"</td>";
+                       html += "<td>"+capitalizeFirstLetter(student.firstname)+"</td>";
                        html += "<td>"+student.email+"</td>";
-                       html += "<td>"+student.SID+"</td>";
+                       html += "<td>"+student.username+"</td>";
                        html += "<td>"+datecal(student.lastaccess)+"</td>";
                        html += "<th><a>Grades</a></th>";
                        html += "<th><a>Exception</a></th>";
@@ -108,6 +111,7 @@ $this->title = 'Student Roster';
                         });
                     $('#count').val(count);
                     $('#student-information-table').append(html);
+                    $('.student-data-table').DataTable();
                  }
 
                 function selectCheckBox(){
