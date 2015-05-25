@@ -21,9 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
 </head>
 <body>
 <div>
+    <?php if($userRights->rights == 20){?>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+    <?php }else{
+
+        echo $this->render('../../course/course/_toolbar',['course'=> $course]);
+    }?>
+
 </div>
 <div class="message-container">
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid='.$course->id.'&userid='.$course->ownerid); ?>" class="btn btn-primary btn-sm">Send New Message</a>

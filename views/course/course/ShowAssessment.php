@@ -4,12 +4,12 @@ use app\components\AppUtility;
 ?>
 <link href='<?php echo AppUtility::getHomeURL()?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-
 <?php $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count"); ?>
 <?php echo $this->render('_toolbar',['course'=> $cid]);
 ?>
 <!--    Display assessment name-->
 <h2><?php echo $assessments->name ?></h2>
+<!--to check if assessment has questions or not-->
 <?php if(!empty($assessmentSession)){?>
 <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessments->timelimit)?>">
 <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
@@ -173,8 +173,7 @@ use app\components\AppUtility;
 <script type="text/javascript">
     $(document).ready(function()
     {
-
-       var timer = $('#timerlimit').val();
+        var timer = $('#timerlimit').val();
        window.onload = CreateTimer("timer",timer);
 
        $('#timershow').hide();
@@ -194,8 +193,6 @@ use app\components\AppUtility;
             $('#timerhide').show();
             $('#timershow').hide();
         });
-
-
         $('#LicensePopup').click(function(e)
         {
             var questionId= $("#questionSet").val();
@@ -230,31 +227,37 @@ use app\components\AppUtility;
         var now_int = parseInt(now);
         var assessmentsession_int =parseInt(assessmentsession);
         var timelimit_int = parseInt(timelimit);
-                if((assessmentsession_int + timelimit_int) < now_int)
+               if((assessmentsession_int + timelimit_int) < now_int)
                 {
+
                      $("#timerwrap").hide();
                      $("#timerhide").hide();
                      $('#expired').show();
-                  var msg = '<div><p>Your time limit has expired </p>'+
-                            '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
-                    $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
-                    ({
-                        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                        width: 'auto', resizable: false,
-                        closeText: "hide",
-                        buttons:
-                        {
-                            "Okay": function ()
-                            {
-                                $(this).dialog('destroy').remove();
-                                return true;
-                            }
 
-                        }
-//
-                    });
+
+                          var msg = '<div><p>Your time limit has expired </p>'+
+                                    '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+                            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+                            ({
+                                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                                width: 'auto', resizable: false,
+                                closeText: "hide",
+                                buttons:
+                                {
+                                    "Okay": function ()
+                                    {
+                                        $(this).dialog('destroy').remove();
+                                        count= count+1;
+                                        return true;
+
+                                    }
+
+                                }
+
+                            });
+
+
                 }
-
     });
 
 </script>

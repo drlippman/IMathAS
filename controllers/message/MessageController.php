@@ -29,11 +29,13 @@ class MessageController extends AppController
             $course = Course::getById($cid);
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
+            $rights=$this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
+
             $teacher = Teacher::getTeachersById($cid);
             $messages = Message::getByCourseId($cid);
             $senders = Message::getSenders($cid);
-            return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher]);
+            return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher,'userRights' => $rights]);
         }
 
     }

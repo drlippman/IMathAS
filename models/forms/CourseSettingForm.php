@@ -44,8 +44,8 @@ class CourseSettingForm extends Model
     {
         return [
             [['courseName', 'enrollmentKey'], 'required'],
-            [['courseName'], 'string', 'max' => 254],
-            [['enrollmentKey'], 'string', 'max' => 100],
+            [['courseName'], 'string', 'max' => 30],
+            [['enrollmentKey'], 'string', 'max' => 20],
             ['latePasses', 'number']
         ];
     }

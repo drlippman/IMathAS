@@ -180,8 +180,10 @@ class SiteController extends AppController
         if ($model->load(Yii::$app->request->post())) {
             $param = $this->getBodyParams();
             $username = $param['ForgotPasswordForm']['username'];
-            if(!empty($user)){
+
             $user = User::findByUsername($username);
+            if($user)
+            {
             $code = AppUtility::generateRandomString();
             $user->remoteaccess = $code;
             $user->save();

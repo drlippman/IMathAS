@@ -55,9 +55,6 @@ $(document).ready(function(){
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
 
-        if((assessmentsession_int + timelimit_int) < now_int)
-         {
-
         $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
@@ -67,61 +64,16 @@ $(document).ready(function(){
                     $(this).dialog('destroy').remove();
                     return false;
                 },
-                "OK": function () {
+                "confirm": function () {
                     window.location = cancelUrl;
                     $(this).dialog("close");
                     return true;
                 }
-                    },
-                    close: function (event, ui) {
-                        $(this).remove();
-                    }
-                });
-        }
-        else
-        {
-             $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons: {
-                    "Cancel": function () {
-                        $(this).dialog('destroy').remove();
-                        return false;
-                    },
-                    "OK": function () {
-                        window.location = cancelUrl;
-                        $(this).dialog("close");
-                        return true;
-                    }
-                },
-                close: function (event, ui) {
-                    $(this).remove();
-                }
-            });
-
-        }
-
-
-//                        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
-//                            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-//                            width: 'auto', resizable: false,
-//                            closeText: "hide",
-//                            buttons: {
-//                                "Cancel": function () {
-//                                    $(this).dialog('destroy').remove();
-//                                    return false;
-//                                },
-//                                "confirm": function () {
-//                                    window.location = cancelUrl;
-//                                    $(this).dialog("close");
-//                                    return true;
-//                               }
-//                            },
-//                            close: function (event, ui) {
-//                                $(this).remove();
-//                            }
-//                        });
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
     });
 
 });
