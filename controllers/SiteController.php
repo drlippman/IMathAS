@@ -219,10 +219,12 @@ class SiteController extends AppController
 
             $user = User::findByEmail($toEmail);
             if ($user) {
-                $message = "<h4>This is an automated message from OpenMath.  Do not respond to this email</h4>";
-                $message .= "<p>Your email was entered in the Username Lookup page on OpenMath.  If you did not do this, you may ignore and delete this message.  ";
-                $message .= "All usernames using this email address are listed below</p><p>";
-                $message .= "Username: <b>" . $user->SID . " </b> <br/>.";
+                $message = "<p>Hello ".ucfirst($user->FirstName)." ".ucfirst($user->LastName).",<br>";
+                $message .= "<p>You have requested the username for email: ".$user->email.",<br>";
+                $message .= "<p>If you made this request then all usernames using this email address are listed below:</p></p><p>";
+                $message .= "<p>Your username is: <b>".$user->SID."</b></br></p>";
+                $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
+                $message .= "<br><h4>This is an automated message from OpenMath.  Do not respond to this email</h4></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotUsernameForm();
                 $this->setSuccessFlash('Username sent to your registered email.');
@@ -369,5 +371,6 @@ class SiteController extends AppController
     {
         return $this->renderWithData('document');
     }
+
 
 }

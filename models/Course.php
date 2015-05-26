@@ -118,4 +118,8 @@ class Course extends BaseImasCourses {
         $data = $command->queryAll();
         return $data;
     }
+    public static function findByName($name){
+        return static::findOne(['name'=>$name]);
+    }
+
 } 

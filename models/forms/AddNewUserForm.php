@@ -23,6 +23,7 @@ class AddNewUserForm extends Model
     {
         return [
             [['FirstName', 'LastName','username','password','email'],'required'],
+            [['rights'],'required', 'message' => 'Assign right to user'],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens(-).'],
              [['FirstName', 'LastName'], 'string'],
              ['email','email'],

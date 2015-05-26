@@ -273,7 +273,6 @@ table tbody tr.odd {
     background-color: #f9f9f9 !important;
 }
 
-
 #change-button{
 
     margin-left: 0px;
@@ -281,5 +280,24 @@ table tbody tr.odd {
 
 .dataTables_filter{
     display: none;
+}
+
+#enroll-btn {
+    margin-left: 0px;
+}
+.rights_alignment{
+    margin-right: 92px;
+}
+.help_alignment
+{
+    margin-left: 10px;
+}
+.right_alignment
+{
+    margin-right: 107px;
+}
+#padd{
+    padding: 2px;
+
 }
 

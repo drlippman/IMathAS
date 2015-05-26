@@ -34,12 +34,21 @@ class Student extends BaseImasStudents {
     {
         return static::findOne(['courseid' => $cId]);
     }
-    public static function getByUsername($username)
+    public static function getByUserIdentity($uid)
     {
-        return static::findAll(['SID' => $username]);
+
+        return static::findAll(['userid' => $uid]);
     }
-    public static function findByCid($cid)
-    {
-        return static::findAll(['courseid' => $cid]);
+    public function createNewStudent($userId,$cid,$param){
+
+        $this->userid=$userId;
+        $this->courseid=$cid;
+        $this->section=$param['section'];
+        $this->code=$param['code'];
+        $this->save();
+    }
+    public static function findByCid($cId){
+        return static::findAll(['courseid'=>$cId]);
+
     }
 } 

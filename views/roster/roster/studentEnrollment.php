@@ -1,7 +1,9 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 $this->title = 'Enroll Student';
+$this->params['breadcrumbs'][] = ['label' => 'roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -13,8 +15,8 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 control-label'],
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
             ],
         ]
     ) ?>
@@ -24,7 +26,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'code') ?>
     <div class="form-group">
         <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary', 'name' => 'enroll-button']) ?>
+            <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
+            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>
 

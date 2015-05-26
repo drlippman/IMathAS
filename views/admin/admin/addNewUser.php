@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'action' => '',
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 '],
+                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
             ],
         ]); ?>
 
@@ -37,16 +37,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'password')->passwordInput() ?>
 
-    <div class="col-lg-0 pull-left">   <a href="/var/www/openmath/views/site/help.php" target="_blank"> <img src="../../../web/img/help.gif"></a></div>
-        <?=
-        $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User',
+
+<!--        <div class="form-group">-->
+    <div class="col-lg-0 pull-left help_alignment"> <a HREF="<?php echo AppUtility::getURLFromHome('site', 'helper-guide') ?>"> <img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
+        <div class="rights_alignment 'id'=>'padd'   ">    <?=
+        $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,
             AppConstant::STUDENT_RIGHT => 'Student',
             AppConstant::TEACHER_RIGHT => 'Teacher',
             AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
             AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
             AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
             AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
-
+        </div>
+<!--        </div>-->
+        <div class="clear-both"></div>
         <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
 
         <div class="form-group">
@@ -55,11 +59,5 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
     </fieldset>
-    <script>
-        function myFunction() {
-            window.open("<?php AppUtility::getURLFromHome('site', 'help','top=0,width=400,height=500,scrollbars=1'); ?>");
-        }
-    </script>
     <?php ActiveForm::end(); ?>
-<!--    <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>-->
 </div>
