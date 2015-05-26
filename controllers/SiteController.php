@@ -224,7 +224,8 @@ class SiteController extends AppController
                 $message .= "<p>If you made this request then all usernames using this email address are listed below:</p></p><p>";
                 $message .= "<p>Your username is: <b>".$user->SID."</b></br></p>";
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
-                $message .= "<br><h4>This is an automated message from OpenMath.  Do not respond to this email</h4></p>";
+                $message .= "<br>This is an automated message from OpenMath.  Do not respond to this email</p><br>";
+                $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_USER_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotUsernameForm();
                 $this->setSuccessFlash('Username sent to your registered email.');

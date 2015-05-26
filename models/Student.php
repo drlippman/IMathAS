@@ -51,4 +51,10 @@ class Student extends BaseImasStudents {
         return static::findAll(['courseid'=>$cId]);
 
     }
+    public function insertNewStudent($studentId,$courseId,$section){
+        $this->userid=$studentId;
+        $this->courseid=$courseId;
+        $this->section=$section;
+        $this->save();
+    }
 } 

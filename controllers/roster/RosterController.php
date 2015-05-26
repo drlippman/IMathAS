@@ -2,6 +2,7 @@
 namespace app\controllers\roster;
 use app\models\Course;
 use app\models\forms\EnrollFromOtherCourseForm;
+use app\models\forms\EnrollStudentsForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
@@ -231,60 +232,80 @@ class RosterController extends AppController
         $course = Course::getById($cid);
         $teacherId=Yii::$app->user->identity->getId();
         $list=Teacher::getTeacherByUserId($teacherId);
-        $tempArray =array();
+        $courseDetails=array();
+
         foreach($list as $teacher)
         {
-            array_push($tempArray,$teacher->course->name);
+            $tempArray = array("id" => $teacher->course->id,
+            "name" => $teacher->course->name);
+            array_push($courseDetails,$tempArray);
         }
-        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$tempArray, 'model'=>$model]);
 
-    }
-    public function actionGetCourseAjax()
-    {
-        $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
-        $teacherId=Yii::$app->user->identity->getId();
-        $list=Teacher::getTeacherByUserId($teacherId);
-        $tempArray =array();
-        foreach($list as $teacher)
+        if($this->isPost())
         {
-            array_push($tempArray,$teacher->course->name);
+           $params = $this->getBodyParams();
+            $courseId = isset($params['name']) ? $params['name'] : null;
+            if($courseId)
+            {
+                $this->redirect('enroll-students?cid='.$cid.'&course='.$courseId);
+            }else{
+                $this->setErrorFlash("Select course from list to choose students");
+            }
         }
-        return json_encode(['status' => '0','query' => $tempArray]);
+        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$courseDetails, 'model'=>$model]);
     }
 
-    public function actionGetStudentAjax()
-    {
-        $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $params=$this->getBodyParams();
-
-        $courseId=Course::findByName($params['checkedvalue']);
-        $ids=$courseId->id;
-        $query=Student::findByCid($ids);
-
-        $studentId=array();
-        foreach($query as $record)
-        {
-           array_push($studentId,$record->userid);
-        }
-         $tempArray2=array();
-        foreach($studentId as $id)
-        {
-           $new=User::findAllById($id);
-            array_push($tempArray2,$new);
-
-        }
-         return json_encode(['status' => '0','record' => $tempArray2]);
-    }
     public function actionEnrollStudents(){
 
         $this->guestUserHandler();
+        $courseid = Yii::$app->request->get('course');
         $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
-        return $this->render('studentEnrollment',['course' => $course]);
+        $model=new EnrollStudentsForm();
+        $course = Course::getById($courseid);
+        $query=Student::findByCid($courseid);
+        $studentDetails=array();
 
+        foreach($query as $student){
+            $tempArray=array();
+            $tempArray = array("id" => $student->user->id,
+                "firstName" => $student->user->FirstName,
+                "lastName"=> $student->user->LastName);
+            array_push($studentDetails,$tempArray);
+
+        }
+        if($this->isPost())
+        {
+            $params=$this->getBodyParams();
+            $record=array();
+            $count=0;
+            foreach($params as $result){
+              array_push($record,$result);
+                $count++;
+            }
+           if($count!=3)
+           {
+             $storedArray=array();
+
+            foreach($record[1] as $entry){
+                $studentList=array("id"=>$entry,"courseId"=>$cid,"section"=>$record[2]['section']);
+                array_push($storedArray,$studentList);
+
+            }
+
+            foreach($storedArray as $studentData){
+                $studentRecord=Student::getByCourseId($studentData['courseId'],$studentData['id']);
+
+                if(!$studentRecord){
+                    $student = new Student();
+                    $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
+                    $this->redirect('student-roster?cid='.$cid);
+                }
+            }
+        }else{
+               $this->setErrorFlash('Select student from list to enroll in a course');
+           }
+        }
+        return $this->render('enrollStudents',['course' => $course,'data'=>$studentDetails,'model'=>$model,'cid'=>$cid]);
     }
 
 }

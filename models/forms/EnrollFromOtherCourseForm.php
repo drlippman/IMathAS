@@ -1,17 +1,14 @@
 <?php
 namespace app\models\forms;
 
+use app\models\_base\BaseImasCourses;
 use Yii;
 use yii\base\Model;
 class EnrollFromOtherCourseForm extends model{
 
-    public $username;
-    public $FirstName;
-    public $LastName;
-    public $email;
-    public $password;
+
     public $rights;
-    public $AssignToGroup;
+
 
     private $_user = false;
 
@@ -30,5 +27,9 @@ class EnrollFromOtherCourseForm extends model{
 
         ];
     }
+    public static function findById(){
+        BaseImasCourses::find()->all();
+    }
+
 }
 
