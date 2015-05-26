@@ -161,7 +161,7 @@ class RosterController extends AppController
         {
             array_push($tempArray,$teacher->course->name);
         }
-        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$tempArray]);
+        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$tempArray, 'model'=>$model]);
 
     }
     public function actionGetCourseAjax()
