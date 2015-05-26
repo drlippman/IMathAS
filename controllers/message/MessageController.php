@@ -11,12 +11,13 @@ use app\models\User;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\MessageForm;
-use yii\db\Query;
-use yii\helpers\ArrayHelper;
-
 
 class MessageController extends AppController
 {
+
+    public $messageData = array();
+    public $totalMessages = array();
+    public $children = array();
 
     public $enableCsrfValidation = false;
 
@@ -297,18 +298,56 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
-        $baseId = Yii::$app->request->get('baseid');
-        $msgId = Yii::$app->request->get('id');
-        if ($this->getAuthenticatedUser()) {
+        $baseId = $this->getParamVal('baseid');
+        $msgId = $this->getParamVal('id');
+        $messages = Message::getByBaseId($msgId, $baseId);
+        $children = array();
+        foreach($messages as $message){
+            $this->children[$message['parent']][] = $message['id'];
 
-            $messages = Message::getByBaseId($msgId,$baseId);
-//            foreach ($messages as $message){
-//                $fromUser = User::getById($message->msgfrom);
-//                array_push($userArray);
-//               }
-            //$fromUser = User::getById($messages->msgfrom);
-            return $this->renderWithData('viewConversation', ['messages' => $messages,]);
+            $tempArray = array();
+            $titleLevel = AppUtility::calculateLevel($message['title']);
+            $fromUser = User::getById($message['msgfrom']);
+            $tempArray['id'] = $message['id'];
+            $tempArray['courseId'] = $message['courseid'];
+            $tempArray['message'] = $message['message'];
+            $tempArray['title'] = $titleLevel['title'];
+            $tempArray['level'] = $titleLevel['level'];
+            $tempArray['senderId'] = $message['msgfrom'];
+            $tempArray['senderName'] = $fromUser->FirstName. ' '. $fromUser->LastName;
+            $tempArray['msgDate'] = $message['senddate'];
+            $tempArray['isRead'] = $message['isread'];
+            $tempArray['replied'] = $message['replied'];
+            $tempArray['parent'] = $message['parent'];
+            $tempArray['baseId'] = $message['baseid'];
+            $this->messageData[$message['id']] =$tempArray;
         }
+
+        $this->createChild($this->children[0]);
+        return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages]);
+    }
+
+    public function createChild($childArray, $arrayKey = 0)
+    {
+        $this->children = AppUtility::removeEmptyAttributes($this->children);
+        foreach($childArray  as $superKey => $child)
+        {
+            array_push($this->totalMessages, $this->messageData[$child]);
+
+            unset($this->children[$arrayKey][$superKey]);
+            if(isset($this->children[$child]))
+            {
+                return $this->createChild($this->children[$child], $child);
+            }
+            else{
+                continue;
+            }
+        }
+        if(count($this->children))
+        {
+            $this->createChild($this->children[key($this->children)], key($this->children));
+        }
+//        AppUtility::dump($this->totalMessages);
     }
 
     public function actionMarkSentUnsendAjax()
@@ -322,7 +361,6 @@ class MessageController extends AppController
                 Message::sentUnsendMsg($msgId);
             }
             return json_encode(array('status' => 0));
-
         }
     }
     public function actionChangeImageAjax()
@@ -330,7 +368,7 @@ class MessageController extends AppController
 
         $params = $this->getBodyParams();
         $row = $params['rowId'];
-        $query =Message::updateFlagValue($row);
+        Message::updateFlagValue($row);
         return json_encode(['status' => '0']);
 
     }

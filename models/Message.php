@@ -30,22 +30,22 @@ class Message extends BaseImasMsgs
 
     public static function getByCourseId($cid)
     {
-        return static::find()->where(['courseid' => $cid])->all();
+        return Message::find()->where(['courseid' => $cid])->all();
     }
 
     public static function getSenders($cid)
     {
-        return static::find()->where(['courseid' => $cid])->groupBy(['msgfrom'])->all();
+        return Message::find()->where(['courseid' => $cid])->groupBy(['msgfrom'])->all();
     }
 
     public static function getByCourseIdAsArray($cid)
     {
-        return static::find()->where(['courseid' => $cid])->asArray()->all();
+        return Message::find()->where(['courseid' => $cid])->asArray()->all();
     }
 
     public static function updateUnread($msgId)
     {
-        $message = static::getById($msgId);
+        $message = Message::getById($msgId);
         if($message->isread==1){
             $message->isread=0;
         }
@@ -65,7 +65,7 @@ class Message extends BaseImasMsgs
     }
     public static function updateRead($msgId)
     {
-        $message = static::getById($msgId);
+        $message = Message::getById($msgId);
         if($message->isread==0)
         {
             $message->isread=1;
@@ -94,16 +94,16 @@ class Message extends BaseImasMsgs
     }
     public static function getById($id)
     {
-        return static::findOne($id);
+        return Message::findOne($id);
     }
 
-    public static function getByMsgId($msgId, $baseId)
+    public static function getByMsgId($msgId)
     {
-        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
+        return Message::findOne($msgId);
     }
     public static function deleteFromReceivedMsg($msgId)
     {
-        $message =static::getById($msgId);
+        $message =Message::getById($msgId);
         if($message->isread!=4)
         {
             if($message->isread==5 )
@@ -136,7 +136,7 @@ class Message extends BaseImasMsgs
     }
     public static function deleteFromSentMsg($msgId)
     {
-        $message =static::getById($msgId);
+        $message =Message::getById($msgId);
         if($message->isread==2)
         {
             $message->delete();
@@ -159,8 +159,8 @@ class Message extends BaseImasMsgs
     }
     public static function sentUnsendMsg($msgId)
     {
-        $message =static::getById($msgId);
-        $message->delete();
+        $message =Message::getById($msgId);
+            $message->delete();
     }
 
     public function createReply($params)
@@ -189,7 +189,11 @@ class Message extends BaseImasMsgs
 
     public static function getByBaseId($msgId, $baseId)
     {
-        return static::find()->where(['id' => $msgId] or ['baseid' => $baseId])->orderBy('id')->all();
+        if($baseId == 0)
+        {
+            $baseId = $msgId;
+        }
+        return Message::find()->where(['id' => $msgId])->orWhere(['baseid' => $baseId])->orderBy('senddate')->asArray()->all();
     }
 
     public static function getUsersToDisplay($uid)

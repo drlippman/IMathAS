@@ -576,4 +576,19 @@ class AppUtility extends Component
 
     }
 
+    public static function calculateLevel($title)
+    {
+        $n = 0;
+        while (strpos($title,'Re: ') === 0) {
+            $title = substr($title,4);
+            $n++;
+        }
+        if ($n == 1) {
+            $title = 'Re: '.$title;
+        } else if ($n > 1) {
+            $title = "Re<sup>$n</sup>: ".$title;
+        }
+        return array('title' => $title, 'level' => $n);
+}
+
 }
