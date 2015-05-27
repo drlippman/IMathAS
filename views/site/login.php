@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="form-group select-text-margin">
         <div class="col-lg-offset-1 col-lg-11 select-text-margin">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-min-width', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-min-width','id' => 'enroll-btn', 'name' => 'login-button']) ?>
         </div>
     </div>
 

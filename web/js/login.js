@@ -9,7 +9,7 @@ document.getElementById("tzname").value = tz.name();
 function updateloginarea() {
     setnode = document.getElementById("settings");
     var html = "";
-    html += '<div class="form-group"><label class="col-lg-1 control-label">Accessibility:</label> <div class="col-lg-3"><select name="access" class="form-control"><option value="0">Use defaults</option>';
+    html += '<div class="form-group"><label class="col-lg-1 control-label">Accessibility</label> <div class="col-lg-3"><select name="access" class="form-control"><option value="0">Use defaults</option>';
     html += '<option value="3">Force image-based display</option>';
     html += '<option value="1">Use text-based display</option></select> </div>';
     html += "<div class='col-lg-1 help-link'><a href='#' onClick=\"window.open('helper-guide','help','top=0,width=400,height=500,scrollbars=1,left=150')\">Help</a> </div></div>";

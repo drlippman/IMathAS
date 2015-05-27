@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 
 $this->title = 'Enroll in a course';
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,7 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="form-group">
         <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('Sign Up', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?>
+            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a>
         </div>
     </div>
 

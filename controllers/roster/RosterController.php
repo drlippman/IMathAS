@@ -1,15 +1,18 @@
 <?php
 namespace app\controllers\roster;
 use app\models\Course;
+use app\models\forms\CreateAndEnrollNewStudentForm;
 use app\models\forms\EnrollFromOtherCourseForm;
 use app\models\forms\EnrollStudentsForm;
 use app\models\forms\AssignSectionAndCodesForm;
+use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
 use app\models\Student;
 use app\models\Teacher;
+use app\models\Tutor;
 use app\models\User;
 use Seld\JsonLint\JsonParser;
 use Yii;
@@ -357,8 +360,52 @@ class RosterController extends AppController
                $this->setErrorFlash('Select student from list to enroll in a course');
            }
         }
-        return $this->render('enrollStudents',['course' => $course,'data'=>$studentDetails,'model'=>$model,'cid'=>$cid]);
+        return $this->render('enrollStudents',['course' => $course,'data'=>$studentDetails,'model'=> $model,'cid'=> $cid]);
     }
+
+    public function actionCreateAndEnrollNewStudent()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
+        $model= new CreateAndEnrollNewStudentForm();
+        if($this->isPost()){
+            $params=$this->getBodyParams();
+//            AppUtility::dump($params);
+            $record=array();
+            foreach($params as $result){
+                array_push($record,$result);
+            }
+            $findUser=User::findByUsername($record[1]['username']);
+            if(!$findUser) {
+                    $user = new User();
+                    $user -> createAndEnrollNewStudent($record[1]);
+                    $studentid =User::findByUsername($record[1]['username']);
+                    $newStudent=new Student();
+                    $newStudent->createNewStudent($studentid['id'], $cid, $record[1]);
+                $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
+
+            }else{
+                $this->setErrorFlash('Username already exists');
+            }
+        }
+
+        return $this->renderWithData('createAndEnrollNewStudent', ['course' => $course, 'model'=>$model]);
+
+    }
+    public function actionManageTutors()
+    {
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+        $tutors=Tutor::getByCourseId($cid);
+        $course = Course::getById($cid);
+        $model= new ManageTutorsForm();
+
+
+        return $this->renderWithData('manageTutors', ['course' => $course, 'model'=>$model]);
+
+    }
+
 
 }
 

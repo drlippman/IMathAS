@@ -17,4 +17,8 @@ class Tutor extends BaseImasTutors
     {
         return static::findOne( ['userid' => $id,'courseid' => $courseid]);
     }
+    public static function getByCourseId($courseid)
+    {
+        return static::findAll( ['courseid' => $courseid]);
+    }
 } 

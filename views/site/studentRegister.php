@@ -7,11 +7,11 @@ use app\components\AppUtility;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\RegisterModel */
 
-$this->title = 'New User Registration';
+$this->title = 'New User / Student Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <p>Please fill out the following fields to SignUp</p>
+    <p>Please fill out the following fields to SignUp</p><br>
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
 
          <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('SignUp', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Sign Up', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
             &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
         </div>
     </div>

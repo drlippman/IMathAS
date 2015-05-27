@@ -164,6 +164,20 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function findAllById($id){
         return static::find()->where(['id'=>$id])->asArray()->all();
     }
+    public static function createAndEnrollNewStudent($params)
+    {
+        $params['SID'] = $params['username'];
+        $params['password'] = AppUtility::passwordHash($params['password']);
+        $params['rights'] = '10';
+        $user = new User();
+        $user->attributes = $params;
+        $user->save();
+        if($user->id)
+        {
+            return true;
+        }
+        return false;
+    }
 
 
 }

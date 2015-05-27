@@ -25,13 +25,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>">Assign Sections and/or Codes</a><br>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>">Manage LatePasses</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Manage Tutors</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid='.$course->id); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>">Enroll Student with known username</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
                 <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Import Students from File</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Create and Enroll new student</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>">Create and Enroll new student</a><br/>
 
             </span><br class="clear"/>
         </div>
