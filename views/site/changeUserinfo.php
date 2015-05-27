@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css"/>
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -13,6 +12,7 @@ $this->title = 'Profile Settings';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
+<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/dashboard.css" type="text/css"/>
 <div class="site-login">
 
     <?php
@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </fieldset>
     <div class="form-group">
         <div class="col-lg-offset-2 col-lg-8 display_field">
-            <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>
 

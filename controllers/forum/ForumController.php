@@ -35,13 +35,8 @@ class ForumController extends AppController{
         $param = $this->getBodyParams();
         $search = $param['search'];
         $cid = $param['cid'];
- //       $value=$param['value'];
         $query= Yii::$app->db->createCommand("SELECT * from imas_forums where name LIKE '$search%'")->queryAll();
-      //  $queryResult= Yii::$app->db->createCommand("SELECT subject from imas_forum_posts")->queryAll();
-     //   AppUtility::dump($queryResult);
-
         $forums = Forums::getByCourseId($cid);
-
         if($forums)
         {
             $forumArray = array();
