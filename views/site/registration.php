@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'username') ?>
     <?= $form->field($model, 'password')->passwordInput() ?>
     <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-    <?= $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label col-lg-12 col-lg-offset-8']]) ?>
+    <?= $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label']]) ?>
 
     <div class="form-group">
         <div class="col-lg-offset-4"><?= Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
@@ -58,3 +58,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="clear"></div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $('.register-terms-label').closest('div').addClass('col-lg-offset-4');
+    });
+
+</script>

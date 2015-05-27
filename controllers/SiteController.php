@@ -120,11 +120,16 @@ class SiteController extends AppController
             $user->save();
 
             $toEmail = $user->email;
-            $message = '<p>We received a request for instructor account with following credentials.</p>';
+            $message = "<p>Welcome to OpenMath</p> ";
+            $message .= "<p>Hi ".ucfirst($user->FirstName)." ". ucfirst($user->LastName)." ,</p> ";
+            $message .= '<p>We received a request for instructor account with following credentials.</p>';
             $message .= 'First Name: ' . $user->FirstName . "<br/>\n";
             $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
             $message .= 'Email Name: ' . $user->email . "<br/>\n";
             $message .= 'User Name: ' . $user->SID . "<br/>\n";
+            $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+            $message .= "</p>Best Regards,<br></p>";
+            $message .= "</p>OpenMath Team<br></p>";
             AppUtility::sendMail(AppConstant::INSTRUCTOR_REQUEST_MAIL_SUBJECT, $message, $toEmail);
             $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
             return $this->redirect(AppUtility::getURLFromHome('site','registration'));
@@ -149,6 +154,9 @@ class SiteController extends AppController
                 $message .= 'Last Name: ' . $params['LastName'] . "<br/>\n";
                 $message .= 'Email Name: ' . $params['email'] . "<br/>\n";
                 $message .= 'User Name: ' . $params['username'] . "<br/>\n";
+                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+                $message .= "</p>Best Regards,<br></p>";
+                $message .= "</p>OpenMath Team<br></p>";
                 AppUtility::sendMail(AppConstant::STUDENT_REQUEST_MAIL_SUBJECT, $message, $params['email']);
                 $this->setSuccessFlash('Account created successfully, please login to get into system.');
                 return $this->redirect(AppUtility::getURLFromHome('site','login'));
@@ -190,14 +198,17 @@ class SiteController extends AppController
             $toEmail = $user->email;
             $id = $user->id;
 
-
-                $message = "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
+                $message = "<p>Welcome to OpenMath</p> ";
+                $message .= "<p>Hi ".ucfirst($user->FirstName)." ". ucfirst($user->LastName).",</p> ";
+                $message .= "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
                 $message .= "<p>Click on the link below to reset your password using our secure server:</p>";
                 $message .= "<p><a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
                 $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
+                $message .= "Username: <b>" . $user->email ." </b> <br/>.";
                 $message .= "<p>If you did not request to have your password reset you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<p>If clicking the link does not seem to work, you can copy and paste the link into your browser's address window, or retype it there. Once you have returned to OpenMath, we will give instructions for resetting your password.</p>";
-                $message .= "</p><h4>This is an automated message from OpenMath.  Do not respond to this email</h4>\r\n";
+                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+                $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotPasswordForm();
                 $this->setSuccessFlash('Password reset link sent to your registered email.');
@@ -219,9 +230,9 @@ class SiteController extends AppController
 
             $user = User::findByEmail($toEmail);
             if ($user) {
-                $message = "<p>Hello ".ucfirst($user->FirstName)." ".ucfirst($user->LastName).",<br>";
-                $message .= "<p>You have requested the username for email: ".$user->email.",<br>";
-                $message .= "<p>If you made this request then all usernames using this email address are listed below:</p></p><p>";
+                $message = "<p>Welcome to OpenMath</p> ";
+                $message .= "<p>Hi ".ucfirst($user->FirstName)." ".ucfirst($user->LastName).",<br>";
+                $message .= "<p>We received a request to reset the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Usernames associated with this email listed below.</p> ";
                 $message .= "<p>Your username is: <b>".$user->SID."</b></br></p>";
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<br>This is an automated message from OpenMath.  Do not respond to this email</p><br>";
