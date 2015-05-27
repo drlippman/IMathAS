@@ -2,6 +2,7 @@
 
 use app\components\AppUtility;
 use yii\helpers\Html;
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -21,59 +22,25 @@ use yii\helpers\Html;
     <h3>Assign Section/Code Numbers</h3>
 </head>
 <body>
-<form method="post" action="listusers.php?cid=2&amp;assigncode=1">
-    <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
+<form method="post" action="assign-sections-and-codes?cid=<?php echo $cid ?>">
+    <input type="hidden" id="course-id" value="<?php echo $cid?>">
+
 		<table class="student-data" id="student-data-table">
 			<thead>
-			<tr><th></th><th>Name</th><th>Section</th><th>Code</th>
+			<tr><th>Name</th><th>Section</th><th>Code</th>
 			</tr>
+            <?php
+            foreach($studentInformation as $singleStudentInformation){ ?>
+                <tr>
+                    <td><?php echo $singleStudentInformation['Name']?></td>
+                    <td><input type="text" value="<?php echo $singleStudentInformation['section']?> "name='section[<?php echo $singleStudentInformation['userid']?>]'> </td>
+                    <td><input type="text" value="<?php echo $singleStudentInformation['code']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
+
+                </tr>
+            <?php }?>
 			</thead>
         </table>
-        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('roster', 'roster/student-roster?cid='.$course->id)?>" id="aaa">Submit</a>
-             <script type="text/javascript">
-
-
-                $(document).ready(function () {
-                    var course_id =  $( "#course-id" ).val();
-
-                    jQuerySubmit('assign-sections-and-codes-ajax',{ course_id: course_id }, 'assignSectionsAndCodesSuccess');
-
-                });
-                function assignSectionsAndCodesSuccess(response) {
-
-
-                    var students = JSON.parse(response);
-                    students = students.studentinformation;
-                    var html = "";
-//                   var null=;
-                    $.each(students, function (index, student) {
-                        if(student.section == 'NULL' )
-                        {
-                            student.section=" ";
-                        }
-                        html += "<tr> <td><input type='checkbox' name='student-information-check' value='" + student.id + "'></td>";
-                        html += "<td>" + student.Name + "</td>";
-                        html += "<td><input type='text' value='"+student.section+"'></td>";
-                        html += "<td><input type='text' value='"+student.code+"'></td>";
-                    });
-                    $('#student-data-table').append(html);
-                    $('.student-data').DataTable();
-                }
-
-                $(document).ready(function(){
-
-                    $('#aaa').click(function(){
-                        alert("hi");
-
-                    });
-
-//                    $("#mytable tr).each(function(index){
-//                    $(this).append("<td>" + col_array[index] + "</td>");
-//                });
-                });
-
-            </script>
-
+    <input type="submit" class="btn btn-primary">
 
 	</form>
 </body>

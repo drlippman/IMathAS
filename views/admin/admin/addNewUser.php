@@ -39,8 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <!--        <div class="form-group">-->
-    <div class="col-lg-0 pull-left help_alignment"> <a HREF="<?php echo AppUtility::getURLFromHome('site', 'helper-guide') ?>"> <img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
-        <div class="rights_alignment 'id'=>'padd'   ">    <?=
+    <div class="col-lg-0 pull-left select-text-margin"> <a HREF="<?php echo AppUtility::getURLFromHome('site', 'helper-guide') ?>"> <img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
+        <div class="rights_alignment">    <?=
         $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,
             AppConstant::STUDENT_RIGHT => 'Student',
             AppConstant::TEACHER_RIGHT => 'Teacher',

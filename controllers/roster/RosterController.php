@@ -3,6 +3,7 @@ namespace app\controllers\roster;
 use app\models\Course;
 use app\models\forms\EnrollFromOtherCourseForm;
 use app\models\forms\EnrollStudentsForm;
+use app\models\forms\AssignSectionAndCodesForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
@@ -27,7 +28,36 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
-        return $this->render('studentRoster', ['course' => $course]);
+       // return $this->render('studentRoster', ['course' => $course]);
+
+        $this->guestUserHandler();
+        $cid = Yii::$app->request->get('cid');
+
+        $students = Student::findByCid($cid);
+
+        $studArray = array();
+        $isCode = false;
+        $isSection= false;
+        foreach ($students as $stud)
+        {
+//            && !empty($stud->code)
+            if($stud->code != '' )
+            {
+                $isCode = true;
+            }
+            if($stud->section != '')
+            {
+                $isSection = true;
+            }
+            $tempArray = array(
+                'Section' => $stud->section,
+                'code' => $stud->code,
+            );
+
+            array_push($studArray, $tempArray);
+
+        }
+        return $this->render('studentRoster', ['studentInformation' => $studArray,'course' => $course,'isSection' => $isSection,'isCode' => $isCode]);
 
     }
 
@@ -108,21 +138,33 @@ class RosterController extends AppController
         $params = $this->getBodyParams();
         $cid = $params['course_id'];
 
-        $query = Student::findByCid($cid);
-
+        $Students = Student::findByCid($cid);
+        $isCode = false;
+        $isSection= false;
         $studentArray = array();
-        foreach ($query as $abc) {
-            $tempArray = array('lastname' => $abc->user->LastName,
-                'firstname' => $abc->user->FirstName,
-                'email' => $abc->user->email,
-                'username' => $abc->user->SID,
-                'lastaccess' => $abc->user->lastaccess,
+        foreach ($Students as $stud) {
+
+            if($stud->code != '' )
+            {
+                $isCode = true;
+            }
+            if($stud->section != '')
+            {
+                $isSection = true;
+            }
+            $tempArray = array('lastname' => $stud->user->LastName,
+                'firstname' => $stud->user->FirstName,
+                'email' => $stud->user->email,
+                'username' => $stud->user->SID,
+                'lastaccess' => $stud->user->lastaccess,
+                'section' => $stud->section,
+                'code' => $stud->code,
 
             );
             array_push($studentArray, $tempArray);
 
         }
-        return json_encode(['status' => '0', 'query' => $studentArray]);
+        return json_encode(['status' => '0', 'query' => $studentArray,'isCode'=>$isCode,'isSection'=>$isSection]);
     }
 
     public function actionStudentEnrollment()
@@ -165,20 +207,20 @@ class RosterController extends AppController
     }
 
 
+//    public function actionAssignSectionsAndCodes()
+//    {
+//        $this->guestUserHandler();
+//        $cid = Yii::$app->request->get('cid');
+//        $course = Course::getById($cid);
+//
+//
+//
+//    }
+
     public function actionAssignSectionsAndCodes()
-    {
+   {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
-
-        return $this->render('assignSectionsAndCodes', ['course' => $course]);
-
-    }
-
-    public function actionAssignSectionsAndCodesAjax()
-    {
-        $params = $this->getBodyParams();
-        $cid = $params['course_id'];
         $query = Student::findByCid($cid);
 
         $studentArray = array();
@@ -186,12 +228,22 @@ class RosterController extends AppController
             $tempArray = array('Name' => $abc->user->FirstName . ' ' . $abc->user->LastName,
                 'code' => $abc->code,
                 'section' => $abc->section,
-                'studenId' => $abc->id
+                'userid' => $abc->userid
             );
             array_push($studentArray, $tempArray);
-
         }
-        return json_encode(['status' => '0', 'studentinformation' => $studentArray]);
+        $student = array();
+        if($this->isPost())
+        {
+            $paramas = $_POST;
+            foreach($paramas['section'] as $key => $section)
+            {
+                $code = ($paramas['code'][$key]);
+                Student::updateSectionAndCodeValue($section,$key,$code,$cid);
+            }
+            $this->redirect('student-roster?cid='.$cid);
+        }
+        return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $cid]);
     }
 
     public function actionManageLatePasses()

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="../../web/css/dashboard.css" type="text/css"/>
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
@@ -12,7 +13,6 @@ $this->title = 'Profile Settings';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/dashboard.css" type="text/css"/>
 <div class="site-login">
 
     <?php
@@ -28,8 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-\">{input}</div>\n<div class=\"col-lg-8 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2'],
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-lg-2 control-label'],
             ],
         ]); ?>
 
@@ -83,6 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
         </div>
     </div>
+
     <?php ActiveForm::end(); ?>
 
 </div>

@@ -47,16 +47,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
                 <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
             <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
+
+
             <table class="student-data-table" id="student-information-table">
                 <thead>
-                <tr><th></th><th>Last</th><th>First</th><th>Email</th>
-                    <th>Last Access</th><th>Grades</th><th>Due Dates</th><th>Chg Info</th><th>Lock Out</th>
+                <tr><th></th>
+                    <?php if($isSection == true)
+                    {?>
+                    <th>Section</th>
+                   <?php }
+                    if($isCode == true)
+                    {?>
+                    <th>Code</th>
+                   <?php } ?>
+                    <th>Last</th><th>First</th><th>Email</th><th>UserName</th><th>Last Access</th><th>Grades</th><th>Due Dates</th><th>Chg Info</th><th>Lock Out</th>
                 </tr>
                 </thead>
             </table>
-
-            <div class="roster-div"></div>
-            Number of Student : <input id="count">
 
             <script type="text/javascript">
 
@@ -71,12 +78,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 function studentRosterSuccess(response)
                 {
                     var students = JSON.parse(response);
-
+                    var isCode = students.isCode;
+                    var isSection = students.isSection;
                     if (students.status == 0) {
                         var students = students.query;
 
 
-                        showStudentInformation(students);
+                        showStudentInformation(students,isCode,isSection);
                 }
                 }
 
@@ -87,14 +95,19 @@ $this->params['breadcrumbs'][] = $this->title;
 //                    $('roster-div').append(html);
 //                }
 
-                function showStudentInformation(students)
+                function showStudentInformation(students,isCode,isSection)
                 {
-                    var count = 0;
                     var html = "";
-
                    $.each(students, function(index, student){
-
                        html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
+                        if(isSection == true)
+                        {
+                            html += "<td>"+student.section+"</td>";
+                        }
+                        if(isCode == true)
+                        {
+                            html += "<td>"+student.code+"</td>";
+                        }
                        html += "<td>"+capitalizeFirstLetter(student.lastname)+"</td>";
                        html += "<td>"+capitalizeFirstLetter(student.firstname)+"</td>";
                        html += "<td>"+student.email+"</td>";
@@ -104,10 +117,7 @@ $this->params['breadcrumbs'][] = $this->title;
                        html += "<th><a>Exception</a></th>";
                        html += "<th><a>Chg</a></th>";
                        html += "<th><a>Lock</a></th>";
-
-                       count++;
                         });
-                    $('#count').val(count);
                     $('#student-information-table').append(html);
                     $('.student-data-table').DataTable();
                  }

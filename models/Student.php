@@ -11,7 +11,6 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
-
 class Student extends BaseImasStudents {
 
     public function create($param)
@@ -51,10 +50,22 @@ class Student extends BaseImasStudents {
         return static::findAll(['courseid'=>$cId]);
 
     }
-    public function insertNewStudent($studentId,$courseId,$section){
-        $this->userid=$studentId;
-        $this->courseid=$courseId;
-        $this->section=$section;
+
+    public function insertNewStudent($studentId,$courseId,$section)
+    {
+        $this->userid = $studentId;
+        $this->courseid = $courseId;
+        $this->section = $section;
         $this->save();
+    }
+    public static function updateSectionAndCodeValue($section, $userid, $code, $cid)
+    {
+
+        $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
+        $student->section = $section;
+        $student->code = $code;
+        $student->save();
+
+
     }
 } 
