@@ -21,10 +21,10 @@ use app\components\AppUtility;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\db\Query;
+
 use app\models\forms\ImportStudentForm;
 use yii\web\UploadedFile;
 use app\components\AppConstant;
-
 
 
 class RosterController extends AppController
@@ -387,12 +387,56 @@ class RosterController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
-        $tutors=Tutor::getByCourseId($cid);
-        $course = Course::getById($cid);
-        $model= new ManageTutorsForm();
+        $tutors = Tutor::getByCourseId($cid);
+        $tutorId = array();
+        $studentInfo = array();
+        $sortBy = 'section';
+        $order = AppConstant::ASCENDING;
+        foreach($tutors as $tutor)
+        {
+            $tempArray = array('Name' => $tutor->user->FirstName.' '.$tutor->user->LastName,'id' => $tutor->user->id);
+            array_push($studentInfo,$tempArray);
+        }
+        $sections = Student::findByCourseId($cid,$sortBy,$order);
+        $sectionArray = array();
+        foreach($sections as $section)
+        {
+            array_push($sectionArray,$section->section);
+        }
+        return $this->renderWithData('manageTutors', ['courseid' => $cid,'student' => $studentInfo,'section' => $sectionArray]);
+    }
+    public function actionMarkUpdateAjax()
+    {
+        $this->guestUserHandler();
 
+            $params = $this->getBodyParams();
+            $users = explode(',',$params['username']);
+            $cid = Yii::$app->request->get('cid');
+            AppUtility::dump("hiii");
+            $userIdArray = array();
+            $userNotFoundArray = array();
+            $teacherIdArray = array();
+            $studentArray= array();
+            foreach($users as $entry) {
+                $userId = User::findByUsername($entry);
+                if (!$userId) {
+                    array_push($userNotFoundArray,$entry);
 
-        return $this->renderWithData('manageTutors', ['course' => $course, 'model'=>$model]);
+                }
+                else{
+                    array_push($userIdArray,$userId->id);
+                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                    if($isTeacher){
+                        $tutors=Tutor::getByUserId($isTeacher->userid,$cid);
+//                        AppUtility::dump($tutors);
+
+                    }else{
+                        array_push($studentArray,$userId->id);
+                    }
+                }
+            }
+//        AppUtility::dump($studentArray);
+            return json_encode(array('status' => 0));
 
     }
 

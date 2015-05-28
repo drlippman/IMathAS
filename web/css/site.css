@@ -308,7 +308,20 @@ table tbody tr.odd {
     float: left;
 }
 
+
 a:link:focus{
     text-decoration: none;
+}
+
+
+div.user-image{
+    padding: 5px;
+    padding-bottom: 10px;
+}
+p#settimezone{
+    padding: 0px;
+}
+div.update-checkbox{
+    padding-left: 15px;
 }
 

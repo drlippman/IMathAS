@@ -23,6 +23,7 @@ class ChangeUserInfoForm extends Model
     public $NewForumPostsWidget;
     public $NewMessagesNotesOnCourseList;
     public $NewPostsNotesOnCourseList;
+    public $remove;
 
     private $_user = false;
 
@@ -40,6 +41,7 @@ class ChangeUserInfoForm extends Model
             ['email','email'],
             ['changePassword','boolean'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
+            ['remove', 'boolean'],
             ['file','safe'],
             [['file'],'file'],
             [['password', 'oldPassword', 'rePassword'], 'validatePassword'],
@@ -61,6 +63,7 @@ class ChangeUserInfoForm extends Model
             'file'=>'Picture',
             'message'=>'Messages/Posts per page',
             'homepage'=>'Show on home page',
+            'remove' => 'Remove',
         ];
     }
 

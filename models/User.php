@@ -186,5 +186,22 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         }
         return false;
     }
-
+    public static function findByUserId($uid)
+    {
+        return static::findAll(['id'=>$uid]);
+    }
+    public static function updateImgByUserId($id){
+        $user=User::getById($id);
+        if($user->id=$id){
+           $user->hasuserimg=1;
+            $user->save();
+        }
+    }
+    public static function deleteImgByUserId($id){
+        $user=User::getById($id);
+        if($user->id=$id){
+            $user->hasuserimg=0;
+            $user->save();
+        }
+    }
 }

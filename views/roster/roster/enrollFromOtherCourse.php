@@ -6,7 +6,6 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Enroll From Other Course';
-//$this->params['breadcrumbs'][] = ['label' => '', 'url' => ['']]];
 $this->params['breadcrumbs'][] = ['label' => 'List students', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div><br>
         <h4>Select students to enroll: </h4>
-        check: <a id="checkAll" class="check-all" href="#">All</a> /
+        Check: <a id="checkAll" class="check-all" href="#">All</a> /
         <a id="checkNone" class="uncheck-all" href="#">None</a>
         <br><br>
 <div id="list">

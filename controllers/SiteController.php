@@ -348,21 +348,32 @@ class SiteController extends AppController
     {
         $this->guestUserHandler();
         $tzname = $this->getUserTimezone();
-
+        $userid = Yii::$app->user->identity->getId();
         $user = $this->getAuthenticatedUser();
         $model = new ChangeUserInfoForm();
+
         if ($model->load(Yii::$app->request->post()) && $model->checkPassword()) {
             $params = Yii::$app->request->getBodyParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->file) {
+
+            if ($model->file ) {
+
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+                $model->remove=0;
             }
             User::saveUserRecord($params);
+            User::updateImgByUserId($userid);
+            if($model->remove==1){
+                User::deleteImgByUserId($userid);
+
+            }
             $this->setSuccessFlash('Changes updated successfully.');
+            $this->redirect('change-user-info');
         }
         $this->includeJS(['js/changeUserInfo.js']);
-        return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname]);
+
+        return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid]);
     }
 
     public function actionStudentEnrollCourse()
