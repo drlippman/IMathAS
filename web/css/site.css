@@ -298,6 +298,7 @@ table tbody tr.odd {
 
 }
 
+
 .text-label{
     width: 100%;
     margin-bottom: 25px !important;
@@ -305,5 +306,9 @@ table tbody tr.odd {
 
 .left-align-text{
     float: left;
+}
+
+a:link:focus{
+    text-decoration: none;
 }
 
