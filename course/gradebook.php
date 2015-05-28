@@ -26,6 +26,10 @@ if (isset($teacherid)) {
 if (isset($tutorid)) {
 	$istutor = true;
 }
+if (!$isteacher && !$istutor && !isset($studentid)) {
+	echo _('Error - you are not a student, teacher, or tutor for this course');
+	exit;
+}
 if ($isteacher || $istutor) {
 	$canviewall = true;
 } else {
