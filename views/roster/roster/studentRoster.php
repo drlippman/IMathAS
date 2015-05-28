@@ -30,8 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>">Enroll Student with known username</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Import Students from File</a><br/>
+                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$course->id); ?>">Import Students from File</a><br/>
                 <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>">Create and Enroll new student</a><br/>
+
 
             </span><br class="clear"/>
         </div>
@@ -68,7 +69,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <script type="text/javascript">
 
                 $(document).ready(function () {
-                //    createRosterTableHeader();
                     var course_id =  $( "#course-id" ).val();
                     selectCheckBox();
                     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
@@ -87,13 +87,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         showStudentInformation(students,isCode,isSection);
                 }
                 }
-
-//                function createRosterTableHeader(){
-//                var html = "<table class='student-data-table' id='student-information-table'>";
-//                    html += "<thead><tr><th></th><th>Last</th><th>First</th><th>Email</th><th>Username</th><th>Last Access</th>";
-//                    html += "<th>Grades</th><th>Due Dates</th><th>Chg Info</th><th>Lock Out</th></tr></thead><tbody></tbody></table>";
-//                    $('roster-div').append(html);
-//                }
 
                 function showStudentInformation(students,isCode,isSection)
                 {

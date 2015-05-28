@@ -21,6 +21,9 @@ use app\components\AppUtility;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\db\Query;
+use app\models\forms\ImportStudentForm;
+use yii\web\UploadedFile;
+use app\components\AppConstant;
 
 
 
@@ -162,7 +165,6 @@ class RosterController extends AppController
 
             );
             array_push($studentArray, $tempArray);
-AppUtility::dump($studentArray);
         }
         return json_encode(['status' => '0', 'query' => $studentArray,'isCode'=>$isCode,'isSection'=>$isSection]);
     }
@@ -360,7 +362,6 @@ AppUtility::dump($studentArray);
         $model= new CreateAndEnrollNewStudentForm();
         if($this->isPost()){
             $params=$this->getBodyParams();
-//            AppUtility::dump($params);
             $record=array();
             foreach($params as $result){
                 array_push($record,$result);
@@ -395,6 +396,63 @@ AppUtility::dump($studentArray);
 
     }
 
+    public function actionImportStudent()
+    {
+        $user = $this->getAuthenticatedUser();
+        $model = new ImportStudentForm();
+        $now = time();
+        $cid = Yii::$app->request->get('cid');
 
+        if ($model->load(Yii::$app->request->post())) {
+            $params = Yii::$app->request->getBodyParams();
+            $params = $params['ImportStudentForm'];
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if ($model->file) {
+                $filename = AppConstant::UPLOAD_DIRECTORY . $now . '.csv';
+                $model->file->saveAs($filename);
+            }
+
+            $studentRecords = $this->ImportStudentCsv($filename, $cid);
+            foreach($studentRecords as $record)
+            {
+                User::createStudentAccount($record);
+            }
+            $this->setSuccessFlash('Imported student successfully.');
+
+        }
+        return $this->render('importStudent',['model'=>$model]);
+    }
+
+    public function ImportStudentCsv($fileName, $cid){
+        $course = Course::getById($cid);
+        if($course)
+        {
+            if(isset($fileName) && !empty($fileName) && ($handle = fopen($fileName, "r")) !== FALSE){
+                while ($data = fgetcsv($handle, 1000, ",",'"')) {
+                    $totalColumns = count($data);
+                    if (!empty($data)) {
+                        if ($totalColumns == 5) {
+                            $studentRecords[] = array('username' => $data[0],
+                                'FirstName' => $data[1],
+                                'LastName' => $data[2],
+                                'email'=> $data[3],
+                                'password' => $data[4],
+                                'enrollkey' => $course->enrollkey,
+                                'courseid' => $cid
+                            );
+                        }else{
+                            return array('isValidCSV'=>'failed',
+                                'message'=>'Invalid CSV'
+                            );
+                        }
+                    }
+                }
+                fclose($handle);
+                return $studentRecords;
+            }
+        }
+
+        return false;
+    }
 }
 

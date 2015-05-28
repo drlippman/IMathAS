@@ -81,9 +81,9 @@ $this->params['breadcrumbs'][] = $this->title;
     });
     var messageData;
     function createTableHeader(){
-    var html = "<table id='message-table display-message-table' class='message-table display-message-table'>"
-        html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>"
-        html += "</tr></thead><tbody class='message-table-body'></tbody></table>"
+    var html = "<table id='message-table display-message-table' class='message-table display-message-table'>";
+        html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
+        html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
         $('.message-div').append(html);
     }
     function showMessageSuccess(response)

@@ -122,6 +122,13 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = new User();
         $user->attributes = $params;
         $user->save();
+
+        if($user->id && isset($params['userid']) && isset($params['courseid']))
+        {
+            $student = new Student();
+            $student->create($params);
+        }
+
         if($user->id)
         {
             return true;
@@ -164,6 +171,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function findAllById($id){
         return static::find()->where(['id'=>$id])->asArray()->all();
     }
+
     public static function createAndEnrollNewStudent($params)
     {
         $params['SID'] = $params['username'];
@@ -178,6 +186,5 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         }
         return false;
     }
-
 
 }
