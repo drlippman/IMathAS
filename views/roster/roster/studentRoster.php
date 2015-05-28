@@ -3,8 +3,6 @@ use app\components\AppUtility;
 $this->title = 'Roster';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!DOCTYPE html>
-<html>
 <head>
 
     <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
@@ -12,32 +10,23 @@ $this->params['breadcrumbs'][] = $this->title;
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 </head>
-<body>
-
         <div ><h2>Student Roster </h2></div>
-
         <div class="cpmid">
             <span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?>">View Login Grid</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>">Assign Sections and/or Codes</a><br>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?>">View Login Grid</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>">Assign Sections and/or Codes</a><br>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>">Manage LatePasses</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid='.$course->id); ?>">Manage Tutors</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>">Manage LatePasses</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid='.$course->id); ?>">Manage Tutors</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>">Enroll Student with known username</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>">Enroll students from another course</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>">Enroll Student with known username</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>">Enroll students from another course</a><br/>
             </span><span class="column" style="width:auto;">
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$course->id); ?>">Import Students from File</a><br/>
-                <a HREF="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>">Create and Enroll new student</a><br/>
-
-
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$course->id); ?>">Import Students from File</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>">Create and Enroll new student</a><br/>
             </span><br class="clear"/>
         </div>
-        <form id="qform" method=post action="listusers.php?cid=2">
-
             <p>check: <a  class="uncheck-all" href="#">None</a> /
                 <a   class="check-all" href="#">All</a>
                 With Selected:
@@ -48,8 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students">
                 <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
             <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-
-
             <table class="student-data-table" id="student-information-table">
                 <thead>
                 <tr><th></th>
@@ -65,16 +52,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
                 </thead>
             </table>
-
             <script type="text/javascript">
-
                 $(document).ready(function () {
                     var course_id =  $( "#course-id" ).val();
                     selectCheckBox();
                     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
-
                 });
-
                 function studentRosterSuccess(response)
                 {
                     var students = JSON.parse(response);
@@ -82,12 +65,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     var isSection = students.isSection;
                     if (students.status == 0) {
                         var students = students.query;
-
-
                         showStudentInformation(students,isCode,isSection);
                 }
                 }
-
                 function showStudentInformation(students,isCode,isSection)
                 {
                     var html = "";
@@ -114,24 +94,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     $('#student-information-table').append(html);
                     $('.student-data-table').DataTable();
                  }
-
                 function selectCheckBox(){
                     $('.check-all').click(function(){
                         $('#student-information-table input:checkbox').each(function(){
                             $(this).prop('checked',true);
                         })
                     });
-
                     $('.uncheck-all').click(function(){
                         $('#student-information-table input:checkbox').each(function(){
                             $(this).prop('checked',false);
                         })
                     });
                 }
-
                 function datecal(a)
                 {
-
                     var date = new Date(a*1000);
                     var  month = ('0' + (date.getMonth() + 1)).slice(-2);
                     var day = ('0' + date.getDate()).slice(-2);
@@ -141,7 +117,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         min = ('0' + date.getMinutes()).slice(-2),
                         ampm = 'AM',
                         time;
-
                     if (hh > 12) {
                         h = hh - 12;
                         ampm = 'PM';
@@ -152,13 +127,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         h = 12;
                     }
                     time = month + '/' + day + '/' + year + '  ' + h + ':' + min + ' ' + ampm;
-
                     return time;
                 }
             </script>
-        </form>
-
-
-
-</body>
-</html>

@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
         <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <p>Showing Number of Logins <label id="first-date-label"></label>  through  <label id="last-date-label"></label>
-
         <div class="pull-left select-text-margin">
            <a id="previous-link" href="#">Show previous week.</a>&nbsp;&nbsp;<a id="following-link" href="#">Show following week.</a>&nbsp;&nbsp;
             <div class="pull-right"> Show</div>
@@ -37,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
         </div>
     </div>
+
     <div class="pull-left select-text-margin"> through</div>
     <div class="col-lg-3 pull-left" id="datepicker-id1" >
         <?php
@@ -143,6 +143,7 @@ $this->params['breadcrumbs'][] = $this->title;
             $( "#w0").val(finalDate);
             $("#first-date-label").text(finalDate);
             finalDate = lastDate(finalDate, daysInAWeek, 'deduct');
+            $('#count').val(finalDate);
             $( "#w1").val(finalDate);
             $('#go-button').trigger('click');
             $('#last-date-label').text(finalDate);

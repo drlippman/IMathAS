@@ -29,18 +29,12 @@ use app\components\AppConstant;
 
 class RosterController extends AppController
 {
-
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
-        $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-
         $students = Student::findByCid($cid);
-
-        $studArray = array();
         $isCode = false;
         $isSection= false;
         foreach ($students as $stud)
@@ -53,15 +47,8 @@ class RosterController extends AppController
             {
                 $isSection = true;
             }
-            $tempArray = array(
-                'Section' => $stud->section,
-                'code' => $stud->code,
-            );
-
-            array_push($studArray, $tempArray);
-
         }
-        return $this->render('studentRoster', ['studentInformation' => $studArray,'course' => $course,'isSection' => $isSection,'isCode' => $isCode]);
+        return $this->render('studentRoster', ['course' => $course,'isSection' => $isSection,'isCode' => $isCode]);
     }
 
     public function actionLoginGridView()
@@ -69,21 +56,16 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
-
         return $this->render('loginGridView', ['course' => $course]);
-
     }
 
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();
-
         $params = $this->getBodyParams();
         $cid = $params['cid'];
-
         $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
         $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
-
         $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
         $headsArray = array();
         $headsArray[] = 'Name';
@@ -127,15 +109,12 @@ class RosterController extends AppController
             $stuLogs[$key]['name'] = $nameHash[$key];
             $stuLogs[$key]['row'] = $field;
         }
-
         $retJSON = new \stdClass();
         $retJSON->header = $headsArray;
         $retJSON->rows = $stuLogs;
-
         $test = array('status' => '0', 'data' => $retJSON);
         return json_encode($test);
     }
-
     public function actionStudentRosterAjax()
     {
         $params = $this->getBodyParams();
@@ -162,20 +141,17 @@ class RosterController extends AppController
                 'lastaccess' => $stud->user->lastaccess,
                 'section' => $stud->section,
                 'code' => $stud->code,
-
             );
             array_push($studentArray, $tempArray);
         }
         return json_encode(['status' => '0', 'query' => $studentArray,'isCode'=>$isCode,'isSection'=>$isSection]);
     }
-
     public function actionStudentEnrollment()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $model = new StudentEnrollmentForm();
         $course = Course::getById($cid);
-
         if ($model->load(\Yii::$app->request->post())) {
             $param = $this->getBodyParams();
             $param = $param['StudentEnrollmentForm'];
@@ -203,13 +179,11 @@ class RosterController extends AppController
         }
         return $this->render('studentEnrollment', ['course' => $course, 'model' => $model]);
     }
-
    public function actionAssignSectionsAndCodes()
    {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $query = Student::findByCid($cid);
-
         $studentArray = array();
         foreach ($query as $abc) {
             $tempArray = array('Name' => $abc->user->FirstName . ' ' . $abc->user->LastName,
@@ -232,24 +206,20 @@ class RosterController extends AppController
         }
         return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $cid]);
     }
-
     public function actionManageLatePasses()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
-
         $model = Student::findByCid($cid);
-
         $studentArray = array();
-
-        foreach ($model as $abc)
+        foreach ($model as $student)
         {
-            $tempArray = array('Name' => $abc->user->FirstName.' '.$abc->user->LastName,
-                'Section' => $abc->section,
-                'Latepass' => $abc->latepass,
-                'StudenId' => $abc->id,
-                'latePassHrs' => $abc->course->latepasshrs,
-                'userid' => $abc->userid
+            $tempArray = array('Name' => $student->user->FirstName.' '.$student->user->LastName,
+                'Section' => $student->section,
+                'Latepass' => $student->latepass,
+                'StudenId' => $student->id,
+                'latePassHrs' => $student->course->latepasshrs,
+                'userid' => $student->userid
             );
             array_push($studentArray, $tempArray);
             $student = array();
@@ -264,13 +234,9 @@ class RosterController extends AppController
                 Course::updatePassHours($latepasshours,$cid);
                 $this->redirect('student-roster?cid='.$cid);
             }
-
         }
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
-
     }
-
-
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
@@ -280,14 +246,12 @@ class RosterController extends AppController
         $teacherId=Yii::$app->user->identity->getId();
         $list=Teacher::getTeacherByUserId($teacherId);
         $courseDetails=array();
-
         foreach($list as $teacher)
         {
             $tempArray = array("id" => $teacher->course->id,
             "name" => $teacher->course->name);
             array_push($courseDetails,$tempArray);
         }
-
         if($this->isPost())
         {
            $params = $this->getBodyParams();
@@ -301,9 +265,7 @@ class RosterController extends AppController
         }
         return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$courseDetails, 'model'=>$model]);
     }
-
     public function actionEnrollStudents(){
-
         $this->guestUserHandler();
         $courseid = Yii::$app->request->get('course');
         $cid = Yii::$app->request->get('cid');
@@ -311,14 +273,12 @@ class RosterController extends AppController
         $course = Course::getById($courseid);
         $query=Student::findByCid($courseid);
         $studentDetails=array();
-
         foreach($query as $student){
             $tempArray=array();
             $tempArray = array("id" => $student->user->id,
                 "firstName" => $student->user->FirstName,
                 "lastName"=> $student->user->LastName);
             array_push($studentDetails,$tempArray);
-
         }
         if($this->isPost())
         {
@@ -337,11 +297,9 @@ class RosterController extends AppController
                 $studentList=array("id"=>$entry,"courseId"=>$cid,"section"=>$record[2]['section']);
                 array_push($storedArray,$studentList);
             }
-
             foreach($storedArray as $studentData){
                 $studentRecord=Student::getByCourseId($studentData['courseId'],$studentData['id']);
-
-                if(!$studentRecord){
+                 if(!$studentRecord){
                     $student = new Student();
                     $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
                     $this->redirect('student-roster?cid='.$cid);
@@ -353,7 +311,6 @@ class RosterController extends AppController
         }
         return $this->render('enrollStudents',['course' => $course,'data'=>$studentDetails,'model'=> $model,'cid'=> $cid]);
     }
-
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
@@ -379,9 +336,7 @@ class RosterController extends AppController
                 $this->setErrorFlash('Username already exists');
             }
         }
-
         return $this->renderWithData('createAndEnrollNewStudent', ['course' => $course, 'model'=>$model]);
-
     }
     public function actionManageTutors()
     {
@@ -428,18 +383,14 @@ class RosterController extends AppController
                     $isTeacher = Teacher::getUniqueByUserId($userId->id);
                     if($isTeacher){
                         $tutors=Tutor::getByUserId($isTeacher->userid,$cid);
-//                        AppUtility::dump($tutors);
-
-                    }else{
+                     }else{
                         array_push($studentArray,$userId->id);
                     }
                 }
             }
-//        AppUtility::dump($studentArray);
-            return json_encode(array('status' => 0));
+             return json_encode(array('status' => 0));
 
     }
-
     public function actionImportStudent()
     {
         $user = $this->getAuthenticatedUser();
@@ -462,11 +413,9 @@ class RosterController extends AppController
                 User::createStudentAccount($record);
             }
             $this->setSuccessFlash('Imported student successfully.');
-
         }
         return $this->render('importStudent',['model'=>$model]);
     }
-
     public function ImportStudentCsv($fileName, $cid){
         $course = Course::getById($cid);
         if($course)
@@ -495,7 +444,6 @@ class RosterController extends AppController
                 return $studentRecords;
             }
         }
-
         return false;
     }
 }
