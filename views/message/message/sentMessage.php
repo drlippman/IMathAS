@@ -176,7 +176,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 markArray.push($(this).val());
             });
             if(markArray.length!=0) {
-                var html = '<div><p>Are you sure?</p></div>';
+                var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
 
                 var cancelUrl = $(this).attr('href');
                 e.preventDefault();
@@ -275,7 +275,7 @@ $this->params['breadcrumbs'][] = $this->title;
                markArray.push($(this).val());
            });
            if(markArray.length!=0) {
-               var html = '<div><p>Are you sure? </p></div>';
+               var html = '<div><p>Are you sure ? you want to Unsend. </p></div>';
 
                var cancelUrl = $(this).attr('href');
                e.preventDefault();

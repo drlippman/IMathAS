@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <p>Showing Number of Logins <label id="first-date-label"></label>  through  <label id="last-date-label"></label>
 
         <div class="pull-left select-text-margin">
-           <a id="previous-link">Show previous week.</a>&nbsp;&nbsp;<a id="following-link">Show following week.</a>&nbsp;&nbsp;
+           <a id="previous-link" href="#">Show previous week.</a>&nbsp;&nbsp;<a id="following-link" href="#">Show following week.</a>&nbsp;&nbsp;
             <div class="pull-right"> Show</div>
         </div>
         <div class="col-lg-3 pull-left" id="datepicker-id">
@@ -69,18 +69,21 @@ $this->params['breadcrumbs'][] = $this->title;
     $( document ).ready(function() {
         var startDate = $( "#datepicker-id input" ).val();
         var endDate = $( "#datepicker-id1 input" ).val();
-        $("#first-date-label").val(startDate);
-        $("#last-date-label").val(endDate);
 
         $("#first-date-label").text(startDate);
         $('#last-date-label').text(endDate);
 
         var course_id =  $( "#course-id" ).val();
         var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
+
         jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
+
         $("#go-button").click(function () {
             var startDate = $( "#datepicker-id input" ).val();
             var endDate = $( "#datepicker-id1 input" ).val();
+
+            $("#first-date-label").text(startDate);
+            $('#last-date-label').text(endDate);
 
             var course_id =  $( "#course-id" ).val();
             var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
@@ -102,16 +105,28 @@ $this->params['breadcrumbs'][] = $this->title;
     function toggleDate(selector, dayDiff, adjustment) {
         inputString = $("#"+selector).val();
         var dString = inputString.split('-');
-
         var dt = new Date(dString[2], dString[0] - 1, dString[1]);
+
         dayDiff = parseInt(dayDiff);
         if (adjustment == 'add') {
             dt.setDate(dt.getDate()+dayDiff);
-
         } else{
             dt.setDate(dt.getDate()-dayDiff);
         }
 
+        var finalDate = pad(dt.getMonth()+1,2) + "-" + pad(dt.getDate(),2) + "-" + dt.getFullYear();
+        return finalDate;
+    }
+    function lastDate(inputString, dayDiff, adjustment) {
+         var dString = inputString.split('-');
+        var dt = new Date(dString[2], dString[0] - 1, dString[1]);
+
+        dayDiff = parseInt(dayDiff);
+        if (adjustment == 'add') {
+            dt.setDate(dt.getDate()+dayDiff);
+        } else{
+            dt.setDate(dt.getDate()+dayDiff);
+        }
         var finalDate = pad(dt.getMonth()+1,2) + "-" + pad(dt.getDate(),2) + "-" + dt.getFullYear();
         return finalDate;
     }
@@ -122,27 +137,23 @@ $this->params['breadcrumbs'][] = $this->title;
     });
 
     function previousWeekHandler(){
-        var daysInAWeek = 7;
+        var daysInAWeek = 6;
         $("#previous-link").click(function () {
             finalDate = toggleDate('w0', daysInAWeek, 'deduct');
             $( "#w0").val(finalDate);
-
             $("#first-date-label").text(finalDate);
-
-            finalDate = toggleDate('w1', daysInAWeek, 'deduct');
+            finalDate = lastDate(finalDate, daysInAWeek, 'deduct');
             $( "#w1").val(finalDate);
             $('#go-button').trigger('click');
-
             $('#last-date-label').text(finalDate);
         });
     }
     function nextWeekHandler(){
-        var daysInAWeek = 7;
+        var daysInAWeek = 6;
         $("#following-link").click(function () {
             finalDate = toggleDate('w0', daysInAWeek, 'add');
             $( "#w0").val(finalDate);
-            $("#first-date-label").text(finalDate);
-            finalDate = toggleDate('w1', daysInAWeek, 'add');
+            finalDate = lastDate(finalDate, daysInAWeek, 'add');
             $( "#w1").val(finalDate);
             $('#go-button').trigger('click');
             $("#last-date-label").text(finalDate);
@@ -152,8 +163,6 @@ $this->params['breadcrumbs'][] = $this->title;
     function loginGridViewSuccess(response) {
         var data = JSON.parse(response);
         data = data.data;
-
-        //data = response;
         var tableString = '';
         headerArray = data.header;
         rows = data.rows;
@@ -166,9 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
             name = studata.name;
             rows = studata.row;
             tableString = tableString+ "<tr>";
-            //alert( "Name: " + i + ", Value: " + n );
-            tableString = tableString + "<td>" + name + "</td>";
-
+             tableString = tableString + "<td>" + name + "</td>";
             for(i=1; i<headerArray.length; i++) {
                 var headerVal = headerArray[i];
                 tableString = tableString + "<td>" + rows[headerVal] + "</td>";
