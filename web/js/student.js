@@ -39,12 +39,6 @@ $(document).ready(function(){
 //        Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
-        var assessmentsession = $("#assessmentsession").val();
-        var now = $("#now").val();
-        var timelimit = $("#timelimit").val();
-        var now_int = parseInt(now);
-        var assessmentsession_int =parseInt(assessmentsession);
-        var timelimit_int = parseInt(timelimit);
         var linkId = $(this).attr('id')
         var timelimit = Math.abs($('#time-limit'+linkId).val());
         var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
