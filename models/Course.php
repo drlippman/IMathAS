@@ -121,5 +121,11 @@ class Course extends BaseImasCourses {
     public static function findByName($name){
         return static::findOne(['name'=>$name]);
     }
+    public static function updatePassHours($latepasshours,$cid)
+    {
 
+        $student = Course::findOne(['id' => $cid]);
+        $student->latepasshrs = $latepasshours;
+        $student->save();
+    }
 } 

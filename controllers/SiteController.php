@@ -354,7 +354,6 @@ class SiteController extends AppController
         if ($model->load(Yii::$app->request->post()) && $model->checkPassword()) {
             $params = Yii::$app->request->getBodyParams();
             $params = $params['ChangeUserInfoForm'];
-
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');

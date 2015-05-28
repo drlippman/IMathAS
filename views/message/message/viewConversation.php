@@ -4,7 +4,7 @@ use app\components\AppUtility;
 
 $this->title = 'Message Conversation';
 $this->params['breadcrumbs'][] = $this->title;
-
+$currentLevel = 0;
 ?>
 <!DOCTYPE html>
 <html>
@@ -13,14 +13,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="../../../web/js/jquery.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="<?php AppUtility::getHomeURL()?>css/imascore.css" type="text/css"/>
-    <link rel="stylesheet" href="<?php AppUtility::getHomeURL()?>css/default.css" type="text/css"/>
-    <link rel="stylesheet" href="<?php AppUtility::getHomeURL()?>css/handheld.css"
+    <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/forums.css"
+    <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/imascore.css" type="text/css"/>
+    <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/default.css" type="text/css"/>
+    <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/handheld.css"
           media="handheld,only screen and (max-device-width:480px)"/>
 
-    <script type="text/javascript" src="<?php AppUtility::getHomeURL()?>js/general.js"></script>
-    <script type="text/javascript" src="<?php AppUtility::getHomeURL()?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
-    <script src="<?php AppUtility::getHomeURL()?>js/ASCIIsvg_min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/general.js"></script>
+    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
+    <script src="<?php echo AppUtility::getHomeURL()?>js/ASCIIsvg_min.js" type="text/javascript"></script>
 </head>
 <body>
 <div class=mainbody>
@@ -41,17 +42,36 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php foreach($messages as $index => $message){ ?>
 
-        <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
-            <span class=right><a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>">Reply</a>
-                <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
-            </span>
-            <b><?php echo $message['title'] ?></b><br/>Posted by: <a
-            href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
-        <span style="color:red;">New</span>
-    </div>
-    <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
 
-  <?php      }?>
+        <?php if($message['level'] != 0 && $message['level'] < $currentLevel)
+        { ?>
+            </div>
+        <?php }?>
+    <?php if($message['level'] != 0 && $message['level'] > $currentLevel)
+            { ?>
+                <div class="forumgrp" id="block<?php echo $index-1 ?>">
+
+           <?php }?>
+            <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
+                <span class=right><a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>">Reply</a>
+                    <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
+                </span>
+                <b><?php echo $message['title'] ?></b><br/>Posted by: <a
+                href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
+            <span style="color:red;">New</span>
+            </div>
+            <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
+
+
+            <?php if($index == (count($messages) - 1))
+            {
+                for($i = $message['level']; $i > 0; $i--){?>
+                    </div>
+            <?php } }?>
+        <?php
+            $currentLevel = $message['level'];
+            ?>
+    <?php      }?>
 
     </div>
 </div>

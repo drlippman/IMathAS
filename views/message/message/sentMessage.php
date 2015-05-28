@@ -176,8 +176,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 markArray.push($(this).val());
             });
             if(markArray.length!=0) {
-                var html = '<div><p>Are you sure? This will delete your message from</p>' +
-                    '<p>Inbox.</p></div>';
+                var html = '<div><p>Are you sure?</p></div>';
 
                 var cancelUrl = $(this).attr('href');
                 e.preventDefault();
@@ -276,8 +275,7 @@ $this->params['breadcrumbs'][] = $this->title;
                markArray.push($(this).val());
            });
            if(markArray.length!=0) {
-               var html = '<div><p>Are you sure? This will delete your message from</p>'+
-                   '<p>the receivers inbox and your sent list.</p></div>';
+               var html = '<div><p>Are you sure? </p></div>';
 
                var cancelUrl = $(this).attr('href');
                e.preventDefault();

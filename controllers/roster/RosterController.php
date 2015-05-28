@@ -14,6 +14,7 @@ use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
 use app\models\User;
+use kartik\base\AnimateAsset;
 use Seld\JsonLint\JsonParser;
 use Yii;
 use app\components\AppUtility;
@@ -31,8 +32,6 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
-       // return $this->render('studentRoster', ['course' => $course]);
-
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
 
@@ -43,8 +42,7 @@ class RosterController extends AppController
         $isSection= false;
         foreach ($students as $stud)
         {
-//            && !empty($stud->code)
-            if($stud->code != '' )
+             if($stud->code != '' )
             {
                 $isCode = true;
             }
@@ -61,7 +59,6 @@ class RosterController extends AppController
 
         }
         return $this->render('studentRoster', ['studentInformation' => $studArray,'course' => $course,'isSection' => $isSection,'isCode' => $isCode]);
-
     }
 
     public function actionLoginGridView()
@@ -165,7 +162,7 @@ class RosterController extends AppController
 
             );
             array_push($studentArray, $tempArray);
-
+AppUtility::dump($studentArray);
         }
         return json_encode(['status' => '0', 'query' => $studentArray,'isCode'=>$isCode,'isSection'=>$isSection]);
     }
@@ -201,26 +198,11 @@ class RosterController extends AppController
                     $this->setErrorFlash('This username is already enrolled in the class.');
                 }
             }
-
-
         }
-
         return $this->render('studentEnrollment', ['course' => $course, 'model' => $model]);
-
     }
 
-
-//    public function actionAssignSectionsAndCodes()
-//    {
-//        $this->guestUserHandler();
-//        $cid = Yii::$app->request->get('cid');
-//        $course = Course::getById($cid);
-//
-//
-//
-//    }
-
-    public function actionAssignSectionsAndCodes()
+   public function actionAssignSectionsAndCodes()
    {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
@@ -264,14 +246,22 @@ class RosterController extends AppController
                 'Section' => $abc->section,
                 'Latepass' => $abc->latepass,
                 'StudenId' => $abc->id,
-                'latePassHrs' => $abc->course->latepasshrs
+                'latePassHrs' => $abc->course->latepasshrs,
+                'userid' => $abc->userid
             );
             array_push($studentArray, $tempArray);
-
-//            if(Yii::$app->request->isPost)
-//            {
-//                AppUtility::dump($_REQUEST);
-//            }
+            $student = array();
+            if($this->isPost())
+            {
+                $paramas = $_POST;
+                foreach($paramas['code'] as $key => $latepass)
+                {
+                    $latepasshours= $paramas['passhours'];
+                    Student::updateLatepasses($latepass,$key,$cid);
+                }
+                Course::updatePassHours($latepasshours,$cid);
+                $this->redirect('student-roster?cid='.$cid);
+            }
 
         }
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
@@ -344,7 +334,6 @@ class RosterController extends AppController
             foreach($record[1] as $entry){
                 $studentList=array("id"=>$entry,"courseId"=>$cid,"section"=>$record[2]['section']);
                 array_push($storedArray,$studentList);
-
             }
 
             foreach($storedArray as $studentData){

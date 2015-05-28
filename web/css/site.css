@@ -286,15 +286,16 @@ table tbody tr.odd {
     margin-left: 0px;
 }
 .rights_alignment{
-    margin-right: 92px;
+    margin-right: 9%;
 }
 
 .right_alignment
 {
     margin-right: 107px;
 }
-#padd{
-    padding: 2px;
+#submit-button{
+    margin-left: 19%;
 
 }
+
 

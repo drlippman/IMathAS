@@ -68,4 +68,11 @@ class Student extends BaseImasStudents {
 
 
     }
+    public static function updateLatepasses($latepass,$userid,$cid)
+    {
+
+        $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
+        $student->latepass = $latepass;
+        $student->save();
+    }
 } 

@@ -324,6 +324,7 @@ class MessageController extends AppController
         }
 
         $this->createChild($this->children[0]);
+//        $this->includeCSS('css/forums.css');
         return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages]);
     }
 

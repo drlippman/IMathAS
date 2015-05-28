@@ -6,7 +6,7 @@ use app\components\AppUtility;
 
 <p>Communication</p>
 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a><br>
-<a href="">Forums</a><br>
+<a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"> Forums</a><br>
 
 <p>Tools</p>
 <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"> Roster</a><br>

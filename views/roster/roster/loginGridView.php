@@ -2,6 +2,7 @@
 use kartik\date\DatePicker;
 
 $this->title = 'Login Grid View';
+$this->params['breadcrumbs'][] = ['label' => 'roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -15,7 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"></div>
         <div id="headerlogingrid" class="pagetitle"><h2>Login Grid View</h2></div>
         <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-        <p>Showing Number of Logins May 5,2015 through May 17,2015
+        <p>Showing Number of Logins <label id="first-date-label"></label>  through  <label id="last-date-label"></label>
+
         <div class="pull-left select-text-margin">
            <a id="previous-link">Show previous week.</a>&nbsp;&nbsp;<a id="following-link">Show following week.</a>&nbsp;&nbsp;
             <div class="pull-right"> Show</div>
@@ -67,6 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
     $( document ).ready(function() {
         var startDate = $( "#datepicker-id input" ).val();
         var endDate = $( "#datepicker-id1 input" ).val();
+        $("#first-date-label").val(startDate);
+        $("#last-date-label").val(endDate);
+
+        $("#first-date-label").text(startDate);
+        $('#last-date-label').text(endDate);
 
         var course_id =  $( "#course-id" ).val();
         var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
@@ -120,9 +127,13 @@ $this->params['breadcrumbs'][] = $this->title;
             finalDate = toggleDate('w0', daysInAWeek, 'deduct');
             $( "#w0").val(finalDate);
 
+            $("#first-date-label").text(finalDate);
+
             finalDate = toggleDate('w1', daysInAWeek, 'deduct');
             $( "#w1").val(finalDate);
             $('#go-button').trigger('click');
+
+            $('#last-date-label').text(finalDate);
         });
     }
     function nextWeekHandler(){
@@ -130,10 +141,11 @@ $this->params['breadcrumbs'][] = $this->title;
         $("#following-link").click(function () {
             finalDate = toggleDate('w0', daysInAWeek, 'add');
             $( "#w0").val(finalDate);
-
+            $("#first-date-label").text(finalDate);
             finalDate = toggleDate('w1', daysInAWeek, 'add');
             $( "#w1").val(finalDate);
             $('#go-button').trigger('click');
+            $("#last-date-label").text(finalDate);
         });
     }
 

@@ -2,15 +2,15 @@
 
 use app\components\AppUtility;
 use yii\helpers\Html;
-
+$this->title = 'Assign Section And Codes';
+$this->params['breadcrumbs'][] = ['label' => 'roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 
-    <div class="breadcrumb" id="title_bar">
-        <a HREF="<?php echo AppUtility::getURLFromHome('site', 'index') ?>">Home</a><br/>
-    </div>
+
     <link rel="stylesheet" type="text/css"
           href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
@@ -33,8 +33,8 @@ use yii\helpers\Html;
             foreach($studentInformation as $singleStudentInformation){ ?>
                 <tr>
                     <td><?php echo $singleStudentInformation['Name']?></td>
-                    <td><input type="text" value="<?php echo $singleStudentInformation['section']?> "name='section[<?php echo $singleStudentInformation['userid']?>]'> </td>
-                    <td><input type="text" value="<?php echo $singleStudentInformation['code']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
+                    <td><input type="text" size="5" value="<?php echo $singleStudentInformation['section']?> "name='section[<?php echo $singleStudentInformation['userid']?>]'> </td>
+                    <td><input type="text" size="5" value="<?php echo $singleStudentInformation['code']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
 
                 </tr>
             <?php }?>
