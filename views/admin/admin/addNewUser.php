@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
+use kartik\time\TimePicker;
 use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
@@ -40,14 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <!--        <div class="form-group">-->
     <div class="col-lg-0 pull-left select-text-margin"> <a HREF="<?php echo AppUtility::getURLFromHome('site', 'helper-guide') ?>"> <img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
-        <div class="rights_alignment">    <?=
-        $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,
+        <div class="rights_alignment">
+
+            <?=$form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,
             AppConstant::STUDENT_RIGHT => 'Student',
             AppConstant::TEACHER_RIGHT => 'Teacher',
             AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
             AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
             AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
-            AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
+            AppConstant::ADMIN_RIGHT => 'Full Admin']) ?>
         </div>
 <!--        </div>-->
         <div class="clear-both"></div>

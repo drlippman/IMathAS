@@ -149,7 +149,7 @@ use app\components\AppUtility;
                     buttons:
                     {
 
-                        "G0 Back": function ()
+                        "Go Back": function ()
                         {
                                 window.location ="index?cid="+courseid;
                                  $(this).dialog('destroy').remove();
