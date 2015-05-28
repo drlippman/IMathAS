@@ -44,6 +44,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
 
+<!--    <input type="hidden" id="forumId" class="courseId" value="--><?php //echo $forum->id ?><!--">-->
+
+
     <br>
 
 
@@ -68,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
             else {
                       echo "<p>There are no active forums at this time.</p>";
              }?>
-<?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 </div>
 
     <script>
@@ -82,8 +85,8 @@ $this->params['breadcrumbs'][] = $this->title;
             $('#forum_search').click(function () {
                 var search = $('#search_text').val();
                 var courseId = $('.courseId').val();
-              //  var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
-                var allData = {search: search, cid: courseId}
+                var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
+                var allData = {search: search, cid: courseId , value: val}
                 jQuerySubmit('get-forum-name-ajax', allData, 'getTextSuccess');
             });
         });
@@ -98,8 +101,10 @@ $this->params['breadcrumbs'][] = $this->title;
            {
                var forumData = result.forum;
                var queryData = result.searchData;
-               var subjectData = result.subjectResult;
-               searchByForum(forumData, queryData);
+               var subjectData = result.bySubject;
+              var checkVal= result.checkVal;
+               var courseId=result.courseId;
+               searchByForum(forumData, queryData,subjectData,checkVal);
            }
         }
 
@@ -114,10 +119,12 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         function showForumTable(forums) {
+            var courseId = $('.courseId').val();
 
             var html = "";
             $.each(forums, function (index, forum) {
-                html += "<tr> <td><a href='#'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
+
+                html += "<tr> <td><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=')?>"+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";
@@ -131,16 +138,19 @@ $this->params['breadcrumbs'][] = $this->title;
         function searchByForum(forumData, queryData)
         {
             var filteredArray = [];
-            $.each(queryData, function (index, queryresult) {
-                $.each(forumData, function (index, forumresult) {
-                    if (queryresult.id == forumresult.forumId)
-                    {
-                        filteredArray.push(forumresult);
-                    }
+
+
+
+                $.each(queryData, function (index, queryresult) {
+                    $.each(forumData, function (index, forumresult) {
+                        if (queryresult.id == forumresult.forumId)
+                        {
+                            filteredArray.push(forumresult);
+                        }
+                    });
                 });
-            });
-//            alert(filteredArray);
-            showForumTable(filteredArray);
+                showForumTable(filteredArray);
+
         }
 
     </script>
