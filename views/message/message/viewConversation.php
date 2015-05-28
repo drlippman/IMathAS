@@ -31,10 +31,17 @@ $currentLevel = 0;
             <div class="clear"></div>
         </div>
     </div>
-<?php //AppUtility::dump();?>
+
     <div class="midwrapper">
-        <p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?cid='.$messages[0]['id'])?>">Back to Message</a></p>
-<!--        <a HREF="--><?php //echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id) ?><!--">View Login Grid</a><br/>-->
+        <?php $sent = $_GET['message'];
+        if($sent != 1) { ?>
+         <p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message='.$sent.'&id=' . $messages[0]['id']); ?>">Back to Message</a></p>
+        <?php }?>
+        <?php $sent = $_GET['message'];
+        if($sent == 1) { ?>
+            <p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message='.$sent.'&id=' . $messages[0]['id']); ?>">Back to Message</a></p>
+        <?php }?>
+
         <button onclick="expandall()" class="btn btn-primary">Expand All</button>
         <button onclick="collapseall()" class="btn btn-primary">Collapse All</button>
         <button onclick="showall()" class="btn btn-primary">Show All</button>

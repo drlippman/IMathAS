@@ -34,14 +34,17 @@
          </pre>
     </div>
     <div >
-        <?php $sent = $_GET['message']; if($sent != 1) { ?>
+        <?php $sent = $_GET['message'];
+        if($sent != 1) { ?>
         <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id='.$messages->id);?>" class="btn btn-primary " > Reply</a >&nbsp;
         <a class="btn btn-primary "  > Mark Unread </a >&nbsp;
         <a class="btn btn-primary  btn-danger" > Delete</a >&nbsp;
+            <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&message='.$sent.'&baseid='.$messages->baseid);?>" > View Conversation </a >&nbsp;
+            <a href = "" id="marked" > Gradebook</a >
         <?php }?>
-        <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&baseid='.$messages->baseid);?>" > View Conversation </a >&nbsp;
-        <?php $sent = $_GET['message']; if($sent != 1) { ?>
-        <a href = "" id="marked" > Gradebook</a >
+
+        <?php $sent = $_GET['message']; if($sent == 1) { ?>
+            <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id='.$messages->id.'&message='.$sent.'&baseid='.$messages->baseid);?>" > View Conversation </a >&nbsp;
         <?php }?>
 
      </div>

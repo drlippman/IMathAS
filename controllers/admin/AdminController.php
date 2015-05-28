@@ -44,8 +44,7 @@ class AdminController extends AppController
 
             $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
         }
-        $this->includeCSS(["../css/courseSetting.css"]);
-        $this->includeJS(["../js/courseSetting.js"]);
+         $this->includeJS(["../js/courseSetting.js"]);
         return $this->renderWithData('addNewUser', ['model' => $model,]);
     }
 
