@@ -48,7 +48,6 @@ $(document).ready(function(){
             '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
-
         $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
