@@ -32,10 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'lastName')->textInput(); ?>
         <?= $form->field($model, 'nameLastColumn')->dropDownList([AppConstant::NUMERIC_ZERO => 'Whole entry', AppConstant::NUMERIC_ONE => 'First word in entry', AppConstant::NUMERIC_TWO => 'Second word in entry', AppConstant::NUMERIC_THREE => 'Last word in entry',], ['prompt' => 'Select entry']) ?>
         <?= $form->field($model, 'emailAddress')->textInput(); ?>
-        <?= $form->field($model, 'userName')->radioList([AppConstant::NUMERIC_ONE => 'Yes , Column: <input type="text">',AppConstant::NUMERIC_ZERO=>'No , Use as username: firstname_lastname']); ?>
-        <?= $form->field($model, 'setPassword')->radioList([AppConstant::NUMERIC_ZERO => 'First 4 characters of username',AppConstant::NUMERIC_ONE=>'Last 4 characters of username',AppConstant::NUMERIC_THREE=>'Use value in column<input type="text">',AppConstant::NUMERIC_TWO=>'Set to:<input type="text">']); ?>
-        <?= $form->field($model, 'codeNumber')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes , use value in column:<input type="text">']); ?>
-        <?= $form->field($model, 'sectionValue')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes , use:<input type="text">',AppConstant::NUMERIC_TWO => 'Yes , use value in column:<input type="text">']); ?>
+        <?= $form->field($model, 'userName')->radioList([AppConstant::NUMERIC_ONE => 'Yes , Column: <input type="text" name=unloc size=4 value="2">',AppConstant::NUMERIC_ZERO=>'No , Use as username: firstname_lastname']); ?>
+        <?= $form->field($model, 'setPassword')->radioList([AppConstant::NUMERIC_ZERO => 'First 4 characters of username',AppConstant::NUMERIC_ONE=>'Last 4 characters of username',AppConstant::NUMERIC_THREE=>'Use value in column<input type="text" name="pwcol" size=4 value="1">',AppConstant::NUMERIC_TWO=>'Set to:<input type="text" name="defpw" value="password"   >']); ?>
+        <?= $form->field($model, 'codeNumber')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes , use value in column:<input type="text" name="code" size=4 value="1">']); ?>
+        <?= $form->field($model, 'sectionValue')->radioList([AppConstant::NUMERIC_ZERO=>'No',AppConstant::NUMERIC_ONE => 'Yes , use:<input type="text" name="secval" size=6 value="">',AppConstant::NUMERIC_TWO => 'Yes , use value in column:<input type="text" name="seccol" size=4 value="4">']); ?>
         <label class="col-md-3">Enroll students in</label><label class="col-md-9">This Class</label>
     </fieldset>
     <div class="form-group">

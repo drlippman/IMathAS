@@ -399,52 +399,139 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
 
         if ($model->load(Yii::$app->request->post())) {
-            $params = Yii::$app->request->getBodyParams();
-            $params = $params['ImportStudentForm'];
+            $params = $this->getRequestParams();
+           // AppUtility::dump($params);
+
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $now . '.csv';
                 $model->file->saveAs($filename);
             }
 
-            $studentRecords = $this->ImportStudentCsv($filename, $cid);
-            foreach($studentRecords as $record)
-            {
-                User::createStudentAccount($record);
-            }
+            $studentRecords = $this->ImportStudentCsv($filename, $cid,$params);
+           
             $this->setSuccessFlash('Imported student successfully.');
         }
         return $this->render('importStudent',['model'=>$model]);
     }
-    public function ImportStudentCsv($fileName, $cid){
+
+    public function ImportStudentCsv($fileName, $cid, $params){
         $course = Course::getById($cid);
         if($course)
         {
-            if(isset($fileName) && !empty($fileName) && ($handle = fopen($fileName, "r")) !== FALSE){
-                while ($data = fgetcsv($handle, 1000, ",",'"')) {
-                    $totalColumns = count($data);
-                    if (!empty($data)) {
-                        if ($totalColumns == 5) {
-                            $studentRecords[] = array('username' => $data[0],
-                                'FirstName' => $data[1],
-                                'LastName' => $data[2],
-                                'email'=> $data[3],
-                                'password' => $data[4],
-                                'enrollkey' => $course->enrollkey,
-                                'courseid' => $cid
-                            );
-                        }else{
-                            return array('isValidCSV'=>'failed',
-                                'message'=>'Invalid CSV'
-                            );
+            $handle = fopen($fileName,'r');
+            if ($params['ImportStudentForm']['headerRow']==1) {
+                $data = fgetcsv($handle,2096);
+            }
+
+            while (($data = fgetcsv($handle,2096))!==false) {
+                $arr = $this->parsecsv($data, $params);
+                for ($i=0;$i<count($arr);$i++) {
+                    $arr[$i] = trim($arr[$i]);
+                }
+
+                if (trim($arr[0])=='' || trim($arr[0])=='_') {
+                    continue;
+                }
+                $studentInformation = array();
+                $uid = User::getByName($arr[0]);
+                $result = $uid;
+                if ($result) {
+                    $id = mysql_result($result,0,0);
+                    echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
+                } else {
+                    if (($params['ImportStudentForm']['setPassword']==0 || $params['ImportStudentForm']['setPassword']==1) && strlen($arr[0])<4) {
+                        if (isset($CFG['GEN']['newpasswords'])) {
+                            $pw = password_hash($arr[0], PASSWORD_DEFAULT);
+                        } else {
+                            $pw = md5($arr[0]);
+                        }
+                    } else {
+                        if ($params['ImportStudentForm']['setPassword']==0) {
+
+                                $pw = password_hash(substr($arr[0],0,4), PASSWORD_DEFAULT);
+                        } else if ($params['ImportStudentForm']['setPassword']==1) {
+
+                                $pw = password_hash(substr($arr[0],-4), PASSWORD_DEFAULT);
+
+                        } else if ($params['ImportStudentForm']['setPassword']==2) {
+
+                                $pw = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
+
+                        } else if ($params['ImportStudentForm']['setPassword']==3) {
+                            if (trim($arr[6])=='') {
+                                echo "Password for {$arr[0]} is blank; skipping import<br/>";
+                                continue;
+                            }
                         }
                     }
+
+                    $user = new User();
+                    $user->createUserFromCsv($arr, AppConstant::STUDENT_RIGHT, $pw);
                 }
-                fclose($handle);
-                return $studentRecords;
+
+
             }
         }
         return false;
     }
-}
 
+   public function parsecsv($data, $params) {
+        $fn = $data[$params['ImportStudentForm']['firstName']-1];
+        if ($params['ImportStudentForm']['nameFirstColumn']!=0) {
+            $fncol = explode(' ',$fn);
+            if ($params['ImportStudentForm']['nameFirstColumn']<3) {
+                $fn = $fncol[$params['ImportStudentForm']['nameFirstColumn']-1];
+            } else {
+                $fn = $fncol[count($fncol)-1];
+            }
+        }
+        $ln = $data[$params['ImportStudentForm']['lastName']-1];
+        if ($params['ImportStudentForm']['lastName']!=$params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn']!=0) {
+            $fncol = explode(' ',$ln);
+        }
+        if ($params['ImportStudentForm']['nameLastColumn']!=0) {
+            if ($params['ImportStudentForm']['nameLastColumn']<3) {
+                $ln = $fncol[$params['ImportStudentForm']['nameLastColumn']-1];
+            } else {
+                $ln = $fncol[count($fncol)-1];
+            }
+        }
+        $fn = preg_replace('/\W/','',$fn);
+        $ln = preg_replace('/\W/','',$ln);
+        $fn = ucfirst(strtolower($fn));
+        $ln = ucfirst(strtolower($ln));
+        if ($params['ImportStudentForm']['userName']==0) {
+            $un = strtolower($fn.'_'.$ln);
+        } else {
+            $un = $data[$_POST['unloc']-1];
+            $un = preg_replace('/\W/','',$un);
+        }
+        if ($params['ImportStudentForm']['emailAddress']>0) {
+            $email = $data[$params['ImportStudentForm']['emailAddress']-1];
+            if ($email=='') {
+                $email = 'none@none.com';
+            }
+        } else {
+            $email = 'none@none.com';
+        }
+        if ($params['ImportStudentForm']['codeNumber']==1) {
+            $code = $data[$_POST['code']-1];
+        } else {
+            $code = 0;
+        }
+        if ($params['ImportStudentForm']['sectionValue']==1) {
+            $sec = $_POST['secval'];
+        } else if ($params['ImportStudentForm']['sectionValue']==2) {
+            $sec = $data[$_POST['seccol']-1];
+        } else {
+            $sec = 0;
+        }
+        if ($params['ImportStudentForm']['setPassword']==3) {
+            $pw = $data[$_POST['pwcol']-1];
+        } else {
+            $pw = 0;
+        }
+        return array($un,$fn,$ln,$email,$code,$sec,$pw);
+    }
+}

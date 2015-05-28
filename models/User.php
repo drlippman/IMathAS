@@ -44,6 +44,20 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $user;
     }
 
+    public function createUserFromCsv($student, $right, $pw){
+
+//        $query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
+//                    mysql_query($query) or die("Query failed : " . mysql_error());
+//                    $id = mysql_insert_id();
+        $this->SID = $student[0];
+        $this->FirstName = $student[1];
+        $this->LastName = $student[2];
+        $this->email = $student[3];
+        $this->rights = $right;
+        $this->password = $pw;
+        $this->save();
+    }
+
 
     public static function findUser($username)
     {
@@ -136,7 +150,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return false;
     }
 
-
     public static function findAllTeachers($sortBy, $order)
     {
         return User::find()->where(['rights' => [20,40,60,75,100]])->orderBy([$sortBy => $order])->asArray()->all();
@@ -144,7 +157,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function findUsers($params)
     {
-        return static::findAll($params);
+        return User::findAll($params);
     }
 
     public static function updateRights($id, $rights, $groupId = 0)
@@ -164,11 +177,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return static::findOne(['id' => $id, 'remoteaccess' => $code]);
     }
+
     public static function getByName($uname)
     {
         return static::findAll(['SID'=>$uname]);
     }
-    public static function findAllById($id){
+
+    public static function findAllById($id)
+    {
         return static::find()->where(['id'=>$id])->asArray()->all();
     }
 

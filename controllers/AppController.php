@@ -22,6 +22,11 @@ class AppController extends Controller
         return $_POST;
     }
 
+    function getRequestParams()
+    {
+        return $_REQUEST;
+    }
+
     function setSuccessFlash($message)
     {
         $this->_setFlash('success', $message);
