@@ -2,12 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: tudip
+<<<<<<< Updated upstream
  * Date: 18/5/15
  * Time: 3:57 PM
+=======
+ * Date: 20/5/15
+ * Time: 3:43 PM
+>>>>>>> Stashed changes
  */
 
 namespace app\controllers\assessment;
-
 
 use app\components\AppUtility;
 use app\controllers\AppController;
@@ -22,6 +26,7 @@ use Yii;
 
 class AssessmentController extends AppController
 {
+
 //    public function actionShowAssessment()
 //    {
 //        $this->guestUserHandler();
@@ -76,8 +81,6 @@ class AssessmentController extends AppController
 //        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
 //    }
 
-
-
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
@@ -89,8 +92,6 @@ class AssessmentController extends AppController
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
-//       AppUtility::dump($course);
-
         $assessmentclosed = false;
 
         if ($assessment->avail == 0) {
@@ -99,11 +100,11 @@ class AssessmentController extends AppController
 
         $this->saveAssessmentSession($assessment, $id);
 
+
         $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
         $this->includeJS(['../js/timer.js']);
         return $this->render('ShowAssessment', ['cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
     }
-
 
     public function saveAssessmentSession($assessment, $id)
     {
@@ -139,6 +140,7 @@ class AssessmentController extends AppController
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
     }
+
 
     public function actionQuestionSet()
     {
@@ -239,7 +241,7 @@ class AssessmentController extends AppController
         $this->guestUserHandler();
         $questionId = $this->getParamVal('to');
         $pq = AppUtility::basicShowQuestions($questionId);
-        //AppUtility::dump($pq);die;
+
 
 //        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
 
