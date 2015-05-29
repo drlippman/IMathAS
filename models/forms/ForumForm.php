@@ -1,7 +1,9 @@
 <?php
 
 namespace app\models\forms;
+use app\components\AppUtility;
 use yii\base\Model;
+use Yii;
 class ForumForm extends Model
 {
     public $search;
@@ -24,4 +26,18 @@ class ForumForm extends Model
                 'thread' => 'Thread',
             ];
     }
+    public static  function byAllSubject($search ){
+
+        $subject = Yii::$app->db->createCommand("SELECT subject from  imas_forum_posts where subject LIKE '$search%' ")->queryAll();
+        return $subject;
+
+    }
+
+    public static  function thread(){
+
+        $thread = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts")->queryAll();
+        return $thread;
+
+    }
+
 }

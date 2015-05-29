@@ -40,16 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <input type="button" id="forum_search" value="Search"/>
         </div>
     </div>
-
-
     <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
-
-<!--    <input type="hidden" id="forumId" class="courseId" value="--><?php //echo $forum->id ?><!--">-->
-
-
     <br>
-
-
     <?php if(!empty($forum)){?>
     <table id="forum-table displayforum" class="forum-table">
         <thead>
