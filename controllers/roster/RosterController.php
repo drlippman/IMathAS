@@ -393,119 +393,111 @@ class RosterController extends AppController
     {
         $user = $this->getAuthenticatedUser();
         $model = new ImportStudentForm();
-        $now = time();
-        $cid = Yii::$app->request->get('cid');
+        $nowTime = time();
+        $courseId = Yii::$app->request->get('cid');
 
         if ($model->load(Yii::$app->request->post())) {
             $params = $this->getRequestParams();
-            // AppUtility::dump($params);
-
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
-                $filename = AppConstant::UPLOAD_DIRECTORY . $now . '.csv';
+                $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
                 $model->file->saveAs($filename);
             }
-
-            $studentRecords = $this->ImportStudentCsv($filename, $cid, $params);
-
+            $studentRecords = $this->ImportStudentCsv($filename, $courseId,$params);
             $this->setSuccessFlash('Imported student successfully.');
         }
         return $this->render('importStudent', ['model' => $model]);
     }
 
-    public function ImportStudentCsv($fileName, $cid, $params)
-    {
-
-        $course = Course::getById($cid);
-        if ($course) {
-            $handle = fopen($fileName, 'r');
-            if ($params['ImportStudentForm']['headerRow'] == 1) {
-                $data = fgetcsv($handle, 2096);
+    public function ImportStudentCsv($fileName, $courseId, $params){
+        $course = Course::getById($courseId);
+        $AllUserArray = array();
+        if($course)
+        {
+            $handle = fopen($fileName,'r');
+            if ($params['ImportStudentForm']['headerRow']==1) {
+                $data = fgetcsv($handle,2096);
             }
 
-            while (($data = fgetcsv($handle, 2096)) !== false) {
-                $arr = $this->parsecsv($data, $params);
-                for ($i = 0; $i < count($arr); $i++) {
-                    $arr[$i] = trim($arr[$i]);
+            while (($data = fgetcsv($handle,2096))!==false) {
+                $StudentDataArray = $this->parsecsv($data, $params);
+
+                for ($i=0;$i<count($StudentDataArray);$i++) {
+                    $StudentDataArray[$i] = trim($StudentDataArray[$i]);
                 }
 
-                if (trim($arr[0]) == '' || trim($arr[0]) == '_') {
+                if (trim($StudentDataArray[0])=='' || trim($StudentDataArray[0])=='_') {
                     continue;
                 }
-                $studentInformation = array();
-                $uid = User::getByName($arr[0]);
-                $result = $uid;
-                if ($result) {
-                    $id = mysql_result($result, 0, 0);
-                    echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
+
+                $userData = User::getByName($StudentDataArray[0]);
+
+                if ($userData) {
+                    $userExist = User::userAlreadyExist($StudentDataArray[0]);
                 } else {
-                    if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($arr[0]) < 4) {
-                        if (isset($CFG['GEN']['newpasswords'])) {
-                            $pw = password_hash($arr[0], PASSWORD_DEFAULT);
-                        } else {
-                            $pw = md5($arr[0]);
-                        }
+                    if (($params['ImportStudentForm']['setPassword']==0 || $params['ImportStudentForm']['setPassword']==1) && strlen($StudentDataArray[0])<4) {
+
+                        $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
+
                     } else {
                         if ($params['ImportStudentForm']['setPassword'] == 0) {
+                            $password = password_hash(substr($StudentDataArray[0],0,4), PASSWORD_DEFAULT);
+                        } else if ($params['ImportStudentForm']['setPassword']==1) {
 
-                            $pw = password_hash(substr($arr[0], 0, 4), PASSWORD_DEFAULT);
-                        } else if ($params['ImportStudentForm']['setPassword'] == 1) {
-
-                            $pw = password_hash(substr($arr[0], -4), PASSWORD_DEFAULT);
+                            $password = password_hash(substr($StudentDataArray[0],-4), PASSWORD_DEFAULT);
 
                         } else if ($params['ImportStudentForm']['setPassword'] == 2) {
+                            $password = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
 
-                            $pw = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
-
-                        } else if ($params['ImportStudentForm']['setPassword'] == 3) {
-                            if (trim($arr[6]) == '') {
-                                echo "Password for {$arr[0]} is blank; skipping import<br/>";
+                        } else if ($params['ImportStudentForm']['setPassword']==3) {
+                            if (trim($StudentDataArray[6])=='') {
+                                echo "Password for {$StudentDataArray[0]} is blank; skipping import<br/>";
                                 continue;
                             }
+
+                            $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
                         }
                     }
-
-                    $user = new User();
-                    $user->createUserFromCsv($arr, AppConstant::STUDENT_RIGHT, $pw);
+                    array_push($AllUserArray,$StudentDataArray);
+//                    $user = new User();
+//                    $user->createUserFromCsv($StudentDataArray, AppConstant::STUDENT_RIGHT, $password);
                 }
-
-
             }
+            return $AllUserArray;
         }
         return false;
     }
 
-    public function parsecsv($data, $params)
-    {
-        $fn = $data[$params['ImportStudentForm']['firstName'] - 1];
-        if ($params['ImportStudentForm']['nameFirstColumn'] != 0) {
-            $fncol = explode(' ', $fn);
-            if ($params['ImportStudentForm']['nameFirstColumn'] < 3) {
-                $fn = $fncol[$params['ImportStudentForm']['nameFirstColumn'] - 1];
+   public function parsecsv($data, $params) {
+        $firstname = $data[$params['ImportStudentForm']['firstName']-1];
+        if ($params['ImportStudentForm']['nameFirstColumn']!=0) {
+            $firstnameColumn = explode(' ',$firstname);
+            if ($params['ImportStudentForm']['nameFirstColumn']<3) {
+                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn']-1];
             } else {
-                $fn = $fncol[count($fncol) - 1];
+                $firstname = $firstnameColumn[count($firstnameColumn)-1];
             }
         }
-        $ln = $data[$params['ImportStudentForm']['lastName'] - 1];
-        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
-            $fncol = explode(' ', $ln);
+       $lastname = $data[$params['ImportStudentForm']['lastName']-1];
+        if ($params['ImportStudentForm']['lastName']!=$params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn']!=0) {
+            $lastnameColumn = explode(' ',$lastname);
         }
-        if ($params['ImportStudentForm']['nameLastColumn'] != 0) {
-            if ($params['ImportStudentForm']['nameLastColumn'] < 3) {
-                $ln = $fncol[$params['ImportStudentForm']['nameLastColumn'] - 1];
+        if ($params['ImportStudentForm']['nameLastColumn']!=0) {
+            if ($params['ImportStudentForm']['nameLastColumn']<3) {
+                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn']-1];
             } else {
-                $ln = $fncol[count($fncol) - 1];
+                $lastname = $lastnameColumn[count($lastnameColumn)-1];
             }
         }
-        $fn = preg_replace('/\W/', '', $fn);
-        $ln = preg_replace('/\W/', '', $ln);
-        $fn = ucfirst(strtolower($fn));
-        $ln = ucfirst(strtolower($ln));
-        if ($params['ImportStudentForm']['userName'] == 0) {
-            $un = strtolower($fn . '_' . $ln);
+       $firstname = preg_replace('/\W/','',$firstname);
+       $lastname = preg_replace('/\W/','',$lastname);
+       $firstname = ucfirst(strtolower($firstname));
+       $lastname = ucfirst(strtolower($lastname));
+        if ($params['ImportStudentForm']['userName']==0) {
+            $username = strtolower($firstname.'_'.$lastname);
         } else {
-            $un = $data[$_POST['unloc'] - 1];
-            $un = preg_replace('/\W/', '', $un);
+            $username = $data[$_POST['unloc']-1];
+            $username = preg_replace('/\W/','',$username);
         }
         if ($params['ImportStudentForm']['emailAddress'] > 0) {
             $email = $data[$params['ImportStudentForm']['emailAddress'] - 1];
@@ -524,14 +516,22 @@ class RosterController extends AppController
             $sec = $_POST['secval'];
         } else if ($params['ImportStudentForm']['sectionValue'] == 2) {
             $sec = $data[$_POST['seccol'] - 1];
+
+        if ($params['ImportStudentForm']['sectionValue']==1) {
+            $section = $_POST['secval'];
+        } else if ($params['ImportStudentForm']['sectionValue']==2) {
+            $section = $data[$_POST['seccol']-1];
         } else {
-            $sec = 0;
+            $section = 0;
         }
-        if ($params['ImportStudentForm']['setPassword'] == 3) {
-            $pw = $data[$_POST['pwcol'] - 1];
+
+        if ($params['ImportStudentForm']['setPassword']==3) {
+            $password = $data[$_POST['pwcol']-1];
         } else {
-            $pw = 0;
+            $password = 0;
         }
-        return array($un, $fn, $ln, $email, $code, $sec, $pw);
+        return array($username,$firstname,$lastname,$email,$code,$section,$password);
+
     }
+}
 }

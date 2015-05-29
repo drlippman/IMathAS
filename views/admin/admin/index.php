@@ -172,7 +172,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     function getAllCourseSuccess(response)
     {
-        console.log(response);
         var result = JSON.parse(response);
         if(result.status == 0)
         {

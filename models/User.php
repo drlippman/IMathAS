@@ -44,7 +44,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $user;
     }
 
-    public function createUserFromCsv($student, $right, $pw){
+    public function createUserFromCsv($student, $right, $password){
 
 //        $query = "INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password) VALUES ('$arr[0]','$arr[1]','$arr[2]','$arr[3]',10,'$pw')";
 //                    mysql_query($query) or die("Query failed : " . mysql_error());
@@ -54,7 +54,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->LastName = $student[2];
         $this->email = $student[3];
         $this->rights = $right;
-        $this->password = $pw;
+        $this->password = $password;
         $this->save();
     }
 
@@ -219,5 +219,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->hasuserimg=0;
             $user->save();
         }
+    }
+
+    public static function userAlreadyExist($StudentDataArray){
+        $message = "Username {$StudentDataArray} already existed in system";
+        return $message;
     }
 }

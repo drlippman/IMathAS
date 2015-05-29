@@ -655,5 +655,7 @@ class AppUtility extends Component
         return $queInfo;
     }
 
-
+    public static function addslashes_deep($value) {
+        return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
+    }
 }

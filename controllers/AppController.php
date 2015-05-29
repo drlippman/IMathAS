@@ -99,12 +99,12 @@ class AppController extends Controller
     }
     public function successResponse($data)
     {
-        return json_encode(array('status' => 0, 'result' => $data));
+        return json_encode(array('status' => 0, 'data' => $data));
     }
 
     public function terminateResponse($msg)
     {
-        return json_encode(array('status' => 0, 'message' => $msg));
+        return json_encode(array('status' => -1, 'message' => $msg));
     }
 
     public function getParamVal($key){
