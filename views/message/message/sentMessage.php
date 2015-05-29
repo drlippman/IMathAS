@@ -5,23 +5,13 @@ use app\components\AppUtility;
 $this->title = 'Sent Messages';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <!-- DataTables CSS -->
 
-    <link rel="stylesheet" type="text/css"
-          href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+
+    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-
-
-</head>
-<body>
+    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
@@ -35,16 +25,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class="col-md-3">
             <select name="seluid" class="show-course form-control" id="course-sent-id">
             <option value="0">All Courses</option>
-
-        </select>
+            </select>
 
         </span> <span class="col-md-2 select-text-margin" align="center"><b>By Recipient :</b></span>
-
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="user-sent-id">
             <option value="0">Select a user</option>
             </select>
-
         </span></p>
     </div><br><br>
     <div>
@@ -54,19 +41,16 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary btn-sm"id="mark-sent-delete">Remove From Sent Message List</a>
             <a class="btn btn-primary btn-sm" id="mark-unsend">Unsend</a>
         </p>
-
     </div>
 
     <div class="message-div"></div>
-</div>
-</body>
-</html>
+    </div>
+
 <script type="text/javascript">
     $(document).ready(function () {
         var cid = $(".send-course-id").val();
         var userId = $(".send-user-id").val();
         var inputData = {cid: cid, userId: userId};
-
         jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
         selectCheckBox();
         jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
@@ -101,8 +85,6 @@ $this->params['breadcrumbs'][] = $this->title;
             htmlCourse += "<option value = messageData.msgTo>"+uniqueUserForFilter[i]+"</option>"
 
         }
-     // $(".show-users").append(htmlCourse);
-
         var result = JSON.parse(response);
         if(result.status == 0)
         {
@@ -110,8 +92,6 @@ $this->params['breadcrumbs'][] = $this->title;
             showMessage(messageData);
         }
     }
-
-
     function showMessage(messageData)
     {
         var html = "";
@@ -134,7 +114,6 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".message-table-body").append(html);
         $('.display-message-table').DataTable();
     }
-
     function selectCheckBox(){
         $('.check-all').click(function(){
             $('.message-table-body input:checkbox').each(function(){
@@ -157,8 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
             filterByCourse();
         }
     }
-
-        function courseDisplay(courseData)
+    function courseDisplay(courseData)
         {
             var html = "";
             $.each(courseData,function(index, courseData){
@@ -169,8 +147,6 @@ $this->params['breadcrumbs'][] = $this->title;
    function markSentDelete()
     {
         $("#mark-sent-delete").click(function(e){
-
-
             var markArray = [];
             $('.message-table-body input[name="msg-check"]:checked').each(function () {
                 markArray.push($(this).val());
@@ -219,15 +195,10 @@ $this->params['breadcrumbs'][] = $this->title;
             {
                 alert("Nothing to Remove");
             }
-
-
-
         });
 
     }
-    function markDeleteSuccess(){
-
-    }
+    function markDeleteSuccess(){}
 
     function getUserSuccess(response) {
          var result = JSON.parse(response);
@@ -288,21 +259,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                            $(this).dialog('destroy').remove();
                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-
                                $(this).prop('checked', false);
-
                            });
                            return false;
                        },
                        "confirm": function () {
-//                            window.location = cancelUrl;
-
                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
                                $(this).prop('checked', false);
                                $(this).closest('tr').remove();
                            });
                            $(this).dialog("close");
-
                            var readMsg = {checkedMsgs: markArray};
                            jQuerySubmit('mark-sent-unsend-ajax', readMsg, 'markUnsendSuccess');
                            return true;
@@ -311,20 +277,15 @@ $this->params['breadcrumbs'][] = $this->title;
                    close: function (event, ui) {
                        $(this).remove();
                    }
-
                });
            }
            else
            {
                alert("Nothing to unsend");
            }
-
-
         });
     }
-    function markUnsendSuccess(){
-
-    }
+    function markUnsendSuccess(){}
 
     function filterByCourse()
     {
@@ -343,5 +304,4 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
-
 </script>

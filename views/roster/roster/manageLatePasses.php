@@ -60,7 +60,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </thead>
     </table>
    <div id="submit-button"> <input type="submit" class="btn btn-primary" value="Save Changes"></div>
-<script>
+
+ <?php ActiveForm::end(); ?>
+<script  type="text/javascript">
    function addText()
    {
        var text_id =  document.getElementById("txt_add").value;
@@ -78,4 +80,3 @@ $this->params['breadcrumbs'][] = $this->title;
    }
 </script>
 
-<?php ActiveForm::end(); ?>

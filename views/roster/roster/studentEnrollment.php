@@ -9,7 +9,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <h2>Enroll an Existing user</h2>
 <br>
-
 <div class="site-login">
     <?php $form =ActiveForm::begin(
         [
@@ -20,7 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-
     <?= $form->field($model, 'usernameToEnroll') ?>
     <?= $form->field($model, 'section') ?>
     <?= $form->field($model, 'code') ?>
@@ -30,7 +28,5 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>
-
-
     <?php ActiveForm::end(); ?>
 </div>

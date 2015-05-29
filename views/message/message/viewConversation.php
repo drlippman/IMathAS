@@ -6,9 +6,6 @@ $this->title = 'Message Conversation';
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
     <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge"/>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,8 +19,6 @@ $currentLevel = 0;
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/general.js"></script>
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
     <script src="<?php echo AppUtility::getHomeURL()?>js/ASCIIsvg_min.js" type="text/javascript"></script>
-</head>
-<body>
 <div class=mainbody>
     <div class="headerwrapper">
         <div id="navlistcont">
@@ -86,8 +81,6 @@ $currentLevel = 0;
 
     </div>
 </div>
-</body>
-</html>
 <script type="text/javascript">
     function toggleshow(bnum) {
         var node = document.getElementById('block' + bnum);

@@ -23,22 +23,19 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-
-
-
     <div><br>
         <h4>Select students to enroll: </h4>
         Check: <a id="checkAll" class="check-all" href="#">All</a> /
         <a id="checkNone" class="uncheck-all" href="#">None</a>
         <br><br>
-<div id="list">
+    <div id="list">
         <?php
         foreach($data as $value){
 
             echo "<tr><td><input type='checkbox' name='studdent[".$value['id']."]' value='{$value['id']}' class='master'></td>"." " ."<td>{$value['lastName']}"." , " ."{$value['firstName']}</td></tr><br>";
         }
         ?>
-</div>
+    </div>
         <br><br>
         <?= $form->field($model, 'section') ?>
 
@@ -51,8 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$cid)  ?>">Back</a>
         </div>
     </div>
-
-
     <?php ActiveForm::end(); ?>
 </div>
 <script type="text/javascript">
@@ -64,6 +59,4 @@ $this->params['breadcrumbs'][] = $this->title;
             $('#list input[type="checkbox"]').prop('checked', true);
         });
     });
-
-
 </script>

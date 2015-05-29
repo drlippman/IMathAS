@@ -366,6 +366,7 @@ class SiteController extends AppController
             User::updateImgByUserId($userid);
             if($model->remove==1){
                 User::deleteImgByUserId($userid);
+                unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
 
             }
             $this->setSuccessFlash('Changes updated successfully.');

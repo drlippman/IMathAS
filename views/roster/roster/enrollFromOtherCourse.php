@@ -11,7 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <h2>Enroll Student From Another Course</h2>
 <div class="site-login">
-
     <?php $form =ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -21,19 +20,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]
     ) ?>
-
-
-
       <div><br>
           <h4>Select a course to choose students from:</h4>
         <?php
-             foreach($data as $value){
-
+             foreach($data as $value)
+             {
                  echo "<tr><td><input type='radio' name='name' value='{$value['id']}'></td>"." " ."<td>{$value['name']}</td></tr><br>";
              }
         ?>
     </div>
-
     <div class="form-group">
         <div class="col-lg-11">
             <br>
@@ -41,8 +36,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>
-
-
     <?php ActiveForm::end(); ?>
 </div>
 

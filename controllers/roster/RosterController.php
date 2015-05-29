@@ -302,7 +302,8 @@ class RosterController extends AppController
                  if(!$studentRecord){
                     $student = new Student();
                     $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
-                    $this->redirect('student-roster?cid='.$cid);
+
+                    
                 }
             }
         }else{

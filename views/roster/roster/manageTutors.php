@@ -9,14 +9,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
-<link rel="stylesheet" type="text/css"
-      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<script type="text/javascript" charset="utf8"
-        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-<script type="text/javascript" charset="utf8"
-        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <input type="hidden" class="sectionInfo" value="<?php echo $section[0] ?>">
 <input type="hidden" class="courseId" value="<?php echo $courseid ?>">
 <?php $ar = $section?>
@@ -27,22 +24,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <table class='list'>
     <thead>
-    <tr>
         <th>Tutor Name</th>
         <th>Limit to Section</th>
         <th>Remove?  Check <a id="checkAll" class="check-all" href="#">All</a> /
             <a id="checkNone" class="uncheck-all" href="#">None</a></th>
-    </tr>
     </thead>
-
-
-
     <tbody>
     <div>
     <?php
     foreach($student as $value)
     {
-
         echo "<tr><td>{$value['Name']}</td><td><select class='show-section'></select><td><input type='checkbox' name='{$value['id']}' value='{$value['id']}' class='master'></td></tr>";
     }
     ?>

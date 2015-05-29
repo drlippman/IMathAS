@@ -6,9 +6,7 @@ $this->params['breadcrumbs'][] = ['label' => 'roster', 'url' => ['/roster/roster
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<!DOCTYPE html>
 <p id="demo"></p>
-<body>
 <div class=mainbody>
     <div class="headerwrapper"></div>
     <div class="midwrapper">
@@ -61,8 +59,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="footerwrapper"></div>
 </div>
-</body>
-
 
 <script language="javascript" type="text/javascript">
 
@@ -187,4 +183,4 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#table_placeholder').html(tableString);
     }
 </script>
-</html>
+

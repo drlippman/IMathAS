@@ -6,9 +6,7 @@ use app\components\AppUtility;
 $this->title = 'Messages';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+
     <!-- DataTables CSS -->
     <link rel="stylesheet" type="text/css"
           href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
@@ -18,8 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-</head>
-<body>
 <div>
     <?php if($userRights->rights == 20){?>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
@@ -64,8 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="message-div"></div>
 
 </div>
-</body>
-</html>
+
 <script type="text/javascript">
     $(document).ready(function () {
         var cid = $(".send-msg").val();
@@ -209,9 +204,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     function markAsUnreadSuccess(response)
-    {
-
-    }
+    {   }
 
     function markAsRead(){
         $("#mark-read").click(function(){
@@ -220,23 +213,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 markArray.push($(this).val());
                 $(this).closest('tr').css('font-weight', 'normal');
                 $(this).prop('checked',false);
-
-
-
             });
             var readMsg={checkedMsg: markArray};
             jQuerySubmit('mark-as-read-ajax',readMsg,'markAsReadSuccess');
 
         });
-
-
     }
     function markAsReadSuccess(response)
-    {
-
-    }
-
-
+    { }
     function filterByCourse()
     {
         $('#course-id').on('change', function() {
@@ -254,7 +238,6 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
-
     function getUserSuccess(response)
     {
         var result = JSON.parse(response);
@@ -265,7 +248,6 @@ $this->params['breadcrumbs'][] = $this->title;
             filterByUser();
         }
     }
-
     function userDisplay(userData)
     {
         var html = "";
@@ -274,7 +256,6 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         $(".show-users").append(html);
     }
-
     function markAsDelete(){
         $("#mark-delete").click(function(e){
 
@@ -285,7 +266,6 @@ $this->params['breadcrumbs'][] = $this->title;
             if(markArray.length!=0) {
                 var html = '<div><p>Are you sure? This will delete your message from</p>' +
                     '<p>Inbox.</p></div>';
-
                 var cancelUrl = $(this).attr('href');
                 e.preventDefault();
                 $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
@@ -294,18 +274,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     closeText: "hide",
                     buttons: {
                         "Cancel": function () {
-
                             $(this).dialog('destroy').remove();
                             $('.message-table-body input[name="msg-check"]:checked').each(function () {
-
                                 $(this).prop('checked', false);
-
                             });
                             return false;
                         },
                         "confirm": function () {
-//                            window.location = cancelUrl;
-
                             $('.message-table-body input[name="msg-check"]:checked').each(function () {
                                 $(this).prop('checked', false);
                                 $(this).closest('tr').remove();
@@ -320,22 +295,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     close: function (event, ui) {
                         $(this).remove();
                     }
-
                 });
             }
             else
             {
                 alert("Nothing to delete");
             }
-
         });
-
     }
 
-
-    function markAsDeleteSuccess(){
-
-    }
+    function markAsDeleteSuccess(){}
 
     function filterByUser()
     {
@@ -356,7 +325,6 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
-
     function changeImage(element,rowId) {
         element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif";
         element.bln = !element.bln;
@@ -367,12 +335,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
     }
     function changeImageSuccess(response)
-    {
-
-
-    }
-
-
-
-
+    { }
 </script>
