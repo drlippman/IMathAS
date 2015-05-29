@@ -47,8 +47,6 @@ $currentLevel = 0;
 
 
         <?php foreach($messages as $index => $message){ ?>
-
-
         <?php if($message['level'] != 0 && $message['level'] < $currentLevel)
         { ?>
             </div>
@@ -59,8 +57,12 @@ $currentLevel = 0;
 
            <?php }?>
             <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
-                <span class=right><a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>">Reply</a>
-                    <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
+                <span class=right>
+
+                 <?php if($message['receiveId'] != $message['senderId']) { ?>
+                     <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>" > Reply</a >
+                 <?php } ?>
+                 <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
                 </span>
                 <b><?php echo $message['title'] ?></b><br/>Posted by: <a
                 href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>

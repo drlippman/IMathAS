@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers\roster;
+
 use app\models\Course;
 use app\models\forms\CreateAndEnrollNewStudentForm;
 use app\models\forms\EnrollFromOtherCourseForm;
@@ -36,19 +37,18 @@ class RosterController extends AppController
         $course = Course::getById($cid);
         $students = Student::findByCid($cid);
         $isCode = false;
-        $isSection= false;
-        foreach ($students as $student)
-        {
-             if($student->code != '' )
-            {
+        $isSection = false;
+        foreach ($students as $student) {
+            if ($student->code != '') {
                 $isCode = true;
             }
-            if($student->section != '')
-            {
+            if ($student->section != '') {
                 $isSection = true;
             }
         }
-        return $this->render('studentRoster', ['course' => $course,'isSection' => $isSection,'isCode' => $isCode]);
+        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
+        $this->includeJS(['../js/studentroster.js','../js/general.js']);
+        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
     }
 
     public function actionLoginGridView()
@@ -56,6 +56,8 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
+        $this->includeCSS(['../css/jquery-ui.css']);
+        $this->includeJS(['../js/logingridview.js','../js/general.js']);
         return $this->render('loginGridView', ['course' => $course]);
     }
 
@@ -115,23 +117,21 @@ class RosterController extends AppController
         $test = array('status' => '0', 'data' => $retJSON);
         return json_encode($test);
     }
+
     public function actionStudentRosterAjax()
     {
         $params = $this->getBodyParams();
         $cid = $params['course_id'];
-
         $Students = Student::findByCid($cid);
         $isCode = false;
-        $isSection= false;
+        $isSection = false;
         $studentArray = array();
         foreach ($Students as $student) {
 
-            if($student->code != '' )
-            {
+            if ($student->code != '') {
                 $isCode = true;
             }
-            if($student->section != '')
-            {
+            if ($student->section != '') {
                 $isSection = true;
             }
             $tempArray = array('lastname' => $student->user->LastName,
@@ -144,8 +144,9 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
         }
-        return json_encode(['status' => '0', 'query' => $studentArray,'isCode'=>$isCode,'isSection'=>$isSection]);
+        return json_encode(['status' => '0', 'query' => $studentArray, 'isCode' => $isCode, 'isSection' => $isSection]);
     }
+
     public function actionStudentEnrollment()
     {
         $this->guestUserHandler();
@@ -179,8 +180,9 @@ class RosterController extends AppController
         }
         return $this->render('studentEnrollment', ['course' => $course, 'model' => $model]);
     }
-   public function actionAssignSectionsAndCodes()
-   {
+
+    public function actionAssignSectionsAndCodes()
+    {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $query = Student::findByCid($cid);
@@ -194,27 +196,25 @@ class RosterController extends AppController
             array_push($studentArray, $tempArray);
         }
         $student = array();
-        if($this->isPost())
-        {
+        if ($this->isPost()) {
             $paramas = $_POST;
-            foreach($paramas['section'] as $key => $section)
-            {
+            foreach ($paramas['section'] as $key => $section) {
                 $code = ($paramas['code'][$key]);
-                Student::updateSectionAndCodeValue($section,$key,$code,$cid);
+                Student::updateSectionAndCodeValue($section, $key, $code, $cid);
             }
-            $this->redirect('student-roster?cid='.$cid);
+            $this->redirect('student-roster?cid=' . $cid);
         }
         return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $cid]);
     }
+
     public function actionManageLatePasses()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $model = Student::findByCid($cid);
         $studentArray = array();
-        foreach ($model as $student)
-        {
-            $tempArray = array('Name' => $student->user->FirstName.' '.$student->user->LastName,
+        foreach ($model as $student) {
+            $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
                 'Section' => $student->section,
                 'Latepass' => $student->latepass,
                 'StudenId' => $student->id,
@@ -223,122 +223,120 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
             $student = array();
-            if($this->isPost())
-            {
+            if ($this->isPost()) {
                 $paramas = $_POST;
-                foreach($paramas['code'] as $key => $latepass)
-                {
-                    $latepasshours= $paramas['passhours'];
-                    Student::updateLatepasses($latepass,$key,$cid);
+                foreach ($paramas['code'] as $key => $latepass) {
+                    $latepasshours = $paramas['passhours'];
+                    Student::updateLatepasses($latepass, $key, $cid);
                 }
-                Course::updatePassHours($latepasshours,$cid);
-                $this->redirect('student-roster?cid='.$cid);
+                Course::updatePassHours($latepasshours, $cid);
+                $this->redirect('student-roster?cid=' . $cid);
             }
         }
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
     }
+
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $model = new EnrollFromOtherCourseForm();
         $course = Course::getById($cid);
-        $teacherId=Yii::$app->user->identity->getId();
-        $list=Teacher::getTeacherByUserId($teacherId);
-        $courseDetails=array();
-        foreach($list as $teacher)
-        {
+        $teacherId = Yii::$app->user->identity->getId();
+        $list = Teacher::getTeacherByUserId($teacherId);
+        $courseDetails = array();
+        foreach ($list as $teacher) {
             $tempArray = array("id" => $teacher->course->id,
-            "name" => $teacher->course->name);
-            array_push($courseDetails,$tempArray);
+                "name" => $teacher->course->name);
+            array_push($courseDetails, $tempArray);
         }
-        if($this->isPost())
-        {
-           $params = $this->getBodyParams();
+        if ($this->isPost()) {
+            $params = $this->getBodyParams();
             $courseId = isset($params['name']) ? $params['name'] : null;
-            if($courseId)
-            {
-                $this->redirect('enroll-students?cid='.$cid.'&course='.$courseId);
-            }else{
+            if ($courseId) {
+                $this->redirect('enroll-students?cid=' . $cid . '&course=' . $courseId);
+            } else {
                 $this->setErrorFlash("Select course from list to choose students");
             }
         }
-        return $this->render('enrollFromOtherCourse',['course' => $course,'data'=>$courseDetails, 'model'=>$model]);
+        return $this->render('enrollFromOtherCourse', ['course' => $course, 'data' => $courseDetails, 'model' => $model]);
     }
-    public function actionEnrollStudents(){
+
+    public function actionEnrollStudents()
+    {
         $this->guestUserHandler();
         $courseid = Yii::$app->request->get('course');
         $cid = Yii::$app->request->get('cid');
-        $model=new EnrollStudentsForm();
+        $model = new EnrollStudentsForm();
         $course = Course::getById($courseid);
-        $query=Student::findByCid($courseid);
-        $studentDetails=array();
-        foreach($query as $student){
-            $tempArray=array();
+        $query = Student::findByCid($courseid);
+        $studentDetails = array();
+        foreach ($query as $student) {
+            $tempArray = array();
             $tempArray = array("id" => $student->user->id,
                 "firstName" => $student->user->FirstName,
-                "lastName"=> $student->user->LastName);
-            array_push($studentDetails,$tempArray);
+                "lastName" => $student->user->LastName);
+            array_push($studentDetails, $tempArray);
         }
-        if($this->isPost())
-        {
-            $params=$this->getBodyParams();
-            $record=array();
-            $count=0;
-            foreach($params as $result){
-              array_push($record,$result);
+        if ($this->isPost()) {
+            $params = $this->getBodyParams();
+            $record = array();
+            $count = 0;
+            foreach ($params as $result) {
+                array_push($record, $result);
                 $count++;
             }
-           if($count!=3)
-           {
-             $storedArray=array();
+            if ($count != 3) {
+                $storedArray = array();
 
-            foreach($record[1] as $entry){
-                $studentList=array("id"=>$entry,"courseId"=>$cid,"section"=>$record[2]['section']);
-                array_push($storedArray,$studentList);
-            }
-            foreach($storedArray as $studentData){
-                $studentRecord=Student::getByCourseId($studentData['courseId'],$studentData['id']);
-                 if(!$studentRecord){
-                    $student = new Student();
-                    $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
-
-                    
+                foreach ($record[1] as $entry) {
+                    $studentList = array("id" => $entry, "courseId" => $cid, "section" => $record[2]['section']);
+                    array_push($storedArray, $studentList);
                 }
+                foreach ($storedArray as $studentData) {
+                    $studentRecord = Student::getByCourseId($studentData['courseId'], $studentData['id']);
+                    if (!$studentRecord) {
+                        $student = new Student();
+                        $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
+
+
+                    }
+                }
+            } else {
+                $this->setErrorFlash('Select student from list to enroll in a course');
             }
-        }else{
-               $this->setErrorFlash('Select student from list to enroll in a course');
-           }
         }
-        return $this->render('enrollStudents',['course' => $course,'data'=>$studentDetails,'model'=> $model,'cid'=> $cid]);
+        return $this->render('enrollStudents', ['course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $cid]);
     }
+
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
-        $model= new CreateAndEnrollNewStudentForm();
-        if($this->isPost()){
-            $params=$this->getBodyParams();
-            $record=array();
-            foreach($params as $result){
-                array_push($record,$result);
+        $model = new CreateAndEnrollNewStudentForm();
+        if ($this->isPost()) {
+            $params = $this->getBodyParams();
+            $record = array();
+            foreach ($params as $result) {
+                array_push($record, $result);
             }
-            $findUser=User::findByUsername($record[1]['username']);
-            if(!$findUser) {
-                    $user = new User();
-                    $user -> createAndEnrollNewStudent($record[1]);
-                    $studentid =User::findByUsername($record[1]['username']);
-                    $newStudent=new Student();
-                    $newStudent->createNewStudent($studentid['id'], $cid, $record[1]);
+            $findUser = User::findByUsername($record[1]['username']);
+            if (!$findUser) {
+                $user = new User();
+                $user->createAndEnrollNewStudent($record[1]);
+                $studentid = User::findByUsername($record[1]['username']);
+                $newStudent = new Student();
+                $newStudent->createNewStudent($studentid['id'], $cid, $record[1]);
                 $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
 
-            }else{
+            } else {
                 $this->setErrorFlash('Username already exists');
             }
         }
-        return $this->renderWithData('createAndEnrollNewStudent', ['course' => $course, 'model'=>$model]);
+        return $this->renderWithData('createAndEnrollNewStudent', ['course' => $course, 'model' => $model]);
     }
+
     public function actionManageTutors()
     {
         $this->guestUserHandler();
@@ -348,50 +346,49 @@ class RosterController extends AppController
         $studentInfo = array();
         $sortBy = 'section';
         $order = AppConstant::ASCENDING;
-        foreach($tutors as $tutor)
-        {
-            $tempArray = array('Name' => $tutor->user->FirstName.' '.$tutor->user->LastName,'id' => $tutor->user->id);
-            array_push($studentInfo,$tempArray);
+        foreach ($tutors as $tutor) {
+            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id);
+            array_push($studentInfo, $tempArray);
         }
-        $sections = Student::findByCourseId($cid,$sortBy,$order);
+        $sections = Student::findByCourseId($cid, $sortBy, $order);
         $sectionArray = array();
-        foreach($sections as $section)
-        {
-            array_push($sectionArray,$section->section);
+        foreach ($sections as $section) {
+            array_push($sectionArray, $section->section);
         }
-        return $this->renderWithData('manageTutors', ['courseid' => $cid,'student' => $studentInfo,'section' => $sectionArray]);
+        return $this->renderWithData('manageTutors', ['courseid' => $cid, 'student' => $studentInfo, 'section' => $sectionArray]);
     }
+
     public function actionMarkUpdateAjax()
     {
         $this->guestUserHandler();
 
-            $params = $this->getBodyParams();
-            $users = explode(',',$params['username']);
-            $cid = Yii::$app->request->get('cid');
-            AppUtility::dump("hiii");
-            $userIdArray = array();
-            $userNotFoundArray = array();
-            $teacherIdArray = array();
-            $studentArray= array();
-            foreach($users as $entry) {
-                $userId = User::findByUsername($entry);
-                if (!$userId) {
-                    array_push($userNotFoundArray,$entry);
+        $params = $this->getBodyParams();
+        $users = explode(',', $params['username']);
+        $cid = Yii::$app->request->get('cid');
+        AppUtility::dump("hiii");
+        $userIdArray = array();
+        $userNotFoundArray = array();
+        $teacherIdArray = array();
+        $studentArray = array();
+        foreach ($users as $entry) {
+            $userId = User::findByUsername($entry);
+            if (!$userId) {
+                array_push($userNotFoundArray, $entry);
 
-                }
-                else{
-                    array_push($userIdArray,$userId->id);
-                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                    if($isTeacher){
-                        $tutors=Tutor::getByUserId($isTeacher->userid,$cid);
-                     }else{
-                        array_push($studentArray,$userId->id);
-                    }
+            } else {
+                array_push($userIdArray, $userId->id);
+                $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                if ($isTeacher) {
+                    $tutors = Tutor::getByUserId($isTeacher->userid, $cid);
+                } else {
+                    array_push($studentArray, $userId->id);
                 }
             }
-             return json_encode(array('status' => 0));
+        }
+        return json_encode(array('status' => 0));
 
     }
+
     public function actionImportStudent()
     {
         $user = $this->getAuthenticatedUser();
@@ -401,7 +398,7 @@ class RosterController extends AppController
 
         if ($model->load(Yii::$app->request->post())) {
             $params = $this->getRequestParams();
-           // AppUtility::dump($params);
+            // AppUtility::dump($params);
 
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
@@ -409,59 +406,59 @@ class RosterController extends AppController
                 $model->file->saveAs($filename);
             }
 
-            $studentRecords = $this->ImportStudentCsv($filename, $cid,$params);
+            $studentRecords = $this->ImportStudentCsv($filename, $cid, $params);
 
             $this->setSuccessFlash('Imported student successfully.');
         }
-        return $this->render('importStudent',['model'=>$model]);
+        return $this->render('importStudent', ['model' => $model]);
     }
 
-    public function ImportStudentCsv($fileName, $cid, $params){
+    public function ImportStudentCsv($fileName, $cid, $params)
+    {
 
         $course = Course::getById($cid);
-        if($course)
-        {
-            $handle = fopen($fileName,'r');
-            if ($params['ImportStudentForm']['headerRow']==1) {
-                $data = fgetcsv($handle,2096);
+        if ($course) {
+            $handle = fopen($fileName, 'r');
+            if ($params['ImportStudentForm']['headerRow'] == 1) {
+                $data = fgetcsv($handle, 2096);
             }
 
-            while (($data = fgetcsv($handle,2096))!==false) {
+            while (($data = fgetcsv($handle, 2096)) !== false) {
                 $arr = $this->parsecsv($data, $params);
-                for ($i=0;$i<count($arr);$i++) {
+                for ($i = 0; $i < count($arr); $i++) {
                     $arr[$i] = trim($arr[$i]);
                 }
 
-                if (trim($arr[0])=='' || trim($arr[0])=='_') {
+                if (trim($arr[0]) == '' || trim($arr[0]) == '_') {
                     continue;
                 }
                 $studentInformation = array();
                 $uid = User::getByName($arr[0]);
                 $result = $uid;
                 if ($result) {
-                    $id = mysql_result($result,0,0);
+                    $id = mysql_result($result, 0, 0);
                     echo "Username {$arr[0]} already existed in system; using existing<br/>\n";
                 } else {
-                    if (($params['ImportStudentForm']['setPassword']==0 || $params['ImportStudentForm']['setPassword']==1) && strlen($arr[0])<4) {
+                    if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($arr[0]) < 4) {
                         if (isset($CFG['GEN']['newpasswords'])) {
                             $pw = password_hash($arr[0], PASSWORD_DEFAULT);
                         } else {
                             $pw = md5($arr[0]);
                         }
                     } else {
-                        if ($params['ImportStudentForm']['setPassword']==0) {
+                        if ($params['ImportStudentForm']['setPassword'] == 0) {
 
-                                $pw = password_hash(substr($arr[0],0,4), PASSWORD_DEFAULT);
-                        } else if ($params['ImportStudentForm']['setPassword']==1) {
+                            $pw = password_hash(substr($arr[0], 0, 4), PASSWORD_DEFAULT);
+                        } else if ($params['ImportStudentForm']['setPassword'] == 1) {
 
-                                $pw = password_hash(substr($arr[0],-4), PASSWORD_DEFAULT);
+                            $pw = password_hash(substr($arr[0], -4), PASSWORD_DEFAULT);
 
-                        } else if ($params['ImportStudentForm']['setPassword']==2) {
+                        } else if ($params['ImportStudentForm']['setPassword'] == 2) {
 
-                                $pw = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
+                            $pw = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
 
-                        } else if ($params['ImportStudentForm']['setPassword']==3) {
-                            if (trim($arr[6])=='') {
+                        } else if ($params['ImportStudentForm']['setPassword'] == 3) {
+                            if (trim($arr[6]) == '') {
                                 echo "Password for {$arr[0]} is blank; skipping import<br/>";
                                 continue;
                             }
@@ -478,62 +475,63 @@ class RosterController extends AppController
         return false;
     }
 
-   public function parsecsv($data, $params) {
-        $fn = $data[$params['ImportStudentForm']['firstName']-1];
-        if ($params['ImportStudentForm']['nameFirstColumn']!=0) {
-            $fncol = explode(' ',$fn);
-            if ($params['ImportStudentForm']['nameFirstColumn']<3) {
-                $fn = $fncol[$params['ImportStudentForm']['nameFirstColumn']-1];
+    public function parsecsv($data, $params)
+    {
+        $fn = $data[$params['ImportStudentForm']['firstName'] - 1];
+        if ($params['ImportStudentForm']['nameFirstColumn'] != 0) {
+            $fncol = explode(' ', $fn);
+            if ($params['ImportStudentForm']['nameFirstColumn'] < 3) {
+                $fn = $fncol[$params['ImportStudentForm']['nameFirstColumn'] - 1];
             } else {
-                $fn = $fncol[count($fncol)-1];
+                $fn = $fncol[count($fncol) - 1];
             }
         }
-        $ln = $data[$params['ImportStudentForm']['lastName']-1];
-        if ($params['ImportStudentForm']['lastName']!=$params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn']!=0) {
-            $fncol = explode(' ',$ln);
+        $ln = $data[$params['ImportStudentForm']['lastName'] - 1];
+        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
+            $fncol = explode(' ', $ln);
         }
-        if ($params['ImportStudentForm']['nameLastColumn']!=0) {
-            if ($params['ImportStudentForm']['nameLastColumn']<3) {
-                $ln = $fncol[$params['ImportStudentForm']['nameLastColumn']-1];
+        if ($params['ImportStudentForm']['nameLastColumn'] != 0) {
+            if ($params['ImportStudentForm']['nameLastColumn'] < 3) {
+                $ln = $fncol[$params['ImportStudentForm']['nameLastColumn'] - 1];
             } else {
-                $ln = $fncol[count($fncol)-1];
+                $ln = $fncol[count($fncol) - 1];
             }
         }
-        $fn = preg_replace('/\W/','',$fn);
-        $ln = preg_replace('/\W/','',$ln);
+        $fn = preg_replace('/\W/', '', $fn);
+        $ln = preg_replace('/\W/', '', $ln);
         $fn = ucfirst(strtolower($fn));
         $ln = ucfirst(strtolower($ln));
-        if ($params['ImportStudentForm']['userName']==0) {
-            $un = strtolower($fn.'_'.$ln);
+        if ($params['ImportStudentForm']['userName'] == 0) {
+            $un = strtolower($fn . '_' . $ln);
         } else {
-            $un = $data[$_POST['unloc']-1];
-            $un = preg_replace('/\W/','',$un);
+            $un = $data[$_POST['unloc'] - 1];
+            $un = preg_replace('/\W/', '', $un);
         }
-        if ($params['ImportStudentForm']['emailAddress']>0) {
-            $email = $data[$params['ImportStudentForm']['emailAddress']-1];
-            if ($email=='') {
+        if ($params['ImportStudentForm']['emailAddress'] > 0) {
+            $email = $data[$params['ImportStudentForm']['emailAddress'] - 1];
+            if ($email == '') {
                 $email = 'none@none.com';
             }
         } else {
             $email = 'none@none.com';
         }
-        if ($params['ImportStudentForm']['codeNumber']==1) {
-            $code = $data[$_POST['code']-1];
+        if ($params['ImportStudentForm']['codeNumber'] == 1) {
+            $code = $data[$_POST['code'] - 1];
         } else {
             $code = 0;
         }
-        if ($params['ImportStudentForm']['sectionValue']==1) {
+        if ($params['ImportStudentForm']['sectionValue'] == 1) {
             $sec = $_POST['secval'];
-        } else if ($params['ImportStudentForm']['sectionValue']==2) {
-            $sec = $data[$_POST['seccol']-1];
+        } else if ($params['ImportStudentForm']['sectionValue'] == 2) {
+            $sec = $data[$_POST['seccol'] - 1];
         } else {
             $sec = 0;
         }
-        if ($params['ImportStudentForm']['setPassword']==3) {
-            $pw = $data[$_POST['pwcol']-1];
+        if ($params['ImportStudentForm']['setPassword'] == 3) {
+            $pw = $data[$_POST['pwcol'] - 1];
         } else {
             $pw = 0;
         }
-        return array($un,$fn,$ln,$email,$code,$sec,$pw);
+        return array($un, $fn, $ln, $email, $code, $sec, $pw);
     }
 }

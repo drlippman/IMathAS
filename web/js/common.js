@@ -8,7 +8,7 @@ $(document).ready(function(){
 });
 
 function jQuerySubmit(url, data, successCallBack) {
-
+alert(data);
     $.post(
         url,
         data,
