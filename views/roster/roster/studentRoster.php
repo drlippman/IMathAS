@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 $this->title = 'Roster';
+$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <head>

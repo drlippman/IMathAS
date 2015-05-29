@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = 'Admin';
+$this->title = 'Course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!--<div class="mainbody">-->

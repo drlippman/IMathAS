@@ -37,13 +37,13 @@ class RosterController extends AppController
         $students = Student::findByCid($cid);
         $isCode = false;
         $isSection= false;
-        foreach ($students as $stud)
+        foreach ($students as $student)
         {
-             if($stud->code != '' )
+             if($student->code != '' )
             {
                 $isCode = true;
             }
-            if($stud->section != '')
+            if($student->section != '')
             {
                 $isSection = true;
             }
@@ -124,23 +124,23 @@ class RosterController extends AppController
         $isCode = false;
         $isSection= false;
         $studentArray = array();
-        foreach ($Students as $stud) {
+        foreach ($Students as $student) {
 
-            if($stud->code != '' )
+            if($student->code != '' )
             {
                 $isCode = true;
             }
-            if($stud->section != '')
+            if($student->section != '')
             {
                 $isSection = true;
             }
-            $tempArray = array('lastname' => $stud->user->LastName,
-                'firstname' => $stud->user->FirstName,
-                'email' => $stud->user->email,
-                'username' => $stud->user->SID,
-                'lastaccess' => $stud->user->lastaccess,
-                'section' => $stud->section,
-                'code' => $stud->code,
+            $tempArray = array('lastname' => $student->user->LastName,
+                'firstname' => $student->user->FirstName,
+                'email' => $student->user->email,
+                'username' => $student->user->SID,
+                'lastaccess' => $student->user->lastaccess,
+                'section' => $student->section,
+                'code' => $student->code,
             );
             array_push($studentArray, $tempArray);
         }
@@ -185,11 +185,11 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $query = Student::findByCid($cid);
         $studentArray = array();
-        foreach ($query as $abc) {
-            $tempArray = array('Name' => $abc->user->FirstName . ' ' . $abc->user->LastName,
-                'code' => $abc->code,
-                'section' => $abc->section,
-                'userid' => $abc->userid
+        foreach ($query as $student) {
+            $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                'code' => $student->code,
+                'section' => $student->section,
+                'userid' => $student->userid
             );
             array_push($studentArray, $tempArray);
         }
@@ -410,13 +410,14 @@ class RosterController extends AppController
             }
 
             $studentRecords = $this->ImportStudentCsv($filename, $cid,$params);
-           
+
             $this->setSuccessFlash('Imported student successfully.');
         }
         return $this->render('importStudent',['model'=>$model]);
     }
 
     public function ImportStudentCsv($fileName, $cid, $params){
+
         $course = Course::getById($cid);
         if($course)
         {

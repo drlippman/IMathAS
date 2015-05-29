@@ -2,6 +2,8 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 $this->title = 'New Message';
+$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>

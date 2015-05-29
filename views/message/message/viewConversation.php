@@ -3,6 +3,8 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 $this->title = 'Message Conversation';
+$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$messages[0]['courseId']]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$messages[0]['courseId']]];
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
 ?>

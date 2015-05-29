@@ -1,6 +1,8 @@
     <?php
     use app\components\AppUtility;
-    $this->title = 'Messages';
+    $this->title = 'Message';
+    $this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$messages->courseid]];
+    $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$messages->courseid]];
     $this->params['breadcrumbs'][] = $this->title;
     echo $this->render('../../instructor/instructor/_toolbarTeacher');
 ?>
