@@ -590,5 +590,70 @@ class AppUtility extends Component
         }
         return array('title' => $title, 'level' => $n);
 }
+    public static function questionInfo($queInfo)
+    {
+        $connection = Yii::$app->getDb();
+        $query = "SELECT * FROM imas_assessment_sessions WHERE id = 36";
+        $command = $connection->createCommand($query);
+        $line = $command->queryOne();
+        var_dump($line); die;
+        if (strpos($line['questions'],';') === false) {
+            $questions = explode(",",$line['questions']);
+            $bestquestions = $questions;
+
+        } else {
+            list($questions,$bestquestions) = explode(";",$line['questions']);
+            $questions = explode(",",$questions);
+            $bestquestions = explode(",",$bestquestions);
+        }
+        $seeds = explode(",",$line['seeds']);
+        if (strpos($line['scores'],';')===false) {
+            $scores = explode(",",$line['scores']);
+            $noraw = true;
+            $rawscores = $scores;
+        } else {
+            $sp = explode(';',$line['scores']);
+            $scores = explode(',', $sp[0]);
+            $rawscores = explode(',', $sp[1]);
+            $noraw = false;
+        }
+
+        $attempts = explode(",",$line['attempts']);
+        $lastanswers = explode("~",$line['lastanswers']);
+        if ($line['timeontask']=='') {
+            $timesontask = array_fill(0,count($questions),'');
+        } else {
+            $timesontask = explode(',',$line['timeontask']);
+        }
+        $lti_sourcedid = $line['lti_sourcedid'];
+
+        if (trim($line['reattempting'])=='') {
+            $reattempting = array();
+        } else {
+            $reattempting = explode(",",$line['reattempting']);
+        }
+
+        $bestseeds = explode(",",$line['bestseeds']);
+        if ($noraw) {
+            $bestscores = explode(',',$line['bestscores']);
+            $bestrawscores = $bestscores;
+            $firstrawscores = $bestscores;
+        } else {
+            $sp = explode(';',$line['bestscores']);
+            $bestscores = explode(',', $sp[0]);
+            $bestrawscores = explode(',', $sp[1]);
+            $firstrawscores = explode(',', $sp[2]);
+        }
+        $bestattempts = explode(",",$line['bestattempts']);
+        $bestlastanswers = explode("~",$line['bestlastanswers']);
+        $starttime = $line['starttime'];
+
+        $query = "SELECT * FROM imas_assessments WHERE id= 2";
+        $command = $connection->createCommand($query);
+        $testsettings = $command->queryOne();
+        //AppUtility::dump($testsettings);
+        return $queInfo;
+    }
+
 
 }

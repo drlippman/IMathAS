@@ -133,7 +133,7 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
-        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css']);
+        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css', '../css/jquery-ui.css']);
         $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
         $this->includeJS(['../js/student.js']);
         return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
@@ -151,7 +151,7 @@ class CourseController extends AppController
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
-//       AppUtility::dump($course);
+
 
         $assessmentclosed = false;
 
@@ -241,23 +241,17 @@ class CourseController extends AppController
         $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
 
-    public function actionQuestion()
-    {
-        $this->guestUserHandler();
-        $questionId = $this->getParamVal('to');
-        $pq = AppUtility::basicShowQuestions($questionId);
-        AppUtility::dump($pq);
-
-        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
-
-
-    }
-    public function actionQuestionSet()
-    {
-        $tpQuestion = QuestionSet::getById('1');
-
-        $this->renderWithData('question-set');
-    }
+//    public function actionQuestion()
+//    {
+//        $this->guestUserHandler();
+//        $questionId = $this->getParamVal('to');
+//        $pq = AppUtility::basicShowQuestions($questionId);
+//        AppUtility::dump($pq);die;
+//
+////        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
+//
+//
+//    }
 
     public function actionPassword()
     {

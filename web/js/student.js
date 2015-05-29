@@ -39,13 +39,12 @@ $(document).ready(function(){
 //        Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
+
         var linkId = $(this).attr('id')
         var timelimit = Math.abs($('#time-limit'+linkId).val());
         var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
         var min = Math.floor((timelimit%3600)/60);
         var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click OK to start or continue working on the assessment.</div>';
-        var msg = '<div><p>Your time limit has expired </p>'+
-            '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
         $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
@@ -67,6 +66,7 @@ $(document).ready(function(){
                 $(this).remove();
             }
         });
+
     });
 
 });
