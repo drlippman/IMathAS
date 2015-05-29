@@ -116,21 +116,39 @@ class ForumController extends AppController{
         $user = Yii::$app->user->identity;
 
         $this->includeCSS(['../css/forums.css']);
+        $this->includeJS(['../js/thread.js']);
 
         return $this->renderWithData('thread',['forum' =>$forum, 'cid' =>$cid, 'users' => $user,'forumid' => $forumid]);
     }
 
     public function actionGetThreadAjax(){
-
-
         $param = $this->getBodyParams();
         $forumid = $param['forumid'];
         $thread = ForumForm::thread($forumid);
-
         if($thread)
         {
 
-            return json_encode(array('status' => 0, 'threadData' => $thread));
+                $threadArray = array();
+
+                foreach ($thread as $data)
+                {
+                    $username = User::getById($data['userid']);
+
+                            $temparray = array(
+                           'forumiddata' => $data['forumid'],
+                           'subject' => $data['subject'],
+                           'views' => $data['views'],
+                           'replyby' => $data['replyby'],
+                           'postdate' => date('F d, o g:i a',$data['postdate']),
+                            'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+
+                    );
+
+                    array_push($threadArray,$temparray);
+
+                }
+
+            return json_encode(array('status' => 0, 'threadData' => $threadArray));
         }
         else{
             return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));

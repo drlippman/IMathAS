@@ -324,4 +324,10 @@ p#settimezone{
 div.update-checkbox{
     padding-left: 15px;
 }
+#search{
+    padding-bottom: 10px;
+}
+#thread{
+    padding-bottom: 14px;
+}
 
