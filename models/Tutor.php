@@ -38,4 +38,10 @@ class Tutor extends BaseImasTutors
         $tutor = Tutor::getById($userId);
         $tutor->delete();
     }
+    public static function updateSection($userid,$courseid,$section)
+    {
+        $tutor = Tutor::getByUserId($userid,$courseid);
+        $tutor->section = $section;
+        $tutor->save();
+    }
 } 

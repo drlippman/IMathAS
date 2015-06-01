@@ -25,14 +25,14 @@ function updateInfo()
             $(this).closest('tr').css('font-weight', 'normal');
             $(this).prop('checked',false);
         });
+        var sectionArray = [];
+         $('.tutor-table-body select[name = "select-section"]').each(function()
+         {
+             var tempArray = {tutorId:this.id,tutorSection:this.value};
+             sectionArray.push(tempArray);
 
-        $('.tutor-table-body select[name = "select-section"]:selected').each(function(){
-            $('#user-sent-id').on('change', function() {
-
-            });
-        });
-
-        var data =  {courseid:cid,username:usernames,checkedtutor: markArray};
+         });
+        var data =  {courseid:cid,username:usernames,checkedtutor: markArray,sectionArray:sectionArray};
         jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
     });
 }

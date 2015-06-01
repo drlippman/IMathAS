@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div>
 
-<table class='list display-message-table'>
+<table class='list display-tutor-table'>
     <thead>
         <th>Tutor Name</th>
         <th>Limit to Section</th>
@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
                 foreach($tutors as $value)
                 {
-                  echo "<tr><td>{$value['Name']}</td><td><select class = 'show-section' name = 'select-section'><option value = ''>All</option>" ?>
+                  echo "<tr><td>{$value['Name']}</td><td><select class = 'show-section' id='{$value['id']}' name = 'select-section'><option value = ''>All</option>" ?>
                     <?php
                         foreach($section as $key => $option)
                             {
@@ -39,13 +39,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 {
                                     if($option != $value['section'])
                                         {
-                                            echo"<option value = '$key'>$option</option>";
+                                            echo"<option value = '{$option}'>$option</option>";
                                         }
                                     else
                                     {
                                         if($value['section'] != null)
                                             {
-                                                echo"<option value = '$key' selected='selected'>$option</option>";
+                                                echo"<option value = '{$option}' selected='selected'>$option</option>";
                                             }
                                     }
                                 }
@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
         {
            if(sessionCount == 0)
            {
-               $("#user-div").append("<b class = 'btn-danger'>Following Usernames Were Not Found :</b>");
+               $("#user-div").append("<b class = 'btn-danger'>Following Usernames Were Not Found :</b>&nbsp;");
                sessionCount++;
            }
             $.each($sessionatr, function( index, value )
@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
             });
             $.session.clear();
         }
-        $('.display-message-table').DataTable();
+        $('.display-tutor-table').DataTable();
         markCheck();
         updateInfo();
     });

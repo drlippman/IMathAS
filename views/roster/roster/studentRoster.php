@@ -1,5 +1,10 @@
 <?php
 use app\components\AppUtility;
+
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+
+
 $this->title = 'Roster';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -34,16 +39,33 @@ $this->params['breadcrumbs'][] = $this->title;
                     and Enroll new student</a><br/>
             </span><br class="clear"/>
 </div>
-<p>Check: <a class="uncheck-all" href="#">None</a> /
-    <a class="check-all" href="#">All</a>
+<div class ="student-roster">
+
+    <?php $form =ActiveForm::begin(
+        [
+            'options' => ['class' => 'form-horizontal'],
+            'fieldConfig' => [
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+            ],
+        ]
+    ) ?>
+
+<p>Check: <a class="check-all" href="#">All</a> /
+    <a class="check-all" href="#">Non-locked</a> /
+    <a class="uncheck-all" href="#">None</a>
+
     With Selected:
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >    <input type=submit name=submit value="E-mail" title="Send e-mail to the selected students"></span>
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Message" title="Send a message to the selected students"></span>
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Unenroll" title="Unenroll the selected students"></span>
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Lock" title="Lock selected students out of the course">
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students"></span>
-    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students"></span><span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></span></p>
+
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">E-mail</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Message</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Unenroll</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Lock</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Make Exception</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Copy Emails</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Pictures</a></span>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
+    <input type="submit" value="Lock">
     <table class="student-data-table" id="student-information-table">
     <thead>
     <tr>
@@ -68,4 +90,5 @@ $this->params['breadcrumbs'][] = $this->title;
     </tr>
     </thead>
 </table>
-
+    <?php ActiveForm::end(); ?>
+</div>

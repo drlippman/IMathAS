@@ -78,7 +78,7 @@ class Student extends BaseImasStudents {
     }
 
     public static function findByCourseId($cId,$sortBy, $order){
-        return static::find()->where(['courseid'=>$cId])->orderBy([$sortBy => $order])->all();
+        return static::find()->where(['courseid'=>$cId])->groupBy('section')->orderBy([$sortBy => $order])->all();
     }
 
 } 

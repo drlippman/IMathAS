@@ -9,6 +9,7 @@ use app\models\forms\AssignSectionAndCodesForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
+use app\models\forms\StudentRosterForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
 use app\models\Student;
@@ -36,6 +37,7 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
         $students = Student::findByCid($cid);
+        $model =new StudentRosterForm();
         $isCode = false;
         $isSection = false;
         foreach ($students as $student) {
@@ -46,10 +48,15 @@ class RosterController extends AppController
                 $isSection = true;
             }
         }
+        if($this->isPost()){
+            $params=$this->getBodyParams();
+            AppUtility::dump($params);
+        }
 
         $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
-        $this->includeJS(['../js/studentroster.js', '../js/general.js']);
-        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
+        $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
+        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode,'mode' => $model]);
+
     }
 
     public function actionLoginGridView()
@@ -142,7 +149,8 @@ class RosterController extends AppController
             if ($student->section != '') {
                 $isSection = true;
             }
-            $tempArray = array('lastname' => $student->user->LastName,
+            $tempArray = array('id' => $student->user->id
+                ,'lastname' => $student->user->LastName,
                 'firstname' => $student->user->FirstName,
                 'email' => $student->user->email,
                 'username' => $student->user->SID,
@@ -244,7 +252,7 @@ class RosterController extends AppController
         $this->includeJS(['../js/managelatepasses.js']);
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
     }
-
+//Controller method to display the dynamic radio list of courses
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
@@ -270,6 +278,8 @@ class RosterController extends AppController
         }
         return $this->render('enrollFromOtherCourse', ['course' => $course, 'data' => $courseDetails, 'model' => $model]);
     }
+
+//Controller method to dynamically create student list with checkbox and enroll students displayed in a list in current course.
 
     public function actionEnrollStudents()
     {
@@ -319,6 +329,8 @@ class RosterController extends AppController
         return $this->render('enrollStudents', ['course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $cid]);
     }
 
+// Controller method for create and enroll new student in current course
+
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
@@ -347,6 +359,8 @@ class RosterController extends AppController
         return $this->renderWithData('createAndEnrollNewStudent', ['course' => $course, 'model' => $model]);
     }
 
+//Controller method for manage tutor page
+
     public function actionManageTutors()
     {
         $this->guestUserHandler();
@@ -370,6 +384,8 @@ class RosterController extends AppController
         $this->includeJS(['../js/general.js?ver=012115','../js/roster/managetutors.js?ver=012115','../js/jquery.session.js?ver=012115','../js/DataTables-1.10.6/media/js/jquery.dataTables.js','../js/roster/managetutors.js']);
         return $this->renderWithData('manageTutors', ['courseid' => $courseid,'tutors' => $tutorInfo,'section' => $sectionArray]);
     }
+
+// Function to add or update information After submitting the information from manage tutor page
 
     public function actionMarkUpdateAjax()
     {
@@ -412,6 +428,12 @@ class RosterController extends AppController
                     }
                 }
             }
+        $params['sectionArray'] = isset($params['sectionArray'])? $params['sectionArray'] :'';
+        foreach($params['sectionArray'] as $tutors)
+        {
+            Tutor::updateSection($tutors['tutorId'],$courseid,$tutors['tutorSection']);
+
+        }
          $params['checkedtutor'] = isset($params['checkedtutor'])? $params['checkedtutor'] :'';
         if($params['checkedtutor'] != ''){
             foreach($params['checkedtutor'] as $tutor)
@@ -556,6 +578,7 @@ class RosterController extends AppController
         } else {
             $password = 0;
         }
+
         return array($username, $firstname, $lastname, $email, $code, $section, $password);
     }
 
@@ -566,4 +589,26 @@ class RosterController extends AppController
         $user = new User();
         $user->createUserFromCsv($StudentDataArray, AppConstant::STUDENT_RIGHT, $password);
     }
+
+//Contoller method to lock the student to have a access of course
+    public function actionStudentLock()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
+        AppUtility::dump($params);
+        $this->includeCSS(['../css/jquery-ui.css']);
+        $this->includeJS(['../js/logingridview.js','../js/general.js']);
+        return $this->render('studentLock', ['course' => $course]);
+    }
+//
+//    public  function actionMarkLockAjax()
+//    {
+//        $params = $this->getRequestParams();
+//        $courseid = Yii::$app->request->get('cid');
+//
+//        return $this->render('studentLock', ['params' => $params]);
+//    }
 }
+
