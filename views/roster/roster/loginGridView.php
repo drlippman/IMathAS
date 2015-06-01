@@ -1,10 +1,14 @@
 <?php
+namespace app\controllers;
 use kartik\date\DatePicker;
 use app\components\AppUtility;
 use app\controllers\AppController;
+use yii\helpers\Html;
+
+
 
 $this->title = 'Login Grid View';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -51,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
     <div>
-        <input type="submit" id="go-button" name="daterange" value="Go"/>
+        <input type="submit" id="go-button"  name="daterange" value="Go"/>
     </div>
     <div id="table_placeholder"></div>
 

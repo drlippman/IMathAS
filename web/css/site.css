@@ -327,4 +327,11 @@ div.update-checkbox{
 .change-rights{
     margin-left: -1%;
 }
+#table_placeholder{
+    margin-top: 5px;
+}
+#go-button{
+    margin-top: -1px;
+}
+
 

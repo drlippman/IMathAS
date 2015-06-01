@@ -46,6 +46,7 @@ class RosterController extends AppController
                 $isSection = true;
             }
         }
+
         $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
         $this->includeJS(['../js/studentroster.js', '../js/general.js']);
         return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
@@ -58,6 +59,7 @@ class RosterController extends AppController
         $course = Course::getById($cid);
         $this->includeCSS(['../css/jquery-ui.css']);
         $this->includeJS(['../js/logingridview.js', '../js/general.js']);
+
         return $this->render('loginGridView', ['course' => $course]);
     }
 
@@ -68,54 +70,60 @@ class RosterController extends AppController
         $cid = $params['cid'];
         $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
         $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
-        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
-        $headsArray = array();
-        $headsArray[] = 'Name';
-        for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
-            $day = date('m/d', $curDate);
-            $headsArray[] = $day;
-        }
-        $rowLogs = array();
-        $nameHash = array();
-        foreach ($loginLogs as $loginLog) {
-            $day = date('m/d', $loginLog['logintime']);
-            $user_id = $loginLog['userid'];
-            if (!isset($rowLogs[$user_id])) {
-                $rowLogs[$user_id] = array();
-            }
-            $userSpecificDaysArray = $rowLogs[$user_id];
-            if (!isset($userSpecificDaysArray[$day])) {
-                $userSpecificDaysArray[$day] = 1;
-            } else {
-                $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + 1;;
-            }
-            if (!isset($nameHash[$user_id])) {
-                $nameHash[$user_id] = $loginLog['LastName'] . ', ' . $loginLog['FirstName'];
-            }
-            $rowLogs[$user_id] = $userSpecificDaysArray;
-        }
 
-        foreach ($headsArray as $headElem) {
-            foreach ($rowLogs as $key => $field) {
-                if ($headElem == 'Name') {
-                    continue;
+
+      //  if($newStartDate<$newEndDate) {
+            $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
+            $headsArray = array();
+            $headsArray[] = 'Name';
+            for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
+                $day = date('m/d', $curDate);
+                $headsArray[] = $day;
+            }
+            $rowLogs = array();
+            $nameHash = array();
+            foreach ($loginLogs as $loginLog) {
+                $day = date('m/d', $loginLog['logintime']);
+                $user_id = $loginLog['userid'];
+                if (!isset($rowLogs[$user_id])) {
+                    $rowLogs[$user_id] = array();
                 }
-                if (!isset($field[$headElem])) {
-                    $field[$headElem] = '';
-                    $rowLogs[$key] = $field;
+                $userSpecificDaysArray = $rowLogs[$user_id];
+                if (!isset($userSpecificDaysArray[$day])) {
+                    $userSpecificDaysArray[$day] = 1;
+                } else {
+                    $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + 1;;
+                }
+                if (!isset($nameHash[$user_id])) {
+                    $nameHash[$user_id] = $loginLog['LastName'] . ', ' . $loginLog['FirstName'];
+                }
+                $rowLogs[$user_id] = $userSpecificDaysArray;
+            }
+
+            foreach ($headsArray as $headElem) {
+                foreach ($rowLogs as $key => $field) {
+                    if ($headElem == 'Name') {
+                        continue;
+                    }
+                    if (!isset($field[$headElem])) {
+                        $field[$headElem] = '';
+                        $rowLogs[$key] = $field;
+                    }
                 }
             }
-        }
-        $stuLogs = array();
-        foreach ($rowLogs as $key => $field) {
-            $stuLogs[$key]['name'] = $nameHash[$key];
-            $stuLogs[$key]['row'] = $field;
-        }
-        $retJSON = new \stdClass();
-        $retJSON->header = $headsArray;
-        $retJSON->rows = $stuLogs;
-        $test = array('status' => '0', 'data' => $retJSON);
-        return json_encode($test);
+            $stuLogs = array();
+            foreach ($rowLogs as $key => $field) {
+                $stuLogs[$key]['name'] = $nameHash[$key];
+                $stuLogs[$key]['row'] = $field;
+            }
+            $retJSON = new \stdClass();
+            $retJSON->header = $headsArray;
+            $retJSON->rows = $stuLogs;
+            $test = array('status' => '0', 'data' => $retJSON);
+            return json_encode($test);
+//        }else{
+//            $this->setErrorFlash('Enter Valid Date.');
+//        }
     }
 
     public function actionStudentRosterAjax()

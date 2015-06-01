@@ -37,8 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
 
         <div class="form-group">
+
             <div class="col-lg-offset-2">
-                <?= Html::submitButton('Update Info', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+                <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+
             </div>
         </div>
     </fieldset>
