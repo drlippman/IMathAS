@@ -97,6 +97,9 @@ class AdminController extends AppController
         return $this->renderWithData('changeRights', ['model' => $model]);
     }
 
-
+    public function actionHelpOfRights()
+    {
+        return $this->renderWithData('helpOfRights');
+    }
 
 }

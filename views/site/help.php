@@ -1,9 +1,9 @@
 
 <?php
-$this->title = 'IMathAs Help';
+$this->title = 'OpenMath Help';
 ?>
 
-    <div><h2><a>IMathAS Help</a></h2></div>
+    <div><h2><a>OpenMath Help</a></h2></div>
     <div>
         <h2><a name="loggingin">Logging In</a></h2>
 

@@ -9,6 +9,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/in
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<link rel="stylesheet" type="text/css"
+      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8"
+        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 
 <?php $form = ActiveForm::begin([
     'id' => 'login-form',
@@ -50,6 +54,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>Section</th>
             <th>LatePasses Remaining</th>
         </tr>
+        </thead>
+        <tbody>
         <?php
         foreach($studentInformation as $singleStudentInformation){ ?>
             <tr>
@@ -58,26 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><input type="text" class="latepass-text-id" size="4" value="<?php echo $singleStudentInformation['Latepass']?>"name='code[<?php echo $singleStudentInformation['userid']?>]'> </td>
             </tr>
         <?php }?>
-        </thead>
+        <tbody>
     </table>
-   <div id="submit-button"> <input type="submit" class="btn btn-primary" value="Save Changes"></div>
+    <input type="submit" class="btn btn-primary" value="Save Changes">
 
  <?php ActiveForm::end(); ?>
-<script  type="text/javascript">
-   function addText()
-   {
-       var text_id =  document.getElementById("txt_add").value;
-       $( ".latepass-text-id" ).each(function() {
-           var oldlatepass = $(this).val();
-           $(this).val(parseInt(oldlatepass) + parseInt(text_id));
-       });
-   }
-   function replaceText()
-   {
-       var text_id =  document.getElementById("txt_add").value;
-       $( ".latepass-text-id" ).each(function() {
-           $(this).val(parseInt(text_id));
-       });
-   }
-</script>
-

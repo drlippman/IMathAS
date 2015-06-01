@@ -199,8 +199,8 @@ class RosterController extends AppController
         if ($this->isPost()) {
             $paramas = $_POST;
             foreach ($paramas['section'] as $key => $section) {
-                $code = ($paramas['code'][$key]);
-                Student::updateSectionAndCodeValue($section, $key, $code, $cid);
+                $code = trim($paramas['code'][$key]);
+                Student::updateSectionAndCodeValue(trim($section), $key, $code, $cid);
             }
             $this->redirect('student-roster?cid=' . $cid);
         }
@@ -226,13 +226,14 @@ class RosterController extends AppController
             if ($this->isPost()) {
                 $paramas = $_POST;
                 foreach ($paramas['code'] as $key => $latepass) {
-                    $latepasshours = $paramas['passhours'];
-                    Student::updateLatepasses($latepass, $key, $cid);
+                    $latepasshours = ['passhours'];
+                    Student::updateLatepasses(trim($latepass), $key, $cid);
                 }
                 Course::updatePassHours($latepasshours, $cid);
                 $this->redirect('student-roster?cid=' . $cid);
             }
         }
+        $this->includeJS(['../js/managelatepasses.js']);
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
     }
 

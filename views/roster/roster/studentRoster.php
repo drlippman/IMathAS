@@ -36,18 +36,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <p>check: <a class="uncheck-all" href="#">None</a> /
     <a class="check-all" href="#">All</a>
     With Selected:
-    <input type=submit name=submit value="E-mail" title="Send e-mail to the selected students">
-    <input type=submit name=submit value="Message" title="Send a message to the selected students">
-    <input type=submit name=submit value="Unenroll" title="Unenroll the selected students"> <input type=submit
-                                                                                                   name=submit
-                                                                                                   value="Lock"
-                                                                                                   title="Lock selected students out of the course">
-    <input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students">
-    <input type=submit name=submit value="Copy Emails"
-           title="Get copyable list of email addresses for selected students">
-    <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></p>
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >    <input type=submit name=submit value="E-mail" title="Send e-mail to the selected students"></span>
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Message" title="Send a message to the selected students"></span>
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Unenroll" title="Unenroll the selected students"></span>
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Lock" title="Lock selected students out of the course">
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Make Exception" title="Make due date exceptions for selected students"></span>
+    <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type=submit name=submit value="Copy Emails" title="Get copyable list of email addresses for selected students"></span><span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >   <input type="button" value="Pictures" onclick="rotatepics()" title="View/hide student pictures, if available"/></span></p>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-<table class="student-data-table" id="student-information-table">
+    <table class="student-data-table" id="student-information-table">
     <thead>
     <tr>
         <th></th>

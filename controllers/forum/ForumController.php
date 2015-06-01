@@ -117,7 +117,7 @@ class ForumController extends AppController{
         $this->includeCSS(['../css/forums.css']);
         $this->includeJS(['../js/thread.js']);
 
-        return $this->renderWithData('thread',['forum' =>$forum, 'cid' =>$cid, 'users' => $user,'forumid' => $forumid]);
+        return $this->renderWithData('thread',['cid' =>$cid, 'users' => $user,'forumid' => $forumid]);
     }
 
     public function actionGetThreadAjax(){
@@ -156,6 +156,30 @@ class ForumController extends AppController{
             return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
         }
 
+    }
+    public function actionMoveThread()
+    {
+        $cid = Yii::$app->request->get('cid');
+        $forumId = Yii::$app->request->get('forumid');
+        $forums = Forums::getByCourseId($cid);
+        $user = Yii::$app->user->identity;
+
+        $forumArray = array();
+        foreach($forums as $key => $forum)
+        {
+
+            $tempArray = array
+            (
+                'forumId' => $forum->id,
+                'forumName' => $forum->name,
+                'courseId'=> $forum->courseid
+
+            );
+            array_push($forumArray, $tempArray);
+
+        }
+
+        return $this->renderWithData('moveThread',['forums' =>$forumArray]);
     }
 
 }
