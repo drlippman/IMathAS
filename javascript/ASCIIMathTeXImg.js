@@ -16,19 +16,22 @@ FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
 (at http://www.gnu.org/licences/lgpl.html) for more details.
 */
 
+//var AMTcgiloc = '';			//set to the URL of your LaTex renderer
 var noMathRender = false;
 
 (function() {
-var translateOnLoad = false;	//true to autotranslate
-var mathcolor = "";       // defaults to back, or specify any other color
-var displaystyle = true;      // puts limits above and below large operators
-var showasciiformulaonhover = true; // helps students learn ASCIIMath
-var decimalsign = ".";        // change to "," if you like, beware of `(1,2)`!
-var AMdelimiter1 = "`", AMescape1 = "\\\\`"; // can use other characters
-var AMusedelimiter2 = false; 		//whether to use second delimiter below
-var AMdelimiter2 = "$", AMescape2 = "\\\\\\$", AMdelimiter2regexp = "\\$";
-var doubleblankmathdelimiter = false; // if true,  x+1  is equal to `x+1`
-                                      // for IE this works only in <!--   -->
+var config = {
+  translateOnLoad: false,		  //true to autotranslate
+  mathcolor: "",       	      // defaults to back, or specify any other color
+  displaystyle: true,         // puts limits above and below large operators
+  showasciiformulaonhover: true, // helps students learn ASCIIMath
+  decimalsign: ".",           // change to "," if you like, beware of `(1,2)`!
+  AMdelimiter1: "`", AMescape1: "\\\\`", // can use other characters
+  AMusedelimiter2: false, 	  //whether to use second delimiter below
+  AMdelimiter2: "$", AMescape2: "\\\\\\$", AMdelimiter2regexp: "\\$",
+  AMdocumentId: null,   // PmWiki element containing math (default=body)
+  doubleblankmathdelimiter: false // if true,  x+1  is equal to `x+1`
+};                                // for IE this works only in <!--   -->
 
 var CONST = 0, UNARY = 1, BINARY = 2, INFIX = 3, LEFTBRACKET = 4, 
     RIGHTBRACKET = 5, SPACE = 6, UNDEROVER = 7, DEFINITION = 8,
@@ -110,6 +113,8 @@ var AMsymbols = [
 {input:"nnn", tag:"mo", output:"\u22C2", tex:"bigcap", ttype:UNDEROVER},
 {input:"uu",  tag:"mo", output:"\u222A", tex:"cup", ttype:CONST},
 {input:"uuu", tag:"mo", output:"\u22C3", tex:"bigcup", ttype:UNDEROVER},
+{input:"overset", tag:"mover", output:"stackrel", tex:null, ttype:BINARY},
+{input:"underset", tag:"munder", output:"stackrel", tex:null, ttype:BINARY},
 
 //binary relation symbols
 {input:"!=",  tag:"mo", output:"\u2260", tex:"ne", ttype:CONST},
@@ -187,6 +192,7 @@ var AMsymbols = [
 {input:"/_",  tag:"mo", output:"\u2220",  tex:"angle", ttype:CONST},
 {input:"/_\\",  tag:"mo", output:"\u25B3",  tex:"triangle", ttype:CONST},
 {input:"\\ ",  tag:"mo", output:"\u00A0", tex:null, ttype:CONST, val:true},
+{input:"%",  tag:"mo", output:"%", tex:"%", ttype:CONST, notexcopy:true},
 {input:"quad", tag:"mo", output:"\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"qquad", tag:"mo", output:"\u00A0\u00A0\u00A0\u00A0", tex:null, ttype:CONST},
 {input:"cdots", tag:"mo", output:"\u22EF", tex:null, ttype:CONST},
@@ -396,7 +402,7 @@ function AMgetSymbol(str) {
     st = str.slice(k,k+1);
     k++;
   }
-  if (st == decimalsign) {
+  if (st == config.decimalsign) {
     st = str.slice(k,k+1);
     if ("0"<=st && st<="9") {
       integ = false;
@@ -521,12 +527,22 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
    
     result = AMTparseExpr(str,true);
     AMnestingDepth--;
+    var leftchop = 0;
     if (result[0].substr(0,6)=="\\right") {
-	    if (result[0].substr(0,7)=="\\right.") {
-		    result[0] = result[0].substr(7);
-	    } else {
-		    result[0] = result[0].substr(6);
-	    }
+    	    st = result[0].charAt(6);
+    	    if (st==")" || st=="]" || st=="}") {
+    	    	    leftchop = 6;
+    	    } else if (st==".") {
+    	    	    leftchop = 7;
+    	    } else {
+    	    	    st = result[0].substr(6,7);
+    	    	    if (st=='\\rbrace') {
+    	    	    	    leftchop = 13;
+    	    	    }
+    	    }
+    }
+    if (leftchop>0) {
+	    result[0] = result[0].substr(leftchop);
 	    if (typeof symbol.invisible == "boolean" && symbol.invisible) 
 		    node = '{'+result[0]+'}';
 	    else {
@@ -594,16 +610,10 @@ function AMTparseSexpr(str) { //parses str and returns [node,tailstr]
     result2[0] = AMTremoveBrackets(result2[0]);
     if (symbol.input=="color") {
     	newFrag = '{\\color{'+result[0].replace(/[\{\}]/g,'')+'}'+result2[0]+'}';    
-    }
-    if (symbol.input=="root" || symbol.input=="stackrel") {
-	    if (symbol.input=="root") {
-		    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';
-	    } else {
-		    newFrag = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}{'+result2[0]+'}}';
-	    }
-    }
-    if (symbol.input=="frac") {
-	    newFrag = '{\\frac{'+result[0]+'}{'+result2[0]+'}}';
+    } else  if (symbol.input=="root") {
+	    newFrag = '{\\sqrt['+result[0]+']{'+result2[0]+'}}';
+    } else {
+	    newFrag = '{'+AMTgetTeXsymbol(symbol)+'{'+result[0]+'}{'+result2[0]+'}}';
     }
     return [newFrag,result2[1]];
   case INFIX:
@@ -828,10 +838,10 @@ function AMparseMath(str) {
   if (typeof mathbg != "undefined" && mathbg=='dark') {
 	  texstring = "\\reverse " + texstring;
   }
-  if (mathcolor!="") {
-	  texstring = "\\"+mathcolor + texstring;
+  if (config.mathcolor!="") {
+	  texstring = "\\"+config.mathcolor + texstring;
   }
-  if (displaystyle) {
+  if (config.displaystyle) {
 	  texstring = "\\displaystyle" + texstring;
   } else {
 	  texstring = "\\textstyle" + texstring;
@@ -846,7 +856,7 @@ function AMparseMath(str) {
   }
   node.src = AMTcgiloc + '?' + texstring;
   node.style.verticalAlign = "middle";
-  if (showasciiformulaonhover)                      //fixed by djhsu so newline
+  if (config.showasciiformulaonhover)                      //fixed by djhsu so newline
     node.setAttribute("title",str.replace(/\s+/g," "));//does not show in Gecko
  
   var snode = document.createElement("span");
@@ -888,27 +898,27 @@ function AMprocessNodeR(n, linebreaks) {
     str = n.nodeValue;
     if (!(str == null)) {
       str = str.replace(/\r\n\r\n/g,"\n\n");
-      if (doubleblankmathdelimiter) {
-        str = str.replace(/\x20\x20\./g," "+AMdelimiter1+".");
-        str = str.replace(/\x20\x20,/g," "+AMdelimiter1+",");
-        str = str.replace(/\x20\x20/g," "+AMdelimiter1+" ");
+      if (config.doubleblankmathdelimiter) {
+        str = str.replace(/\x20\x20\./g," "+config.AMdelimiter1+".");
+        str = str.replace(/\x20\x20,/g," "+config.AMdelimiter1+",");
+        str = str.replace(/\x20\x20/g," "+config.AMdelimiter1+" ");
       }
       str = str.replace(/\x20+/g," ");
       str = str.replace(/\s*\r\n/g," ");
        mtch = false;
-      if (AMusedelimiter2) {
-      str = str.replace(new RegExp(AMescape2, "g"),
+      if (config.AMusedelimiter2) {
+      str = str.replace(new RegExp(config.AMescape2, "g"),
               function(st){mtch=true;return "AMescape2"});
       }
-      str = str.replace(new RegExp(AMescape1, "g"),
+      str = str.replace(new RegExp(config.AMescape1, "g"),
               function(st){mtch=true;return "AMescape1"});
-     if (AMusedelimiter2)  str = str.replace(new RegExp(AMdelimiter2regexp, "g"),AMdelimiter1);
-      arr = str.split(AMdelimiter1);
+     if (config.AMusedelimiter2)  str = str.replace(new RegExp(config.AMdelimiter2regexp, "g"),config.AMdelimiter1);
+      arr = str.split(config.AMdelimiter1);
       for (i=0; i<arr.length; i++)
-      	if (AMusedelimiter2) {	     
-		arr[i]=arr[i].replace(/AMescape2/g,AMdelimiter2).replace(/AMescape1/g,AMdelimiter1);
+      	if (config.AMusedelimiter2) {	     
+		arr[i]=arr[i].replace(/AMescape2/g,config.AMdelimiter2).replace(/AMescape1/g,config.AMdelimiter1);
 	} else {
-		arr[i]=arr[i].replace(/AMescape1/g,AMdelimiter1);
+		arr[i]=arr[i].replace(/AMescape1/g,config.AMdelimiter1);
 	}
       if (arr.length>1 || mtch) {
         
@@ -929,8 +939,8 @@ function AMprocessNodeR(n, linebreaks) {
 
 function AMprocessNode(n, linebreaks, spanclassAM) {
   var frag,st;
-  if (spanclassAM!=null) {;
-    frag = document.getElementsByTagName("span")
+  if (spanclassAM!=null) {
+    frag = document.getElementsByTagName("span");
     for (var i=0;i<frag.length;i++)
       if (frag[i].className == "AM")
         AMprocessNodeR(frag[i],linebreaks);
@@ -939,7 +949,7 @@ function AMprocessNode(n, linebreaks, spanclassAM) {
       st = n.innerHTML;
     } catch(err) {}
     if (st==null || 
-        st.indexOf(AMdelimiter1)!=-1)// || st.indexOf(AMdelimiter2)!=-1) 
+        st.indexOf(config.AMdelimiter1)!=-1)// || st.indexOf(config.AMdelimiter2)!=-1) 
       AMprocessNodeR(n,linebreaks);
   }
 }
@@ -948,7 +958,7 @@ function translate(spanclassAM) {
   if (!AMtranslated) { // run this only once
     AMtranslated = true;
     var body = document.getElementsByTagName("body")[0];
-    var processN = document.getElementById(AMdocumentId);
+    var processN = document.getElementById(config.AMdocumentId);
     AMprocessNode((processN!=null?processN:body), false, spanclassAM);
   }
 }
@@ -960,16 +970,18 @@ var AMnoMathML = true;
 AMinitSymbols();
 
 window.translate = translate;
+window.AMTconfig = config;
 window.AMprocessNode = AMprocessNode;
 window.AMparseMath = AMparseMath;
 window.AMTparseMath = AMparseMath;
 window.AMTparseAMtoTeX = AMTparseAMtoTeX;
 
 function generic(){
-  if (translateOnLoad) {
+  if (config.translateOnLoad) {
       translate();
   }
-};
+}
+
 //setup onload function
 if(typeof window.addEventListener != 'undefined'){
   //.. gecko, safari, konqueror and standard
@@ -999,6 +1011,4 @@ else if(typeof window.attachEvent != 'undefined'){
     window.onload = generic;
   }
 }
-
-
 })();
