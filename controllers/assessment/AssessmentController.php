@@ -190,12 +190,11 @@ class AssessmentController extends AppController
 
     }
 
-
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
 
-        $id = Yii::$app->request->get('id');
+        $id = $this->getParamVal('id');
         $courseId = Yii::$app->request->get('cid');
         $assessment = Assessments::getByAssessmentId($id);
         $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
