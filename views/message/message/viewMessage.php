@@ -51,10 +51,3 @@
 
      </div>
 
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-//                $(".btn").hide();
-//                $("#marked").hide();
-        });
-    </script>

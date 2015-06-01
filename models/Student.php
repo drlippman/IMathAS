@@ -33,17 +33,17 @@ class Student extends BaseImasStudents {
     {
         return static::findOne(['courseid' => $cId]);
     }
-    public static function getByUserIdentity($uid)
+    public static function getByUserIdentity($uid,$courseid)
     {
 
-        return static::findAll(['userid' => $uid]);
+        return static::findAll(['userid' => $uid,'courseid' => $courseid]);
     }
     public function createNewStudent($userId,$cid,$param){
 
-        $this->userid=$userId;
-        $this->courseid=$cid;
-        $this->section=$param['section'];
-        $this->code=$param['code'];
+        $this->userid = $userId;
+        $this->courseid = $cid;
+        $this->section = empty($param['section']) ? null : $param['section'];
+        $this->code = empty($param['code']) ? null : $param['code'];;
         $this->save();
     }
     public static function findByCid($cId){
@@ -55,7 +55,7 @@ class Student extends BaseImasStudents {
     {
         $this->userid = $studentId;
         $this->courseid = $courseId;
-        $this->section = $section;
+        $this->section = empty($section) ? null : $section;
         $this->save();
     }
     public static function updateSectionAndCodeValue($section, $userid, $code, $cid)

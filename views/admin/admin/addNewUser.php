@@ -37,10 +37,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'email')->textInput() ?>
 
         <?= $form->field($model, 'password')->passwordInput() ?>
-
-
-<!--        <div class="form-group">-->
-    <div class="col-lg-0 pull-left select-text-margin"> <a HREF="<?php echo AppUtility::getURLFromHome('site', 'helper-guide') ?>"> <img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
+        
+        <!--        <div class="form-group">-->
+    <div class="col-lg-0 pull-left select-text-margin"><a href="#" onclick="window.open('help-of-rights','helpOfRights','top=0,width=400,height=500,scrollbars=1,left=150')"><img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
         <div class="rights_alignment">
 
             <?=$form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,

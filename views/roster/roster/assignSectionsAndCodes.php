@@ -20,22 +20,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <table class="student-data" id="student-data-table">
         <thead>
-        <tr>
-            <th>Name</th>
-            <th>Section</th>
-            <th>Code</th>
-        </tr>
+            <tr>
+                <th>Name</th>
+                <th>Section</th>
+                <th>Code</th>
+            </tr>
+        </thead>
+        <tbody>
         <?php
         foreach ($studentInformation as $singleStudentInformation) { ?>
             <tr>
                 <td><?php echo $singleStudentInformation['Name']?></td>
-                <td><input type="text" size="5" value="<?php echo $singleStudentInformation['section']?> "
+                <td><input type="text" value="<?php echo $singleStudentInformation['section']?>"
                            name='section[<?php echo $singleStudentInformation['userid']?>]'></td>
-                <td><input type="text" size="5" value="<?php echo $singleStudentInformation['code']?>"
+                <td><input type="text" value="<?php echo $singleStudentInformation['code']?>"
                            name='code[<?php echo $singleStudentInformation['userid']?>]'></td>
             </tr>
         <?php } ?>
-        </thead>
+        </tbody>
     </table>
     <input type="submit" class="btn btn-primary">
 </form>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.student-data').DataTable();
+    });
+
+
+</script>

@@ -50,13 +50,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?php ActiveForm::end(); ?>
 </div>
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#checkNone').click(function() {
-            $('#list input[type="checkbox"]').prop('checked', false);
-        });
-        $('#checkAll').click(function() {
-            $('#list input[type="checkbox"]').prop('checked', true);
-        });
-    });
-</script>
+
