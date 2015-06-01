@@ -3,7 +3,9 @@ namespace app\controllers\forum;
 
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
+use app\models\forms\ThreadForm;
 use app\models\Forums;
+use app\models\Thread;
 use app\models\User;
 use app\components\AppUtility;
 use app\components\AppConstant;
@@ -20,7 +22,7 @@ class ForumController extends AppController{
         $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
         $model = new ForumForm();
-        $temparray= array();
+        $model->thread ='subject';
         if ($model->load(Yii::$app->request->post()))
         {
             $param = $this->getBodyParams();
@@ -36,33 +38,31 @@ class ForumController extends AppController{
         $search = $param['search'];
         $cid = $param['cid'];
         $checkBoxVal= $param['value'];
-        $query= Yii::$app->db->createCommand("SELECT * from imas_forums where name LIKE '$search%'")->queryAll();
-        $forums = Forums::getByCourseId($cid);
-        $result =ForumForm::byAllSubject($search);
-        if($forums)
+        $query= ForumForm::byAllSubject($search);
+        if($query)
         {
-            $forumArray = array();
-            foreach($forums as $key => $forum)
+            $queryarray = array();
+            foreach ($query as $data)
             {
-                $threadCount = count($forum->imasForumThreads);
-                $postCount = count($forum->imasForumPosts);
-                $lastObject = '';
-                if($postCount > 0)
-                {
-                    $lastObject = $forum->imasForumPosts[$postCount-1];
-                }
-                $tempArray = array
-                (
-                    'forumId' => $forum->id,
-                    'forumname' => $forum->name,
-                    'threads' => $threadCount,
-                    'posts' => $postCount,
-                    'lastPostDate' => ($lastObject != '') ? date('M-d-Y h:i s', $lastObject->postdate) : ''
+                $username = User::getById($data['userid']);
+                $postdate = Thread::getById($data['threadid']);
+
+
+                $temparray = array(
+                    'forumiddata' => $data['forumid'],
+                    'subject' => $data['subject'],
+                    'views' => $data['views'],
+                    'replyby' => $data['replyby'],
+                    'postdate' => date('F d, o g:i a',$postdate->lastposttime),
+                    'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+
                 );
-                array_push($forumArray, $tempArray);
+
+                array_push($queryarray,$temparray);
+
             }
 
-            return json_encode(array('status' => 0, 'forum' =>$forumArray, 'searchData' => $query,'bySubject' => $result,'checkVal' => $checkBoxVal,'courseId' => $cid));
+            return json_encode(array('status' => 0, 'data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search));
         }else{
             return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
         }
@@ -114,7 +114,6 @@ class ForumController extends AppController{
         $forumid = Yii::$app->request->get('forumid');
         $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
-
         $this->includeCSS(['../css/forums.css']);
         $this->includeJS(['../js/thread.js']);
 
@@ -124,7 +123,7 @@ class ForumController extends AppController{
     public function actionGetThreadAjax(){
         $param = $this->getBodyParams();
         $forumid = $param['forumid'];
-        $thread = ForumForm::thread($forumid);
+        $thread = ThreadForm::thread($forumid);
         if($thread)
         {
 
@@ -133,18 +132,21 @@ class ForumController extends AppController{
                 foreach ($thread as $data)
                 {
                     $username = User::getById($data['userid']);
+                    $postdate = Thread::getById($data['threadid']);
+
 
                             $temparray = array(
                            'forumiddata' => $data['forumid'],
                            'subject' => $data['subject'],
                            'views' => $data['views'],
                            'replyby' => $data['replyby'],
-                           'postdate' => date('F d, o g:i a',$data['postdate']),
+                           'postdate' => date('F d, o g:i a',$postdate->lastposttime),
                             'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
 
                     );
 
                     array_push($threadArray,$temparray);
+
 
                 }
 

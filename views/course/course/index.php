@@ -98,7 +98,7 @@ echo $this->render('_toolbar',['course'=> $course]);
             <?php } ?>
         <?php break; ?>
 
-<!-- ////////////////// Forum here //////////////////-->
+
     <?php case 'Forum': ?>
         <?php $forum = $item[key($item)]; ?>
             <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>

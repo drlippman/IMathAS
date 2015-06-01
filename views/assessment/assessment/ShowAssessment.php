@@ -62,12 +62,10 @@ use app\components\AppUtility;
     <ul class=qlist>
         <li>
 
-<!--            <span class=current>-->
                 <img alt="untried" src="/IMathAS/img/te_blue_arrow.png"/>
                 <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/question?to=' . $question->id) ?>">Q <?php echo $key+1?></a> (0/<?php echo $question->points ?>)
 
                 <input type="hidden" id="questionSet" class="questionId" value="<?php echo $question->id ?>">
-            <!--            </span>-->
 
         </li>
     </ul>
@@ -132,12 +130,12 @@ use app\components\AppUtility;
     else{?>
         <input type="hidden" id="course-Id" value="<?php echo $cid->id;?>">
         <!--    Else condition if questions are not present in the assessment -->
-    <script type="text/javascript">
+    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $cid->id) ?>">
+        <script type="text/javascript">
         $(document).ready(function()
         {
             var courseid = $("#course-Id").val();
             var msg = '<div><p>This assessment does not have any questions right now</div>';
-
             $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
             ({
                     modal: true, title: 'Warning', zIndex: 10000, autoOpen: true,
@@ -148,7 +146,9 @@ use app\components\AppUtility;
 
                         "Go Back": function ()
                         {
-                                window.location ="index?cid="+courseid;
+
+                               window.location ="index?cid="+courseid;
+<!--                            window.location=<a href="--><?php //echo AppUtility::getURLFromHome('course', 'course/index?cid=' .) ?><!--">-->
                                  $(this).dialog('destroy').remove();
 
                         }

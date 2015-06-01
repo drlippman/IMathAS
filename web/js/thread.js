@@ -23,7 +23,6 @@ function threadSuccess(response)
                 {
                     thread.replyby= 0;
                     html += "<tr> <td><a href='#'>" +(thread.subject) +"</a> "+ thread.name+" </td> ";
-
                     html += "<td>" + thread.replyby + "</td>";
                     html += "<td>" + thread.views + "</td>";
                     html += "<td>" + thread.postdate + "</td>";

@@ -1,15 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
-<<<<<<< Updated upstream
- * Date: 18/5/15
- * Time: 3:57 PM
-=======
- * Date: 20/5/15
- * Time: 3:43 PM
->>>>>>> Stashed changes
- */
 
 namespace app\controllers\assessment;
 
@@ -22,7 +11,23 @@ use app\models\Exceptions;
 use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\Student;
+use app\components\AppConstant;
+use app\models\AppModel;
+use app\models\Blocks;
+use app\models\forms\CourseSettingForm;
+use app\models\forms\SetPassword;
+use app\models\Links;
+use app\models\Forums;
+use app\models\GbScheme;
+use app\models\Items;
+use app\models\Teacher;
+use app\models\InlineText;
+use app\models\Wiki;
+use app\models\User;
 use Yii;
+use app\models\forms\DeleteCourseForm;
+use yii\db\Exception;
+use yii\helpers\Html;
 
 class AssessmentController extends AppController
 {
@@ -80,6 +85,111 @@ class AssessmentController extends AppController
 //        $this->includeJS(['../js/timer.js']);
 //        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
 //    }
+    public function actionIndex()
+    {
+        $this->guestUserHandler();
+
+        $cid = $this->getParamVal('cid');
+        $id = Yii::$app->request->get('id');
+        $uid = Yii::$app->user->identity->getId();
+        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
+        $cid = Yii::$app->request->get('cid');
+        $responseData = array();
+        $course = Course::getById($cid);
+        if ($course) {
+            $itemOrders = unserialize($course->itemorder);
+            if (count($itemOrders)) {
+                foreach ($itemOrders as $key => $itemOrder) {
+                    $tempAray = array();
+                    if (is_array($itemOrder)) {
+                        $tempAray['Block'] = $itemOrder;
+                        $blockItems = $itemOrder['items'];
+
+                        $tempItemList = array();
+                        if (count($blockItems)) {
+                            foreach ($blockItems as $blockKey => $blockItem) {
+                                $tempItem = array();
+                                $item = Items::getById($blockItem);
+                                switch ($item->itemtype) {
+                                    case 'Assessment':
+                                        $assessment = Assessments::getByAssessmentId($item->typeid);
+                                        $tempItem[$item->itemtype] = $assessment;
+                                        break;
+                                    case 'Calendar':
+                                        $tempItem[$item->itemtype] = 1;
+                                        break;
+                                    case 'Forum':
+                                        $form = Forums::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $form;
+                                        break;
+                                    case 'Wiki':
+                                        $wiki = Wiki::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $wiki;
+                                        break;
+                                    case 'LinkedText':
+                                        $linkedText = Links::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $linkedText;
+                                        break;
+                                    case 'InlineText':
+                                        $inlineText = InlineText::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $inlineText;
+                                        break;
+                                }
+                                array_push($tempItemList, $tempItem);
+                            }
+                        }
+                        $tempAray['itemList'] = $tempItemList;
+                        array_push($responseData, $tempAray);
+                    } else {
+                        $item = Items::getById($itemOrder);
+                        switch ($item->itemtype) {
+                            case 'Assessment':
+                                $assessment = Assessments::getByAssessmentId($item->typeid);
+                                $tempAray[$item->itemtype] = $assessment;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Calendar':
+                                $tempAray[$item->itemtype] = 1;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Forum':
+                                $form = Forums::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $form;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'Wiki':
+                                $wiki = Wiki::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $wiki;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'InlineText':
+                                $inlineText = InlineText::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $inlineText;
+                                array_push($responseData, $tempAray);
+                                break;
+                            case 'LinkedText':
+                                $linkedText = Links::getById($item->typeid);
+                                $tempAray[$item->itemtype] = $linkedText;
+                                array_push($responseData, $tempAray);
+                                break;
+                        }
+                    }
+                }
+            }
+
+        } else {
+// @TODO Need to add logic here
+        }
+
+        $course = Course::getById($cid);
+        $student = Student::getByCId($cid);
+        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css', '../css/jquery-ui.css']);
+        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
+        $this->includeJS(['../js/student.js']);
+        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
+
+    }
+
 
     public function actionShowAssessment()
     {

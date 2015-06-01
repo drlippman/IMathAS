@@ -35,12 +35,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <thead>
 
                 <th>Topic</th>
-<!--                <th>flag</th>-->
                 <th>Replies</th>
                 <th>Views</th>
                 <th>Last Post Date</th>
-
-
         </thead>
         <tbody class="forum-table-body">
         </tbody>

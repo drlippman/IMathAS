@@ -28,16 +28,11 @@ class ForumForm extends Model
     }
     public static  function byAllSubject($search ){
 
-        $subject = Yii::$app->db->createCommand("SELECT subject from  imas_forum_posts where subject LIKE '$search%' ")->queryAll();
+        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where subject LIKE '$search%' ")->queryAll();
         return $subject;
 
     }
 
-    public static  function thread(){
 
-        $thread = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts")->queryAll();
-        return $thread;
-
-    }
 
 }
