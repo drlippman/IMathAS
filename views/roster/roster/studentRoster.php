@@ -5,12 +5,14 @@ $this->title = 'Roster';
 $this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
     <link rel="stylesheet" type="text/css"
           href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div><h2>Student Roster </h2></div>
 <div class="cpmid">
+
             <span class="column" style="width:auto;">
                 <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View
                     Login Grid</a><br/>
@@ -33,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     and Enroll new student</a><br/>
             </span><br class="clear"/>
 </div>
-<p>check: <a class="uncheck-all" href="#">None</a> /
+<p>Check: <a class="uncheck-all" href="#">None</a> /
     <a class="check-all" href="#">All</a>
     With Selected:
     <span><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>" >    <input type=submit name=submit value="E-mail" title="Send e-mail to the selected students"></span>
@@ -67,3 +69,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </tr>
     </thead>
 </table>
+

@@ -161,20 +161,20 @@ class RosterController extends AppController
             if (!$uid) {
                 $this->setErrorFlash('Student not found please enter correct username.');
             } else {
-                $stdrecord = Student::getByUserIdentity($uid->id);
 
                 $teacher = Teacher::getTeacherByUserId($uid->id);
-
                 if ($teacher) {
                     $this->setErrorFlash('Teachers can\'t be enrolled as students - use Student View, or create a separate student account.');
-                } elseif (!$stdrecord) {
-
-                    $student = new Student();
-                    $student->createNewStudent($uid->id, $cid, $param);
-                    $this->setSuccessFlash('Student have been enrolled in course ' . $course->name . ' successfully');
-                    $model = new StudentEnrollmentForm();
-                } else {
-                    $this->setErrorFlash('This username is already enrolled in the class.');
+                } else{
+                    $stdrecord = Student::getByUserIdentity($uid->id,$cid);
+                    if($stdrecord){
+                        $this->setErrorFlash('This username is already enrolled in the class');
+                    }else {
+                        $student = new Student();
+                        $student->createNewStudent($uid->id, $cid, $param);
+                        $this->setSuccessFlash('Student have been enrolled in course ' . $course->name . ' successfully');
+                        $model = new StudentEnrollmentForm();
+                    }
                 }
             }
         }
@@ -299,14 +299,15 @@ class RosterController extends AppController
                     if (!$studentRecord) {
                         $student = new Student();
                         $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
-
-
+                        $this->setSuccessFlash('Enrolled Successfully');
                     }
+
                 }
             } else {
                 $this->setErrorFlash('Select student from list to enroll in a course');
             }
         }
+        $this->includeJS(['../js/roster/enrollstudents.js']);
         return $this->render('enrollStudents', ['course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $cid]);
     }
 
@@ -341,53 +342,76 @@ class RosterController extends AppController
     public function actionManageTutors()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $tutors = Tutor::getByCourseId($cid);
+        $courseid = Yii::$app->request->get('cid');
+        $tutors = Tutor::getByCourseId($courseid);
         $tutorId = array();
-        $studentInfo = array();
+        $tutorInfo = array();
         $sortBy = 'section';
         $order = AppConstant::ASCENDING;
         foreach ($tutors as $tutor) {
-            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id);
-            array_push($studentInfo, $tempArray);
+
+            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id ,'section' => $tutor->section);
+            array_push($tutorInfo, $tempArray);
         }
-        $sections = Student::findByCourseId($cid, $sortBy, $order);
+        $sections = Student::findByCourseId($courseid,$sortBy,$order);
         $sectionArray = array();
         foreach ($sections as $section) {
             array_push($sectionArray, $section->section);
         }
-        return $this->renderWithData('manageTutors', ['courseid' => $cid, 'student' => $studentInfo, 'section' => $sectionArray]);
+        $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeJS(['../js/general.js?ver=012115','../js/roster/managetutors.js?ver=012115','../js/jquery.session.js?ver=012115','../js/DataTables-1.10.6/media/js/jquery.dataTables.js','../js/roster/managetutors.js']);
+        return $this->renderWithData('manageTutors', ['courseid' => $courseid,'tutors' => $tutorInfo,'section' => $sectionArray]);
     }
 
     public function actionMarkUpdateAjax()
     {
         $this->guestUserHandler();
-
-        $params = $this->getBodyParams();
-        $users = explode(',', $params['username']);
-        $cid = Yii::$app->request->get('cid');
-        AppUtility::dump("hiii");
-        $userIdArray = array();
-        $userNotFoundArray = array();
-        $teacherIdArray = array();
-        $studentArray = array();
-        foreach ($users as $entry) {
-            $userId = User::findByUsername($entry);
-            if (!$userId) {
-                array_push($userNotFoundArray, $entry);
-
-            } else {
-                array_push($userIdArray, $userId->id);
-                $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                if ($isTeacher) {
-                    $tutors = Tutor::getByUserId($isTeacher->userid, $cid);
-                } else {
-                    array_push($studentArray, $userId->id);
+            $params = $this->getBodyParams();
+            $users = explode(',',$params['username']);
+            $courseid = $params['courseid'];
+            $sortBy = 'section';
+            $order = AppConstant::ASCENDING;
+            $userIdArray = array();
+            $userNotFoundArray = array();
+            $studentArray= array();
+            $tutorsArray=array();
+            $sections = Student::findByCourseId($courseid,$sortBy,$order);
+            $sectionArray = array();
+            foreach($sections as $section)
+            {
+                array_push($sectionArray, $section->section);
+            }
+            foreach($users as $entry)
+            {
+               $userId = User::findByUsername($entry);
+                if (!$userId) {
+                    array_push($userNotFoundArray,$entry);
+                }
+                else{
+                    array_push($userIdArray,$userId->id);
+                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                    if($isTeacher){
+                        $tutors = Tutor::getByUserId($isTeacher->userid,$courseid);
+                        if(!$tutors)
+                        {
+                            $tutorInfo=array('Name'=>$userId->FirstName.' '.$userId->LastName,'id'=>$userId->id);
+                            array_push($tutorsArray,$tutorInfo);
+                            $tutor = new Tutor();
+                            $tutor->create($isTeacher->userid, $courseid);
+                        }
+                     }else{
+                        array_push($studentArray, $userId->id);
+                    }
                 }
             }
+         $params['checkedtutor'] = isset($params['checkedtutor'])? $params['checkedtutor'] :'';
+        if($params['checkedtutor'] != ''){
+            foreach($params['checkedtutor'] as $tutor)
+            {
+                Tutor::deleteTutorByUserId($tutor);
+            }
         }
-        return json_encode(array('status' => 0));
-
+        return json_encode(array('status' => 0,'userNotFound' => $userNotFoundArray,'tutors' => $tutorsArray,'section' => $sectionArray));
     }
 
     public function actionImportStudent()

@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasTutors;
 
 class Tutor extends BaseImasTutors
@@ -20,5 +21,21 @@ class Tutor extends BaseImasTutors
     public static function getByCourseId($courseid)
     {
         return static::findAll( ['courseid' => $courseid]);
+    }
+    public function create($userid,$courseid)
+    {
+        $this->userid = $userid;
+        $this->courseid = $courseid;
+        $this->save();
+        return $this->id;
+    }
+    public static function getById($id)
+    {
+        return static::findOne( ['userid' => $id]);
+    }
+    public static function deleteTutorByUserId($userId)
+    {
+        $tutor = Tutor::getById($userId);
+        $tutor->delete();
     }
 } 

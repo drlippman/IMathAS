@@ -31,7 +31,7 @@ class BaseImasTutors extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['userid', 'courseid', 'section'], 'required'],
+            [['userid', 'courseid'], 'required'],
             [['userid', 'courseid'], 'integer'],
             [['section'], 'string', 'max' => 40]
         ];
