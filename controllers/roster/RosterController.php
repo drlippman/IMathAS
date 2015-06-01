@@ -47,7 +47,7 @@ class RosterController extends AppController
             }
         }
         $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
-        $this->includeJS(['../js/studentroster.js','../js/general.js']);
+        $this->includeJS(['../js/studentroster.js', '../js/general.js']);
         return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
     }
 
@@ -57,7 +57,7 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
         $this->includeCSS(['../css/jquery-ui.css']);
-        $this->includeJS(['../js/logingridview.js','../js/general.js']);
+        $this->includeJS(['../js/logingridview.js', '../js/general.js']);
         return $this->render('loginGridView', ['course' => $course]);
     }
 
@@ -420,7 +420,7 @@ class RosterController extends AppController
         $model = new ImportStudentForm();
         $nowTime = time();
         $courseId = Yii::$app->request->get('cid');
-
+        $studentRecords = '';
         if ($model->load(Yii::$app->request->post())) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
@@ -428,101 +428,100 @@ class RosterController extends AppController
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
                 $model->file->saveAs($filename);
             }
-            $studentRecords = $this->ImportStudentCsv($filename, $courseId,$params);
-            $this->setSuccessFlash('Imported student successfully.');
+            $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
+            if($filename){
+                $this->redirect(array('show-import-student', 'studentData' => $studentRecords));
+            }
+//            $this->setSuccessFlash('Imported student successfully.');
         }
+        if(!$studentRecords){
         return $this->render('importStudent', ['model' => $model]);
+        }
     }
 
-    public function ImportStudentCsv($fileName, $courseId, $params){
+    public function ImportStudentCsv($fileName, $courseId, $params)
+    {
         $course = Course::getById($courseId);
         $AllUserArray = array();
-        if($course)
-        {
-            $handle = fopen($fileName,'r');
-            if ($params['ImportStudentForm']['headerRow']==1) {
-                $data = fgetcsv($handle,2096);
+        if ($course) {
+            $handle = fopen($fileName, 'r');
+            if ($params['ImportStudentForm']['headerRow'] == 1) {
+                $data = fgetcsv($handle, 2096);
             }
-
-            while (($data = fgetcsv($handle,2096))!==false) {
+            while (($data = fgetcsv($handle, 2096)) !== false) {
                 $StudentDataArray = $this->parsecsv($data, $params);
-
-                for ($i=0;$i<count($StudentDataArray);$i++) {
+                for ($i = 0; $i < count($StudentDataArray); $i++) {
                     $StudentDataArray[$i] = trim($StudentDataArray[$i]);
                 }
-
-                if (trim($StudentDataArray[0])=='' || trim($StudentDataArray[0])=='_') {
+                if (trim($StudentDataArray[0]) == '' || trim($StudentDataArray[0]) == '_') {
                     continue;
                 }
-
                 $userData = User::getByName($StudentDataArray[0]);
 
                 if ($userData) {
                     $userExist = User::userAlreadyExist($StudentDataArray[0]);
                 } else {
-                    if (($params['ImportStudentForm']['setPassword']==0 || $params['ImportStudentForm']['setPassword']==1) && strlen($StudentDataArray[0])<4) {
-
+                    if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($StudentDataArray[0]) < 4) {
                         $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
-
                     } else {
                         if ($params['ImportStudentForm']['setPassword'] == 0) {
-                            $password = password_hash(substr($StudentDataArray[0],0,4), PASSWORD_DEFAULT);
-                        } else if ($params['ImportStudentForm']['setPassword']==1) {
-
-                            $password = password_hash(substr($StudentDataArray[0],-4), PASSWORD_DEFAULT);
+                            $password = password_hash(substr($StudentDataArray[0], 0, 4), PASSWORD_DEFAULT);
+                        } else if ($params['ImportStudentForm']['setPassword'] == 1) {
+                            $password = password_hash(substr($StudentDataArray[0], -4), PASSWORD_DEFAULT);
 
                         } else if ($params['ImportStudentForm']['setPassword'] == 2) {
-                            $password = password_hash($_POST['defpw'], PASSWORD_DEFAULT);
+                            $password = password_hash($params['defpw'], PASSWORD_DEFAULT);
 
-                        } else if ($params['ImportStudentForm']['setPassword']==3) {
-                            if (trim($StudentDataArray[6])=='') {
+                        } else if ($params['ImportStudentForm']['setPassword'] == 3) {
+                            if (trim($StudentDataArray[6]) == '') {
                                 echo "Password for {$StudentDataArray[0]} is blank; skipping import<br/>";
                                 continue;
                             }
-
                             $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
                         }
                     }
                     array_push($AllUserArray,$StudentDataArray);
-//                    $user = new User();
-//                    $user->createUserFromCsv($StudentDataArray, AppConstant::STUDENT_RIGHT, $password);
                 }
             }
+
             return $AllUserArray;
         }
         return false;
     }
 
-   public function parsecsv($data, $params) {
-        $firstname = $data[$params['ImportStudentForm']['firstName']-1];
-        if ($params['ImportStudentForm']['nameFirstColumn']!=0) {
-            $firstnameColumn = explode(' ',$firstname);
-            if ($params['ImportStudentForm']['nameFirstColumn']<3) {
-                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn']-1];
+    public function parsecsv($data, $params)
+    {
+        $firstnamePosition = $params['ImportStudentForm']['firstName'] - 1;
+        $firstname = $data[$firstnamePosition];
+        if ($params['ImportStudentForm']['nameFirstColumn'] != 0) {
+            $firstnameColumn = explode(' ', $firstname);
+            if ($params['ImportStudentForm']['nameFirstColumn'] < 3) {
+                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn'] - 1];
             } else {
-                $firstname = $firstnameColumn[count($firstnameColumn)-1];
+                $firstname = $firstnameColumn[count($firstnameColumn) - 1];
             }
         }
-       $lastname = $data[$params['ImportStudentForm']['lastName']-1];
-        if ($params['ImportStudentForm']['lastName']!=$params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn']!=0) {
-            $lastnameColumn = explode(' ',$lastname);
+        $lastnamePosition = $params['ImportStudentForm']['lastName'] - 1;
+        $lastname = $data[$lastnamePosition];
+        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
+            $lastnameColumn = explode(' ', $lastname);
         }
-        if ($params['ImportStudentForm']['nameLastColumn']!=0) {
-            if ($params['ImportStudentForm']['nameLastColumn']<3) {
-                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn']-1];
+        if ($params['ImportStudentForm']['nameLastColumn'] != 0) {
+            if ($params['ImportStudentForm']['nameLastColumn'] < 3) {
+                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn'] - 1];
             } else {
-                $lastname = $lastnameColumn[count($lastnameColumn)-1];
+                $lastname = $lastnameColumn[count($lastnameColumn) - 1];
             }
         }
-       $firstname = preg_replace('/\W/','',$firstname);
-       $lastname = preg_replace('/\W/','',$lastname);
-       $firstname = ucfirst(strtolower($firstname));
-       $lastname = ucfirst(strtolower($lastname));
-        if ($params['ImportStudentForm']['userName']==0) {
-            $username = strtolower($firstname.'_'.$lastname);
+        $firstname = preg_replace('/\W/', '', $firstname);
+        $lastname = preg_replace('/\W/', '', $lastname);
+        $firstname = ucfirst(strtolower($firstname));
+        $lastname = ucfirst(strtolower($lastname));
+        if ($params['ImportStudentForm']['userName'] == 0) {
+            $username = strtolower($firstname . '_' . $lastname);
         } else {
-            $username = $data[$_POST['unloc']-1];
-            $username = preg_replace('/\W/','',$username);
+            $username = $data[$params['unloc'] - 1];
+            $username = preg_replace('/\W/', '', $username);
         }
         if ($params['ImportStudentForm']['emailAddress'] > 0) {
             $email = $data[$params['ImportStudentForm']['emailAddress'] - 1];
@@ -533,30 +532,30 @@ class RosterController extends AppController
             $email = 'none@none.com';
         }
         if ($params['ImportStudentForm']['codeNumber'] == 1) {
-            $code = $data[$_POST['code'] - 1];
+            $code = $data[$params['code'] - 1];
         } else {
             $code = 0;
         }
         if ($params['ImportStudentForm']['sectionValue'] == 1) {
-            $sec = $_POST['secval'];
+            $section = $params['secval'];
         } else if ($params['ImportStudentForm']['sectionValue'] == 2) {
-            $sec = $data[$_POST['seccol'] - 1];
-
-        if ($params['ImportStudentForm']['sectionValue']==1) {
-            $section = $_POST['secval'];
-        } else if ($params['ImportStudentForm']['sectionValue']==2) {
-            $section = $data[$_POST['seccol']-1];
+            $section = $data[$params['seccol'] - 1];
         } else {
             $section = 0;
         }
-
-        if ($params['ImportStudentForm']['setPassword']==3) {
-            $password = $data[$_POST['pwcol']-1];
+        if ($params['ImportStudentForm']['setPassword'] == 3) {
+            $password = $data[$params['pwcol'] - 1];
         } else {
             $password = 0;
         }
-        return array($username,$firstname,$lastname,$email,$code,$section,$password);
-
+        return array($username, $firstname, $lastname, $email, $code, $section, $password);
     }
-}
+
+    public function actionShowImportStudent()
+    {
+        $studentInformation = $this->getRequestParams();
+        return $this->render('showImportStudent',['studentData' => $studentInformation]);
+        $user = new User();
+        $user->createUserFromCsv($StudentDataArray, AppConstant::STUDENT_RIGHT, $password);
+    }
 }
