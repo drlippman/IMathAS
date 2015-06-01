@@ -256,14 +256,14 @@ class SiteController extends AppController
 
     public function actionResetPassword()
     {
-        $id = Yii::$app->request->get('id');
-        $code = Yii::$app->request->get('code');
+        $id = $this->getParamVal('id');
+        $code = $this->getParamVal('code');
         $model = new ResetPasswordForm();
         $user = User::getByIdAndCode($id, $code);
 
         if($user)
         {
-            if(Yii::$app->request->post())
+            if($this->isPost())
             {
                 $params = $this->getBodyParams();
                 $newPassword = $params['ResetPasswordForm']['newPassword'];
@@ -394,6 +394,5 @@ class SiteController extends AppController
     {
         return $this->renderWithData('document');
     }
-
 
 }

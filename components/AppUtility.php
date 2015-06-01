@@ -490,9 +490,9 @@ class AppUtility extends Component
     {
 
         require_once("TestUtil.php");
-       $arrayData = basicshowq($qn,$seqinactive=false,$colors=array());
-       //var_dump($arrayData);
-       return $arrayData;
+        $arrayData = basicshowq($qn, $seqinactive = false, $colors = array());
+        //var_dump($arrayData);
+        return $arrayData;
 
     }
 
@@ -579,81 +579,106 @@ class AppUtility extends Component
     public static function calculateLevel($title)
     {
         $n = 0;
-        while (strpos($title,'Re: ') === 0) {
-            $title = substr($title,4);
+        while (strpos($title, 'Re: ') === 0) {
+            $title = substr($title, 4);
             $n++;
         }
         if ($n == 1) {
-            $title = 'Re: '.$title;
+            $title = 'Re: ' . $title;
         } else if ($n > 1) {
-            $title = "Re<sup>$n</sup>: ".$title;
+            $title = "Re<sup>$n</sup>: " . $title;
         }
         return array('title' => $title, 'level' => $n);
-}
-    public static function questionInfo($queInfo)
+    }
+
+   /* public static function questionInfo($queInfo)
     {
         $connection = Yii::$app->getDb();
-        $query = "SELECT * FROM imas_assessment_sessions WHERE id = 36";
-        $command = $connection->createCommand($query);
-        $line = $command->queryOne();
-        var_dump($line); die;
-        if (strpos($line['questions'],';') === false) {
-            $questions = explode(",",$line['questions']);
+//        $query = "SELECT * FROM imas_assessment_sessions WHERE id =" .$queInfo->id;
+        $tempArray =array();
+        foreach ($queInfo as $que){
+            $query = "SELECT * FROM imas_assessment_sessions WHERE id =".$que->id;
+            $questionData = $connection->createCommand($query)->queryAll();
+            array_push($tempArray,$questionData);
+        }
+        foreach($tempArray as $line){
+
+//        $line = $command->queryAll();
+//        var_dump($line); die;
+        if (strpos($line['questions'], ';') === false) {
+            $questions = explode(",", $line['questions']);
             $bestquestions = $questions;
 
         } else {
-            list($questions,$bestquestions) = explode(";",$line['questions']);
-            $questions = explode(",",$questions);
-            $bestquestions = explode(",",$bestquestions);
+            list($questions, $bestquestions) = explode(";", $line['questions']);
+            $questions = explode(",", $questions);
+            $bestquestions = explode(",", $bestquestions);
         }
-        $seeds = explode(",",$line['seeds']);
-        if (strpos($line['scores'],';')===false) {
-            $scores = explode(",",$line['scores']);
+        $seeds = explode(",", $line['seeds']);
+        if (strpos($line['scores'], ';') === false) {
+            $scores = explode(",", $line['scores']);
+            // print_r('Im here'); die;
             $noraw = true;
             $rawscores = $scores;
         } else {
-            $sp = explode(';',$line['scores']);
+            $sp = explode(';', $line['scores']);
             $scores = explode(',', $sp[0]);
             $rawscores = explode(',', $sp[1]);
-            $noraw = false;
+           $noraw = false;
         }
-
-        $attempts = explode(",",$line['attempts']);
-        $lastanswers = explode("~",$line['lastanswers']);
-        if ($line['timeontask']=='') {
-            $timesontask = array_fill(0,count($questions),'');
+        $attempts = explode(",", $line['attempts']);
+        $lastanswers = explode("~", $line['lastanswers']);
+        if ($line['timeontask'] == '') {
+            $timesontask = array_fill(0, count($questions), '');
         } else {
-            $timesontask = explode(',',$line['timeontask']);
+            $timesontask = explode(',', $line['timeontask']);
         }
         $lti_sourcedid = $line['lti_sourcedid'];
-
-        if (trim($line['reattempting'])=='') {
+        if (trim($line['reattempting']) == '') {
             $reattempting = array();
         } else {
-            $reattempting = explode(",",$line['reattempting']);
+            $reattempting = explode(",", $line['reattempting']);
         }
 
-        $bestseeds = explode(",",$line['bestseeds']);
+        $bestseeds = explode(",", $line['bestseeds']);
         if ($noraw) {
-            $bestscores = explode(',',$line['bestscores']);
+            $bestscores = explode(',', $line['bestscores']);
             $bestrawscores = $bestscores;
             $firstrawscores = $bestscores;
         } else {
-            $sp = explode(';',$line['bestscores']);
+            $sp = explode(';', $line['bestscores']);
             $bestscores = explode(',', $sp[0]);
             $bestrawscores = explode(',', $sp[1]);
             $firstrawscores = explode(',', $sp[2]);
         }
-        $bestattempts = explode(",",$line['bestattempts']);
-        $bestlastanswers = explode("~",$line['bestlastanswers']);
+        $bestattempts = explode(",", $line['bestattempts']);
+        $bestlastanswers = explode("~", $line['bestlastanswers']);
         $starttime = $line['starttime'];
 
-        $query = "SELECT * FROM imas_assessments WHERE id= 2";
+        $query = "SELECT * FROM imas_assessments WHERE id=5";
         $command = $connection->createCommand($query);
         $testsettings = $command->queryOne();
-        //AppUtility::dump($testsettings);
+       // AppUtility::dump($testsettings);
         return $queInfo;
+}
     }
+    public static function testSettingInfo($testsetting)
+    {
+        $connection = Yii::$app->getDb();
+        $query = "SELECT * FROM imas_assessments WHERE id=5";
+        $command = $connection->createCommand($query);
+        $testsettings = $command->queryOne();
+        return $testsettings;
+    }
+    public static function questionSetId($qi)
+    {
+        $connection = Yii::$app->getDb();
+        $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
+        $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id = 18";
+        $result = $connection->createCommand($query);
+        $row =  $result->queryOne();
+        return $row;
+    }*/
 
     public static function addslashes_deep($value) {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));

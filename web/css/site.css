@@ -334,4 +334,7 @@ div.update-checkbox{
     margin-top: -1px;
 }
 
-
+.align-linked-text-right
+{
+    text-align: right;
+}

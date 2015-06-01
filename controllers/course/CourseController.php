@@ -552,4 +552,15 @@ class CourseController extends AppController
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
     }
+
+    public function actionShowLinkedText()
+    {
+        $cid = $this->getParamVal('cid');
+        $id = Yii::$app->request->get('id');
+
+        $course = Course::getById($cid);
+        $link = Links::getById($id);
+
+        return $this->renderWithData('showLinkedText', ['course' => $course, 'links' => $link]);
+    }
 }

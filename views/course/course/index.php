@@ -98,7 +98,7 @@ echo $this->render('_toolbar',['course'=> $course]);
             <?php } ?>
         <?php break; ?>
 
-
+<!-- ///////////////////////////// Forum here /////////////////////// -->
     <?php case 'Forum': ?>
         <?php $forum = $item[key($item)]; ?>
             <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
@@ -165,12 +165,16 @@ echo $this->render('_toolbar',['course'=> $course]);
         <?php $link = $item[key($item)]; ?>
             <?php if ($link->avail != 0 && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
         <!--Link type : http-->
-                <?php if ((substr($link->text, 0, 4) == 'http')) { ?>
+                    <?php $text = $link->text;?>
+                <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
                 <div class="item">
                     <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                     <div class="title">
-                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
-                        <?php echo $link->title ?></a></b>
+                        <?php if($link->target == 1){?>
+                        <b><a href="<?php echo $text ?>"target="_blank"><?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
+                        <?php }else {?>
+                            <b><a href="<?php echo $text ?>"><?php echo $link->title; ?></a></b>
+                        <?php }?>
                     </div>
                     <div class="itemsum">
                         <p><p><?php echo $link->summary ?>&nbsp;</p></p>
@@ -181,10 +185,22 @@ echo $this->render('_toolbar',['course'=> $course]);
                 <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
                 <div class="item">
                     <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
-                    <div class="title">
-                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
-                        <?php echo $link->title ?></a></b>
-                    </div>
+                        <div class="title">
+                            <?php if($link->target != 0) {?>
+                             <?php
+                             $filename = substr(strip_tags($link->text),5);
+                             require_once("../components/filehandler.php");
+                             $alink = getcoursefileurl($filename);
+                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                            } else
+                            {
+                                $filename = substr(strip_tags($link->text),5);
+                                require_once("../components/filehandler.php");
+                                $alink = getcoursefileurl($filename);
+                                echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                            }?>
+
+                         </div>
                     <div class="itemsum">
                         <p><p><?php echo $link->summary ?>&nbsp;</p></p>
                     </div>
@@ -195,12 +211,14 @@ echo $this->render('_toolbar',['course'=> $course]);
                 <div class="item">
                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                     <div class="title">
-        <!--open on new window or on same window-->
+                <!--open on new window or on same window-->
                         <?php if ($link->target != 0) { ?>
-                        <?php echo "<li><a href=\" target=\"_blank\"></a></li>" ?>
-                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
-                        <?php } ?>
-                        <?php echo $link->title ?></a></b>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid .'&id=' .$link->id) ?>"target="_blank">
+                        <?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                        <?php }else{ ?>
+                            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid .'&id=' .$link->id) ?>">
+                                <?php echo $link->title ?></a></b>
+                            <?php }?>
                     </div>
                     <div class="itemsum"><p>
                         <p><?php echo $link->summary ?>&nbsp;</p></p></div>
@@ -210,8 +228,13 @@ echo $this->render('_toolbar',['course'=> $course]);
                     <div class="item">
                         <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                         <div class="title">
-                            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
-                            <?php echo $link->title ?></a></b>
+                            <?php if($link->target != 0) {?>
+                                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid .'&id=' .$link->id) ?>" target="_blank">
+                                        <?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                            <?php } else {?>
+                                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid .'&id=' .$link->id) ?>">
+                                        <?php echo $link->title ?></a></b>
+                            <?php }?>
                         </div>
                         <div class="itemsum"><p>
                             <p><?php echo $link->summary ?>&nbsp;</p></p></div>
@@ -220,16 +243,82 @@ echo $this->render('_toolbar',['course'=> $course]);
                     <?php } ?>
         <!--Hide ends-->
             <?php } elseif ($link->avail == 2 && $link->enddate == 2000000000) { ?>
-                <div class="item">
-                    <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
-                    <div class="title">
-                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid) ?>">
-                        <?php echo $link->title ?></a></b>
-                    </div>
-                    <div class="itemsum"><p>
-                        <p><?php echo $link->summary ?>&nbsp;</p></p></div>
-                        <div class="clear"></div>
-                    </div>
+                    <!--Link type : http-->
+                    <?php $text = $link->text;?>
+                    <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
+                        <div class="item">
+                            <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
+                            <div class="title">
+                                <?php if($link->target == 1){?>
+                                    <b><a href="<?php echo $text ?>"target="_blank"><?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
+                                <?php }else {?>
+                                    <b><a href="<?php echo $text ?>"><?php echo $link->title; ?></a></b>
+                                <?php }?>
+                            </div>
+                            <div class="itemsum">
+                                <p><p><?php echo $link->summary ?>&nbsp;</p></p>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <!--Link type : file-->
+                    <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
+                        <div class="item">
+                            <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
+                            <div class="title">
+                                <?php if($link->target != 0) {?>
+                                    <?php
+                                    $filename = substr(strip_tags($link->text),5);
+                                    require_once("../components/filehandler.php");
+                                    $alink = getcoursefileurl($filename);
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                } else
+                                {
+                                    $filename = substr(strip_tags($link->text),5);
+                                    require_once("../components/filehandler.php");
+                                    $alink = getcoursefileurl($filename);
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                }?>
+                            </div>
+                            <div class="itemsum">
+                                <p><p><?php echo $link->summary ?>&nbsp;</p></p>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <!--Link type : external tool-->
+                    <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
+                        <div class="item">
+                            <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+                            <div class="title">
+                                <!--open on new window or on same window-->
+                                <?php if ($link->target != 0) { ?>
+                                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid .'&id=' .$link->id) ?>"target="_blank">
+                                            <?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                                <?php }else{ ?>
+                                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid .'&id=' .$link->id) ?>">
+                                            <?php echo $link->title ?></a></b>
+                                <?php }?>
+                            </div>
+                            <div class="itemsum"><p>
+                                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+                            <div class="clear"></div>
+                        </div>
+                    <?php } else { ?>
+                        <div class="item">
+                            <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+                            <div class="title">
+                                <?php if($link->target != 0) {?>
+                                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid .'&id=' .$link->id) ?>" target="_blank">
+                                            <?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                                <?php } else {?>
+                                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid .'&id=' .$link->id) ?>">
+                                            <?php echo $link->title ?></a></b>
+                                <?php }?>
+                            </div>
+                            <div class="itemsum"><p>
+                                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+                            <div class="clear"></div>
+                        </div>
+                    <?php } ?>
             <?php } ?> <!--Show always-->
     <?php break; ?>
 
@@ -251,39 +340,21 @@ echo $this->render('_toolbar',['course'=> $course]);
             <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
                 <ul class="fileattachlist">
                     <li>
-                        <a href="/open-math/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                        <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                     </li>
                 </ul>
             <?php } ?>
         </div>
         <div class="clear"></div>
         <?php } elseif ($inline->avail == 2) { ?> <!--Hide ends and displays show always-->
-        <div class="item">
-         <!--Hide title and icon-->
-            <?php if ($inline->title != '##hidden##') { ?>
-                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
-                <div class="title">
-                    <b><?php echo $inline->title ?></b>
-                </div>
-            <?php } ?>
-            <div class="itemsum"><p>
-                <p><?php echo $inline->text ?></p>
-            </div>
-            <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
-                <ul class="fileattachlist">
-                    <li><a href="/open-math/files/<?php echo $instrFile->filename ?>"
-                           target="_blank"><?php echo $instrFile->filename ?></a></li>
-                </ul>
-            <?php } ?>
         </div>
         <div class="clear"></div>
         <?php } ?>
     <?php break; ?>
 
 <!-- Calender Here-->
-    <?php case 'Calendar': ?>
-        <div id='calendar'>
-        </div>
+<?php case 'Calendar': ?>
+    <div class ='calendar'></div>
     <?php break; ?>
 
   <!--  Block here-->
@@ -835,9 +906,9 @@ echo $this->render('_toolbar',['course'=> $course]);
                         <?php break; ?>
 
                         <!-- Calender Here-->
-                    <?php case 'Calendar': ?>
-                        <div class ='calendar'></div>
-                    <?php break; ?>
+<!--                    --><?php //case 'Calendar': ?>
+<!--                        <div class ='calendar'></div>-->
+<!--                    --><?php //break; ?>
             <?php endswitch; ?>
         <?php }?>
       <?php }?>

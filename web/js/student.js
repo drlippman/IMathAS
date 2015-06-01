@@ -1,11 +1,22 @@
 $(document).ready(function(){
 
 //    Display Calender
+    var date = new Date();
+    var d = date.getDate();
+    var m = date.getMonth();
+    var y = date.getFullYear();
 
-    var startDate = '2015-05-05';
-    var endDate = '2015-05-04';
-    var reviewDate = '2015-05-09';
-
+    var events_array = [
+        {
+            img: 'img/assess.png',
+            title: 'All Day Event',
+            start: new Date(y, m, d)
+        },
+        {
+            title: 'Long Event',
+            start: new Date(y, m, d+5)
+        }
+    ];
     $('.calendar').fullCalendar({
 
         height: 400,
@@ -14,26 +25,15 @@ $(document).ready(function(){
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
-        businessHours: false, // display business hours
         editable: false,
-        events: [
-            {
-                title: 'Assessment',
-                start: endDate
-
-            },
-            {
-                title: 'Review Assessment',
-                start: reviewDate,
-                color: '#257e4a'
-            }
-        ],
-        eventClick: function(e) {
-
-            var html = "<p>This is the default dialog.</p>";
-            $( "#dialog" ).dialog();
-
+        events: events_array,
+        eventRender: function(event, element, calEvent) {
+            element.find(".fc-event-title").after($("<span class=\"fc-event-icons\"></span>").html("<img src=\"/img/assess.png\" />"));
         }
+    });
+
+    $('.fc-event').on('click','img',function(event) {
+        alert($(this).attr('src'));
     });
 
 //        Show Dialog Pop Up for Assessment time
