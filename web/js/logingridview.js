@@ -2,19 +2,17 @@
  * Created by supravat on 29/5/15.
  */
 $( document ).ready(function() {
-    var startDate = $( "#datepicker-id input" ).val();
-    var endDate = $( "#datepicker-id1 input" ).val();
+    var startDate = $("#datepicker-id input").val();
+    var endDate = $("#datepicker-id1 input").val();
     todaysdate = endDate;
 
     $('#following-link').hide()
     $("#first-date-label").text(startDate);
     $('#last-date-label').text(endDate);
 
-    var course_id =  $( "#course-id" ).val();
-    var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
-
+    var course_id = $("#course-id").val();
+    var transferData = {newStartDate: startDate, newEndDate: endDate, cid: course_id};
     jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
-
     $("#go-button").click(function () {
         var startDate = $( "#datepicker-id input" ).val();
         var endDate = $( "#datepicker-id1 input" ).val();
@@ -24,11 +22,25 @@ $( document ).ready(function() {
         }
         $("#first-date-label").text(startDate);
         $('#last-date-label').text(endDate);
-
+        $('#flash-message').hide();
         var course_id =  $( "#course-id" ).val();
         var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
 
-        jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
+
+        if (endDate=="" || startDate== ""){
+            $('#flash-message').show();
+            $('#flash-message').html("<div class='alert alert-danger'>Date field can not be blank.</div>");
+        }
+        else if ((startDate > endDate) || startDate== ""){
+            $('#flash-message').show();
+            $('#flash-message').html("<div class='alert alert-danger'>First date can not be greater then last date.</div>");
+        }
+        else
+        {
+            $('#flash-message').hide();
+            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
+
+        }
     });
 
 });

@@ -6,6 +6,7 @@
           <p>What do you want to do?<br/>
               <input type="radio" name="movetype" value="0" checked="checked" onclick="toggleforumselect(0)"/> Move thread to different forum<br/>
               <input type="radio" name="movetype" value="1" onclick="toggleforumselect(1)"/> Move post to be a reply to a thread</p>
+    </div>
 <div id="fsel" >Move to forum:<br/>
 
     <?php
@@ -20,7 +21,23 @@
      </div>
 
 
-
+    <input type=button value="Move">
     <input type=button value="Nevermind" class="secondarybtn" onClick="window.location='thread.php?page=1&cid=2&forum=2'"></p>
 </div>
-    <div class="footerwrapper"></div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        var forumid= $('#forumid').val();
+        jQuerySubmit('get-thread-ajax',{forumid: forumid },'threadSuccess');
+
+    });
+
+    function threadSuccess(response)
+    {
+        var result = JSON.parse(response);
+        alert(response);
+    }
+
+</script>>
