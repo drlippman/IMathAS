@@ -1059,6 +1059,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
 		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
@@ -1167,7 +1168,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 	} else if ($anstype == "matching") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['questiontitle'])) {if (is_array($options['questiontitle'])) {$questiontitle = $options['questiontitle'][$qn];} else {$questiontitle = $options['questiontitle'];}}
 		if (isset($options['answertitle'])) {if (is_array($options['answertitle'])) {$answertitle = $options['answertitle'][$qn];} else {$answertitle = $options['answertitle'];}}
 		if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}}
@@ -1979,13 +1981,17 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$out .=  '<option value="2B">' . _('Between two values') . '</option><option value="2O">' . _('2 regions') . '</option></select>. ' . _('Click and drag and arrows to adjust the values.');
 			
 			$out .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;">';
+			//for future development of non-standard normal
+			//for ($i=0;$i<9;$i++) {
+			//	$out .= '<div style="position: absolute; left:'.(60*$i).'px; top:150px; height:20px; width:20px; background:#fff;z-index:2;text-align:center">'.($mu+($i-4)*$sig).'</div>';	
+			//}
 			$out .=  '<div style="position: absolute; left:0; top:0; height:200px; width:0px; background:#00f;" id="normleft'.$qn.'">&nbsp;</div>';
 			$out .=  '<div style="position: absolute; right:0; top:0; height:200px; width:0px; background:#00f;" id="normright'.$qn.'">&nbsp;</div>';
 			$out .=  '<img style="position: absolute; left:0; top:0;z-index:1;width:100%;max-width:100%" src="'.$imasroot.'/img/normalcurve.gif"/>';
-			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:2;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
-			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:2;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
-			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid1txt'.$qn.'"></div>';
-			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:2;" id="slid2txt'.$qn.'"></div>';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid1'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
+			$out .=  '<img style="position: absolute; top:142px;left:0px;cursor:pointer;z-index:3;" id="slid2'.$qn.'" src="'.$imasroot.'/img/uppointer.gif"/>';
+			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid1txt'.$qn.'"></div>';
+			$out .=  '<div style="position: absolute; top:170px;left:0px;z-index:3;" id="slid2txt'.$qn.'"></div>';
 			$out .=  '</div></div>';
 			$out .=  '<script type="text/javascript">addnormslider('.$qn.');</script>';
 		} else if ($answerformat=='normalcurve') {
@@ -2115,11 +2121,13 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
 			if (isset($options['background'][$qn])) { $backg = $options['background'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
+				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 		} else {
 			if (isset($options['grid'])) { $grid = $options['grid'];}
 			if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['background'])) { $backg = $options['background'];}
 			if (isset($options['answers'])) {$answers = $options['answers'];}
+				else if (isset($options['answer'])) {$answers = $options['answer'];}
 		
 		}
 		
@@ -2827,7 +2835,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
@@ -2884,7 +2893,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return $score;
 	} else if ($anstype == "matching") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
@@ -4016,11 +4026,13 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
+				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 			if (isset($options['partweights'][$qn])) {$partweights = $options['partweights'][$qn];}
 		} else {
 			if (isset($options['grid'])) { $grid = $options['grid'];}
 			if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['answers'])) {$answers = $options['answers'];}
+				else if (isset($options['answer'])) {$answers = $options['answer'];}
 			if (isset($options['partweights'])) {$partweights = $options['partweights'];}
 		}
 		if (isset($options['reltolerance'])) {if (is_array($options['reltolerance'])) {$reltolerance = $options['reltolerance'][$qn];} else {$reltolerance = $options['reltolerance'];}}
