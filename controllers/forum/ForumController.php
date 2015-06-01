@@ -68,6 +68,50 @@ class ForumController extends AppController{
         }
 
     }
+    public function actionGetSearchPostAjax()
+    {
+
+        $this->guestUserHandler();
+        $param = $this->getBodyParams();
+        $search = $param['search'];
+        $checkBoxVal= $param['value'];
+        $query= ForumForm::byAllSubject($search);
+
+
+        if($query)
+        {
+            $queryarray = array();
+            foreach ($query as $data)
+            {
+                $username = User::getById($data['userid']);
+                $postdate = Thread::getById($data['threadid']);
+                $forumname = Forums::getById($data['forumid']);
+
+
+
+
+                $temparray = array(
+                    'forumiddata' => $data['forumid'],
+                    'subject' => $data['subject'],
+                    'views' => $data['views'],
+                    'forumname' => ucfirst($forumname->name),
+                    'postdate' => date('F d, o g:i a',$postdate->lastposttime),
+                    'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+                    'message' => $data['message'],
+
+                    );
+
+                array_push($queryarray,$temparray);
+
+            }
+
+            return json_encode(array('status' => 0, 'data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search));
+        }else{
+            return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+        }
+
+    }
+
 
     public function actionGetForumsAjax()
     {
@@ -152,8 +196,9 @@ class ForumController extends AppController{
 
             return json_encode(array('status' => 0, 'threadData' => $threadArray));
         }
-        else{
-            return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+        else
+        {
+            return json_encode(array('status' => -1, 'msg' => 'Thread  not found for this Forum'));
         }
 
     }

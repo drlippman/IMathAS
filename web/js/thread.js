@@ -48,5 +48,9 @@ function threadSuccess(response)
 
 
     }
+    else if(result.status == -1)
+    {
+        $('#forum-table').hide;
+    }
 
 }

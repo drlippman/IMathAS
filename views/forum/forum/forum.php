@@ -67,7 +67,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 </div>
 
-<div id="search">
+<div id="searchthread">
     <table id="forumsearch-table displayforum" class="forumsearch-table">
         <thead>
 
@@ -83,15 +83,29 @@ $this->params['breadcrumbs'][] = $this->title;
     </table>
 
 </div>
+<div id="searchpost">
+<?php
+    echo "<div class=block>";
+        echo "<b><label  id='subject'></label></b>";
+        echo  "&nbsp;&nbsp;&nbsp;in(&nbsp;<label id='forumname'></label>)";
+
+        echo "<br/>Posted by:&nbsp;&nbsp;<label id='postedby'></label> ";
+        echo " &nbsp;&nbsp;<label id='postdate'></label> ";
+        echo "</div><div class=blockitems>";
+
+        echo " <label id='message'></label>";
+        echo "<p><a href='#'</a>Show full thread</p>";
+        echo "</div>\n"   ?>
+</div>
+
 
     <script>
         $(document).ready(function ()
         {
             var courseId = $('.courseId').val();
             jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
-            $('#search').hide();
-//            $('#search-label').hide();
-
+            $('#searchthread').hide();
+            $('#searchpost').hide();
             $('#forum_search').click(function ()
             {
 
@@ -101,22 +115,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
                 if(search.length>0)
                 {
-                    $('#search').show();
-                    $('#display').hide();
-                    $('#flash-message').hide();
-                    if(val == 'subject')
-                    {
-                        jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
-                    }
-                    else
-                    {
 
-                        jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
-                    }
+                      $('#flash-message').hide();
+                        if(val == 'subject')
+                        {
+                            $('#searchthread').show();
+                            $('#display').hide();
+                            $('#searchpost').hide();
+                            jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                        }
+                        else
+                        {
+                            $('#searchthread').hide();
+                            $('#display').hide();
+                            $('#searchpost').show();
+
+                            jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
+
+                        }
                 }
                else
                 {
-                            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be empty:");
+                            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blankn");
 
 
                 }
@@ -133,6 +153,21 @@ $this->params['breadcrumbs'][] = $this->title;
             var result = JSON.parse(response);
             if (result.status == 0)
             {
+                  var postData = result.data;
+
+
+                $.each(postData, function(index, Data)
+                {
+
+                    $('#subject').text(Data.subject);
+                    $('#forumname').text(Data.forumname);
+                    $('#postedby').text(Data.name);
+                    $('#postdate').text(Data.postdate);
+                    var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
+                   $('#message').text(result);
+
+
+                });
 
 
             }
@@ -167,15 +202,17 @@ $this->params['breadcrumbs'][] = $this->title;
                            else
                            {
 
-                               html += "<tr> <td><a href='#'>" +(thread.subject) +"</a> "+ thread.name+" </td> ";
-                               html += "<td>" + thread.replyby + "</td>";
-                               html += "<td>" + thread.views + "</td>";
-                               html += "<td>" + thread.postdate + "</td>";
+                               html += "<tr> <td><a href='#'>" +(search.subject) +"</a> "+ search.name+" </td> ";
+                               html += "<td>" + search.replyby + "</td>";
+                               html += "<td>" + search.views + "</td>";
+                               html += "<td>" + search.postdate + "</td>";
                            }
                        }
                        else if(result.checkvalue == 'post')
                        {
                            alert("Work in Progress");
+
+
 
                        }
 

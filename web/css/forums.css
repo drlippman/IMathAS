@@ -75,12 +75,6 @@ span.leftbtns img {
     text-align: center;
 }
 
-/*.forum-table{*/
-
-    /*width:100%;*/
-/*}*/
-	
-
 #forum-table {
     display:none;
 
@@ -95,4 +89,8 @@ span.leftbtns img {
 
 }
 
-                                                                            
+#searchpost > div > label{
+font-weight:400;
+    font-family: "Tahoma", "sans-serif";
+
+}
