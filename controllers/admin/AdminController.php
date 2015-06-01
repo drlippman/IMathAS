@@ -38,7 +38,8 @@ class AdminController extends AppController
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
             $params['password'] = AppUtility::passwordHash($params['password']);
 
-            $user = new User();
+           $user = new User();
+            $model = new AddNewUserForm();
             $user->attributes = $params;
             $user->save();
 
