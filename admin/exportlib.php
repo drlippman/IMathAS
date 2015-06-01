@@ -70,6 +70,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$parents = Array();
 		$names = Array();
 		$nonpriv = isset($_POST['nonpriv']);
+		$noncopyright = isset($_POST['noncopyright']);
 		//$libs is systemid=>newid
 		//$parents is childnewid=>parentnewid
 		
@@ -148,6 +149,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 		$query .= "WHERE imas_library_items.libid IN ($liblist) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
 		if ($nonpriv) {
 			$query .= " AND imas_questionset.userights>0";
+		} 
+		if ($noncopyright) {
+			$query .= " AND imas_questionset.license>0";
 		}
 		$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$qassoc = Array();
@@ -299,6 +303,10 @@ if ($overwriteBody==1) {
 		<span class="form">Limit to non-private questions and libs?</span>
 		<span class="formright">
 			<input type="checkbox" name="nonpriv" checked="checked" />
+		</span><br class="form" />
+		<span class="form">Limit to non-copyrighted questions?</span>
+		<span class="formright">
+			<input type="checkbox" name="noncopyright" checked="checked" />
 		</span><br class="form" />
 		<span class=form>Package Description</span>
 		<span class=formright>
