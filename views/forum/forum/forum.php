@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div>
     <?= $form->field($model, 'search')->textInput(['id' => 'search_text']); ?>
+
 </div>
     <?= $form->field($model, 'thread')->inline()->radioList(['subject' => 'All thread subjects' , 'post' => 'All Post']) ?>
     <div class="form-group">
@@ -89,19 +90,53 @@ $this->params['breadcrumbs'][] = $this->title;
             var courseId = $('.courseId').val();
             jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
             $('#search').hide();
-            $('#forum_search').click(function () {
-                $('#search').show();
-                $('#display').hide();
-                var search = $('#search_text').val();
+//            $('#search-label').hide();
 
+            $('#forum_search').click(function ()
+            {
+
+
+                var search = $('#search_text').val();
                 var courseId = $('.courseId').val();
                 var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
+                if(search.length>0)
+                {
+                    $('#search').show();
+                    $('#display').hide();
+                    $('#flash-message').hide();
+                    if(val == 'subject')
+                    {
+                        jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                    }
+                    else
+                    {
 
-                var allData = {search: search, cid: courseId , value: val}
-                jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                        jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
+                    }
+                }
+               else
+                {
+                            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be empty:");
+
+
+                }
+
+
 
             });
+
         });
+
+        function postSuccess(response)
+        {
+            console.log(response);
+            var result = JSON.parse(response);
+            if (result.status == 0)
+            {
+
+
+            }
+        }
 
         function threadSuccess(response)
         {
@@ -111,9 +146,9 @@ $this->params['breadcrumbs'][] = $this->title;
            {
 
                var searchdata = result.data;
-               var checkvalue= result.checkvalue
+               var checkvalue= result.checkvalue;
                var searchtext = result.search;
-               if(searchtext= " "){
+
                    var html = "";
                    $.each(searchdata, function(index, search)
                    {
@@ -145,10 +180,6 @@ $this->params['breadcrumbs'][] = $this->title;
                        }
 
                    });
-               }
-               else{
-                   alert("Enter search value");
-               }
 
                $(".forumsearch-table-body tr").remove();
                $(".forumsearch-table-body").append(html);
