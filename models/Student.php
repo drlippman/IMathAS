@@ -87,5 +87,10 @@ class Student extends BaseImasStudents {
         $student->locked = strtotime(date('F d, o g:i a'));;
         $student->save();
     }
+    public static function deleteStudent($userid,$courseid)
+    {
+        $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
+        $student->delete();
+    }
 
 } 

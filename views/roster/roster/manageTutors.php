@@ -4,13 +4,12 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 $this->title = 'Manage Tutors';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<input type="hidden" class="sectionInfo" value="<?php echo $section[0] ?>">
 <input type="hidden" class="courseId" value="<?php echo $courseid ?>">
 <?php $sectionArray = $section?>
 
@@ -69,6 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function () {
         var sessionCount = 0;
         var sectionarray = $(".section-array").val();
+        $('.display-tutor-table').DataTable();
         $sessionatr = $.session.get("userNotFound");
 
         if($sessionatr)
@@ -83,8 +83,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 $("#user-div").append(''+value+'');
             });
             $.session.clear();
+            $sessionatr.clean();
         }
-        $('.display-tutor-table').DataTable();
+        $.session.clear();
+
         markCheck();
         updateInfo();
     });

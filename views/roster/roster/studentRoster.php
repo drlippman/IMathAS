@@ -30,13 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <p>Check: <a class="check-all" href="#">All</a> /
-    <a class="check-all" href="#">Non-locked</a> /
+    <a class="non-locked" href="#">Non-locked</a> /
     <a class="uncheck-all" href="#">None</a>
 
     With Selected:
     <span> <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid='.$course->id); ?>"class="btn btn-primary" id="">E-mail</a></span>
     <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Message</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Unenroll</a></span>
+    <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
     <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
     <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Make Exception</a></span>
     <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Copy Emails</a></span>

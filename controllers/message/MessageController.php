@@ -176,6 +176,7 @@ class MessageController extends AppController
         if (Yii::$app->request->post()) {
 
             $params = $this->getBodyParams();
+            $cid = Yii::$app->request->get('cid');
             $msgIds = $params['checkedMsg'];
             foreach ($msgIds as $msgId) {
                 Message::updateUnread($msgId);
@@ -221,6 +222,8 @@ class MessageController extends AppController
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
             $fromUser = User::getById($messages->msgfrom);
+            $this->includeCSS(['../css/jquery-ui.css']);
+            $this->includeJS(['../js/message/viewmessage.js']);
             return $this->renderWithData('viewMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
         }
     }

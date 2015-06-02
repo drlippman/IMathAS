@@ -2,6 +2,7 @@ $(document).ready(function () {
     var course_id =  $( "#course-id" ).val();
     selectCheckBox();
     studentLock();
+    studentUnenroll();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
 var studentData;
@@ -40,34 +41,19 @@ function showStudentInformation(students,isCode,isSection)
         }
         if(student.locked ==0){ html += "<td>"+capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='locked-student'>"+capitalizeFirstLetter(student.lastname)+"</td>";}
         if(student.locked ==0){ html += "<td>"+capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='locked-student'>"+capitalizeFirstLetter(student.firstname)+"</td>";}
-        //html += "<td>"+capitalizeFirstLetter(student.firstname)+"</td>";
         html += "<td><a>"+student.email+"</a></td>";
         html += "<td>"+student.username+"</td>";
         if(student.locked ==0)
         {
-            if(student.lastaccess != 0)
-            {
-                html += "<td><a>"+datecal(student.lastaccess)+"</a></td>";
-            }
-            else
-            {
-                html += "<td><a>never</a></td>";
-            }
+            if(student.lastaccess != 0){ html += "<td><a>"+datecal(student.lastaccess)+"</a></td>"; }
+            else{ html += "<td><a>never</a></td>"; }
         }
-        else{
-            html += "<td><a>Is locked out</a></a></td>"
-        }
+        else{ html += "<td><a>Is locked out</a></a></td>" }
         html += "<td><a>Grades</a></td>";
         html += "<td><a>Exception</a></td>";
         html += "<td><a>Chg</a></td>";
-        if(student.locked == 0)
-        {
-            html += "<td><a>Lock</a></td>";
-        }
-        else
-        {
-            html += "<td><a>Unlock</a></td>";
-        }
+        if(student.locked == 0) { html += "<td><a>Lock</a></td>"; }
+        else{ html += "<td><a>Unlock</a></td>"; }
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
@@ -81,6 +67,15 @@ function selectCheckBox(){
     $('.uncheck-all').click(function(){
         $('#student-information-table input:checkbox').each(function(){
             $(this).prop('checked',false);
+        })
+    });
+    $('.non-locked').click(function(){
+        $('#student-information-table input:checkbox').each(function(){
+            if($(this).parent().next().next().next().next().next().next().next().next().next().next().next().text() == "Lock"){
+            $(this).prop('checked',true);
+            }else{
+                $(this).prop('checked',false);
+            }
         })
     });
 }
@@ -131,18 +126,18 @@ function studentLock(){
                 closeText: "hide",
                 buttons: {
                     "Yes, Lock Out Student": function () {
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                        $('#student-information-table input[name="student-information-check"]:checked').each(function () {
                             $(this).prop('checked', false);
                         });
                         $(this).dialog("close");
                         var data = {checkedstudents: markArray,courseid:course_id};
-                        jQuerySubmit('mark-lock-ajax', data, 'marklockSuccess');
+                        jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
                         return true;
                     },
                     "Cancel": function () {
 
                         $(this).dialog('destroy').remove();
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                        $('#student-information-table input[name="student-information-check"]:checked').each(function () {
                             $(this).prop('checked', false);
                         });
                         return false;
@@ -160,6 +155,74 @@ function studentLock(){
     });
 }
 
-function marklockSuccess(response){
+function markLockSuccess(response){
+    location.reload();
+}
+
+function studentUnenroll(){
+    $('#unenroll-btn').click(function(e){
+        var course_id =  $( "#course-id" ).val();
+        var markArray = [];
+        var dataArray = [];
+        $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
+            markArray.push($(this).val());
+            dataArray.push( $(this).parent().next().next().next().text()+' '+$(this).parent().next().next().next().next().text()+
+            ' ('+$(this).parent().next().next().next().next().next().next().text()+')');
+        });
+
+        if(markArray.length!=0) {
+            var html = '<div><p><b style = "color: red">Warning!</b>:&nbsp;This will delete ALL course data about these students. This action cannot be undone. ' +
+                'If you have a student who isn\'t attending but may return, use the Lock Out of course option instead of unenrolling them.</p><p>Are you SURE' +
+                ' you want to unenroll the selected students?</p></p></div>';
+            $.each(dataArray, function (index, studentData) {
+                html += studentData+'<br>';
+            });
+            var cancelUrl = $(this).attr('href');
+            e.preventDefault();
+            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: '730', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Unenroll": function () {
+                        $('#student-information-table input[name="student-information-check"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        $(this).dialog("close");
+                        var data = {checkedstudents: markArray,courseid:course_id};
+                        jQuerySubmit('mark-unenroll-ajax', data, 'markUnenrollSuccess');
+                        return true;
+                    },
+                    "Lock Students Out Instead": function () {
+                        $('#student-information-table input[name="student-information-check"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        $(this).dialog("close");
+                        var data = {checkedstudents: markArray,courseid:course_id};
+                        jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
+                        return true;
+                    },
+                    "Cancel": function () {
+
+                        $(this).dialog('destroy').remove();
+                        $('#student-information-table input[name="student-information-check"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
+        }
+        else
+        {
+            alert("Please select the checkbox to Unenroll the students.");
+        }
+    });
+}
+
+function markUnenrollSuccess(response){
     location.reload();
 }

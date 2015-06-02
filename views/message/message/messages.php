@@ -4,7 +4,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
 $this->title = 'Messages';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -91,6 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
         html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
         $('.message-div').append(html);
     }
+
     function showMessageSuccess(response) {
         var filterArrayForUser = [];
         $.each(JSON.parse(response), function (index, messageData) {
@@ -188,6 +189,7 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         $(".show-course").append(html);
     }
+
     function markAsUnread() {
         $('#mark-as-unread').click(function () {
             var markArray = [];
@@ -217,8 +219,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
         });
     }
+
     function markAsReadSuccess(response) {
     }
+
     function filterByCourse() {
         $('#course-id').on('change', function () {
             var filteredArray = [];
@@ -235,6 +239,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
+
     function getUserSuccess(response) {
         var result = JSON.parse(response);
         if (result.status == 0) {
@@ -243,6 +248,7 @@ $this->params['breadcrumbs'][] = $this->title;
             filterByUser();
         }
     }
+
     function userDisplay(userData) {
         var html = "";
         $.each(userData, function (index, userData) {
@@ -250,6 +256,7 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         $(".show-users").append(html);
     }
+
     function markAsDelete() {
         $("#mark-delete").click(function (e) {
 
@@ -318,6 +325,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }
+
     function changeImage(element, rowId) {
         element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif";
         element.bln = !element.bln;
@@ -327,6 +335,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     }
+
     function changeImageSuccess(response) {
     }
     function limitToTagShow() {

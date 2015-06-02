@@ -371,6 +371,7 @@ class RosterController extends AppController
     {
         $this->guestUserHandler();
         $courseid = Yii::$app->request->get('cid');
+        $course = Course::getById($courseid);
         $tutors = Tutor::getByCourseId($courseid);
         $tutorId = array();
         $tutorInfo = array();
@@ -388,7 +389,7 @@ class RosterController extends AppController
         }
         $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['../js/general.js?ver=012115', '../js/roster/managetutors.js?ver=012115', '../js/jquery.session.js?ver=012115', '../js/DataTables-1.10.6/media/js/jquery.dataTables.js', '../js/roster/managetutors.js']);
-        return $this->renderWithData('manageTutors', ['courseid' => $courseid, 'tutors' => $tutorInfo, 'section' => $sectionArray]);
+        return $this->renderWithData('manageTutors', ['course' => $course,'courseid' => $courseid, 'tutors' => $tutorInfo, 'section' => $sectionArray]);
     }
 
 // Function to add or update information After submitting the information from manage tutor page
@@ -623,6 +624,7 @@ class RosterController extends AppController
         return $this->render('showImportStudent',['studentData' => $studentInformation]);
     }
 
+//Controller method to assign lock on student.
 
     public function actionMarkLockAjax()
     {
@@ -636,21 +638,25 @@ class RosterController extends AppController
         return json_encode(array('status' => 0));
 
     }
-//
-//    public  function actionMarkLockAjax()
-//    {
-//        $params = $this->getRequestParams();
-//        $courseid = Yii::$app->request->get('cid');
-//
-//        return $this->render('studentLock', ['params' => $params]);
-//    }
-
-
 
     public function actionRosterEmail()
     {
         $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
         return $this->renderWithData('rosterEmail');
+    }
+
+    public function actionMarkUnenrollAjax()
+    {
+        $this->layout = false;
+        $params = $this->getRequestParams();
+        foreach($params['checkedstudents'] as $students)
+        {
+            Student::deleteStudent($students,$params['courseid']);
+        }
+
+        return json_encode(array('status' => 0));
+
+
     }
 }
 
