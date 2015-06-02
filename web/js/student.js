@@ -5,42 +5,13 @@ $(document).ready(function(){
     var d = date.getDate();
     var m = date.getMonth();
     var y = date.getFullYear();
-
-    var events_array = [
-        {
-            img: 'img/assess.png',
-            title: 'All Day Event',
-            start: new Date(y, m, d)
-        },
-        {
-            title: 'Long Event',
-            start: new Date(y, m, d+5)
-        }
-    ];
-    $('.calendar').fullCalendar({
-
-        height: 400,
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,agendaWeek,agendaDay'
-        },
-        editable: false,
-        events: events_array,
-        eventRender: function(event, element, calEvent) {
-            element.find(".fc-event-title").after($("<span class=\"fc-event-icons\"></span>").html("<img src=\"/img/assess.png\" />"));
-        }
-    });
-
-    $('.fc-event').on('click','img',function(event) {
-        alert($(this).attr('src'));
-    });
+    calendar();
 
 //        Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
 
-        var linkId = $(this).attr('id')
+        var linkId = $(this).attr('id');
         var timelimit = Math.abs($('#time-limit'+linkId).val());
         var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
         var min = Math.floor((timelimit%3600)/60);
@@ -70,3 +41,55 @@ $(document).ready(function(){
     });
 
 });
+// Display calendar
+    function calendar() {
+        var courseId = $('.calender-course-id').val();
+        $('.calendar').fullCalendar({
+            height: 400,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            editable: false,
+            events: function (start, end, timezone, callback) {
+                $.ajax({
+                    url: 'get-assessment-data-ajax',
+                    data: {
+                        cid: courseId
+                    },
+                    success: function (response) {
+                        response = JSON.parse(response);
+                        console.log(response.data);
+                        var assessmentData = response.data;
+                        var events = [];
+
+                        $.each(assessmentData, function (index, assessmentDetail) {
+                            events.push({
+                                title: assessmentDetail.name,
+                                start: assessmentDetail.endDate // will be parsed
+                            });
+                        });
+                        callback(events);
+                    }
+
+                });
+            }
+        });
+    }
+
+//Responce of ajax for calendar
+    function getAssessmentDataRequest(response) {
+        var result = JSON.parse(response);
+        if (result.status == 0) {
+            var tempArray = [];
+            var courseData = result.data;
+            alert(courseData);
+            $.each(courseData, function (index, temp) {
+                $.each(temp, function (index, singleValue) {
+                    tempArray.push(singleValue);
+                });
+                calendar(tempArray);
+            });
+        }
+    }

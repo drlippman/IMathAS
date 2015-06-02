@@ -461,7 +461,6 @@ class CourseController extends AppController
             if ($params['userId'] != null && $params['cid'] != null) {
                 $teacher->create($params['userId'], $params['cid']);
             }
-
             return $this->getReturnableResponse(0);
         }
 
@@ -557,10 +556,27 @@ class CourseController extends AppController
     {
         $cid = $this->getParamVal('cid');
         $id = Yii::$app->request->get('id');
-
         $course = Course::getById($cid);
         $link = Links::getById($id);
-
         return $this->renderWithData('showLinkedText', ['course' => $course, 'links' => $link]);
+    }
+
+    public function actionGetAssessmentDataAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = $params['cid'];
+        $assessments = Assessments::getByCourseId($cid);
+        $assesssmentArray = array();
+        foreach ($assessments as $assessment)
+        {
+            $assesssmentArray[] = array(
+                'startDate' => date('Y-m-d', $assessment['startdate']),
+                'endDate' => date('Y-m-d', $assessment['enddate']),
+                'reviewDate' => $assessment['reviewdate'],
+                'name' => $assessment['name']
+                );
+        }
+        return $this->getReturnableResponse(0,$assesssmentArray);
     }
 }

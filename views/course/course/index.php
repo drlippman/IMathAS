@@ -8,7 +8,7 @@ use app\components\AppUtility;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 echo $this->render('_toolbar',['course'=> $course]);
 ?>
-
+<input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 <div class=" col-lg-3 needed">
      <?php echo $this->render('_leftSide',['course'=> $course]);?>
 </div>
