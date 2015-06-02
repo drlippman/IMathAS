@@ -338,3 +338,6 @@ div.update-checkbox{
 {
     text-align: right;
 }
+td.locked-student{
+    text-decoration: line-through;
+}

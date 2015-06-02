@@ -48,7 +48,7 @@ class StudentRegisterForm extends Model
     {
         return [
             'SID' => 'Enter username',
-            'password' => 'Choose password',
+            'password' => 'Password',
             'rePassword' => 'Confirm password',
             'FirstName' => 'First name',
             'LastName' => 'Last name',

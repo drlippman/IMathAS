@@ -37,7 +37,7 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
         $students = Student::findByCid($cid);
-        $model =new StudentRosterForm();
+        $model = new StudentRosterForm();
         $isCode = false;
         $isSection = false;
         foreach ($students as $student) {
@@ -48,14 +48,13 @@ class RosterController extends AppController
                 $isSection = true;
             }
         }
-        if($this->isPost()){
-            $params=$this->getBodyParams();
-            AppUtility::dump($params);
+        if ($this->isPost()) {
+            $params = $this->getBodyParams();
         }
 
-        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
-        $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
-        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode,'mode' => $model]);
+        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css', '../css/site.css']);
+        $this->includeJS(['../js/roster/studentroster.js', '../js/general.js']);
+        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode, 'mode' => $model]);
 
     }
 
@@ -79,55 +78,55 @@ class RosterController extends AppController
         $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
 
 
-      //  if($newStartDate<$newEndDate) {
-            $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
-            $headsArray = array();
-            $headsArray[] = 'Name';
-            for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
-                $day = date('m/d', $curDate);
-                $headsArray[] = $day;
+        //  if($newStartDate<$newEndDate) {
+        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
+        $headsArray = array();
+        $headsArray[] = 'Name';
+        for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
+            $day = date('m/d', $curDate);
+            $headsArray[] = $day;
+        }
+        $rowLogs = array();
+        $nameHash = array();
+        foreach ($loginLogs as $loginLog) {
+            $day = date('m/d', $loginLog['logintime']);
+            $user_id = $loginLog['userid'];
+            if (!isset($rowLogs[$user_id])) {
+                $rowLogs[$user_id] = array();
             }
-            $rowLogs = array();
-            $nameHash = array();
-            foreach ($loginLogs as $loginLog) {
-                $day = date('m/d', $loginLog['logintime']);
-                $user_id = $loginLog['userid'];
-                if (!isset($rowLogs[$user_id])) {
-                    $rowLogs[$user_id] = array();
-                }
-                $userSpecificDaysArray = $rowLogs[$user_id];
-                if (!isset($userSpecificDaysArray[$day])) {
-                    $userSpecificDaysArray[$day] = 1;
-                } else {
-                    $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + 1;;
-                }
-                if (!isset($nameHash[$user_id])) {
-                    $nameHash[$user_id] = $loginLog['LastName'] . ', ' . $loginLog['FirstName'];
-                }
-                $rowLogs[$user_id] = $userSpecificDaysArray;
+            $userSpecificDaysArray = $rowLogs[$user_id];
+            if (!isset($userSpecificDaysArray[$day])) {
+                $userSpecificDaysArray[$day] = 1;
+            } else {
+                $userSpecificDaysArray[$day] = $userSpecificDaysArray[$day] + 1;;
             }
+            if (!isset($nameHash[$user_id])) {
+                $nameHash[$user_id] = $loginLog['LastName'] . ', ' . $loginLog['FirstName'];
+            }
+            $rowLogs[$user_id] = $userSpecificDaysArray;
+        }
 
-            foreach ($headsArray as $headElem) {
-                foreach ($rowLogs as $key => $field) {
-                    if ($headElem == 'Name') {
-                        continue;
-                    }
-                    if (!isset($field[$headElem])) {
-                        $field[$headElem] = '';
-                        $rowLogs[$key] = $field;
-                    }
+        foreach ($headsArray as $headElem) {
+            foreach ($rowLogs as $key => $field) {
+                if ($headElem == 'Name') {
+                    continue;
+                }
+                if (!isset($field[$headElem])) {
+                    $field[$headElem] = '';
+                    $rowLogs[$key] = $field;
                 }
             }
-            $stuLogs = array();
-            foreach ($rowLogs as $key => $field) {
-                $stuLogs[$key]['name'] = $nameHash[$key];
-                $stuLogs[$key]['row'] = $field;
-            }
-            $retJSON = new \stdClass();
-            $retJSON->header = $headsArray;
-            $retJSON->rows = $stuLogs;
-            $test = array('status' => '0', 'data' => $retJSON);
-            return json_encode($test);
+        }
+        $stuLogs = array();
+        foreach ($rowLogs as $key => $field) {
+            $stuLogs[$key]['name'] = $nameHash[$key];
+            $stuLogs[$key]['row'] = $field;
+        }
+        $retJSON = new \stdClass();
+        $retJSON->header = $headsArray;
+        $retJSON->rows = $stuLogs;
+        $test = array('status' => '0', 'data' => $retJSON);
+        return json_encode($test);
 //        }else{
 //            $this->setErrorFlash('Enter Valid Date.');
 //        }
@@ -135,6 +134,7 @@ class RosterController extends AppController
 
     public function actionStudentRosterAjax()
     {
+        $this->layout = false;
         $params = $this->getBodyParams();
         $cid = $params['course_id'];
         $Students = Student::findByCid($cid);
@@ -150,16 +150,18 @@ class RosterController extends AppController
                 $isSection = true;
             }
             $tempArray = array('id' => $student->user->id
-                ,'lastname' => $student->user->LastName,
+            , 'lastname' => $student->user->LastName,
                 'firstname' => $student->user->FirstName,
                 'email' => $student->user->email,
                 'username' => $student->user->SID,
-                'lastaccess' => $student->user->lastaccess,
+                'lastaccess' => $student->lastaccess,
+                'locked' =>$student->locked  ,
                 'section' => $student->section,
                 'code' => $student->code,
             );
             array_push($studentArray, $tempArray);
         }
+//        $this->render('studentLock',['courseid',$cid]);
         return json_encode(['status' => '0', 'query' => $studentArray, 'isCode' => $isCode, 'isSection' => $isSection]);
     }
 
@@ -181,11 +183,11 @@ class RosterController extends AppController
                 $teacher = Teacher::getTeacherByUserId($uid->id);
                 if ($teacher) {
                     $this->setErrorFlash('Teachers can\'t be enrolled as students - use Student View, or create a separate student account.');
-                } else{
-                    $stdrecord = Student::getByUserIdentity($uid->id,$cid);
-                    if($stdrecord){
+                } else {
+                    $stdrecord = Student::getByUserIdentity($uid->id, $cid);
+                    if ($stdrecord) {
                         $this->setErrorFlash('This username is already enrolled in the class');
-                    }else {
+                    } else {
                         $student = new Student();
                         $student->createNewStudent($uid->id, $cid, $param);
                         $this->setSuccessFlash('Student have been enrolled in course ' . $course->name . ' successfully');
@@ -255,6 +257,7 @@ class RosterController extends AppController
         $this->includeJS(['../js/managelatepasses.js']);
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
     }
+
 //Controller method to display the dynamic radio list of courses
     public function actionEnrollFromOtherCourse()
     {
@@ -375,17 +378,17 @@ class RosterController extends AppController
         $order = AppConstant::ASCENDING;
         foreach ($tutors as $tutor) {
 
-            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id ,'section' => $tutor->section);
+            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id, 'section' => $tutor->section);
             array_push($tutorInfo, $tempArray);
         }
-        $sections = Student::findByCourseId($courseid,$sortBy,$order);
+        $sections = Student::findByCourseId($courseid, $sortBy, $order);
         $sectionArray = array();
         foreach ($sections as $section) {
             array_push($sectionArray, $section->section);
         }
         $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-        $this->includeJS(['../js/general.js?ver=012115','../js/roster/managetutors.js?ver=012115','../js/jquery.session.js?ver=012115','../js/DataTables-1.10.6/media/js/jquery.dataTables.js','../js/roster/managetutors.js']);
-        return $this->renderWithData('manageTutors', ['courseid' => $courseid,'tutors' => $tutorInfo,'section' => $sectionArray]);
+        $this->includeJS(['../js/general.js?ver=012115', '../js/roster/managetutors.js?ver=012115', '../js/jquery.session.js?ver=012115', '../js/DataTables-1.10.6/media/js/jquery.dataTables.js', '../js/roster/managetutors.js']);
+        return $this->renderWithData('manageTutors', ['courseid' => $courseid, 'tutors' => $tutorInfo, 'section' => $sectionArray]);
     }
 
 // Function to add or update information After submitting the information from manage tutor page
@@ -393,58 +396,52 @@ class RosterController extends AppController
     public function actionMarkUpdateAjax()
     {
         $this->guestUserHandler();
-            $params = $this->getBodyParams();
-            $users = explode(',',$params['username']);
-            $courseid = $params['courseid'];
-            $sortBy = 'section';
-            $order = AppConstant::ASCENDING;
-            $userIdArray = array();
-            $userNotFoundArray = array();
-            $studentArray= array();
-            $tutorsArray=array();
-            $sections = Student::findByCourseId($courseid,$sortBy,$order);
-            $sectionArray = array();
-            foreach($sections as $section)
-            {
-                array_push($sectionArray, $section->section);
-            }
-            foreach($users as $entry)
-            {
-               $userId = User::findByUsername($entry);
-                if (!$userId) {
-                    array_push($userNotFoundArray,$entry);
-                }
-                else{
-                    array_push($userIdArray,$userId->id);
-                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                    if($isTeacher){
-                        $tutors = Tutor::getByUserId($isTeacher->userid,$courseid);
-                        if(!$tutors)
-                        {
-                            $tutorInfo=array('Name'=>$userId->FirstName.' '.$userId->LastName,'id'=>$userId->id);
-                            array_push($tutorsArray,$tutorInfo);
-                            $tutor = new Tutor();
-                            $tutor->create($isTeacher->userid, $courseid);
-                        }
-                     }else{
-                        array_push($studentArray, $userId->id);
+        $params = $this->getBodyParams();
+        $users = explode(',', $params['username']);
+        $courseid = $params['courseid'];
+        $sortBy = 'section';
+        $order = AppConstant::ASCENDING;
+        $userIdArray = array();
+        $userNotFoundArray = array();
+        $studentArray = array();
+        $tutorsArray = array();
+        $sections = Student::findByCourseId($courseid, $sortBy, $order);
+        $sectionArray = array();
+        foreach ($sections as $section) {
+            array_push($sectionArray, $section->section);
+        }
+        foreach ($users as $entry) {
+            $userId = User::findByUsername($entry);
+            if (!$userId) {
+                array_push($userNotFoundArray, $entry);
+            } else {
+                array_push($userIdArray, $userId->id);
+                $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                if ($isTeacher) {
+                    $tutors = Tutor::getByUserId($isTeacher->userid, $courseid);
+                    if (!$tutors) {
+                        $tutorInfo = array('Name' => $userId->FirstName . ' ' . $userId->LastName, 'id' => $userId->id);
+                        array_push($tutorsArray, $tutorInfo);
+                        $tutor = new Tutor();
+                        $tutor->create($isTeacher->userid, $courseid);
                     }
+                } else {
+                    array_push($studentArray, $userId->id);
                 }
             }
-        $params['sectionArray'] = isset($params['sectionArray'])? $params['sectionArray'] :'';
-        foreach($params['sectionArray'] as $tutors)
-        {
-            Tutor::updateSection($tutors['tutorId'],$courseid,$tutors['tutorSection']);
+        }
+        $params['sectionArray'] = isset($params['sectionArray']) ? $params['sectionArray'] : '';
+        foreach ($params['sectionArray'] as $tutors) {
+            Tutor::updateSection($tutors['tutorId'], $courseid, $tutors['tutorSection']);
 
         }
-         $params['checkedtutor'] = isset($params['checkedtutor'])? $params['checkedtutor'] :'';
-        if($params['checkedtutor'] != ''){
-            foreach($params['checkedtutor'] as $tutor)
-            {
+        $params['checkedtutor'] = isset($params['checkedtutor']) ? $params['checkedtutor'] : '';
+        if ($params['checkedtutor'] != '') {
+            foreach ($params['checkedtutor'] as $tutor) {
                 Tutor::deleteTutorByUserId($tutor);
             }
         }
-        return json_encode(array('status' => 0,'userNotFound' => $userNotFoundArray,'tutors' => $tutorsArray,'section' => $sectionArray));
+        return json_encode(array('status' => 0, 'userNotFound' => $userNotFoundArray, 'tutors' => $tutorsArray, 'section' => $sectionArray));
     }
 
     public function actionImportStudent()
@@ -462,6 +459,7 @@ class RosterController extends AppController
                 $model->file->saveAs($filename);
             }
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
+
             $newUserRecords = array();
             $existUserRecords = array();
 
@@ -484,8 +482,8 @@ class RosterController extends AppController
             }
 
         }
-        if(!$studentRecords){
-        return $this->render('importStudent', ['model' => $model]);
+        if (!$studentRecords) {
+            return $this->render('importStudent', ['model' => $model]);
         }
     }
 
@@ -530,11 +528,13 @@ class RosterController extends AppController
                             $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
                         }
                     }
+
                     array_push($StudentDataArray, $password);
                     array_push($AllUserArray, $StudentDataArray);
                 }
                 if ($userData){
                     array_push($ExistingUser,$userData);
+                    array_push($AllUserArray, $StudentDataArray);
                 }
             }
 
@@ -623,25 +623,18 @@ class RosterController extends AppController
         return $this->render('showImportStudent',['studentData' => $studentInformation]);
     }
 
-//Contoller method to lock the student to have a access of course
-    public function actionStudentLock()
+
+    public function actionMarkLockAjax()
     {
-        $this->guestUserHandler();
+        $this->layout = false;
         $params = $this->getRequestParams();
-        $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
-        AppUtility::dump($params);
-        $this->includeCSS(['../css/jquery-ui.css']);
-        $this->includeJS(['../js/logingridview.js','../js/general.js']);
-        return $this->render('studentLock', ['course' => $course]);
+        foreach($params['checkedstudents'] as $students)
+        {
+            Student::updateLocked($students,$params['courseid']);
+        }
+
+        return json_encode(array('status' => 0));
+
     }
-//
-//    public  function actionMarkLockAjax()
-//    {
-//        $params = $this->getRequestParams();
-//        $courseid = Yii::$app->request->get('cid');
-//
-//        return $this->render('studentLock', ['params' => $params]);
-//    }
 }
 

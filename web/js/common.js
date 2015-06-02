@@ -1,6 +1,4 @@
-/**
- * Created by tudip on 4/5/15.
- */
+
 $(document).ready(function(){
 
 //    $('.dataTables_filter input').get(0).type = 'text';

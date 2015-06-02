@@ -17,39 +17,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <div><h2>Student Roster </h2></div>
 <div class="cpmid">
 
-            <span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View
-                    Login Grid</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid=' . $course->id); ?>">Assign
-                    Sections and/or Codes</a><br>
-            </span><span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid=' . $course->id); ?>">Manage
-                    LatePasses</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid=' . $course->id); ?>">Manage
-                    Tutors</a><br/>
-            </span><span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid=' . $course->id . '&enroll=student'); ?>">Enroll
-                    Student with known username</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $course->id); ?>">Enroll
-                    students from another course</a><br/>
-            </span><span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid=' . $course->id); ?>">Import
-                    Students from File</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid=' . $course->id); ?>">Create
-                    and Enroll new student</a><br/>
+            <span class="column" style="width:auto;"><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View Login Grid</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid=' . $course->id); ?>">Assign Sections and/or Codes</a><br>
+            </span><span class="column" style="width:auto;"><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid=' . $course->id); ?>">Manage LatePasses</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid=' . $course->id); ?>">Manage Tutors</a><br/>
+            </span><span class="column" style="width:auto;"><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid=' . $course->id . '&enroll=student'); ?>">Enroll Student with known username</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $course->id); ?>">Enroll students from another course</a><br/>
+            </span><span class="column" style="width:auto;"><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid=' . $course->id); ?>">Import Students from File</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid=' . $course->id); ?>">Create and Enroll new student</a><br/>
             </span><br class="clear"/>
 </div>
-<div class ="student-roster">
 
-    <?php $form =ActiveForm::begin(
-        [
-            'options' => ['class' => 'form-horizontal'],
-            'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
-            ],
-        ]
-    ) ?>
 
 <p>Check: <a class="check-all" href="#">All</a> /
     <a class="check-all" href="#">Non-locked</a> /
@@ -57,16 +35,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
     With Selected:
 
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">E-mail</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Message</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Unenroll</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Lock</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Make Exception</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Copy Emails</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="msg-btn">Pictures</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">E-mail</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Message</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Unenroll</a></span>
+    <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Make Exception</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Copy Emails</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Pictures</a></span>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-    <input type="submit" value="Lock">
-    <table class="student-data-table" id="student-information-table">
+    <table class="student-data-table" >
     <thead>
     <tr>
         <th></th>
@@ -89,6 +66,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <th>Lock Out</th>
     </tr>
     </thead>
+    <tbody id="student-information-table">
+    </tbody>
 </table>
-    <?php ActiveForm::end(); ?>
-</div>

@@ -80,5 +80,12 @@ class Student extends BaseImasStudents {
     public static function findByCourseId($cId,$sortBy, $order){
         return static::find()->where(['courseid'=>$cId])->groupBy('section')->orderBy([$sortBy => $order])->all();
     }
+    public static function updateLocked($userid,$courseid)
+    {
+
+        $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
+        $student->locked = strtotime(date('F d, o g:i a'));;
+        $student->save();
+    }
 
 } 
