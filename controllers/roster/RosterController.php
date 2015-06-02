@@ -37,7 +37,7 @@ class RosterController extends AppController
         $cid = Yii::$app->request->get('cid');
         $course = Course::getById($cid);
         $students = Student::findByCid($cid);
-        $model = new StudentRosterForm();
+
         $isCode = false;
         $isSection = false;
         foreach ($students as $student) {
@@ -54,7 +54,7 @@ class RosterController extends AppController
 
         $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css', '../css/site.css']);
         $this->includeJS(['../js/roster/studentroster.js', '../js/general.js']);
-        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode, 'mode' => $model]);
+        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
 
     }
 
