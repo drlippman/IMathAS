@@ -214,6 +214,7 @@ class RosterController extends AppController
         $student = array();
         if ($this->isPost()) {
             $paramas = $_POST;
+            AppUtility::dump($paramas);
             foreach ($paramas['section'] as $key => $section) {
                 $code = trim($paramas['code'][$key]);
                 Student::updateSectionAndCodeValue(trim($section), $key, $code, $cid);
@@ -239,8 +240,10 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
             $student = array();
+
             if ($this->isPost()) {
                 $paramas = $_POST;
+
                 foreach ($paramas['code'] as $key => $latepass) {
                     $latepasshours = ['passhours'];
                     Student::updateLatepasses(trim($latepass), $key, $cid);

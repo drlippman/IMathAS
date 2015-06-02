@@ -47,5 +47,4 @@ $this->params['breadcrumbs'][] = $this->title;
         $('.student-data').DataTable();
     });
 
-
 </script>
