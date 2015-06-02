@@ -462,10 +462,27 @@ class RosterController extends AppController
                 $model->file->saveAs($filename);
             }
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
-            if($filename){
-                $this->redirect(array('show-import-student', 'studentData' => $studentRecords));
+            $newUserRecords = array();
+            $existUserRecords = array();
+
+            foreach($studentRecords['allUsers'] as $users){
+                array_push($newUserRecords, $users);
             }
-//            $this->setSuccessFlash('Imported student successfully.');
+            foreach($studentRecords['existingUsers'] as $users){
+                foreach ($users as $singleUser){
+                    $tempArray = array(
+                    'userName' => $singleUser->SID,
+                    'firstName' => $singleUser->FirstName,
+                    'lastName' => $singleUser->LastName,
+                    'email' => $singleUser->email,
+                    );
+                    array_push($existUserRecords,$tempArray);
+                }
+            }
+            if($filename){
+                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords , 'newUsers' => $newUserRecords));
+            }
+
         }
         if(!$studentRecords){
         return $this->render('importStudent', ['model' => $model]);
@@ -476,6 +493,7 @@ class RosterController extends AppController
     {
         $course = Course::getById($courseId);
         $AllUserArray = array();
+        $ExistingUser = array();
         if ($course) {
             $handle = fopen($fileName, 'r');
             if ($params['ImportStudentForm']['headerRow'] == 1) {
@@ -490,7 +508,6 @@ class RosterController extends AppController
                     continue;
                 }
                 $userData = User::getByName($StudentDataArray[0]);
-
                 if ($userData) {
                     $userExist = User::userAlreadyExist($StudentDataArray[0]);
                 } else {
@@ -513,11 +530,15 @@ class RosterController extends AppController
                             $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
                         }
                     }
-                    array_push($AllUserArray,$StudentDataArray);
+                    array_push($StudentDataArray, $password);
+                    array_push($AllUserArray, $StudentDataArray);
+                }
+                if ($userData){
+                    array_push($ExistingUser,$userData);
                 }
             }
 
-            return $AllUserArray;
+            return  (['allUsers' => $AllUserArray,'existingUsers' => $ExistingUser]);
         }
         return false;
     }
@@ -588,9 +609,18 @@ class RosterController extends AppController
     public function actionShowImportStudent()
     {
         $studentInformation = $this->getRequestParams();
+        if($this->isPost())
+        {$params = $this->getRequestParams();
+            AppUtility::dump($params     );
+            $user = new User();
+            foreach($studentInformation['newUsers'] as $newEntry){
+                $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
+            }
+            $this->setSuccessFlash('Imported student successfully.');
+        }
+        $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeJS(['../js/general.js?','../js/roster/importstudent.js','../js/DataTables-1.10.6/media/js/jquery.dataTables.js']);
         return $this->render('showImportStudent',['studentData' => $studentInformation]);
-        $user = new User();
-        $user->createUserFromCsv($StudentDataArray, AppConstant::STUDENT_RIGHT, $password);
     }
 
 //Contoller method to lock the student to have a access of course

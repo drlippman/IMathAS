@@ -53,11 +53,7 @@ class MessageController extends AppController
             $users = User::findAllUsers($sortBy, $order);
             $uid = Yii::$app->user->identity->getId();
             $this->includeCSS(["../css/message.css"]);
-            $this->includeJS(["../js/editor/tiny_mce.js"]);
-            $this->includeJS(["../js/editor/tiny_mce_src.js"]);
-            $this->includeJS(["../js/editor/themes/advanced/editor_template.js"]);
-            $this->includeJS(["../js/editor/plugins/asciimath/editor_plugin.js"]);
-            $this->includeJS(["../js/general.js"]);
+            $this->includeJS(['../js/message/sendMessage.js',"../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
             return $this->renderWithData('sendMessage', ['course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $uid]);
 
         }
