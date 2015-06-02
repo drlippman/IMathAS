@@ -26,4 +26,3 @@ function sendMessage(response)
         window.location = "index?cid="+cid;
         }
 }
-

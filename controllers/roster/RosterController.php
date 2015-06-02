@@ -636,5 +636,23 @@ class RosterController extends AppController
         return json_encode(array('status' => 0));
 
     }
+//
+//    public  function actionMarkLockAjax()
+//    {
+//        $params = $this->getRequestParams();
+//        $courseid = Yii::$app->request->get('cid');
+//
+//        return $this->render('studentLock', ['params' => $params]);
+//    }
+
+
+
+    public function actionRosterEmail()
+    {
+        $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+        return $this->renderWithData('rosterEmail');
+    }
 }
+
+
 
