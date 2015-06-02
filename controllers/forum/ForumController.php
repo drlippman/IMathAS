@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers\forum;
 
+use app\models\Course;
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
 use app\models\forms\ThreadForm;
@@ -15,6 +16,10 @@ use Yii;
 class ForumController extends AppController
 {
 
+    public $postData = array();
+    public $totalPosts = array();
+    public $children = array();
+
 
     public function actionSearchForum()
     {
@@ -22,6 +27,7 @@ class ForumController extends AppController
 
         $cid = Yii::$app->request->get('cid');
         $forum = Forums::getByCourseId($cid);
+        $course = Course::getById($cid);
         $user = Yii::$app->user->identity;
         $model = new ForumForm();
         $model->thread = 'subject';
@@ -30,7 +36,7 @@ class ForumController extends AppController
             $search = $param['ForumForm']['search'];
         }
         $this->includeCSS(['../css/forums.css']);
-        return $this->renderWithData('forum', ['model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user]);
+        return $this->renderWithData('forum', ['model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course]);
     }
 
     public function actionGetForumNameAjax()
@@ -153,13 +159,14 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $cid = Yii::$app->request->get('cid');
+        $course = Course::getById($cid);
         $forumid = Yii::$app->request->get('forumid');
         $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
         $this->includeCSS(['../css/forums.css']);
         $this->includeJS(['../js/thread.js']);
 
-        return $this->renderWithData('thread', ['cid' => $cid, 'users' => $user, 'forumid' => $forumid]);
+        return $this->renderWithData('thread', ['cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course]);
     }
 
     public function actionGetThreadAjax()
@@ -253,4 +260,77 @@ class ForumController extends AppController
 
         return $this->render('modifyPost');
     }
+
+    public function actionPost()
+    {
+        $this->guestUserHandler();
+        $threadId = Yii::$app->request->get('threadid');
+        $data = ForumPosts::getbyid($threadId);
+         $postArray = array();
+
+        foreach ($data as $postdata)
+        {
+            $this->children[$postdata['parent']][] = $postdata['id'];
+            $username = User::getById($postdata['userid']);
+            $postdate = Thread::getById($postdata['threadid']);
+            $forumname = Forums::getById($postdata['forumid']);
+            $titleLevel = AppUtility::calculateLevel($postdata['subject']);
+            $tempArray = array();
+            $tempArray['id'] = $postdata['id'];
+            $tempArray['threadId'] = $postdata['threadid'];
+            $tempArray['forumiddata'] = $postdata['forumid'];
+            $tempArray['subject'] = $titleLevel['title'];
+            $tempArray['forumname'] = ucfirst($forumname->name);
+            $tempArray['postdate'] = date('F d, o g:i a', $postdate->lastposttime);
+            $tempArray['name'] = ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName);
+            $tempArray['message'] = $postdata['message'];
+           $tempArray['level'] = $titleLevel['level'];
+            $this->postData[$postdata['id']] = $tempArray;
+        }
+
+
+//            $temparray = array(
+//                'threadId' => $postdata['id'],
+//                'forumiddata' => $postdata['forumid'],
+//                'subject' => $titleLevel['title'],
+//                'forumname' => ucfirst($forumname->name),
+//                'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+//                'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
+//                'message' => $postdata['message'],
+//                'level' => $titleLevel['level'],
+//
+//                'id' =>$postdata['id'],
+//
+//            );
+
+//            array_push($this->postData[$postdata['id']],$temparray);
+//
+//        }
+
+        $this->createChild($this->children[0]);
+//        $this->includeCSS(['../css/forums.css']);
+
+        return $this->render('post',['postdata' => $postArray]);
+    }
+    public function createChild($childArray, $arrayKey = 0)
+    {
+        $this->children = AppUtility::removeEmptyAttributes($this->children);
+        foreach ($childArray as $superKey => $child) {
+
+            array_push($this->totalPosts, $this->postData[$child]);
+
+            unset($this->children[$arrayKey][$superKey]);
+            if (isset($this->children[$child])) {
+                return $this->createChild($this->children[$child], $child);
+            } else {
+                continue;
+            }
+        }
+        if (count($this->children)) {
+            $this->createChild($this->children[key($this->children)], key($this->children));
+        }
+//        AppUtility::dump($this->totalPosts);
+
+    }
+
 }

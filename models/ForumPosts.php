@@ -17,6 +17,12 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost->forumid = $forumId;
         $ForumPost->save();
     }
+    public static function getbyid($threadId)
+    {
+
+        $ForumPost = ForumPosts::findAll(['threadid' => $threadId]);
+     return $ForumPost;
+    }
 
 
 }

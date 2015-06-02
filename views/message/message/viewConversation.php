@@ -16,7 +16,7 @@ $currentLevel = 0;
     <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/imascore.css" type="text/css"/>
     <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/default.css" type="text/css"/>
     <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/handheld.css"
-          media="handheld,only screen and (max-device-width:480px)"/>
+    media="handheld,only screen and (max-device-width:480px)"/>
 
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/general.js"></script>
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>

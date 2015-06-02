@@ -23,10 +23,9 @@ function threadSuccess(response)
                 if(thread.replyby == null)
                 {
 
-console.log(thread);
                     thread.replyby= 0;
                     //html += "<tr> <td><a href='#'>" +(thread.subject) +"</a> "+ thread.name+" </td> ";
-                    html += "<tr> <td><a href='#'>" +(thread.subject) +"</a> "+ thread.name+" <a href='move-thread?forumId=2&courseId=2&threadId=7'>Move</a> <a href='modify-post?forumId=1&courseId=2&threadId=5'>Modify</a><a href='#'> Remove </a></td> ";
+                    html += "<tr> <td><a href='post?threadid=9'>" +(thread.subject) +"</a> "+ thread.name+" <a href='move-thread?forumId=2&courseId=2&threadId=7'>Move</a> <a href='modify-post?forumId=1&courseId=2&threadId=5'>Modify</a><a href='#'> Remove </a></td> ";
 
                     html += "<td>" + thread.replyby + "</td>";
                     html += "<td>" + thread.views + "</td>";

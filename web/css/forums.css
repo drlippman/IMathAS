@@ -91,6 +91,19 @@ span.leftbtns img {
 
 #searchpost > div > label{
 font-weight:400;
-    font-family: "Tahoma", "sans-serif";
+    font-family: "Times New Roman", Symbola, serif;
 
+}
+
+#postlabel > div > h4
+{
+
+    font-weight: bold;
+    font-family: "Times New Roman", Symbola, serif;
+
+}
+
+#postlabel
+{
+padding-bottom: 10px;
 }
