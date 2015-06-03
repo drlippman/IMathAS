@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             else
             {?>
-                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg" width="150" alt="file not found" /></br>
+                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" width="150" alt="file not found" /></br>
                  <div class="update-checkbox">
                 <?= $form->field($model, 'remove')->checkbox() ?>
             </div>

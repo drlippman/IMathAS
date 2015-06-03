@@ -285,10 +285,10 @@ class RosterController extends AppController
         $query = Student::findByCid($courseid);
         $studentDetails = array();
         foreach ($query as $student) {
-            $tempArray = array();
-            $tempArray = array("id" => $student->user->id,
-                "firstName" => $student->user->FirstName,
-                "lastName" => $student->user->LastName);
+            $users = User::getById($student->userid);
+            $tempArray = array("id" => $student->userid,
+                "firstName" => $users->FirstName,
+                "lastName" => $users->LastName);
             array_push($studentDetails, $tempArray);
         }
         if ($this->isPost()) {
