@@ -76,7 +76,6 @@ $(document).ready(function(){
                 });
             },
             eventClick:  function(event, jsEvent, view) {
-                //alert('hello, Im here!');
                 //set the values and open the modal pop up
                 $('.calendar').html(event.html);
                 //$('#eventLink').attr(event, event.URL);

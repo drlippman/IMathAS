@@ -203,7 +203,7 @@ class SiteController extends AppController
                 $message .= "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
                 $message .= "Username: <b>" . $user->SID." </b><br>";
                 $message .= "<p>Click on the link below to reset your password using our secure server:</p>";
-                $message .= "<p><a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
+                $message .= "<p> URL: <a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
                 $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
                 $message .= "<p>If you did not request to have your password reset you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<p>If clicking the link does not seem to work, you can copy and paste the link into your browser's address window, or retype it there. Once you have returned to OpenMath, we will give instructions for resetting your password.</p>";
@@ -232,8 +232,8 @@ class SiteController extends AppController
             if ($user) {
                 $message = "<p>Welcome to OpenMath</p> ";
                 $message .= "<p>Hi ".ucfirst($user->FirstName)." ".ucfirst($user->LastName).",<br>";
-                $message .= "<p>We received a request to reset the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Usernames associated with this email listed below.</p> ";
-                $message .= "<p>Your username is: <b>".$user->SID."</b></br></p>";
+                $message .= "<p>We received a request to get the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Username associated with this email listed below.</p> ";
+                $message .= "<p>Username: <b>".$user->SID."</b></br></p>";
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<br>This is an automated message from OpenMath.  Do not respond to this email</p><br>";
                 $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";

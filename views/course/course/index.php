@@ -356,9 +356,13 @@ echo $this->render('_toolbar',['course'=> $course]);
 <!-- Calender Here-->
 <?php case 'Calendar': ?>
     <div class ='calendar'>
-        <div class="modal-pop-up-assessment">
-            <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
-        </div>
+
+    </div>
+    <div hidden="" class="modal-pop-up-assessment">
+        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+        <?php if ($assessment->enddate != 2000000000) { ?>
+            <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+        <?php }?>
     </div>
     <?php break; ?>
 
