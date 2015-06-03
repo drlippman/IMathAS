@@ -336,4 +336,34 @@ class ForumController extends AppController
 
     }
 
+   public function actionReplyPost()
+   {
+       $this->guestUserHandler();
+//       $courseId = Yii::$app->request->get('courseId');
+       $threadId = Yii::$app->request->get('id');
+//         $forumId = Yii::$app->request->get('forumId');
+       $thread =ForumPosts::getbyidpost($threadId);
+
+       $threadArray = array();
+       foreach ($thread as $data)
+       {
+
+
+               $temparray = array
+               (
+
+                   'subject' => $data['subject'],
+
+               );
+               array_push($threadArray, $temparray);
+
+
+       }
+
+       $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+
+   return $this->renderWithData('replypost',['reply' => $threadArray]);
+
+   }
+
 }

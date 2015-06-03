@@ -23,6 +23,12 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findAll(['threadid' => $threadId]);
      return $ForumPost;
     }
+    public static function getbyidpost($threadId)
+    {
+
+        $ForumPost = ForumPosts::findAll(['id' => $threadId]);
+        return $ForumPost;
+    }
 
     public static  function modifyThread($threadid,$message,$subject)
     {
