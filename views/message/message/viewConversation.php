@@ -46,13 +46,18 @@ $currentLevel = 0;
         <br><br>
 
 
-        <?php foreach($messages as $index => $message){ ?>
-        <?php if($message['level'] != 0 && $message['level'] < $currentLevel)
-        { ?>
+        <?php
+        $cnt =0;
+        foreach($messages as $index => $message){ ?>
+        <?php
+        if($message['level'] != 0 && $message['level'] < $currentLevel)
+        {$cnt--;
+        ?>
             </div>
+
         <?php }?>
     <?php if($message['level'] != 0 && $message['level'] > $currentLevel)
-            { ?>
+            { $cnt++;?>
                 <div class="forumgrp" id="block<?php echo $index-1 ?>">
 
            <?php }?>
@@ -73,12 +78,12 @@ $currentLevel = 0;
 
             <?php if($index == (count($messages)-1))
             {
-                for($i = $message['level']; $i > 0; $i--){?>
+                for($i = $cnt; $i > 0; $i--){?>
                     </div>
             <?php } }?>
         <?php
             $currentLevel = $message['level'];
-        $cnt = (count($messages) - 1);
+       // $cnt = (count($messages) - 1);
         ?>
     <input type="hidden" id="cnt" value="<?php echo $cnt ?>">
     <?php      }?>

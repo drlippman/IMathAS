@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" charset="utf8"
-       src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <input type="hidden" id="course-id" value="<?php echo $cid ?>">
 
 <div id="search">
@@ -31,15 +31,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <span><a href="#">Limit to New</a> | <a href="#">Limit to Flagged</a></span>|
     <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
 </div>
-    <input type="hidden" id="forumid" value="<?php echo $forumid ?>">
+<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
 <div>
     <table id="forum-table displayforum" class="forum-table">
         <thead>
 
-                <th>Topic</th>
-                <th>Replies</th>
-                <th>Views</th>
-                <th>Last Post Date</th>
+        <th>Topic</th>
+        <th>Replies</th>
+        <th>Views</th>
+        <th>Last Post Date</th>
         </thead>
         <tbody class="forum-table-body">
         </tbody>

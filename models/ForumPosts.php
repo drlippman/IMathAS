@@ -24,5 +24,11 @@ class ForumPosts extends BaseImasForumPosts
      return $ForumPost;
     }
 
-
+    public static  function modifyThread($threadid,$message,$subject)
+    {
+        $threadPost = ForumPosts::findOne(['threadid' => $threadid]);
+        $threadPost->subject = $subject;
+        $threadPost->message = $message;
+        $threadPost->save();
+    }
 }

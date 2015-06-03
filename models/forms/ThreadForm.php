@@ -18,4 +18,5 @@ class ThreadForm extends Model
         return $thread;
 
     }
+
 } 

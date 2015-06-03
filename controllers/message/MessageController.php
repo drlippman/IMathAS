@@ -317,6 +317,7 @@ class MessageController extends AppController
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
         $messages = Message::getByBaseId($msgId, $baseId);
+        AppUtility::dump($messages);
         $children = array();
         foreach ($messages as $message) {
             $this->children[$message['parent']][] = $message['id'];

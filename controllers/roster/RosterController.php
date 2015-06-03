@@ -9,7 +9,6 @@ use app\models\forms\AssignSectionAndCodesForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
-use app\models\forms\StudentRosterForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
 use app\models\Student;
@@ -31,41 +30,38 @@ use app\components\AppConstant;
 
 class RosterController extends AppController
 {
+//Controller method to display student information on student roster page.
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
-        $students = Student::findByCid($cid);
-
-        $isCode = false;
-        $isSection = false;
+        $courseid = Yii::$app->request->get('cid');
+        $course = Course::getById($courseid);
+        $students = Student::findByCid($courseid);
+        $isCodePresent = false;
+        $isSectionPresent = false;
         foreach ($students as $student) {
             if ($student->code != '') {
-                $isCode = true;
+                $isCodePresent = true;
             }
             if ($student->section != '') {
-                $isSection = true;
+                $isSectionPresent = true;
             }
         }
         if ($this->isPost()) {
             $params = $this->getBodyParams();
         }
-
-        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css', '../css/site.css']);
-        $this->includeJS(['../js/roster/studentroster.js', '../js/general.js']);
-        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSection, 'isCode' => $isCode]);
-
-    }
+        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
+        $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
+        return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent]);
+     }
 
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $course = Course::getById($cid);
+        $courseid = Yii::$app->request->get('cid');
+        $course = Course::getById($courseid);
         $this->includeCSS(['../css/jquery-ui.css']);
         $this->includeJS(['../js/logingridview.js', '../js/general.js']);
-
         return $this->render('loginGridView', ['course' => $course]);
     }
 
@@ -73,13 +69,10 @@ class RosterController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getBodyParams();
-        $cid = $params['cid'];
+        $courseid = $params['cid'];
         $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
         $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
-
-
-        //  if($newStartDate<$newEndDate) {
-        $loginLogs = LoginGrid::getById($cid, $newStartDate, $newEndDate);
+        $loginLogs = LoginGrid::getById($courseid, $newStartDate, $newEndDate);
         $headsArray = array();
         $headsArray[] = 'Name';
         for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
@@ -105,7 +98,6 @@ class RosterController extends AppController
             }
             $rowLogs[$user_id] = $userSpecificDaysArray;
         }
-
         foreach ($headsArray as $headElem) {
             foreach ($rowLogs as $key => $field) {
                 if ($headElem == 'Name') {
@@ -127,27 +119,25 @@ class RosterController extends AppController
         $retJSON->rows = $stuLogs;
         $test = array('status' => '0', 'data' => $retJSON);
         return json_encode($test);
-//        }else{
-//            $this->setErrorFlash('Enter Valid Date.');
-//        }
     }
+
 
     public function actionStudentRosterAjax()
     {
         $this->layout = false;
         $params = $this->getBodyParams();
-        $cid = $params['course_id'];
-        $Students = Student::findByCid($cid);
-        $isCode = false;
-        $isSection = false;
+        $courseid = $params['course_id'];
+        $Students = Student::findByCid($courseid);
+        $isCodePresent = false;
+        $isSectionPresent = false;
         $studentArray = array();
         foreach ($Students as $student) {
 
             if ($student->code != '') {
-                $isCode = true;
+                $isCodePresent = true;
             }
             if ($student->section != '') {
-                $isSection = true;
+                $isSectionPresent = true;
             }
             $tempArray = array('id' => $student->user->id
             , 'lastname' => $student->user->LastName,
@@ -161,9 +151,9 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
         }
-//        $this->render('studentLock',['courseid',$cid]);
-        return json_encode(['status' => '0', 'query' => $studentArray, 'isCode' => $isCode, 'isSection' => $isSection]);
-    }
+        return json_encode(['status' => '0', 'query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent]);
+     }
+
 
     public function actionStudentEnrollment()
     {
@@ -202,8 +192,9 @@ class RosterController extends AppController
     public function actionAssignSectionsAndCodes()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $query = Student::findByCid($cid);
+        $courseid = Yii::$app->request->get('cid');
+        $query = Student::findByCid($courseid);
+        $course = Course::getById($courseid);
         $studentArray = array();
         foreach ($query as $student) {
             $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
@@ -213,24 +204,23 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
         }
-        $student = array();
         if ($this->isPost()) {
             $paramas = $_POST;
-            AppUtility::dump($paramas);
             foreach ($paramas['section'] as $key => $section) {
                 $code = trim($paramas['code'][$key]);
-                Student::updateSectionAndCodeValue(trim($section), $key, $code, $cid);
+                Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseid);
             }
-            $this->redirect('student-roster?cid=' . $cid);
+            $this->redirect('student-roster?cid=' . $courseid);
         }
-        return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $cid]);
+        return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $courseid,'course'=>$course]);
     }
 
     public function actionManageLatePasses()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        $model = Student::findByCid($cid);
+        $courseid = Yii::$app->request->get('cid');
+        $model = Student::findByCid($courseid);
+        $course = Course::getById($courseid);
         $studentArray = array();
         foreach ($model as $student) {
             $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
@@ -241,21 +231,18 @@ class RosterController extends AppController
                 'userid' => $student->userid
             );
             array_push($studentArray, $tempArray);
-            $student = array();
-
-            if ($this->isPost()) {
+                if ($this->isPost()) {
                 $paramas = $_POST;
-
                 foreach ($paramas['code'] as $key => $latepass) {
-                    $latepasshours = ['passhours'];
-                    Student::updateLatepasses(trim($latepass), $key, $cid);
+                    $latepasshours = $paramas['passhours'];
+                    Student::updateLatepasses(trim($latepass), $key, $courseid);
                 }
-                Course::updatePassHours($latepasshours, $cid);
-                $this->redirect('student-roster?cid=' . $cid);
+                Course::updatePassHours($latepasshours, $courseid);
+                $this->redirect('student-roster?cid=' . $courseid);
             }
         }
         $this->includeJS(['../js/managelatepasses.js']);
-        return $this->render('manageLatePasses', ['studentInformation' => $studentArray]);
+        return $this->render('manageLatePasses', ['studentInformation' => $studentArray,'course' => $course]);
     }
 
 //Controller method to display the dynamic radio list of courses
@@ -451,6 +438,7 @@ class RosterController extends AppController
         $model = new ImportStudentForm();
         $nowTime = time();
         $courseId = Yii::$app->request->get('cid');
+        $course = Course::getById($courseId);
         $studentRecords = '';
         if ($model->load(Yii::$app->request->post())) {
             $params = $this->getRequestParams();
@@ -479,13 +467,14 @@ class RosterController extends AppController
                 }
             }
             if($filename){
-                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords , 'newUsers' => $newUserRecords));
+                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords , 'newUsers' => $newUserRecords,'course' => $course));
             }
 
         }
-        if (!$studentRecords) {
-            return $this->render('importStudent', ['model' => $model]);
-        }
+
+        if(!$studentRecords){
+        return $this->render('importStudent', ['model' => $model,'course' => $course]);
+          }
     }
 
     public function ImportStudentCsv($fileName, $courseId, $params)

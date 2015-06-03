@@ -1,3 +1,4 @@
+<?php use app\components\AppUtility;?>
 <form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $courseId ?>&threadId=<?php echo $threadId ?>">
 
 <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
@@ -41,9 +42,8 @@
 </div>
 
 
-    <input type=submit id="move-button" value="Move">
-    <input type=button value="Nevermind" class="secondarybtn"
-           onClick="window.location='thread.php?page=1&cid=2&forum=2'"></p>
+    <input type=submit class="btn btn-primary" id="move-button" value="Move">
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid'.$forumId)  ?>">Cancel</a>
 </form>
 
 <script type="text/javascript">

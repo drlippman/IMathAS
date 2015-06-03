@@ -106,7 +106,7 @@ class ForumController extends AppController
                     'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
                     'message' => $data['message'],
 
-                    );
+                );
 
                 array_push($queryarray,$temparray);
 
@@ -182,14 +182,13 @@ class ForumController extends AppController
                 $username = User::getById($data['userid']);
                 $postdate = Thread::getById($data['threadid']);
 
-
                 $temparray = array(
                     'threadId' => $data['id'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                     'views' => $data['views'],
                     'replyby' => $data['replyby'],
-                    'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                   // 'postdate' => date('F d, o g:i a', $postdate->lastposttime),
                     'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
 
                 );
@@ -227,7 +226,7 @@ class ForumController extends AppController
         if ($thread) {
             $threadArray = array();
             foreach ($thread as $data) {
-                    $temparray = array(
+                $temparray = array(
                     'threadId' => $data['id'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
@@ -244,21 +243,47 @@ class ForumController extends AppController
                 $this->includeJS(['../js/thread.js']);
                 return $this->renderWithData('thread', ['cid' => $courseId, 'users' => $user, 'forumid' => $forumId]);
             }
-                return $this->renderWithData('moveThread', ['forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId]);
+            return $this->renderWithData('moveThread', ['forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId]);
         }
 
     }
 
     public function actionModifyPost()
     {
-      $this->guestUserHandler();
+        $this->guestUserHandler();
         $courseId = Yii::$app->request->get('courseId');
         $threadId = Yii::$app->request->get('threadId');
         $forumId = Yii::$app->request->get('forumId');
-        $forums = Forums::getByCourseId($courseId);
         $thread = ThreadForm::thread($forumId);
+        $threadArray = array();
+        $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js','../js/modifypost.js']);
+        foreach ($thread as $data)
+        {
+            if(($data['threadid']) == $threadId)
+            {
+                $temparray = array(
+                    'thid' => $data['threadid'],
+                    'forumiddata' => $data['forumid'],
+                    'subject' => $data['subject'],
+                    'message' => $data['message'],
+                );
+                array_push($threadArray, $temparray);
+            }
 
-        return $this->render('modifyPost');
+        }
+
+        return $this->renderWithData('modifyPost', ['threadId' => $threadId,'forumId'=>$forumId,'courseId'=>$courseId,'thread'=>$threadArray]);
+
+    }
+    public function actionModifyPostAjax()
+    {
+        $params = $this->getBodyParams();
+        $forumid = $params['forumid'];
+        $threadid = $params['threadId'];
+        $message = trim($params['message']);
+        $subject = trim($params['subject']);
+        $thread = ForumPosts::modifyThread($threadid,$message,$subject);
+        return json_encode(array('status' => 0));
     }
 
     public function actionPost()

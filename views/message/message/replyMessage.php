@@ -60,7 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
             var baseId = $(".base-id").val();
             var isReplied = $(".is-replied").val();
             var messageDetails = {cid: cid , sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied};
-            alert(JSON.stringify(messageDetails));
             jQuerySubmit('reply-message-ajax',messageDetails,'replyMessage');
         });
 

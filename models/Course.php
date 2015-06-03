@@ -123,7 +123,6 @@ class Course extends BaseImasCourses {
     }
     public static function updatePassHours($latepasshours,$cid)
     {
-
         $student = Course::findOne(['id' => $cid]);
         $student->latepasshrs = $latepasshours;
         $student->save();
