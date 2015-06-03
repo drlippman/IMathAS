@@ -207,7 +207,7 @@ class SiteController extends AppController
                 $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
                 $message .= "<p>If you did not request to have your password reset you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<p>If clicking the link does not seem to work, you can copy and paste the link into your browser's address window, or retype it there. Once you have returned to OpenMath, we will give instructions for resetting your password.</p>";
-                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
+                $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email. <br><br></p>";
                 $message .= "<p>Best Regards,<br>OpenMath Team</p></p>";
                 AppUtility::sendMail(AppConstant::FORGOT_PASS_MAIL_SUBJECT, $message, $toEmail);
                 $model = new ForgotPasswordForm();

@@ -78,9 +78,10 @@ $(document).ready(function(){
             eventClick:  function(event, jsEvent, view) {
                 //set the values and open the modal pop up
                 $('.calendar').html(event.html);
-                //$('#eventLink').attr(event, event.URL);
-                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.title });
+                $('.modal-pop-up-assessment').attr(event,'javascript:void(0);');
+                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.title,width:350});
             }
+
         });
     }
 

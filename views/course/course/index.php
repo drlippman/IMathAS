@@ -359,9 +359,22 @@ echo $this->render('_toolbar',['course'=> $course]);
 
     </div>
     <div hidden="" class="modal-pop-up-assessment">
+    <div class="item">
+        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
         <?php if ($assessment->enddate != 2000000000) { ?>
             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+            <!-- Use Late Pass here-->
+            <?php if($students->latepass != 0) {
+                if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
+                    ?>
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                    <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
+                    <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
+                <?php } ?>
+            <?php } else {?>
+                <?php echo "<p>You have no late passes remaining.</p>";?>
+            <?php }?>
         <?php }?>
     </div>
     <?php break; ?>
