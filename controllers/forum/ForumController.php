@@ -202,7 +202,7 @@ class ForumController extends AppController
             return json_encode(array('status' => -1, 'msg' => 'Thread  not found for this Forum'));
         }
     }
-
+//controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
     public function actionMoveThread()
     {
         $courseId = Yii::$app->request->get('courseId');
@@ -235,10 +235,17 @@ class ForumController extends AppController
             }
             if ($this->isPost()) {
                 $paramas = $this->getRequestParams();
-                $forum_Id=$paramas['forum-name'];
-                $thread_Id=$paramas['threadId'];
-                ForumPosts::updateMoveThread($forum_Id,$thread_Id);
+                $thread_Id = $paramas['threadId'];
 
+
+//                if($moveThreadId){
+//                    $moveThreadId = $paramas['thread-name'];
+//                    ForumPosts::updatePostMoveThread($thread_Id,$moveThreadId);
+//                }
+               // if($forum_Id) {
+                    $forum_Id = $paramas['forum-name'];
+                    ForumPosts::updateMoveThread($forum_Id, $thread_Id);
+                //}
                 $this->includeCSS(['../css/forums.css']);
                 $this->includeJS(['../js/thread.js']);
                 return $this->renderWithData('thread', ['cid' => $courseId, 'users' => $user, 'forumid' => $forumId]);
@@ -247,7 +254,7 @@ class ForumController extends AppController
         }
 
     }
-
+//controller method for redirect to modify post page with selected thread data.
     public function actionModifyPost()
     {
         $this->guestUserHandler();
@@ -262,7 +269,7 @@ class ForumController extends AppController
             if(($data['threadid']) == $threadId)
             {
                 $temparray = array(
-                    'thid' => $data['threadid'],
+                    'threadId' => $data['threadid'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                     'message' => $data['message'],
@@ -271,14 +278,12 @@ class ForumController extends AppController
             }
 
         }
-
         return $this->renderWithData('modifyPost', ['threadId' => $threadId,'forumId'=>$forumId,'courseId'=>$courseId,'thread'=>$threadArray]);
-
     }
+    //controller ajax method for fetch modified thread from Modify page and store in database.
     public function actionModifyPostAjax()
     {
         $params = $this->getBodyParams();
-        $forumid = $params['forumid'];
         $threadid = $params['threadId'];
         $message = trim($params['message']);
         $subject = trim($params['subject']);
@@ -333,6 +338,15 @@ class ForumController extends AppController
         if (count($this->children)) {
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
+
+    }
+    //controller ajax method for fetch select as remove thread from Thread page and remove from database.
+    public function actionMarkAsRemoveAjax()
+    {
+            $params = $this->getBodyParams();
+            $threadid = $params['threadId'];
+            ForumPosts::removeThread($threadid);
+            return json_encode(array('status' => 0));
 
     }
 

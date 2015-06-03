@@ -35,7 +35,7 @@
             <?php
 
             if ($thread['forumiddata'] == $forumId && $thread['threadId'] != $threadId) { ?>
-             <input type="radio" name="thread-name"><?php echo $thread['subject']?><br>
+             <input type="radio" id="<?php echo $thread['threadId'] ?>" name="thread-name" value="<?php echo $thread['threadId'] ?>"><?php echo $thread['subject']?><br>
             <?php }
         } ?>
     </div>

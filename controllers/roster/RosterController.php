@@ -55,7 +55,7 @@ class RosterController extends AppController
         $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
         return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent]);
      }
-
+//Controller method for redirect to Login Grid View page.
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
@@ -65,7 +65,7 @@ class RosterController extends AppController
         $this->includeJS(['../js/logingridview.js', '../js/general.js']);
         return $this->render('loginGridView', ['course' => $course]);
     }
-
+//Controller ajax method to retrieve student data form Login grid table
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();
@@ -189,7 +189,7 @@ class RosterController extends AppController
         }
         return $this->render('studentEnrollment', ['course' => $course, 'model' => $model]);
     }
-
+//Controller method to redirect on Assign and Section Codes page with student information
     public function actionAssignSectionsAndCodes()
     {
         $this->guestUserHandler();
@@ -215,7 +215,7 @@ class RosterController extends AppController
         }
         return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $courseid,'course'=>$course]);
     }
-
+//Controller method to redirect on Manage Late Passes page with student information,
     public function actionManageLatePasses()
     {
         $this->guestUserHandler();

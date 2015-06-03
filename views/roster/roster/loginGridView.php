@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-lg-3 pull-left" id="datepicker-id">
             <?php
             echo DatePicker::widget([
-                'name' => 'dp_3',
+                'name' => 'First_Date_Picker',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
                 'value' => date("m-d-Y",strtotime("-1 week +1 day")),
                 'pluginOptions' => [
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-lg-3 pull-left" id="datepicker-id1" >
         <?php
         echo DatePicker::widget([
-            'name' => 'dp_3',
+            'name' => 'Second_Date_Picker',
             'type' => DatePicker::TYPE_COMPONENT_APPEND,
             'value' => date("m-d-Y"),
             'pluginOptions' => [

@@ -316,9 +316,11 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
+        $user = Yii::$app->user->identity;
+
         $messages = Message::getByBaseId($msgId, $baseId);
-        AppUtility::dump($messages);
         $children = array();
+
         foreach ($messages as $message) {
             $this->children[$message['parent']][] = $message['id'];
             $tempArray = array();
@@ -339,12 +341,9 @@ class MessageController extends AppController
             $tempArray['baseId'] = $message['baseid'];
             $this->messageData[$message['id']] = $tempArray;
         }
-
         $this->createChild($this->children[0]);
-//        $this->includeCSS('css/forums.css');
-        return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages]);
+        return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages,'user' => $user]);
     }
-
     public function createChild($childArray, $arrayKey = 0)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
@@ -361,8 +360,7 @@ class MessageController extends AppController
         if (count($this->children)) {
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
-//        AppUtility::dump($this->totalMessages);
-    }
+     }
 
     public function actionMarkSentUnsendAjax()
     {
@@ -386,5 +384,4 @@ class MessageController extends AppController
         return json_encode(['status' => '0']);
 
     }
-
 }

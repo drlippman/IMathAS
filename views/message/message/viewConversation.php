@@ -38,23 +38,21 @@ $currentLevel = 0;
         if($sent == 1) { ?>
             <p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message='.$sent.'&id=' . $messages[0]['id']); ?>">Back to Message</a></p>
         <?php }?>
-
         <button onclick="expandall()" class="btn btn-primary">Expand All</button>
         <button onclick="collapseall()" class="btn btn-primary">Collapse All</button>
         <button onclick="showall()" class="btn btn-primary">Show All</button>
         <button onclick="hideall()" class="btn btn-primary">Hide All</button>
         <br><br>
-
-
         <?php
         $cnt =0;
         foreach($messages as $index => $message){ ?>
         <?php
         if($message['level'] != 0 && $message['level'] < $currentLevel)
         {$cnt--;
+        for($i = $currentLevel; $message['level'] < $i; $i--){?>
+        </div>
+        <?php }
         ?>
-            </div>
-
         <?php }?>
     <?php if($message['level'] != 0 && $message['level'] > $currentLevel)
             { $cnt++;?>
@@ -64,7 +62,7 @@ $currentLevel = 0;
             <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
                 <span class=right>
 
-                 <?php if($message['receiveId'] != $message['senderId']) { ?>
+                 <?php if($user['id'] != $message['senderId']) { ?>
                      <a href = "<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>" > Reply</a >
                  <?php } ?>
                  <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
@@ -74,8 +72,6 @@ $currentLevel = 0;
             <span style="color:red;">New</span>
             </div>
             <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
-
-
             <?php if($index == (count($messages)-1))
             {
                 for($i = $cnt; $i > 0; $i--){?>
@@ -139,7 +135,6 @@ $currentLevel = 0;
             butn.src = imasroot + '/img/expand.gif';
         }
     }
-
     function showall() {
         var icnt =  $( "#cnt" ).val();
         for (var i = 0; i <= icnt; i++) {
