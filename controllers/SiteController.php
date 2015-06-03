@@ -201,10 +201,10 @@ class SiteController extends AppController
                 $message = "<p>Welcome to OpenMath</p> ";
                 $message .= "<p>Hi ".ucfirst($user->FirstName)." ". ucfirst($user->LastName).",</p> ";
                 $message .= "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
+                $message .= "Username: <b>" . $user->SID." </b><br>";
                 $message .= "<p>Click on the link below to reset your password using our secure server:</p>";
                 $message .= "<p><a href=\"" . AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code\">";
                 $message .= AppUtility::urlMode() . $_SERVER['HTTP_HOST'] . Yii::$app->homeUrl . "site/reset-password?id=$id&code=$code</a>\r\n";
-                $message .= "Username: <b>" . $user->email ." </b> <br/>.";
                 $message .= "<p>If you did not request to have your password reset you can safely ignore this email. Rest assured your account is safe.</p>";
                 $message .= "<p>If clicking the link does not seem to work, you can copy and paste the link into your browser's address window, or retype it there. Once you have returned to OpenMath, we will give instructions for resetting your password.</p>";
                 $message .= "</p>This is an automated message from OpenMath.  Do not respond to this email <br><br></p>";
@@ -272,6 +272,7 @@ class SiteController extends AppController
                 $user->remoteaccess = null;
                 $user->save();
                 $this->setSuccessFlash('Your password is changed successfully.');
+                $this->redirect('login');
 
             }
 
@@ -370,11 +371,13 @@ class SiteController extends AppController
 
             }
             $this->setSuccessFlash('Changes updated successfully.');
+            //$this->redirect('dashboard');
             $this->redirect('change-user-info');
         }
         $this->includeJS(['js/changeUserInfo.js']);
 
         return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid]);
+
     }
 
     public function actionStudentEnrollCourse()

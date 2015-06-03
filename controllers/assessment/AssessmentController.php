@@ -31,60 +31,6 @@ use yii\helpers\Html;
 
 class AssessmentController extends AppController
 {
-
-//    public function actionShowAssessment()
-//    {
-//        $this->guestUserHandler();
-//
-//        $id = \Yii::$app->request->get('id');
-//        $assessment = Assessments::getByAssessmentId($id);
-//        $assessmentSession = AssessmentSession::getById($id);
-//        $questionRecords = Questions::getByAssessmentId($id);
-//        $questionSet = QuestionSet::getByQuesSetId($id);
-//        $assessmentclosed = false;
-//
-//        if ($assessment->avail == 0) {
-//            $assessmentclosed = true;
-//        }
-//
-//        list($qlist,$seedlist,$reviewseedlist,$scorelist,$attemptslist,$lalist) =AppUtility::generateAssessmentData($assessment->itemorder,$assessment->shuffle, $assessment->id);
-//
-//        $bestscorelist = $scorelist.';'.$scorelist.';'.$scorelist;
-//        $scorelist = $scorelist.';'.$scorelist;
-//        $bestattemptslist = $attemptslist;
-//        $bestseedslist = $seedlist;
-//        $bestlalist = $lalist;
-//        $starttime = time();
-//        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
-//        $ltisourcedid = '';
-//
-//        $param['questions'] = $qlist;
-//        $param['seeds'] = $seedlist;
-//        $param['userid'] = $id;
-//        $param['assessmentid'] = $id;
-//        $param['attempts'] = $attemptslist;
-//        $param['lastanswers'] = $lalist;
-//        $param['reviewscores'] = $scorelist;
-//        $param['reviewseeds'] = $reviewseedlist;
-//        $param['bestscores'] = $bestscorelist;
-//        $param['scores'] = $scorelist;
-//        $param['bestattempts'] = $bestattemptslist;
-//        $param['bestseeds'] = $bestseedslist;
-//        $param['bestlastanswers'] = $bestlalist;
-//        $param['starttime'] = $starttime;
-//        $param['feedback'] = $deffeedbacktext;
-//        $param['lti_sourcedid'] = $ltisourcedid;
-//
-//        $assessmentSession = new AssessmentSession();
-//        $assessmentSession->attributes = $param;
-//        $assessmentSession->save();
-//
-//        $this->includeCSS(['../css/mathtest.css']);
-//        $this->includeCSS(['../css/default.css']);
-//        $this->includeCSS(['../css/showAssessment.css']);
-//        $this->includeJS(['../js/timer.js']);
-//        return $this->render('ShowAssessment', ['assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet]);
-//    }
     public function actionIndex()
     {
         $this->guestUserHandler();
@@ -184,10 +130,8 @@ class AssessmentController extends AppController
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
         $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css', '../css/jquery-ui.css']);
-        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
-        $this->includeJS(['../js/student.js']);
+        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js','../js/student.js']);
         return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
-
     }
 
     public function actionShowAssessment()

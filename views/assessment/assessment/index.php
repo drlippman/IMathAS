@@ -281,10 +281,13 @@ echo $this->render('_toolbar',['course'=> $course]);
     <?php break; ?>
 
 <!-- Calender Here-->
-    <?php case 'Calendar': ?>
-        <div id='calendar'>
-        </div>
-    <?php break; ?>
+     <?php case 'Calendar': ?>
+            <div class ='calendar'>
+               <div class="modal-pop-up-assessment">
+                    <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+               </div>
+           </div>
+     <?php break; ?>
 
   <!--  Block here-->
     <?php case 'Block': ?>
