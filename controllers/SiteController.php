@@ -361,16 +361,15 @@ class SiteController extends AppController
 
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
                 $model->remove=0;
+                User::saveUserRecord($params);
+                User::updateImgByUserId($userid);
             }
-            User::saveUserRecord($params);
-            User::updateImgByUserId($userid);
             if($model->remove==1){
                 User::deleteImgByUserId($userid);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-
             }
             $this->setSuccessFlash('Changes updated successfully.');
-            $this->redirect('change-user-info');
+            $this->redirect('dashboard');
         }
         $this->includeJS(['js/changeUserInfo.js']);
 
