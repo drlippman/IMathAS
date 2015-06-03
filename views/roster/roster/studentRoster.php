@@ -3,8 +3,6 @@ use app\components\AppUtility;
 
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
-
 $this->title = 'Roster';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -34,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <a class="uncheck-all" href="#">None</a>
 
     With Selected:
-    <span> <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid='.$course->id); ?>"class="btn btn-primary" id="">E-mail</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid='.$course->id); ?>"class="btn btn-primary" id="roster-email">E-mail</a></span>
     <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Message</a></span>
     <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
     <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>

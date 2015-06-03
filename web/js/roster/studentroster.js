@@ -3,6 +3,7 @@ $(document).ready(function () {
     selectCheckBox();
     studentLock();
     studentUnenroll();
+    studentEmail();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
 var studentData;
@@ -150,7 +151,7 @@ function studentLock(){
         }
         else
         {
-            alert("Please select the checkbox to lock the students.");
+            alert("No users selected.");
         }
     });
 }
@@ -225,4 +226,27 @@ function studentUnenroll(){
 
 function markUnenrollSuccess(response){
     location.reload();
+}
+
+function studentEmail(){
+    $('#roster-email').click(function(e){
+        var course_id =  $( "#course-id" ).val();
+        var markArray = [];
+        var dataArray = [];
+        $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
+            markArray.push($(this).val());
+            dataArray.push( $(this).parent().next().next().next().text()+' '+$(this).parent().next().next().next().next().text()+' ('+$(this).parent().next().next().next().next().next().next().text()+')');
+        });
+        if(markArray.length!=0){
+            var Data = {id: markArray, userName: dataArray};
+           jQuerySubmit('roster-email-ajax',Data,'rosterEmailResponse')
+        }else
+        {
+            alert("No users selected.");
+        }
+    });
+}
+function rosterEmailResponse(response){
+    console.log(response);
+    window.location = "roster-email?users="+dataArray;
 }

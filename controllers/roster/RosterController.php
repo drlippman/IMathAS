@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers\roster;
 
+use app\models\Assessments;
 use app\models\Course;
 use app\models\forms\CreateAndEnrollNewStudentForm;
 use app\models\forms\EnrollFromOtherCourseForm;
@@ -630,8 +631,15 @@ class RosterController extends AppController
 
     public function actionRosterEmail()
     {
+        $courseId = Yii::$app->request->get('cid');
+        $assessments = Assessments::getByCourseId($courseId);
+        $selectedStudents = $this->getBodyParams();
+        
+        if($this->isPost()){
+            return $this->renderWithData('rosterEmail');
+        }
         $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
-        return $this->renderWithData('rosterEmail');
+        return $this->renderWithData('rosterEmail',['assessments' => $assessments]);
     }
 
     public function actionMarkUnenrollAjax()
@@ -644,8 +652,12 @@ class RosterController extends AppController
         }
 
         return json_encode(array('status' => 0));
+    }
 
-
+    public function actionRosterEmailAjax()
+    {
+        $userData = $this->getRequestParams();
+        AppUtility::dump($userData);
     }
 }
 
