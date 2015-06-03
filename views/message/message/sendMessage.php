@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class="col-md-2"><b>To</b></span>
         <span class="col-md-8">
         <select name="seluid" class="dropdown form-control" id="seluid">
-            <option value="0">Select a user..</option>
+            <option value="0">Select a user</option>
             <?php foreach ($teachers as $teacher) { ?>
             <option value="<?php echo $teacher->user->id ?>">
 
@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text">'; ?></span>
+        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text" maxlength="100">'; ?></span>
     </div>
     <br><br><br>
 

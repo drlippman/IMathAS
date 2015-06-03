@@ -12,7 +12,20 @@ $("#mess").click(function()
     var receiver = $("#seluid").val();
     var subject = $(".subject").val();
     var body = $("#message").val();
-    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+    if(receiver != 0){
+        if(subject != ''){
+            if (body != ''){
+                jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+            }else{
+                alert('Body field cannot be blank');
+            }
+
+        }else{
+            alert('Subject field cannot be blank');
+        }
+    }else{
+        alert('User is not selected');
+    }
     });
 });
 
@@ -23,6 +36,7 @@ function sendMessage(response)
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-        window.location = "index?cid="+cid;
+            alert('Message sent successfully')
+            window.location = "index?cid="+cid;
         }
 }

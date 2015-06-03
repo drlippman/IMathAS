@@ -125,7 +125,12 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             nonTeachers.push($(this).val());
         });
-        jQuerySubmit('add-all-as-teacher-ajax',{'usersId':JSON.stringify(nonTeachers), 'cid':cid},'addAllAsTeacherSuccess');
+        if (nonTeachers.length == 0)
+        {
+            alert('Select atleast one teacher.');
+        }else{
+            jQuerySubmit('add-all-as-teacher-ajax',{'usersId':JSON.stringify(nonTeachers), 'cid':cid},'addAllAsTeacherSuccess');
+        }
     }
 
     function addAllAsTeacherSuccess(response)
@@ -146,7 +151,13 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             teachers.push($(this).val());
         });
-        jQuerySubmit('remove-all-as-teacher-ajax',{'usersId':JSON.stringify(teachers), 'cid':cid},'removeAllAsTeacherSuccess');
+        if (teachers.length == 0)
+        {
+            alert('Select atleast one teacher.');
+        }else{
+            jQuerySubmit('remove-all-as-teacher-ajax',{'usersId':JSON.stringify(teachers), 'cid':cid},'removeAllAsTeacherSuccess');
+        }
+
     }
     function removeAllAsTeacherSuccess(response)
     {
