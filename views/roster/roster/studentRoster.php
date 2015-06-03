@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     With Selected:
     <span> <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid='.$course->id); ?>"class="btn btn-primary" id="roster-email">E-mail</a></span>
-    <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Message</a></span>
+    <span> <a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-message?cid='.$course->id); ?>"class="btn btn-primary" id="">Message</a></span>
     <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
     <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
     <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"class="btn btn-primary" id="">Make Exception</a></span>

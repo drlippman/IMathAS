@@ -14,15 +14,14 @@ function updateInfo()
 {
     $("#update-btn").click(function(){
         var cid = $(".courseId").val();
-        var data =  {courseid:cid};
+        //var data =  {courseid:cid};
         var usernames = $("#tutor-text").val();
-        var data =  {courseid:cid,username:usernames};
-        jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
+        //var data =  {courseid:cid,username:usernames};
+        //jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
 
         var markArray = [];
         $('.tutor-table-body input[name = "tutor-check"]:checked').each(function() {
             markArray.push($(this).val());
-            $(this).closest('tr').css('font-weight', 'normal');
             $(this).prop('checked',false);
         });
         var sectionArray = [];
@@ -36,7 +35,7 @@ function updateInfo()
         jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
     });
 }
-function markUpdateSuccess(response){
+function markUpdateSuccess(response){console.log(response);
     var result = JSON.parse(response);
     $.session.set("userNotFound", result.userNotFound);
     location.reload();

@@ -386,6 +386,7 @@ class RosterController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getBodyParams();
+        $params['username'] = trim($params['username']);
         $users = explode(',', $params['username']);
         $courseid = $params['courseid'];
         $sortBy = 'section';
@@ -399,31 +400,38 @@ class RosterController extends AppController
         foreach ($sections as $section) {
             array_push($sectionArray, $section->section);
         }
-        foreach ($users as $entry) {
-            $userId = User::findByUsername($entry);
-            if (!$userId) {
-                array_push($userNotFoundArray, $entry);
-            } else {
-                array_push($userIdArray, $userId->id);
-                $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                if ($isTeacher) {
-                    $tutors = Tutor::getByUserId($isTeacher->userid, $courseid);
-                    if (!$tutors) {
-                        $tutorInfo = array('Name' => $userId->FirstName . ' ' . $userId->LastName, 'id' => $userId->id);
-                        array_push($tutorsArray, $tutorInfo);
-                        $tutor = new Tutor();
-                        $tutor->create($isTeacher->userid, $courseid);
-                    }
+        if(count($users)) {
+            foreach ($users as $entry) {
+                $entry=trim($entry);
+                $userId = User::findByUsername($entry);
+                if (!$userId) {
+                    array_push($userNotFoundArray, $entry);
                 } else {
-                    array_push($studentArray, $userId->id);
+                    array_push($userIdArray, $userId->id);
+                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                    if ($isTeacher) {
+                        $tutors = Tutor::getByUserId($isTeacher->userid, $courseid);
+                        if (!$tutors) {
+                            $tutorInfo = array('Name' => $userId->FirstName . ' ' . $userId->LastName, 'id' => $userId->id);
+                            array_push($tutorsArray, $tutorInfo);
+                            $tutor = new Tutor();
+                            $tutor->create($isTeacher->userid, $courseid);
+                        }
+                    } else {
+                        array_push($studentArray, $userId->id);
+                    }
                 }
             }
         }
         $params['sectionArray'] = isset($params['sectionArray']) ? $params['sectionArray'] : '';
-        foreach ($params['sectionArray'] as $tutors) {
-            Tutor::updateSection($tutors['tutorId'], $courseid, $tutors['tutorSection']);
 
+        if($params['sectionArray'])
+        {
+            foreach ($params['sectionArray'] as $tutors) {
+                Tutor::updateSection($tutors['tutorId'], $courseid, $tutors['tutorSection']);
+            }
         }
+
         $params['checkedtutor'] = isset($params['checkedtutor']) ? $params['checkedtutor'] : '';
         if ($params['checkedtutor'] != '') {
             foreach ($params['checkedtutor'] as $tutor) {
@@ -658,6 +666,20 @@ class RosterController extends AppController
     {
         $userData = $this->getRequestParams();
         AppUtility::dump($userData);
+    }
+
+    public function actionRosterMessage()
+    {
+        $courseId = Yii::$app->request->get('cid');
+        $course = Course::getById($courseId);
+        $assessments = Assessments::getByCourseId($courseId);
+        $selectedStudents = $this->getBodyParams();
+
+        if($this->isPost()){
+            return $this->renderWithData('rosterEmail');
+        }
+        $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+        return $this->renderWithData('rosterMessage',['course' => $course ,'assessments' => $assessments]);
     }
 }
 

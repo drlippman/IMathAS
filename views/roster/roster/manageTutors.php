@@ -67,7 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type = "text/javascript">
     $(document).ready(function () {
         var sessionCount = 0;
-        var sectionarray = $(".section-array").val();
         $('.display-tutor-table').DataTable();
         $sessionatr = $.session.get("userNotFound");
 
@@ -83,7 +82,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 $("#user-div").append(''+value+'');
             });
             $.session.clear();
-            $sessionatr.clean();
         }
         $.session.clear();
 
