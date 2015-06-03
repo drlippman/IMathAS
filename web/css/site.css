@@ -342,3 +342,8 @@ td.locked-student{
     text-decoration: line-through;
 }
 
+#reset-password-submit
+{
+    margin-left: 0px;
+}
+
