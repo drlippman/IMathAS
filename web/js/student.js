@@ -43,6 +43,7 @@ $(document).ready(function(){
 });
 // Display calendar
     function calendar() {
+       // var html = "<div>Assessment</div>";
         var courseId = $('.calender-course-id').val();
         $('.calendar').fullCalendar({
             height: 400,
@@ -60,25 +61,31 @@ $(document).ready(function(){
                     },
                     success: function (response) {
                         response = JSON.parse(response);
-                        console.log(response.data);
                         var assessmentData = response.data;
                         var events = [];
 
                         $.each(assessmentData, function (index, assessmentDetail) {
                             events.push({
                                 title: assessmentDetail.name,
-                                start: assessmentDetail.endDate // will be parsed
+                                start: assessmentDetail.endDate
                             });
                         });
                         callback(events);
                     }
 
                 });
+            },
+            eventClick:  function(event, jsEvent, view) {
+                //alert('hello, Im here!');
+                //set the values and open the modal pop up
+                $('.calendar').html(event.html);
+                //$('#eventLink').attr(event, event.URL);
+                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.title });
             }
         });
     }
 
-//Responce of ajax for calendar
+//Response of ajax for calendar
     function getAssessmentDataRequest(response) {
         var result = JSON.parse(response);
         if (result.status == 0) {

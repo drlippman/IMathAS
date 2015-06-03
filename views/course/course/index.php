@@ -9,6 +9,7 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 echo $this->render('_toolbar',['course'=> $course]);
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
+
 <div class=" col-lg-3 needed">
      <?php echo $this->render('_leftSide',['course'=> $course]);?>
 </div>
@@ -354,7 +355,11 @@ echo $this->render('_toolbar',['course'=> $course]);
 
 <!-- Calender Here-->
 <?php case 'Calendar': ?>
-    <div class ='calendar'></div>
+    <div class ='calendar'>
+        <div class="modal-pop-up-assessment">
+            <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+        </div>
+    </div>
     <?php break; ?>
 
   <!--  Block here-->
