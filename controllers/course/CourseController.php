@@ -574,7 +574,7 @@ class CourseController extends AppController
             $assesssmentArray[] = array(
                 'startDate' => date('Y-m-d', $assessment['startdate']),
                 'endDate' => date('Y-m-d', $assessment['enddate']),
-                'reviewDate' => $assessment['reviewdate'],
+                'reviewDate' => date('Y-m-d', $assessment['reviewdate']),
                 'name' => $assessment['name']
                 );
         }

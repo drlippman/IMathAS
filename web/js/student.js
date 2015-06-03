@@ -43,7 +43,7 @@ $(document).ready(function(){
 });
 // Display calendar
     function calendar() {
-       // var html = "<div>Assessment</div>";
+        var htmlMsg = "<div>Assessment</div>";
         var courseId = $('.calender-course-id').val();
         $('.calendar').fullCalendar({
             height: 400,
@@ -67,8 +67,11 @@ $(document).ready(function(){
                         $.each(assessmentData, function (index, assessmentDetail) {
                             events.push({
                                 title: assessmentDetail.name,
-                                start: assessmentDetail.endDate
+                                start: assessmentDetail.endDate,
+                                end : assessmentDetail.reviewDate,
+                                message: 'Assessment'
                             });
+                            console.log(events);
                         });
                         callback(events);
                     }
@@ -78,8 +81,7 @@ $(document).ready(function(){
             eventClick:  function(event, jsEvent, view) {
                 //set the values and open the modal pop up
                 $('.calendar').html(event.html);
-                $('.modal-pop-up-assessment').attr(event,'javascript:void(0);');
-                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.title,width:350});
+                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
             }
 
         });
