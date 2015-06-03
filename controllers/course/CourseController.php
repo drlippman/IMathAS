@@ -296,6 +296,7 @@ class CourseController extends AppController
                 $gbSchemeId = $gbScheme->create($courseId);
                 if ($teacherId && $gbSchemeId) {
                     $this->setSuccessFlash('Course added successfully. Course id: ' . $courseId . ' and Enrollment key: ' . $bodyParams['CourseSettingForm']['enrollmentKey']);
+                    $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
                     $model = new CourseSettingForm();
                     $isSuccess = true;
                 }
