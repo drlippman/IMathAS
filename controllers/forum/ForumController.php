@@ -312,30 +312,9 @@ class ForumController extends AppController
            $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
-
-
-//            $temparray = array(
-//                'threadId' => $postdata['id'],
-//                'forumiddata' => $postdata['forumid'],
-//                'subject' => $titleLevel['title'],
-//                'forumname' => ucfirst($forumname->name),
-//                'postdate' => date('F d, o g:i a', $postdate->lastposttime),
-//                'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-//                'message' => $postdata['message'],
-//                'level' => $titleLevel['level'],
-//
-//                'id' =>$postdata['id'],
-//
-//            );
-
-//            array_push($this->postData[$postdata['id']],$temparray);
-//
-//        }
-
         $this->createChild($this->children[0]);
-//        $this->includeCSS(['../css/forums.css']);
-
-        return $this->render('post',['postdata' => $postArray]);
+        $this->includeCSS(['../css/forums.css']);
+        return $this->render('post',['postdata' => $this->totalPosts]);
     }
     public function createChild($childArray, $arrayKey = 0)
     {
@@ -354,7 +333,6 @@ class ForumController extends AppController
         if (count($this->children)) {
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
-//        AppUtility::dump($this->totalPosts);
 
     }
 

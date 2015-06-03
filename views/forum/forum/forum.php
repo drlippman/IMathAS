@@ -96,6 +96,11 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<p><a href='#'</a>Show full thread</p>";
         echo "</div>\n"   ?>
 </div>
+<div id="result">
+
+    <?php echo("No Result Found For Your Search");?>
+
+</div>
 
 
     <script>
@@ -105,40 +110,56 @@ $this->params['breadcrumbs'][] = $this->title;
             jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
             $('#searchthread').hide();
             $('#searchpost').hide();
+            $('#result').hide();
+
             $('#forum_search').click(function ()
             {
 
-
+                var searchReg = /^[a-zA-Z0-9-]+$/;
                 var search = $('#search_text').val();
                 var courseId = $('.courseId').val();
                 var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
-                if(search.length>0)
-                {
 
-                      $('#flash-message').hide();
-                        if(val == 'subject')
+
+                        if(search.length>0)
                         {
-                            $('#searchthread').show();
-                            $('#display').hide();
-                            $('#searchpost').hide();
-                            jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                            if(search.match(/^[a-z A-Z 0-9-]+$/))
+                            {
+;
+                                  $('#flash-message').hide();
+                                    if(val == 'subject')
+                                    {
+                                        $('#searchthread').show();
+                                        $('#display').hide();
+                                        $('#searchpost').hide();
+                                        $('#result').hide();
+                                        jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                                    }
+                                    else
+                                    {
+                                        $('#searchthread').hide();
+                                        $('#display').hide();
+                                        $('#searchpost').show();
+                                        $('#result').hide();
+                                        jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
+
+                                    }
+
+                            }
+                            else
+                            {
+                                $('#flash-message').show();
+                                $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
+                            }
+
                         }
-                        else
+                       else
                         {
-                            $('#searchthread').hide();
-                            $('#display').hide();
-                            $('#searchpost').show();
+                            $('#flash-message').show();
+                                    $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
 
-                            jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
 
                         }
-                }
-               else
-                {
-                            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blankn");
-
-
-                }
 
 
 
@@ -170,12 +191,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
             }
+            else
+            {
+                $('#searchpost').hide();
+                $('#result').show();
+            }
         }
 
         function threadSuccess(response)
         {
-                console.log(response);
+
             var result = JSON.parse(response);
+
            if (result.status == 0)
            {
 
@@ -183,47 +210,53 @@ $this->params['breadcrumbs'][] = $this->title;
                var checkvalue= result.checkvalue;
                var searchtext = result.search;
 
-                   var html = "";
-                   $.each(searchdata, function(index, search)
-                   {
-
-                       if(result.checkvalue == 'subject')
+                      var html = "";
+                       $.each(searchdata, function(index, search)
                        {
 
-                           if(search.replyby == null)
-                           {
-                               search.replyby= 0;
-                               html += "<tr> <td><a href='#'>" +(search.subject) +"</a> "+ search.name+" </td> ";
-                               html += "<td>" + search.replyby + "</td>";
-                               html += "<td>" + search.views + "</td>";
-                               html += "<td>" + search.postdate + "</td>";
-                           }
-                           else
+                           if(result.checkvalue == 'subject')
                            {
 
-                               html += "<tr> <td><a href='#'>" +(search.subject) +"</a> "+ search.name+" </td> ";
-                               html += "<td>" + search.replyby + "</td>";
-                               html += "<td>" + search.views + "</td>";
-                               html += "<td>" + search.postdate + "</td>";
+                               if(search.replyby == null)
+                               {
+                                   search.replyby= 0;
+                                   html += "<tr> <td><a href='#'>" +(search.subject) +"</a> "+ search.name+" </td> ";
+                                   html += "<td>" + search.replyby + "</td>";
+                                   html += "<td>" + search.views + "</td>";
+                                   html += "<td>" + search.postdate + "</td>";
+                               }
+                               else
+                               {
+
+                                   html += "<tr> <td><a href='#'>" +(search.subject) +"</a> "+ search.name+" </td> ";
+                                   html += "<td>" + search.replyby + "</td>";
+                                   html += "<td>" + search.views + "</td>";
+                                   html += "<td>" + search.postdate + "</td>";
+                               }
                            }
-                       }
-                       else if(result.checkvalue == 'post')
-                       {
-                           alert("Work in Progress");
+                           else if(result.checkvalue == 'post')
+                           {
+                               alert("Work in Progress");
+
+                           }
 
 
+                       });
 
-                       }
 
-                   });
+                       $(".forumsearch-table-body tr").remove();
+                       $(".forumsearch-table-body").append(html);
+                       $('.forumsearch-table').DataTable();
+                 }
+            else{
 
-               $(".forumsearch-table-body tr").remove();
-               $(".forumsearch-table-body").append(html);
-               $('.forumsearch-table').DataTable();
-
+               $('#searchthread').hide();
+               $('#result').show();
 
            }
+
         }
+
 
         function forumsSuccess(response) {
 

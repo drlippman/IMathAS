@@ -148,7 +148,6 @@ use app\components\AppUtility;
                         {
 
                                window.location ="index?cid="+courseid;
-<!--                            window.location=<a href="--><?php //echo AppUtility::getURLFromHome('course', 'course/index?cid=' .) ?><!--">-->
                                  $(this).dialog('destroy').remove();
 
                         }
