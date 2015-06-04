@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript" charset="utf8"
         src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <input type="hidden" id="course-id" value="<?php echo $cid ?>">
+<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
 
 <div id="search">
     <span>Search: <input type=text name="search" /></span>
@@ -26,12 +27,14 @@ $this->params['breadcrumbs'][] = $this->title;
     &nbsp;&nbsp;<span><?= Html::submitButton('Search', ['id' => 'change-button','class' => 'btn btn-primary btn-sm', 'name' => 'search-button',]) ?></span>
 </div>
 <div id="thread">
-    <span><?= Html::submitButton('Add New Thread', ['id' => 'addnewthread','class' => 'btn btn-primary btn-sm', 'name' => 'Addnewthread-button']) ?></span> |
+    <span>
+        <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?id=' .$forumid ); ?>"
+           class="btn btn-primary btn-sm">Add New Thread</a></span> |
     <span></span><a href="#">List Posts by Name</a> </span>|
     <span><a href="#">Limit to New</a> | <a href="#">Limit to Flagged</a></span>|
     <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
 </div>
-<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
+
 
 <div>
     <table id="forum-table displayforum" class="forum-table">

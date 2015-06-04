@@ -575,7 +575,9 @@ class CourseController extends AppController
                 'startDate' => date('Y-m-d', $assessment['startdate']),
                 'endDate' => date('Y-m-d', $assessment['enddate']),
                 'reviewDate' => date('Y-m-d', $assessment['reviewdate']),
-                'name' => $assessment['name']
+                'name' => $assessment['name'],
+                'endDateString' => $assessment['enddate'],
+                'reviewDateString' => $assessment['reviewdate']
                 );
         }
         return $this->getReturnableResponse(0,$assesssmentArray);
