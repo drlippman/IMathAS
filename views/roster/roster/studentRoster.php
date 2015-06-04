@@ -48,9 +48,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <a class="uncheck-all" href="#">None</a>
                 With Selected:</span>
     </form>
-    <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">
+    <form action="roster-email" method="post" id="roster-form">
         <input type="hidden" id="student-id" name="student-data" value=""/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-email" value="Email"></span>
+        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
+                  id="">Email</a></span>
     </form>
     <form>
         <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
