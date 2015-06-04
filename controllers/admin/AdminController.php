@@ -31,7 +31,6 @@ class AdminController extends AppController
         $this->guestUserHandler();
         $model = new AddNewUserForm();
         if ($model->load(Yii::$app->request->post())){
-
             $params = $this->getBodyParams();
             $params = $params['AddNewUserForm'];
             $params['SID'] = $params['username'];
@@ -42,7 +41,6 @@ class AdminController extends AppController
             $model = new AddNewUserForm();
             $user->attributes = $params;
             $user->save();
-
             $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
         }
          $this->includeJS(["../js/courseSetting.js"]);
@@ -73,19 +71,17 @@ class AdminController extends AppController
 
     public function actionGetAllCourseUserAjax()
     {
-        $cid = Yii::$app->request->get('cid');
-
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $courseData = Course::findCourseDataArray();
         $user = User::findAllUsersArray($sortBy, $order);
 
-        return json_encode(array('status' => 0, 'courses' => $courseData, 'users' => $user));
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courses' => $courseData, 'users' => $user));
     }
 
     public function actionChangeRights()
     {
-        $id = Yii::$app->request->get('id');
+        $id = $this->getParamVal('id');
         $this->guestUserHandler();
         $model = new ChangeRightsForm();
         if ($model->load(Yii::$app->request->post())) {

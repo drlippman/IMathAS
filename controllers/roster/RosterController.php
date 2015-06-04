@@ -31,7 +31,7 @@ use app\components\AppConstant;
 
 class RosterController extends AppController
 {
-//Controller method to display student information on student roster page.
+    //Controller method to display student information on student roster page.
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
@@ -48,14 +48,12 @@ class RosterController extends AppController
                 $isSectionPresent = true;
             }
         }
-        if ($this->isPost()) {
-            $params = $this->getBodyParams();
-        }
         $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
         $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
         return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent]);
      }
-//Controller method for redirect to Login Grid View page.
+
+    //Controller method for redirect to Login Grid View page.
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
@@ -65,7 +63,8 @@ class RosterController extends AppController
         $this->includeJS(['../js/logingridview.js', '../js/general.js']);
         return $this->render('loginGridView', ['course' => $course]);
     }
-//Controller ajax method to retrieve student data form Login grid table
+
+    //Controller ajax method to retrieve student data form Login grid table
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();
@@ -118,8 +117,7 @@ class RosterController extends AppController
         $retJSON = new \stdClass();
         $retJSON->header = $headsArray;
         $retJSON->rows = $stuLogs;
-        $test = array('status' => '0', 'data' => $retJSON);
-        return json_encode($test);
+        return $this->successResponse($retJSON);
     }
 
 
@@ -152,7 +150,7 @@ class RosterController extends AppController
             );
             array_push($studentArray, $tempArray);
         }
-        return json_encode(['status' => '0', 'query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent]);
+        return json_encode(['status' => AppConstant::RETURN_SUCCESS, 'query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent]);
      }
 
 
@@ -189,11 +187,12 @@ class RosterController extends AppController
         }
         return $this->render('studentEnrollment', ['course' => $course, 'model' => $model]);
     }
-//Controller method to redirect on Assign and Section Codes page with student information
+
+    // Controller method to redirect on Assign and Section Codes page with student information
     public function actionAssignSectionsAndCodes()
     {
         $this->guestUserHandler();
-        $courseid = Yii::$app->request->get('cid');
+        $courseid = $this->getParamVal('cid');
         $query = Student::findByCid($courseid);
         $course = Course::getById($courseid);
         $studentArray = array();
@@ -206,15 +205,16 @@ class RosterController extends AppController
             array_push($studentArray, $tempArray);
         }
         if ($this->isPost()) {
-            $paramas = $_POST;
-            foreach ($paramas['section'] as $key => $section) {
-                $code = trim($paramas['code'][$key]);
+            $params = $_POST;
+            foreach ($params['section'] as $key => $section) {
+                $code = trim($params['code'][$key]);
                 Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseid);
             }
             $this->redirect('student-roster?cid=' . $courseid);
         }
         return $this->render('assignSectionsAndCodes', ['studentInformation' => $studentArray, 'cid' => $courseid,'course'=>$course]);
     }
+
 //Controller method to redirect on Manage Late Passes page with student information,
     public function actionManageLatePasses()
     {
@@ -246,14 +246,14 @@ class RosterController extends AppController
         return $this->render('manageLatePasses', ['studentInformation' => $studentArray,'course' => $course]);
     }
 
-//Controller method to display the dynamic radio list of courses
+    // Controller method to display the dynamic radio list of courses
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $model = new EnrollFromOtherCourseForm();
         $course = Course::getById($cid);
-        $teacherId = Yii::$app->user->identity->getId();
+        $teacherId = $this->getUserId();
         $list = Teacher::getTeacherByUserId($teacherId);
         $courseDetails = array();
         foreach ($list as $teacher) {
@@ -273,13 +273,14 @@ class RosterController extends AppController
         return $this->render('enrollFromOtherCourse', ['course' => $course, 'data' => $courseDetails, 'model' => $model]);
     }
 
-//Controller method to dynamically create student list with checkbox and enroll students displayed in a list in current course.
-
+    // Controller method to dynamically create student list with checkbox and enroll students displayed in a list in current course.
     public function actionEnrollStudents()
     {
         $this->guestUserHandler();
-        $courseid = Yii::$app->request->get('course');
-        $cid = Yii::$app->request->get('cid');
+
+        $courseid = $this->getParamVal('course');
+        $cid = $this->getParamVal('cid');
+
         $model = new EnrollStudentsForm();
         $course = Course::getById($courseid);
         $query = Student::findByCid($courseid);
@@ -328,7 +329,7 @@ class RosterController extends AppController
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         $model = new CreateAndEnrollNewStudentForm();
         if ($this->isPost()) {
@@ -358,7 +359,7 @@ class RosterController extends AppController
     public function actionManageTutors()
     {
         $this->guestUserHandler();
-        $courseid = Yii::$app->request->get('cid');
+        $courseid = $this->getParamVal('cid');
         $course = Course::getById($courseid);
         $tutors = Tutor::getByCourseId($courseid);
         $tutorId = array();
@@ -366,7 +367,6 @@ class RosterController extends AppController
         $sortBy = 'section';
         $order = AppConstant::ASCENDING;
         foreach ($tutors as $tutor) {
-
             $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id, 'section' => $tutor->section);
             array_push($tutorInfo, $tempArray);
         }
@@ -412,7 +412,7 @@ class RosterController extends AppController
                     if ($isTeacher) {
                         $tutors = Tutor::getByUserId($isTeacher->userid, $courseid);
                         if (!$tutors) {
-                            $tutorInfo = array('Name' => $userId->FirstName . ' ' . $userId->LastName, 'id' => $userId->id);
+                            $tutorInfo = array('Name' => AppUtility::getFullName($userId->FirstName, $userId->LastName), 'id' => $userId->id);
                             array_push($tutorsArray, $tutorInfo);
                             $tutor = new Tutor();
                             $tutor->create($isTeacher->userid, $courseid);
@@ -438,15 +438,14 @@ class RosterController extends AppController
                 Tutor::deleteTutorByUserId($tutor);
             }
         }
-        return json_encode(array('status' => 0, 'userNotFound' => $userNotFoundArray, 'tutors' => $tutorsArray, 'section' => $sectionArray));
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'userNotFound' => $userNotFoundArray, 'tutors' => $tutorsArray, 'section' => $sectionArray));
     }
 
     public function actionImportStudent()
     {
-        $user = $this->getAuthenticatedUser();
         $model = new ImportStudentForm();
         $nowTime = time();
-        $courseId = Yii::$app->request->get('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $studentRecords = '';
         if ($model->load(Yii::$app->request->post())) {
@@ -506,7 +505,6 @@ class RosterController extends AppController
                 }
                 $userData = User::getByName($StudentDataArray[0]);
                 if ($userData) {
-                    $userExist = User::userAlreadyExist($StudentDataArray[0]);
                 } else {
                     if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($StudentDataArray[0]) < 4) {
                         $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
@@ -527,12 +525,11 @@ class RosterController extends AppController
                             $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
                         }
                     }
-
                     array_push($StudentDataArray, $password);
                     array_push($AllUserArray, $StudentDataArray);
                 }
                 if ($userData){
-                    array_push($ExistingUser,$userData);
+                    array_push($ExistingUser, $userData);
                     array_push($AllUserArray, $StudentDataArray);
                 }
             }
@@ -631,14 +628,12 @@ class RosterController extends AppController
         {
             Student::updateLocked($students,$params['courseid']);
         }
-
-        return json_encode(array('status' => 0));
-
+        return $this->successResponse();
     }
 
     public function actionRosterEmail()
     {
-        $courseId = Yii::$app->request->get('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessments = Assessments::getByCourseId($courseId);
         $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
@@ -668,7 +663,7 @@ class RosterController extends AppController
             Student::deleteStudent($students,$params['courseid']);
         }
 
-        return json_encode(array('status' => 0));
+        return $this->successResponse();
     }
 
     public function actionRosterEmailAjax()
@@ -679,11 +674,9 @@ class RosterController extends AppController
 
     public function actionRosterMessage()
     {
-        $courseId = Yii::$app->request->get('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessments = Assessments::getByCourseId($courseId);
-        $selectedStudents = $this->getBodyParams();
-
         if($this->isPost()){
             return $this->renderWithData('rosterEmail');
         }
@@ -691,6 +684,3 @@ class RosterController extends AppController
         return $this->renderWithData('rosterMessage',['course' => $course ,'assessments' => $assessments]);
     }
 }
-
-
-

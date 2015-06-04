@@ -17,4 +17,14 @@ class QuestionSet extends BaseImasQuestionset
     {
         return static::findAll(['id' => $id]);
     }
+    public static function getById($id)
+    {
+        $query = "SELECT qtext FROM imas_questionset WHERE id= 1";
+        $connection = Yii::$app->getDb();
+        $command = $connection->createCommand($query);
+        $qdata = $command->queryAll();
+        return $qdata;
+
+    }
+
 } 

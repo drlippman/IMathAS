@@ -4,8 +4,6 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 $this->title = 'Thread';
-//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['course/course/index?cid='.$_GET['cid']]];
-//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['forum/forum/search-forum?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"

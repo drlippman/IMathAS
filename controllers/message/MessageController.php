@@ -32,10 +32,7 @@ class MessageController extends AppController
             $order = AppConstant::ASCENDING;
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
-
             $teacher = Teacher::getTeachersById($cid);
-            $messages = Message::getByCourseId($cid);
-            $senders = Message::getSenders($cid);
             return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights]);
         }
 
@@ -44,39 +41,38 @@ class MessageController extends AppController
     public function actionSendMessage()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         if ($this->getAuthenticatedUser()) {
             $course = Course::getById($cid);
             $teacher = Teacher::getTeachersById($cid);
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
             $users = User::findAllUsers($sortBy, $order);
-            $uid = Yii::$app->user->identity->getId();
+            $uid = $this->getUserId();
             $this->includeCSS(["../css/message.css"]);
             $this->includeJS(['../js/message/sendMessage.js',"../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
             return $this->renderWithData('sendMessage', ['course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $uid]);
-
         }
     }
 
     public function actionConfirmMessage()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $uid = Yii::$app->user->identity->getId();
+            $uid = $this->getUserId();
             if ($params['receiver'] != 0 && $params['cid'] != null) {
                 $message = new Message();
                 $message->create($params, $uid);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
         }
     }
 
     public function actionDisplayMessageAjax()
     {
         if (!$this->isGuestUser()) {
-            $uid = Yii::$app->user->identity->getId();
+            $uid = $this->getUserId();
             $params = $this->getBodyParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
             $mesages = Message::getUsersToDisplay($uid);
@@ -87,34 +83,25 @@ class MessageController extends AppController
                         $dateArray[] = $message;
                     }
                 }
-
-                $newArray = array();
-                foreach ($dateArray as $singleDate) {
-                    $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
-                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
-                    $singleDate['title'] = $titleLevel['title'];
-                    $newArray[] = $singleDate;
-                }
             } else {
                 foreach ($mesages as $message) {
                     $dateArray[] = $message;
                 }
-                $newArray = array();
-                foreach ($dateArray as $singleDate) {
-                    $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
-                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
-                    $singleDate['title'] = $titleLevel['title'];
-                    $newArray[] = $singleDate;
-                }
             }
-            return json_encode(array('status' => 0, 'messageData' => $newArray));
+            $newArray = array();
+            foreach ($dateArray as $singleDate) {
+                $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                $newArray[] = $singleDate;
+            }
+
+            return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $newArray));
         }
     }
 
     public function actionSentMessage()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
 
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
@@ -123,8 +110,6 @@ class MessageController extends AppController
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($cid);
-            $messages = Message::getByCourseId($cid);
-            $senders = Message::getSenders($cid);
             return $this->renderWithData('sentMessage', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher]);
         }
     }
@@ -132,9 +117,9 @@ class MessageController extends AppController
     public function actionDisplaySentMessageAjax()
     {
         if (!$this->isGuestUser()) {
-            $uid = Yii::$app->user->identity->getId();
+            $uid = $this->getUserId();
             $mesages = Message::getUsersToDisplayMessage($uid);
-
+            $dateArray = array();
             if ($mesages) {
 
                 foreach ($mesages as $message) {
@@ -147,9 +132,9 @@ class MessageController extends AppController
                     $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
                 }
-                return json_encode(array('status' => 0, 'messageData' => $newArray));
+                return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $newArray));
             } else {
-                return json_encode(array('status' => 0, 'messageData' => $mesages));
+                return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $mesages));
             }
         }
     }
@@ -158,49 +143,41 @@ class MessageController extends AppController
     public function actionGetCourseAjax()
     {
         $this->guestUserHandler();
-
-        $user = $this->getAuthenticatedUser();
         $params = Yii::$app->request->getBodyParams();
-        $cid = $params['cid'];
         $userId = $params['userId'];
         $teachers = Teacher::getTeacherByUserId($userId);
         $teacherArray = array();
         foreach ($teachers as $teacher) {
             $tempArray = array('courseId' => $teacher->course->id,
                 'courseName' => $teacher->course->name);
-
             array_push($teacherArray, $tempArray);
         }
-        return json_encode(array('status' => 0, 'courseData' => $teacherArray));
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courseData' => $teacherArray));
     }
 
     public function actionMarkAsUnreadAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
-
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $cid = Yii::$app->request->get('cid');
-            $messageIds = $params['checkedMsg'];
-            foreach ($messageIds as $messageId) {
-                Message::updateUnread($messageId);
-
+            $msgIds = $params['checkedMsg'];
+            foreach ($msgIds as $msgId) {
+                Message::updateUnread($msgId);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
         }
-
     }
 
     public function actionMarkAsReadAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $messageIds = $params['checkedMsg'];
             foreach ($messageIds as $messageId) {
                 Message::updateRead($messageId);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
         }
     }
 
@@ -208,20 +185,15 @@ class MessageController extends AppController
     public function actionGetUserAjax()
     {
         $this->guestUserHandler();
-
-        $user = $this->getAuthenticatedUser();
-        $params = Yii::$app->request->getBodyParams();
-        $cid = $params['cid'];
-        $userId = Yii::$app->user->identity->getId();
-        $mesages = Message::getUsersToUserMessage($userId);
-
-        return json_encode(array('status' => 0, 'userData' => $mesages));
+        $userId = $this->getUserId();
+        $query = Message::getUsersToUserMessage($userId);
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'userData' => $query));
     }
 
     public function actionViewMessage()
     {
         $this->guestUserHandler();
-        $msgId = Yii::$app->request->get('id');
+        $msgId = $this->getParamVal('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
@@ -235,13 +207,13 @@ class MessageController extends AppController
     public function actionMarkAsDeleteAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $msgIds = $params['checkedMsg'];
             foreach ($msgIds as $msgId) {
                 Message::deleteFromReceivedMsg($msgId);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
 
         }
     }
@@ -249,13 +221,13 @@ class MessageController extends AppController
     public function actionMarkSentRemoveAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $msgIdss = $params['checkedMsgs'];
             foreach ($msgIdss as $msgId) {
                 Message::deleteFromSentMsg($msgId);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
 
         }
     }
@@ -263,8 +235,8 @@ class MessageController extends AppController
     public function actionReplyMessage()
     {
         $this->guestUserHandler();
-        $baseId = Yii::$app->request->get('baseid');
-        $msgId = Yii::$app->request->get('id');
+        $baseId = $this->getParamVal('baseid');
+        $msgId = $this->getParamVal('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
@@ -276,41 +248,30 @@ class MessageController extends AppController
     public function actionGetSentCourseAjax()
     {
         $this->guestUserHandler();
-
-        $user = $this->getAuthenticatedUser();
-        $params = Yii::$app->request->getBodyParams();
-        $cid = $params['cid'];
-
-        $userId = Yii::$app->user->identity->getId();
-        $mesages = Message::getUsersToCourseMessage($userId);
-
-        return json_encode(array('status' => 0, 'courseData' => $mesages));
+        $userId = $this->getUserId();
+        $message = Message::getUsersToCourseMessage($userId);
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courseData' => $message));
     }
 
     public function actionGetSentUserAjax()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
-        $params = Yii::$app->request->getBodyParams();
-        $cid = $params['cid'];
-        $userId = Yii::$app->user->identity->getId();
-        $mesages = Message::getSentUsersMessage($userId);
-
-        return json_encode(array('status' => 0, 'userData' => $mesages));
-
+        $userId = $this->getUserId();
+        $message = Message::getSentUsersMessage($userId);
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'userData' => $message));
     }
 
     public function actionReplyMessageAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = Yii::$app->request->getBodyParams();
             if ($this->getAuthenticatedUser()) {
                 if ($params['receiver'] != 0 && $params['cid'] != null) {
                     $message = new Message();
                     $message->createReply($params);
                 }
-                return json_encode(array('status' => 0));
+                return $this->successResponse();
             }
         }
     }
@@ -320,7 +281,7 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
-        $user = Yii::$app->user->identity;
+        $user = $this->getAuthenticatedUser();
 
         if($baseId == 0)
         {
@@ -328,8 +289,6 @@ class MessageController extends AppController
         }
 
         $messages = Message::getByBaseId($msgId, $baseId);
-        $children = array();
-
         foreach ($messages as $message) {
             $this->children[$message['parent']][] = $message['id'];
             $tempArray = array();
@@ -354,6 +313,7 @@ class MessageController extends AppController
         $this->createChild($this->children[key($this->children)]);
         return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages,'user' => $user]);
     }
+
     public function createChild($childArray, $arrayKey = 0)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
@@ -375,23 +335,22 @@ class MessageController extends AppController
     public function actionMarkSentUnsendAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post()) {
+        if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $msgIdss = $params['checkedMsgs'];
-            foreach ($msgIdss as $msgId) {
+            $msgIds = $params['checkedMsgs'];
+            foreach ($msgIds as $msgId) {
                 Message::sentUnsendMsg($msgId);
             }
-            return json_encode(array('status' => 0));
+            return $this->successResponse();
         }
     }
 
     public function actionChangeImageAjax()
     {
-
         $params = $this->getBodyParams();
+
         $rowId = $params['rowId'];
         Message::updateFlagValue($rowId);
         return json_encode(['status' => '0']);
-
     }
 }

@@ -39,11 +39,9 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
 
+        $id = $this->getParamVal('id');
+        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $cid = $this->getParamVal('cid');
-        $id = Yii::$app->request->get('id');
-        $uid = Yii::$app->user->identity->getId();
-        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
-        $cid = Yii::$app->request->get('cid');
         $responseData = array();
         $course = Course::getById($cid);
         if ($course) {
@@ -144,20 +142,13 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
 
-        $id = Yii::$app->request->get('id');
-        $courseId = Yii::$app->request->get('cid');
+        $id = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
         $assessment = Assessments::getByAssessmentId($id);
-        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
+        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
-
-
-        $assessmentclosed = false;
-
-        if ($assessment->avail == 0) {
-            $assessmentclosed = true;
-        }
 
         $this->saveAssessmentSession($assessment, $id);
 
@@ -171,7 +162,7 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $assessmentId = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
-        $studentId = Yii::$app->user->identity->id;
+        $studentId = $this->getUserId();
         $exception = Exceptions::getByAssessmentId($assessmentId);
 
         $assessment = Assessments::getByAssessmentId($assessmentId);
@@ -194,12 +185,6 @@ class CourseController extends AppController
         $param['islatepass'] = 1;
 
         if (count($exception)) {
-
-            if ($assessment->allowlate != 0 && $assessment->enddate != 0 && $assessment->startdate != 0) {
-
-                $hasException = true;
-            }
-
 
             if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate) < $course->latepasshrs * 3600))) {
                 $latepass = $student->latepass;
@@ -240,18 +225,6 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
-
-//    public function actionQuestion()
-//    {
-//        $this->guestUserHandler();
-//        $questionId = $this->getParamVal('to');
-//        $pq = AppUtility::basicShowQuestions($questionId);
-//        AppUtility::dump($pq);die;
-//
-////        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
-//
-//
-//    }
 
     public function actionPassword()
     {
@@ -324,12 +297,12 @@ class CourseController extends AppController
                 $params = $bodyParams['CourseSettingForm'];
                 $courseSetting['name'] = $params['courseName'];
                 $courseSetting['enrollkey'] = $params['enrollmentKey'];
-                $availables = $this->getSanitizedValue($params['available'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
-                $courseSetting['available'] = AppUtility::makeAvailable($availables);
+                $available = $this->getSanitizedValue($params['available'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
+                $courseSetting['available'] = AppUtility::makeAvailable($available);
                 $courseSetting['copyrights'] = $params['copyCourse'];
                 $courseSetting['msgset'] = $params['messageSystem'];
-                $toolsets = $this->getSanitizedValue($params['navigationLink'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
-                $courseSetting['toolset'] = AppUtility::makeToolset($toolsets);
+                $toolset = $this->getSanitizedValue($params['navigationLink'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
+                $courseSetting['toolset'] = AppUtility::makeToolset($toolset);
                 $courseSetting['deflatepass'] = $params['latePasses'];
                 $courseSetting['theme'] = $params['theme'];
                 $courseSetting['deftime'] = AppUtility::calculateTimeDefference($bodyParams['start_time'], $bodyParams['end_time']);
@@ -384,10 +357,10 @@ class CourseController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
 
-            if (Yii::$app->user->identity->rights == 75) // 75 is instructor right
+            if ($this->getAuthenticatedUser()->rights == 75) // 75 is instructor right
             {
 
-            } elseif (Yii::$app->user->identity->rights > 75) {
+            } elseif ($this->getAuthenticatedUser()->rights > 75) {
                 $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
                 if ($course) {
                     $course->ownerid = $params['newOwner'];
@@ -401,8 +374,8 @@ class CourseController extends AppController
                     $newTeacher = new Teacher();
                     $newTeacher->create($params['oldOwner'], $params['cid']);
                 }
-            } elseif (Yii::$app->user->identity->rights > 40) {
-                if ($params['oldOwner'] == Yii::$app->user->identity->id) {
+            } elseif ($this->getAuthenticatedUser()->rights > 40) {
+                if ($params['oldOwner'] == $this->getUserId()) {
                     $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
                     if ($course) {
                         $course->ownerid = $params['newOwner'];
@@ -410,7 +383,7 @@ class CourseController extends AppController
                     }
                 }
             }
-            return $this->getReturnableResponse(0);
+            return $this->successResponse();
         }
     }
 
@@ -449,7 +422,7 @@ class CourseController extends AppController
                 }
             }
         }
-        return $this->getReturnableResponse(0, array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher));
+        return $this->successResponse(array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher));
     }
 
     public function actionAddTeacherAjax()
@@ -462,7 +435,7 @@ class CourseController extends AppController
             if ($params['userId'] != null && $params['cid'] != null) {
                 $teacher->create($params['userId'], $params['cid']);
             }
-            return $this->getReturnableResponse(0);
+            return $this->successResponse();
         }
 
     }
@@ -477,7 +450,7 @@ class CourseController extends AppController
             if ($params['userId'] != null && $params['cid'] != null) {
                 $teacher->removeTeacher($params['userId'], $params['cid']);
             }
-            return $this->getReturnableResponse(0);
+            return $this->successResponse();
         }
     }
 
@@ -486,14 +459,14 @@ class CourseController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $cid = $params['cid'];
-            $usersId = json_decode($params['usersId']);
+            $usersIds = json_decode($params['usersId']);
 
-            for ($i = 0; $i < count($usersId); $i++) {
+            for ($i = 0; $i < count($usersIds); $i++) {
                 $teacher = new Teacher();
-                $teacher->create($usersId[$i], $cid);
+                $teacher->create($usersIds[$i], $cid);
             }
 
-            return $this->getReturnableResponse(0);
+            return $this->successResponse();
         }
     }
 
@@ -501,15 +474,16 @@ class CourseController extends AppController
     {
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $cid = $params['cid'];
-            $usersId = json_decode($params['usersId']);
 
-            for ($i = 0; $i < count($usersId); $i++) {
+            $cid = $params['cid'];
+            $usersIds = json_decode($params['usersId']);
+
+            for ($i = 0; $i < count($usersIds); $i++) {
                 $teacher = new Teacher();
-                $teacher->removeTeacher($usersId[$i], $cid);
+                $teacher->removeTeacher($usersIds[$i], $cid);
             }
 
-            return $this->getReturnableResponse(0);
+            return $this->successResponse();
         }
     }
 
@@ -568,18 +542,18 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $cid = $params['cid'];
         $assessments = Assessments::getByCourseId($cid);
-        $assesssmentArray = array();
+        $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
-            $assesssmentArray[] = array(
-                'startDate' => date('Y-m-d', $assessment['startdate']),
-                'endDate' => date('Y-m-d', $assessment['enddate']),
-                'reviewDate' => date('Y-m-d', $assessment['reviewdate']),
+            $assessmentArray[] = array(
+                'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
+                'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
+                'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
                 'name' => $assessment['name'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate']
                 );
         }
-        return $this->getReturnableResponse(0,$assesssmentArray);
+        return $this->successResponse($assessmentArray);
     }
 }

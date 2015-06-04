@@ -77,7 +77,7 @@ $(document).ready(function(){
                                 events.push({
                                     title: assessmentDetail.name,
                                     start: assessmentDetail.reviewDate,
-                                    message1: 'Review Assessment',
+                                    message: 'Review Assessment',
                                     color: eventColor
                                 });
                             }
@@ -85,7 +85,7 @@ $(document).ready(function(){
                             {
                                 events.push({
                                     title: assessmentDetail.name,
-                                    start: assessmentDetail.reviewDate,
+                                    start: assessmentDetail.endDate,
                                     message: 'Assessment',
                                     color: eventColor
                                 });
@@ -98,15 +98,7 @@ $(document).ready(function(){
             eventClick:  function(event, jsEvent, view) {
                 //set the values and open the modal pop up
                 $('.calendar').html(event.html);
-                if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > now)
-                {
-                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message1,width:350});
-                }
-                else
-                {
-                    $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
-                }
-
+                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
             }
 
         });

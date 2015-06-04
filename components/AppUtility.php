@@ -123,6 +123,14 @@ class AppUtility extends Component
         return false;
     }
 
+    public static function getFormattedDate($dateStr, $format = 'Y-m-d'){
+        return date($format, $dateStr);
+    }
+
+    public static function getFullName($first, $last){
+        return trim(ucfirst($first).' '.ucfirst($last));
+    }
+
     public static function passwordHash($password)
     {
         require_once("Password.php");

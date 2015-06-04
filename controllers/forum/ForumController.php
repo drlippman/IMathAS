@@ -25,27 +25,22 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
 
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $forum = Forums::getByCourseId($cid);
         $course = Course::getById($cid);
-        $user = Yii::$app->user->identity;
+        $user = $this->getAuthenticatedUser();
         $model = new ForumForm();
         $model->thread = 'subject';
-        if ($model->load(Yii::$app->request->post())) {
-            $param = $this->getBodyParams();
-            $search = $param['ForumForm']['search'];
-        }
+
         $this->includeCSS(['../css/forums.css']);
         return $this->renderWithData('forum', ['model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course]);
     }
 
     public function actionGetForumNameAjax()
     {
-
         $this->guestUserHandler();
         $param = $this->getBodyParams();
         $search = $param['search'];
-        $cid = $param['cid'];
         $checkBoxVal = $param['value'];
         $query = ForumForm::byAllSubject($search);
         if ($query) {
@@ -53,31 +48,24 @@ class ForumController extends AppController
             foreach ($query as $data) {
                 $username = User::getById($data['userid']);
                 $postdate = Thread::getById($data['threadid']);
-
-
                 $temparray = array(
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                     'views' => $data['views'],
                     'replyby' => $data['replyby'],
                     'postdate' => date('F d, o g:i a', $postdate->lastposttime),
-                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-
+                    'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                 );
-
                 array_push($queryarray, $temparray);
-
             }
-
-            return json_encode(array('status' => 0, 'data' => $queryarray, 'checkvalue' => $checkBoxVal, 'search' => $search));
+            return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'data' => $queryarray, 'checkvalue' => $checkBoxVal, 'search' => $search));
         } else {
-            return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+            return $this->terminateResponse('Forums not found for this course.');
         }
 
     }
     public function actionGetSearchPostAjax()
     {
-
         $this->guestUserHandler();
         $param = $this->getBodyParams();
         $search = $param['search'];
@@ -100,19 +88,14 @@ class ForumController extends AppController
                     'views' => $data['views'],
                     'forumname' => ucfirst($forumname->name),
                     'postdate' => date('F d, o g:i a',$postdate->lastposttime),
-                    'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+                    'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                     'message' => $data['message'],
-
                 );
-
                 array_push($queryarray,$temparray);
-
             }
-
-            return json_encode(array('status' => 0, 'data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search));
-//            return RedirectToAction('forum',['data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search]);
+            return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search));
         }else{
-            return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+            return $this->terminateResponse('Forums not found for this course.');
         }
 
     }
@@ -146,9 +129,9 @@ class ForumController extends AppController
                 array_push($forumArray, $tempArray);
             }
             $this->includeCSS(['../css/forums.css']);
-            return json_encode(array('status' => 0, 'forum' => $forumArray));
+            return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'forum' => $forumArray));
         } else {
-            return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
+            return $this->terminateResponse('Forums not found for this course.');
         }
     }
 
@@ -156,14 +139,12 @@ class ForumController extends AppController
     public function actionThread()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
-        $forumid = Yii::$app->request->get('forumid');
-        $forum = Forums::getByCourseId($cid);
-        $user = Yii::$app->user->identity;
+        $forumid = $this->getParamVal('forumid');
+        $user = $this->getAuthenticatedUser();
         $this->includeCSS(['../css/forums.css']);
         $this->includeJS(['../js/thread.js']);
-
         return $this->renderWithData('thread', ['cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course]);
     }
 
@@ -186,25 +167,25 @@ class ForumController extends AppController
                     'views' => $data['views'],
                     'replyby' => $data['replyby'],
                     'postdate' => date('F d, o g:i a',$data['postdate']),
-                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
+                    'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                 );
             array_push($threadArray, $temparray);
 
             }
         $this->includeJS(['../js/thread.js']);
-        return json_encode(array('status' => 0, 'threadData' => $threadArray));
+        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'threadData' => $threadArray));
 
 
     }
 //controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
     public function actionMoveThread()
     {
-        $courseId = Yii::$app->request->get('courseId');
-        $threadId = Yii::$app->request->get('threadId');
-        $forumId = Yii::$app->request->get('forumId');
+        $courseId = $this->getParamVal('courseId');
+        $threadId = $this->getParamVal('threadId');
+        $forumId = $this->getParamVal('forumId');
         $forums = Forums::getByCourseId($courseId);
         $thread = ThreadForm::thread($forumId);
-        $user = Yii::$app->user->identity;
+        $user = $this->getAuthenticatedUser();
         $forumArray = array();
         foreach ($forums as $key => $forum) {
 
@@ -251,9 +232,9 @@ class ForumController extends AppController
     public function actionModifyPost()
     {
         $this->guestUserHandler();
-        $courseId = Yii::$app->request->get('courseId');
-        $threadId = Yii::$app->request->get('threadId');
-        $forumId = Yii::$app->request->get('forumId');
+        $courseId = $this->getParamVal('courseId');
+        $threadId = $this->getParamVal('threadId');
+        $forumId = $this->getParamVal('forumId');
         $thread = ThreadForm::thread($forumId);
         $threadArray = array();
         $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js','../js/modifypost.js']);
@@ -279,16 +260,15 @@ class ForumController extends AppController
         $threadid = $params['threadId'];
         $message = trim($params['message']);
         $subject = trim($params['subject']);
-        ForumPosts::modifyThread($threadid,$message,$subject);
-        return json_encode(array('status' => 0));
+        ForumPosts::modifyThread($threadid, $message, $subject);
+        return $this->successResponse();
     }
 
     public function actionPost()
     {
         $this->guestUserHandler();
-        $threadId = Yii::$app->request->get('threadid');
+        $threadId = $this->getParamVal('threadid');
         $data = ForumPosts::getbyid($threadId);
-         $postArray = array();
 
         foreach ($data as $postdata)
         {
@@ -304,9 +284,9 @@ class ForumController extends AppController
             $tempArray['subject'] = $titleLevel['title'];
             $tempArray['forumname'] = ucfirst($forumname->name);
             $tempArray['postdate'] = date('F d, o g:i a', $postdate->lastposttime);
-            $tempArray['name'] = ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName);
+            $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['message'] = $postdata['message'];
-           $tempArray['level'] = $titleLevel['level'];
+            $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
 
@@ -314,6 +294,7 @@ class ForumController extends AppController
         $this->includeCSS(['../css/forums.css']);
         return $this->render('post',['postdata' => $this->totalPosts]);
     }
+
     public function createChild($childArray, $arrayKey = 0)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
@@ -337,25 +318,20 @@ class ForumController extends AppController
     public function actionMarkAsRemoveAjax()
     {
             $params = $this->getBodyParams();
-            $threadId = $params['threadId'];
-            ForumPosts::removeThread($threadId);
-            return json_encode(array('status' => 0));
 
+            $threadid = $params['threadId'];
+            ForumPosts::removeThread($threadid);
+            return $this->successResponse();
     }
 
    public function actionReplyPost()
    {
        $this->guestUserHandler();
-//       $courseId = Yii::$app->request->get('courseId');
-       $threadId = Yii::$app->request->get('id');
-//         $forumId = Yii::$app->request->get('forumId');
-       $thread =ForumPosts::getbyidpost($threadId);
-
+       $threadId = $this->getParamVal('id');
+       $thread = ForumPosts::getbyidpost($threadId);
        $threadArray = array();
        foreach ($thread as $data)
        {
-
-
                $temparray = array
                (
 
@@ -363,8 +339,6 @@ class ForumController extends AppController
 
                );
                array_push($threadArray, $temparray);
-
-
        }
 
        $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
@@ -372,5 +346,26 @@ class ForumController extends AppController
    return $this->renderWithData('replypost',['reply' => $threadArray]);
 
    }
+
+    public function actionAddNewThread()
+    {
+        $this->guestUserHandler();
+        $threadId = $this->getParamVal('id');
+        $thread = ForumPosts::getbyidpost($threadId);
+        $threadName = Forums::getById($threadId);
+        $threadArray = array();
+        foreach ($thread as $data)
+        {
+            $temparray = array
+            (
+                'subject' => $data['subject'],
+            );
+            array_push($threadArray, $temparray);
+        }
+
+        $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+        return $this->renderWithData('addNewThread',['reply' => $threadArray, 'threadName' => $threadName]);
+
+    }
 
 }

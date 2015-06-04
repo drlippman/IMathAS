@@ -61,5 +61,6 @@ class AppConstant
     const SOMETHING_WENT_WRONG = 'Something went wrong, please try latter.';
 
     const SET_PASSWORD_ERROR = 'Password incorrect. Try again.';
-
+    const RETURN_SUCCESS = 0;
+    const RETURN_ERROR = -1;
 }

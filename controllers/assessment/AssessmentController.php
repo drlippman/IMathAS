@@ -11,35 +11,21 @@ use app\models\Exceptions;
 use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\Student;
-use app\components\AppConstant;
-use app\models\AppModel;
-use app\models\Blocks;
-use app\models\forms\CourseSettingForm;
-use app\models\forms\SetPassword;
 use app\models\Links;
 use app\models\Forums;
-use app\models\GbScheme;
 use app\models\Items;
-use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Wiki;
-use app\models\User;
 use Yii;
-use app\models\forms\DeleteCourseForm;
-use yii\db\Exception;
-use yii\helpers\Html;
 
 class AssessmentController extends AppController
 {
     public function actionIndex()
     {
         $this->guestUserHandler();
-
+        $id = $this->getParamVal('id');
         $cid = $this->getParamVal('cid');
-        $id = Yii::$app->request->get('id');
-        $uid = Yii::$app->user->identity->getId();
-        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
-        $cid = Yii::$app->request->get('cid');
+        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $responseData = array();
         $course = Course::getById($cid);
         if ($course) {
@@ -92,33 +78,28 @@ class AssessmentController extends AppController
                             case 'Assessment':
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempAray[$item->itemtype] = $assessment;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = 1;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Forum':
                                 $form = Forums::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $form;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $wiki;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'InlineText':
                                 $inlineText = InlineText::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $inlineText;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'LinkedText':
                                 $linkedText = Links::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $linkedText;
-                                array_push($responseData, $tempAray);
                                 break;
                         }
+                        array_push($responseData, $tempAray);
                     }
                 }
             }
@@ -139,9 +120,9 @@ class AssessmentController extends AppController
         $this->guestUserHandler();
 
         $id = $this->getParamVal('id');
-        $courseId = Yii::$app->request->get('cid');
+        $courseId = $this->getParamVal('cid');
         $assessment = Assessments::getByAssessmentId($id);
-        $assessmentSession = AssessmentSession::getAssessmentSession(Yii::$app->user->identity->id, $id);
+        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
@@ -205,9 +186,9 @@ class AssessmentController extends AppController
     public function actionLatePass()
     {
         $this->guestUserHandler();
-        $assessmentId = \Yii::$app->request->get('id');
-        $courseId = \Yii::$app->request->get('cid');
-        $studentId = \Yii::$app->user->identity->id;
+        $assessmentId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
+        $studentId = $this->getUserId();
         $exception = Exceptions::getByAssessmentId($assessmentId);
 
         $assessment = Assessments::getByAssessmentId($assessmentId);
@@ -215,7 +196,6 @@ class AssessmentController extends AppController
         $course = Course::getById($courseId);
 
         $addtime = $course->latepasshrs * 60 * 60;
-        $hasexception = true;
         $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $usedlatepasses = round(($assessment->allowlate - $assessment->enddate)/($course->latepasshrs * 3600));
         $startdate = $assessment->startdate;
@@ -231,14 +211,6 @@ class AssessmentController extends AppController
 
         if(count($exception))
         {
-
-            if($assessment->allowlate != 0 && $assessment->enddate != 0 && $assessment->startdate != 0)
-            {
-
-                $hasException = true;
-            }
-
-
             if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate)< $course->latepasshrs * 3600)))
             {
                 $latepass = $student->latepass;
@@ -268,7 +240,7 @@ class AssessmentController extends AppController
                         if ($exception->islatepass > $n)
                         {
                             $exception->islatepass = $exception->islatepass - $n;
-                            $exception->enddate=$newend;
+                            $exception->enddate = $newend;
                         } else {
                             //dnt push anything into db.
                         }

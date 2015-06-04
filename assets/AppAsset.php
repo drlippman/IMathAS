@@ -29,7 +29,7 @@ class AppAsset extends AssetBundle
         'position' => \yii\web\View::POS_HEAD
     );
     public $js = [
-        'js/jquery.min.js',
+        'js/jquery.js',
 //        'js/general.js',
         'js/mathjax/MathJax.js?config=AM_HTMLorMML',
         'js/ASCIIsvg_min.js',

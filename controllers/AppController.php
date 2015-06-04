@@ -61,6 +61,10 @@ class AppController extends Controller
         }
     }
 
+    function getUserId(){
+        return $this->getAuthenticatedUser()->getId();
+    }
+
     function getUserTimezone(){
         return AppConstant::DEFAULT_TIME_ZONE;
     }
@@ -97,14 +101,15 @@ class AppController extends Controller
     public function isPost(){
         return Yii::$app->request->getMethod() == 'POST';
     }
-    public function successResponse($data)
+
+    public function successResponse($data = '')
     {
-        return json_encode(array('status' => 0, 'data' => $data));
+        return $this->getReturnableResponse(AppConstant::RETURN_SUCCESS, $data);
     }
 
     public function terminateResponse($msg)
     {
-        return json_encode(array('status' => -1, 'message' => $msg));
+        return json_encode(array('status' => AppConstant::RETURN_ERROR, 'message' => $msg));
     }
 
     public function getParamVal($key){
@@ -120,7 +125,7 @@ class AppController extends Controller
         return Yii::$app->request->post();
     }
 
-    public function getReturnableResponse($status, $data = ''){
+    public function getReturnableResponse($status = AppConstant::RETURN_SUCCESS, $data = ''){
         return json_encode(array('status' =>$status, 'data' => $data));
     }
 

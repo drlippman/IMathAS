@@ -48,6 +48,7 @@ class Teacher extends BaseImasTeachers
     {
         return static::find()->where(['courseid' => $cid])->all();
     }
+
     public static function getUniqueByUserId($userid)
     {
         return static::findOne( ['userid' => $userid]);

@@ -296,7 +296,6 @@ class SiteController extends AppController
         }
     }
 
-
     public function actionDashboard()
     {
         if (!$this->isGuestUser()) {
@@ -349,7 +348,7 @@ class SiteController extends AppController
     {
         $this->guestUserHandler();
         $tzname = $this->getUserTimezone();
-        $userid = Yii::$app->user->identity->getId();
+        $userid = $this->getUserId();
         $user = $this->getAuthenticatedUser();
         $model = new ChangeUserInfoForm();
 
@@ -365,7 +364,7 @@ class SiteController extends AppController
                 User::saveUserRecord($params);
                 User::updateImgByUserId($userid);
             }
-            if($model->remove==1){
+            if($model->remove == 1){
                 User::deleteImgByUserId($userid);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
             }

@@ -17,7 +17,7 @@ class InstructorController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         $this->includeJS(['../js/course.js']);
         $this->includeCSS(['../css/_leftSide.css']);

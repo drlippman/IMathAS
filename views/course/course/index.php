@@ -32,7 +32,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                     ?>
                     <div class="item">
-                        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+                        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
                         <div class="title">
                             <?php if($assessment->timelimit != 0) { //timelimit
                                if($assessment->password == '') {?> <!--Set password-->
@@ -80,7 +80,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                 </div>
             <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
                 <div class="item">
-                    <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+                    <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
                     <div class="title">
                         <b>
                         <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link"><?php echo $assessment->name ?></a>
@@ -377,6 +377,27 @@ echo $this->render('_toolbar',['course'=> $course]);
                         <?php echo "<p>You have no late passes remaining.</p>";?>
                     <?php }?>
                 <?php }?>
+            </div>
+        </div>
+    </div>
+    <div hidden="" class="modal-pop-up-review-date">
+        <div class="item">
+            <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+            <div class="title">
+                <b>
+                  <?php echo $assessment->name ?></a>
+                </b>
+                <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+                <?php if ($assessment->reviewdate == 2000000000) { ?>
+                    <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
+                    <BR>This assessment is in review mode - no scores will be saved.
+                <?php } else { ?>
+                    <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
+                    <BR>This assessment is in review mode - no scores will be saved.
+                <?php } ?>
+            </div>
+            <div class="itemsum">
+                <p><?php echo $assessment->summary ?></p>
             </div>
         </div>
     </div>
