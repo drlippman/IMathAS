@@ -6,6 +6,7 @@ use app\components\AppUtility;
 $this->title = 'Forums';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['course/course/index?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
+//AppUtility::dump($data);
 ?>
 <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"/>
@@ -82,6 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </table>
 
 </div>
+
 <div id="searchpost">
 <?php
     echo "<div class=block>";
@@ -97,9 +99,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "</div>\n"   ?>
 </div>
 <div id="result">
-
     <?php echo("No Result Found For Your Search");?>
-
 </div>
 
 
@@ -169,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         function postSuccess(response)
         {
-            console.log(response);
+            var count=0;
             var result = JSON.parse(response);
             if (result.status == 0)
             {
@@ -185,9 +185,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     $('#postdate').text(Data.postdate);
                     var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
                    $('#message').text(result);
-
+                    count=count+1;
 
                 });
+
 
 
             }

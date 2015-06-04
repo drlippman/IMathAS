@@ -113,6 +113,7 @@ class ForumController extends AppController
             }
 
             return json_encode(array('status' => 0, 'data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search));
+//            return RedirectToAction('forum',['data' =>$queryarray , 'checkvalue' => $checkBoxVal,'search' => $search]);
         }else{
             return json_encode(array('status' => -1, 'msg' => 'Forums not found for this course.'));
         }
@@ -171,36 +172,32 @@ class ForumController extends AppController
 
     public function actionGetThreadAjax()
     {
-        $param = $this->getBodyParams();
-        $forumid = $param['forumid'];
+        $params = $this->getBodyParams();
+        $forumid = $params['forumid'];
         $thread = ThreadForm::thread($forumid);
-        if ($thread) {
 
-            $threadArray = array();
-
-            foreach ($thread as $data) {
+           $threadArray = array();
+            foreach ($thread as $data)
+            {
                 $username = User::getById($data['userid']);
-                $postdate = Thread::getById($data['threadid']);
 
                 $temparray = array(
+                    'parent' => $data['parent'],
                     'threadId' => $data['id'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                     'views' => $data['views'],
                     'replyby' => $data['replyby'],
-                   // 'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                    'postdate' => date('F d, o g:i a',$data['postdate']),
                     'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
-
                 );
+            array_push($threadArray, $temparray);
 
-                array_push($threadArray, $temparray);
             }
-            return json_encode(array('status' => 0, 'threadData' => $threadArray));
-        }
-        else
-        {
-            return json_encode(array('status' => -1, 'msg' => 'Thread  not found for this Forum'));
-        }
+        $this->includeJS(['../js/thread.js']);
+        return json_encode(array('status' => 0, 'threadData' => $threadArray));
+
+
     }
 //controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
     public function actionMoveThread()
@@ -317,7 +314,8 @@ class ForumController extends AppController
            $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
-        $this->createChild($this->children[0]);
+//        AppUtility::dump($this->children);
+        $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['../css/forums.css']);
         return $this->render('post',['postdata' => $this->totalPosts]);
     }
