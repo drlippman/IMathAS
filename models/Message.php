@@ -193,7 +193,7 @@ class Message extends BaseImasMsgs
         {
             $baseId = $msgId;
         }
-        return Message::find()->where(['id' => $msgId])->orWhere(['baseid' => $baseId])->orderBy('senddate')->asArray()->all();
+        return Message::find()->where(['id' => $baseId])->orWhere(['baseid' => $baseId])->orderBy('senddate')->asArray()->all();
     }
 
     public static function getUsersToDisplay($uid)

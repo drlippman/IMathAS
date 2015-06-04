@@ -46,29 +46,3 @@
     <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid'.$forumId)  ?>">Cancel</a>
 </form>
 
-<script type="text/javascript">
-$(document).ready(function() {
-    $('#move-forum').show();
-    $('#move-thread').hide();
-
-    $('#myForm input').on('change', function() {
-      var v=$('input[name="movetype"]:checked', '#myForm').val();
-
-            if (v==0) {
-                $('#move-forum').show();
-                $('#move-thread').hide();
-            }
-            if (v==1) {
-                $('#move-forum').hide();
-                $('#move-thread').show();
-            }
-
-
-    $("#move-button").click(function () {
-        //var thread_id =  $( "#thread-id" ).val();
-        var forum_id =  $('input[name="forum-name"]:checked', '#myForm').val();
-
-    });
-    });
-});
-</script>

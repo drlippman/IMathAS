@@ -94,9 +94,6 @@ class ForumController extends AppController
                 $postdate = Thread::getById($data['threadid']);
                 $forumname = Forums::getById($data['forumid']);
 
-
-
-
                 $temparray = array(
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
@@ -224,7 +221,7 @@ class ForumController extends AppController
             $threadArray = array();
             foreach ($thread as $data) {
                 $temparray = array(
-                    'threadId' => $data['id'],
+                    'threadId' => $data['threadid'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                 );
@@ -233,8 +230,6 @@ class ForumController extends AppController
             if ($this->isPost()) {
                 $paramas = $this->getRequestParams();
                 $thread_Id = $paramas['threadId'];
-
-
 //                if($moveThreadId){
 //                    $moveThreadId = $paramas['thread-name'];
 //                    ForumPosts::updatePostMoveThread($thread_Id,$moveThreadId);
@@ -247,6 +242,7 @@ class ForumController extends AppController
                 $this->includeJS(['../js/thread.js']);
                 return $this->renderWithData('thread', ['cid' => $courseId, 'users' => $user, 'forumid' => $forumId]);
             }
+            $this->includeJS(['../css/movethread.js']);
             return $this->renderWithData('moveThread', ['forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId]);
         }
 
@@ -267,7 +263,6 @@ class ForumController extends AppController
             {
                 $temparray = array(
                     'threadId' => $data['threadid'],
-                    'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
                     'message' => $data['message'],
                 );
@@ -284,7 +279,7 @@ class ForumController extends AppController
         $threadid = $params['threadId'];
         $message = trim($params['message']);
         $subject = trim($params['subject']);
-        $thread = ForumPosts::modifyThread($threadid,$message,$subject);
+        ForumPosts::modifyThread($threadid,$message,$subject);
         return json_encode(array('status' => 0));
     }
 
@@ -314,7 +309,7 @@ class ForumController extends AppController
            $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
-//        AppUtility::dump($this->children);
+
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['../css/forums.css']);
         return $this->render('post',['postdata' => $this->totalPosts]);
@@ -342,8 +337,8 @@ class ForumController extends AppController
     public function actionMarkAsRemoveAjax()
     {
             $params = $this->getBodyParams();
-            $threadid = $params['threadId'];
-            ForumPosts::removeThread($threadid);
+            $threadId = $params['threadId'];
+            ForumPosts::removeThread($threadId);
             return json_encode(array('status' => 0));
 
     }

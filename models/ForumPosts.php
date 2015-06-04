@@ -16,6 +16,7 @@ class ForumPosts extends BaseImasForumPosts
 
         $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
         $ForumPost->threadid = $moveThreadId;
+        $ForumPost->parent = $moveThreadId;
         $ForumPost->save();
     }
     public static function getbyid($threadId)
@@ -31,17 +32,23 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static  function modifyThread($threadid,$message,$subject)
+    public static  function modifyThread($threadId,$message,$subject)
     {
-        $threadPost = ForumPosts::findOne(['threadid' => $threadid]);
+        $threadPost = ForumPosts::findOne(['threadid' => $threadId]);
         $threadPost->subject = $subject;
         $threadPost->message = $message;
         $threadPost->save();
     }
-    public static function removeThread($threadid)
+    public static function removeThread($threadId)
     {
-        $thread = ForumPosts::findOne($threadid);
+        $threads = ForumPosts::findAll(['threadid' => $threadId]);
+        if($threads)
+        {
+            foreach($threads as $thread)
+            {
                 $thread->delete();
+            }
+        }
     }
     public static function updateMoveThread($forumId,$threadId)
     {

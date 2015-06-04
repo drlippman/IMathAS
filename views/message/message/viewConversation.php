@@ -44,18 +44,18 @@ $currentLevel = 0;
         <button onclick="hideall()" class="btn btn-primary">Hide All</button>
         <br><br>
         <?php
-        $cnt =0;
+        $DivCount =0;
         foreach($messages as $index => $message){ ?>
         <?php
         if($message['level'] != 0 && $message['level'] < $currentLevel)
-        {$cnt--;
+        {$DivCount--;
         for($i = $currentLevel; $message['level'] < $i; $i--){?>
         </div>
         <?php }
         ?>
         <?php }?>
     <?php if($message['level'] != 0 && $message['level'] > $currentLevel)
-            { $cnt++;?>
+            { $DivCount++;?>
                 <div class="forumgrp" id="block<?php echo $index-1 ?>">
 
            <?php }?>
@@ -74,14 +74,14 @@ $currentLevel = 0;
             <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
             <?php if($index == (count($messages)-1))
             {
-                for($i = $cnt; $i > 0; $i--){?>
+                for($i = $DivCount; $i > 0; $i--){?>
                     </div>
             <?php } }?>
         <?php
             $currentLevel = $message['level'];
-       // $cnt = (count($messages) - 1);
+        $messageCount = (count($messages) - 1);
         ?>
-    <input type="hidden" id="cnt" value="<?php echo $cnt ?>">
+    <input type="hidden" id="messageCount" value="<?php echo $messageCount ?>">
     <?php      }?>
 
     </div>
@@ -114,8 +114,8 @@ $currentLevel = 0;
         }
     }
     function expandall() {
-        var bcnt =  $( "#cnt" ).val();
-        for (var i = 0; i < bcnt; i++) {
+        var messageCount =  $( "#messageCount" ).val();
+        for (var i = 0; i < messageCount; i++) {
             var node = document.getElementById('block' + i);
             var butn = document.getElementById('butb' + i);
             node.className = 'forumgrp';
@@ -125,8 +125,8 @@ $currentLevel = 0;
         }
     }
     function collapseall() {
-        var bcnt =  $( "#cnt" ).val();
-        for (var i = 0; i <= bcnt; i++) {
+        var messageCount =  $( "#messageCount" ).val();
+        for (var i = 0; i <= messageCount; i++) {
             var node = document.getElementById('block' + i);
             var butn = document.getElementById('butb' + i);
             node.className = 'hidden';
@@ -136,8 +136,8 @@ $currentLevel = 0;
         }
     }
     function showall() {
-        var icnt =  $( "#cnt" ).val();
-        for (var i = 0; i <= icnt; i++) {
+        var messageCount =  $( "#messageCount" ).val();
+        for (var i = 0; i <= messageCount; i++) {
             var node = document.getElementById('item' + i);
             var buti = document.getElementById('buti' + i);
             node.className = "blockitems";
@@ -145,8 +145,8 @@ $currentLevel = 0;
         }
     }
     function hideall() {
-        var icnt =  $( "#cnt" ).val();
-        for (var i = 0; i <= icnt; i++) {
+        var messageCount =  $( "#messageCount" ).val();
+        for (var i = 0; i <= messageCount; i++) {
             var node = document.getElementById('item' + i);
             var buti = document.getElementById('buti' + i);
             node.className = "hidden";

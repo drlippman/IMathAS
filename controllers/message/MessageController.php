@@ -79,29 +79,31 @@ class MessageController extends AppController
             $uid = Yii::$app->user->identity->getId();
             $params = $this->getBodyParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
-            $query = Message::getUsersToDisplay($uid);
+            $mesages = Message::getUsersToDisplay($uid);
             $dateArray = array();
             if ($ShowRedFlagRow == 1) {
-                foreach ($query as $senddate) {
-                    if ($senddate['isread'] == 8 || $senddate['isread'] == 9 || $senddate['isread'] == 12 || $senddate['isread'] == 13) {
-                        $dateArray[] = $senddate;
+                foreach ($mesages as $message) {
+                    if ($message['isread'] == 8 || $message['isread'] == 9 || $message['isread'] == 12 || $message['isread'] == 13) {
+                        $dateArray[] = $message;
                     }
                 }
 
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
                     $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
-
+                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
+                    $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
                 }
             } else {
-                foreach ($query as $senddate) {
-                    $dateArray[] = $senddate;
+                foreach ($mesages as $message) {
+                    $dateArray[] = $message;
                 }
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
                     $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
-
+                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
+                    $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
                 }
             }
@@ -131,21 +133,23 @@ class MessageController extends AppController
     {
         if (!$this->isGuestUser()) {
             $uid = Yii::$app->user->identity->getId();
-            $query = Message::getUsersToDisplayMessage($uid);
+            $mesages = Message::getUsersToDisplayMessage($uid);
 
-            if ($query) {
+            if ($mesages) {
 
-                foreach ($query as $senddate) {
-                    $dateArray[] = $senddate;
+                foreach ($mesages as $message) {
+                    $dateArray[] = $message;
                 }
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
                     $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
+                    $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
                 }
                 return json_encode(array('status' => 0, 'messageData' => $newArray));
             } else {
-                return json_encode(array('status' => 0, 'messageData' => $query));
+                return json_encode(array('status' => 0, 'messageData' => $mesages));
             }
         }
     }
@@ -177,9 +181,9 @@ class MessageController extends AppController
 
             $params = $this->getBodyParams();
             $cid = Yii::$app->request->get('cid');
-            $msgIds = $params['checkedMsg'];
-            foreach ($msgIds as $msgId) {
-                Message::updateUnread($msgId);
+            $messageIds = $params['checkedMsg'];
+            foreach ($messageIds as $messageId) {
+                Message::updateUnread($messageId);
 
             }
             return json_encode(array('status' => 0));
@@ -192,9 +196,9 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if (Yii::$app->request->post()) {
             $params = $this->getBodyParams();
-            $msgIds = $params['checkedMsg'];
-            foreach ($msgIds as $msgId) {
-                Message::updateRead($msgId);
+            $messageIds = $params['checkedMsg'];
+            foreach ($messageIds as $messageId) {
+                Message::updateRead($messageId);
             }
             return json_encode(array('status' => 0));
         }
@@ -209,9 +213,9 @@ class MessageController extends AppController
         $params = Yii::$app->request->getBodyParams();
         $cid = $params['cid'];
         $userId = Yii::$app->user->identity->getId();
-        $query = Message::getUsersToUserMessage($userId);
+        $mesages = Message::getUsersToUserMessage($userId);
 
-        return json_encode(array('status' => 0, 'userData' => $query));
+        return json_encode(array('status' => 0, 'userData' => $mesages));
     }
 
     public function actionViewMessage()
@@ -278,9 +282,9 @@ class MessageController extends AppController
         $cid = $params['cid'];
 
         $userId = Yii::$app->user->identity->getId();
-        $query = Message::getUsersToCourseMessage($userId);
+        $mesages = Message::getUsersToCourseMessage($userId);
 
-        return json_encode(array('status' => 0, 'courseData' => $query));
+        return json_encode(array('status' => 0, 'courseData' => $mesages));
     }
 
     public function actionGetSentUserAjax()
@@ -290,9 +294,9 @@ class MessageController extends AppController
         $params = Yii::$app->request->getBodyParams();
         $cid = $params['cid'];
         $userId = Yii::$app->user->identity->getId();
-        $query = Message::getSentUsersMessage($userId);
+        $mesages = Message::getSentUsersMessage($userId);
 
-        return json_encode(array('status' => 0, 'userData' => $query));
+        return json_encode(array('status' => 0, 'userData' => $mesages));
 
     }
 
@@ -318,6 +322,11 @@ class MessageController extends AppController
         $msgId = $this->getParamVal('id');
         $user = Yii::$app->user->identity;
 
+        if($baseId == 0)
+        {
+            $baseId = $msgId;
+        }
+
         $messages = Message::getByBaseId($msgId, $baseId);
         $children = array();
 
@@ -341,7 +350,8 @@ class MessageController extends AppController
             $tempArray['baseId'] = $message['baseid'];
             $this->messageData[$message['id']] = $tempArray;
         }
-        $this->createChild($this->children[0]);
+
+        $this->createChild($this->children[key($this->children)]);
         return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages,'user' => $user]);
     }
     public function createChild($childArray, $arrayKey = 0)
@@ -379,8 +389,8 @@ class MessageController extends AppController
     {
 
         $params = $this->getBodyParams();
-        $row = $params['rowId'];
-        Message::updateFlagValue($row);
+        $rowId = $params['rowId'];
+        Message::updateFlagValue($rowId);
         return json_encode(['status' => '0']);
 
     }

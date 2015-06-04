@@ -30,8 +30,7 @@ function threadSuccess(response)
                             html += "<td>" + thread.views + "</td>";
                             html += "<td>" + thread.postdate + "</td>";
                     }
-
-                }
+                 }
                 else {
 
                     html += "<tr> <td><a href='#'>" + (thread.subject) + "</a> " + thread.name + " </td> ";
