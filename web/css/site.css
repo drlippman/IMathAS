@@ -347,3 +347,12 @@ td.locked-student{
     margin-left: 0px;
 }
 
+.button-container form,
+.button-container form div {
+    display: inline;
+}
+
+.button-container button {
+    display: inline;
+    vertical-align: middle;
+}

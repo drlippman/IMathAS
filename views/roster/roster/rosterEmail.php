@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 $this->title = 'New Message';
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
 //$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$_GET['cid']]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -37,7 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
           <option value='0'>Don't limit - send to all</option>;
           <?php foreach ($assessments as $assessment) { ?>
           <option value="<?php echo $assessment->id ?>">
-
               <?php echo ucfirst($assessment->name);?>
               </option><?php } ?>
       </select>
@@ -47,6 +46,9 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>
-        <span></span>
+        <span class="col-md-12"><?php foreach ($studentDetails as $studentDetail) { ?>
+            <?php echo "<li>$studentDetail->FirstName, $studentDetail->LastName ($studentDetail->SID)</li>" ?>
+            <?php } ?>
+        </span>
     </div>
 </div>

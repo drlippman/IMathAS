@@ -610,7 +610,6 @@ class RosterController extends AppController
         $studentInformation = $this->getRequestParams();
         if($this->isPost())
         {$params = $this->getRequestParams();
-            AppUtility::dump($params     );
             $user = new User();
             foreach($studentInformation['newUsers'] as $newEntry){
                 $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
@@ -640,14 +639,24 @@ class RosterController extends AppController
     public function actionRosterEmail()
     {
         $courseId = Yii::$app->request->get('cid');
+        $course = Course::getById($courseId);
         $assessments = Assessments::getByCourseId($courseId);
-        $selectedStudents = $this->getBodyParams();
-        
-        if($this->isPost()){
-            return $this->renderWithData('rosterEmail');
-        }
         $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
-        return $this->renderWithData('rosterEmail',['assessments' => $assessments]);
+        if($this->isPost()){
+            $selectedStudents = $this->getBodyParams();
+            if ($selectedStudents['student-data'] != ''){
+
+                $selectedStudents = explode(',',$selectedStudents['student-data']);
+                $studentArray = array();
+                foreach ($selectedStudents as $student){
+                    $studentName = User::getById($student);
+                    array_push($studentArray,$studentName);
+                }
+                return $this->renderWithData('rosterEmail',['assessments' => $assessments, 'studentDetails' => $studentArray, 'course' => $course]);
+            }else{
+                return $this->redirect('student-roster?cid='.$courseId);
+            }
+        }
     }
 
     public function actionMarkUnenrollAjax()

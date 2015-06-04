@@ -230,23 +230,17 @@ function markUnenrollSuccess(response){
 
 function studentEmail(){
     $('#roster-email').click(function(e){
-        var course_id =  $( "#course-id" ).val();
         var markArray = [];
         var dataArray = [];
         $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
             markArray.push($(this).val());
-            dataArray.push( $(this).parent().next().next().next().text()+' '+$(this).parent().next().next().next().next().text()+' ('+$(this).parent().next().next().next().next().next().next().text()+')');
         });
         if(markArray.length!=0){
-            var Data = {id: markArray, userName: dataArray};
-           jQuerySubmit('roster-email-ajax',Data,'rosterEmailResponse')
+            document.getElementById("student-id").value = markArray;
         }else
         {
             alert("No users selected.");
+            location.reload();
         }
     });
-}
-function rosterEmailResponse(response){
-    console.log(response);
-    window.location = "roster-email?users="+dataArray;
 }
