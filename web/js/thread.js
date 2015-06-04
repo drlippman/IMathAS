@@ -5,7 +5,10 @@ $(document).ready(function ()
     jQuerySubmit('get-thread-ajax',{forumid: forumid },'threadSuccess');
 });
 
-function threadSuccess(response) {
+
+function threadSuccess(response)
+{
+
     var result = JSON.parse(response);
     var fid = $('#forumid').val();
     var courseId = $('#course-id').val();
@@ -15,16 +18,19 @@ function threadSuccess(response) {
         var threads = result.threadData;
         var html = "";
         $.each(threads, function (index, thread) {
+            if(fid == thread.forumiddata)
+            {
+                if(thread.replyby == null)
+                {
+                    thread.replyby= 0;
+                    if(thread.parent == 0)
+                    {
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"'>" +(thread.subject) +"</a> "+ thread.name+" <a href='move-thread?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Move</a> <a href='modify-post?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Modify</a><a href='#' name='tabs' data-var='"+thread.threadId+"' class='mark-remove'> Remove </a></td> ";
+                            html += "<td>" + thread.replyby + "</td>";
+                            html += "<td>" + thread.views + "</td>";
+                            html += "<td>" + thread.postdate + "</td>";
+                    }
 
-            if (fid == thread.forumiddata) {
-                if (thread.replyby == null) {
-                    thread.replyby = 0;
-                    //html += "<tr> <td><a href='#'>" +(thread.subject) +"</a> "+ thread.name+" </td> ";
- 
-                    html += "<tr> <td><a href='post?threadid=9'>" + (thread.subject) + "</a> " + thread.name + " <a href='move-thread?forumId=1&courseId=2&threadId=12'>Move</a> <a href='modify-post?forumId=4&courseId=2&threadId=1'>Modify</a><a href='#' name='tabs' data-var='2' class='mark-remove'> Remove </a></td> ";
-                    html += "<td>" + thread.replyby + "</td>";
-                    html += "<td>" + thread.views + "</td>";
-                    html += "<td>" + thread.postdate + "</td>";
                 }
                 else {
 
