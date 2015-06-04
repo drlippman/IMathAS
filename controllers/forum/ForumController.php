@@ -188,7 +188,6 @@ class ForumController extends AppController
         $user = $this->getAuthenticatedUser();
         $forumArray = array();
         foreach ($forums as $key => $forum) {
-
             $tempArray = array
             (
                 'forumId' => $forum->id,
@@ -205,25 +204,27 @@ class ForumController extends AppController
                     'threadId' => $data['threadid'],
                     'forumiddata' => $data['forumid'],
                     'subject' => $data['subject'],
+                    'parent' => $data['parent'],
                 );
                 array_push($threadArray, $temparray);
             }
             if ($this->isPost()) {
                 $paramas = $this->getRequestParams();
+                $movetype = $paramas['movetype'];
                 $thread_Id = $paramas['threadId'];
-//                if($moveThreadId){
-//                    $moveThreadId = $paramas['thread-name'];
-//                    ForumPosts::updatePostMoveThread($thread_Id,$moveThreadId);
-//                }
-               // if($forum_Id) {
+                if($movetype == 1){
+                    $moveThreadId = $paramas['thread-name'];
+                    ForumPosts::updatePostMoveThread($thread_Id,$moveThreadId);
+                }
+                else{
                     $forum_Id = $paramas['forum-name'];
                     ForumPosts::updateMoveThread($forum_Id, $thread_Id);
-                //}
+                }
                 $this->includeCSS(['../css/forums.css']);
                 $this->includeJS(['../js/thread.js']);
                 return $this->renderWithData('thread', ['cid' => $courseId, 'users' => $user, 'forumid' => $forumId]);
             }
-            $this->includeJS(['../css/movethread.js']);
+          //  $this->includeJS(['../css/movethread.js']);
             return $this->renderWithData('moveThread', ['forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId]);
         }
 
@@ -257,11 +258,12 @@ class ForumController extends AppController
     public function actionModifyPostAjax()
     {
         $params = $this->getBodyParams();
-        $threadid = $params['threadId'];
+        $threadId = $params['threadId'];
         $message = trim($params['message']);
         $subject = trim($params['subject']);
-        ForumPosts::modifyThread($threadid, $message, $subject);
+        ForumPosts::modifyThread($threadId, $message, $subject);
         return $this->successResponse();
+
     }
 
     public function actionPost()
