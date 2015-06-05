@@ -1,18 +1,20 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 $this->title = 'New Message';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
-//$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+//AppUtility::dump(json_decode($studentDetails));
 ?>
+<form action="roster-email" method="post" id="roster-form">
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
 <div class="student-roster-email">
+    <input type="hidden" name="isEmail" value="1"/>
+    <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
     <h2><b>Send Mass E-mail</b></h2>
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text">'; ?></span>
+        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text" name="subject">'; ?></span>
     </div>
     <br><br>
     <div class="gb">
@@ -26,14 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
         autofill with each student's first/last name</p>
     <div>
         <span class="col-md-2"><b>Send copy to</b></span>
-        <span class="col-md-10"><input type="radio" name="only-student" id="self" value="none"> Only Students<br>
-            <input type="radio" name="student" id="self" value="self" checked="checked"> Students and you<br>
-            <input type="radio" name="instuctor" id="self" value="allt"> Students and all instructors of this course</span>
+        <span class="col-md-10"><input type="radio" name="emailCopyToSend" id="self" value="singleStudent"> Only Students<br>
+            <input type="radio" name="emailCopyToSend" id="self" value="selfStudent" checked="checked"> Students and you<br>
+            <input type="radio" name="emailCopyToSend" id="self" value="allTeacher"> Students and all instructors of this course</span>
     </div>
     <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
     <span class="roster-assessment">
 	 <p class="col-md-3">To students who haven't completed</p>
-	  <select name="roster-data" id="roster-data" class="col-md-4 select-text-margin">
+	  <select name="roster-assessment-data" id="roster-assessment-data" class="col-md-4 select-text-margin">
           <option value='0'>Don't limit - send to all</option>;
           <?php foreach ($assessments as $assessment) { ?>
           <option value="<?php echo $assessment->id ?>">
@@ -42,13 +44,14 @@ $this->params['breadcrumbs'][] = $this->title;
       </select>
     </span>
     <div class="col-lg-offset-2 col-md-12"><br>
-        <a class="btn btn-primary" id="mess">Send Message</a>
+        <input type="submit" class="btn btn-primary" id="email-button">Send Message</a>
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>
-        <span class="col-md-12"><?php foreach ($studentDetails as $studentDetail) { ?>
-            <?php echo "<li>$studentDetail->FirstName, $studentDetail->LastName ($studentDetail->SID)</li>" ?>
+        <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
+            <?php echo "<li>".$studentDetail['FirstName'].",". $studentDetail['LastName']." ". ($studentDetail['SID'])."</li>" ?>
             <?php } ?>
         </span>
     </div>
 </div>
+</form>

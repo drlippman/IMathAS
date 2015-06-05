@@ -239,8 +239,8 @@ function studentEmail(){
             document.getElementById("student-id").value = markArray;
         }else
         {
+            e.preventDefault();
             alert("No users selected.");
-            location.reload();
         }
     });
 }
