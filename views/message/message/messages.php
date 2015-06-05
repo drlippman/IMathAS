@@ -69,57 +69,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        $("#show-all-link").hide();
-        var cid = $(".send-msg").val();
-        var ShowRedFlagRow = -1;
-        var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-        jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-        jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
-        jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
-        selectCheckBox();
-        markAsRead();
-        markAsUnread();
-        markAsDelete();
-        limitToTagShow();
-    });
-    var messageData;
-    function createTableHeader() {
-        var html = "<table id='message-table display-message-table' class='message-table display-message-table'>";
-        html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
-        html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
-        $('.message-div').append(html);
-    }
-
-    function showMessageSuccess(response) {
-        var filterArrayForUser = [];
-        $.each(JSON.parse(response), function (index, messageData) {
-            $.each(messageData, function (index, msgData) {
-                filterArrayForUser.push(msgData.msgFrom);
-            });
-
-        });
-        var uniqueUserForFilter = filterArrayForUser.filter(function (itm, i, a) {
-            return i == a.indexOf(itm);
-        });
-
-        var htmlCourse = '';
-        for (i = 0; i < uniqueUserForFilter.length; i++) {
-            htmlCourse += "<option value = " + uniqueUserForFilter + ">" + uniqueUserForFilter[i] + "</option>"
-
-        }
-        //  $(".show-user").append(htmlCourse);
-
-        var result = JSON.parse(response);
-        if (result.status == 0) {
-            messageData = result.messageData;
-            showMessage(messageData);
-        }
-    }
 
     function showMessage(messageData) {
-        var rohan;
+        var temp;
         var html = " ";
         var htmlCourse = "";
         $.each(messageData, function (index, messageData) {
@@ -130,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
             else {
                 html += "<tr class='unread-message message-row message-row-" + messageData.id + "'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + messageData.id + "' class='message-checkbox-" + messageData.id + "' ></td>";
             }
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=0&id=')?>" + messageData.id + "'> " + messageData.title + "</a></td>";
+            html += "<td><a href='view-message?message=0&id=" + messageData.id + "'> " + messageData.title + "</a></td>";
             if (messageData.replied == 1) {
                 html += "<th>Yes</th>";
             }
@@ -139,11 +91,10 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             var rowid = messageData.id;
             if (messageData.isread < 7) {
+
                 html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif' onclick='changeImage(this,"+false+"," + rowid + ")'/></td>";
+
             }
-//            else if (messageData.isread == 1 || messageData.isread == 0) {
-//                html += "<td><img src='<?php //echo AppUtility::getHomeURL() ?>//img/flagempty.gif' onclick='changeImage(this," + rowid + ")'/></td>";
-//            }
             else {
                 html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif' onclick='changeImage(this,"+true+"," + rowid + ")'/></td>";
             }
@@ -159,6 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
         $('.display-message-table').DataTable();
 
     }
+
 
     function selectCheckBox() {
         $('.check-all').click(function () {
@@ -327,44 +279,17 @@ $this->params['breadcrumbs'][] = $this->title;
         });
     }
 
-    function changeImage(element,rohan, rowId) {
-        console.log(rohan);
-if(rohan == false){
+    function changeImage(element,temp, rowId) {
+        console.log(temp);
+if(temp == false){
         element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif";
         element.bln = !element.bln;
 }
-        if(rohan ==true ){
+        if(temp ==true ){
             element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif";
             element.bln = !element.bln;
         }
         var row = {rowId: rowId};
         jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
-    }
-
-    function changeImageSuccess(response) {
-    }
-    function limitToTagShow() {
-
-        $("#limit-to-tag-link").click(function () {
-            $("#limit-to-tag-link").hide();
-            $("#show-all-link").show();
-            var ShowRedFlagRow = 1;
-            var cid = $(".send-msg").val();
-            var userId = $(".send-userId").val();
-            var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-            jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-
-        });
-        $("#show-all-link").click(function () {
-            $("#limit-to-tag-link").show();
-            $("#show-all-link").hide();
-            ShowRedFlagRow = 0;
-            var cid = $(".send-msg").val();
-            var userId = $(".send-userId").val();
-            var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-            jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-        });
     }
 </script>

@@ -11,15 +11,17 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="student-roster-email">
     <input type="hidden" name="isEmail" value="1"/>
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
+    <input type="hidden" name="courseId" value='<?php echo $course->id ?>'/>
+
     <h2><b>Send Mass E-mail</b></h2>
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-8"><?php echo '<input class="textbox subject" type="text" name="subject">'; ?></span>
+        <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></span>
     </div>
     <br><br>
     <div class="gb">
-        <span class="col-md-1"><b>Message</b></span>
-        <?php echo "<span class='left col-md-11'><div class= 'editor'>
+        <span class="col-md-2"><b>Message</b></span>
+        <?php echo "<span class='left col-md-10'><div class= 'editor'>
         <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>";
         echo "</textarea></div></span><br>"; ?>
     </div>
@@ -44,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </select>
     </span>
     <div class="col-lg-offset-2 col-md-12"><br>
-        <input type="submit" class="btn btn-primary" id="email-button">Send Message</a>
+        <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>

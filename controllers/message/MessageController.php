@@ -33,6 +33,7 @@ class MessageController extends AppController
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($cid);
+            $this->includeJS(["../js/message/message.js"]);
             return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights]);
         }
 

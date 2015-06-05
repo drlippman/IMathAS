@@ -636,8 +636,10 @@ class RosterController extends AppController
     {
         if($this->isPost()){
             $selectedStudents = $this->getBodyParams();
+            $emailSender = $this->getAuthenticatedUser();
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : 0;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
+
             if(!$isActionForEmail)
             {
                 $course = Course::getById($courseId);
@@ -666,21 +668,28 @@ class RosterController extends AppController
                     );
                     array_push($studentArray, $tempArray);
                 }
-
+                $message = $selectedStudents['message'];
+                $subject = $selectedStudents['subject'];
                 if($selectedStudents['emailCopyToSend'] == 'singleStudent'){
-                    foreach($studentArray as $singleStudent){
-                        AppUtility::sendMail($selectedStudents['subject'], $selectedStudents['message'], $singleStudent['emailId']);
-                    }
+                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
                 }elseif($selectedStudents['emailCopyToSend'] == 'selfStudent'){
-                    foreach($studentArray as $singleStudent){
-                        AppUtility::sendMail($selectedStudents['subject'], $selectedStudents['message'], $singleStudent['emailId']);
-                    }
+                    AppUtility::sendMail($subject, $message, $emailSender['email']);
+                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
                 }elseif($selectedStudents['emailCopyToSend'] == 'allTeacher'){
-
+                    $instructors = Teacher::getTeachersById($selectedStudents['courseId']);
+                    foreach($instructors as $instructor){
+                            AppUtility::sendMail($subject, $message, $instructor->user->email);
+                    }
+                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
                 }
-
-
+                return $this->redirect('student-roster?cid='.$courseId);
             }
+        }
+    }
+
+    public function sendEmailToSelectedUser($subject,$message, $studentArray){
+        foreach($studentArray as $singleStudent){
+            AppUtility::sendMail($subject,$message, $singleStudent['emailId']);
         }
     }
 

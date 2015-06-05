@@ -53,5 +53,4 @@ class Teacher extends BaseImasTeachers
     {
         return static::findOne( ['userid' => $userid]);
     }
-
 }

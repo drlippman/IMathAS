@@ -17,7 +17,7 @@ $("#mess").click(function()
             if (body != ''){
                 jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }else{
-                alert('Body field cannot be blank');
+
             }
 
         }else{
