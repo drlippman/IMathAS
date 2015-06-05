@@ -42,7 +42,7 @@ $(document).ready(function(){
     });
 
 });
-// Display calendar
+    // Display calendar
     function calendar() {
         var htmlMsg = "<div>Assessment</div>";
         var courseId = $('.calender-course-id').val();

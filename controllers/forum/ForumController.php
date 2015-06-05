@@ -291,7 +291,6 @@ class ForumController extends AppController
             $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
-
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['../css/forums.css']);
         return $this->render('post',['postdata' => $this->totalPosts]);

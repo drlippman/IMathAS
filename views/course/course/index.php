@@ -384,7 +384,6 @@ echo $this->render('_toolbar',['course'=> $course]);
         <div class="item">
             <input type="hidden" class="review-date" name="reviewDate" value="<?php echo $assessment->reviewdate; ?>">
             <input type="hidden" class="end-date" name="endDate" value="<?php echo $assessment->enddate; ?>">
-
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
                 <b>

@@ -692,8 +692,13 @@ class RosterController extends AppController
         {
             Student::deleteStudent($students,$params['courseid']);
         }
-
         return $this->successResponse();
+    }
+
+    public function actionRosterEmailAjax()
+    {
+        $userData = $this->getRequestParams();
+        AppUtility::dump($userData);
     }
 
     public function actionRosterMessage()
@@ -719,11 +724,6 @@ class RosterController extends AppController
             {
                 return $this->redirect('student-roster?cid='.$courseId);
             }
-            }
+           }
         }
-
 }
-
-
-
-

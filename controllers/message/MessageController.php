@@ -121,7 +121,6 @@ class MessageController extends AppController
             $mesages = Message::getUsersToDisplayMessage($uid);
             $dateArray = array();
             if ($mesages) {
-
                 foreach ($mesages as $message) {
                     $dateArray[] = $message;
                 }
@@ -282,12 +281,10 @@ class MessageController extends AppController
         $baseId = $this->getParamVal('baseid');
         $msgId = $this->getParamVal('id');
         $user = $this->getAuthenticatedUser();
-
         if($baseId == 0)
         {
             $baseId = $msgId;
         }
-
         $messages = Message::getByBaseId($msgId, $baseId);
         foreach ($messages as $message) {
             $this->children[$message['parent']][] = $message['id'];
@@ -348,9 +345,9 @@ class MessageController extends AppController
     public function actionChangeImageAjax()
     {
         $params = $this->getBodyParams();
-
         $rowId = $params['rowId'];
         Message::updateFlagValue($rowId);
         return json_encode(['status' => '0']);
+
     }
 }
