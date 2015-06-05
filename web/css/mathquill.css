@@ -1,0 +1,579 @@
+/*
+ * LaTeX Math in pure HTML and CSS -- No images whatsoever
+ * v0.xa
+ * by Jay and Han
+ * Lesser GPL Licensed: http: //www.gnu.org/licenses/lgpl.html
+ *
+ * This file is automatically included by mathquill.js
+ *
+ */
+
+
+@font-face {
+  font-family: 'Symbola';
+  font-style: normal;
+  font-weight: normal;
+  src: url(font/Symbola2.eot);
+  
+  src: local("Symbola Regular"), local("Symbola"),  url(font/Symbola2.woff) format('woff'),url(font/Symbola2.ttf) format("truetype"), url(font/Symbola2.otf) format("opentype"), url(font/Symbola2.svg#Symbola) format("svg");
+}
+.mathquill-editable {
+  display: -moz-inline-box;
+  display: inline-block;
+  white-space: pre-wrap;
+}
+.mathquill-editable .cursor {
+  border-left: 1px solid black;
+  margin-right: -1px;
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  display: -moz-inline-box;
+  display: inline-block;
+}
+.mathquill-editable .cursor.blink {
+  visibility: hidden;
+}
+.mathquill-editable,
+.mathquill-embedded-latex .mathquill-editable {
+  border: 1px solid gray;
+  padding: 2px;
+}
+.mathquill-embedded-latex .mathquill-editable {
+  margin: 1px;
+}
+.mathquill-editable.hasCursor,
+.mathquill-editable .hasCursor {
+  -webkit-box-shadow: #68b4df 0 0 3px 2px;
+  -moz-box-shadow: #68b4df 0 0 3px 2px;
+  box-shadow: #68b4df 0 0 3px 2px;
+}
+.mathquill-editable .latex-command-input {
+  color: inherit;
+  font-family: "Courier New", monospace;
+  border: 1px solid gray;
+  padding-right: 1px;
+  margin-right: 1px;
+  margin-left: 2px;
+}
+.mathquill-editable .latex-command-input.empty {
+  background: transparent;
+}
+.mathquill-editable .latex-command-input.hasCursor {
+  border-color: ActiveBorder;
+}
+.mathquill-editable.empty:after,
+.mathquill-textbox:after,
+.mathquill-rendered-math .empty:after {
+  visibility: hidden;
+  content: 'c';
+}
+.mathquill-editable .cursor:only-child:after,
+.mathquill-editable .textarea + .cursor:last-child:after {
+  visibility: hidden;
+  content: 'c';
+}
+.mathquill-textbox {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.mathquill-rendered-math {
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 115%;
+  line-height: 1;
+  display: -moz-inline-box;
+  display: inline-block;
+}
+.mathquill-rendered-math .non-leaf,
+.mathquill-rendered-math .scaled {
+  display: -moz-inline-box;
+  display: inline-block;
+}
+.mathquill-rendered-math var,
+.mathquill-rendered-math .text,
+.mathquill-rendered-math .nonSymbola {
+  font-family: "Times New Roman", Symbola, serif;
+  line-height: .9;
+}
+.mathquill-rendered-math * {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+  border-color: black;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+.mathquill-rendered-math .empty {
+  background: #ccc;
+}
+.mathquill-rendered-math.empty {
+  background: transparent;
+}
+.mathquill-rendered-math .text {
+  font-size: 87%;
+}
+.mathquill-rendered-math .font {
+  font: 1em "Times New Roman", Symbola, serif;
+}
+.mathquill-rendered-math .font * {
+  font-family: inherit;
+  font-style: inherit;
+}
+.mathquill-rendered-math b,
+.mathquill-rendered-math b.font {
+  font-weight: bolder;
+}
+.mathquill-rendered-math var,
+.mathquill-rendered-math i,
+.mathquill-rendered-math i.font {
+  font-style: italic;
+}
+.mathquill-rendered-math var.florin {
+  margin: 0 -0.1em;
+}
+.mathquill-rendered-math big {
+  font-size: 125%;
+}
+.mathquill-rendered-math .roman {
+  font-style: normal;
+}
+.mathquill-rendered-math .sans-serif {
+  font-family: sans-serif, Symbola, serif;
+}
+.mathquill-rendered-math .monospace {
+  font-family: monospace, Symbola, serif;
+}
+.mathquill-rendered-math .overline {
+  border-top: 1px solid black;
+  margin-top: 1px;
+}
+.mathquill-rendered-math .underline {
+  border-bottom: 1px solid black;
+  margin-bottom: 1px;
+}
+.mathquill-rendered-math .binary-operator {
+  padding: 0 0.2em;
+  display: -moz-inline-box;
+  display: inline-block;
+}
+.mathquill-rendered-math .unary-operator {
+  padding-left: 0.2em;
+}
+.mathquill-rendered-math sup,
+.mathquill-rendered-math sub {
+  position: relative;
+  font-size: 90%;
+}
+.mathquill-rendered-math sup .binary-operator,
+.mathquill-rendered-math sub .binary-operator {
+  padding: 0 .1em;
+}
+.mathquill-rendered-math sup .unary-operator,
+.mathquill-rendered-math sub .unary-operator {
+  padding-left: .1em;
+}
+.mathquill-rendered-math sup.limit,
+.mathquill-rendered-math sub.limit,
+.mathquill-rendered-math sup.nthroot,
+.mathquill-rendered-math sub.nthroot {
+  font-size: 80%;
+}
+.mathquill-rendered-math sup .fraction,
+.mathquill-rendered-math sub .fraction {
+  font-size: 70%;
+  vertical-align: -0.4em;
+}
+.mathquill-rendered-math sup .numerator,
+.mathquill-rendered-math sub .numerator {
+  padding-bottom: 0;
+}
+.mathquill-rendered-math sup .denominator,
+.mathquill-rendered-math sub .denominator {
+  padding-top: 0;
+}
+.mathquill-rendered-math sup {
+  vertical-align: .5em;
+}
+.mathquill-rendered-math sup.limit,
+.mathquill-rendered-math sup.nthroot {
+  vertical-align: 0.8em;
+}
+.mathquill-rendered-math sup.nthroot {
+  margin-right: -0.6em;
+  margin-left: .2em;
+  min-width: .5em;
+  z-index: 2;
+}
+.mathquill-rendered-math sub {
+  vertical-align: -0.4em;
+}
+.mathquill-rendered-math sub.limit {
+  vertical-align: -0.6em;
+}
+.mathquill-rendered-math .paren {
+  padding: 0 .1em;
+  vertical-align: bottom;
+  -webkit-transform-origin: bottom center;
+  -moz-transform-origin: bottom center;
+  -ms-transform-origin: bottom center;
+  -o-transform-origin: bottom center;
+  transform-origin: bottom center;
+}
+.mathquill-rendered-math .array {
+  vertical-align: middle;
+  text-align: center;
+}
+.mathquill-rendered-math .array > span {
+  display: block;
+}
+.mathquill-rendered-math .non-italicized-function {
+  font-family: Symbola, "Times New Roman", serif;
+  line-height: .9;
+  font-style: normal;
+  padding-right: .2em;
+}
+.mathquill-rendered-math .fraction {
+  font-size: 90%;
+  text-align: center;
+  vertical-align: -0.5em;
+  padding: 0 .2em;
+}
+.mathquill-rendered-math .fraction,
+.mathquill-rendered-math x:-moz-any-link {
+  display: -moz-groupbox;
+}
+.mathquill-rendered-math .fraction,
+.mathquill-rendered-math x:-moz-any-link,
+.mathquill-rendered-math x:default {
+  display: inline-block;
+}
+.mathquill-rendered-math .numerator,
+.mathquill-rendered-math .denominator {
+  display: block;
+}
+.mathquill-rendered-math .numerator {
+  padding: 0 0.1em;
+  margin-bottom: -0.1em;
+}
+.mathquill-rendered-math .denominator {
+  border-top: 1px solid;
+  float: right;
+  width: 100%;
+  padding: .1em .1em 0 .1em;
+  margin-right: -0.1em;
+  margin-left: -0.1em;
+}
+.mathquill-rendered-math .sqrt-prefix {
+  padding-top: 0;
+  position: relative;
+  top: .1em;
+  vertical-align: top;
+  -webkit-transform-origin: top;
+  -moz-transform-origin: top;
+  -ms-transform-origin: top;
+  -o-transform-origin: top;
+  transform-origin: top;
+}
+.mathquill-rendered-math .sqrt-stem {
+  border-top: 1px solid;
+  margin-top: 1px;
+  padding-left: .15em;
+  padding-right: .2em;
+  margin-right: .1em;
+}
+.mathquill-rendered-math .vector-prefix {
+  display: block;
+  text-align: center;
+  line-height: .25em;
+  margin-bottom: -0.1em;
+  font-size: 0.75em;
+}
+.mathquill-rendered-math .vector-stem {
+  display: block;
+}
+.mathquill-rendered-math,
+.mathquill-rendered-math .mathquill-editable {
+  cursor: text;
+  font-family: Symbola, "Times New Roman", serif;
+}
+.mathquill-rendered-math .selection,
+.mathquill-editable .selection,
+.mathquill-rendered-math .selection .non-leaf,
+.mathquill-editable .selection .non-leaf,
+.mathquill-rendered-math .selection .scaled,
+.mathquill-editable .selection .scaled {
+  background: #B4D5FE !important;
+  background: Highlight !important;
+  color: HighlightText;
+  border-color: HighlightText;
+}
+.mathquill-rendered-math .selection .matrixed,
+.mathquill-editable .selection .matrixed {
+  background: #39F !important;
+}
+.mathquill-rendered-math .selection .matrixed-container,
+.mathquill-editable .selection .matrixed-container {
+  filter: progid:DXImageTransform.Microsoft.Chroma(color='#3399FF') !important;
+}
+.mathquill-rendered-math .selection.blur,
+.mathquill-editable .selection.blur,
+.mathquill-rendered-math .selection.blur .non-leaf,
+.mathquill-editable .selection.blur .non-leaf,
+.mathquill-rendered-math .selection.blur .scaled,
+.mathquill-editable .selection.blur .scaled,
+.mathquill-rendered-math .selection.blur .matrixed,
+.mathquill-editable .selection.blur .matrixed {
+  background: #D4D4D4 !important;
+  color: black;
+  border-color: black;
+}
+.mathquill-rendered-math .selection.blur .matrixed-container,
+.mathquill-editable .selection.blur .matrixed-container {
+  filter: progid:DXImageTransform.Microsoft.Chroma(color='#D4D4D4') !important;
+}
+.mathquill-editable .textarea,
+.mathquill-rendered-math .textarea {
+  position: relative;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+.mathquill-editable .textarea *,
+.mathquill-rendered-math .textarea *,
+.mathquill-editable .selectable,
+.mathquill-rendered-math .selectable {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+  position: absolute;
+  clip: rect(1em 1em 1em 1em);
+  border: none;
+  height: 1px;
+}
+.mathquill-rendered-math .matrixed {
+  background: white;
+  display: -moz-inline-box;
+  display: inline-block;
+}
+.mathquill-rendered-math .matrixed-container {
+  filter: progid:DXImageTransform.Microsoft.Chroma(color='white');
+  margin-top: -0.1em;
+}
+
+/*****  CSS for IMathAS MathQuill editor ****/
+
+#mqee {
+	position: absolute;
+	width: 500px;
+	left: -400px;
+	background: #F7F7F7;
+	border: 2px solid #009;
+	margin:0; padding: 0;
+	display: none;
+	z-index: 10;
+}
+#mqeetopbar {
+	background: #006;
+	width: 100%;
+	color: #fff;
+	cursor: pointer;
+	height: 26px;
+	line-height: 26px;
+	cursor: move;
+}
+#mqeetopbar>span {
+	padding-left: 5px;
+}
+#mqeeclosebutton {
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	float: right;
+	text-align: center;
+	background: #fff;
+	color: #000;
+	margin: 2px;
+	border: 1px solid #009;
+	font-family: sans-serif;
+	font-size: 70%;
+	cursor: pointer;
+}
+#mqeeclosebutton:hover {
+	color: #f00;
+}
+#mqeeinsides {
+	padding: 5px;
+}
+#mqholder {
+	margin: 10px 5px;
+}
+#mqarea {
+	width: 475px;
+	background: #fff;
+	min-height: 2em;
+	font-size: 120%;
+}
+.mqeebtn {
+	font-family: "Times New Roman", Times, serif;
+	color: #000;
+	cursor: pointer;
+	padding: 0 0.5em 0;
+	height: 44px;
+	/*border: 1px solid #000;*/
+	text-align: center;
+	background: #fff;
+	vertical-align: middle;
+}
+
+#tabs-functions .mqeebtn, #tabs-trig .mqeebtn {
+	vertical-align: baseline;
+	height: 32px;
+	padding-top: 5px;
+}
+
+.mqeetab { 
+	cursor: pointer;
+	height: 35px;
+	padding: 0px 1em;
+	border: 1px solid #000;
+	text-align: center;
+	background: #fff;
+	vertical-align: middle;
+	color: #000;
+}
+.mqeeactive {
+	background: #cfc;
+}
+.mqeehighlight {
+	/*background: #ccf;*/
+	color: #00f;
+}
+.mqeeclick {
+	background: #aaf;
+}
+.mqeedd {
+	cursor: pointer;
+	font-family: sans-serif;
+	position: absolute; 
+	height: 8px; 
+	/*background: #ff0 url('tinyarrow.gif') no-repeat center;*/
+	display:none; 
+	text-align:center; 
+	background: #ff0;
+	color: #930;
+	/*font-size: 6px;*/
+	border: 1px solid #fa0;
+	border-left: 0;
+	width: 10px;
+}
+
+.tab_container {
+	border: 1px solid #999;
+	border-top: none;
+	clear: both;
+	float: left; 
+	width: 100%;
+	height: 50px;
+	background: #fff;
+	margin-bottom: 5px;
+}
+ul.tabs {
+	margin: 0;
+	padding: 0;
+	float: left;
+	list-style: none;
+	height: 32px;
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #999;
+	width: 100%;
+}
+ul.tabs li {
+	float: left;
+	margin: 0;
+	padding: 0;
+	height: 31px; 
+	line-height: 31px; 
+	border: 1px solid #999;
+	border-left: none;
+	margin-bottom: -1px; 
+	overflow: hidden;
+	position: relative;
+	background: #e0e0e0;
+}
+ul.tabs li a {
+	text-decoration: none;
+	color: #000;
+	display: block;
+	padding: 0 20px;
+	border: 1px solid #fff; 	
+	outline: none;
+}
+ul.tabs li a:hover {
+	background: #ccc;
+}
+html ul.tabs li.active, html ul.tabs li.active a:hover  { 
+	background: #fff;
+	border-bottom: 1px solid #fff; 
+}
+.emptybox {
+	display: inline-block;
+	width: .5em;
+	height: .7em;
+	margin: .1em 0;
+	border: 1px solid #999;
+	vertical-align: bottom;
+}
+.emptybox.brack {
+	margin: .1em 0 .2em 0;
+}
+.emptybox.wide {
+	margin: .1em;
+}
+.mqeehighlight .emptybox {
+	border: 1px solid #99f;
+}
+.mqeebtn span {
+	cursor: pointer;
+}
+
+#mqeeclosebutton {
+	font-family: sans-serif;
+	cursor: pointer;
+}
+
+#mqeeinsides {
+	font-size: medium;
+}
+
+div#mqee, .unselectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+table.cursor-icons td.mqeebtn {
+	height: auto;
+	width: auto;
+	background: transparent;
+	padding: 0px;
+}
+table.cursor-icons td.mqeebtn div {
+	background-repeat:no-repeat;
+	width: 24px;height: 25px;
+	background-image:url('../img/mq_cursor_sprites2.png');
+}
+
+table.cursor-icons td.mqeebtn .down{ background-position: 0 -60px;}
+table.cursor-icons td.mqeebtn .down:hover{ background-position: 0 -90px;}
+table.cursor-icons td.mqeebtn .left{ background-position: 0 -120px;}
+table.cursor-icons td.mqeebtn .left:hover{ background-position: 0 -150px;}
+table.cursor-icons td.mqeebtn .right{ background-position: 0 -180px;}
+table.cursor-icons td.mqeebtn .right:hover{ background-position: 0 -210px;}
+table.cursor-icons td.mqeebtn .back{ background-position: 0 0;} 
+table.cursor-icons td.mqeebtn .back:hover{ background-position: 0 -30px;}
+table.cursor-icons td.mqeebtn .up{ background-position: 0 -240px;} 
+table.cursor-icons td.mqeebtn .up:hover{ background-position: 0 -270px;}

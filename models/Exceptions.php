@@ -17,13 +17,17 @@ class Exceptions extends BaseImasExceptions
     public static function getByAssessmentId($id)
     {
         return static::findOne(['assessmentid' => $id]);
-
     }
 
     public function create($param)
     {
         $this->attributes = $param;
         $this->save();
+    }
+
+    public static function getByAssessmentIdAndUserId($userId, $assessmentId)
+    {
+        return static::findOne(['assessmentid' => $assessmentId, 'userid' => $userId]);
     }
 
 } 

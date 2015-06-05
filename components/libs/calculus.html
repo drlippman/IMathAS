@@ -1,0 +1,20 @@
+<html><body>
+<h1>Macro Library calculus</h1>
+A collection of numerical calculus routines.  These are intended to do
+<BR>numerical calculations where they are specifically needed, not substitute 
+<BR>for entering symbolic derivatives or integrals.
+<BR>
+<BR>Version 1.0 Oct 19, 2009
+<BR><ul>
+<li><a href="#calculusdiffquotient">calculusdiffquotient</a></li>
+<li><a href="#calculusnumint">calculusnumint</a></li>
+</ul>
+<h3><a name="calculusdiffquotient">calculusdiffquotient</a></h3>
+calculusdiffquotient(function,variable,a,h)
+<BR>calculated the difference quotient (f(a+h)-f(a))/h
+<BR><h3><a name="calculusnumint">calculusnumint</a></h3>
+calculusnumint(func,var,a,b,n,method)
+<BR>do a numerical integral approximation on interval [a,b] with
+<BR>n subdivisions using specified method
+<BR>method = left, right, midpoint, trapezoidal, or simpsons
+<BR>

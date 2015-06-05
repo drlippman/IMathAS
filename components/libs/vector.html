@@ -1,0 +1,50 @@
+<html><body>
+<h1>Macro Library vector</h1>
+Vector functions.  Version 1.0, April 4, 2006
+<BR><ul>
+<li><a href="#dotp">dotp</a></li>
+<li><a href="#crossp">crossp</a></li>
+<li><a href="#vecnorm">vecnorm</a></li>
+<li><a href="#vecsum">vecsum</a></li>
+<li><a href="#vecdiff">vecdiff</a></li>
+<li><a href="#vecprod">vecprod</a></li>
+<li><a href="#veccompareset">veccompareset</a></li>
+<li><a href="#veccomparesamespan">veccomparesamespan</a></li>
+</ul>
+<h3><a name="dotp">dotp</a></h3>
+dotp(a,b)
+<BR>dot product of vectors a and b
+<BR>a,b arrays (1+ elements)
+<BR><h3><a name="crossp">crossp</a></h3>
+crossp(a,b)
+<BR>cross product of vectors a and b
+<BR>a,b arrays (3 elements).  Returns array.
+<BR><h3><a name="vecnorm">vecnorm</a></h3>
+vecnorm(a)
+<BR>returns magnitude of vector a
+<BR>a array (1+ elements)
+<BR><h3><a name="vecsum">vecsum</a></h3>
+vecsum(a,b)
+<BR>returns sum a+b
+<BR>a,b arrays same length
+<BR><h3><a name="vecdiff">vecdiff</a></h3>
+vecdiff(a,b)
+<BR>returns difference a-b
+<BR>a,b arrays same length
+<BR><h3><a name="vecprod">vecprod</a></h3>
+vecprod(a,c)
+<BR>returns sum c*a
+<BR>a arrays, c scalar
+<BR><h3><a name="veccompareset">veccompareset</a></h3>
+veccompareset(a,b)
+<BR>a and b are both arrays of vectors, e.g. $a = array(array(1,2,3),array(3,4,5))
+<BR>returns a value between 0 (no overlap) and 1 (sets are equivalent)
+<BR>calculated as n(a intersect b)/max(n(a),n(b))
+<BR><h3><a name="veccomparesamespan">veccomparesamespan</a></h3>
+veccomparesamespan(A,B)
+<BR>determins if span(A) = span(B), where A is a linearly independent set.
+<BR>a and b are both arrays of vectors, e.g. $A = array(array(1,2,3),array(3,4,5))
+<BR>Note that if you want to use the columns of a matrix as A, you'll need to
+<BR>&nbsp;&nbsp;transpose the matrix 
+<BR>Returns true or false
+<BR>

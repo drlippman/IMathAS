@@ -347,8 +347,7 @@ td.locked-student{
     margin-left: 0px;
 }
 
-.button-container form,
-.button-container form div {
+.button-container form, .button-container form div {
     display: inline;
 }
 
@@ -356,3 +355,16 @@ td.locked-student{
     display: inline;
     vertical-align: middle;
 }
+
+div.navbar{
+    min-width: 160px;
+}
+
+.margin-right-inset{
+    margin-right: 1%;
+}
+
+a:focus {
+     outline: none;
+}
+

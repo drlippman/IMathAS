@@ -8,171 +8,47 @@ use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
+use app\models\Links;
 use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\Student;
-use app\models\Links;
 use app\models\Forums;
 use app\models\Items;
 use app\models\InlineText;
 use app\models\Wiki;
+use app\models\Teacher;
 use Yii;
 
 class AssessmentController extends AppController
 {
-    public function actionIndex()
-    {
-        $this->guestUserHandler();
-        $id = $this->getParamVal('id');
-        $cid = $this->getParamVal('cid');
-        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $responseData = array();
-        $course = Course::getById($cid);
-        if ($course) {
-            $itemOrders = unserialize($course->itemorder);
-            if (count($itemOrders)) {
-                foreach ($itemOrders as $key => $itemOrder) {
-                    $tempAray = array();
-                    if (is_array($itemOrder)) {
-                        $tempAray['Block'] = $itemOrder;
-                        $blockItems = $itemOrder['items'];
-
-                        $tempItemList = array();
-                        if (count($blockItems)) {
-                            foreach ($blockItems as $blockKey => $blockItem) {
-                                $tempItem = array();
-                                $item = Items::getById($blockItem);
-                                switch ($item->itemtype) {
-                                    case 'Assessment':
-                                        $assessment = Assessments::getByAssessmentId($item->typeid);
-                                        $tempItem[$item->itemtype] = $assessment;
-                                        break;
-                                    case 'Calendar':
-                                        $tempItem[$item->itemtype] = 1;
-                                        break;
-                                    case 'Forum':
-                                        $form = Forums::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $form;
-                                        break;
-                                    case 'Wiki':
-                                        $wiki = Wiki::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $wiki;
-                                        break;
-                                    case 'LinkedText':
-                                        $linkedText = Links::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $linkedText;
-                                        break;
-                                    case 'InlineText':
-                                        $inlineText = InlineText::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $inlineText;
-                                        break;
-                                }
-                                array_push($tempItemList, $tempItem);
-                            }
-                        }
-                        $tempAray['itemList'] = $tempItemList;
-                        array_push($responseData, $tempAray);
-                    } else {
-                        $item = Items::getById($itemOrder);
-                        switch ($item->itemtype) {
-                            case 'Assessment':
-                                $assessment = Assessments::getByAssessmentId($item->typeid);
-                                $tempAray[$item->itemtype] = $assessment;
-                                break;
-                            case 'Calendar':
-                                $tempAray[$item->itemtype] = 1;
-                                break;
-                            case 'Forum':
-                                $form = Forums::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $form;
-                                break;
-                            case 'Wiki':
-                                $wiki = Wiki::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $wiki;
-                                break;
-                            case 'InlineText':
-                                $inlineText = InlineText::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $inlineText;
-                                break;
-                            case 'LinkedText':
-                                $linkedText = Links::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $linkedText;
-                                break;
-                        }
-                        array_push($responseData, $tempAray);
-                    }
-                }
-            }
-
-        } else {
-// @TODO Need to add logic here
-        }
-
-        $course = Course::getById($cid);
-        $student = Student::getByCId($cid);
-        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css', '../css/jquery-ui.css']);
-        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js','../js/student.js']);
-        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
-    }
-
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
-
-        $id = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $assessment = Assessments::getByAssessmentId($id);
-        $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $questionRecords = Questions::getByAssessmentId($id);
-        $questionSet = QuestionSet::getByQuesSetId($id);
-        $course = Course::getById($courseId);
-        $assessmentclosed = false;
-
-        if ($assessment->avail == 0) {
-            $assessmentclosed = true;
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $assessmentId = isset($params['id']) ? trim($params['id']) : "";
+        $to = isset($params['to']) ? trim($params['to']) : 0;
+        $courseId = isset($params['id']) ? trim($params['cid']) : "";
+        $assessment = Assessments::getByAssessmentId($assessmentId);
+        $teacher = Teacher::getByUserId($user->getId(), $courseId);
+        $assessmentSession = AssessmentSession::getAssessmentSession($user->getId(), $assessmentId);
+        if(!$assessmentSession)
+        {
+            $assessmentSessionObject = new AssessmentSession();
+            $assessmentSession = $assessmentSessionObject->saveAssessmentSession($assessment, $user->getId());
         }
 
-        $this->saveAssessmentSession($assessment, $id);
+        $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
 
-
-        $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
+        $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css', '../css/jquery-ui.css']);
+        $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
-    }
+        $this->includeJS(['../js/ASCIIMathTeXImg_min.js']);
+        $this->includeJS(['../js/general.js']);
+        $this->includeJS(['../js/eqntips.js']);
+        $this->includeJS(['../js/editor/tiny_mce.js']);
+        return $this->render('ShowAssessment', ['response'=> $response]);
 
-    public function saveAssessmentSession($assessment, $id)
-    {
-        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
-
-        $bestscorelist = $scorelist . ';' . $scorelist . ';' . $scorelist;
-        $scorelist = $scorelist . ';' . $scorelist;
-        $bestattemptslist = $attemptslist;
-        $bestseedslist = $seedlist;
-        $bestlalist = $lalist;
-        $starttime = time();
-        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
-        $ltisourcedid = '';
-
-        $param['questions'] = $qlist;
-        $param['seeds'] = $seedlist;
-        $param['userid'] = $id;
-        $param['assessmentid'] = $id;
-        $param['attempts'] = $attemptslist;
-        $param['lastanswers'] = $lalist;
-        $param['reviewscores'] = $scorelist;
-        $param['reviewseeds'] = $reviewseedlist;
-        $param['bestscores'] = $bestscorelist;
-        $param['scores'] = $scorelist;
-        $param['bestattempts'] = $bestattemptslist;
-        $param['bestseeds'] = $bestseedslist;
-        $param['bestlastanswers'] = $bestlalist;
-        $param['starttime'] = $starttime;
-        $param['feedback'] = $deffeedbacktext;
-        $param['lti_sourcedid'] = $ltisourcedid;
-
-        $assessmentSession = new AssessmentSession();
-        $assessmentSession->attributes = $param;
-        $assessmentSession->save();
     }
 
 

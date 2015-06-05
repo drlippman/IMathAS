@@ -1,0 +1,65 @@
+<html><body>
+<h1>Macro Library fractions</h1>
+Fraction operations library
+<BR><ul>
+<li><a href="#fractionrand">fractionrand</a></li>
+<li><a href="#fractiondiffdrands">fractiondiffdrands</a></li>
+<li><a href="#fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></li>
+<li><a href="#fractionparse">fractionparse</a></li>
+<li><a href="#fractiontomixed">fractiontomixed</a></li>
+<li><a href="#fractiontodecimal">fractiontodecimal</a></li>
+<li><a href="#fractionreduce">fractionreduce</a></li>
+<li><a href="#fractionadd">fractionadd</a></li>
+<li><a href="#fractionsubtract">fractionsubtract</a></li>
+<li><a href="#fractionmultiply">fractionmultiply</a></li>
+<li><a href="#fractiondivide">fractiondivide</a></li>
+<li><a href="#fractionneg">fractionneg</a></li>
+<li><a href="#fractionpower">fractionpower</a></li>
+<li><a href="#fractionroot">fractionroot</a></li>
+</ul>
+<h3><a name="fractionrand">fractionrand</a></h3>
+fractionrand(denom) 
+<BR>returns a proper reduced fraction with the given denominator
+<BR><h3><a name="fractiondiffdrands">fractiondiffdrands</a></h3>
+fractiondiffdrands(min,max,n) {
+<BR>returns n fractions with different denominators from min to max
+<BR><h3><a name="fractiondiffdrandsfrom">fractiondiffdrandsfrom</a></h3>
+fractiondiffdrandsfrom(list,n) {
+<BR>returns n fractions with different denominators from the list
+<BR><h3><a name="fractionparse">fractionparse</a></h3>
+fractionparse(fraction)
+<BR>converts a fraction into an array(num, denom)
+<BR><h3><a name="fractiontomixed">fractiontomixed</a></h3>
+fractiontomixed(f)
+<BR>converts a fraction string to a mixed number string
+<BR><h3><a name="fractiontodecimal">fractiontodecimal</a></h3>
+fractiontodecimal(f)
+<BR><h3><a name="fractionreduce">fractionreduce</a></h3>
+fractionreduce(f)
+<BR>takes a fraction string or array(num,denom)
+<BR>returns a reduced fraction string
+<BR><h3><a name="fractionadd">fractionadd</a></h3>
+fractionadd(f1,f2,[f3,f4,...])
+<BR>adds a set of fractions, returning a reduced fraction sum
+<BR><h3><a name="fractionsubtract">fractionsubtract</a></h3>
+fractionsubtract(f1,f2,[f3,f4,...])
+<BR>subtract a set of fractions, returning a reduced fraction difference
+<BR>f1 - f2 - f3 - f4 etc.
+<BR><h3><a name="fractionmultiply">fractionmultiply</a></h3>
+fractionmultiply(f1,f2,[f3,f4,...])
+<BR>multiply a set of fractions, returning a reduced fraction
+<BR><h3><a name="fractiondivide">fractiondivide</a></h3>
+fractiondivide(f1,f2,[f3,f4,...])
+<BR>divide a set of fractions, returning a reduced fraction
+<BR>f1 -: f2 -: f3 -: f4
+<BR><h3><a name="fractionneg">fractionneg</a></h3>
+fractionneg(frac)
+<BR>change the sign of a fraction
+<BR><h3><a name="fractionpower">fractionpower</a></h3>
+fractionpower(frac, power)
+<BR>raises a fraction to a power
+<BR><h3><a name="fractionroot">fractionroot</a></h3>
+fractionroot(frac, [root])
+<BR>finds the root of the fraction (defaults to square root), rationalizing
+<BR>the denominator.  The output is a string.
+<BR>

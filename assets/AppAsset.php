@@ -22,7 +22,6 @@ class AppAsset extends AssetBundle
         'css/default.css',
         'css/jquery-ui.min.css',
         'css/jquery-ui.structure.min.css',
-        'css/handheld.css',
         'css/site.css',
     ];
     public $jsOptions = array(

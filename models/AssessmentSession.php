@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasAssessmentSessions;
 
 class AssessmentSession extends BaseImasAssessmentSessions
@@ -27,16 +28,52 @@ class AssessmentSession extends BaseImasAssessmentSessions
     }
     public static function getById($id)
     {
-        return AssessmentSession::findOne(['assessmentid' => $id]);
+        return AssessmentSession::findOne($id);
     }
 
-    public static function getAssessmentSession($id, $aid)
+    public static function getAssessmentSession($userId, $aid)
     {
-        return AssessmentSession::findOne(['userid' => $id, 'assessmentid' => $aid]);
+        return AssessmentSession::findOne(['userid' => $userId, 'assessmentid' => $aid]);
     }
 
     public static function getByUserId($uid)
     {
         return AssessmentSession::findOne(['userid' => $uid]);
+    }
+
+    public function saveAssessmentSession($assessment, $userId)
+    {
+        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
+
+        $bestscorelist = $scorelist . ';' . $scorelist . ';' . $scorelist;
+        $scorelist = $scorelist . ';' . $scorelist;
+        $bestattemptslist = $attemptslist;
+        $bestseedslist = $seedlist;
+        $bestlalist = $lalist;
+        $starttime = time();
+        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
+        $ltisourcedid = '';
+        $param['questions'] = $qlist;
+        $param['seeds'] = $seedlist;
+        $param['userid'] = $userId;
+        $param['assessmentid'] = $assessment->id;
+        $param['attempts'] = $attemptslist;
+        $param['reviewattempts'] = $attemptslist;
+        $param['lastanswers'] = $lalist;
+        $param['reviewlastanswers'] = $lalist;
+        $param['reviewscores'] = $scorelist;
+        $param['reviewseeds'] = $reviewseedlist;
+        $param['bestscores'] = $bestscorelist;
+        $param['scores'] = $scorelist;
+        $param['bestattempts'] = $bestattemptslist;
+        $param['bestseeds'] = $bestseedslist;
+        $param['bestlastanswers'] = $bestlalist;
+        $param['starttime'] = time();
+        $param['feedback'] = $deffeedbacktext;
+        $param['lti_sourcedid'] = $ltisourcedid;
+
+        $this->attributes = $param;
+        $this->save();
+        return self::getById($this->id);
     }
 } 

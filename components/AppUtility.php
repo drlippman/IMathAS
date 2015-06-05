@@ -3,6 +3,7 @@
 namespace app\components;
 
 
+use app\models\Exceptions;
 use app\models\Questions;
 use Yii;
 use yii\base\Component;
@@ -494,18 +495,6 @@ class AppUtility extends Component
         }
     }
 
-    public static function basicShowQuestions($qn, $seqinactive = false, $colors = array())
-    {
-
-        require_once("TestUtil.php");
-        $arrayData = basicshowq($qn, $seqinactive = false, $colors = array());
-        //var_dump($arrayData);
-        return $arrayData;
-
-    }
-
-    /*Generate assessment data*/
-
     public static function generateAssessmentData($itemorder, $shuffle, $aid, $arrayout = false)
     {
         $ioquestions = explode(",", $itemorder);
@@ -602,4 +591,445 @@ class AppUtility extends Component
     public static function addslashes_deep($value) {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
     }
+
+    public static function showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $next)
+    {
+        global $allowedmacros, $mathfuncs;
+        $allowedmacros = array();
+        $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+        $allowedmacros = $mathfuncs;
+        $introdividers = array();
+
+        include("displayq2.php");
+        include("testutil.php");
+        include("asidutil.php");
+        $isTeacher = false;
+        if($teacher)
+        {
+            $isTeacher = true;
+        }
+
+        global $questions, $disallowedvar, $showhints, $qi, $responseString, $superdone, $bestquestions, $seeds, $noraw, $rawscores, $attempts, $lastanswers, $timesontask, $lti_sourcedid, $reattempting, $bestseeds, $bestrawscores, $bestscores, $firstrawscores, $bestattempts, $bestlastanswers, $starttime, $testsettings, $inexception, $isreview, $exceptionduedate;
+        $superdone = false;
+        $isreview = false;
+        if($assessmentSession)
+        {
+            if (strpos($assessmentSession->questions,';') === false) {
+                $questions = explode(",", $assessmentSession->questions);
+                $bestquestions = $questions;
+            } else {
+                list($questions, $bestquestions) = explode(";", $assessmentSession->questions);
+                $questions = explode(",", $questions);
+                $bestquestions = explode(",", $bestquestions);
+            }
+
+            $seeds = explode(",", $assessmentSession->seeds);
+            if (strpos($assessmentSession->scores,';')===false) {
+                $scores = explode(",", $assessmentSession->scores);
+                $noraw = true;
+                $rawscores = $scores;
+            } else {
+                $sp = explode(';',$assessmentSession->scores);
+                $scores = explode(',', $sp[0]);
+                $rawscores = explode(',', $sp[1]);
+                $noraw = false;
+            }
+
+            $attempts = explode(",", $assessmentSession->attempts);
+            $lastanswers = explode("~",$assessmentSession->lastanswers);
+            if ($assessmentSession->timeontask == '') {
+                $timesontask = array_fill(0,count($questions), '');
+            } else {
+                $timesontask = explode(',', $assessmentSession->timeontask);
+            }
+            $lti_sourcedid = $assessmentSession->lti_sourcedid;
+
+            if (trim($assessmentSession->reattempting) == '') {
+                $reattempting = array();
+            } else {
+                $reattempting = explode(",", $assessmentSession->reattempting);
+            }
+
+            $bestseeds = explode(",", $assessmentSession->bestseeds);
+            if ($noraw) {
+                $bestscores = explode(',', $assessmentSession->bestscores);
+                $bestrawscores = $bestscores;
+                $firstrawscores = $bestscores;
+            } else {
+                $sp = explode(';', $assessmentSession->bestscores);
+                $bestscores = explode(',', $sp[0]);
+                $bestrawscores = explode(',', $sp[1]);
+                $firstrawscores = explode(',', $sp[2]);
+            }
+            $bestattempts = explode(",", $assessmentSession->bestattempts);
+            $bestlastanswers = explode("~", $assessmentSession->bestlastanswers);
+            $starttime = $assessmentSession->starttime;
+
+
+            if($starttime == 0)
+            {
+                $assessmentSession->starttime = time();
+                $assessmentSession->save();
+            }
+
+            if($assessment)
+            {
+                $testsettings = $assessment->attributes;
+
+                if ($testsettings['displaymethod'] == 'VideoCue' && $testsettings['viddata']=='') {
+                    $testsettings['displaymethod'] = 'Embed';
+                }
+                if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/',$testsettings['intro'],$matches) == 1) {
+                    if (strtolower($matches[1]) == 'link') {
+                        $linkedText = Links::getById(intval($matches[2]));
+                        $vals = $linkedText->text;
+                        $testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
+                    } else if (strtolower($matches[1])=='assessment') {
+                        $importAssessment = Assessments::getByAssessmentId(intval($matches[2]));
+                        $vals = $importAssessment->intro;
+                        $testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
+                    }
+                }
+            }
+
+            if (!$isTeacher) {
+                $rec = "data-base=\"assessintro-{$assessmentSession->assessmentid}\" ";
+                $testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
+            }
+
+            list($testsettings['testtype'], $testsettings['showans']) = explode('-', $testsettings['deffeedback']);
+
+            $now = time();
+
+            if ($testsettings['avail']==0 && !$isTeacher) {
+                echo 'Assessment is closed';die;
+                //    leavetestmsg();
+            }
+
+            $actas = 1;
+            if ($actas) {
+
+                $row = Exceptions::getByAssessmentIdAndUserId($user->id, $assessmentId);
+
+                if ($row) {
+                    if ($now < $row->startdate || $row->enddate < $now) { //outside exception dates
+                        if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
+                            $isreview = true;
+                        } else {
+                            if (!$isTeacher) {
+                                echo 'Assessment is closed';die;
+                                //leavetestmsg();
+                            }
+                        }
+                    } else { //in exception
+                        if ($testsettings['enddate'] < $now) { //exception is for past-due-date
+                            $inexception = true;
+                        }
+                    }
+                    $exceptionduedate = $row->enddate;
+                } else { //has no exception
+                    if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
+                        if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+                            $isreview = true;
+                        } else {
+                            if (!$isTeacher) {
+                                echo 'Assessment is closed';die;
+                                // leavetestmsg();
+                            }
+                        }
+                    }
+                }
+            }
+
+            $qi = getquestioninfo($questions, $testsettings);
+
+
+            for ($i = 0; $i < count($questions); $i++) {
+                if ($qi[$questions[$i]]['withdrawn'] == 1 && $qi[$questions[$i]]['points'] > 0) {
+                    $bestscores[$i] = $qi[$questions[$i]]['points'];
+                    $bestrawscores[$i] = 1;
+                }
+            }
+
+            $allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
+            $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
+            $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
+            $showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
+            $noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
+            $reviewatend = ($testsettings['testtype']=="EndReview");
+            $showhints = ($testsettings['showhints']==1);
+            $showtips = $testsettings['showtips'];
+            $regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
+            if ($regenonreattempt) {
+                $nocolormark = true;
+            }
+
+
+            if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
+                $placeinhead = "<script type='text/javascript'>var eetype='".$testsettings['eqnhelper']."</script>";
+                $placeinhead .= "<script type='text/javascript' src = '".AppUtility::getHomeURL()."js/eqnhelper.js?v=030112'></script>";
+                $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+
+            } else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
+                $placeinhead = "<link rel='stylesheet' href='".AppUtility::getHomeURL()."/assessment/mathquill.css?v=102113' type='text/css' />";
+                if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
+                    $placeinhead .= '<!--[if lte IE 7]><style style="text/css">
+				.mathquill-editable.empty { width: 0.5em; }
+				.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
+				.mathquill-rendered-math sup { line-height: .8em; }
+				.mathquill-rendered-math .numerator {float: left; padding: 0;}
+				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
+				</style><![endif]-->';
+                }
+                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."js/mathquill_min.js?v=102113'></script>";
+                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."js/mathquilled.js?v=070214'></script>";
+                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."javascript/AMtoMQ.js?v=102113'></script>";
+                $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+
+            }
+
+            $useeqnhelper = $testsettings['eqnhelper'];
+
+            $responseString .= '<div id="headershowtest" class="pagetitle">';
+            $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
+
+            if ($testsettings['testtype']=="Practice" && !$isreview) {
+                echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
+            }
+
+            if (!$isreview && !$superdone) {
+                if ($exceptionduedate > 0) {
+                    $timebeforedue = $exceptionduedate - time();
+                } else {
+                    $timebeforedue = $testsettings['enddate'] - time();
+                }
+                if ($timebeforedue < 0) {
+                    $duetimenote = _('Past due');
+                } else if ($timebeforedue < 24*3600) { //due within 24 hours
+                    if ($timebeforedue < 300) {
+                        $duetimenote = '<span style="color:#f00;">' . _('Due in under ');
+                    } else {
+                        $duetimenote = '<span>' . _('Due in ');
+                    }
+                    if ($timebeforedue>3599) {
+                        $duetimenote .= floor($timebeforedue/3600). " " . _('hours') . ", ";
+                    }
+                    $duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes');
+                    $duetimenote .= '. ';
+                    if ($exceptionduedate > 0) {
+                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a',$exceptionduedate);
+                    } else {
+                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+                    }
+                } else {
+                    if ($testsettings['enddate']==2000000000) {
+                        $duetimenote = '';
+                    } else if ($exceptionduedate > 0) {
+                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a',$exceptionduedate);
+                    } else {
+                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+                    }
+                }
+            }
+
+            $restrictedtimelimit = false;
+
+            $responseString .= '<div class="right margin-right-inset"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
+            $responseString .= filter("<div id=intro class='hidden margin-right-inset'>{$testsettings['intro']}</div>\n");
+
+            $lefttodo = self::shownavbar($questions,$scores,$next,$testsettings['showcat'],$courseId,$assessmentId);
+
+            if (unans($scores[$next]) || amreattempting($next)) {
+                $responseString .= "<div class=inset>\n";
+                if (isset($intropieces)) {
+                    foreach ($introdividers as $k=>$v) {
+                        if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
+                            if ($next+1==$v[1]) {
+                                $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;"> Hide Question Information</a></div>';
+                                $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                            } else {
+                                $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
+                                $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+//                echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+//                echo '<input type="hidden" name="disptime" value="'.time().'" />';
+//                echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+
+                $responseString .= "<a name=\"beginquestions\"></a>\n";
+                basicshowq($next);
+                showqinfobar($next ,true,true);
+                $responseString .= "</div>\n";
+
+            }else {
+                $responseString .= "<div class=inset>\n";
+                $responseString .= "<a name=\"beginquestions\"></a>\n";
+                $responseString .= "You've already done this problem.\n";
+                $reattemptsremain = false;
+                if ($showeachscore) {
+                    $possible = $qi[$questions[$next]]['points'];
+                    $responseString .= "<p>Score on last attempt: ";
+                    $responseString .= printscore($scores[$next],$next);
+                    $responseString .= "</p>\n";
+                    $responseString .= "<p>Score in gradebook: ";
+                    $responseString .= printscore($bestscores[$next],$next);
+                    $responseString .= "</p>";
+                }
+                if (hasreattempts($next)) {
+                    //if ($showeachscore) {
+                    $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
+                    //}
+                    $reattemptsremain = true;
+                }
+                if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
+                    $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
+                }
+                if ($lefttodo == 0) {
+                    $responseString .= "<a href=\"showtest.php?action=skip&amp;done=true\">When you are done, click here to see a summary of your score</a>\n";
+                }
+                if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
+                    $responseString .= "<p>Question with last attempt is displayed for your review only</p>";
+
+                    if (!$noraw && $showeachscore) {
+                        //$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
+                        if (strpos($rawscores[$next],'~')!==false) {
+                            $colors = explode('~',$rawscores[$next]);
+                        } else {
+                            $colors = array($rawscores[$next]);
+                        }
+                    } else {
+                        $colors = array();
+                    }
+                    $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+                    if ($qshowans) {
+                        displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
+                    } else {
+                        displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
+                    }
+                    $contactlinks = showquestioncontactlinks($next);
+                    if ($contactlinks!='') {
+                        $responseString .= '<div class="review">'.$contactlinks.'</div>';
+                    }
+                }
+                $responseString .= "</div>\n";
+            }
+
+        }
+
+        return $responseString;
+    }
+
+
+
+    static function shownavbar($questions,$scores,$current,$showcat,$courseId,$assessmentId) {
+        global $responseString, $isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores;
+        $showeachscore = 1;
+        $todo = 0;
+        $earned = 0;
+        $poss = 0;
+        $responseString .= "<a href='#beginquestions'><img class=skipnav src='".AppUtility::getHomeURL()."img/blank.gif' alt='Skip Navigation')'/></a>\n";
+        $responseString .= "<div class=navbar>";
+        $responseString .= "<h4>Questions</h4>\n";
+        $responseString .= "<ul class=qlist>\n";
+        for ($i = 0; $i < count($questions); $i++) {
+            $responseString .= "<li>";
+            if ($current == $i) { $responseString .= "<span class=current>";}
+            if (unans($scores[$i]) || amreattempting($i)) {
+                $todo++;
+            }
+            if ($isreview) {
+                $thisscore = getpts($scores[$i]);
+            } else {
+                $thisscore = getpts($bestscores[$i]);
+            }
+
+            if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
+                $responseString .= "<img alt='untried' src='".AppUtility::getHomeURL()."/img/te_blue_arrow.png'/> ";
+            } else if (canimprove($i) && !$noindivscores) {
+                if ($thisscore==0 || $noindivscores) {
+                    $responseString .= "<img alt=\"incorrect - can retry\" src='".AppUtility::getHomeURL()."img/te_red_redo.png'/> ";
+                } else {
+                    $responseString .= "<img alt=\"partially correct - can retry\" src='".AppUtility::getHomeURL()."img/{te_yellow_redo.png'/> ";
+                }
+            } else {
+                if (!$showeachscore) {
+                    $responseString .= "<img alt=\"cannot retry\" src='".AppUtility::getHomeURL()."img/te_blank.gif'/> ";
+                } else {
+                    if ($thisscore == $qi[$questions[$i]]['points']) {
+                        $responseString .= "<img alt=\"correct\" src='".AppUtility::getHomeURL()."img/te_green_check.png'/> ";
+                    } else if ($thisscore==0) {
+                        $responseString .= "<img alt=\"incorrect - cannot retry\" src='".AppUtility::getHomeURL()."img/te_red_ex.png'/> ";
+                    } else {
+                        $responseString .= "<img alt=\"partially correct - cannot retry\" src='".AppUtility::getHomeURL()."img/te_yellow_check.png'/> ";
+                    }
+                }
+            }
+
+
+            if ($showcat > 1 && $qi[$questions[$i]]['category']!='0') {
+                if ($qi[$questions[$i]]['withdrawn']==1) {
+                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+                } else {
+                    $responseString .= "<a href=\"showtest.php?to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+                }
+            } else {
+                if ($qi[$questions[$i]]['withdrawn']==1) {
+                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+                } else {
+                    $responseString .= "<a href=\"show-assessment?id=$assessmentId&amp;cid=$courseId&amp;to=$i\">Q ". ($i+1) . "</a>";
+                }
+            }
+            if ($showeachscore) {
+                if ((canimprove($i) && $isreview) || (!$isreview && canimprovebest($i))) {
+                    $responseString .= ' (';
+                } else {
+                    $responseString .= ' [';
+                }
+                if ($isreview) {
+                    $thisscore = getpts($scores[$i]);
+                } else {
+                    $thisscore = getpts($bestscores[$i]);
+                }
+                if ($thisscore < 0) {
+                    $responseString .= '0';
+                } else {
+                    $responseString .= $thisscore;
+                    $earned += $thisscore;
+                }
+                $responseString .= '/'.$qi[$questions[$i]]['points'];
+                $poss += $qi[$questions[$i]]['points'];
+                if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
+                    $responseString .= ')';
+                } else {
+                    $responseString .= ']';
+                }
+            }
+
+            if ($current == $i) { $responseString .= "</span>";}
+
+            $responseString .= "</li>\n";
+        }
+        $responseString .= "</ul>";
+        if ($showeachscore) {
+            if ($isreview) {
+                $responseString .= "<p>Review: ";
+            } else {
+                $responseString .= "<p>Grade: ";
+            }
+            $responseString .= $earned."/".$poss."</p>";
+        }
+        if (!$isdiag && $testsettings['noprint']==0) {
+            $responseString .= "<p><a href='#' onclick=\"window.open('".AppUtility::getHomeURL()."assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
+        }
+
+        $responseString .= "</div>\n";
+
+        return $todo;
+    }
+
 }

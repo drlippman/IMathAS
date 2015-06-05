@@ -1,0 +1,30 @@
+<html><body>
+<h1>Macro Library interval</h1>
+Interval functions, Version 1.1 March 2, 2010
+<BR><ul>
+<li><a href="#forminterval">forminterval</a></li>
+<li><a href="#linegraph">linegraph</a></li>
+<li><a href="#linegraphbrackets">linegraphbrackets</a></li>
+<li><a href="#intervalstodraw">intervalstodraw</a></li>
+</ul>
+<h3><a name="forminterval">forminterval</a></h3>
+forminterval(min,max,minmarkertype,maxmarkertype)
+<BR>Forms an interval string, like "[2,3)"
+<BR>min,max: min and max of interval
+<BR>minmarkertype, maxmarkertype: 0 for open, 1 for closed
+<BR><h3><a name="linegraph">linegraph</a></h3>
+linegraph(intervals,[xmin,xmax,xscl,width,height])
+<BR>Creates a line graph
+<BR>intervals:  string or array of strings in interval notation, ex: [2,5)
+<BR><h3><a name="linegraphbrackets">linegraphbrackets</a></h3>
+linegraphbrackets(intervals,[xmin,xmax,xscl,width,height])
+<BR>Creates a line graph using brackets/parens instead of open/closed dots
+<BR>intervals:  string or array of strings in interval notation, ex: [2,5)
+<BR><h3><a name="intervalstodraw">intervalstodraw</a></h3>
+intervalstodraw(interval,xmin,xmax)
+<BR>converts an interval like (-oo,4]U(3,5] into an array of strings 
+<BR>suitable for use as $answers for a drawing question with 
+<BR>$answerformat = 'numberline'
+<BR>also provide xmin and xmax, the min and max of the drawing grid
+<BR>if different than the default -5 to 5
+<BR>

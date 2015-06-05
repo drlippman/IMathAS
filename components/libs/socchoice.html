@@ -1,0 +1,55 @@
+<html><body>
+<h1>Macro Library socchoice</h1>
+a collection of social choice routines
+<BR>
+<BR>Version 1.0 Sept 27, 2012
+<BR><ul>
+<li><a href="#apportion">apportion</a></li>
+<li><a href="#apportion_info">apportion_info</a></li>
+<li><a href="#banzhafpower">banzhafpower</a></li>
+<li><a href="#shapleyshubikpower">shapleyshubikpower</a></li>
+</ul>
+<h3><a name="apportion">apportion</a></h3>
+apportion(populations, seats, method)
+<BR> populations: array or list of state populations
+<BR> seats: number of seats to apportion
+<BR> method: method to use: "hamilton", "jefferson", "adams", "webster", 
+<BR>                        "huntington", "lowndes"
+<BR> returns an array giving the apportionment to each state
+<BR><h3><a name="apportion_info">apportion_info</a></h3>
+apportion_info(populations, seats, method)
+<BR> populations: array or list of state populations
+<BR> seats: number of seats to apportion
+<BR> method: method to use: "hamilton", "jefferson", "adams", "webster", 
+<BR>                        "huntington", "lowndes"
+<BR> returns an array of:
+<BR>  0) the divisor
+<BR>  1  an array of quotas (decimal values), 
+<BR>  2) an array of initial lower quotas (hamilton, jefferson, lowndes)
+<BR>     an array of initial upper quotas (adams)
+<BR>     an array of initial rounded quotas (webster)
+<BR>     an array of initial allocations (huntington)
+<BR>  3) an array of geometric means (huntington)
+<BR>     an array of decimal/whole ratios (lowndes)
+<BR>     an array of decimal remainders (hamilton)
+<BR>     nothing (others)
+<BR>  4) valid modified divisors, in interval notation (jefferson, adams, webster)
+<BR><h3><a name="banzhafpower">banzhafpower</a></h3>
+banzhafpower(weights, quota)
+<BR> weights: list or array of voter weights
+<BR> quota: voting system quota
+<BR> format: defaults to decimal power index values
+<BR>         "counts": power counts, "frac": power index as fractions strings
+<BR> calculates the Banzhaf power index for the voting system.
+<BR> returns an array of power indexes 
+<BR>
+<BR> Based on http://www.hippasus.com/resources/socialsoftware/banzhaf.py (CC-BY)
+<BR><h3><a name="shapleyshubikpower">shapleyshubikpower</a></h3>
+shapleyshubikpower(weights, quota, [format])
+<BR> weights: list or array of voter weights   (max: 7 voters)  
+<BR> quota: voting system quota
+<BR> format: defaults to decimal power index values
+<BR>         "counts": power counts, "frac": power index as fractions strings
+<BR> calculates the Shapley-Shubik power index for the voting system.
+<BR> returns an array of power indexes 
+<BR>

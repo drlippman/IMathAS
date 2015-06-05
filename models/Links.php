@@ -15,11 +15,11 @@ class Links extends BaseImasLinkedtext
 {
     public static function getByCourseId($courseId)
     {
-        return static::findAll(['courseid' => $courseId]);
+        return Links::findAll(['courseid' => $courseId]);
     }
 
     public static function getById($id)
     {
-        return static::findOne(['id' => $id]);
+        return Links::findOne(['id' => $id]);
     }
 } 
