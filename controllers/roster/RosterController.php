@@ -698,14 +698,32 @@ class RosterController extends AppController
 
     public function actionRosterMessage()
     {
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $assessments = Assessments::getByCourseId($courseId);
-        $selectedStudents = $this->getBodyParams();
         if($this->isPost()){
-            return $this->renderWithData('rosterEmail');
+            $courseId = Yii::$app->request->get('cid');
+            $userId = Yii::$app->user->identity->getId();
+            $course = Course::getById($courseId);
+            $assessments = Assessments::getByCourseId($courseId);
+            $this->includeJS(['../js/roster/rosterMessage.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+            $selectedStudents = $this->getBodyParams();
+
+            if ($selectedStudents['student-data'] != '')
+            {
+                $selectedStudents = explode(',',$selectedStudents['student-data']);
+                $studentArray = array();
+                foreach ($selectedStudents as $student){
+                    $studentName = User::getById($student);
+                    array_push($studentArray,$studentName);
+                }
+                return $this->renderWithData('rosterMessage',['assessments' => $assessments, 'studentDetails' => $studentArray, 'course' => $course]);
+            }else
+            {
+                return $this->redirect('student-roster?cid='.$courseId);
+            }
+            }
         }
-        $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
-        return $this->renderWithData('rosterMessage',['course' => $course ,'assessments' => $assessments]);
-    }
+
 }
+
+
+
+
