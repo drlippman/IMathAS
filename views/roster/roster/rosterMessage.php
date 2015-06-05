@@ -3,16 +3,20 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 $this->title = 'Send Mass Message';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<form action="roster-message" method="post" id="roster-form">
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
-<div class="student-roster-email" xmlns="http://www.w3.org/1999/html">
+<div class="student-roster-message">
+    <input type="hidden" name="isMessage" value="1"/>
+    <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
+    <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
     <h2><b>Send Mass Message</b></h2>
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span><?php echo '<input class="col-md-8 textbox subject" type="text" >'; ?></span>
+        <span><?php echo '<input class="col-md-8 textbox subject" type="text" name ="subject">'; ?></span>
     </div>
     <br><br>
     <div class="gb">
@@ -25,13 +29,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <span class="col-md-2"><b>Send copy to</b></span>
         <span class="col-md-10">
-            <input type="radio" name="copy-user" id="self" value="none"> Only Students<br>
-            <input type="radio" name="copy-user" id="self" value="self" checked="checked"> Students and you<br>
-            <input type="radio" name="copy-user" id="self" value="allt"> Students and all instructors of this course</span>
+            <input type="radio" name="messageCopyToSend" id="self" value="onlyStudents"> Only Students<br>
+            <input type="radio" name="messageCopyToSend" id="self" value="selfAndStudents" checked="checked"> Students and you<br>
+            <input type="radio" name="messageCopyToSend" id="self" value="teachersAndStudents"> Students and all instructors of this course</span>
     </div>
     <div >
         <span class="col-md-2 select-text-margin"><b>Save sent messages?</b></span>
-        <span class="col-md-10 select-text-margin"><input type="checkbox" id="save-sent-message"></span>
+        <span class="col-md-10 select-text-margin"><input type="checkbox" name="isChecked" id="save-sent-message"></span>
     </div>
     <div>
     <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
@@ -47,12 +51,14 @@ $this->params['breadcrumbs'][] = $this->title;
     </span>
     </div>
     <div class="col-lg-offset-2 col-md-10"><br>
-        <a class="btn btn-primary" id="mess">Send Message</a>
+        <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
     </div>
     <div>
         <span><p class="col-md-3"><br>Unless limited, message will be sent to:</p></span>
-        <span class="col-md-12"><?php foreach ($studentDetails as $studentDetail) { ?>
-        <?php echo "<li>$studentDetail->FirstName, $studentDetail->LastName ($studentDetail->SID)</li>"?><?php } ?>
-        <span></span>
+       <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
+               <?php echo "<li>".$studentDetail['LastName'].",". $studentDetail['FirstName']." (". ($studentDetail['SID']).")</li>" ?>
+           <?php } ?>
+        </span>
     </div>
 </div>
+</form>

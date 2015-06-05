@@ -4,7 +4,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Forums';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['course/course/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->request->getReferrer())]];
 $this->params['breadcrumbs'][] = $this->title;
 //AppUtility::dump($data);
 ?>

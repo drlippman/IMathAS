@@ -23,13 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>
     </div>
     <div>
-        <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Courses :</b></span>
+        <p><span class="select-text-margin pull-left"><b>Filter By Courses :</b></span>
         <span class="col-md-3">
             <select name="seluid" class="show-course form-control" id="course-sent-id">
             <option value="0">All Courses</option>
             </select>
 
-        </span> <span class="col-md-2 select-text-margin" align="center"><b>By Recipient :</b></span>
+        </span> <span class="select-text-margin pull-left"><b>By Recipient :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="user-sent-id">
             <option value="0">Select a user</option>
@@ -37,8 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </span></p>
     </div><br><br>
     <div>
-        <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
-            <a id="check-all-box" class="check-all" href="#">All</a>
+        <p>Check: <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all" href="#">None</a>
             With Selected:
             <a class="btn btn-primary btn-sm"id="mark-sent-delete">Remove From Sent Message List</a>
             <a class="btn btn-primary btn-sm" id="mark-unsend">Unsend</a>

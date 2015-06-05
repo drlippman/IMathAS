@@ -356,6 +356,7 @@ td.locked-student{
     vertical-align: middle;
 }
 
+
 div.navbar{
     min-width: 160px;
 }
@@ -374,5 +375,12 @@ a:focus {
 .btn-primary {
     color: #fff !important; background-color: #428bca !important; border-color: #357ebd !important;
 
+}
+
+
+.breadcrumb > li + li:before {
+    padding: 0 5px;
+    color: #ccc;
+    content: ">\00a0";
 }
 

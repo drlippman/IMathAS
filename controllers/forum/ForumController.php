@@ -40,7 +40,7 @@ class ForumController extends AppController
 
         }
         $this->includeCSS(['../css/forums.css']);
-        return $this->renderWithData('forum', ['model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course]);
+        return $this->renderWithData('forum', ['model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course, 'referrer' => Yii::$app->request->getReferrer()]);
     }
 
     public function actionGetForumNameAjax()

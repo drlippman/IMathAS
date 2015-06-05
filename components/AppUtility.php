@@ -1032,4 +1032,11 @@ class AppUtility extends Component
         return $todo;
     }
 
+    public static function getRefererUri($refere){
+        $home = self::getHomeURL();
+        $absUrl = str_replace('http://localhost', '', $refere);
+        $refereUri = str_replace($home, '', $absUrl);
+        return $refereUri;
+    }
+
 }

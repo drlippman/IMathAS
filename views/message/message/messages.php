@@ -38,14 +38,14 @@ $this->params['breadcrumbs'][] = $this->title;
             | <a class="btn btn-primary btn-sm">Picture</a></p>
     </div>
     <div>
-        <p><span class="col-md-2 select-text-margin" align="center"><b>Filter By Course :</b></span>
+        <p><span class="select-text-margin pull-left"><b>Filter By Course :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="show-course form-control" id="course-id">
             <option value="0">All Courses</option>
 
         </select>
 
-        </span> <span class="col-md-2 select-text-margin" align="center"><b>By Sender :</b></span>
+        </span> <span class="select-text-margin pull-left"><b>By Sender :</b></span>
 
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="user-id">
@@ -57,8 +57,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div>
 
-        <p>check: <a id="uncheck-all-box" class="uncheck-all" href="#">None</a> /
-            <a id="check-all-box" class="check-all" href="#">All</a>
+        <p>Check:  <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all" href="#">None</a>
+
             With Selected:
             <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>

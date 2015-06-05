@@ -55,6 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </form>
     <form action="roster-message?cid=<?php echo $course->id ?>" method="post" id="roster-form">
         <input type="hidden" id="message-id" name="student-data" value=""/>
+        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
         <span> <input type="submit" class="btn btn-primary" id="roster-message" value="Message"></span>
     </form>
         <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>

@@ -12,6 +12,7 @@ use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
 use app\models\loginTime;
+use app\models\Message;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
@@ -635,7 +636,6 @@ class RosterController extends AppController
     {
         if($this->isPost()){
             $selectedStudents = $this->getBodyParams();
-
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : 0;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
             if(!$isActionForEmail)
@@ -654,7 +654,7 @@ class RosterController extends AppController
                 }else{
                     return $this->redirect('student-roster?cid='.$courseId);
                 }
-            }else{AppUtility::dump($selectedStudents);
+            }else{
                 $studentArray = array();
                 $students = $selectedStudents['studentInformation'];
                 foreach(unserialize($students) as $student){
@@ -695,35 +695,75 @@ class RosterController extends AppController
         return $this->successResponse();
     }
 
-    public function actionRosterEmailAjax()
-    {
-        $userData = $this->getRequestParams();
-        AppUtility::dump($userData);
-    }
 
     public function actionRosterMessage()
     {
         if($this->isPost()){
-            $courseId = Yii::$app->request->get('cid');
-            $userId = Yii::$app->user->identity->getId();
-            $course = Course::getById($courseId);
-            $assessments = Assessments::getByCourseId($courseId);
-            $this->includeJS(['../js/roster/rosterMessage.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
             $selectedStudents = $this->getBodyParams();
-
-            if ($selectedStudents['student-data'] != '')
+            $isActionForMessage = isset($selectedStudents['isMessage']) ? $selectedStudents['isMessage'] : 0;
+            $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
+            if(!$isActionForMessage)
             {
-                $selectedStudents = explode(',',$selectedStudents['student-data']);
-                $studentArray = array();
-                foreach ($selectedStudents as $student){
-                    $studentName = User::getById($student);
-                    array_push($studentArray,$studentName);
+                $course = Course::getById($courseId);
+                $assessments = Assessments::getByCourseId($courseId);
+                if ($selectedStudents['student-data'] != ''){
+                    $selectedStudents = explode(',',$selectedStudents['student-data']);
+                    $studentArray = array();
+                    foreach ($selectedStudents as $studentId){
+                        $student = User::getById($studentId);
+                        array_push($studentArray,$student->attributes);
+                    }
+                    $this->includeJS(['../js/roster/rosterMessage.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+                    return $this->renderWithData('rosterMessage',['assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course]);
+                }else{
+                    return $this->redirect('student-roster?cid='.$courseId);
                 }
-                return $this->renderWithData('rosterMessage',['assessments' => $assessments, 'studentDetails' => $studentArray, 'course' => $course]);
-            }else
-            {
-                return $this->redirect('student-roster?cid='.$courseId);
+            }else{
+                $studentArray = array();
+                $sendToStudents = array();
+                $user =  $this->getAuthenticatedUser();
+                $students = $selectedStudents['studentInformation'];
+                $courseId = $selectedStudents['courseid'];
+                $course = Course::getById($courseId);
+                $subject = trim($selectedStudents['subject']);
+                $messageBody =  trim($selectedStudents['message']);
+                foreach(unserialize($students) as $student){
+                    $tempArray = array('userId' => $student['id']);
+                    array_push($studentArray, $tempArray);
+                    $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
+                    array_push($sendToStudents, $sendto);
+                }
+                $toList = implode("<br>",$sendToStudents);
+//                if($selectedStudents['messageCopyToSend'] == 'onlyStudents'){
+//                    foreach($studentArray as $singleStudent){
+//                        $this->sendMassMessage($courseId,$singleStudent['userId'],$subject,$messageBody);
+//                    }
+//                    return $this->redirect('student-roster?cid='.$courseId);
+//                }else
+                    if($selectedStudents['messageCopyToSend'] == 'selfAndStudents')
+                {
+                    foreach($studentArray as $singleStudent)
+                    {
+                        $this->sendMassMessage($courseId,$singleStudent['userId'],$subject,$messageBody);
+                    }
+                    $messageToTeacher = $messageBody.addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
+                    $this->sendMassMessage($courseId,$user->id,$subject,$messageToTeacher);
+                    return $this->redirect('student-roster?cid='.$courseId);
+                }elseif($selectedStudents['messageCopyToSend'] == 'teachersAndStudents')
+                {
+
+                }
+
+
             }
-           }
         }
+        }
+    public function sendMassMessage($courseId,$receiver,$subject,$messageBody){
+            $user =  $this->getAuthenticatedUser();
+            $tempArray = array('cid' => $courseId, 'receiver' => $receiver, 'subject' => $subject , 'body' => $messageBody);
+            $message = new Message();
+            $message->create($tempArray,$user->id );
+    }
+
+
 }
