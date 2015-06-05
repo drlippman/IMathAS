@@ -20,6 +20,7 @@ function threadSuccess(response)
         $.each(threads, function (index, thread) {
             if(fid == thread.forumiddata)
             {
+                alert(thread.parent);
                 if(thread.replyby == null)
                 {
                     thread.replyby= 0;

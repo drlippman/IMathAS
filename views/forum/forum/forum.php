@@ -83,23 +83,9 @@ $this->params['breadcrumbs'][] = $this->title;
     </table>
 
 </div>
-
-<div id="searchpost">
-<?php
-    echo "<div class=block>";
-        echo "<b><label  id='subject'></label></b>";
-        echo  "&nbsp;&nbsp;&nbsp;in(&nbsp;<label id='forumname'></label>)";
-
-        echo "<br/>Posted by:&nbsp;&nbsp;<label id='postedby'></label> ";
-        echo " &nbsp;&nbsp;<label id='postdate'></label> ";
-        echo "</div><div class=blockitems>";
-
-        echo " <label id='message'></label>";
-        echo "<p><a href='#'</a>Show full thread</p>";
-        echo "</div>\n"   ?>
-</div>
+<div id="searchpost"></div>
 <div id="result">
-    <?php echo("No Result Found For Your Search");?>
+    <h5><Strong>No result found for your search.</Strong></h5>
 </div>
 
 
@@ -169,7 +155,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         function postSuccess(response)
         {
-            var count=0;
+           console.log(response);
             var result = JSON.parse(response);
             if (result.status == 0)
             {
@@ -178,17 +164,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 $.each(postData, function(index, Data)
                 {
-
-                    $('#subject').text(Data.subject);
-                    $('#forumname').text(Data.forumname);
-                    $('#postedby').text(Data.name);
-                    $('#postdate').text(Data.postdate);
                     var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
-                   $('#message').text(result);
-                    count=count+1;
-
+                    var html = "<div class='block'>";
+                    html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
+                    html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumname+"</label>)";
+                    html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
+                    html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
+                    html += "</div><div class=blockitems>";
+                    html += "<label id='message'>"+result+"</label>";
+                    html += "<p><a href='#'</a>Show full thread</p>";
+                    html += "</div>\n";
+                   $('#searchpost').append(html);
                 });
-
 
 
             }
@@ -201,7 +188,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         function threadSuccess(response)
         {
-
+            console.log(response);
             var result = JSON.parse(response);
 
            if (result.status == 0)
@@ -249,12 +236,13 @@ $this->params['breadcrumbs'][] = $this->title;
                        $(".forumsearch-table-body").append(html);
                        $('.forumsearch-table').DataTable();
                  }
-            else{
+                else
+                {
+                    $('#result').show();
+                    $('#searchthread').hide();
 
-               $('#searchthread').hide();
-               $('#result').show();
 
-           }
+                }
 
         }
 

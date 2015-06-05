@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <span><a href="#">Limit to New</a> | <a href="#">Limit to Flagged</a></span>|
     <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
 </div>
-
+<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
 
 <div>
     <table id="forum-table displayforum" class="forum-table">

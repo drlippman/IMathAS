@@ -25,10 +25,10 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findAll(['threadid' => $threadId]);
      return $ForumPost;
     }
-    public static function getbyidpost($threadId)
+    public static function getbyidpost($Id)
     {
 
-        $ForumPost = ForumPosts::findAll(['id' => $threadId]);
+        $ForumPost = ForumPosts::findAll(['id' => $Id]);
         return $ForumPost;
     }
 
@@ -56,5 +56,19 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
         $ForumPost->forumid = $forumId;
         $ForumPost->save();
+    }
+
+    public function createReply($params, $user)
+    {
+        $this->threadid = isset($params['threadid']) ? $params['threadid'] : null;
+
+        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
+        $this->subject = isset($params['subject']) ? $params['subject'] : null;
+        $this->userid = isset($user->id) ? $user->id : null;
+        $this->parent = $params['threadid'];
+        $this->message = isset($params['body']) ? $params['body'] : null;
+        $postdate = strtotime(date('F d, o g:i a'));
+        $this->postdate = $postdate;
+        $this->save();
     }
 }

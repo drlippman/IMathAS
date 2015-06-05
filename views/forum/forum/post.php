@@ -76,7 +76,7 @@ src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLo
             <?php }?>
                 <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
                         <span class=right>
-                        <a href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id']); ?>" > Reply</a >
+                        <a href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'].'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>" > Reply</a >
                         <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
                         </span>
                         <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
