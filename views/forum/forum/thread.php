@@ -47,3 +47,4 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
 </div>
+

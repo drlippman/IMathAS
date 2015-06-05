@@ -119,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     function showMessage(messageData) {
-        var v;
+        var rohan;
         var html = " ";
         var htmlCourse = "";
         $.each(messageData, function (index, messageData) {
@@ -139,13 +139,13 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             var rowid = messageData.id;
             if (messageData.isread < 7) {
-                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif' onclick='changeImage(v," + rowid + ")'/></td>";
+                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif' onclick='changeImage(this,"+false+"," + rowid + ")'/></td>";
             }
 //            else if (messageData.isread == 1 || messageData.isread == 0) {
 //                html += "<td><img src='<?php //echo AppUtility::getHomeURL() ?>//img/flagempty.gif' onclick='changeImage(this," + rowid + ")'/></td>";
 //            }
             else {
-                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif' onclick='changeImage(v," + rowid + ")'/></td>";
+                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif' onclick='changeImage(this,"+true+"," + rowid + ")'/></td>";
             }
             html += "<td>" + messageData.FirstName.substr(0, 1).toUpperCase() + messageData.FirstName.substr(1) + " " + messageData.LastName.substr(0, 1).toUpperCase() + messageData.LastName.substr(1) + "</td>";
             html += "<td>" + messageData.name.substr(0, 1).toUpperCase() + messageData.name.substr(1) + "</td>";
@@ -327,11 +327,16 @@ $this->params['breadcrumbs'][] = $this->title;
         });
     }
 
-    function changeImage(element, rowId) {
-        console.log(element);
-        element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif";
-       // element.bln = !element.bln;
-        console.log(element.bln);
+    function changeImage(element,rohan, rowId) {
+        console.log(rohan);
+if(rohan == false){
+        element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif";
+        element.bln = !element.bln;
+}
+        if(rohan ==true ){
+            element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif";
+            element.bln = !element.bln;
+        }
         var row = {rowId: rowId};
         jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
     }

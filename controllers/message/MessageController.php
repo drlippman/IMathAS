@@ -86,6 +86,7 @@ class MessageController extends AppController
             } else {
                 foreach ($mesages as $message) {
                     $dateArray[] = $message;
+
                 }
             }
             $newArray = array();

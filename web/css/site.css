@@ -365,6 +365,14 @@ div.navbar{
 }
 
 a:focus {
-     outline: none;
+    outline: none;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background-color: #3071a9 !important; border-color: #285e8e !important;
+}
+
+.btn-primary {
+    color: #fff !important; background-color: #428bca !important; border-color: #357ebd !important;
+
 }
 

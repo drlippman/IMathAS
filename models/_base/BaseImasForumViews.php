@@ -32,7 +32,7 @@ class BaseImasForumViews extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['userid', 'threadid', 'lastview'], 'required'],
+            //[['userid', 'threadid', 'lastview'], 'required'],
             [['userid', 'threadid', 'lastview', 'tagged'], 'integer']
         ];
     }

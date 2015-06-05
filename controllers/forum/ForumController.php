@@ -4,8 +4,10 @@ namespace app\controllers\forum;
 use app\models\Course;
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
+use app\models\forms\ForumViews;
 use app\models\forms\ThreadForm;
 use app\models\ForumPosts;
+use app\models\ForumView;
 use app\models\Forums;
 use app\models\Thread;
 use app\models\User;
@@ -168,8 +170,7 @@ class ForumController extends AppController
         $user = Yii::$app->user->identity;
         $this->includeCSS(['../css/forums.css']);
         $this->includeJS(['../js/thread.js']);
-
-        return $this->renderWithData('thread', ['cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course]);
+         return $this->renderWithData('thread', ['cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course]);
     }
 
     public function actionGetThreadAjax()
@@ -180,8 +181,9 @@ class ForumController extends AppController
            $threadArray = array();
             foreach ($thread as $data)
             {
-                $username = User::getById($data['userid']);
 
+                $username = User::getById($data['userid']);
+                $tagged = ForumViews::forumViews($data['threadid']);
                 $temparray = array(
                     'parent' => $data['parent'],
                     'threadId' => $data['id'],
@@ -190,7 +192,8 @@ class ForumController extends AppController
                     'views' => $data['views'],
                     'replyby' => $data['replyby'],
                     'postdate' => date('F d, o g:i a',$data['postdate']),
-                    'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
+                     'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                    'tagged' =>$tagged[0]['tagged'],
                 );
             array_push($threadArray, $temparray);
 
@@ -393,6 +396,13 @@ class ForumController extends AppController
         $this->includeJS(["../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
         return $this->renderWithData('addNewThread',['reply' => $threadArray, 'threadName' => $threadName]);
 
+    }
+    public function actionChangeImageAjax()
+    {
+        $params = $this->getBodyParams();
+        $rowId = $params['rowId'];
+        ForumView::updateFlagValue($rowId);
+        return json_encode(['status' => '0']);
     }
 
     public function actionReplyPostAjax()

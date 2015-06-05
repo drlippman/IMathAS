@@ -26,7 +26,7 @@ function threadSuccess(response)
                     thread.replyby= 0;
                     if(thread.parent == 0)
                     {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"'>" +(thread.subject) +"</a> "+ thread.name+" <a href='move-thread?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Move</a> <a href='modify-post?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Modify</a><a href='#' name='tabs' data-var='"+thread.threadId+"' class='mark-remove'> Remove </a></td> ";
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"'>" +(thread.subject) +"</a> "+ thread.name+" <img src='../img/flagempty.gif' onclick='#'><a href='move-thread?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Move</a> <a href='modify-post?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Modify</a><a href='#' name='tabs' data-var='"+thread.threadId+"' class='mark-remove'> Remove </a></td> ";
                             html += "<td>" + thread.replyby + "</td>";
                             html += "<td>" + thread.views + "</td>";
                             html += "<td>" + thread.postdate + "</td>";
