@@ -51,12 +51,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <form action="roster-email" method="post" id="roster-form">
         <input type="hidden" id="student-id" name="student-data" value=""/>
         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
-                  id="">Email</a></span>
+        <span> <input type="submit" class="btn btn-primary" id="roster-email" value="Email"></span>
     </form>
-    <form>
-        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
-                  id="">Message</a></span>
+    <form action="roster-message?cid=<?php echo $course->id ?>" method="post" id="roster-form">
+        <input type="hidden" id="message-id" name="student-data" value=""/>
+        <span> <input type="submit" class="btn btn-primary" id="roster-message" value="Message"></span>
     </form>
         <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
         <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>

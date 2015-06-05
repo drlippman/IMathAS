@@ -633,23 +633,53 @@ class RosterController extends AppController
 
     public function actionRosterEmail()
     {
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $assessments = Assessments::getByCourseId($courseId);
-        $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
         if($this->isPost()){
             $selectedStudents = $this->getBodyParams();
-            if ($selectedStudents['student-data'] != ''){
 
-                $selectedStudents = explode(',',$selectedStudents['student-data']);
-                $studentArray = array();
-                foreach ($selectedStudents as $student){
-                    $studentName = User::getById($student);
-                    array_push($studentArray,$studentName);
+            $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : 0;
+            $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
+            if(!$isActionForEmail)
+            {
+                $course = Course::getById($courseId);
+                $assessments = Assessments::getByCourseId($courseId);
+                if ($selectedStudents['student-data'] != ''){
+                    $selectedStudents = explode(',',$selectedStudents['student-data']);
+                    $studentArray = array();
+                    foreach ($selectedStudents as $studentId){
+                        $student = User::getById($studentId);
+                        array_push($studentArray,$student->attributes);
+                    }
+                    $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+                    return $this->renderWithData('rosterEmail',['assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course]);
+                }else{
+                    return $this->redirect('student-roster?cid='.$courseId);
                 }
-                return $this->renderWithData('rosterEmail',['assessments' => $assessments, 'studentDetails' => $studentArray, 'course' => $course]);
-            }else{
-                return $this->redirect('student-roster?cid='.$courseId);
+            }else{AppUtility::dump($selectedStudents);
+                $studentArray = array();
+                $students = $selectedStudents['studentInformation'];
+                foreach(unserialize($students) as $student){
+                    $tempArray = array(
+                        'firstName' => $student['FirstName'],
+                        'lastName' => $student['LastName'],
+                        'emailId' => $student['email'],
+                        'userId' => $student['id']
+                    );
+                    array_push($studentArray, $tempArray);
+                }
+
+                if($selectedStudents['emailCopyToSend'] == 'singleStudent'){
+                    foreach($studentArray as $singleStudent){
+                        AppUtility::sendMail($selectedStudents['subject'], $selectedStudents['message'], $singleStudent['emailId']);
+                    }
+                }elseif($selectedStudents['emailCopyToSend'] == 'selfStudent'){
+                    foreach($studentArray as $singleStudent){
+                        AppUtility::sendMail($selectedStudents['subject'], $selectedStudents['message'], $singleStudent['emailId']);
+                    }
+                }elseif($selectedStudents['emailCopyToSend'] == 'allTeacher'){
+
+                }
+
+
             }
         }
     }
@@ -666,21 +696,34 @@ class RosterController extends AppController
         return $this->successResponse();
     }
 
-    public function actionRosterEmailAjax()
-    {
-        $userData = $this->getRequestParams();
-        AppUtility::dump($userData);
-    }
-
     public function actionRosterMessage()
     {
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $assessments = Assessments::getByCourseId($courseId);
         if($this->isPost()){
-            return $this->renderWithData('rosterEmail');
+            $courseId = Yii::$app->request->get('cid');
+            $userId = Yii::$app->user->identity->getId();
+            $course = Course::getById($courseId);
+            $assessments = Assessments::getByCourseId($courseId);
+            $this->includeJS(['../js/roster/rosterMessage.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
+            $selectedStudents = $this->getBodyParams();
+
+            if ($selectedStudents['student-data'] != '')
+            {
+                $selectedStudents = explode(',',$selectedStudents['student-data']);
+                $studentArray = array();
+                foreach ($selectedStudents as $student){
+                    $studentName = User::getById($student);
+                    array_push($studentArray,$studentName);
+                }
+                return $this->renderWithData('rosterMessage',['assessments' => $assessments, 'studentDetails' => $studentArray, 'course' => $course]);
+            }else
+            {
+                return $this->redirect('student-roster?cid='.$courseId);
+            }
+            }
         }
-        $this->includeJS(['../js/roster/rosterEmail.js','../js/editor/tiny_mce.js' , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
-        return $this->renderWithData('rosterMessage',['course' => $course ,'assessments' => $assessments]);
-    }
+
 }
+
+
+
+

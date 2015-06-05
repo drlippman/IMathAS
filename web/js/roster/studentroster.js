@@ -4,6 +4,7 @@ $(document).ready(function () {
     studentLock();
     studentUnenroll();
     studentEmail();
+    studentMessage();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
 var studentData;
@@ -231,7 +232,6 @@ function markUnenrollSuccess(response){
 function studentEmail(){
     $('#roster-email').click(function(e){
         var markArray = [];
-        var dataArray = [];
         $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
             markArray.push($(this).val());
         });
@@ -239,8 +239,24 @@ function studentEmail(){
             document.getElementById("student-id").value = markArray;
         }else
         {
+            e.preventDefault();
             alert("No users selected.");
-            location.reload();
         }
     });
 }
+function studentMessage(){
+    $('#roster-message').click(function(e){
+        var markArray = [];
+        $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
+            markArray.push($(this).val());
+        });
+        if(markArray.length!=0){
+            document.getElementById("message-id").value = markArray;
+        }else
+        {
+            alert("No users selected.");
+            e.preventDefault();
+        }
+    });
+}
+

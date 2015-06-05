@@ -34,7 +34,7 @@
         foreach ($threads as $thread) { ?>
             <?php
 
-            if ($thread['forumiddata'] == $forumId && $thread['threadId'] != $threadId) { ?>
+            if ( $thread['forumiddata'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == 0 ) { ?>
              <input type="radio" id="<?php echo $thread['threadId'] ?>" name="thread-name" value="<?php echo $thread['threadId'] ?>"><?php echo $thread['subject']?><br>
             <?php }
         } ?>
@@ -46,3 +46,26 @@
     <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid'.$forumId)  ?>">Cancel</a>
 </form>
 
+<script>
+    $(document).ready(function() {
+        $('#move-forum').show();
+        $('#move-thread').hide();
+
+        $('#myForm input').on('change', function() {
+            var v=$('input[name="movetype"]:checked', '#myForm').val();
+
+            if (v==0) {
+                $('#move-forum').show();
+                $('#move-thread').hide();
+            }
+            if (v==1) {
+                $('#move-forum').hide();
+                $('#move-thread').show();
+            }
+            $("#move-button").click(function () {
+                var forum_id =  $('input[name="forum-name"]:checked', '#myForm').val();
+
+            });
+        });
+    });
+</script>

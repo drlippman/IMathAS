@@ -92,13 +92,9 @@ $currentLevel = 0;
         var butn = document.getElementById('butb' + bnum);
         if (node.className == 'forumgrp') {
             node.className = 'hidden';
-            //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
-            //       butn.value = 'Expand';
             butn.src = imasroot + '/img/expand.gif';
         } else {
             node.className = 'forumgrp';
-            //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
-            //       butn.value = 'Collapse';
             butn.src = imasroot + '/img/collapse.gif';
         }
     }
@@ -119,8 +115,6 @@ $currentLevel = 0;
             var node = document.getElementById('block' + i);
             var butn = document.getElementById('butb' + i);
             node.className = 'forumgrp';
-            //     butn.value = 'Collapse';
-            //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
             butn.src = imasroot + '/img/collapse.gif';
         }
     }
@@ -130,8 +124,6 @@ $currentLevel = 0;
             var node = document.getElementById('block' + i);
             var butn = document.getElementById('butb' + i);
             node.className = 'hidden';
-            //     butn.value = 'Expand';
-            //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
             butn.src = imasroot + '/img/expand.gif';
         }
     }
