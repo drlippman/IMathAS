@@ -19,7 +19,6 @@ use app\components\AppUtility;
     </div>
     <div class="col-lg-offset-1 col-md-8">
         <br>
-        <input type="hidden" class="add-new-thread" value="<?php echo $reply; ?>">
         <a class="btn btn-primary" id="msg-btn">Post Thread</a>
     </div>
 </div>

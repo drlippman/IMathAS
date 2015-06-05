@@ -382,18 +382,17 @@ echo $this->render('_toolbar',['course'=> $course]);
     </div>
     <div hidden="" class="modal-pop-up-review-date">
         <div class="item">
+            <input type="hidden" class="review-date" name="reviewDate" value="<?php echo $assessment->reviewdate; ?>">
+            <input type="hidden" class="end-date" name="endDate" value="<?php echo $assessment->enddate; ?>">
+
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
                 <b>
                   <?php echo $assessment->name ?></a>
                 </b>
                 <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                <?php if ($assessment->reviewdate == 2000000000) { ?>
-                    <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
-                    <BR>This assessment is in review mode - no scores will be saved.
-                <?php } else { ?>
-                    <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
-                    <BR>This assessment is in review mode - no scores will be saved.
+                <?php if ($assessment->reviewdate != 2000000000) { ?>
+                    <BR><?php echo 'Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
                 <?php } ?>
             </div>
             <div class="itemsum">

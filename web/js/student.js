@@ -1,13 +1,14 @@
 $(document).ready(function(){
 
-//    Display Calender
-    var date = new Date();
-    var d = date.getDate();
-    var m = date.getMonth();
-    var y = date.getFullYear();
-    calendar();
+    //Display Calender
 
-//        Show Dialog Pop Up for Assessment time
+        var date = new Date();
+        var d = date.getDate();
+        var m = date.getMonth();
+        var y = date.getFullYear();
+        calendar();
+
+    //Show Dialog Pop Up for Assessment time
 
     $('.confirmation-require').click(function(e){
 
@@ -46,6 +47,8 @@ $(document).ready(function(){
         var htmlMsg = "<div>Assessment</div>";
         var courseId = $('.calender-course-id').val();
         var now = $('.current-time').val();
+        var reviewDateH = $('.review-date').val();
+        var endDateH = $('.end-date').val();
 
         $('.calendar').fullCalendar({
             height: 400,
@@ -72,6 +75,7 @@ $(document).ready(function(){
                             {
                                 eventColor = 'red';
                             }
+                            //alert(assessmentDetail.endDateString < now);
                             if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > now)
                             {
                                 events.push({
@@ -96,11 +100,17 @@ $(document).ready(function(){
                 });
             },
             eventClick:  function(event, jsEvent, view) {
-                //set the values and open the modal pop up
-                $('.calendar').html(event.html);
-                $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
+                if(endDateH < now && reviewDateH != 0 && reviewDateH > now)
+                {
+                    $('.calendar').html(event.html);
+                    $('.modal-pop-up-review-date').dialog({ modal: true, title: event.message,width:350});
+                }
+                else
+                {
+                    $('.calendar').html(event.html);
+                    $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
+                }
             }
-
         });
     }
 
@@ -110,7 +120,6 @@ $(document).ready(function(){
         if (result.status == 0) {
             var tempArray = [];
             var courseData = result.data;
-            alert(courseData);
             $.each(courseData, function (index, temp) {
                 $.each(temp, function (index, singleValue) {
                     tempArray.push(singleValue);
