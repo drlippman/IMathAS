@@ -1,17 +1,32 @@
 <?php
 
+/**
+ * Created by PhpStorm.
+ * User: tudip
+ * Date: 5/6/15
+ * Time: 7:13 PM
+ */
 
 namespace app\models;
-
-use app\components\AppUtility;
-use app\models\_base\BaseImasForumViews;
 use Yii;
 
-class ForumView extends BaseImasForumViews {
+use app\components\AppUtility;
+use app\models\_base\BaseImasForumPosts;
+use app\models\_base\BaseImasForumViews;
 
-    public static function updateFlagValue($row)
+class ForumView extends BaseImasForumViews
+{
+
+
+    public static function getbythreadId($threadid)
     {
-        $query = Yii::$app->db->createCommand("UPDATE imas_forum_views SET tagged=(tagged^1) WHERE threadid='$row';'")->queryAll();
 
+        $views = Yii::$app->db->createCommand("SELECT userid,lastview,count(distinct userid) FROM imas_forum_views where threadid = $threadid")->queryAll();
+//        AppUtility::dump($views);
+        return $views;
     }
-}
+
+
+
+} 
+
