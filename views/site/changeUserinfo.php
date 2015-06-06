@@ -12,7 +12,6 @@ $this->title = 'Profile Settings';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL()?>css/dashboard.css" type="text/css"/>
 <div class="site-login">
 
     <?php

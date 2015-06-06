@@ -63,4 +63,5 @@ class AppConstant
     const SET_PASSWORD_ERROR = 'Password incorrect. Try again.';
     const RETURN_SUCCESS = 0;
     const RETURN_ERROR = -1;
+    const UNAUTHORIZED_ACCESS = 'Unauthorized access, please login with correct credentials.';
 }

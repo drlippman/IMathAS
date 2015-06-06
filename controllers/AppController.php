@@ -9,6 +9,7 @@
 namespace app\controllers;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use yii\web\Controller;
 use Yii;
 
@@ -25,6 +26,11 @@ class AppController extends Controller
     function getRequestParams()
     {
         return $_REQUEST;
+    }
+
+    function getParam($key)
+    {
+        return $_REQUEST[$key];
     }
 
     function setSuccessFlash($message)
@@ -54,10 +60,16 @@ class AppController extends Controller
         return \Yii::$app->user->isGuest;
     }
 
-    function guestUserHandler(){
+    function guestUserHandler($isAjaxCall = false){
         if(self::isGuestUser())
         {
-            return $this->redirect(Yii::$app->homeUrl.'site/login');
+            if($isAjaxCall)
+            {
+//                return self::terminateResponse(AppConstant::UNAUTHORIZED_ACCESS);
+                return false;
+            }else{
+                return $this->redirect(Yii::$app->homeUrl.'site/login');
+            }
         }
     }
 
@@ -71,13 +83,25 @@ class AppController extends Controller
 
     function includeCSS($cssFileArray){
         for($i=0; $i<count($cssFileArray); $i++){
-            $this->getView()->registerCssFile("../" . $cssFileArray[$i]);
+            $this->getView()->registerCssFile("../../css/".$cssFileArray[$i]);
         }
     }
 
     function includeJS($jsFileArray){
         for($i=0; $i<count($jsFileArray); $i++){
-            $this->getView()->registerJsFile("../" . $jsFileArray[$i]);
+            $this->getView()->registerJsFile("../../js/".$jsFileArray[$i]);
+        }
+    }
+
+    function directIncludeCSS($cssFileArray){
+        for($i=0; $i<count($cssFileArray); $i++){
+            $this->getView()->registerCssFile("../css/".$cssFileArray[$i]);
+        }
+    }
+
+    function directIncludeJS($jsFileArray){
+        for($i=0; $i<count($jsFileArray); $i++){
+            $this->getView()->registerJsFile("../js/".$jsFileArray[$i]);
         }
     }
 
@@ -104,7 +128,7 @@ class AppController extends Controller
 
     public function successResponse($data = '')
     {
-        return $this->getReturnableResponse(AppConstant::RETURN_SUCCESS, $data);
+        return json_encode(array('status' =>AppConstant::RETURN_SUCCESS, 'data' => $data));
     }
 
     public function terminateResponse($msg)
@@ -123,10 +147,6 @@ class AppController extends Controller
 
     public function isPostMethod(){
         return Yii::$app->request->post();
-    }
-
-    public function getReturnableResponse($status = AppConstant::RETURN_SUCCESS, $data = ''){
-        return json_encode(array('status' =>$status, 'data' => $data));
     }
 
 }

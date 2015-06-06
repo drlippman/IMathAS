@@ -20,7 +20,6 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\components\AppUtility;
 use app\models\forms\ChangePasswordForm;
-use app\models\forms\MessageForm;
 use yii\web\UploadedFile;
 
 class SiteController extends AppController
@@ -84,7 +83,7 @@ class SiteController extends AppController
         }
         $challenge = AppUtility::getChallenge();
 
-        $this->includeJS(['js/jstz_min.js', 'js/login.js']);
+        $this->directIncludeJs(['jstz_min.js', 'login.js']);
 
         return $this->renderWithData('login', [
             'model' => $model, 'challenge' => $challenge,
@@ -303,9 +302,9 @@ class SiteController extends AppController
             $students = Student::getByUserId($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
             if ($user) {
-                $this->includeCSS(['css/dashboard.css']);
+                $this->directIncludeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
-                $this->includeJS(["js/dashboard.js", "js/ASCIIsvg_min.js", "js/tablesorter.js"]);
+                $this->directIncludeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
 
                 $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers];
                 return $this->renderWithData('dashboard', $userData);
@@ -371,7 +370,8 @@ class SiteController extends AppController
             $this->setSuccessFlash('Changes updated successfully.');
             $this->redirect('dashboard');
         }
-        $this->includeJS(['js/changeUserInfo.js']);
+        $this->directIncludeCSS(['dashboard.css']);
+        $this->directIncludeJS(['changeUserInfo.js']);
 
         return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid]);
 

@@ -40,13 +40,9 @@ class AssessmentController extends AppController
 
         $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
 
-        $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css', '../css/jquery-ui.css']);
+        $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css', 'jquery-ui.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
-        $this->includeJS(['../js/timer.js']);
-        $this->includeJS(['../js/ASCIIMathTeXImg_min.js']);
-        $this->includeJS(['../js/general.js']);
-        $this->includeJS(['../js/eqntips.js']);
-        $this->includeJS(['../js/editor/tiny_mce.js']);
+        $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
         return $this->render('ShowAssessment', ['response'=> $response]);
 
     }
