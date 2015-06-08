@@ -131,17 +131,16 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
-        $this->includeCSS(['../css/fullcalendar.min.css', '../css/calendar.css', '../css/jquery-ui.css']);
-        $this->includeJS(['../js/moment.min.js', '../js/fullcalendar.min.js']);
-        $this->includeJS(['../js/student.js']);
-        return $this->render('index', ['courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession]);
-
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js']);
+        $this->includeJS(['student.js']);
+        $returnData = array('courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
+        return $this->render('index', $returnData);
     }
 
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
-
         $id = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
         $assessment = Assessments::getByAssessmentId($id);
@@ -152,9 +151,10 @@ class CourseController extends AppController
 
         $this->saveAssessmentSession($assessment, $id);
 
-        $this->includeCSS(['../css/mathtest.css', '../css/default.css', '../css/showAssessment.css']);
-        $this->includeJS(['../js/timer.js']);
-        return $this->render('ShowAssessment', ['cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time()]);
+        $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css']);
+        $this->includeJS(['timer.js']);
+        $returnData = array('cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time());
+        return $this->render('ShowAssessment', $returnData);
     }
 
     public function actionLatePass()
@@ -164,13 +164,11 @@ class CourseController extends AppController
         $courseId = $this->getParamVal('cid');
         $studentId = $this->getUserId();
         $exception = Exceptions::getByAssessmentId($assessmentId);
-
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
         $course = Course::getById($courseId);
 
         $addtime = $course->latepasshrs * 60 * 60;
-        $hasexception = true;
         $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $usedlatepasses = round(($assessment->allowlate - $assessment->enddate) / ($course->latepasshrs * 3600));
         $startdate = $assessment->startdate;
@@ -195,9 +193,7 @@ class CourseController extends AppController
 
             if ($exception->islatepass != 0) {
                 echo "<p>Un-use late-pass</p>";
-
                 if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * 60 * 60) {
-
                     echo '<p>Too late to un-use this LatePass</p>';
                 } else {
                     if ($currentTime < $assessment->enddate) {
@@ -236,7 +232,7 @@ class CourseController extends AppController
         $assessment = Assessments::getByAssessmentId($assessmentId);
         if ($this->isPostMethod())
         {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $password = $params['SetPassword']['password'];
             if($password == $assessment->password)
             {
@@ -247,7 +243,8 @@ class CourseController extends AppController
                 $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
             }
         }
-        return $this->renderWithData('setPassword', ['model' => $model, 'assessments' => $assessment]);
+        $returnData = array('model' => $model, 'assessments' => $assessment);
+        return $this->renderWithData('setPassword', $returnData);
     }
 
 
@@ -256,9 +253,9 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $model = new CourseSettingForm();
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load($this->getPostData())) {
             $isSuccess = false;
-            $bodyParams = $this->getBodyParams();
+            $bodyParams = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
             $course = new Course();
             $courseId = $course->create($user, $bodyParams);
@@ -278,22 +275,23 @@ class CourseController extends AppController
                 $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
             }
         }
-        $this->includeCSS(["../css/courseSetting.css"]);
-        $this->includeJS(["../js/courseSetting.js"]);
-        return $this->renderWithData('addNewCourse', ['model' => $model]);
+        $this->includeCSS(["courseSetting.css"]);
+        $this->includeJS(["courseSetting.js"]);
+        $returnData = array('model' => $model);
+        return $this->renderWithData('addNewCourse', $returnData);
     }
 
     public function actionCourseSetting()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $user = $this->getAuthenticatedUser();
         $course = Course::getById($cid);
         if ($course) {
             $model = new CourseSettingForm();
 
-            if ($model->load(Yii::$app->request->post())) {
-                $bodyParams = $this->getBodyParams();
+            if ($model->load($this->getPostData())) {
+                $bodyParams = $this->getRequestParams();
                 $params = $bodyParams['CourseSettingForm'];
                 $courseSetting['name'] = $params['courseName'];
                 $courseSetting['enrollkey'] = $params['enrollmentKey'];
@@ -313,8 +311,9 @@ class CourseController extends AppController
             }
             else{
             $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
-            $this->includeCSS(["../css/courseSetting.css"]);
-            return $this->renderWithData('courseSetting', ['model' => $model, 'course' => $course, 'selectionList' => $selectionList]);
+            $this->includeCSS(["courseSetting.css"]);
+            $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
+            return $this->renderWithData('courseSetting', $returnData);
             }
 
         }
@@ -325,7 +324,7 @@ class CourseController extends AppController
     public function actionDeleteCourse()
     {
         $model = new DeleteCourseForm();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         if ($course) {
             $status = Course::deleteCourse($course->id);
@@ -343,19 +342,21 @@ class CourseController extends AppController
     public function actionTransferCourse()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUsers($sortBy, $order);
         $course = Course::getById($cid);
-        $this->includeCSS(['../css/dashboard.css']);
-        return $this->renderWithData('transferCourse', array('users' => $users, 'course' => $course));
+        //$this->includeJS(['/course/transfercourse.js']);
+        $this->includeCSS(['dashboard.css']);
+        $returnData = array('users' => $users, 'course' => $course);
+        return $this->renderWithData('transferCourse', $returnData);
     }
 
     public function actionUpdateOwner()
     {
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
 
             if ($this->getAuthenticatedUser()->rights == 75) // 75 is instructor right
             {
@@ -390,8 +391,10 @@ class CourseController extends AppController
     public function actionAddRemoveCourse()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
-        return $this->renderWithData('addRemoveCourse', ['cid' => $cid]);
+        $cid = $this->getParamVal('cid');
+        $this->includeJS(['course/addremovecourse.js']);
+        $returnData = array('cid' => $cid);
+        return $this->renderWithData('addRemoveCourse', $returnData);
     }
 
     public function actionGetTeachers()
@@ -428,7 +431,7 @@ class CourseController extends AppController
     public function actionAddTeacherAjax()
     {
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
 
             $teacher = new Teacher();
 
@@ -443,7 +446,7 @@ class CourseController extends AppController
     public function actionRemoveTeacherAjax()
     {
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
 
             $teacher = new Teacher();
 
@@ -457,7 +460,7 @@ class CourseController extends AppController
     public function actionAddAllAsTeacherAjax()
     {
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $cid = $params['cid'];
             $usersIds = json_decode($params['usersId']);
 
@@ -473,7 +476,7 @@ class CourseController extends AppController
     public function actionRemoveAllAsTeacherAjax()
     {
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
 
             $cid = $params['cid'];
             $usersIds = json_decode($params['usersId']);
@@ -533,7 +536,8 @@ class CourseController extends AppController
         $id = Yii::$app->request->get('id');
         $course = Course::getById($cid);
         $link = Links::getById($id);
-        return $this->renderWithData('showLinkedText', ['course' => $course, 'links' => $link]);
+        $returnData = array('course' => $course, 'links' => $link);
+        return $this->renderWithData('showLinkedText', $returnData);
     }
 
     public function actionGetAssessmentDataAjax()

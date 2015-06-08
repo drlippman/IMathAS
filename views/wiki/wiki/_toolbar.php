@@ -4,7 +4,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
 ?>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/_leftSide.css">
+<link rel="stylesheet" href="../../../web/css/_leftSide.css">
 <div class=mainbody>
     <div class="headerwrapper">
         <div id="navlistcont">

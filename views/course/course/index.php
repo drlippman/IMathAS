@@ -359,8 +359,9 @@ echo $this->render('_toolbar',['course'=> $course]);
 <?php case 'Calendar': ?>
     <div class ='calendar'>
         <div hidden="" class="modal-pop-up-assessment">
-            <div class="item">
                 <input type="hidden" class="current-time" name="current-time" value="<?php echo $now;?>">
+                <?php if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) { ?>
+                <div class="item">
                 <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
                 <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
@@ -380,10 +381,12 @@ echo $this->render('_toolbar',['course'=> $course]);
             </div>
         </div>
     </div>
+    <?php } elseif($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) { ?>
     <div hidden="" class="modal-pop-up-review-date">
         <div class="item">
             <input type="hidden" class="review-date" name="reviewDate" value="<?php echo $assessment->reviewdate; ?>">
             <input type="hidden" class="end-date" name="endDate" value="<?php echo $assessment->enddate; ?>">
+
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
                 <b>
@@ -399,7 +402,8 @@ echo $this->render('_toolbar',['course'=> $course]);
             </div>
         </div>
     </div>
-   </div>
+    <?php }?>
+    </div>
     <?php break; ?>
 
   <!--  Block here-->

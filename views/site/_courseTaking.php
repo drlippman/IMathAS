@@ -21,7 +21,7 @@ use app\components\AppUtility;
         </ul>
         <div class="center">
             <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('student', 'student/student-enroll-course') ?>">Enroll in a New Class</a><br>
-            <a id="unhidelink" style="display:none" class="small" href="work-in-progress">Unhide hidden courses</a>
+            <a  id="unhidelink" class="course-taking small" href="work-in-progress">Unhide hidden courses</a>
         </div>
     </div>
 </div>

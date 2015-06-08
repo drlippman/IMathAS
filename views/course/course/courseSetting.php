@@ -39,7 +39,6 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
         <div class="form-label-alignment">
 
             <?= $form->field($model, 'courseName')->textInput(); ?>
-
             <?= $form->field($model, 'enrollmentKey')->textInput() ?>
 
             <div class="datetime form-group">
@@ -84,6 +83,5 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
         </div>
     </div>
 </div>
-
 
 <?php ActiveForm::end(); ?>

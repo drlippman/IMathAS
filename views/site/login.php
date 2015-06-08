@@ -35,18 +35,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="form-group select-text-margin">
         <div class="col-lg-offset-1 col-lg-11 select-text-margin">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-min-width','id' => 'enroll-btn', 'name' => 'login-button']) ?>
+            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-min-width', 'id' => 'enroll-btn', 'name' => 'login-button']) ?>
         </div>
     </div>
 
     <?php ActiveForm::end(); ?>
 
-    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'student-register');?>">Register as a new student</a></p>
-
-    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-password');?>">Forgot Password</a></p>
-
-    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-username');?>">Forgot Username</a></p>
-
-    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'check-browser');?>">Browser check</a></p>
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'student-register'); ?>">Register as a new student</a></p>
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-password'); ?>">Forgot Password</a></p>
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'forgot-username'); ?>">Forgot Username</a></p>
+    <p><a href="<?php echo AppUtility::getURLFromHome('site', 'check-browser'); ?>">Browser check</a></p>
 
 </div>

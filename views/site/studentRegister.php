@@ -7,7 +7,7 @@ use app\components\AppUtility;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\RegisterModel */
 
-$this->title = 'New User / Student Registration';
+$this->title = 'Student Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
@@ -24,15 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
 
     <?= $form->field($model, 'username')->textInput(); ?>
-
     <?= $form->field($model, 'password')->passwordInput() ?>
-
     <?= $form->field($model, 'rePassword')->passwordInput() ?>
-
     <?= $form->field($model, 'FirstName')->textInput(); ?>
-
     <?= $form->field($model, 'LastName') ?>
-
     <?= $form->field($model, 'email') ?>
 
     <?=
@@ -41,16 +36,14 @@ $this->params['breadcrumbs'][] = $this->title;
         ])->checkboxList(['1' => 'Notify Me By Email When I Receive A New Message']) ?>
 
     <?php echo "If you already know your course ID, you can enter it now. Otherwise, leave this blank and you can enroll later." ?>
-<br><br>
+    <br><br>
     <?= $form->field($model, 'courseID') ?>
-
     <?= $form->field($model, 'EnrollmentKey') ?>
 
     <div class="form-group">
-
          <div class="col-lg-offset-2 col-lg-11">
             <?= Html::submitButton('Sign Up', ['id' => 'sign-up-button','class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-            &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
+            &nbsp; &nbsp;<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
         </div>
     </div>
 

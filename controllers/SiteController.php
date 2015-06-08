@@ -82,12 +82,9 @@ class SiteController extends AppController
             }
         }
         $challenge = AppUtility::getChallenge();
-
         $this->directIncludeJs(['jstz_min.js', 'login.js']);
-
-        return $this->renderWithData('login', [
-            'model' => $model, 'challenge' => $challenge,
-        ]);
+        $responseData = array('model' => $model, 'challenge' => $challenge,);
+        return $this->renderWithData('login', $responseData);
     }
 
     /**
@@ -106,9 +103,9 @@ class SiteController extends AppController
     public function actionRegistration()
     {
         $model = new RegistrationForm();
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load($this->getPostData())) {
 
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
@@ -120,7 +117,7 @@ class SiteController extends AppController
 
             $toEmail = $user->email;
             $message = "<p>Welcome to OpenMath</p> ";
-            $message .= "<p>Hi ".ucfirst($user->FirstName)." ". ucfirst($user->LastName)." ,</p> ";
+            $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName)." ,</p> ";
             $message .= '<p>We received a request for instructor account with following credentials.</p>';
             $message .= 'First Name: ' . $user->FirstName . "<br/>\n";
             $message .= 'Last Name: ' . $user->LastName . "<br/>\n";
@@ -133,18 +130,17 @@ class SiteController extends AppController
             $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
             return $this->redirect(AppUtility::getURLFromHome('site','registration'));
         }
-        return $this->renderWithData('registration', [
-            'model' => $model,
-        ]);
+        $this->directIncludeJS(["registration.js"]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('registration', $responseData);
     }
 
     public function actionStudentRegister()
     {
-
         $flashMsg ='';
         $model = new StudentRegisterForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $params = $this->getBodyParams();
+        if ($model->load($this->getPostData())) {
+            $params = $this->getRequestParams();
             $params = $params['StudentRegisterForm'];
             $status = User::createStudentAccount($params);
             if ($status) {
@@ -160,9 +156,10 @@ class SiteController extends AppController
                 $this->setSuccessFlash('Account created successfully, please login to get into system.');
                 return $this->redirect(AppUtility::getURLFromHome('site','login'));
             }
-            $this->setErrorFlash('Error occurred, try again later.');
+            $this->setErrorFlash('User: '.$params['username']. ' already exist.');
         }
-        return $this->renderWithData('studentRegister', ['model' => $model,]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('studentRegister', $responseData);
     }
 
     /**
@@ -177,28 +174,28 @@ class SiteController extends AppController
     public function actionDiagnostic()
     {
         $model = new DiagnosticForm();
-        return $this->renderWithData('diagnostic', ['model' => $model]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('diagnostic', $responseData);
     }
-
 
     public function actionForgotPassword()
     {
         $model = new ForgotPasswordForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $param = $this->getBodyParams();
-            $username = $param['ForgotPasswordForm']['username'];
+        if ($model->load($this->getPostData())) {
+                $param = $this->getRequestParams();
+                $username = $param['ForgotPasswordForm']['username'];
+                $user = User::findByUsername($username);
 
-            $user = User::findByUsername($username);
             if($user)
             {
-            $code = AppUtility::generateRandomString();
-            $user->remoteaccess = $code;
-            $user->save();
-            $toEmail = $user->email;
-            $id = $user->id;
+                $code = AppUtility::generateRandomString();
+                $user->remoteaccess = $code;
+                $user->save();
+                $toEmail = $user->email;
+                $id = $user->id;
 
                 $message = "<p>Welcome to OpenMath</p> ";
-                $message .= "<p>Hi ".ucfirst($user->FirstName)." ". ucfirst($user->LastName).",</p> ";
+                $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName).",</p> ";
                 $message .= "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
                 $message .= "Username: <b>" . $user->SID." </b><br>";
                 $message .= "<p>Click on the link below to reset your password using our secure server:</p>";
@@ -213,24 +210,23 @@ class SiteController extends AppController
                 $this->setSuccessFlash('Password reset link sent to your registered email.');
             }else{
                 $this->setErrorFlash('Such username does not exist.');
-
             }
         }
-
-        return $this->renderWithData('forgotPassword', ['model' => $model,]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('forgotPassword', $responseData);
     }
 
     public function actionForgotUsername()
     {
         $model = new ForgotUsernameForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $param = $this->getBodyParams();
+        if ($model->load($this->getPostData())) {
+            $param = $this->getRequestParams();
             $toEmail = $param['ForgotUsernameForm']['email'];
 
             $user = User::findByEmail($toEmail);
             if ($user) {
                 $message = "<p>Welcome to OpenMath</p> ";
-                $message .= "<p>Hi ".ucfirst($user->FirstName)." ".ucfirst($user->LastName).",<br>";
+                $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName).",<br>";
                 $message .= "<p>We received a request to get the username associated with this e-mail address ".$user->email.". If you have made this request, please see the Username associated with this email listed below.</p> ";
                 $message .= "<p>Username: <b>".$user->SID."</b></br></p>";
                 $message .= "<p>If you did not request to have your username you can safely ignore this email. Rest assured your account is safe.</p>";
@@ -243,7 +239,8 @@ class SiteController extends AppController
                 $this->setErrorFlash(AppConstant::INVALID_EMAIL);
             }
         }
-        return $this->renderWithData('forgotUsername', ['model' => $model,]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('forgotUsername', $responseData);
     }
 
     public function actionCheckBrowser()
@@ -251,7 +248,6 @@ class SiteController extends AppController
         return $this->renderWithData('checkBrowser');
 
     }
-
 
     public function actionResetPassword()
     {
@@ -264,7 +260,7 @@ class SiteController extends AppController
         {
             if($this->isPost())
             {
-                $params = $this->getBodyParams();
+                $params = $this->getRequestParams();
                 $newPassword = $params['ResetPasswordForm']['newPassword'];
                 $password = AppUtility::passwordHash($newPassword);
                 $user->password = $password;
@@ -274,14 +270,12 @@ class SiteController extends AppController
                 $this->redirect('login');
 
             }
-
         }else{
             $this->setErrorFlash('Reset Link has been expired.');
         }
-
-        return $this->renderWithData('resetPassword', ['model' => $model]);
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('resetPassword', $responseData);
     }
-
 
     //////////////////////////////////////////////////////////////
     ////////////////// Logged in user functions //////////////////
@@ -319,8 +313,8 @@ class SiteController extends AppController
     {
         $this->guestUserHandler();
         $model = new ChangePasswordForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $param = $this->getBodyParams();
+        if ($model->load($this->getPostData())) {
+            $param = $this->getRequestParams();
 
             $oldPass = $param['ChangePasswordForm']['oldPassword'];
             $newPass = $param['ChangePasswordForm']['newPassword'];
@@ -340,6 +334,7 @@ class SiteController extends AppController
                 return $this->redirect('change-password');
             }
         }
+        $responseData = array('model' => $model,);
         return $this->renderWithData('changePassword', ['model' => $model]);
     }
 
@@ -351,7 +346,7 @@ class SiteController extends AppController
         $user = $this->getAuthenticatedUser();
         $model = new ChangeUserInfoForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->checkPassword()) {
+        if ($model->load($this->getPostData()) && $model->checkPassword()) {
             $params = Yii::$app->request->getBodyParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
@@ -370,19 +365,19 @@ class SiteController extends AppController
             $this->setSuccessFlash('Changes updated successfully.');
             $this->redirect('dashboard');
         }
+
         $this->directIncludeCSS(['dashboard.css']);
         $this->directIncludeJS(['changeUserInfo.js']);
-
-        return $this->renderWithData('changeUserinfo', ['model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid]);
-
+        $responseData = array('model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid);
+        return $this->renderWithData('changeUserinfo', $responseData);
     }
 
     public function actionStudentEnrollCourse()
     {
         $this->guestUserHandler();
         $model = new StudentEnrollCourseForm();
-        return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
-
+        $responseData = array('model' => $model,);
+        return $this->renderWithData('studentEnrollCourse', $responseData);
     }
 
     public function actionHelperGuide()
@@ -394,5 +389,4 @@ class SiteController extends AppController
     {
         return $this->renderWithData('document');
     }
-
 }

@@ -6,14 +6,10 @@ $this->title = 'Transfer Course';
 $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
     <title>Transfer Course Owner</title>
     <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
     <!-- DataTables CSS -->
-</head>
-<body>
+
 <div class=mainbody>
     <div id="headeradmin" class="pagetitle"><h2>Transfer Course Owner</h2></div>
     <div class="form-group">
@@ -37,9 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" id="userId" value="<?php echo $course->ownerid ?>">
 </div>
 
-
-</body>
-</html>
 <script>
 $( document ).ready(function() {
     $(".transfer").click(function () {

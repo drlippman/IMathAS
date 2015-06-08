@@ -1,23 +1,24 @@
 <?php
 
 use app\components\AppUtility;
+use app\components\AppConstant;
+
 $this->title = 'Check Browser';
 $this->params['breadcrumbs'][] = $this->title;
 
-//	require("config.php");
 $sessiondata['mathdisp'] = 1;
 $sessiondata['graphdisp'] = 1;
 $nologo = true;
 ?>
 
-<h2><?php echo \app\components\AppConstant::INSTALL_NAME; ?> Browser Check</h2>
-<p><?php echo \app\components\AppConstant::INSTALL_NAME; ?> requires JavaScript. Visual Math and Graph display is
+<h2><?php echo AppConstant::INSTALL_NAME; ?> Browser Check</h2>
+<p><?php echo AppConstant::INSTALL_NAME; ?> requires JavaScript. Visual Math and Graph display is
     supported both through image-based display,
     which requires no setup, or browser-based display. Browser-based display is faster, more accurate, and prettier
     than image-based display. The rest of this page will guide you through setting up browser-based Math and Graph
     display.</p>
 
-<p>For browser-based Math and Graph display, <?php echo \app\components\AppConstant::INSTALL_NAME; ?> recommends:<br/>
+<p>For browser-based Math and Graph display, <?php echo AppConstant::INSTALL_NAME; ?> recommends:<br/>
     Windows: Internet Explorer 6 or higher + MathPlayer + AdobeSVG, or Internet Explorer 9 + MathPlayer, or <a
         href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a><br/>
     Mac: <a href="http://www.mozilla.com/firefox/">FireFox 1.5 or higher</a>.</p>
