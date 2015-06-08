@@ -4,7 +4,6 @@ use app\components\AppUtility;
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-//AppUtility::dump(json_decode($studentDetails));
 ?>
 <form action="roster-email" method="post" id="roster-form">
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
@@ -16,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h2><b>Send Mass E-mail</b></h2>
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></span>
+        <span class="col-md-8"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></span>
     </div>
     <br><br>
     <div class="gb">
@@ -45,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
               </option><?php } ?>
       </select>
     </span>
-    <div class="col-lg-offset-2 col-md-12"><br>
+    <div class="col-lg-offset-2 col-md-10"><br>
         <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
     </div>
     <div>

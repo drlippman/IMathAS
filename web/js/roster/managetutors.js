@@ -30,7 +30,7 @@ function markCheck()
 
 function updateInfo()
 {
-    $("#update-btn").click(function(){
+    $("#update-bttn").click(function(){
         var cid = $(".courseId").val();
         var usernames = $("#tutor-text").val();
         var markArray = [];

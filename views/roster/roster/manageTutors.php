@@ -60,5 +60,5 @@ $this->params['breadcrumbs'][] = $this->title;
 <br>
     <textarea name = "newtutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
-<a class = "btn btn-primary" id = "update-btn">Update</a>
+<a class = "btn btn-primary" id = "update-bttn">Update</a>
 

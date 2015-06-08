@@ -16,12 +16,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <h2><b>Send Mass Message</b></h2>
     <div>
         <span class="col-md-2"><b>Subject</b></span>
-        <span><?php echo '<input class="col-md-8 textbox subject" type="text" name ="subject">'; ?></span>
+        <span class="col-md-8"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></span>
     </div>
     <br><br>
     <div class="gb">
-        <span class="col-md-1"><b>Message</b></span>
-        <?php echo "<span class='left col-md-11'><div class= 'editor'>
+        <span class="col-md-2"><b>Message</b></span>
+        <?php echo "<span class='left col-md-10'><div class= 'editor'>
         <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>"; echo "</textarea></div></span><br>"; ?>
     </div>
     <p class="col-md-2"></p>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
     <span class="roster-assessment ">
 	 <p class="col-md-3">To students who haven't completed</p>
-	  <select name="roster-data" id="roster-data" class="col-md-4 select-text-margin">
+	  <select name="roster-assessment-data" id="roster-data" class="col-md-4 select-text-margin">
           <option value='0'>Don't limit - send to all</option>;
           <?php foreach ($assessments as $assessment) { ?>
           <option value="<?php echo $assessment->id ?>">
@@ -50,8 +50,8 @@ $this->params['breadcrumbs'][] = $this->title;
       </select>
     </span>
     </div>
-    <div class="col-lg-offset-2 col-md-10"><br>
-        <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
+    <div class=" col-lg-offset-2 col-md-10"><br>
+        <input type="submit" class="btn btn-primary " id="email-button" value="Send Message" style="margin-left: 0px">
     </div>
     <div>
         <span><p class="col-md-3"><br>Unless limited, message will be sent to:</p></span>

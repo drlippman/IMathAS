@@ -2,6 +2,7 @@
 namespace app\controllers\roster;
 
 use app\models\Assessments;
+use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\forms\CreateAndEnrollNewStudentForm;
 use app\models\forms\EnrollFromOtherCourseForm;
@@ -752,10 +753,11 @@ class RosterController extends AppController
                     return $this->redirect('student-roster?cid='.$courseId);
                 }
             }else{
+                $students = array();
                 $studentArray = array();
                 $sendToStudents = array();
                 $user =  $this->getAuthenticatedUser();
-                $students = $selectedStudents['studentInformation'];
+                $studentsInfo = unserialize($selectedStudents['studentInformation']);
                 $courseId = $selectedStudents['courseid'];
                 $course = Course::getById($courseId);
                 $subject = trim($selectedStudents['subject']);
@@ -764,7 +766,19 @@ class RosterController extends AppController
                     $notSaved = 4 ;
                 }
                 $save = 1;
-                foreach(unserialize($students) as $student){
+                if($selectedStudents['roster-assessment-data']!=0){
+                    $query = AssessmentSession::getStudentByAssessments($selectedStudents['roster-assessment-data']);
+                    foreach($query as $entry){
+                        foreach($studentsInfo as $record){
+                            if($entry['userid'] != $record['id'])
+                            array_push($students,$record);
+                        }
+                    }
+                }
+                else{
+                        array_push($students,$studentsInfo);
+                }
+                foreach($students as $student){
                     $tempArray = array('userId' => $student['id']);
                     array_push($studentArray, $tempArray);
                     $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));

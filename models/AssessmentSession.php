@@ -76,4 +76,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $this->save();
         return self::getById($this->id);
     }
+    public static function getStudentByAssessments($assessmentId)
+    {
+        return AssessmentSession::find()->where(['assessmentid' => $assessmentId ])->andWhere(['NOT LIKE', 'scores', -1 ])->all();
+    }
 } 
