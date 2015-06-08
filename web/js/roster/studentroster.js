@@ -10,11 +10,11 @@ $(document).ready(function () {
 var studentData;
 function studentRosterSuccess(response)
 {
-    var students = JSON.parse(response);
-    var isCode = students.isCode;
-    var isSection = students.isSection;
-    if (students.status == 0) {
-        var students = students.query;
+    response= JSON.parse(response);
+    var isCode = response.data.isCode;
+    var isSection = response.data.isSection;
+    if (response.status == 0) {
+        var students = response.data.query;
         showStudentInformation(students,isCode,isSection);
         studentData = students;
     }

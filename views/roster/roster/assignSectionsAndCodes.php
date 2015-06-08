@@ -4,15 +4,10 @@ use app\components\AppUtility;
 use yii\helpers\Html;
 
 $this->title = 'Assign Section And Codes';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid=' . $_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" type="text/css"
-      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-<script type="text/javascript" charset="utf8"
-        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-
 <h3>Assign Section/Code Numbers</h3>
 
 <form method="post" action="assign-sections-and-codes?cid=<?php echo $cid ?>">
@@ -42,9 +37,3 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="submit" class="btn btn-primary">
 </form>
 
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('.student-data').DataTable();
-    });
-
-</script>

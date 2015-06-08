@@ -4,12 +4,11 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 $this->title = 'Manage Tutors';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <input type="hidden" class="courseId" value="<?php echo $courseid ?>">
 <?php $sectionArray = $section?>
 
@@ -63,29 +62,3 @@ $this->params['breadcrumbs'][] = $this->title;
 <br><br>
 <a class = "btn btn-primary" id = "update-btn">Update</a>
 
-
-<script type = "text/javascript">
-    $(document).ready(function () {
-        var sessionCount = 0;
-        $('.display-tutor-table').DataTable();
-        $sessionatr = $.session.get("userNotFound");
-
-        if($sessionatr)
-        {
-           if(sessionCount == 0)
-           {
-               $("#user-div").append("<b class = 'btn-danger'>Following Usernames Were Not Found :</b>&nbsp;");
-               sessionCount++;
-           }
-            $.each($sessionatr, function( index, value )
-            {
-                $("#user-div").append(''+value+'');
-            });
-            $.session.clear();
-        }
-        $.session.clear();
-
-        markCheck();
-        updateInfo();
-    });
-</script>

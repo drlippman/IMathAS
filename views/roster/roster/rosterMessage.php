@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div >
         <span class="col-md-2 select-text-margin"><b>Save sent messages?</b></span>
-        <span class="col-md-10 select-text-margin"><input type="checkbox" name="isChecked" id="save-sent-message"></span>
+        <span class="col-md-10 select-text-margin"><input type="checkbox" name="isChecked" id="save-sent-message" checked="true"></span>
     </div>
     <div>
     <span class="col-md-2 select-text-margin"><b>Limit send </b></span>

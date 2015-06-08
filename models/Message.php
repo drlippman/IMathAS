@@ -24,6 +24,10 @@ class Message extends BaseImasMsgs
         $this->message = $params['body'];
         $sendDate = strtotime(date('F d, o g:i a'));
         $this->senddate = $sendDate;
+        if($params['isread'] == 4)
+        {
+            $this->isread = 4;
+        }
         $this->save();
         return $this->id;
     }

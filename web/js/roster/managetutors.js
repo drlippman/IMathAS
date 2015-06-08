@@ -1,3 +1,21 @@
+
+$(document).ready(function () {
+    var sessionCount = 0;
+    $('.display-tutor-table').DataTable();
+    var sessionVar = $.session.get("userNotFound");
+    if(sessionVar)
+    {
+        if(sessionCount == 0)
+        {
+            $("#user-div").append("<b>Following Usernames Were Not Found :</b>&nbsp;");
+            sessionCount++;
+        }
+            $("#user-div").append(sessionVar);
+    }
+    $.session.clear();
+    markCheck();
+    updateInfo();
+});
 function markCheck()
 {
     $('#checkNone').click(function()
@@ -14,11 +32,7 @@ function updateInfo()
 {
     $("#update-btn").click(function(){
         var cid = $(".courseId").val();
-        //var data =  {courseid:cid};
         var usernames = $("#tutor-text").val();
-        //var data =  {courseid:cid,username:usernames};
-        //jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
-
         var markArray = [];
         $('.tutor-table-body input[name = "tutor-check"]:checked').each(function() {
             markArray.push($(this).val());
@@ -35,8 +49,8 @@ function updateInfo()
         jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
     });
 }
-function markUpdateSuccess(response){console.log(response);
+function markUpdateSuccess(response){
     var result = JSON.parse(response);
-    $.session.set("userNotFound", result.userNotFound);
+    $.session.set("userNotFound", result.data.userNotFound);
     location.reload();
 }
