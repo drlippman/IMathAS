@@ -8,7 +8,7 @@ use app\components\AppUtility;
     <br><br>
     <div>
         <div class="col-md-1"><b>Subject</b></div>
-        <div class="col-md-8"><input class="textbox subject" type="text"></div>
+        <div class="col-md-8"><input class="subject" type="text"></div>
     </div>
     <br><br><br>
     <div>
@@ -18,7 +18,9 @@ use app\components\AppUtility;
     </div>
     <div class="col-lg-offset-1 col-md-8">
         <br>
-        <input type="hidden" class="add-new-thread" value="<?php echo $reply; ?>">
+        <input type="hidden" id="userId" value="<?php echo $userId; ?>">
+        <input type="hidden" id="forumId" value="<?php echo $forumName->id; ?>">
+        <input type="hidden" id="courseId" value="<?php echo $courseid; ?>">
         <a class="btn btn-primary" id="addthread">Post Thread</a>
     </div>
 </div>

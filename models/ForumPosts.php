@@ -71,4 +71,16 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->save();
     }
+    public function createThread($params,$userId)
+    {
+
+        $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
+        $this->subject = isset($params['subject']) ? $params['subject'] : null;
+        $this->userid = isset($userId) ?  $userId : null;
+        $postdate = strtotime(date('F d, o g:i a'));
+        $this->postdate = $postdate;
+        $this->message = isset($params['body']) ? $params['body'] : null;
+        $this->save();
+
+    }
 }

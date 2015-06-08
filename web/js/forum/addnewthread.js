@@ -7,15 +7,24 @@ $(document).ready(function () {
     {
 
         tinyMCE.triggerSave();
-        alert("Hiiiii");
-//            var courseid = $(".courseid").val();
-//            var forumid = $(".forumid").val();
-//            var threadid = $(".threadid").val();
-//            var subject = $(".subject").val();
-//            var body = $("#postreply").val();
-//            var replyDetails = {couserid:courseid,forumid:forumid,threadid:threadid,subject:subject,body:body};
-//            jQuerySubmit('reply-post-ajax',replyDetails,'replyPost');
+            var forumId = $("#forumId").val();
+            var subject = $(".subject").val();
+            var body = $("#message").val();
+            var threadDetails = {forumId:forumId,subject:subject,body:body};
+            jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
     });
 
 
 });
+function newThreadSuccess(response)
+{
+    console.log(JSON.parse(response));
+    var forumId = $("#forumId").val();
+    var courseId = $('#courseId').val();
+    response = JSON.parse(response);
+    if (response.status == 0)
+    {
+
+        window.location = "thread?cid="+courseId+"&forumid="+forumId;
+    }
+}

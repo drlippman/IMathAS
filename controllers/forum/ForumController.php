@@ -7,6 +7,7 @@ use app\controllers\AppController;
 use app\models\forms\ForumViews;
 use app\models\forms\ThreadForm;
 use app\models\ForumPosts;
+use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Forums;
 use app\models\Thread;
@@ -114,13 +115,15 @@ class ForumController extends AppController
     public function actionGetForumsAjax()
     {
         $this->guestUserHandler();
-
+        $currentime = time();
         $param = $this->getBodyParams();
         $cid = $param['cid'];
         $forums = Forums::getByCourseId($cid);
+        $user = $this->getAuthenticatedUser();
 
         if ($forums)
         {
+
             $forumArray = array();
             foreach ($forums as $key => $forum) {
                 $threadCount = count($forum->imasForumThreads);
@@ -135,12 +138,17 @@ class ForumController extends AppController
                     'forumname' => $forum->name,
                     'threads' => $threadCount,
                     'posts' => $postCount,
+                    'currenttime' => $currentime,
+                    'enddate' => $forum->enddate,
+                    'rights' => $user->rights,
                     'lastPostDate' => ($lastObject != '') ? date('M-d-Y h:i s', $lastObject->postdate) : ''
                 );
                 array_push($forumArray, $tempArray);
             }
+
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/forum.js']);
+
             return $this->successResponse($forumArray);
         }
         else
@@ -152,10 +160,10 @@ class ForumController extends AppController
     public function actionThread()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
-        $forumid = Yii::$app->request->get('forumid');
-        $forum = Forums::getByCourseId($cid);
+        $forumid = $this->getParamVal('forumid');
+//        $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/thread.js']);
@@ -374,14 +382,35 @@ class ForumController extends AppController
     public function actionAddNewThread()
     {
         $this->guestUserHandler();
+        $userId = $this->getUserId();
         $forumId = $this->getParamVal('forumid');
         $courseid =  $this->getParamVal('cid');
         $forumName = Forums::getById($forumId);
         $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/addnewthread.js']);
-        $responseData = array('forumName' => $forumName, 'courseid' => $courseid);
+        $responseData = array('forumName' => $forumName, 'courseid' => $courseid,'userId' => $userId);
         return $this->renderWithData('addNewThread',$responseData);
 
     }
+
+    public function actionAddNewThreadAjax()
+    {
+        $this->guestUserHandler();
+        if ($this->isPost())
+        {
+            $params = $this->getRequestParams();
+            $userId = $this->getUserId();
+            $newThread = new ForumThread();
+            $newThread->createThread($params,$userId);
+//
+//            $newThread = new ForumPosts();
+//            $newThread->createThread($params,$userId);
+
+            return $this->successResponse();
+
+        }
+
+    }
+
     public function actionChangeImageAjax()
     {
         $params = $this->getBodyParams();
@@ -393,14 +422,12 @@ class ForumController extends AppController
     public function actionReplyPostAjax()
     {
         $this->guestUserHandler();
-        if (Yii::$app->request->post())
+        if ($this->isPost())
         {
             $params = Yii::$app->request->getBodyParams();
             $user = Yii::$app->user->identity;
-
             $reply = new ForumPosts();
             $reply->createReply($params,$user);
-
             return $this->successResponse();
         }
     }
