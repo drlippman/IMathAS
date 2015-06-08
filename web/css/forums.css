@@ -80,10 +80,7 @@ span.leftbtns img {
 
 }
 
-.radio-inline{
 
-    padding-left: 3%;
-}
 #forum_search{
     margin-left: 0px;
 
@@ -106,4 +103,9 @@ font-weight:400;
 #postlabel
 {
 padding-bottom: 10px;
+}
+
+.radio-inline{
+
+    padding-left: 3%; !important
 }

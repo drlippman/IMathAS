@@ -8,37 +8,36 @@ $(document).ready(function ()
 
 function threadSuccess(response)
 {
-
-    var result = JSON.parse(response);
+    var count;
+    response = JSON.parse(response);
     var fid = $('#forumid').val();
     var courseId = $('#course-id').val();
+    if (response.status == 0)
+    {
 
-    if (result.status == 0) {
+        var threads = response.data;
 
-        var threads = result.threadData;
         var html = "";
-        $.each(threads, function (index, thread) {
+        $.each(threads, function (index, thread)
+        {
             if(fid == thread.forumiddata)
             {
-                alert(thread.parent);
-                if(thread.replyby == null)
+                count =0;
+                $.each(threads,function (index,data)
                 {
-                    thread.replyby= 0;
+                        if(thread.threadId == data.threadId)
+                        {
+                            count++;
+                        }
+                });
+                count--;
                     if(thread.parent == 0)
                     {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"'>" +(thread.subject) +"</a> "+ thread.name+" <img src='../img/flagempty.gif' onclick='#'><a href='move-thread?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Move</a> <a href='modify-post?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Modify</a><a href='#' name='tabs' data-var='"+thread.threadId+"' class='mark-remove'> Remove </a></td> ";
-                            html += "<td>" + thread.replyby + "</td>";
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"'>" +(thread.subject) +"</a> "+ thread.name+" <a href='move-thread?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Move</a> <a href='modify-post?forumId="+thread.forumiddata+"&courseId="+courseId+"&threadId="+thread.threadId+"'>Modify</a><a href='#' name='tabs' data-var='"+thread.threadId+"' class='mark-remove'> Remove </a></td> ";
+                            html += "<td>" + count + "</td>";
                             html += "<td>" + thread.views + "</td>";
                             html += "<td>" + thread.postdate + "</td>";
                     }
-                 }
-                else {
-
-                    html += "<tr> <td><a href='#'>" + (thread.subject) + "</a> " + thread.name + " </td> ";
-                    html += "<td>" + thread.replyby + "</td>";
-                    html += "<td>" + thread.views + "</td>";
-                    html += "<td>" + thread.postdate + "</td>";
-                }
             }
         });
         $(".forum-table-body").append(html);

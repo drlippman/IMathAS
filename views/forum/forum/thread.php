@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div id="thread">
     <span>
-        <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?id=' .$forumid ); ?>"
+        <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
            class="btn btn-primary btn-sm">Add New Thread</a></span> |
     <span></span><a href="#">List Posts by Name</a> </span>|
     <span><a href="#">Limit to New</a> | <a href="#">Limit to Flagged</a></span>|
