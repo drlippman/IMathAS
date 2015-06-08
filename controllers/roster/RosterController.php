@@ -754,8 +754,8 @@ class RosterController extends AppController
                 }
             }else{
                 $students = array();
-                $studentArray = array();
                 $sendToStudents = array();
+                $filteredStudents = array();
                 $user =  $this->getAuthenticatedUser();
                 $studentsInfo = unserialize($selectedStudents['studentInformation']);
                 $courseId = $selectedStudents['courseid'];
@@ -768,42 +768,48 @@ class RosterController extends AppController
                 $save = 1;
                 if($selectedStudents['roster-assessment-data']!=0){
                     $query = AssessmentSession::getStudentByAssessments($selectedStudents['roster-assessment-data']);
+                    if($query){
                     foreach($query as $entry){
                         foreach($studentsInfo as $record){
-                            if($entry['userid'] != $record['id'])
-                            array_push($students,$record);
+                            if($entry['userid'] == $record['id']){
+                            array_push($students,$record['id']);
+                            }
                         }
+                    }
                     }
                 }
                 else{
-                        array_push($students,$studentsInfo);
+                      foreach($studentsInfo as $infoStudent){
+                        array_push($filteredStudents,$infoStudent['id']);
+                      }
                 }
-                foreach($students as $student){
-                    $tempArray = array('userId' => $student['id']);
-                    array_push($studentArray, $tempArray);
-                    $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
-                    array_push($sendToStudents, $sendto);
-                }
+                foreach($studentsInfo as $student){
+                        if (!in_array($student['id'],$students)) {
+                            array_push($filteredStudents,$student['id']);
+                            $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
+                            array_push($sendToStudents, $sendto);
+                    }
+                    }
                 $toList = implode("<br>",$sendToStudents);
                 if($selectedStudents['messageCopyToSend'] == 'onlyStudents'){
-                    foreach($studentArray as $singleStudent){
-                        $this->sendMassMessage($courseId, $singleStudent['userId'], $subject, $messageBody, $notSaved);
+                    foreach($filteredStudents as $singleStudent){
+                        $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
                     return $this->redirect('student-roster?cid='.$courseId);
                 }elseif($selectedStudents['messageCopyToSend'] == 'selfAndStudents')
                 {
-                    foreach($studentArray as $singleStudent)
+                    foreach($filteredStudents as $singleStudent)
                     {
-                        $this->sendMassMessage($courseId, $singleStudent['userId'], $subject, $messageBody, $notSaved);
+                        $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
                     $messageToTeacher = $messageBody.addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
                     $this->sendMassMessage($courseId, $user->id, $subject, $messageToTeacher, $save);
                     return $this->redirect('student-roster?cid='.$courseId);
                 }elseif($selectedStudents['messageCopyToSend'] == 'teachersAndStudents')
                 {
-                    foreach($studentArray as $singleStudent)
+                    foreach($filteredStudents as $singleStudent)
                     {
-                        $this->sendMassMessage($courseId, $singleStudent['userId'], $subject, $messageBody, $notSaved);
+                        $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
                     $teachers = Teacher::getAllTeachers($courseId);
                     foreach($teachers as $teacher){
