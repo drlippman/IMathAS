@@ -21,10 +21,14 @@ class MessageController extends AppController
 
     public $enableCsrfValidation = false;
 
+    /**
+     *
+     * @return string
+     */
     public function actionIndex()
     {
         $this->guestUserHandler();
-        $cid = Yii::$app->request->get('cid');
+        $cid = $this->getParam('cid');
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($cid);
@@ -33,8 +37,9 @@ class MessageController extends AppController
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($cid);
-            $this->includeJS(["../js/message/message.js"]);
-            return $this->renderWithData('messages', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights]);
+            $this->includeJS(["message/message.js"]);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights);
+            return $this->renderWithData('messages', $responseData);
         }
 
     }
@@ -42,7 +47,7 @@ class MessageController extends AppController
     public function actionSendMessage()
     {
         $this->guestUserHandler();
-        $cid = $this->getParamVal('cid');
+        $cid = $this->getParam('cid');
         if ($this->getAuthenticatedUser()) {
             $course = Course::getById($cid);
             $teacher = Teacher::getTeachersById($cid);
@@ -50,9 +55,10 @@ class MessageController extends AppController
             $order = AppConstant::ASCENDING;
             $users = User::findAllUsers($sortBy, $order);
             $uid = $this->getUserId();
-            $this->includeCSS(["../css/message.css"]);
-            $this->includeJS(['../js/message/sendMessage.js',"../js/editor/tiny_mce.js" , '../js/editor/tiny_mce_src.js', '../js/general.js', '../js/editor/plugins/asciimath/editor_plugin.js', '../js/editor/themes/advanced/editor_template.js']);
-            return $this->renderWithData('sendMessage', ['course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $uid]);
+            $this->includeCSS(["message.css"]);
+            $this->includeJS(['message/sendMessage.js',"editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js']);
+            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $uid);
+            return $this->renderWithData('sendMessage', $responseData);
         }
     }
 
@@ -76,34 +82,38 @@ class MessageController extends AppController
             $uid = $this->getUserId();
             $params = $this->getBodyParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
-            $mesages = Message::getUsersToDisplay($uid);
-            $dateArray = array();
-            if ($ShowRedFlagRow == 1) {
-                foreach ($mesages as $message) {
-                    if ($message['isread'] == 8 || $message['isread'] == 9 || $message['isread'] == 12 || $message['isread'] == 13) {
+            $messages = Message::getUsersToDisplay($uid);
+            if($messages)
+            {
+                $dateArray = array();
+                if ($ShowRedFlagRow == 1) {
+                    foreach ($messages as $message) {
+                        if ($message['isread'] == 8 || $message['isread'] == 9 || $message['isread'] == 12 || $message['isread'] == 13) {
+                            $dateArray[] = $message;
+                        }
+                    }
+                } else {
+                    foreach ($messages as $message) {
                         $dateArray[] = $message;
                     }
                 }
-            } else {
-                foreach ($mesages as $message) {
-                    $dateArray[] = $message;
-
+                $newArray = array();
+                foreach ($dateArray as $singleDate) {
+                    $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                    $newArray[] = $singleDate;
                 }
+                return $this->successResponse($newArray);
             }
-            $newArray = array();
-            foreach ($dateArray as $singleDate) {
-                $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
-                $newArray[] = $singleDate;
+            else{
+                return $this->terminateResponse('No message found.');
             }
-
-            return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $newArray));
         }
     }
 
     public function actionSentMessage()
     {
         $this->guestUserHandler();
-        $cid = $this->getParamVal('cid');
+        $cid = $this->getParam('cid');
 
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
@@ -112,18 +122,20 @@ class MessageController extends AppController
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($cid);
-            return $this->renderWithData('sentMessage', ['model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher]);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher);
+            $this->includeJS(['message/sentMessage.js']);
+            return $this->renderWithData('sentMessage',$responseData );
         }
     }
 
     public function actionDisplaySentMessageAjax()
     {
         if (!$this->isGuestUser()) {
-            $uid = $this->getUserId();
-            $mesages = Message::getUsersToDisplayMessage($uid);
+            $userId = $this->getUserId();
+            $messages = Message::getUsersToDisplayMessage($userId);
             $dateArray = array();
-            if ($mesages) {
-                foreach ($mesages as $message) {
+            if ($messages) {
+                foreach ($messages as $message) {
                     $dateArray[] = $message;
                 }
                 $newArray = array();
@@ -133,27 +145,31 @@ class MessageController extends AppController
                     $singleDate['title'] = $titleLevel['title'];
                     $newArray[] = $singleDate;
                 }
-                return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $newArray));
+                return $this->successResponse($newArray);
             } else {
-                return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'messageData' => $mesages));
+                return $this->terminateResponse('No message found.');
             }
         }
     }
 
-
     public function actionGetCourseAjax()
     {
         $this->guestUserHandler();
-        $params = Yii::$app->request->getBodyParams();
+        $params = $this->getRequestParams();
         $userId = $params['userId'];
         $teachers = Teacher::getTeacherByUserId($userId);
         $teacherArray = array();
-        foreach ($teachers as $teacher) {
-            $tempArray = array('courseId' => $teacher->course->id,
-                'courseName' => $teacher->course->name);
-            array_push($teacherArray, $tempArray);
+        if($teachers)
+        {
+            foreach ($teachers as $teacher) {
+                $tempArray = array('courseId' => $teacher->course->id,
+                    'courseName' => $teacher->course->name);
+                array_push($teacherArray, $tempArray);
+            }
+            return $this->successResponse($teacherArray);
+        } else {
+            return $this->terminateResponse('No Course found.');
         }
-        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courseData' => $teacherArray));
     }
 
     public function actionMarkAsUnreadAjax()
@@ -162,10 +178,15 @@ class MessageController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $msgIds = $params['checkedMsg'];
-            foreach ($msgIds as $msgId) {
-                Message::updateUnread($msgId);
+            if($msgIds){
+                foreach ($msgIds as $msgId) {
+                    Message::updateUnread($msgId);
+                }
+                return $this->successResponse();
+            }else
+            {
+                return $this->terminateResponse('No Course found.');
             }
-            return $this->successResponse();
         }
     }
 
@@ -174,34 +195,44 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $messageIds = $params['checkedMsg'];
-            foreach ($messageIds as $messageId) {
-                Message::updateRead($messageId);
+            $msgIds = $params['checkedMsg'];
+            if($msgIds){
+                foreach ($msgIds as $messageId) {
+                    Message::updateRead($messageId);
+                }
+                return $this->successResponse();
+            }else
+            {
+                return $this->terminateResponse('No Course found.');
             }
-            return $this->successResponse();
         }
     }
-
 
     public function actionGetUserAjax()
     {
         $this->guestUserHandler();
         $userId = $this->getUserId();
-        $query = Message::getUsersToUserMessage($userId);
-        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'userData' => $query));
+        $userData = Message::getUsersToUserMessage($userId);
+        if($userData)
+        {
+            return $this->successResponse($userData);
+        } else {
+            return $this->terminateResponse('No User found.');
+        }
     }
 
     public function actionViewMessage()
     {
         $this->guestUserHandler();
-        $msgId = $this->getParamVal('id');
+        $msgId = $this->getParam('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
             $fromUser = User::getById($messages->msgfrom);
-            $this->includeCSS(['../css/jquery-ui.css']);
-            $this->includeJS(['../js/message/viewmessage.js']);
-            return $this->renderWithData('viewMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
+            $this->includeCSS(['jquery-ui.css']);
+            $this->includeJS(['message/viewmessage.js']);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser);
+            return $this->renderWithData('viewMessage', $responseData);
         }
     }
 
@@ -215,7 +246,6 @@ class MessageController extends AppController
                 Message::deleteFromReceivedMsg($msgId);
             }
             return $this->successResponse();
-
         }
     }
 
@@ -224,25 +254,30 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
-            $msgIdss = $params['checkedMsgs'];
-            foreach ($msgIdss as $msgId) {
-                Message::deleteFromSentMsg($msgId);
+            $msgIds = $params['checkedMsgs'];
+            if($msgIds){
+                foreach ($msgIds as $msgId) {
+                    Message::deleteFromSentMsg($msgId);
+                }
+                return $this->successResponse();
+            }else
+            {
+                return $this->terminateResponse('No Course found.');
             }
-            return $this->successResponse();
-
         }
     }
 
     public function actionReplyMessage()
     {
         $this->guestUserHandler();
-        $baseId = $this->getParamVal('baseid');
-        $msgId = $this->getParamVal('id');
+        $baseId = $this->getParam('baseid');
+        $msgId = $this->getParam('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
-            $this->includeJS(["../js/editor/tiny_mce.js"]);
-            return $this->renderWithData('replyMessage', ['messages' => $messages, 'fromUser' => $fromUser]);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser);
+            $this->includeJS(["editor/tiny_mce.js","message/replyMessage.js"]);
+            return $this->renderWithData('replyMessage', $responseData);
         }
     }
 
@@ -251,7 +286,13 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $userId = $this->getUserId();
         $message = Message::getUsersToCourseMessage($userId);
-        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courseData' => $message));
+        if($message){
+            return $this->successResponse($message);
+        }
+        else
+        {
+            return $this->terminateResponse('No Course found.');
+        }
     }
 
     public function actionGetSentUserAjax()
@@ -259,7 +300,13 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $userId = $this->getUserId();
         $message = Message::getSentUsersMessage($userId);
-        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'userData' => $message));
+        if($message){
+            return $this->successResponse($message);
+        }
+        else
+        {
+            return $this->terminateResponse('No User found.');
+        }
     }
 
     public function actionReplyMessageAjax()
@@ -280,8 +327,8 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
-        $baseId = $this->getParamVal('baseid');
-        $msgId = $this->getParamVal('id');
+        $baseId = $this->getParam('baseid');
+        $msgId = $this->getParam('id');
         $user = $this->getAuthenticatedUser();
         if($baseId == 0)
         {
@@ -308,9 +355,10 @@ class MessageController extends AppController
             $tempArray['baseId'] = $message['baseid'];
             $this->messageData[$message['id']] = $tempArray;
         }
-
+        $responseData = array('messages' => $this->totalMessages,'user' => $user);
+        $this->includeJS(["message/viewConversation.js"]);
         $this->createChild($this->children[key($this->children)]);
-        return $this->renderWithData('viewConversation', ['messages' => $this->totalMessages,'user' => $user]);
+        return $this->renderWithData('viewConversation', $responseData);
     }
 
     public function createChild($childArray, $arrayKey = 0)
@@ -350,6 +398,5 @@ class MessageController extends AppController
         $rowId = $params['rowId'];
         Message::updateFlagValue($rowId);
         return json_encode(['status' => '0']);
-
     }
 }

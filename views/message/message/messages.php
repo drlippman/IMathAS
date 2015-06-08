@@ -4,7 +4,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
 $this->title = 'Messages';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -22,11 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
         <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
-    <?php } else {
+    <?php
+    } else {
 
         echo $this->render('../../course/course/_toolbar', ['course' => $course]);
     } ?>
-
 </div>
 <div class="message-container">
     <div><p>
@@ -42,11 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class="col-md-3">
         <select name="seluid" class="show-course form-control" id="course-id">
             <option value="0">All Courses</option>
-
         </select>
-
         </span> <span class="select-text-margin pull-left"><b>By Sender :</b></span>
-
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="user-id">
             <option value="0">Select a user</option>
@@ -56,240 +53,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <br><br>
 
     <div>
-
-        <p>Check:  <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all" href="#">None</a>
-
+        <p>Check: <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all"
+                                                                              href="#">None</a>
             With Selected:
             <a class="btn btn-primary " id="mark-as-unread">Mark as Unread</a>
             <a class="btn btn-primary" id="mark-read">Mark as Read</a>
             <a class="btn btn-primary  btn-danger" id="mark-delete">Delete</a>
     </div>
     <div class="message-div"></div>
-
 </div>
-
-<script type="text/javascript">
-
-    function showMessage(messageData) {
-        var temp;
-        var html = " ";
-        var htmlCourse = "";
-        $.each(messageData, function (index, messageData) {
-
-            if (messageData.isread == 1 || messageData.isread == 5 || messageData.isread == 9 || messageData.isread == 13) {
-                html += "<tr class='read-message message-row message-row-'" + messageData.id + "> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + messageData.id + "' class='message-checkbox-" + messageData.id + "' ></td>";
-            }
-            else {
-                html += "<tr class='unread-message message-row message-row-" + messageData.id + "'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + messageData.id + "' class='message-checkbox-" + messageData.id + "' ></td>";
-            }
-            html += "<td><a href='view-message?message=0&id=" + messageData.id + "'> " + messageData.title + "</a></td>";
-            if (messageData.replied == 1) {
-                html += "<th>Yes</th>";
-            }
-            else {
-                html += "<th>No</th>";
-            }
-            var rowid = messageData.id;
-            if (messageData.isread < 7) {
-
-                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif' onclick='changeImage(this,"+false+"," + rowid + ")'/></td>";
-
-            }
-            else {
-                html += "<td><img src='<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif' onclick='changeImage(this,"+true+"," + rowid + ")'/></td>";
-            }
-            html += "<td>" + messageData.FirstName.substr(0, 1).toUpperCase() + messageData.FirstName.substr(1) + " " + messageData.LastName.substr(0, 1).toUpperCase() + messageData.LastName.substr(1) + "</td>";
-            html += "<td>" + messageData.name.substr(0, 1).toUpperCase() + messageData.name.substr(1) + "</td>";
-            html += "<td>" + messageData.senddate + "</td>";
-
-        });
-
-        $('.message-div div').remove();
-        createTableHeader();
-        $(".message-table-body").append(html);
-        $('.display-message-table').DataTable();
-
-    }
-
-
-    function selectCheckBox() {
-        $('.check-all').click(function () {
-            $('.message-table-body input:checkbox').each(function () {
-                $(this).prop('checked', true);
-            })
-        });
-
-        $('.uncheck-all').click(function () {
-            $('.message-table-body input:checkbox').each(function () {
-                $(this).prop('checked', false);
-            })
-        });
-    }
-
-    function getCourseSuccess(response) {
-        var result = JSON.parse(response);
-        if (result.status == 0) {
-            var courseData = result.courseData;
-            courseDisplay(courseData);
-            filterByCourse();
-        }
-    }
-
-    function courseDisplay(courseData) {
-        var html = "";
-        $.each(courseData, function (index, courseData) {
-            html += "<option value = " + courseData.courseId + ">" + courseData.courseName + "</option>"
-        });
-        $(".show-course").append(html);
-    }
-
-    function markAsUnread() {
-        $('#mark-as-unread').click(function () {
-            var markArray = [];
-            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                $(this).closest('tr').css('font-weight', 'bold');
-                markArray.push($(this).val());
-                $(this).prop('checked', false);
-            });
-            var readMsg = {checkedMsg: markArray};
-            jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
-        });
-    }
-
-    function markAsUnreadSuccess(response) {
-    }
-
-    function markAsRead() {
-        $("#mark-read").click(function () {
-            var markArray = [];
-            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                markArray.push($(this).val());
-                $(this).closest('tr').css('font-weight', 'normal');
-                $(this).prop('checked', false);
-            });
-            var readMsg = {checkedMsg: markArray};
-            jQuerySubmit('mark-as-read-ajax', readMsg, 'markAsReadSuccess');
-
-        });
-    }
-
-    function markAsReadSuccess(response) {
-    }
-
-    function filterByCourse() {
-        $('#course-id').on('change', function () {
-            var filteredArray = [];
-            var selectedCourseId = this.value;
-            if (selectedCourseId == 0) {
-                showMessage(messageData);
-            } else {
-                $.each(messageData, function (index, messageData) {
-                    if (selectedCourseId == messageData.courseid) {
-                        filteredArray.push(messageData);
-                    }
-                    showMessage(filteredArray);
-                });
-            }
-        });
-    }
-
-    function getUserSuccess(response) {
-        var result = JSON.parse(response);
-        if (result.status == 0) {
-            var userData = result.userData;
-            userDisplay(userData);
-            filterByUser();
-        }
-    }
-
-    function userDisplay(userData) {
-        var html = "";
-        $.each(userData, function (index, userData) {
-            html += "<option value = " + userData.id + ">" + userData.FirstName + " " + userData.LastName + "</option>"
-        });
-        $(".show-users").append(html);
-    }
-
-    function markAsDelete() {
-        $("#mark-delete").click(function (e) {
-
-            var markArray = [];
-            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                markArray.push($(this).val());
-            });
-            if (markArray.length != 0) {
-                var html = '<div><p>Are you sure? This will delete your message from</p>' +
-                    '<p>Inbox.</p></div>';
-                var cancelUrl = $(this).attr('href');
-                e.preventDefault();
-                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                    width: 'auto', resizable: false,
-                    closeText: "hide",
-                    buttons: {
-                        "Cancel": function () {
-                            $(this).dialog('destroy').remove();
-                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                                $(this).prop('checked', false);
-                            });
-                            return false;
-                        },
-                        "confirm": function () {
-                            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                                $(this).prop('checked', false);
-                                $(this).closest('tr').remove();
-                            });
-                            $(this).dialog("close");
-
-                            var readMsg = {checkedMsg: markArray};
-                            jQuerySubmit('mark-as-delete-ajax', readMsg, 'markAsDeleteSuccess');
-                            return true;
-                        }
-                    },
-                    close: function (event, ui) {
-                        $(this).remove();
-                    }
-                });
-            }
-            else {
-                alert("Nothing to delete");
-            }
-        });
-    }
-
-    function markAsDeleteSuccess() {
-    }
-
-    function filterByUser() {
-        $('#user-id').on('change', function () {
-            var filteredArray = [];
-            var selectedUserId = this.value;
-            if (selectedUserId == 0) {
-                showMessage(messageData);
-            } else {
-                $.each(messageData, function (index, messageData) {
-                    if (selectedUserId == messageData.msgfrom) {
-
-                        filteredArray.push(messageData);
-                    }
-                    console.log(JSON.stringify(filteredArray));
-                    showMessage(filteredArray);
-                });
-            }
-        });
-    }
-
-    function changeImage(element,temp, rowId) {
-        console.log(temp);
-if(temp == false){
-        element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif";
-        element.bln = !element.bln;
-}
-        if(temp ==true ){
-            element.src = element.bln ? "<?php echo AppUtility::getHomeURL() ?>img/flagfilled.gif" : "<?php echo AppUtility::getHomeURL() ?>img/flagempty.gif";
-            element.bln = !element.bln;
-        }
-        var row = {rowId: rowId};
-        jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
-    }
-</script>

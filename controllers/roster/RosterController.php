@@ -49,8 +49,8 @@ class RosterController extends AppController
                 $isSectionPresent = true;
             }
         }
-        $this->includeCSS(['../css/jquery-ui.css', '../css/dataTables-jqueryui.css']);
-        $this->includeJS(['../js/roster/studentroster.js','../js/general.js']);
+        $this->includeCSS(['jquery-ui.css', 'dataTables.jqueryui.css']);
+        $this->includeJS(['roster/studentroster.js','general.js']);
         return $this->render('studentRoster', ['course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent]);
      }
 
@@ -704,7 +704,6 @@ class RosterController extends AppController
         return $this->successResponse();
     }
 
-
     public function actionRosterMessage()
     {
         if($this->isPost()){
@@ -766,13 +765,11 @@ class RosterController extends AppController
 
             }
         }
-        }
+    }
     public function sendMassMessage($courseId,$receiver,$subject,$messageBody){
             $user =  $this->getAuthenticatedUser();
             $tempArray = array('cid' => $courseId, 'receiver' => $receiver, 'subject' => $subject , 'body' => $messageBody);
             $message = new Message();
             $message->create($tempArray,$user->id );
     }
-
-
 }

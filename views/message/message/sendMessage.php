@@ -2,8 +2,8 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 $this->title = 'New Message';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?><form>
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
@@ -18,7 +18,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <option value="0">Select a recipient</option>
             <?php foreach ($teachers as $teacher) { ?>
             <option value="<?php echo $teacher->user->id ?>">
-
                 <?php echo ucfirst($teacher->user->FirstName) . " " . ucfirst($teacher->user->LastName); ?>
             </option><?php } ?>
         </select>
@@ -28,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div>
         <span class="col-md-1"><b>Subject</b></span>
-        <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?><label id="lable-show" class="col-md-2 lable-show" >Required</label></span>
+        <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
     </div>
     <br><br><br>
 
