@@ -14,7 +14,6 @@ use app\models\forms\MessageForm;
 
 class MessageController extends AppController
 {
-
     public $messageData = array();
     public $totalMessages = array();
     public $children = array();
@@ -41,7 +40,6 @@ class MessageController extends AppController
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights);
             return $this->renderWithData('messages', $responseData);
         }
-
     }
 
     public function actionSendMessage()
@@ -313,7 +311,7 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getBodyParams();
             if ($this->getAuthenticatedUser()) {
                 if ($params['receiver'] != 0 && $params['cid'] != null) {
                     $message = new Message();
@@ -335,30 +333,32 @@ class MessageController extends AppController
             $baseId = $msgId;
         }
         $messages = Message::getByBaseId($msgId, $baseId);
-        foreach ($messages as $message) {
-            $this->children[$message['parent']][] = $message['id'];
-            $tempArray = array();
-            $titleLevel = AppUtility::calculateLevel($message['title']);
-            $fromUser = User::getById($message['msgfrom']);
-            $tempArray['id'] = $message['id'];
-            $tempArray['courseId'] = $message['courseid'];
-            $tempArray['message'] = $message['message'];
-            $tempArray['title'] = $titleLevel['title'];
-            $tempArray['level'] = $titleLevel['level'];
-            $tempArray['senderId'] = $message['msgfrom'];
-            $tempArray['receiveId'] = $message['msgto'];
-            $tempArray['senderName'] = $fromUser->FirstName . ' ' . $fromUser->LastName;
-            $tempArray['msgDate'] = $message['senddate'];
-            $tempArray['isRead'] = $message['isread'];
-            $tempArray['replied'] = $message['replied'];
-            $tempArray['parent'] = $message['parent'];
-            $tempArray['baseId'] = $message['baseid'];
-            $this->messageData[$message['id']] = $tempArray;
+        if($messages){
+            foreach ($messages as $message) {
+                $this->children[$message['parent']][] = $message['id'];
+                $tempArray = array();
+                $titleLevel = AppUtility::calculateLevel($message['title']);
+                $fromUser = User::getById($message['msgfrom']);
+                $tempArray['id'] = $message['id'];
+                $tempArray['courseId'] = $message['courseid'];
+                $tempArray['message'] = $message['message'];
+                $tempArray['title'] = $titleLevel['title'];
+                $tempArray['level'] = $titleLevel['level'];
+                $tempArray['senderId'] = $message['msgfrom'];
+                $tempArray['receiveId'] = $message['msgto'];
+                $tempArray['senderName'] = $fromUser->FirstName . ' ' . $fromUser->LastName;
+                $tempArray['msgDate'] = $message['senddate'];
+                $tempArray['isRead'] = $message['isread'];
+                $tempArray['replied'] = $message['replied'];
+                $tempArray['parent'] = $message['parent'];
+                $tempArray['baseId'] = $message['baseid'];
+                $this->messageData[$message['id']] = $tempArray;
+            }
+            $this->includeJS(["message/viewConversation.js"]);
+            $this->createChild($this->children[key($this->children)]);
+            $responseData = array('messages' => $this->totalMessages,'user' => $user);
+            return $this->renderWithData('viewConversation', $responseData);
         }
-        $responseData = array('messages' => $this->totalMessages,'user' => $user);
-        $this->includeJS(["message/viewConversation.js"]);
-        $this->createChild($this->children[key($this->children)]);
-        return $this->renderWithData('viewConversation', $responseData);
     }
 
     public function createChild($childArray, $arrayKey = 0)
@@ -385,10 +385,15 @@ class MessageController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
             $msgIds = $params['checkedMsgs'];
-            foreach ($msgIds as $msgId) {
-                Message::sentUnsendMsg($msgId);
+            if($msgIds){
+                foreach ($msgIds as $msgId) {
+                    Message::sentUnsendMsg($msgId);
+                }
+                return $this->successResponse();
+            }else
+            {
+                return $this->terminateResponse('No message');
             }
-            return $this->successResponse();
         }
     }
 
@@ -396,7 +401,11 @@ class MessageController extends AppController
     {
         $params = $this->getBodyParams();
         $rowId = $params['rowId'];
-        Message::updateFlagValue($rowId);
-        return json_encode(['status' => '0']);
+        if($rowId){
+            Message::updateFlagValue($rowId);
+            return $this->successResponse();
+        }else{
+            return $this->terminateResponse('No message');
+        }
     }
 }

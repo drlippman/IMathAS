@@ -152,9 +152,9 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
+
         $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent);
         return $this->successResponse($responseData);
-
      }
 
 
