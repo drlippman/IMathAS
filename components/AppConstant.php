@@ -64,4 +64,7 @@ class AppConstant
     const RETURN_SUCCESS = 0;
     const RETURN_ERROR = -1;
     const UNAUTHORIZED_ACCESS = 'Unauthorized access, please login with correct credentials.';
+
+    const ASSET_TYPE_CSS = "css";
+    const ASSET_TYPE_JS = "js";
 }

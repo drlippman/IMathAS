@@ -82,7 +82,7 @@ class SiteController extends AppController
             }
         }
         $challenge = AppUtility::getChallenge();
-        $this->directIncludeJs(['jstz_min.js', 'login.js']);
+        $this->includeJS(['jstz_min.js', 'login.js']);
         $responseData = array('model' => $model, 'challenge' => $challenge,);
         return $this->renderWithData('login', $responseData);
     }
@@ -130,7 +130,7 @@ class SiteController extends AppController
             $this->setSuccessFlash(AppConstant::INSTRUCTOR_REQUEST_SUCCESS);
             return $this->redirect(AppUtility::getURLFromHome('site','registration'));
         }
-        $this->directIncludeJS(["registration.js"]);
+        $this->includeJS(["registration.js"]);
         $responseData = array('model' => $model,);
         return $this->renderWithData('registration', $responseData);
     }
@@ -296,9 +296,9 @@ class SiteController extends AppController
             $students = Student::getByUserId($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
             if ($user) {
-                $this->directIncludeCSS(['dashboard.css']);
+                $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
-                $this->directIncludeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
+                $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
 
                 $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers];
                 return $this->renderWithData('dashboard', $userData);
@@ -366,8 +366,8 @@ class SiteController extends AppController
             $this->redirect('dashboard');
         }
 
-        $this->directIncludeCSS(['dashboard.css']);
-        $this->directIncludeJS(['changeUserInfo.js']);
+        $this->includeCSS(['dashboard.css']);
+        $this->includeJS(['changeUserInfo.js']);
         $responseData = array('model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid);
         return $this->renderWithData('changeUserinfo', $responseData);
     }

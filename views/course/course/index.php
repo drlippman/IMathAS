@@ -138,7 +138,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                 <div class="item">
                     <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
                     <div class="title">
-                        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
+                        <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
                         <span>New Revisions</span>
                     </div>
@@ -151,7 +151,7 @@ echo $this->render('_toolbar',['course'=> $course]);
             <div class="item">
                 <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
                 <div class="title">
-                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
+                    <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                     <?php echo $wikis->name ?></a></b>
                     <span>New Revisions</span>
                 </div>
@@ -380,12 +380,13 @@ echo $this->render('_toolbar',['course'=> $course]);
                 <?php }?>
             </div>
         </div>
+        <?php } elseif($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) { ?>
     </div>
-    <?php } elseif($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) { ?>
     <div hidden="" class="modal-pop-up-review-date">
         <div class="item">
             <input type="hidden" class="review-date" name="reviewDate" value="<?php echo $assessment->reviewdate; ?>">
             <input type="hidden" class="end-date" name="endDate" value="<?php echo $assessment->enddate; ?>">
+            <input type="hidden" class="start-date" name="startDate" value="<?php echo $assessment->startdate; ?>">
 
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
@@ -528,7 +529,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                                     <div class="item">
                                         <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
                                         <div class="title">
-                                            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
+                                            <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'course/index?cid=' . $wikis->courseid) ?>">
                                             <?php echo $wikis->name ?></a></b>
                                             <span>New Revisions</span>
                                         </div>

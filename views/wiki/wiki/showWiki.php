@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 echo $this->render('_toolbar',['course'=> $course]);
+//AppUtility::dump($wikiRevisionData);
 ?>
 <div id="wikiName">
     <h2><?php echo $wiki->name; ?></h2>
@@ -11,7 +12,9 @@ echo $this->render('_toolbar',['course'=> $course]);
     <span>
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
            class="btn btn-primary btn-sm">Edit this page</a></span><BR><BR>
+    <?php foreach($body as $key => $bod) {?>
     <div id="wikicontent" class="wikicontent">
-
+        <p><?php echo $bod; ?></p>
     </div>
+    <?php }?>
 </div>

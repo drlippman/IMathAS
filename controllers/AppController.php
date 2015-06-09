@@ -18,6 +18,7 @@ class AppController extends Controller
 
     public $enableCsrfValidation = false;
 
+
     function getBodyParams()
     {
         return $_POST;
@@ -46,6 +47,11 @@ class AppController extends Controller
     function setWarningFlash($message)
     {
         $this->_setFlash('warning', $message);
+    }
+
+    private function _setFlash($type, $message)
+    {
+        \Yii::$app->session->setFlash($type, $message);
     }
 
     function unauthorizedAccessHandler()
@@ -82,44 +88,32 @@ class AppController extends Controller
     }
 
     function includeCSS($cssFileArray){
-        for($i=0; $i<count($cssFileArray); $i++){
-            $this->getView()->registerCssFile("../../css/".$cssFileArray[$i]);
-        }
+        $this->includeAssets($cssFileArray, AppConstant::ASSET_TYPE_CSS);
     }
 
     function includeJS($jsFileArray){
-        for($i=0; $i<count($jsFileArray); $i++){
-            $this->getView()->registerJsFile("../../js/".$jsFileArray[$i]);
-        }
+        $this->includeAssets($jsFileArray, AppConstant::ASSET_TYPE_JS);
     }
 
-    function directIncludeCSS($cssFileArray){
-        for($i=0; $i<count($cssFileArray); $i++){
-            $this->getView()->registerCssFile("../css/".$cssFileArray[$i]);
-        }
-    }
-
-    function directIncludeJS($jsFileArray){
-        for($i=0; $i<count($jsFileArray); $i++){
-            $this->getView()->registerJsFile("../js/".$jsFileArray[$i]);
+    function includeAssets($fileArray, $assetType){
+        $cnt = count($fileArray);
+        $homeUrl = Yii::$app->homeUrl;
+        for($i = 0; $i < $cnt; $i++){
+            $fileURL = $homeUrl . $assetType . "/" . $fileArray[$i];
+            if($assetType == AppConstant::ASSET_TYPE_CSS){
+                $this->getView()->registerCssFile($fileURL);
+            }else{
+                $this->getView()->registerJsFile($fileURL);
+            }
         }
     }
 
     public function renderWithData($viewName, $data = array()){
-        if(isset($data)){
-            return $this->render($viewName, $data);
-        }else{
-            return $this->render($viewName);
-        }
+        return $this->render($viewName, $data);
     }
 
     function getAuthenticatedUser(){
         return \Yii::$app->user->identity;
-    }
-
-    private function _setFlash($type, $message)
-    {
-        \Yii::$app->session->setFlash($type, $message);
     }
 
     public function isPost(){

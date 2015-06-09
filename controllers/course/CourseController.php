@@ -554,6 +554,7 @@ class CourseController extends AppController
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
                 'name' => $assessment['name'],
+                'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate']
                 );
