@@ -8,7 +8,7 @@ class WikiRevision extends BaseImasWikiRevisions
 {
     public static function getByRevisionId($id)
     {
-        return WikiRevision::findOne(['wikiid' => $id]);
+        return WikiRevision::findAll(['wikiid' => $id]);
     }
     public function saveRevision($params, $user, $wikicontent)
     {
@@ -25,7 +25,11 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getEditedWiki($sortBy, $order,$wikiId)
     {
-        return WikiRevision::find()->where(['wikiid'=> $wikiId])->orderBy([$sortBy => $order])->all();
+        return WikiRevision::find()->where(['id'=> $wikiId])->all();
     }
 
+    public static function getRevisionId($id)
+    {
+        return WikiRevision::findAll(['id' => $id]);
+    }
 }

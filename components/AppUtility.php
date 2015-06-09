@@ -50,12 +50,16 @@ class AppUtility extends Component
 
     public static function getURLFromHome($controllerName, $shortURL)
     {
-        return Yii::$app->homeUrl . $controllerName . "/" . $shortURL;
+        return self::getHomeURL() . $controllerName . "/" . $shortURL;
     }
 
     public static function getHomeURL()
     {
         return Yii::$app->homeUrl;
+    }
+
+    public static function getAssetURL(){
+        return self::getHomeURL();
     }
 
     public static function getTimeStampFromDate($dateStr)

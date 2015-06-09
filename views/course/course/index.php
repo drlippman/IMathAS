@@ -32,7 +32,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                     ?>
                     <div class="item">
-                        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+                        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
                         <div class="title">
                             <?php if($assessment->timelimit != 0) { //timelimit
                                if($assessment->password == '') {?> <!--Set password-->

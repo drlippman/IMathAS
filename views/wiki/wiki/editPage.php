@@ -8,11 +8,15 @@ use app\components\AppUtility;
     <br><br>
 
     <form method="post" action="show-wiki?courseId=<?php echo $course->id ?>&wikiId=<?php echo $wiki->id?>">
-        <div>
-            <?php echo "<div class='left col-md-11'><div class= 'editor'>
-            <textarea id='wiki-edit-body' name='body' style='width: 100%;' rows='20' cols='200'></textarea></div></div><br>"; ?>
+            <input type="hidden" name="baserevision" value="<?php echo $wikiRevisionData->id;?>" />
+            <div class= 'editor'>
+                <textarea id='wikicontent' name='wikicontent' style='width: 100%;' rows='30' cols='60'>
+                    <?php foreach($wikiRevisionData as $key => $singleRevision){?>
+                        <?php echo htmlentities($singleRevision->revision);?>
+                    <?php }?>
+                </textarea>
+            </div>
 
-        </div>
         <div class="col-lg-offset-1 col-md-8">
             <input type="submit" class="btn btn-primary" value="Save Revision">
         </div>
@@ -27,3 +31,4 @@ use app\components\AppUtility;
         });
     });
 </script>
+

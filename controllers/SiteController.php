@@ -156,7 +156,7 @@ class SiteController extends AppController
                 $this->setSuccessFlash('Account created successfully, please login to get into system.');
                 return $this->redirect(AppUtility::getURLFromHome('site','login'));
             }
-            $this->setErrorFlash('User: '.$params['username']. ' already exist.');
+            $this->setErrorFlash('User already exist.');
         }
         $responseData = array('model' => $model,);
         return $this->renderWithData('studentRegister', $responseData);

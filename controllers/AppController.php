@@ -74,7 +74,7 @@ class AppController extends Controller
 //                return self::terminateResponse(AppConstant::UNAUTHORIZED_ACCESS);
                 return false;
             }else{
-                return $this->redirect(Yii::$app->homeUrl.'site/login');
+                return $this->redirect(AppUtility::getHomeURL().'site/login');
             }
         }
     }
@@ -95,11 +95,12 @@ class AppController extends Controller
         $this->includeAssets($jsFileArray, AppConstant::ASSET_TYPE_JS);
     }
 
+
     function includeAssets($fileArray, $assetType){
         $cnt = count($fileArray);
-        $homeUrl = Yii::$app->homeUrl;
+        $assetUrl = AppUtility::getAssetURL();
         for($i = 0; $i < $cnt; $i++){
-            $fileURL = $homeUrl . $assetType . "/" . $fileArray[$i];
+            $fileURL = $assetUrl . $assetType . "/" . $fileArray[$i];
             if($assetType == AppConstant::ASSET_TYPE_CSS){
                 $this->getView()->registerCssFile($fileURL);
             }else{
@@ -107,6 +108,7 @@ class AppController extends Controller
             }
         }
     }
+
 
     public function renderWithData($viewName, $data = array()){
         return $this->render($viewName, $data);

@@ -32,9 +32,10 @@ use yii\helpers\Html;
 
 class CourseController extends AppController
 {
-
+    /**
+     * Display all course in item order
+     */
     public $enableCsrfValidation = false;
-
     public function actionIndex()
     {
         $this->guestUserHandler();
@@ -138,6 +139,9 @@ class CourseController extends AppController
         return $this->render('index', $returnData);
     }
 
+    /**
+     * Display assessment details
+     */
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
@@ -157,6 +161,9 @@ class CourseController extends AppController
         return $this->render('ShowAssessment', $returnData);
     }
 
+    /**
+     * Show late passes of assessment.
+     */
     public function actionLatePass()
     {
         $this->guestUserHandler();
@@ -222,6 +229,9 @@ class CourseController extends AppController
         $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
 
+    /**
+     * Display password, when assessment need password.
+     */
     public function actionPassword()
     {
         $this->guestUserHandler();
@@ -247,7 +257,9 @@ class CourseController extends AppController
         return $this->renderWithData('setPassword', $returnData);
     }
 
-
+    /**
+     * Create new course at admin side
+     */
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
@@ -281,6 +293,9 @@ class CourseController extends AppController
         return $this->renderWithData('addNewCourse', $returnData);
     }
 
+    /**
+     * Setting in created course.
+     */
     public function actionCourseSetting()
     {
         $this->guestUserHandler();
@@ -321,6 +336,9 @@ class CourseController extends AppController
 
     }
 
+    /**
+     * To delete existing course.
+     */
     public function actionDeleteCourse()
     {
         $model = new DeleteCourseForm();
@@ -339,6 +357,9 @@ class CourseController extends AppController
         $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
 
+    /**
+     * @return string
+     */
     public function actionTransferCourse()
     {
         $this->guestUserHandler();
@@ -530,6 +551,9 @@ class CourseController extends AppController
         $assessmentSession->save();
     }
 
+    /**
+     * Display linked text on course page
+     */
     public function actionShowLinkedText()
     {
         $cid = $this->getParamVal('cid');
@@ -540,6 +564,9 @@ class CourseController extends AppController
         return $this->renderWithData('showLinkedText', $returnData);
     }
 
+    /**
+     * To handle event on calendar.
+     */
     public function actionGetAssessmentDataAjax()
     {
         $this->guestUserHandler();
