@@ -14,7 +14,7 @@ class ThreadForm extends Model
 {
     public static  function thread(){
 
-        $thread = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts")->queryAll();
+        $thread = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where parent = 0")->queryAll();
         return $thread;
 
     }

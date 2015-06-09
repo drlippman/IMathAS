@@ -98,6 +98,9 @@ class MessageController extends AppController
                 $newArray = array();
                 foreach ($dateArray as $singleDate) {
                     $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
+                    $titleLevel = AppUtility::calculateLevel($singleDate['title']);
+                    $singleDate['title'] = $titleLevel['title'];
+
                     $newArray[] = $singleDate;
                 }
                 return $this->successResponse($newArray);
