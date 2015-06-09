@@ -60,9 +60,9 @@ $this->params['breadcrumbs'][] = $this->title;
     </form>
         <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
         <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
-    <form>
-        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
-                  id="">Make Exception</a></span>
+    <form action="make-exception?cid=<?php echo $course->id ?>" method="post">
+        <input type="hidden" id="exception-id" name="student-data" value=""/>
+        <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
     </form>
     <form>
         <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"

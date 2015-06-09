@@ -34,24 +34,24 @@ class RosterController extends AppController
         $courseid = $this->getParam('cid');
         $course = Course::getById($courseid);
         $students = Student::findByCid($courseid);
-        if($students){
-        $isCodePresent = false;
-        $isSectionPresent = false;
-        foreach ($students as $student) {
-            if ($student->code != '') {
-                $isCodePresent = true;
+        if ($students) {
+            $isCodePresent = false;
+            $isSectionPresent = false;
+            foreach ($students as $student) {
+                if ($student->code != '') {
+                    $isCodePresent = true;
+                }
+                if ($student->section != '') {
+                    $isSectionPresent = true;
+                }
             }
-            if ($student->section != '') {
-                $isSectionPresent = true;
-            }
-        }
         }
         $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css']);
-        $this->includeJS(['roster/studentroster.js','general.js']);
+        $this->includeJS(['roster/studentroster.js', 'general.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent);
         return $this->render('studentRoster', $responseData);
 
-     }
+    }
 
     //Controller method for redirect to Login Grid View page.
     public function actionLoginGridView()
@@ -131,7 +131,7 @@ class RosterController extends AppController
         $isCodePresent = false;
         $isSectionPresent = false;
         $studentArray = array();
-        if($Students) {
+        if ($Students) {
             foreach ($Students as $student) {
 
                 if ($student->code != '') {
@@ -156,7 +156,7 @@ class RosterController extends AppController
 
         $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent);
         return $this->successResponse($responseData);
-     }
+    }
 
 
     public function actionStudentEnrollment()
@@ -190,7 +190,7 @@ class RosterController extends AppController
             }
         }
         $responseData = array('course' => $course, 'model' => $model);
-        return $this->render('studentEnrollment',$responseData);
+        return $this->render('studentEnrollment', $responseData);
     }
 
     // Controller method to redirect on Assign and Section Codes page with student information
@@ -201,30 +201,29 @@ class RosterController extends AppController
         $query = Student::findByCid($courseid);
         $course = Course::getById($courseid);
         $studentArray = array();
-        if($query){
-        foreach ($query as $student) {
-            $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
-                'code' => $student->code,
-                'section' => $student->section,
-                'userid' => $student->userid
-            );
-            array_push($studentArray, $tempArray);
-        }
+        if ($query) {
+            foreach ($query as $student) {
+                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                    'code' => $student->code,
+                    'section' => $student->section,
+                    'userid' => $student->userid
+                );
+                array_push($studentArray, $tempArray);
+            }
         }
         if ($this->isPost()) {
             $params = $_POST;
-            if($params['section'])
-            {
-            foreach ($params['section'] as $key => $section) {
-                $code = trim($params['code'][$key]);
-                Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseid);
-            }
+            if ($params['section']) {
+                foreach ($params['section'] as $key => $section) {
+                    $code = trim($params['code'][$key]);
+                    Student::updateSectionAndCodeValue(trim($section), $key, $code, $courseid);
+                }
             }
             $this->redirect('student-roster?cid=' . $courseid);
         }
         $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['roster/assignSectionsAndCodes.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('studentInformation' => $studentArray, 'cid' => $courseid,'course'=>$course);
+        $responseData = array('studentInformation' => $studentArray, 'cid' => $courseid, 'course' => $course);
         return $this->render('assignSectionsAndCodes', $responseData);
     }
 
@@ -236,30 +235,30 @@ class RosterController extends AppController
         $model = Student::findByCid($courseid);
         $course = Course::getById($courseid);
         $studentArray = array();
-        if($model){
-        foreach ($model as $student) {
-            $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
-                'Section' => $student->section,
-                'Latepass' => $student->latepass,
-                'StudenId' => $student->id,
-                'latePassHrs' => $student->course->latepasshrs,
-                'userid' => $student->userid
-            );
-            array_push($studentArray, $tempArray);
+        if ($model) {
+            foreach ($model as $student) {
+                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                    'Section' => $student->section,
+                    'Latepass' => $student->latepass,
+                    'StudenId' => $student->id,
+                    'latePassHrs' => $student->course->latepasshrs,
+                    'userid' => $student->userid
+                );
+                array_push($studentArray, $tempArray);
                 if ($this->isPost()) {
-                $paramas = $_POST;
-                foreach ($paramas['code'] as $key => $latepass) {
-                    $latepasshours = $paramas['passhours'];
-                    Student::updateLatepasses(trim($latepass), $key, $courseid);
+                    $paramas = $_POST;
+                    foreach ($paramas['code'] as $key => $latepass) {
+                        $latepasshours = $paramas['passhours'];
+                        Student::updateLatepasses(trim($latepass), $key, $courseid);
+                    }
+                    Course::updatePassHours($latepasshours, $courseid);
+                    $this->redirect('student-roster?cid=' . $courseid);
                 }
-                Course::updatePassHours($latepasshours, $courseid);
-                $this->redirect('student-roster?cid=' . $courseid);
             }
-        }
         }
         $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['roster/managelatepasses.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('studentInformation' => $studentArray,'course' => $course);
+        $responseData = array('studentInformation' => $studentArray, 'course' => $course);
         return $this->render('manageLatePasses', $responseData);
     }
 
@@ -273,13 +272,12 @@ class RosterController extends AppController
         $teacherId = $this->getUserId();
         $list = Teacher::getTeacherByUserId($teacherId);
         $courseDetails = array();
-        if($list)
-        {
-        foreach ($list as $teacher) {
-            $tempArray = array("id" => $teacher->course->id,
-                "name" => $teacher->course->name);
-            array_push($courseDetails, $tempArray);
-        }
+        if ($list) {
+            foreach ($list as $teacher) {
+                $tempArray = array("id" => $teacher->course->id,
+                    "name" => $teacher->course->name);
+                array_push($courseDetails, $tempArray);
+            }
         }
         if ($this->isPost()) {
             $params = $this->getRequestParams();
@@ -305,14 +303,14 @@ class RosterController extends AppController
         $model = new EnrollStudentsForm();
         $query = Student::findByCid($courseid);
         $studentDetails = array();
-        if($query){
-        foreach ($query as $student) {
-            $users = User::getById($student->userid);
-            $tempArray = array("id" => $student->userid,
-                "firstName" => $users->FirstName,
-                "lastName" => $users->LastName);
-            array_push($studentDetails, $tempArray);
-        }
+        if ($query) {
+            foreach ($query as $student) {
+                $users = User::getById($student->userid);
+                $tempArray = array("id" => $student->userid,
+                    "firstName" => $users->FirstName,
+                    "lastName" => $users->LastName);
+                array_push($studentDetails, $tempArray);
+            }
         }
         if ($this->isPost()) {
             $params = $this->getRequestParams();
@@ -342,7 +340,7 @@ class RosterController extends AppController
         }
         $this->includeJS(['roster/enrollstudents.js']);
         $responseData = array('course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $cid);
-        return $this->render('enrollStudents',$responseData);
+        return $this->render('enrollStudents', $responseData);
     }
 
 // Controller method for create and enroll new student in current course
@@ -383,22 +381,22 @@ class RosterController extends AppController
         $tutorInfo = array();
         $sortBy = 'section';
         $order = AppConstant::ASCENDING;
-        if($tutors){
-        foreach ($tutors as $tutor) {
-            $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id, 'section' => $tutor->section);
-            array_push($tutorInfo, $tempArray);
-        }
+        if ($tutors) {
+            foreach ($tutors as $tutor) {
+                $tempArray = array('Name' => $tutor->user->FirstName . ' ' . $tutor->user->LastName, 'id' => $tutor->user->id, 'section' => $tutor->section);
+                array_push($tutorInfo, $tempArray);
+            }
         }
         $sections = Student::findByCourseId($courseid, $sortBy, $order);
         $sectionArray = array();
-        if($sections){
-        foreach ($sections as $section) {
-            array_push($sectionArray, $section->section);
-        }
+        if ($sections) {
+            foreach ($sections as $section) {
+                array_push($sectionArray, $section->section);
+            }
         }
         $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['general.js?ver=012115', 'roster/managetutors.js?ver=012115', 'jquery.session.js?ver=012115', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('course' => $course,'courseid' => $courseid, 'tutors' => $tutorInfo, 'section' => $sectionArray);
+        $responseData = array('course' => $course, 'courseid' => $courseid, 'tutors' => $tutorInfo, 'section' => $sectionArray);
         return $this->renderWithData('manageTutors', $responseData);
     }
 
@@ -422,9 +420,9 @@ class RosterController extends AppController
         foreach ($sections as $section) {
             array_push($sectionArray, $section->section);
         }
-        if(count($users)) {
+        if (count($users)) {
             foreach ($users as $entry) {
-                $entry=trim($entry);
+                $entry = trim($entry);
                 $userId = User::findByUsername($entry);
                 if (!$userId) {
                     array_push($userNotFoundArray, $entry);
@@ -447,8 +445,7 @@ class RosterController extends AppController
         }
         $params['sectionArray'] = isset($params['sectionArray']) ? $params['sectionArray'] : '';
 
-        if($params['sectionArray'])
-        {
+        if ($params['sectionArray']) {
             foreach ($params['sectionArray'] as $tutors) {
                 Tutor::updateSection($tutors['tutorId'], $courseid, $tutors['tutorSection']);
             }
@@ -483,30 +480,30 @@ class RosterController extends AppController
             $newUserRecords = array();
             $existUserRecords = array();
 
-            foreach($studentRecords['allUsers'] as $users){
+            foreach ($studentRecords['allUsers'] as $users) {
                 array_push($newUserRecords, $users);
             }
-            foreach($studentRecords['existingUsers'] as $users){
-                foreach ($users as $singleUser){
+            foreach ($studentRecords['existingUsers'] as $users) {
+                foreach ($users as $singleUser) {
                     $tempArray = array(
-                    'userName' => $singleUser->SID,
-                    'firstName' => $singleUser->FirstName,
-                    'lastName' => $singleUser->LastName,
-                    'email' => $singleUser->email,
+                        'userName' => $singleUser->SID,
+                        'firstName' => $singleUser->FirstName,
+                        'lastName' => $singleUser->LastName,
+                        'email' => $singleUser->email,
                     );
-                    array_push($existUserRecords,$tempArray);
+                    array_push($existUserRecords, $tempArray);
                 }
             }
-            if($filename){
-                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords , 'newUsers' => $newUserRecords,'course' => $course));
+            if ($filename) {
+                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords, 'course' => $course));
             }
 
         }
 
-        if(!$studentRecords){
-            $responseData = array('model' => $model,'course' => $course);
-        return $this->render('importStudent', $responseData);
-          }
+        if (!$studentRecords) {
+            $responseData = array('model' => $model, 'course' => $course);
+            return $this->render('importStudent', $responseData);
+        }
     }
 
     public function ImportStudentCsv($fileName, $courseId, $params)
@@ -552,13 +549,13 @@ class RosterController extends AppController
                     array_push($StudentDataArray, $password);
                     array_push($AllUserArray, $StudentDataArray);
                 }
-                if ($userData){
+                if ($userData) {
                     array_push($ExistingUser, $userData);
                     array_push($AllUserArray, $StudentDataArray);
                 }
             }
 
-            return  (['allUsers' => $AllUserArray,'existingUsers' => $ExistingUser]);
+            return (['allUsers' => $AllUserArray, 'existingUsers' => $ExistingUser]);
         }
         return false;
     }
@@ -629,18 +626,18 @@ class RosterController extends AppController
     public function actionShowImportStudent()
     {
         $studentInformation = $this->getRequestParams();
-        if($this->isPost())
-        {$params = $this->getRequestParams();
+        if ($this->isPost()) {
+            $params = $this->getRequestParams();
             $user = new User();
-            foreach($studentInformation['newUsers'] as $newEntry){
+            foreach ($studentInformation['newUsers'] as $newEntry) {
                 $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
             }
             $this->setSuccessFlash('Imported student successfully.');
         }
         $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-        $this->includeJS(['general.js?','roster/importstudent.js','DataTables-1.10.6/media/js/jquery.dataTables.js']);
+        $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('studentData' => $studentInformation);
-        return $this->render('showImportStudent',$responseData);
+        return $this->render('showImportStudent', $responseData);
     }
 
 //Controller method to assign lock on student.
@@ -649,42 +646,40 @@ class RosterController extends AppController
     {
         $this->layout = false;
         $params = $this->getRequestParams();
-        foreach($params['checkedstudents'] as $students)
-        {
-            Student::updateLocked($students,$params['courseid']);
+        foreach ($params['checkedstudents'] as $students) {
+            Student::updateLocked($students, $params['courseid']);
         }
         return $this->successResponse();
     }
 
     public function actionRosterEmail()
     {
-        if($this->isPost()){
+        if ($this->isPost()) {
             $selectedStudents = $this->getBodyParams();
             $emailSender = $this->getAuthenticatedUser();
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : 0;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
 
-            if(!$isActionForEmail)
-            {
+            if (!$isActionForEmail) {
                 $course = Course::getById($courseId);
                 $assessments = Assessments::getByCourseId($courseId);
-                if ($selectedStudents['student-data'] != ''){
-                    $selectedStudents = explode(',',$selectedStudents['student-data']);
+                if ($selectedStudents['student-data'] != '') {
+                    $selectedStudents = explode(',', $selectedStudents['student-data']);
                     $studentArray = array();
-                    foreach ($selectedStudents as $studentId){
+                    foreach ($selectedStudents as $studentId) {
                         $student = User::getById($studentId);
-                        array_push($studentArray,$student->attributes);
+                        array_push($studentArray, $student->attributes);
                     }
-                    $this->includeJS(['roster/rosterEmail.js','editor/tiny_mce.js' , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+                    $this->includeJS(['roster/rosterEmail.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
-                    return $this->renderWithData('rosterEmail',$responseData);
-                }else{
-                    return $this->redirect('student-roster?cid='.$courseId);
+                    return $this->renderWithData('rosterEmail', $responseData);
+                } else {
+                    return $this->redirect('student-roster?cid=' . $courseId);
                 }
-            }else{
+            } else {
                 $studentArray = array();
                 $students = $selectedStudents['studentInformation'];
-                foreach(unserialize($students) as $student){
+                foreach (unserialize($students) as $student) {
                     $tempArray = array(
                         'firstName' => $student['FirstName'],
                         'lastName' => $student['LastName'],
@@ -695,26 +690,27 @@ class RosterController extends AppController
                 }
                 $message = $selectedStudents['message'];
                 $subject = $selectedStudents['subject'];
-                if($selectedStudents['emailCopyToSend'] == 'singleStudent'){
-                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
-                }elseif($selectedStudents['emailCopyToSend'] == 'selfStudent'){
+                if ($selectedStudents['emailCopyToSend'] == 'singleStudent') {
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
+                } elseif ($selectedStudents['emailCopyToSend'] == 'selfStudent') {
                     AppUtility::sendMail($subject, $message, $emailSender['email']);
-                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
-                }elseif($selectedStudents['emailCopyToSend'] == 'allTeacher'){
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
+                } elseif ($selectedStudents['emailCopyToSend'] == 'allTeacher') {
                     $instructors = Teacher::getTeachersById($selectedStudents['courseId']);
-                    foreach($instructors as $instructor){
-                            AppUtility::sendMail($subject, $message, $instructor->user->email);
+                    foreach ($instructors as $instructor) {
+                        AppUtility::sendMail($subject, $message, $instructor->user->email);
                     }
-                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
                 }
-                return $this->redirect('student-roster?cid='.$courseId);
+                return $this->redirect('student-roster?cid=' . $courseId);
             }
         }
     }
 
-    public function sendEmailToSelectedUser($subject,$message, $studentArray){
-        foreach($studentArray as $singleStudent){
-            AppUtility::sendMail($subject,$message, $singleStudent['emailId']);
+    public function sendEmailToSelectedUser($subject, $message, $studentArray)
+    {
+        foreach ($studentArray as $singleStudent) {
+            AppUtility::sendMail($subject, $message, $singleStudent['emailId']);
         }
     }
 
@@ -722,112 +718,136 @@ class RosterController extends AppController
     {
         $this->layout = false;
         $params = $this->getRequestParams();
-        foreach($params['checkedstudents'] as $students)
-        {
-            Student::deleteStudent($students,$params['courseid']);
+        foreach ($params['checkedstudents'] as $students) {
+            Student::deleteStudent($students, $params['courseid']);
         }
         return $this->successResponse();
     }
 
     public function actionRosterMessage()
     {
-        if($this->isPost()){
+        if ($this->isPost()) {
             $selectedStudents = $this->getRequestParams();
             $isActionForMessage = isset($selectedStudents['isMessage']) ? $selectedStudents['isMessage'] : 0;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
-            if(!$isActionForMessage)
-            {
+            if (!$isActionForMessage) {
                 $course = Course::getById($courseId);
                 $assessments = Assessments::getByCourseId($courseId);
-                if ($selectedStudents['student-data'] != ''){
-                    $selectedStudents = explode(',',$selectedStudents['student-data']);
+                if ($selectedStudents['student-data'] != '') {
+                    $selectedStudents = explode(',', $selectedStudents['student-data']);
                     $studentArray = array();
-                    foreach ($selectedStudents as $studentId){
+                    foreach ($selectedStudents as $studentId) {
                         $student = User::getById($studentId);
-                        array_push($studentArray,$student->attributes);
+                        array_push($studentArray, $student->attributes);
                     }
-                    $this->includeJS(['roster/rosterMessage.js','editor/tiny_mce.js' , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+                    $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
-                    return $this->renderWithData('rosterMessage',$responseData);
-                }else{
-                    return $this->redirect('student-roster?cid='.$courseId);
+                    return $this->renderWithData('rosterMessage', $responseData);
+                } else {
+                    return $this->redirect('student-roster?cid=' . $courseId);
                 }
-            }else{
+            } else {
                 $students = array();
                 $sendToStudents = array();
                 $filteredStudents = array();
-                $user =  $this->getAuthenticatedUser();
+                $user = $this->getAuthenticatedUser();
                 $studentsInfo = unserialize($selectedStudents['studentInformation']);
                 $courseId = $selectedStudents['courseid'];
                 $course = Course::getById($courseId);
                 $subject = trim($selectedStudents['subject']);
-                $messageBody =  trim($selectedStudents['message']);
-                if(!$selectedStudents['isChecked']){
-                    $notSaved = 4 ;
+                $messageBody = trim($selectedStudents['message']);
+                if (!$selectedStudents['isChecked']) {
+                    $notSaved = 4;
                 }
                 $save = 1;
-                if($selectedStudents['roster-assessment-data']!=0){
+                if ($selectedStudents['roster-assessment-data'] != 0) {
                     $query = AssessmentSession::getStudentByAssessments($selectedStudents['roster-assessment-data']);
-                    if($query){
-                    foreach($query as $entry){
-                        foreach($studentsInfo as $record){
-                            if($entry['userid'] == $record['id']){
-                            array_push($students,$record['id']);
+                    if ($query) {
+                        foreach ($query as $entry) {
+                            foreach ($studentsInfo as $record) {
+                                if ($entry['userid'] == $record['id']) {
+                                    array_push($students, $record['id']);
+                                }
                             }
                         }
                     }
+                }
+                foreach ($studentsInfo as $student) {
+                    if (!in_array($student['id'], $students)) {
+                        array_push($filteredStudents, $student['id']);
+                        $sendto = trim(ucfirst($student['LastName']) . ', ' . ucfirst($student['FirstName']));
+                        array_push($sendToStudents, $sendto);
                     }
                 }
-                else{
-                      foreach($studentsInfo as $infoStudent){
-                        array_push($filteredStudents,$infoStudent['id']);
-                      }
-                }
-                foreach($studentsInfo as $student){
-                        if (!in_array($student['id'],$students)) {
-                            array_push($filteredStudents,$student['id']);
-                            $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
-                            array_push($sendToStudents, $sendto);
-                    }
-                    }
-                $toList = implode("<br>",$sendToStudents);
-                if($selectedStudents['messageCopyToSend'] == 'onlyStudents'){
-                    foreach($filteredStudents as $singleStudent){
+                $toList = implode("<br>", $sendToStudents);
+                if ($selectedStudents['messageCopyToSend'] == 'onlyStudents') {
+                    foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
-                    return $this->redirect('student-roster?cid='.$courseId);
-                }elseif($selectedStudents['messageCopyToSend'] == 'selfAndStudents')
-                {
-                    foreach($filteredStudents as $singleStudent)
-                    {
+                    return $this->redirect('student-roster?cid=' . $courseId);
+                } elseif ($selectedStudents['messageCopyToSend'] == 'selfAndStudents') {
+                    foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
-                    $messageToTeacher = $messageBody.addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
+                    $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
                     $this->sendMassMessage($courseId, $user->id, $subject, $messageToTeacher, $save);
-                    return $this->redirect('student-roster?cid='.$courseId);
-                }elseif($selectedStudents['messageCopyToSend'] == 'teachersAndStudents')
-                {
-                    foreach($filteredStudents as $singleStudent)
-                    {
+                    return $this->redirect('student-roster?cid=' . $courseId);
+                } elseif ($selectedStudents['messageCopyToSend'] == 'teachersAndStudents') {
+                    foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
                     $teachers = Teacher::getAllTeachers($courseId);
-                    foreach($teachers as $teacher){
-                        $messageToTeacher = $messageBody.addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
+                    foreach ($teachers as $teacher) {
+                        $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
                         $this->sendMassMessage($courseId, $teacher['userid'], $subject, $messageToTeacher, $save);
                     }
-                    return $this->redirect('student-roster?cid='.$courseId);
+                    return $this->redirect('student-roster?cid=' . $courseId);
                 }
             }
         }
 
     }
 
-    public function sendMassMessage($courseId,$receiver,$subject,$messageBody,$isRead){
+    public function sendMassMessage($courseId, $receiver, $subject, $messageBody, $isRead)
+    {
 
-            $user =  $this->getAuthenticatedUser();
-            $tempArray = array('cid' => $courseId, 'receiver' => $receiver, 'subject' => $subject , 'body' => $messageBody,'isread' => $isRead);
-            $message = new Message();
-            $message->create($tempArray,$user->id );
+        $user = $this->getAuthenticatedUser();
+        $tempArray = array('cid' => $courseId, 'receiver' => $receiver, 'subject' => $subject, 'body' => $messageBody, 'isread' => $isRead);
+        $message = new Message();
+        $message->create($tempArray, $user->id);
+    }
+
+    public function actionMakeException()
+    {
+        if ($this->isPost()) {
+            $selectedStudents = $this->getRequestParams();
+
+            $courseId = $this->getParamVal('cid');
+            $isActionForException = isset($selectedStudents['isException']) ? $selectedStudents['isException'] : 0;
+//            $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
+            if (!$isActionForException) {
+//                $course = Course::getById($courseId);
+//                $assessments = Assessments::getByCourseId($courseId);
+//
+                $course = Course::getById($courseId);
+                $assessments = Assessments::getByCourseId($courseId);
+                if ($selectedStudents['student-data'] != '') {
+                    $selectedStudents = explode(',', $selectedStudents['student-data']);
+                    $studentArray = array();
+                    foreach ($selectedStudents as $studentId) {
+                        $student = User::getById($studentId);
+                        array_push($studentArray, $student->attributes);
+                    }
+                    $this->includeCSS(['site.css']);
+                    $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                    return $this->renderWithData('makeException', $responseData);
+                } else {
+                    return $this->redirect('student-roster?cid=' . $courseId);
+                }
+            }else{
+                AppUtility::dump($this->getRequestParams());
+            }
+        }
+
     }
 }

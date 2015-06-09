@@ -5,6 +5,7 @@ $(document).ready(function () {
     studentUnenroll();
     studentEmail();
     studentMessage();
+    teacherMakeException();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
 var studentData;
@@ -260,3 +261,18 @@ function studentMessage(){
     });
 }
 
+function teacherMakeException(){
+    $('#roster-makeExc').click(function(e){
+        var markArray = [];
+        $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
+            markArray.push($(this).val());
+        });
+        if(markArray.length!=0){
+            document.getElementById("exception-id").value = markArray;
+        }else
+        {
+            alert("No users selected.");
+            e.preventDefault();
+        }
+    });
+}
