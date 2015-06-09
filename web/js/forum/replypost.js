@@ -10,6 +10,7 @@ $(document).ready(function ()
 
         tinyMCE.triggerSave();
         var courseid = $(".courseid").val();
+        alert(courseid);
         var forumid = $(".forumid").val();
         var threadid = $(".threadid").val();
         var subject = $(".subject").val();

@@ -2,6 +2,7 @@
 $this->title = 'Reply';
 $this->params['breadcrumbs'][] = $this->title;
 use app\components\AppUtility;
+
 ?>
 <div class="replypost">
     <input type="hidden" class="forumid" value="<?php echo $forumid ?>">

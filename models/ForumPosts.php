@@ -61,7 +61,6 @@ class ForumPosts extends BaseImasForumPosts
     public function createReply($params, $user)
     {
         $this->threadid = isset($params['threadid']) ? $params['threadid'] : null;
-
         $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->subject = isset($params['subject']) ? $params['subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
@@ -71,10 +70,11 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->save();
     }
-    public function createThread($params,$userId)
+    public function createThread($params,$userId,$threadId)
     {
 
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
+        $this->threadid = isset($threadId) ? $threadId : null;
         $this->subject = isset($params['subject']) ? $params['subject'] : null;
         $this->userid = isset($userId) ?  $userId : null;
         $postdate = strtotime(date('F d, o g:i a'));

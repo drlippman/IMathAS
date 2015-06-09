@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'courseName')->textInput(); ?>
                 <?= $form->field($model, 'enrollmentKey')->textInput() ?>
 
-                <div class="datetime form-group">
+                        <div class="datetime form-group">
                     <?php
                     echo '<label class="start col-lg-2 pull-left "> Start Time </label>';
                     echo '<div class = "pull-left col-lg-4 time-input">';

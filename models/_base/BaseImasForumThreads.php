@@ -37,7 +37,7 @@ class BaseImasForumThreads extends \yii\db\ActiveRecord
     {
         return [
 //            [['id', 'forumid', 'lastposttime', 'lastpostuser', 'views'], 'required'],
-            [['id', 'forumid', 'stugroupid', 'lastposttime', 'lastpostuser', 'views'], 'integer']
+            [['forumid', 'stugroupid', 'lastposttime', 'lastpostuser', 'views'], 'integer']
         ];
     }
 

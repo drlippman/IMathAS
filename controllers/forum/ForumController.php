@@ -4,7 +4,6 @@ namespace app\controllers\forum;
 use app\models\Course;
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
-use app\models\forms\ForumViews;
 use app\models\forms\ThreadForm;
 use app\models\ForumPosts;
 use app\models\ForumThread;
@@ -14,7 +13,10 @@ use app\models\Thread;
 use app\models\User;
 use app\components\AppUtility;
 use app\components\AppConstant;
+use yii\BaseYii;
 use Yii;
+
+
 
 class ForumController extends AppController
 {
@@ -165,33 +167,23 @@ class ForumController extends AppController
         $forumid = $this->getParamVal('forumid');
 //        $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
-
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/thread.js']);
         $responseData = array('cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course);
         return $this->renderWithData('thread',$responseData);
-
     }
 
     public function actionGetThreadAjax()
     {
         $params = $this->getBodyParams();
-        $userRights = $this->getAuthenticatedUser();
-
-        $ShowRedFlagRow = $params['ShowRedFlagRow'];
         $forumid = $params['forumid'];
         $thread = ThreadForm::thread($forumid);
         $threadArray = array();
-        $uniquesDataArray = array();
-        if ($ShowRedFlagRow == 1) {
-            foreach ($thread as $data) {
-
-                $username = User::getById($data['userid']);
-                $uniquesData = ForumView::getbythreadId($data['threadid']);
-                $count = ForumView::uniqueCount($data['threadid']);
-                $tagged = ForumView::forumViews($data['threadid']);
-
-                if ($tagged[0]['tagged'] == 1) {
+            foreach ($thread as $data)
+            {
+                    $username = User::getById($data['userid']);
+                    $uniques = ForumView::getbythreadId($data['threadid']);
+                    $tagged = ForumView::forumViews($data['threadid']);
                     $temparray = array
                     (
 
@@ -201,44 +193,14 @@ class ForumController extends AppController
                         'subject' => $data['subject'],
                         'views' => $data['views'],
                         'replyby' => $data['replyby'],
-                        'postdate' => date('F d, o g:i a', $data['postdate']),
-                        'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
-                        'tagged' => $tagged[0]['tagged'],
-                        'userright' => $userRights['rights'],
+                        'postdate' => date('F d, o g:i a',$data['postdate']),
+                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                        'tagged' =>$tagged[0]['tagged'],
                     );
-                    array_push($threadArray, $temparray);
-                }
+                          array_push($threadArray, $temparray);
             }
-        } else {
-            foreach ($thread as $data) {
-
-                $username = User::getById($data['userid']);
-                $uniquesData = ForumView::getbythreadId($data['threadid']);
-                $tagged = ForumView::forumViews($data['threadid']);
-                $count = ForumView::uniqueCount($data['threadid']);
-                 $temparray = array
-                (
-
-                    'parent' => $data['parent'],
-                    'threadId' => $data['threadid'],
-                    'forumiddata' => $data['forumid'],
-                    'subject' => $data['subject'],
-                    'views' => $data['views'],
-                    'replyby' => $data['replyby'],
-                    'postdate' => date('F d, o g:i a', $data['postdate']),
-                    'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
-                    'tagged' => $tagged[0]['tagged'],
-                     'userright' => $userRights['rights'],
-                     'countArray' =>$count,
-                );
-                array_push($threadArray, $temparray);
-                array_push($uniquesDataArray, $uniquesData);
-            }
-        }
-           // $this->includeJS(['forum/forum.js']);
-        $responseData = array('$threadArray' => $threadArray,'$uniquesDataArray' => $uniquesDataArray);
-            return $this->successResponse($responseData);
-
+        $this->includeJS(['forum/thread.js','forum/forum.js']);
+        return $this->successResponse($threadArray);
     }
 //controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
     public function actionMoveThread()
@@ -398,7 +360,7 @@ class ForumController extends AppController
    public function actionReplyPost()
    {
        $this->guestUserHandler();
-        $courseId = Yii::$app->request->get('courseid');
+        $courseId = $this->getParamVal('courseid');
        $forumId = Yii::$app->request->get('forumid');
        $Id = Yii::$app->request->get('id');
        $threadid = Yii::$app->request->get('threadId');
@@ -421,13 +383,14 @@ class ForumController extends AppController
 
     public function actionAddNewThread()
     {
-        $this->guestUserHandler();
+        $users = $this->getAuthenticatedUser();
         $userId = $this->getUserId();
+        $rights =$users->rights;
         $forumId = $this->getParamVal('forumid');
         $courseid =  $this->getParamVal('cid');
         $forumName = Forums::getById($forumId);
         $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/addnewthread.js']);
-        $responseData = array('forumName' => $forumName, 'courseid' => $courseid,'userId' => $userId);
+        $responseData = array('forumName' => $forumName, 'courseid' => $courseid,'userId' => $userId,'rights' =>$rights);
         return $this->renderWithData('addNewThread',$responseData);
 
     }
@@ -440,11 +403,9 @@ class ForumController extends AppController
             $params = $this->getRequestParams();
             $userId = $this->getUserId();
             $newThread = new ForumThread();
-            $newThread->createThread($params,$userId);
-//
-//            $newThread = new ForumPosts();
-//            $newThread->createThread($params,$userId);
-
+           $threadId = $newThread->createThread($params,$userId);
+            $newThread = new ForumPosts();
+            $newThread->createThread($params,$userId,$threadId);
             return $this->successResponse();
 
         }
@@ -464,7 +425,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         if ($this->isPost())
         {
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getRequestParams();
             $user = Yii::$app->user->identity;
             $reply = new ForumPosts();
             $reply->createReply($params,$user);
