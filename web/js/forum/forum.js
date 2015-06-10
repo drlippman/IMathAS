@@ -19,7 +19,7 @@ $(document).ready(function ()
         {
             if(search.match(/^[a-z A-Z 0-9-]+$/))
             {
-                ;
+
                 $('#flash-message').hide();
                 if(val == 'subject')
                 {
@@ -35,7 +35,7 @@ $(document).ready(function ()
                     $('#display').hide();
                     $('#searchpost').show();
                     $('#result').hide();
-                    jQuerySubmit('get-search-post-ajax',{search: search, cid: courseId , value: val},'postSuccess');
+                    jQuerySubmit('get-search-post-ajax',{search: search, courseid: courseId , value: val},'postSuccess');
 
                 }
 
@@ -133,10 +133,19 @@ function forumsSuccess(response) {
         var html = "";
         $.each(forums, function (index, forum)
         {
-//          alert(JSON.stringify(forum.enddate));
-//            alert(JSON.stringify(forum.currenttime));
+            if(forum.rights > 10)
+            {
 
-            if(forum.enddate > forum.currenttime)
+
+
+                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
+                html += "<td>" + forum.threads + "</td>";
+                html += "<td>" + forum.posts + "</td>";
+                html += "<td>" + forum.lastPostDate + "</td>";
+
+            }
+
+            else(forum.enddate > forum.currenttime)
             {
                 html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";

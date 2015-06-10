@@ -17,34 +17,42 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript" charset="utf8"
         src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <input type="hidden" id="course-id" value="<?php echo $cid ?>">
-<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
+<div class="forumResult"><h2>Forum Search Results</h2></div>
+<div class="threadDetails">
+    <div id="search">
+        <span>Search: <input type=text id="searchText" name="search" /></span>
+        &nbsp;&nbsp;<span><input type=checkbox id="searchAll" name="allforums" /> All forums in course</span>
+        &nbsp;&nbsp;<span><?= Html::submitButton('Search', ['id' => 'change-button','class' => 'btn btn-primary btn-sm', 'name' => 'search-button',]) ?></span>
+    </div>
+    <div id="thread">
+        <span>
+            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
+               class="btn btn-primary btn-sm">Add New Thread</a></span> |
+        <span></span><a href="#">List Posts by Name</a> </span>|
+        <span><a id="limit-to-new-link" href="#">Limit to New</a> | <a id="limit-to-tag-link" href="#">Limit to Tagged</a> <a id="show-all-link" href="#">Show All</a> </span>|
+        <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
+    </div>
+    <input type="hidden" id="forumid" value="<?php echo $forumid ?>">
+    <input type="hidden" id="courseid" value="<?php echo $course->id ?>">
 
-<div id="search">
-    <span>Search: <input type=text name="search" /></span>
-    &nbsp;&nbsp;<span><input type=checkbox name="allforums" /> All forums in course</span>
-    &nbsp;&nbsp;<span><?= Html::submitButton('Search', ['id' => 'change-button','class' => 'btn btn-primary btn-sm', 'name' => 'search-button',]) ?></span>
-</div>
-<div id="thread">
-    <span>
-        <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
-           class="btn btn-primary btn-sm">Add New Thread</a></span> |
-    <span></span><a href="#">List Posts by Name</a> </span>|
-    <span><a id="limit-to-new-link" href="#">Limit to New</a> | <a id="limit-to-tag-link" href="#">Limit to Tagged</a> <a id="show-all-link" href="#">Show All</a> </span>|
-    <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
-</div>
-<input type="hidden" id="forumid" value="<?php echo $forumid ?>">
+    <div>
+        <table id="forum-table displayforum" class="forum-table">
+            <thead>
 
-<div>
-    <table id="forum-table displayforum" class="forum-table">
-        <thead>
-
-        <th>Topic</th>
-        <th>Replies</th>
-        <th>Views(Unique)</th>
-        <th>Last Post Date</th>
-        </thead>
-        <tbody class="forum-table-body">
-        </tbody>
-    </table>
+            <th>Topic</th>
+            <th>Replies</th>
+            <th>Views(Unique)</th>
+            <th>Last Post Date</th>
+            </thead>
+            <tbody class="forum-table-body">
+            </tbody>
+        </table>
+    </div>
 </div>
-<!--<div class="thread-div"></div>-->
+<div id="searchpost"></div>
+
+<div id="result">
+    <h5><Strong>No result found for your search.</Strong></h5>
+</div>
+
+

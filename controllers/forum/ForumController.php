@@ -24,7 +24,7 @@ class ForumController extends AppController
     public $postData = array();
     public $totalPosts = array();
     public $children = array();
-
+/*Controller Action To Redirect To Search Forum Page*/
     public function actionSearchForum()
     {
         $this->guestUserHandler();
@@ -39,6 +39,7 @@ class ForumController extends AppController
         $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course);
         return $this->renderWithData('forum',$responseData);
     }
+    /*Controller Action To Search All threads By Subject*/
     public function actionGetForumNameAjax()
     {
         $this->guestUserHandler();
@@ -75,35 +76,47 @@ class ForumController extends AppController
              return $this->terminateResponse(message);
             }
     }
+    /*Controller Action To Search All Post In A Forum*/
     public function actionGetSearchPostAjax()
     {
         $this->guestUserHandler();
-        $param = $this->getBodyParams();
-        $search = $param['search'];
-        $checkBoxVal= $param['value'];
+        $params = $this->getRequestParams();
+        $courseid =$params['courseid'];
+         $forum = Forums::getByCourseId( $courseid);
+        $search = $params['search'];
+        $checkBoxVal= $params['value'];
         $query= ForumForm::byAllpost($search);
         if($query)
         {
             $searchpost = array();
+            foreach($forum as $forumid){
             foreach ($query as $data)
             {
-                $username = User::getById($data['userid']);
-                $postdate = Thread::getById($data['threadid']);
-                $forumname = Forums::getById($data['forumid']);
-                $temparray = array
-                (
-                    'forumiddata' => $data['forumid'],
-                    'subject' => $data['subject'],
-                    'views' => $data['views'],
-                    'forumname' => ucfirst($forumname->name),
-                    'postdate' => date('F d, o g:i a',$postdate->lastposttime),
-                    'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
-                    'message' => $data['message'],
 
-                );
-                array_push($searchpost, $temparray);
+                if($forumid['id'] == $data['forumid'] )
+                {
+
+                    $username = User::getById($data['userid']);
+                    $postdate = Thread::getById($data['threadid']);
+                    $forumname = Forums::getById($data['forumid']);
+                    $temparray = array
+                    (
+                        'forumiddata' => $data['forumid'],
+                        'subject' => $data['subject'],
+                        'views' => $data['views'],
+                        'forumname' => ucfirst($forumname->name),
+                        'postdate' => date('F d, o g:i a',$postdate->lastposttime),
+                        'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+                        'message' => $data['message'],
+
+                    );
+                    array_push($searchpost, $temparray);
+
+                }
+
             }
-            $this->includeJS(['forum/forum.js']);
+            }
+            $this->includeJS(['forum/forum.js','forum/thread.js']);
             $responseData = array('data' =>$searchpost , 'checkvalue' => $checkBoxVal,'search' => $search);
             return $this->successResponse($responseData);
         }else
@@ -113,7 +126,7 @@ class ForumController extends AppController
 
     }
 
-
+/*Controller Action To Display All The Forums*/
     public function actionGetForumsAjax()
     {
         $this->guestUserHandler();
@@ -143,7 +156,7 @@ class ForumController extends AppController
                     'currenttime' => $currentime,
                     'enddate' => $forum->enddate,
                     'rights' => $user->rights,
-                    'lastPostDate' => ($lastObject != '') ? date('M-d-Y h:i s', $lastObject->postdate) : ''
+                    'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : ''
                 );
                 array_push($forumArray, $tempArray);
             }
@@ -159,13 +172,13 @@ class ForumController extends AppController
         }
     }
 
+/*Controller Action To Redirect To Thread Page*/
     public function actionThread()
     {
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         $forumid = $this->getParamVal('forumid');
-//        $forum = Forums::getByCourseId($cid);
         $user = Yii::$app->user->identity;
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/thread.js']);
@@ -173,6 +186,7 @@ class ForumController extends AppController
         return $this->renderWithData('thread',$responseData);
     }
 
+    /*Controller Action To Display The Thraeds Present In That Particular Forum */
     public function actionGetThreadAjax()
     {
         $params = $this->getBodyParams();
@@ -334,11 +348,12 @@ class ForumController extends AppController
         $threadid = $params['threadId'];
         $message = trim($params['message']);
         $subject = trim($params['subject']);
-        $thread = ForumPosts::modifyThread($threadid,$message,$subject);
+        ForumPosts::modifyThread($threadid,$message,$subject);
         $this->includeJS(['forum/modifypost.js']);
         return $this->successResponse();
     }
 
+/*Controller Action To Redirect To Post Page*/
     public function actionPost()
     {
         $this->guestUserHandler();
@@ -398,6 +413,7 @@ class ForumController extends AppController
             return $this->successResponse();
     }
 
+    /*Controller Action To Reply To A Post*/
    public function actionReplyPost()
    {
        $this->guestUserHandler();
@@ -421,7 +437,21 @@ class ForumController extends AppController
        $responseData = array('reply' => $threadArray,'courseid' => $courseId,'forumid' => $forumId,'threadid' => $threadid);
        return $this->renderWithData('replypost', $responseData);
    }
+    public function actionReplyPostAjax()
+    {
+        $this->guestUserHandler();
+        if ($this->isPost())
+        {
+            $params = $this->getRequestParams();
+            $user = Yii::$app->user->identity;
+            $reply = new ForumPosts();
+            $reply->createReply($params,$user);
+            return $this->successResponse();
+        }
+    }
 
+
+    /*Controller Action To Redirect To New Thread Page*/
     public function actionAddNewThread()
     {
         $users = $this->getAuthenticatedUser();
@@ -436,6 +466,7 @@ class ForumController extends AppController
 
     }
 
+/*Controller Action To Save The Newly Added Thread In Database*/
     public function actionAddNewThreadAjax()
     {
         $this->guestUserHandler();
@@ -452,7 +483,7 @@ class ForumController extends AppController
         }
 
     }
-
+    /*Controller Action To Toggle The Flag Image On Click*/
     public function actionChangeImageAjax()
     {
         $params = $this->getBodyParams();
@@ -461,17 +492,54 @@ class ForumController extends AppController
         return $this->successResponse();
     }
 
-    public function actionReplyPostAjax()
+/*Controller Action To Search Post Of That Forum*/
+    public function actionGetOnlyPostAjax()
     {
+
         $this->guestUserHandler();
-        if ($this->isPost())
+        $params = $this->getRequestParams();
+        $search = $params['search'];
+        $forumid = $params['forumid'];
+        $checkBoxVal= $params['value'];
+        $query= ForumForm::byAllpost($search);
+        if($query)
         {
-            $params = $this->getRequestParams();
-            $user = Yii::$app->user->identity;
-            $reply = new ForumPosts();
-            $reply->createReply($params,$user);
-            return $this->successResponse();
+            $searchpost = array();
+                foreach ($query as $data)
+                {
+                    if($forumid == $data['forumid'])
+                    {
+
+
+                        $username = User::getById($data['userid']);
+                        $postdate = Thread::getById($data['threadid']);
+                        $forumname = Forums::getById($data['forumid']);
+                        $temparray = array
+                        (
+                            'forumiddata' => $data['forumid'],
+                            'subject' => $data['subject'],
+                            'views' => $data['views'],
+                            'forumname' => ucfirst($forumname->name),
+                            'postdate' => date('F d, o g:i a',$postdate->lastposttime),
+                            'name' => ucfirst($username->FirstName).' '.ucfirst($username->LastName),
+                            'message' => $data['message'],
+
+                        );
+                        array_push($searchpost, $temparray);
+                    }
+
+                }
+
+            $this->includeJS(['forum/forum.js','forum/thread.js']);
+            $responseData = array('data' =>$searchpost);
+            return $this->successResponse($responseData);
+        }else
+        {
+            return $this->terminateResponse(message);
         }
+
+
+
     }
 
 
