@@ -76,6 +76,10 @@ class SiteController extends AppController
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->login()) {
+
+                Yii::$app->session->set('tzoffset', $this->getParam('tzoffset'));
+                Yii::$app->session->set('tzname', $this->getParam('tzname'));
+
                 return $this->redirect('dashboard');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_USERNAME_PASSWORD);
@@ -341,7 +345,7 @@ class SiteController extends AppController
     public function actionChangeUserInfo()
     {
         $this->guestUserHandler();
-        $tzname = $this->getUserTimezone();
+        $tzname = AppUtility::getTimezoneName();
         $userid = $this->getUserId();
         $user = $this->getAuthenticatedUser();
         $model = new ChangeUserInfoForm();

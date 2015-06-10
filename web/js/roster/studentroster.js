@@ -5,6 +5,7 @@ $(document).ready(function () {
     studentUnenroll();
     studentEmail();
     studentMessage();
+
    // teacherMakeException();
     copyStudentEmail();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
@@ -15,6 +16,7 @@ function studentRosterSuccess(response)
     response= JSON.parse(response);
     var isCode = response.data.isCode;
     var isSection = response.data.isSection;
+
     var imageSize = response.data.imageSize;
     if (response.status == 0) {
         var students = response.data.query;
@@ -24,7 +26,6 @@ function studentRosterSuccess(response)
 }
 function showStudentInformation(students,isCode,isSection,imageSize)
 {
-
     var html = "";
     $.each(students, function(index, student){
 
@@ -58,8 +59,8 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         html += "<td>"+student.username+"</td>";
         if(student.locked ==0)
         {
-            if(student.lastaccess != 0){ html += "<td><a>"+datecal(student.lastaccess)+"</a></td>"; }
-            else{ html += "<td><a>never</a></td>"; }
+            if(student.lastaccess != 0){ html += "<td><a href='login-log?cid=" + courseId + "&uid="+ student.id +"'>"+datecal(student.lastaccess)+"</a></td>"; }
+            else{ html += "<td><a href='login-log?cid=" + courseId + "&uid="+ student.id +"'>never</a></td>"; }
         }
         else{ html += "<td><a>Is locked out</a></a></td>" }
         html += "<td><a>Grades</a></td>";
@@ -279,6 +280,8 @@ function copyStudentEmail(){
             markArray.push($(this).val());
         });
         if(markArray.length!=0){
+
+
             document.getElementById("email-id").value = markArray;
         }else
         {

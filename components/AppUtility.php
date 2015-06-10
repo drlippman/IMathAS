@@ -317,7 +317,9 @@ class AppUtility extends Component
 
     public static function tzdate($string, $time)
     {
-        global $tzoffset, $tzname;
+        $tzoffset = Yii::$app->session->get('tzoffset');
+        $tzname = Yii::$app->session->get('tzname');
+
         if ($tzname != '') {
             return date($string, $time);
         } else {
@@ -1210,6 +1212,16 @@ class AppUtility extends Component
         $absUrl = str_replace(Yii::$app->request->hostInfo, '', $refere);
         $refereUri = str_replace($home, '', $absUrl);
         return $refereUri;
+    }
+
+    public static function getTimezoneOffset()
+    {
+        return Yii::$app->session->get('tzoffset');
+    }
+
+    public static function getTimezoneName()
+    {
+        return Yii::$app->session->get('tzname');
     }
 
 }

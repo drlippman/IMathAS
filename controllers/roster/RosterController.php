@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers\roster;
 
+use app\models\ActivityLog;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
@@ -11,6 +12,7 @@ use app\models\forms\EnrollStudentsForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollmentForm;
 use app\models\LoginGrid;
+use app\models\LoginLog;
 use app\models\loginTime;
 use app\models\Message;
 use app\models\Student;
@@ -158,7 +160,8 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
-        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize);
+        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize, 'courseId' => $courseid );
+
         return $this->successResponse($responseData);
     }
 
@@ -984,5 +987,54 @@ class RosterController extends AppController
         return $this->redirect('student-roster?cid=' . $courseId);
     }
 }
+
+    public function actionLoginLog(){
+        $courseId = $this->getParamVal('cid');
+        $userId = $this->getParamVal('uid');
+        $userData = User::getById($userId);
+        $userFullName = trim(ucfirst($userData['LastName']).", ".ucfirst($userData['FirstName']));
+        $course = Course::getById($courseId);
+
+        $orderBy = 'logintime';
+        $sortBy = AppConstant::DESCENDING;
+        $loginLog = LoginLog::getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy);
+        $loginLogData = array();
+        foreach($loginLog as $log){
+            $tempArray = array(
+                'logDateTime' => AppUtility::tzdate('l, F j, Y, g:i a', $log['logintime']),
+                'action' => $log['lastaction'],
+            );
+            array_push($loginLogData, $tempArray);
+        }
+        $responseData = array('course' => $course, 'userFullName' =>$userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId);
+        return $this->renderWithData('loginLog', $responseData);
+    }
+
+    public function actionActivityLog(){
+        $courseId = $this->getParamVal('cid');
+        $userId = $this->getParamVal('uid');
+        $userData = User::getById($userId);
+        $userFullName = trim(ucfirst($userData['LastName']).", ".ucfirst($userData['FirstName']));
+        $course = Course::getById($courseId);
+
+        $orderBy = 'viewtime';
+        $sortBy = AppConstant::DESCENDING;
+        $loginLog = ActivityLog::getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy);
+        $wikiArray = array();
+        foreach($loginLog as $log){
+           $subType = substr($log['type'],0,2);
+           if($subType == 'as'){
+               $tempArray = array(
+                   'typeId' => $log['typeid'],
+               );
+               array_push($wikiArray,$tempArray);
+           }
+
+        }
+
+        $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId);
+        return $this->renderWithData('activityLog',$responseData);
+    }
+
 }
 
