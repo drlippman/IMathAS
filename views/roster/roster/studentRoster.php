@@ -62,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
     <form action="make-exception?cid=<?php echo $course->id ?>" method="post">
         <input type="hidden" id="exception-id" name="student-data" value=""/>
+        <input type="hidden" id="section-name" name="section-data" value=""/>
         <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
     </form>
     <form action="copy-student-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">

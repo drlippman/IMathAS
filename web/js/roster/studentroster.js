@@ -40,7 +40,7 @@ function showStudentInformation(students,isCode,isSection,imageSize)
             if(student.section == null){
                 html += "<td></td>";
             }else{
-            html += "<td>"+student.section+"</td>";
+            html += "<td class='section-class'>"+student.section+"</td>";
             }
         }
         if(isCode == true)
@@ -280,6 +280,25 @@ function copyStudentEmail(){
         });
         if(markArray.length!=0){
             document.getElementById("email-id").value = markArray;
+        }else
+        {
+            alert("No users selected.");
+            e.preventDefault();
+        }
+    });
+}
+
+function teacherMakeException(){
+    $('#roster-makeExc').click(function(e){
+        var markArray = [];
+        var sectionName;
+        $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
+            markArray.push($(this).val());
+            sectionName = ($(this).parent().next().text());
+        });
+        if(markArray.length!=0){
+            document.getElementById("exception-id").value = markArray;
+            document.getElementById("section-name").value = sectionName;
         }else
         {
             alert("No users selected.");

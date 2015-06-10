@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>
         <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
-            <?php echo "<li>".$studentDetail['FirstName'].",". $studentDetail['LastName']." ". ($studentDetail['SID'])."</li>" ?>
+                <?php echo "<li>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName'])." (". ($studentDetail['SID']).")</li>" ?>
             <?php } ?>
         </span>
     </div>

@@ -395,4 +395,7 @@ a:focus {
 {
     padding-bottom: 3%;
 }
-
+.margin-zero{
+    margin-top: 25px;
+    margin-left: 0px;
+}

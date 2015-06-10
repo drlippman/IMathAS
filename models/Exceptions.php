@@ -29,5 +29,4 @@ class Exceptions extends BaseImasExceptions
     {
         return static::findOne(['assessmentid' => $assessmentId, 'userid' => $userId]);
     }
-
 } 
