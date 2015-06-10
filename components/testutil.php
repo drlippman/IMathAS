@@ -475,13 +475,13 @@ function scorequestion($qn, $rectime=true) {
 	global $regenonreattempt, $sessiondata;
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
-	
+
 	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
-	
+
 	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
 	$rawscore = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,0); //possible
-	
+
 	$noscores = ($testsettings['testtype']=="NoScores");
 	
 	//work in progress
@@ -515,9 +515,10 @@ function scorequestion($qn, $rectime=true) {
 		} else {
 			$time = 0;  //for all at once display, where time is not useful info
 		}
+        $connection = Yii::$app->getDb();
 		$query = "INSERT INTO imas_firstscores (courseid,qsetid,score,scoredet,timespent) VALUES ";
 		$query .= "('".addslashes($testsettings['courseid'])."','".$qi[$questions[$qn]]['questionsetid']."','".round(100*getpts($unitrawscore))."','".$rawscores[$qn]."','$time')";
-		mysql_query($query) or die("Query failed : " . mysql_error());
+        $connection->createCommand($query)->execute();
 	}
 	
 	//$scores[$qn] = $afterpenalty;
@@ -536,7 +537,7 @@ function scorequestion($qn, $rectime=true) {
 		$bestlastanswers[$qn] = $lastanswers[$qn];
 		$bestquestions[$qn] = $questions[$qn];
 	}
-	
+
 	return $rawscore;
 }
 
@@ -576,6 +577,7 @@ function recordtestdata($limit=false) {
 	}
 	
 	$now = time();
+    $connection = Yii::$app->getDb();
 	if ($isreview) {
 		if ($limit) {
 			$query = "UPDATE imas_assessment_sessions SET reviewlastanswers='$lalist' ";
@@ -594,7 +596,7 @@ function recordtestdata($limit=false) {
 		if (isset($lti_sourcedid) && strlen($lti_sourcedid)>0 && $sessiondata['ltiitemtype']==0) { 
 			//update lti record.  We only do this for single assessment placements
 			
-			require_once("../includes/ltioutcomes.php");
+			require_once("../components/ltioutcomes.php");
 			
 			$total = 0;
 			for ($i =0; $i < count($bestscores);$i++) {
@@ -611,8 +613,8 @@ function recordtestdata($limit=false) {
 	} else {
 		$query .= "WHERE id='$testid' LIMIT 1";
 	}
-	
-	mysql_query($query) or die("Query failed : $query " . mysql_error());
+
+    $connection->createCommand($query)->execute();
 }
 
 function deletefilesifnotused($delfrom,$ifnothere) {
@@ -624,7 +626,7 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 			$outstr .= $match;
 		}
 	}
-	require_once("../includes/filehandler.php");
+	require_once("../components/filehandler.php");
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
 		deleteasidfilesfromstring2($outstr,'agroupid',$sessiondata['groupid'],$testsettings['id']);
 	} else {

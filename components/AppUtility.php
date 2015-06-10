@@ -613,9 +613,10 @@ class AppUtility extends Component
             $isTeacher = true;
         }
 
-        global $questions, $disallowedvar, $showhints, $qi, $responseString, $superdone, $bestquestions, $seeds, $noraw, $rawscores, $attempts, $lastanswers, $timesontask, $lti_sourcedid, $reattempting, $bestseeds, $bestrawscores, $bestscores, $firstrawscores, $bestattempts, $bestlastanswers, $starttime, $testsettings, $inexception, $isreview, $exceptionduedate;
+        global $questions, $disallowedvar, $showhints, $testid, $qi, $responseString, $scores, $superdone, $bestquestions, $seeds, $noraw, $rawscores, $attempts, $lastanswers, $timesontask, $lti_sourcedid, $reattempting, $bestseeds, $bestrawscores, $bestscores, $firstrawscores, $bestattempts, $bestlastanswers, $starttime, $testsettings, $inexception, $isreview, $exceptionduedate;
         $superdone = false;
         $isreview = false;
+        $testid = $assessmentSession->id;
         if($assessmentSession)
         {
             if (strpos($assessmentSession->questions,';') === false) {
@@ -755,6 +756,7 @@ class AppUtility extends Component
                 }
             }
 
+            //global $showtips;
             $allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
             $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
             $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
@@ -839,88 +841,255 @@ class AppUtility extends Component
             $restrictedtimelimit = false;
 
             $responseString .= '<div class="right margin-right-inset"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
-            $responseString .= filter("<div id=intro class='hidden margin-right-inset'>{$testsettings['intro']}</div>\n");
 
-            $lefttodo = self::shownavbar($questions,$scores,$next,$testsettings['showcat'],$courseId,$assessmentId);
+            if (isset($_GET['score'])) { //score a problem
+                $qn = $_GET['score'];
 
-            if (unans($scores[$next]) || amreattempting($next)) {
-                $responseString .= "<div class=inset>\n";
-                if (isset($intropieces)) {
-                    foreach ($introdividers as $k=>$v) {
-                        if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
-                            if ($next+1==$v[1]) {
-                                $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;"> Hide Question Information</a></div>';
-                                $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
-                            } else {
-                                $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
-                                $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                if ($_POST['verattempts']!=$attempts[$qn]) {
+                    $responseString .= "<p>This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
+                } else {
+                    if (isset($_POST['disptime']) && !$isreview) {
+                        $used = $now - intval($_POST['disptime']);
+                        $timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+                    }
+                    $GLOBALS['scoremessages'] = '';
+                    $GLOBALS['questionmanualgrade'] = false;
+
+                    $rawscore = scorequestion($qn);
+
+                    $immediatereattempt = false;
+
+                    if (!$superdone && $showeachscore && hasreattempts($qn)) {
+
+                        if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1)) {
+                            if (!in_array($qn,$reattempting)) {
+                                //$reattempting[] = $qn;
+                                $immediatereattempt = true;
                             }
-                            break;
                         }
                     }
+                    //record score
+                    recordtestdata();
                 }
+                if (!$superdone) {
+                    $responseString .= filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
+                    $lefttodo = self::shownavbar($questions,$scores,$qn,$testsettings['showcat'], $courseId, $assessmentId);
 
-                $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?action=skip&amp;score=$i\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $responseString .= "<div class=inset>\n";
+                    $responseString .= "<a name=\"beginquestions\"></a>\n";
+                    if ($GLOBALS['scoremessages'] != '') {
+                        $responseString .= '<p>'.$GLOBALS['scoremessages'].'</p>';
+                    }
+
+                    if ($showeachscore) {
+                        $possible = $qi[$questions[$qn]]['points'];
+                        if (getpts($rawscore)!=getpts($scores[$qn])) {
+                            $responseString .= "<p>Score before penalty on last attempt: ";
+                            $responseString .= printscore($rawscore,$qn);
+                            $responseString .= "</p>";
+                        }
+                        $responseString .= "<p>";
+                        $responseString .= 'Score on last attempt: ';
+                        $responseString .= printscore($scores[$qn],$qn);
+                        $responseString .= "</p>\n";
+                        $responseString .= "<p>Score in gradebook: ";
+                        $responseString .= printscore($bestscores[$qn],$qn);
+                        $responseString .= "</p>";
+                        if ($GLOBALS['questionmanualgrade'] == true) {
+                            $responseString .= '<p><strong>Note: </strong> This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor</p>';
+                        }
+
+
+                    } else {
+                        $responseString .= '<p>Question Scored</p>';
+                    }
+
+                    $reattemptsremain = false;
+                    if (hasreattempts($qn)) {
+                        $reattemptsremain = true;
+                    }
+
+                    if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
+                        $responseString .= '<p>';
+                        if ($reattemptsremain && !$immediatereattempt) {
+                            $responseString .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>, ";
+                        }
+                        $responseString .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a>";
+                        if ($immediatereattempt) {
+                            $responseString .= _(", reattempt last question below, or select another question.");
+                        } else {
+                            $responseString .= _(", or select another question");
+                        }
+                        $responseString .= "</p>\n";
+                    } else if ($reattemptsremain && !$immediatereattempt) {
+                        $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>";
+                        if ($lefttodo > 0) {
+                            $responseString .=  _(", or select another question");
+                        }
+                        $responseString .= '</p>';
+                    } else if ($lefttodo > 0) {
+                        $responseString .= "<p>"._('Select another question').'</p>';
+                    }
+
+                    if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
+                        //TODO i18n
+
+                        $responseString .= "<p>This question, with your last answer";
+                        if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+                            $responseString .= " and correct answer";
+                            $showcorrectnow = true;
+                        } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+                            $responseString .= " and correct answer";
+                            $showcorrectnow = true;
+                        } else {
+                            $showcorrectnow = false;
+                        }
+
+                        $responseString .= ', is displayed below</p>';
+                        if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
+                            //$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
+                            if (strpos($rawscores[$qn],'~')!==false) {
+                                $colors = explode('~',$rawscores[$qn]);
+                            } else {
+                                $colors = array($rawscores[$qn]);
+                            }
+                        } else {
+                            $colors = array();
+                        }
+                        if ($showcorrectnow) {
+                            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,false,$colors);
+                        } else {
+                            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],false,false,$attempts[$qn],false,false,false,$colors);
+                        }
+                        $contactlinks = showquestioncontactlinks($qn);
+                        if ($contactlinks!='' && !$sessiondata['istutorial']) {
+                            $responseString .= '<div class="review">'.$contactlinks.'</div>';
+                        }
+
+                    } else if ($immediatereattempt) {
+                        $next = $qn;
+                        if (isset($intropieces)) {
+                            foreach ($introdividers as $k=>$v) {
+                                if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
+                                    if ($next+1==$v[1]) {
+                                        $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
+                                        $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                    } else {
+                                        $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
+                                        $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                        $responseString .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
+                        $responseString .= '<input type="hidden" name="disptime" value="'.time().'" />';
+                        $responseString .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+                        $responseString .= "<a name=\"beginquestions\"></a>\n";
+                        basicshowq($next);
+                        showqinfobar($next,true,true);
+                        $responseString .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
+                        if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+                            $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(If you jump to the answer, you must generate a new version to earn credit))) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                        }
+                        $responseString .= "</form>\n";
+
+                    }
+
+                    $responseString .= "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+
+                    $responseString .= "</div>\n";
+                }
+            }else{
+                $responseString .= filter("<div id=intro class='hidden margin-right-inset'>{$testsettings['intro']}</div>\n");
+
+                $lefttodo = self::shownavbar($questions, $scores, $next, $testsettings['showcat'], $courseId, $assessmentId);
+
+                if (unans($scores[$next]) || amreattempting($next)) {
+                    $responseString .= "<div class=inset>\n";
+                    if (isset($intropieces)) {
+                        foreach ($introdividers as $k=>$v) {
+                            if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
+                                if ($next+1==$v[1]) {
+                                    $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;"> Hide Question Information</a></div>';
+                                    $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                } else {
+                                    $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
+                                    $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=".$assessmentId."&amp;cid=".$courseId."&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 //                echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 //                echo '<input type="hidden" name="disptime" value="'.time().'" />';
 //                echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
 
-                $responseString .= "<a name=\"beginquestions\"></a>\n";
-                basicshowq($next);
-                showqinfobar($next ,true,true);
-                $responseString .= "</div>\n";
+                    $responseString .= "<a name=\"beginquestions\"></a>\n";
+                    basicshowq($next);
+                    showqinfobar($next ,true,true);
+                    $responseString .= '<input type="submit" class="btn btn-primary" value="'. _('Submit'). '" />';
+                    if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
+                        $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                    }
+                    $responseString .= "</form>\n";
+                    $responseString .= "</div>\n";
 
-            }else {
-                $responseString .= "<div class=inset>\n";
-                $responseString .= "<a name=\"beginquestions\"></a>\n";
-                $responseString .= "You've already done this problem.\n";
-                $reattemptsremain = false;
-                if ($showeachscore) {
-                    $possible = $qi[$questions[$next]]['points'];
-                    $responseString .= "<p>Score on last attempt: ";
-                    $responseString .= printscore($scores[$next],$next);
-                    $responseString .= "</p>\n";
-                    $responseString .= "<p>Score in gradebook: ";
-                    $responseString .= printscore($bestscores[$next],$next);
-                    $responseString .= "</p>";
-                }
-                if (hasreattempts($next)) {
-                    //if ($showeachscore) {
-                    $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
-                    //}
-                    $reattemptsremain = true;
-                }
-                if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
-                    $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
-                }
-                if ($lefttodo == 0) {
-                    $responseString .= "<a href=\"showtest.php?action=skip&amp;done=true\">When you are done, click here to see a summary of your score</a>\n";
-                }
-                if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
-                    $responseString .= "<p>Question with last attempt is displayed for your review only</p>";
+                }else {
+                    $responseString .= "<div class=inset>\n";
+                    $responseString .= "<a name=\"beginquestions\"></a>\n";
+                    $responseString .= "You've already done this problem.\n";
+                    $reattemptsremain = false;
+                    if ($showeachscore) {
+                        $possible = $qi[$questions[$next]]['points'];
+                        $responseString .= "<p>Score on last attempt: ";
+                        $responseString .= printscore($scores[$next],$next);
+                        $responseString .= "</p>\n";
+                        $responseString .= "<p>Score in gradebook: ";
+                        $responseString .= printscore($bestscores[$next],$next);
+                        $responseString .= "</p>";
+                    }
+                    if (hasreattempts($next)) {
+                        //if ($showeachscore) {
+                        $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;reattempt=$next\">Reattempt this question</a></p>\n";
+                        //}
+                        $reattemptsremain = true;
+                    }
+                    if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
+                        $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
+                    }
+                    if ($lefttodo == 0) {
+                        $responseString .= "<a href=\"showtest.php?action=skip&amp;done=true\">When you are done, click here to see a summary of your score</a>\n";
+                    }
+                    if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
+                        $responseString .= "<p>Question with last attempt is displayed for your review only</p>";
 
-                    if (!$noraw && $showeachscore) {
-                        //$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
-                        if (strpos($rawscores[$next],'~')!==false) {
-                            $colors = explode('~',$rawscores[$next]);
+                        if (!$noraw && $showeachscore) {
+                            //$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
+                            if (strpos($rawscores[$next],'~')!==false) {
+                                $colors = explode('~',$rawscores[$next]);
+                            } else {
+                                $colors = array($rawscores[$next]);
+                            }
                         } else {
-                            $colors = array($rawscores[$next]);
+                            $colors = array();
                         }
-                    } else {
-                        $colors = array();
+                        $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+                        if ($qshowans) {
+                            displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
+                        } else {
+                            displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
+                        }
+                        $contactlinks = showquestioncontactlinks($next);
+                        if ($contactlinks!='') {
+                            $responseString .= '<div class="review">'.$contactlinks.'</div>';
+                        }
                     }
-                    $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
-                    if ($qshowans) {
-                        displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
-                    } else {
-                        displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
-                    }
-                    $contactlinks = showquestioncontactlinks($next);
-                    if ($contactlinks!='') {
-                        $responseString .= '<div class="review">'.$contactlinks.'</div>';
-                    }
+                    $responseString .= "</div>\n";
                 }
-                $responseString .= "</div>\n";
             }
 
         }

@@ -1,4 +1,5 @@
-
+initstack = new Array();
+window.onload = init;
 $(document).ready(function(){
 
 //    $('.dataTables_filter input').get(0).type = 'text';
@@ -41,4 +42,10 @@ function capitalizeFirstLetter(str)
     return str.toLowerCase().replace(/\b[a-z]/g, function(letter) {
         return letter.toUpperCase();
     });
+}
+
+function init() {
+    for (var i=0; i<initstack.length; i++) {
+    var foo = initstack[i]();
+    }
 }

@@ -8,14 +8,7 @@ use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
-use app\models\Links;
-use app\models\Questions;
-use app\models\QuestionSet;
 use app\models\Student;
-use app\models\Forums;
-use app\models\Items;
-use app\models\InlineText;
-use app\models\Wiki;
 use app\models\Teacher;
 use Yii;
 
@@ -31,7 +24,7 @@ class AssessmentController extends AppController
         $courseId = isset($params['id']) ? trim($params['cid']) : "";
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $teacher = Teacher::getByUserId($user->getId(), $courseId);
-        $assessmentSession = AssessmentSession::getAssessmentSession($user->getId(), $assessmentId);
+        $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
         if(!$assessmentSession)
         {
             $assessmentSessionObject = new AssessmentSession();
@@ -40,20 +33,12 @@ class AssessmentController extends AppController
 
         $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
 
-        $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css', 'jquery-ui.css']);
+        $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
         $responseData = array('response'=> $response);
         return $this->render('ShowAssessment', $responseData);
 
-    }
-
-
-    public function actionQuestionSet()
-    {
-        $tpQuestion = QuestionSet::getById('1');
-
-        $this->renderWithData('question-set');
     }
 
     public function actionLatePass()
@@ -133,17 +118,4 @@ class AssessmentController extends AppController
         $this->includeJS(['../js/latePass.js']);
         $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
     }
-
-    public function actionQuestion()
-    {
-        $this->guestUserHandler();
-        $questionId = $this->getParamVal('to');
-        $pq = AppUtility::basicShowQuestions($questionId);
-
-
-//        $this->redirect(AppUtility::getURLFromHome('course','course/show-assessment?id='.$questionId.'&q='.json_encode($pq)));
-
-
-    }
-
 } 

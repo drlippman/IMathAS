@@ -2,6 +2,10 @@ div {
     zoom: 1;
 }
 
+.assessment-btn{
+    height: 2.2em !important;
+}
+
 .clear {
     line-height: 0;
 }
@@ -15,4 +19,3 @@ div {
     top: expression(0+((e=document.documentElement.scrollTop)?e:document.body.scrollTop)+'px');
     left: expression(0+((e=document.documentElement.scrollLeft)?e:document.body.scrollLeft)+'px');
 }
-

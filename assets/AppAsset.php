@@ -29,11 +29,11 @@ class AppAsset extends AssetBundle
     );
     public $js = [
         'js/jquery.js',
+        'js/jquery-ui.min.js',
 //        'js/general.js',
         'js/mathjax/MathJax.js?config=AM_HTMLorMML',
         'js/ASCIIsvg_min.js',
         'js/mathgraphcheck.js',
-        'js/jquery-ui.min.js',
         'js/common.js',
 
     ];
