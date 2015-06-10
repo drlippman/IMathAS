@@ -70,15 +70,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy Emails"></span>
     </form>
     <form>
-        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
-                  id="">Pictures</a></span>
+<!--        <span> <a href="--><?php //echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?><!--"  class="btn btn-primary"-->
+<!--                  id="">Pictures</a></span>-->
+        <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >
     </form>
 </div>
 
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-<table class="student-data-table">
+<table class="student-data-table" id="student-information" >
     <thead>
     <tr>
+        <th></th>
         <th></th>
         <?php if ($isSection == true) {
             ?>
@@ -105,3 +107,34 @@ $this->params['breadcrumbs'][] = $this->title;
 </table>
 
 
+<script type="text/javascript">
+    var picsize = 0;
+    function rotatepics() {
+        picsize = (picsize+1)%3;
+        picshow(picsize);
+    }
+    function picshow(size) {
+        var course_id =  $( "#course-id" ).val();
+        if (size==0) {
+            els = document.getElementById("student-information").getElementsByTagName("img");
+            for (var i=0; i<els.length; i++) {
+                els[i].style.display = "none";
+            }
+        } else {
+            els = document.getElementById("student-information").getElementsByTagName("img");
+            for (var i=0; i<els.length; i++) {
+                els[i].style.display = "inline";
+                    if (size==2) {
+                        els[i].style.width = "100px";
+                        els[i].style.height = "100px"
+                    }
+                if (size==1) {
+                    els[i].style.width = "50px";
+                    els[i].style.height = "50px";
+                }
+            }
+        }
+
+    }
+
+</script>

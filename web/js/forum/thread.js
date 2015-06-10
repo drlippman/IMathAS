@@ -5,7 +5,6 @@ $(document).ready(function ()
     $("#show-all-link").hide();
     $('#result').hide();
     $('.forumResult').hide();
-
     jQuerySubmit('get-thread-ajax',{forumid: forumid,ShowRedFlagRow:ShowRedFlagRow },'threadSuccess');
     limitToTagShow();
 
@@ -47,15 +46,9 @@ $(document).ready(function ()
         {
             $('#flash-message').show();
             $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
-
         }
 
-
-
     });
-
-
-
 });
 function postSearchSuccess(response)
 {
@@ -189,10 +182,10 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
                     if (thread.tagged == 0) {
-                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + " <img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + "  <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
                     }
                     else {
-                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + " <img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + thread.threadId + ")' >Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + "  <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
                     }
 
                     html += "<td>" + count + "</td>";
@@ -202,7 +195,7 @@ function threadSuccess(response)
                             html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + count.usercount + ")" + "</a></td>";
                         } else {
                             html += "<td>" + thread.views + "(" + count.usercount + ")" + "</td>";
-                        }
+                         }
                     });
 
                     html += "<td>" + thread.postdate + "</td>";
@@ -213,8 +206,6 @@ function threadSuccess(response)
         });
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable();
-
-
     }
     else if (result.status == -1) {
         $('#forum-table').hide;
@@ -242,12 +233,10 @@ function threadSuccess(response)
             close: function (event, ui) {
                 $(this).remove();
             }
-
-        });
-
+         });
     });
 
-    $("a[name=view-tabs]").on("click", function () {
+     $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
 //        var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead><tbody><tr><td>sssss</td><td>'+uniquesDataArray+'</td></tr></tbody></table>';
 
@@ -256,9 +245,6 @@ function threadSuccess(response)
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide"
-
-
-
         });
 
     });
@@ -290,8 +276,6 @@ function markAsRemoveSuccess(response) {
     }
 
 }
-
-
 
 function limitToTagShow() {
 

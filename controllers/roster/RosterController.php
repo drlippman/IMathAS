@@ -128,6 +128,7 @@ class RosterController extends AppController
     {
         $this->layout = false;
         $params = $this->getBodyParams();
+        $imageSize = $params['size'];
         $courseid = $params['course_id'];
         $Students = Student::findByCid($courseid);
         $isCodePresent = false;
@@ -151,12 +152,12 @@ class RosterController extends AppController
                     'locked' => $student->locked,
                     'section' => $student->section,
                     'code' => $student->code,
+                    'hasuserimg' => $student->user->hasuserimg,
                 );
                 array_push($studentArray, $tempArray);
             }
         }
-
-        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent);
+        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize);
         return $this->successResponse($responseData);
     }
 

@@ -273,7 +273,8 @@ class ForumController extends AppController
             (
                 'forumId' => $forum->id,
                 'forumName' => $forum->name,
-                'courseId' => $forum->courseid
+                'courseId' => $forum->courseid,
+                'enddate' => $forum->enddate
 
             );
             array_push($forumArray, $tempArray);
@@ -305,11 +306,12 @@ class ForumController extends AppController
                     ForumPosts::updateMoveThread($forum_Id, $thread_Id);
                 }
                 $this->includeCSS(['forums.css']);
-                $this->includeJS(['thread.js']);
+                $this->includeJS(['forum/thread.js']);
                 $responseData = array('cid' => $courseId, 'users' => $user, 'forumid' => $forumId);
                 return $this->renderWithData('thread',$responseData);
 
             }
+            $this->includeJS(['forum/movethread.js']);
             $responseData = array('forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId);
             return $this->renderWithData('moveThread',$responseData);
         }
@@ -324,7 +326,7 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumId');
         $thread = ThreadForm::thread($forumId);
         $threadArray = array();
-        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js','modifypost.js']);
+        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js','forum/modifypost.js']);
         foreach ($thread as $data)
         {
             if(($data['threadid']) == $threadId)

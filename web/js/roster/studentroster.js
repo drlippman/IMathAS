@@ -5,7 +5,7 @@ $(document).ready(function () {
     studentUnenroll();
     studentEmail();
     studentMessage();
-    teacherMakeException();
+   // teacherMakeException();
     copyStudentEmail();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
@@ -15,17 +15,26 @@ function studentRosterSuccess(response)
     response= JSON.parse(response);
     var isCode = response.data.isCode;
     var isSection = response.data.isSection;
+    var imageSize = response.data.imageSize;
     if (response.status == 0) {
         var students = response.data.query;
-        showStudentInformation(students,isCode,isSection);
+        showStudentInformation(students,isCode,isSection,imageSize);
         studentData = students;
     }
 }
-function showStudentInformation(students,isCode,isSection)
+function showStudentInformation(students,isCode,isSection,imageSize)
 {
+
     var html = "";
     $.each(students, function(index, student){
+
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
+        if(student.hasuserimg == 0 ){
+            html += "<td><img  class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' ></td>";
+        }else{
+            html += "<td><img  class='images' width='50' height='50' src='../../Uploads/" + student.id+".jpg' ></td>";
+        }
+
         if(isSection == true)
         {
             if(student.section == null){
@@ -43,8 +52,8 @@ function showStudentInformation(students,isCode,isSection)
             }
 
         }
-        if(student.locked ==0){ html += "<td>"+capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='locked-student'>"+capitalizeFirstLetter(student.lastname)+"</td>";}
-        if(student.locked ==0){ html += "<td>"+capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='locked-student'>"+capitalizeFirstLetter(student.firstname)+"</td>";}
+        if(student.locked ==0){ html += "<td>"+ capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='locked-student'>"+ capitalizeFirstLetter(student.lastname)+"</td>";}
+        if(student.locked ==0){ html += "<td>"+ capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='locked-student'>"+ capitalizeFirstLetter(student.firstname)+"</td>";}
         html += "<td><a>"+student.email+"</a></td>";
         html += "<td>"+student.username+"</td>";
         if(student.locked ==0)
@@ -61,6 +70,7 @@ function showStudentInformation(students,isCode,isSection)
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
+    $(".images").hide();
 }
 function selectCheckBox(){
     $('.check-all').click(function(){

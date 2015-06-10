@@ -55,4 +55,3 @@ $this->params['breadcrumbs'][] = $this->title;
     <h5><Strong>No result found for your search.</Strong></h5>
 </div>
 
-

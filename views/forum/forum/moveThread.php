@@ -17,12 +17,14 @@
 
 <div id="move-forum">Move to forum:
     <div>
-        <?php
-        foreach ($forums as $forum) { ?>
+        <?php $currentTime = time();
+
+        foreach ($forums as $forum) {
+            if($forum['enddate'] > $currentTime) { ?>
             <input type="radio" id="<?php echo $forum['forumId'] ?>" name="forum-name"
                    value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
 
-        <?php } ?>
+        <?php } } ?>
     </div>
 </div>
 
@@ -43,7 +45,7 @@
 
 
     <input type=submit class="btn btn-primary" id="move-button" value="Move">
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid'.$forumId)  ?>">Cancel</a>
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid='.$forumId)  ?>">Cancel</a>
 </form>
 
 <script>
