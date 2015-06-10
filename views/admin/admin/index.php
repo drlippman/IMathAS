@@ -5,9 +5,7 @@ use app\components\AppUtility;
 $this->title = 'Admin';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!DOCTYPE html>
-<html>
-<head>
+
     <title>OpenMath - OpenMathAdministration</title>
     <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
     <!-- DataTables CSS -->
@@ -19,8 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8"
             src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-</head>
-<body>
+
 <div class=mainbody>
 <div class="headerwrapper"></div>
 <div class="midwrapper">
@@ -161,8 +158,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="footerwrapper"></div>
 </div>
-</body>
-</html>
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -172,11 +167,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     function getAllCourseSuccess(response)
     {
-        var result = JSON.parse(response);
-        if(result.status == 0)
+        response = JSON.parse(response);
+        if(response.status == 0)
         {
-            var courses = result.courses;
-            var users = result.users;
+            var courses = response.data.courses;
+            var users = response.data.users;
             createCourseTable(courses);
             createUsersTable(users);
         }

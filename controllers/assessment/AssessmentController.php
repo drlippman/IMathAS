@@ -43,7 +43,8 @@ class AssessmentController extends AppController
         $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css', 'jquery-ui.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        return $this->render('ShowAssessment', ['response'=> $response]);
+        $responseData = array('response'=> $response);
+        return $this->render('ShowAssessment', $responseData);
 
     }
 

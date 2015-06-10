@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
            class="btn btn-primary btn-sm">Add New Thread</a></span> |
     <span></span><a href="#">List Posts by Name</a> </span>|
-    <span><a href="#">Limit to New</a> | <a href="#">Limit to Flagged</a></span>|
+    <span><a id="limit-to-new-link" href="#">Limit to New</a> | <a id="limit-to-tag-link" href="#">Limit to Tagged</a> <a id="show-all-link" href="#">Show All</a> </span>|
     <span><?= Html::submitButton('Mark all Read', ['class' => 'btn btn-primary btn-sm', 'name' => 'markallread-button']) ?></span>
 </div>
 <input type="hidden" id="forumid" value="<?php echo $forumid ?>">
@@ -40,11 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <th>Topic</th>
         <th>Replies</th>
-        <th>Views</th>
+        <th>Views(Unique)</th>
         <th>Last Post Date</th>
         </thead>
         <tbody class="forum-table-body">
         </tbody>
     </table>
 </div>
-
+<!--<div class="thread-div"></div>-->

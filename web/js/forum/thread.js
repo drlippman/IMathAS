@@ -5,19 +5,15 @@ $(document).ready(function ()
     jQuerySubmit('get-thread-ajax',{forumid: forumid },'threadSuccess');
 });
 
-
 function threadSuccess(response)
 {
-
     response = JSON.parse(response);
     var count;
     var fid = $('#forumid').val();
     var courseId = $('#course-id').val();
     if (response.status == 0)
     {
-
         var threads = response.data;
-
 
         var html = "";
         $.each(threads, function (index, thread)
@@ -31,7 +27,6 @@ function threadSuccess(response)
                     if(thread.threadId == data.threadId)
                     {
                         count++;
-
 
                     }
                 });
@@ -48,12 +43,10 @@ function threadSuccess(response)
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable();
 
-
     }
     else if (result.status == -1) {
         $('#forum-table').hide;
     }
-
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
@@ -76,9 +69,7 @@ function threadSuccess(response)
             close: function (event, ui) {
                 $(this).remove();
             }
-
         });
-
     });
 }
 function markAsRemoveSuccess(response) {

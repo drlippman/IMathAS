@@ -52,6 +52,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $this->rights = $right;
         $this->password = $student[7];
         $this->save();
+        return $this->id;
     }
 
 

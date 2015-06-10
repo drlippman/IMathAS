@@ -176,14 +176,22 @@ class ForumController extends AppController
     public function actionGetThreadAjax()
     {
         $params = $this->getBodyParams();
+        $userRights = $this->getAuthenticatedUser();
+
+        $ShowRedFlagRow = $params['ShowRedFlagRow'];
         $forumid = $params['forumid'];
         $thread = ThreadForm::thread($forumid);
         $threadArray = array();
-            foreach ($thread as $data)
-            {
-                    $username = User::getById($data['userid']);
-                    $uniques = ForumView::getbythreadId($data['threadid']);
-                    $tagged = ForumView::forumViews($data['threadid']);
+        $uniquesDataArray = array();
+        if ($ShowRedFlagRow == 1) {
+            foreach ($thread as $data) {
+
+                $username = User::getById($data['userid']);
+                $uniquesData = ForumView::getbythreadId($data['threadid']);
+                $count = ForumView::uniqueCount($data['threadid']);
+                $tagged = ForumView::forumViews($data['threadid']);
+
+                if ($tagged[0]['tagged'] == 1) {
                     $temparray = array
                     (
 
@@ -193,14 +201,47 @@ class ForumController extends AppController
                         'subject' => $data['subject'],
                         'views' => $data['views'],
                         'replyby' => $data['replyby'],
-                        'postdate' => date('F d, o g:i a',$data['postdate']),
-                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
-                        'tagged' =>$tagged[0]['tagged'],
+                        'postdate' => date('F d, o g:i a', $data['postdate']),
+                        'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                        'tagged' => $tagged[0]['tagged'],
+                        'userright' => $userRights['rights'],
+                        'countArray' =>$count,
                     );
-                          array_push($threadArray, $temparray);
+                    array_push($threadArray, $temparray);
+                    array_push($uniquesDataArray, $uniquesData);
+
+                }
             }
-        $this->includeJS(['forum/thread.js','forum/forum.js']);
-        return $this->successResponse($threadArray);
+        } else {
+            foreach ($thread as $data) {
+
+                $username = User::getById($data['userid']);
+                $uniquesData = ForumView::getbythreadId($data['threadid']);
+                $tagged = ForumView::forumViews($data['threadid']);
+                $count = ForumView::uniqueCount($data['threadid']);
+                $temparray = array
+                (
+
+                    'parent' => $data['parent'],
+                    'threadId' => $data['threadid'],
+                    'forumiddata' => $data['forumid'],
+                    'subject' => $data['subject'],
+                    'views' => $data['views'],
+                    'replyby' => $data['replyby'],
+                    'postdate' => date('F d, o g:i a', $data['postdate']),
+                    'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                    'tagged' => $tagged[0]['tagged'],
+                    'userright' => $userRights['rights'],
+                    'countArray' =>$count,
+                );
+                array_push($threadArray, $temparray);
+                array_push($uniquesDataArray, $uniquesData);
+            }
+        }
+        $this->includeJS(['forum/forum.js']);
+        $responseData = array('threadArray' => $threadArray,'uniquesDataArray' => $uniquesDataArray);
+        return $this->successResponse($responseData);
+
     }
 //controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
     public function actionMoveThread()

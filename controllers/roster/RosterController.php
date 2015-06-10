@@ -27,6 +27,8 @@ use app\components\AppConstant;
 
 class RosterController extends AppController
 {
+
+   // public $studentInfo = array();
     //Controller method to display student information on student roster page.
     public function actionStudentRoster()
     {
@@ -468,7 +470,7 @@ class RosterController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $studentRecords = '';
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load($this->getPostData())) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
@@ -497,9 +499,7 @@ class RosterController extends AppController
             if ($filename) {
                 $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords, 'course' => $course));
             }
-
         }
-
         if (!$studentRecords) {
             $responseData = array('model' => $model, 'course' => $course);
             return $this->render('importStudent', $responseData);
@@ -626,18 +626,31 @@ class RosterController extends AppController
     public function actionShowImportStudent()
     {
         $studentInformation = $this->getRequestParams();
-        if ($this->isPost()) {
-            $params = $this->getRequestParams();
-            $user = new User();
-            foreach ($studentInformation['newUsers'] as $newEntry) {
-                $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
-            }
-            $this->setSuccessFlash('Imported student successfully.');
-        }
-        $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-        $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('studentData' => $studentInformation);
-        return $this->render('showImportStudent', $responseData);
+//        if ($this->isPost()) {
+//            $params = $this->getRequestParams();
+//            $user = new User();
+//            foreach ($studentInformation['newUsers'] as $newEntry) {
+//                $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
+                $isCodePresent = false;
+                $isSectionPresent = false;
+                foreach ($studentInformation['newUsers'] as $student) {
+
+                    if ($student['4'] != 0) {
+                        $isCodePresent = true;
+                    }
+                    if ($student['5'] != 0) {
+                        $isSectionPresent = true;
+                    }
+                }
+                $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+
+                $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent);
+
+                return $this->render('showImportStudent', $responseData);
+
+//            }
+//        }
     }
 
 //Controller method to assign lock on student.
@@ -850,4 +863,22 @@ class RosterController extends AppController
         }
 
     }
+
+    public  function actionSaveCsvFileAjax()
+    {
+        $params = $this->getBodyParams();
+
+        $studentdata = $params['studentData'];
+
+        foreach($studentdata as $newEntry){
+
+            $user = new User();
+            $student = new Student();
+           $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
+            $student->assignSectionAndCode($newEntry,$id);
+        }
+        $this->setSuccessFlash('Imported student successfully.');
+        return $this->successResponse();
+    }
 }
+

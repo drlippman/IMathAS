@@ -92,5 +92,11 @@ class Student extends BaseImasStudents {
         $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
         $student->delete();
     }
-
+public function assignSectionAndCode($newEntry,$id)
+{
+    $this->userid = $id;
+    $this->section = $newEntry['5'];
+    $this->code = $newEntry['4'];
+    $this->save();
+}
 } 

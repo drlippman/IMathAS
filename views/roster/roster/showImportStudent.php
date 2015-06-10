@@ -11,22 +11,37 @@ $this->title = 'Import Students';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<form method="post" action="show-import-student">
+
 <div class="import-student">
     <fieldset>
-        <table id="user-table displayUser" class="display-user-table">
+
+
+        <table id="user-table displayUser"  class="display-user-table">
             <thead>
             <tr>
-                <th>Name</th>
                 <th>Username</th>
+                <th>FirstName</th>
+                <th>LastName</th>
                 <th>Email</th>
-                <th>Rights</th>
+
+                <?php if ($isCodePresent == true) {
+                    ?>
+                    <th>Code</th>
+                <?php
+                }
+                if ($isSectionPresent == true) {
+                    ?>
+                    <th>Section</th>
+                <?php } ?>
+
+
             </tr>
             </thead>
-            <tbody class="user-table-body">
+            <tbody class="user-table-body" >
             <?php
             if (isset($studentData['newUsers'])) {
                 $newStudentData = $studentData['newUsers'];
+               // AppUtility::dump($newStudentData);
                 foreach ($newStudentData as $singleRecord) {
                     ?>
                     <tr>
@@ -34,8 +49,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         <td><?php echo $singleRecord[1] ?></td>
                         <td><?php echo $singleRecord[2] ?></td>
                         <td><?php echo $singleRecord[3] ?></td>
+                        <?php if ($isCodePresent == 1) {
+                            ?>
+                            <th><?php echo $singleRecord[4] ?></th>
+                        <?php
+                        }
+                        if ($isSectionPresent == 1) {
+                            ?>
+                            <th><?php echo $singleRecord[5] ?></th>
+                        <?php } ?>
                     </tr>
-                <?php } ?>
+
+                <?php   $index++; } ?>
             <?php } ?>
             <?php
             if (isset($studentData['existingUsers'])) {
@@ -58,8 +83,24 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="roster-submit">
 
-            <input type="submit" value="Submit" class = "btn btn-primary">
+            <input type="button" onclick="saveStudentData()" value="Submit" class ="btn btn-primary">
         </div>
     </div>
 </div>
-</form>
+
+<script>
+    function saveStudentData() {
+        var studentInformation= <?php echo json_encode($studentData ); ?>;
+        var studentData = studentInformation['newUsers'];
+        jQuerySubmit('save-csv-file-ajax', {studentData:studentData}, 'saveCsvFileSuccess');
+    }
+    function saveCsvFileSuccess(response)
+    {
+//        var courseId =
+        if(status == 0)
+        {
+  //           window.location = "student-roster?cid="+courseId;
+        }
+    }
+
+</script>

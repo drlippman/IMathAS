@@ -22,7 +22,8 @@ class AdminController extends AppController
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
-        $this->includeCSS(['../css/dashboard.css']);
+        $this->includeCSS(['dashboard.css']);
+      //  $this->includeJS(['adminIndex.js']);
         return $this->renderWithData('index', ['users' => $users]);
     }
 
@@ -30,8 +31,8 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $model = new AddNewUserForm();
-        if ($model->load(Yii::$app->request->post())){
-            $params = $this->getBodyParams();
+        if ($model->load($this->getPostData())){
+            $params = $this->getRequestParams();
             $params = $params['AddNewUserForm'];
             $params['SID'] = $params['username'];
             $params['hideonpostswidget'] = AppConstant::ZERO_VALUE;
@@ -43,8 +44,9 @@ class AdminController extends AppController
             $user->save();
             $this->setSuccessFlash(AppConstant::ADD_NEW_USER);
         }
-         $this->includeJS(["../js/courseSetting.js"]);
-        return $this->renderWithData('addNewUser', ['model' => $model,]);
+         $this->includeJS(["courseSetting.js"]);
+        $responseData = array('model' => $model);
+        return $this->renderWithData('addNewUser',$responseData);
     }
 
     public function actionAdminDiagnostic()
@@ -52,9 +54,9 @@ class AdminController extends AppController
             $this->guestUserHandler();
             $model = new AdminDiagnosticForm();
 
-            if ($model->load(Yii::$app->request->post()))
+            if ($model->load($this->getPostData()))
             {
-                $params = $this->getBodyParams();
+                $params = $this->getRequestParams();
                 $user = $this->getAuthenticatedUser();
 
                 $params = $params['AdminDiagnosticForm'];
@@ -65,7 +67,8 @@ class AdminController extends AppController
                 $diag->attributes = $params;
                 $diag->save();
             }
-            return $this->renderWithData('adminDiagnostic',['model'=>$model]);
+        $responseData = array('model' => $model);
+            return $this->renderWithData('adminDiagnostic',$responseData);
     }
 
 
@@ -75,8 +78,13 @@ class AdminController extends AppController
         $order = AppConstant::ASCENDING;
         $courseData = Course::findCourseDataArray();
         $user = User::findAllUsersArray($sortBy, $order);
-
-        return json_encode(array('status' => AppConstant::RETURN_SUCCESS, 'courses' => $courseData, 'users' => $user));
+        if($courseData){
+        $responseData = (array('courses' => $courseData, 'users' => $user));
+        return $this->successResponse($responseData);
+    }
+    else{
+        return $this->terminateResponse('No course found.');
+        }
     }
 
     public function actionChangeRights()
@@ -84,14 +92,15 @@ class AdminController extends AppController
         $id = $this->getParamVal('id');
         $this->guestUserHandler();
         $model = new ChangeRightsForm();
-        if ($model->load(Yii::$app->request->post())) {
-            $params = $this->getBodyParams();
+        if ($model->load($this->getPostData())) {
+            $params = $this->getRequestParams();
             $params = $params['ChangeRightsForm'];
             User::updateRights($id, $params['rights'], $params['groupid']);
             $this->setSuccessFlash('User confirmed successfully.');
             return $this->redirect(AppUtility::getURLFromHome('admin','admin/index'));
         }
-        return $this->renderWithData('changeRights', ['model' => $model]);
+        $responseData = array('model' => $model);
+        return $this->renderWithData('changeRights', $responseData);
     }
 
     public function actionHelpOfRights()
