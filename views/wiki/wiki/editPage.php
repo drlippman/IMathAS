@@ -2,12 +2,20 @@
 $this->title = 'Edit Page';
 $this->params['breadcrumbs'][] = $this->title;
 use app\components\AppUtility;
-AppUtility::dump($userData);
 ?>
-<div class="edit-wiki">
-    <h3><b>Edit Wiki: <?php echo $wiki->name;?></h3>
-    <br><br>
+<?php
+$lasteditedby = $userData->FirstName.',' .$userData->LastName;
+    foreach($wikiRevisionData as $key => $singleData) {
+        $time = $singleData->time;
+        $lastedittime = AppUtility::tzdate("F j, Y, g:i a", $time);
+        $numrevisions = $singleData->id;
+}?>
 
+<div class="edit-wiki">
+    <h3><b>Edit Wiki: <?php echo $wiki->name;?></b></h3>
+    <?php if ($numrevisions>0) {
+        echo "Last edited by $lasteditedby on $lastedittime.";
+    } ?>
     <form method="post" action="show-wiki?courseId=<?php echo $course->id ?>&wikiId=<?php echo $wiki->id?>">
             <input type="hidden" name="baserevision" value="<?php echo $wikiRevisionData->id;?>" />
             <div class= 'editor'>

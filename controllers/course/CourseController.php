@@ -44,6 +44,7 @@ class CourseController extends AppController
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $cid = $this->getParamVal('cid');
         $responseData = array();
+        $calendarCount = array();
         $course = Course::getById($cid);
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
@@ -63,6 +64,7 @@ class CourseController extends AppController
                                     case 'Assessment':
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
+                                        array_push($calendarCount, $assessment);
                                         break;
                                     case 'Calendar':
                                         $tempItem[$item->itemtype] = 1;
@@ -96,6 +98,7 @@ class CourseController extends AppController
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempAray[$item->itemtype] = $assessment;
                                 array_push($responseData, $tempAray);
+                                array_push($calendarCount, $assessment);
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = 1;
@@ -135,7 +138,7 @@ class CourseController extends AppController
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js']);
         $this->includeJS(['student.js']);
-        $returnData = array('courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
+        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->render('index', $returnData);
     }
 
@@ -325,14 +328,14 @@ class CourseController extends AppController
                 $course->save();
             }
             else{
-            $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
-            $this->includeCSS(["courseSetting.css"]);
-            $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
-            return $this->renderWithData('courseSetting', $returnData);
+                $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
+                $this->includeCSS(["courseSetting.css"]);
+                $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
+                return $this->renderWithData('courseSetting', $returnData);
             }
 
         }
-            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
+        return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
 
     }
 
@@ -583,8 +586,9 @@ class CourseController extends AppController
                 'name' => $assessment['name'],
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
-                'reviewDateString' => $assessment['reviewdate']
-                );
+                'reviewDateString' => $assessment['reviewdate'],
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'))
+            );
         }
         return $this->successResponse($assessmentArray);
     }

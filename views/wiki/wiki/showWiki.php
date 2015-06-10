@@ -9,7 +9,6 @@ echo $this->render('_toolbar',['course'=> $course]);
 $lasteditedby = $userData->FirstName.',' .$userData->LastName;
 foreach($wikiRevisionData as $key => $singleData) {
 $time = $singleData->time;
-
 $lastedittime = AppUtility::tzdate("F j, Y, g:i a", $time);
 $numrevisions = $singleData->id;
 }?>
@@ -17,8 +16,18 @@ $numrevisions = $singleData->id;
 <p><span id="revisioninfo">Revision <?php echo $numrevisions; ?>
        <?php if ($numrevisions>0) {
 	echo ".  Last edited by $lasteditedby on $lastedittime.";
-} ?>
+}
+?>
 </span>
+<?php
+if ($numrevisions>1) {
+    $last = $numrevisions-1;
+    echo '<span id="prevrev"><input type="button" value="Show Revision History" onclick="initrevisionview()" /></span>';
+    echo '<span id="revcontrol" style="display:none;"><br/>Revision history: <a href="#" id="first" onclick="jumpto(1)">First</a> <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
+    echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a> <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a> <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
+    echo '</span>';
+}
+?>
 <div class="editor">
     <span>
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
@@ -30,3 +39,16 @@ $numrevisions = $singleData->id;
             </div>
     <?php }?>
 </div>
+<script>
+    $(document).ready(function(){
+        $(function() {
+            $("#prevrev").click(function() {
+//                $("#prevrev").toggle();
+                $("#revcontrol").toggle();
+            });
+        });
+
+    });
+
+</script>
+</script>

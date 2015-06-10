@@ -2,11 +2,11 @@ $(document).ready(function(){
 
     //Display Calender
 
-        var date = new Date();
-        var d = date.getDate();
-        var m = date.getMonth();
-        var y = date.getFullYear();
-        calendar();
+    var date = new Date();
+    var d = date.getDate();
+    var m = date.getMonth();
+    var y = date.getFullYear();
+    calendar();
 
     //Show Dialog Pop Up for Assessment time
 
@@ -42,94 +42,95 @@ $(document).ready(function(){
     });
 
 });
-    // Display calendar
-    function calendar() {
-        var htmlMsg = "<div>Assessment</div>";
-        var courseId = $('.calender-course-id').val();
-        var now = $('.current-time').val();
-        var reviewDateH = $('.review-date').val();
-        var endDateH = $('.end-date').val();
-        var startDateH = $('.start-date').val();
+// Display calendar
+function calendar() {
+    var htmlMsg = "<div>Assessment</div>";
+    var courseId = $('.calender-course-id').val();
+    var now = $('.current-time').val();
+    var reviewDate = $('.review-date').val();
+    var endDate = $('.end-date').val();
+    var startDate = $('.start-date').val();
 
-        $('.calendar').fullCalendar({
-            height: 400,
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            editable: false,
-            events: function (start, end, timezone, callback) {
-                $.ajax({
-                    url: 'get-assessment-data-ajax',
-                    data: {
-                        cid: courseId
-                    },
-                    success: function (response) {
-                        response = JSON.parse(response);
-                        var assessmentData = response.data;
-                        var events = [];
+    $('.calendar').fullCalendar({
+        height: 400,
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        editable: false,
+        events: function (start, end, timezone, callback) {
+            $.ajax({
+                url: 'get-assessment-data-ajax',
+                data: {
+                    cid: courseId
+                },
+                success: function (response) {
+                    //console.log(response);
+                    response = JSON.parse(response);
+                    var assessmentData = response.data;
+                    var events = [];
 
-                        $.each(assessmentData, function (index, assessmentDetail) {
-                            var eventColor = 'blue';
-                            if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > now)
-                            {
-                                eventColor = 'red';
-                            }
-                            //alert(assessmentDetail.endDateString < now);
-                            if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > now)
-                            {
-                                alert(assessmentDetail.name);
-                                events.push({
-                                    title: assessmentDetail.name,
-                                    start: assessmentDetail.reviewDate,
-                                    message: 'Review Assessment',
-                                    color: eventColor
-                                });
-                            }
-                            else if(assessmentDetail.endDateString > now && assessmentDetail.startDateString < now)
-                            {
-                                alert(assessmentDetail.name);
-                                events.push({
-                                    title: assessmentDetail.name,
-                                    start: assessmentDetail.endDate,
-                                    message: 'Assessment',
-                                    color: eventColor
-                                });
-                            }
-                        });
-                        callback(events);
-                    }
-                });
-            },
-            eventClick:  function(event, jsEvent, view) {
-                if(endDateH < now && reviewDateH != 0 && reviewDateH > now)
-                {
-                    alert('review');
-                    $('.modal-pop-up-review-date').html(event.html);
-                    $('.modal-pop-up-review-date').dialog({ modal: true, title: event.message,width:350});
+                    $.each(assessmentData, function (index, assessmentDetail) {
+                        var eventColor = 'blue';
+
+                        if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > assessmentDetail.now)
+                        {
+                            eventColor = 'red';
+                        }
+                        //alert(assessmentDetail.endDateString < now);
+                        if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > assessmentDetail.now)
+                        {
+                            events.push({
+                                title: assessmentDetail.name,
+                                start: assessmentDetail.reviewDate,
+                                end:assessmentDetail.endDate,
+                                message: 'Review Assessment',
+                                color: eventColor,
+                                reviewMode: true
+                            });
+                        }
+                        else if(assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now)
+                        {
+                            events.push({
+                                title: assessmentDetail.name,
+                                start: assessmentDetail.endDate,
+                                message: 'Assessment',
+                                color: eventColor
+                            });
+                        }
+                    });
+                    callback(events);
                 }
-                else
-                {
-                    alert('endDate');
-                    $('.modal-pop-up-assessment').html(event.html);
-                    $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
-                }
+            });
+        },
+        eventClick:  function(event, jsEvent, view) {
+            if(event.reviewMode == true)
+            {
+                //$(this).append(event.title);
+                //$(this).append(event.title);
+                $(this).dialog({ modal: true, title: event.message, width:350});
             }
-        });
-    }
+            else
+            {
+                //$(this).append(event.title);
+                $(this).dialog({ modal: true, title: event.message, width:350});
+            }
+        }
+    });
+}
 
 //Response of ajax for calendar
-    function getAssessmentDataRequest(response) {
-        var result = JSON.parse(response);
-        if (result.status == 0) {
-            var tempArray = [];
-            var courseData = result.data;
-            $.each(courseData, function (index, temp) {
-                $.each(temp, function (index, singleValue) {
-                    tempArray.push(singleValue);
-                });
-                calendar(tempArray);
+function getAssessmentDataRequest(response) {
+    var result = JSON.parse(response);
+    if (result.status == 0) {
+        var tempArray = [];
+        var courseData = result.data;
+        $.each(courseData, function (index, temp) {
+            $.each(temp, function (index, singleValue) {
+                tempArray.push(singleValue);
             });
-        }
+            calendar(tempArray);
+        });
     }
+}
