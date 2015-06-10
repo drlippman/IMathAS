@@ -79,6 +79,7 @@ $(document).ready(function(){
                             //alert(assessmentDetail.endDateString < now);
                             if(assessmentDetail.endDateString < now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > now)
                             {
+                                alert(assessmentDetail.name);
                                 events.push({
                                     title: assessmentDetail.name,
                                     start: assessmentDetail.reviewDate,
@@ -88,6 +89,7 @@ $(document).ready(function(){
                             }
                             else if(assessmentDetail.endDateString > now && assessmentDetail.startDateString < now)
                             {
+                                alert(assessmentDetail.name);
                                 events.push({
                                     title: assessmentDetail.name,
                                     start: assessmentDetail.endDate,
@@ -103,11 +105,13 @@ $(document).ready(function(){
             eventClick:  function(event, jsEvent, view) {
                 if(endDateH < now && reviewDateH != 0 && reviewDateH > now)
                 {
+                    alert('review');
                     $('.modal-pop-up-review-date').html(event.html);
                     $('.modal-pop-up-review-date').dialog({ modal: true, title: event.message,width:350});
                 }
                 else
                 {
+                    alert('endDate');
                     $('.modal-pop-up-assessment').html(event.html);
                     $('.modal-pop-up-assessment').dialog({ modal: true, title: event.message,width:350});
                 }

@@ -2,6 +2,7 @@
 $this->title = 'Edit Page';
 $this->params['breadcrumbs'][] = $this->title;
 use app\components\AppUtility;
+AppUtility::dump($userData);
 ?>
 <div class="edit-wiki">
     <h3><b>Edit Wiki: <?php echo $wiki->name;?></h3>

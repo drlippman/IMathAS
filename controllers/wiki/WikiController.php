@@ -45,6 +45,7 @@ class WikiController extends AppController
      */
     public function actionEditPage()
     {
+        $userData = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $wikiId = $this->getParamVal('wikiId');
@@ -63,7 +64,7 @@ class WikiController extends AppController
         }
 
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-        $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime);
+        $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
         return $this->renderWithData('editPage', $responseData);
     }
 

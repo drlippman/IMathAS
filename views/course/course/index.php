@@ -380,9 +380,9 @@ echo $this->render('_toolbar',['course'=> $course]);
                 <?php }?>
             </div>
         </div>
-        <?php } elseif($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) { ?>
     </div>
     <div hidden="" class="modal-pop-up-review-date">
+        <?php } elseif($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) { ?>
         <div class="item">
             <input type="hidden" class="review-date" name="reviewDate" value="<?php echo $assessment->reviewdate; ?>">
             <input type="hidden" class="end-date" name="endDate" value="<?php echo $assessment->enddate; ?>">
