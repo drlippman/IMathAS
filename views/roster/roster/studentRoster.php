@@ -64,9 +64,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="hidden" id="exception-id" name="student-data" value=""/>
         <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
     </form>
-    <form>
-        <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"
-                  id="">Copy Emails</a></span>
+    <form action="copy-student-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">
+        <input type="hidden" id="email-id" name="student-data" value=""/>
+        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+        <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy Emails"></span>
     </form>
     <form>
         <span> <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>" class="btn btn-primary"

@@ -683,37 +683,67 @@ class RosterController extends AppController
                         $student = User::getById($studentId);
                         array_push($studentArray, $student->attributes);
                     }
-                    $this->includeJS(['roster/rosterEmail.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+
+                    $this->includeJS(['roster/rosterEmail.js','editor/tiny_mce.js' , 'editor/tiny_mce_src.js','', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
                     return $this->renderWithData('rosterEmail', $responseData);
                 } else {
                     return $this->redirect('student-roster?cid=' . $courseId);
                 }
-            } else {
+
+            }else{
+                $students = array();
                 $studentArray = array();
-                $students = $selectedStudents['studentInformation'];
-                foreach (unserialize($students) as $student) {
+                $sendToStudents = array();
+                $filteredStudents = array();
+                $studentsInfo = unserialize($selectedStudents['studentInformation']);
+
+                if($selectedStudents['roster-assessment-data']!=0){
+                    $query = AssessmentSession::getStudentByAssessments($selectedStudents['roster-assessment-data']);
+                    if($query){
+                        foreach($query as $entry){
+                            foreach($studentsInfo as $record){
+                                if($entry['userid'] == $record['id']){
+                                    array_push($students,$record['id']);
+                                }
+
+                            }
+                        }
+                    }
+                }
+                foreach($studentsInfo as $student){
+                    if (!in_array($student['id'],$students)) {
+                        array_push($filteredStudents,$student['id']);
+
                     $tempArray = array(
                         'firstName' => $student['FirstName'],
                         'lastName' => $student['LastName'],
                         'emailId' => $student['email'],
-                        'userId' => $student['id']
+                        'userId' => $student['id'],
                     );
                     array_push($studentArray, $tempArray);
+                    $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
+                    array_push($sendToStudents, $sendto);
+                    }
                 }
+                $toList = implode("<br>",$sendToStudents);
                 $message = $selectedStudents['message'];
                 $subject = $selectedStudents['subject'];
-                if ($selectedStudents['emailCopyToSend'] == 'singleStudent') {
-                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
-                } elseif ($selectedStudents['emailCopyToSend'] == 'selfStudent') {
-                    AppUtility::sendMail($subject, $message, $emailSender['email']);
-                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
-                } elseif ($selectedStudents['emailCopyToSend'] == 'allTeacher') {
+                $courseId = $selectedStudents['courseId'];
+                $course = Course::getById($courseId);
+                $messageToTeacher = $message.addslashes("<p>Instructor note: Email sent to these students from course $course->name: <br>$toList\n");
+                if($selectedStudents['emailCopyToSend'] == 'singleStudent'){
+                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
+                }elseif($selectedStudents['emailCopyToSend'] == 'selfStudent'){
+                    AppUtility::sendMail($subject, $messageToTeacher, $emailSender['email']);
+                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
+                }elseif($selectedStudents['emailCopyToSend'] == 'allTeacher'){
                     $instructors = Teacher::getTeachersById($selectedStudents['courseId']);
                     foreach ($instructors as $instructor) {
                         AppUtility::sendMail($subject, $message, $instructor->user->email);
                     }
-                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
+                    $this->sendEmailToSelectedUser($subject,$messageToTeacher, $studentArray);
+
                 }
                 return $this->redirect('student-roster?cid=' . $courseId);
             }
@@ -861,7 +891,6 @@ class RosterController extends AppController
                 AppUtility::dump($this->getRequestParams());
             }
         }
-
     }
 
     public  function actionSaveCsvFileAjax()
@@ -879,6 +908,35 @@ class RosterController extends AppController
         }
         $this->setSuccessFlash('Imported student successfully.');
         return $this->successResponse();
+    }
+
+    public function actionCopyStudentEmail(){
+        if($this->isPost()){
+            $selectedStudents = $this->getRequestParams();
+            $selectedStudentId = explode(',',$selectedStudents['student-data']);
+//            AppUtility::dump($selectedStudentId);
+            $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
+            $course = Course::getById($courseId);
+            $studentArray = array();
+            $studentData = array();
+            foreach ($selectedStudentId as $studentId){
+                $student = User::getById($studentId);
+                array_push($studentArray,$student);
+            }
+            foreach($studentArray as $student){
+
+                $sendto = trim(ucfirst($student['LastName'])." ".ucfirst($student['FirstName']))." < ".$student['email'].">;" ;
+                array_push($studentData, $sendto);
+            }
+            $studentList = implode($studentData);
+            $responseData = array('studentData' => $studentList,'course' => $course);
+            $this->includeJS(['general.js']);
+            return $this->renderWithData('copyStudentEmail', $responseData);
+        }else{
+            $courseId = $this->getParamVal('cid');
+            return $this->redirect('student-roster?cid='.$courseId);
+        }
+
     }
 }
 
