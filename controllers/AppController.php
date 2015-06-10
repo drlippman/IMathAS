@@ -150,4 +150,12 @@ class AppController extends Controller
         return Yii::$app->request->post();
     }
 
+    public function setReferrer()
+    {
+        $referrer = Yii::$app->request->getReferrer();
+        if ($referrer) {
+            Yii::$app->session->set('referrer', $referrer);
+        }
+    }
+
 }

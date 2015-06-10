@@ -5,7 +5,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Forums';
 
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->request->getReferrer())]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->session->get('referrer'))]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!-- DataTables CSS -->

@@ -36,6 +36,7 @@ class ForumController extends AppController
         $model->thread = 'subject';
         $this->includeCSS(['forums.css','dashboard.css']);
         $this->includeJS(['forum/forum.js','general.js?ver=012115']);
+        $this->setReferrer();
         $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user,'course' => $course);
         return $this->renderWithData('forum',$responseData);
     }

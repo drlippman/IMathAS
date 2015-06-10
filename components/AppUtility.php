@@ -1207,7 +1207,7 @@ class AppUtility extends Component
 
     public static function getRefererUri($refere){
         $home = self::getHomeURL();
-        $absUrl = str_replace('http://localhost', '', $refere);
+        $absUrl = str_replace(Yii::$app->request->hostInfo, '', $refere);
         $refereUri = str_replace($home, '', $absUrl);
         return $refereUri;
     }
