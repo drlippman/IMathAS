@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers;
+use app\components\AppUtility;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 
@@ -39,13 +40,16 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
               </div><div class="end pull-left select-text-margin right">at</div>
             <div class="col-lg-4" id="timepicker-id" >
                 <?php
+
                 echo TimePicker::widget([
                     'name' => 'datetime_1',
                     'options' => ['placeholder' => 'Select operating time ...'],
                     'convertFormat' => true,
+                    'value' => date('g:i A'),
                     'pluginOptions' => [
                         'format' => 'd-M-Y g:i A',
-                        'todayHighlight' => true
+                        'todayHighlight' => true,
+                        'interval' => 1
                     ]
                 ]);
                 ?>
