@@ -37,8 +37,13 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
                 <?php
                     foreach($existingExceptions as $entry){
                         echo "<ul><li>".$entry['Name']."<ul>";
+                            natsort($entry['assessments']);
                             foreach($entry['assessments'] as $singleAssessment){
-                                echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".') '."</li>";
+                                echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".')';
+                                    if ($singleAssessment['waivereqscore']==1) {
+                                        echo ' <i>('._('waives prereq').')</i>';
+                                    }
+                                echo "</li>";
                             }
                         echo "</ul></li>";
                 ?>

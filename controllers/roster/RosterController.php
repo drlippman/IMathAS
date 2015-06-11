@@ -893,7 +893,7 @@ class RosterController extends AppController
                             foreach($assessments as $singleAssessment){
                                 $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                                 if($query){
-                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate));
+                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
                                     array_push($exceptionList,$tempArray);
                                 }
                             }
@@ -920,14 +920,15 @@ class RosterController extends AppController
                     if($params['addexc']){
                         $startException = strtotime($params['startDate'].' '.$params['startTime']);
                         $endException = strtotime($params['endDate'].' '.$params['endTime']);
+                        $waivereqscore = (isset($params['waivereqscore']))?1:0;
+                        foreach($studentArray as $student){
                         foreach($params['addexc'] as $assessment){
-                            foreach($studentArray as $student){
                                 $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
                                 if($presentException){
-                                    Exceptions::modifyExistingException($student['id'], $assessment,$startException,$endException);
+                                    Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waivereqscore);
                                 }
                                 else{
-                                    $param = array('userid' =>$student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException);
+                                    $param = array('userid' =>$student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
                                     $exception = new Exceptions();
                                     $exception->create($param);
                                 }
@@ -939,7 +940,7 @@ class RosterController extends AppController
                         foreach($assessments as $singleAssessment){
                             $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                             if($query){
-                                $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate));
+                                $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
                                 array_push($exceptionList,$tempArray);
                             }
                         }
@@ -948,10 +949,9 @@ class RosterController extends AppController
                             array_push($exceptionArray,$assessmentList);
                         }
                     }
-
                 }
-            $this->includeCSS(['site.css']);
-            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
+                $this->includeCSS(['site.css']);
+                $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
             return $this->renderWithData('makeException', $responseData);
         }
             return $this->redirect('student-roster?cid=' . $courseId);
@@ -960,8 +960,6 @@ class RosterController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         }
     }
-
-
     public  function actionSaveCsvFileAjax()
     {
         $params = $this->getBodyParams();
@@ -1140,6 +1138,7 @@ class RosterController extends AppController
         $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId);
         return $this->renderWithData('activityLog',$responseData);
     }
+
     public  function actionLockUnlockAjax()
     {
         $params = $this->getBodyParams();

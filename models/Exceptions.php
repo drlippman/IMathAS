@@ -30,11 +30,12 @@ class Exceptions extends BaseImasExceptions
         return static::findOne(['assessmentid' => $assessmentId, 'userid' => $userId]);
     }
 
-    public static function modifyExistingException($userId, $assessmentId, $startdate, $enddate)
+    public static function modifyExistingException($userId, $assessmentId, $startdate, $enddate, $waivereqscore)
     {
         $exception = Exceptions::getByAssessmentIdAndUserId($userId,$assessmentId);
         $exception->startdate = $startdate;
         $exception->enddate = $enddate;
+        $exception->waivereqscore = $waivereqscore;
         $exception->save();
     }
 
