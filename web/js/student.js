@@ -19,7 +19,7 @@ $(document).ready(function(){
         var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click OK to start or continue working on the assessment.</div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
-        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog({
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
@@ -70,7 +70,6 @@ function calendar() {
                     response = JSON.parse(response);
                     var assessmentData = response.data;
                     var events = [];
-
                     $.each(assessmentData, function (index, assessmentDetail) {
                         var eventColor = 'blue';
 
@@ -84,17 +83,25 @@ function calendar() {
                             events.push({
                                 title: assessmentDetail.name,
                                 start: assessmentDetail.reviewDate,
+                                reviewDat: assessmentDetail.reviewDate,
                                 end:assessmentDetail.endDate,
                                 message: 'Review Assessment',
+                                courseId: assessmentDetail.courseId,
+                                assessmentId: assessmentDetail.assessmentId,
                                 color: eventColor,
                                 reviewMode: true
+
                             });
+
                         }
                         else if(assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now)
                         {
                             events.push({
                                 title: assessmentDetail.name,
                                 start: assessmentDetail.endDate,
+                                startDat: assessmentDetail.endDate,
+                                courseId: assessmentDetail.courseId,
+                                assessmentId: assessmentDetail.assessmentId,
                                 message: 'Assessment',
                                 color: eventColor
                             });
@@ -107,18 +114,29 @@ function calendar() {
         eventClick:  function(event, jsEvent, view) {
             if(event.reviewMode == true)
             {
-                //$(this).append(event.title);
-                //$(this).append(event.title);
-                $(this).dialog({ modal: true, title: event.message, width:350});
+                $("#demo").empty();
+                var title = "<p>" +event.title+"</p>";
+                var dateH = "Showing as Review until  " +event.reviewDat+"";
+                var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
+                var ass = title + dateH;
+                $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>Showing as Review until  " +event.reviewDat+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350});
             }
             else
             {
-                //$(this).append(event.title);
-                $(this).dialog({ modal: true, title: event.message, width:350});
+                $("#demo").empty();
+                var title = "<p><a href='../../assessment/assessment/show-assessment?id="+event.assessmentId+" '>"+event.title+"</a><br></p>";
+                var dateH = "Due " +event.startDat+"";
+                var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
+                var assessment =  title+" "+dateH;
+                $("#demo").append("<div> "+assessmentLogo+" "+title+" <br>"+dateH+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350});
             }
+            $(this).close();
         }
     });
 }
+
 
 //Response of ajax for calendar
 function getAssessmentDataRequest(response) {

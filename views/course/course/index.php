@@ -359,12 +359,8 @@ case 'Assessment': ?>
     <!-- Calender Here-->
 <?php case 'Calendar':?>
     <div class ='calendar'>
-        <div hidden="" class="modal-pop-up-review-date">
 
-        </div>
-        <div hidden="" class="modal-pop-up-assessment">
-
-        </div>
+    </div>
     <?php break; ?>
 
     <!--  Block here-->
@@ -935,5 +931,8 @@ case 'Assessment': ?>
 <?php }?>
 </div>
 
+
+<div id="demo">
+</div>
 
 

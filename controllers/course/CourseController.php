@@ -587,7 +587,9 @@ class CourseController extends AppController
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate'],
-                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'))
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
+                'assessmentId' => $assessment['id'],
+                'courseId' => $assessment['courseid']
             );
         }
         return $this->successResponse($assessmentArray);

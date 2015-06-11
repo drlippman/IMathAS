@@ -22,10 +22,9 @@ $numrevisions = $singleData->id;
 <?php
 if ($numrevisions>1) {
     $last = $numrevisions-1;
-    echo '<span id="prevrev"><input type="button" value="Show Revision History" onclick="initrevisionview()" /></span>';
+    echo '<span id="prevrev"><input type="button" value="Show Revision History"/></span>';
     echo '<span id="revcontrol" style="display:none;"><br/>Revision history: <a href="#" id="first" onclick="jumpto(1)">First</a> <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
-    echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a> <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a> <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
-    echo '</span>';
+    echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a> <a href="#" class="grayout" id="last" onclick="first()">Last</a> <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
 }
 ?>
 <div class="editor">
@@ -49,6 +48,13 @@ if ($numrevisions>1) {
         });
 
     });
+    function first()
+    {
+//        var x = $(".wikicontent").text;
+//        alert(x);
+        $("#last").click(function(){
+            $(".wikicontent").hide();
+        });
+    }
 
-</script>
 </script>
