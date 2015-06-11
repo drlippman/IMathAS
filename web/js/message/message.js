@@ -116,16 +116,22 @@ function courseDisplay(courseData) {
 function markAsUnread() {
     $('#mark-as-unread').click(function () {
         var markArray = [];
-        if(markArray.length != 0) {
-            $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                $(this).closest('tr').css('font-weight', 'bold');
-                markArray.push($(this).val());
-                $(this).prop('checked', false);
-            });
-            var readMsg = {checkedMsg: markArray};
-            jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
-        } else {
-            alert("Nothing to Unread");
+
+
+        $('.message-table-body input[name="msg-check"]:checked').each(function () {
+            $(this).closest('tr').css('font-weight', 'bold');
+            markArray.push($(this).val());
+            $(this).prop('checked', false);
+        });
+        if( markArray.length !=0){
+        var readMsg = {checkedMsg: markArray};
+        jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+    }
+        else {
+
+            var msg ="Select atleast one message to unread";
+            CommonPopUp(msg);
+
         }
     });
 }
@@ -135,18 +141,29 @@ function markAsUnreadSuccess(response) {
 
 function markAsRead() {
     $("#mark-read").click(function () {
+
         var markArray = [];
-        if(markArray.length != 0){
+
+
+
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
             $(this).closest('tr').css('font-weight', 'normal');
             $(this).prop('checked', false);
         });
+        if( markArray.length !=0){
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-read-ajax', readMsg, 'markAsReadSuccess');
-        }else{
-            alert('Nothing to Read');
+
+
+    }
+        else {
+
+            var msg ="Select atleast one message to read";
+            CommonPopUp(msg);
         }
+
+
     });
 }
 
@@ -229,7 +246,9 @@ function markAsDelete() {
             });
         }
         else {
-            alert("Nothing to delete");
+
+            var msg ="Select atleast one message to delete";
+            CommonPopUp(msg);
         }
     });
 }
