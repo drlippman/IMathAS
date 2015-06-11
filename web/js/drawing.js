@@ -25,7 +25,7 @@ var curTarget = null;
 var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
-var imasroot = "/openmath/web";
+var imasroot = "";
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -1408,7 +1408,7 @@ function initCanvases(k) {
 					}
 				}
 			}
-			addTarget(canvases[i][0],'canvas'+canvases[i][0],'/openmath/filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
+			addTarget(canvases[i][0],'canvas'+canvases[i][0],'../../../filter/graph/imgs/'+canvases[i][1],'qn'+canvases[i][0],canvases[i][2],canvases[i][3],canvases[i][4],canvases[i][5],canvases[i][6],canvases[i][7],canvases[i][8],canvases[i][9],canvases[i][10],canvases[i][11],canvases[i][12]);
 		}
 	}
 	
