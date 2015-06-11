@@ -392,7 +392,8 @@ class AppUtility extends Component
 //        Displays date and time
     public static function parsedatetime($date, $time)
     {
-        global $tzoffset, $tzname;
+        $tzoffset = self::getTimezoneOffset();
+        $tzname = self::getTimezoneName();
         preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
         if (count($tmatches) == 0) {
@@ -415,7 +416,8 @@ class AppUtility extends Component
 //    Displays only time
     public static function parsetime($time)
     {
-        global $tzoffset, $tzname;
+        $tzoffset = self::getTimezoneOffset();
+        $tzname = self::getTimezoneName();
         preg_match('/(\d+)\s*:(\d+)\s*(\w+)/', $time, $tmatches);
         if (count($tmatches) == 0) {
             preg_match('/(\d+)\s*([a-zA-Z]+)/', $time, $tmatches);
@@ -1124,7 +1126,7 @@ class AppUtility extends Component
             }
 
             if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
-                $responseString .= "<img alt='untried' src='".AppUtility::getHomeURL()."/img/te_blue_arrow.png'/> ";
+                $responseString .= "<img alt='untried' src='".AppUtility::getHomeURL()."img/te_blue_arrow.png'/> ";
             } else if (canimprove($i) && !$noindivscores) {
                 if ($thisscore==0 || $noindivscores) {
                     $responseString .= "<img alt=\"incorrect - can retry\" src='".AppUtility::getHomeURL()."img/te_red_redo.png'/> ";
