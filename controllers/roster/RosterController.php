@@ -952,6 +952,7 @@ class RosterController extends AppController
                 }
                 $this->includeCSS(['site.css']);
                 $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
+
             return $this->renderWithData('makeException', $responseData);
         }
             return $this->redirect('student-roster?cid=' . $courseId);
@@ -960,6 +961,7 @@ class RosterController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         }
     }
+
     public  function actionSaveCsvFileAjax()
     {
         $params = $this->getBodyParams();
@@ -982,7 +984,6 @@ class RosterController extends AppController
     if ($this->isPost()) {
         $selectedStudents = $this->getRequestParams();
         $selectedStudentId = explode(',', $selectedStudents['student-data']);
-//            AppUtility::dump($selectedStudentId);
         $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
         $course = Course::getById($courseId);
         $studentArray = array();
@@ -1056,11 +1057,7 @@ class RosterController extends AppController
             $assessmentIds = array_unique($lookups['as']);
             foreach($assessmentIds as $id){
                 $query = Assessments::getByAssessmentId($id);
-                $tempArray =array(
-                    'assesssmentId' => $query['id'],
-                    'assessmentName' => $query['name']
-                );
-                array_push($asnames,$tempArray);
+                $asnames[ $query['id']] = $query['name'];
             }
         }
         $innames = array();
@@ -1068,11 +1065,7 @@ class RosterController extends AppController
             $inlineTextIds = array_unique($lookups['in']);
             foreach($inlineTextIds as $id){
                 $query = InlineText::getById($id);
-                $tempArray =array(
-                    'inlineTextId' => $query['id'],
-                    'inlineTextName' => $query['title']
-                );
-                array_push($innames,$tempArray);
+                $innames[$query['id']] = $query['title'];
             }
         }
         $linames = array();
@@ -1080,11 +1073,7 @@ class RosterController extends AppController
             $linkTextIds = array_unique($lookups['li']);
             foreach($linkTextIds as $id){
                 $query = Links::getById($id);
-                $tempArray =array(
-                    'linkTextId' => $query['id'],
-                    'linlkTextName' => $query['title']
-                );
-                array_push($linames,$tempArray);
+                $linames[$query['id']] = $query['title'];
             }
         }
         $winames = array();
@@ -1092,35 +1081,23 @@ class RosterController extends AppController
             $wikiIds = array_unique($lookups['wi']);
             foreach($wikiIds as $id){
                 $query = Wiki::getById($id);
-                $tempArray =array(
-                    'wikiId' => $query['id'],
-                    'wikiName' => $query['name']
-                );
-                array_push($winames,$tempArray);
+                $winames[$query['id']] = $query['name'];
             }
         }
         $exnames = array();
         if (count($lookups['ex'])>0) {
             $extraCredit = array_unique($lookups['ex']);
             foreach($extraCredit as $id){
-                $query = Questions::getByExtraCredit($id);
-                $tempArray =array(
-                    'extraId' => $query['id'],
-                    'extraName' => $query['assessmentid']
-                );
-                array_push($exnames,$tempArray);
+                $query = Questions::getById($id);
+                $exnames[$query['id']] = $query['assessmentid'];
             }
         }
         $fpnames = array();
         if (count($lookups['fo'])>0) {
             $forumPosts = array_unique($lookups['fo']);
             foreach($forumPosts as $id){
-                $query = ForumPosts::getbyidpost($id);
-                $tempArray =array(
-                    'forumPostId' => $query['id'],
-                    'forumPostName' => $query['subject']
-                );
-                array_push($fpnames,$tempArray);
+                $query = ForumPosts::getPostById($id);
+                $fpnames[$query['id']]= $query['subject'];
             }
         }
         $forumnames = array();
@@ -1128,14 +1105,79 @@ class RosterController extends AppController
             $forums = array_unique($lookups['fo']);
             foreach($forums as $id){
                 $query = Forums::getById($id);
-                $tempArray =array(
-                    'forumId' => $query['id'],
-                    'forumName' => $query['name']
-                );
-                array_push($forumnames,$tempArray);
+                $forumnames[$query['id']] = $query['name'];
             }
         }
-        $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId);
+
+//            echo '<tr>';
+//            echo '<td>'.AppUtility::tzdate("l, F j, Y, g:i a",$record['viewtime']).'</td>';
+//            echo '<td>';
+//            switch ($record['type']) {
+//                case 'inlinetext':
+//                    echo 'In inline text item '.$innames['inlineTextName'].', clicked link to '.$thelink;
+//                    break;
+//                case 'linkedsum':
+//                    echo 'From linked item '.$linames['linlkTextName'].' summary, clicked link to '.$thelink;
+//                    break;
+//                case 'linkedlink':
+//                    if ($record['info']==$record['typeid'] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$record['typeid'])!==false)) {
+//                        echo 'Opened linked text item '.$linames['linlkTextName'];
+//                    } else {
+//                        echo 'Clicked linked item <a target="_blank" href="'.$href.'">'.$linames['linlkTextName'].'</a>';
+//                    }
+//                    break;
+//                case 'linkedintext':
+//                    echo 'In linked text '.$linames['linlkTextName'].', clicked link to '.$thelink;
+//                    break;
+//                case 'linkedviacal':
+//                    if ($record['info']==$record['typeid'] || (strpos($href,'showlinkedtext')!==false && strpos($href,'id='.$record['typeid'])!==false)) {
+//                        echo 'Via calendar, opened linked text item '.$linames['linlkTextName'];
+//                    } else {
+//                        echo 'Via calendar, clicked linked item <a target="_blank" href="'.$href.'">'.$linames['linlkTextName'].'</a>';
+//                    }
+//                    break;
+//                case 'extref':
+//                    $p = explode(': ',$record['info']);
+//                    echo 'In assessment '.$exnames['extraName'].', clicked help for <a target="_blank" href="'.$p[1].'">'.$p[0].'</a>';
+//                    break;
+//                case 'assessintro':
+//                    echo 'In assessment '.$asnames['assessmentName'].' intro, clicked link to '.$thelink;
+//                    break;
+//                case 'assesssum':
+//                    echo 'In assessment '.$asnames['assessmentName'].' summary, clicked link to '.$thelink;
+//                    break;
+//                case 'assess':
+//                    echo 'Opened assessment '.$asnames['assessmentName'];
+//
+//                    break;
+//                case 'assesslti':
+//                    echo 'Opened assessment '.$asnames['assessmentName'].' via LTI';
+//                    break;
+//                case 'assessviacal':
+//                    echo 'Via calendar, opened assessment '.$asnames['assessmentName'];
+//                    break;
+//                case 'wiki':
+//                    echo 'Opened wiki '.$winames['wikiName'];
+//                    break;
+//                case 'wikiintext':
+//                    echo 'In wiki '.$winames['wikiName'].', clicked link to '.$thelink;
+//                    break;
+//                case 'forumpost':
+//                    $fp = explode(';',$record['info']);
+//                    echo 'New post <a target="_blank" href="../forums/posts.php?cid='.$courseId.'&forum='.$fp[0].'&thread='.$record['typeid'].'">'.$fpnames['forumPostName'].'</a> in forum '.$forumnames[$fp[0]];
+//                    break;
+//                case 'forumreply':
+//                    $fp = explode(';',$record['info']);
+//                    echo 'New reply <a target="_blank" href="../forums/posts.php?cid='.$courseId.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames['forumPostName'].'</a> in forum '.$forumnames[$fp[0]];
+//                    break;
+//                case 'forummod':
+//                    $fp = explode(';',$record['info']);
+//                    echo 'Modified post/reply <a target="_blank" href="../forums/posts.php?cid='.$courseId.'&forum='.$fp[0].'&thread='.$fp[1].'">'.$fpnames['forumPostName'].'</a> in forum '.$forumnames[$fp[0]];
+//                    break;
+//            }
+//        }
+        $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId,'exnames' => $exnames,'fpnames' => $fpnames,
+                             'actions' => $actions,'asnames'=>$asnames ,'innames' => $innames,'linames'=> $linames,'winames' => $winames,'forumnames' => $forumnames);
         return $this->renderWithData('activityLog',$responseData);
     }
 

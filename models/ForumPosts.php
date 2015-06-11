@@ -83,4 +83,10 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
 
     }
+
+    public static function getPostById($Id)
+    {
+        $ForumPost = ForumPosts::findOne(['id' => $Id]);
+        return $ForumPost;
+    }
 }
