@@ -14,9 +14,9 @@ use app\models\_base\BaseImasExceptions;
 
 class Exceptions extends BaseImasExceptions
 {
-    public static function getByAssessmentId($id)
+    public static function getByAssessmentId($assessmentId)
     {
-        return static::findOne(['assessmentid' => $id]);
+        return static::findOne(['assessmentid' => $assessmentId]);
     }
 
     public function create($param)
@@ -29,4 +29,24 @@ class Exceptions extends BaseImasExceptions
     {
         return static::findOne(['assessmentid' => $assessmentId, 'userid' => $userId]);
     }
+
+    public static function modifyExistingException($userId, $assessmentId, $startdate, $enddate)
+    {
+        $exception = Exceptions::getByAssessmentIdAndUserId($userId,$assessmentId);
+        $exception->startdate = $startdate;
+        $exception->enddate = $enddate;
+        $exception->save();
+    }
+
+    public static function getById($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
+
+    public static function deleteExceptionById($id)
+    {
+        $exception = Exceptions::getById($id);
+        $exception->delete();
+    }
+
 } 

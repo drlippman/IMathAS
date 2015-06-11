@@ -15,41 +15,37 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
         <input type="hidden" name="isException" value="1"/>
         <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
         <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
+        <input type="hidden" name="section" value='<?php echo $section ?>'/>
         <div><div>
             <?php  if(sizeof((unserialize($studentDetails))) == 1){
-            foreach (unserialize($studentDetails) as $studentDetail) {
-                echo "<h3 class='name pull-left'>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName']);
-                if($section != "")
-                echo "</h3><h4 class='pull-left margin-zero'>&nbsp;(section: ".$section.")</h4>";
-                else{
-                    echo " </h3>";
+                foreach (unserialize($studentDetails) as $studentDetail) {
+                    echo "<h3 class='name pull-left'>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName']);
+                    if($section != "")
+                        echo "</h3><h4 class='pull-left margin-zero'>&nbsp;(section: ".$section.")</h4>";
+                    else{
+                        echo " </h3>";
+                    }
                 }
-            }
             }
             ?>
             </div>
             <br class="form">
-            <div>
             <?php
-
-            if($existingExceptions){
-            echo"<h4>Existing Exceptions</h4><p>Select exceptions to clear</p>"
+                if($existingExceptions){
+                echo " <div><h4>Existing Exceptions</h4><p>Select exceptions to clear</p>"
             ?>
-            <?php
-                foreach($existingExceptions as $entry){
-                    echo "<ul><li>".$entry['Name']."<ul>";
-                        foreach($entry['assessments'] as $singleAssessment){
-//                                AppUtility::dump($singleAssessment['exceptionId']);
-                            echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".') '."</li>";
-                        }
-                    echo "</ul></li>";
-            ?>
-            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' value='Record Changes'>";}
+                <?php
+                    foreach($existingExceptions as $entry){
+                        echo "<ul><li>".$entry['Name']."<ul>";
+                            foreach($entry['assessments'] as $singleAssessment){
+                                echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".') '."</li>";
+                            }
+                        echo "</ul></li>";
+                ?>
+            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' value='Record Changes'></div>";}
             else{
-                echo"<p>No exceptions currently exist for the selected students.</p>";
-            }
-            ?>
-            </div>
+                echo"<p>No exceptions currently exist for the selected students.</p></div>";
+            }?>
         </div>
         <div>
             <h4>Make New Exception</h4>
@@ -57,59 +53,56 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
 
               <div class="col-lg-3 pull-left" id="datepicker-id1" >
                   <?php
-                  echo DatePicker::widget([
-                      'name' => 'First_Date_Picker',
-                      'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                      'value' => date("m-d-Y"),
-                      'pluginOptions' => [
+                     echo DatePicker::widget([
+                          'name' => 'startDate',
+                          'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                          'value' => date("m/d/Y"),
+                          'pluginOptions' => [
                           'autoclose' => true,
-                          'format' => 'mm-dd-yyyy' ]
-                  ]);
+                          'format' => 'mm/dd/yyyy' ]
+                     ]);
                   ?>
               </div><div class="end pull-left select-text-margin right">at</div>
             <div class="col-lg-4" id="timepicker-id" >
                 <?php
-
-                echo TimePicker::widget([
-                    'name' => 'datetime_1',
-                    'options' => ['placeholder' => 'Select operating time ...'],
-                    'convertFormat' => true,
-                    'value' => date('g:i A'),
-                    'pluginOptions' => [
-                        'format' => 'd-M-Y g:i A',
-                        'todayHighlight' => true,
-                    ]
-                ]);
+                    echo TimePicker::widget([
+                        'name' => 'startTime',
+                        'options' => ['placeholder' => 'Select operating time ...'],
+                        'convertFormat' => true,
+                        'value' => date('g:i A'),
+                        'pluginOptions' => [
+                            'format' => "m/d/Y g:i A",
+                            'todayHighlight' => true,
+                        ]
+                    ]);
                 ?>
             </div>
             <br class="form">
-
             <span class="form select-text-margin">Available Until:</span>
-
-                 <div class="col-lg-3 pull-left" id="datepicker-id2" >
-                         <?php
-                         echo DatePicker::widget([
-                             'name' => 'Second_Date_Picker',
-                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                             'value' => date("m-d-Y"),
-                             'pluginOptions' => [
-                                 'autoclose' => true,
-                                 'format' => 'mm-dd-yyyy' ]
-                         ]);
-                         ?>
-                 </div><div class="end pull-left select-text-margin right">at</div>
-            <div class="col-lg-4" id="timepicker-id1" >
+            <div class="col-lg-3 pull-left" id="datepicker-id2" >
                 <?php
-                echo TimePicker::widget([
-                    'name' => 'datetime_2',
-                    'options' => ['placeholder' => 'Select operating time ...'],
-                    'convertFormat' => true,
-                    'value' => date('g:i A','10:00 AM'),
-                    'pluginOptions' => [
-                        'format' => 'd-M-Y g:i A',
-                        'todayHighlight' => true,
-                    ]
-                ]);
+                    echo DatePicker::widget([
+                         'name' => 'endDate',
+                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                         'value' => date("m/d/Y",strtotime("+1 week")),
+                         'pluginOptions' => [
+                              'autoclose' => true,
+                              'format' => 'mm/dd/yyyy' ]
+                         ]);
+                ?>
+                </div><div class="end pull-left select-text-margin right">at</div>
+                <div class="col-lg-4" id="timepicker-id1" >
+                <?php
+                    echo TimePicker::widget([
+                        'name' => 'endTime',
+                        'options' => ['placeholder' => 'Select operating time ...'],
+                        'convertFormat' => true,
+                        'value' =>  date('10:00 AM'),
+                        'pluginOptions' => [
+                            'format' => "m/d/Y g:i A",
+                            'todayHighlight' => true,
+                        ]
+                    ]);
                 ?>
             </div>
             </span>
@@ -137,6 +130,5 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
            <?php } ?></ul>
         </span>
         </div>
-
     </div>
 </form>

@@ -5,8 +5,7 @@ $(document).ready(function () {
     studentUnenroll();
     studentEmail();
     studentMessage();
-
-   // teacherMakeException();
+    teacherMakeException();
     copyStudentEmail();
     jQuerySubmit('student-roster-ajax',{ course_id: course_id }, 'studentRosterSuccess');
 });
@@ -40,7 +39,7 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         if(isSection == true)
         {
             if(student.section == null){
-                html += "<td></td>";
+                html += "<td class='section-class'></td>";
             }else{
             html += "<td class='section-class'>"+student.section+"</td>";
             }
@@ -54,10 +53,10 @@ function showStudentInformation(students,isCode,isSection,imageSize)
             }
 
         }
-        if(student.locked ==0){ html += "<td>"+ capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='locked-student'>"+ capitalizeFirstLetter(student.lastname)+"</td>";}
-        if(student.locked ==0){ html += "<td>"+ capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='locked-student'>"+ capitalizeFirstLetter(student.firstname)+"</td>";}
+        if(student.locked ==0){ html += "<td class = 'LastName'>"+ capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='LastName locked-student '>"+ capitalizeFirstLetter(student.lastname)+"</td>";}
+        if(student.locked ==0){ html += "<td class = 'FirstName'>"+ capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='FirstName locked-student '>"+ capitalizeFirstLetter(student.firstname)+"</td>";}
         html += "<td><a>"+student.email+"</a></td>";
-        html += "<td>"+student.username+"</td>";
+        html += "<td class = 'Username'>"+student.username+"</td>";
         if(student.locked ==0)
         {
             if(student.lastaccess != 0){ html += "<td><a href='login-log?cid=" + courseId + "&uid="+ student.id +"'>"+datecal(student.lastaccess)+"</a></td>"; }
@@ -68,8 +67,8 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         html += "<td><a>Exception</a></td>";
         html += "<td><a>Chg</a></td>";
         if(student.locked == 0) {
-            html += "<td><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
-        else{ html += "<td><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }
+            html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
+        else{ html += "<td class = 'lock-class'><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
@@ -88,7 +87,7 @@ function selectCheckBox(){
     });
     $('.non-locked').click(function(){
         $('#student-information-table input:checkbox').each(function(){
-            if($(this).parent().next().next().next().next().next().next().next().next().next().next().next().text() == "Lock"){
+            if(($(this).parent().siblings('.lock-class').text())== "Lock"){
             $(this).prop('checked',true);
             }else{
                 $(this).prop('checked',false);
@@ -127,7 +126,7 @@ function studentLock(){
         var dataArray = [];
         $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
             markArray.push($(this).val());
-            dataArray.push( $(this).parent().next().next().next().text()+' '+$(this).parent().next().next().next().next().text()+' ('+$(this).parent().next().next().next().next().next().next().text()+')');
+            dataArray.push( $(this).parent().siblings('.LastName').text()+' '+$(this).parent().siblings('.FirstName').text()+' ('+$(this).parent().siblings('.Username').text()+')');
         });
 
         if(markArray.length!=0) {
@@ -183,8 +182,8 @@ function studentUnenroll(){
         var dataArray = [];
         $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
             markArray.push($(this).val());
-            dataArray.push( $(this).parent().next().next().next().text()+' '+$(this).parent().next().next().next().next().text()+
-            ' ('+$(this).parent().next().next().next().next().next().next().text()+')');
+            dataArray.push( $(this).parent().siblings('.LastName').text()+' '+$(this).parent().siblings('.FirstName').text()+
+            ' ('+$(this).parent().siblings('.Username').text()+')');
         });
 
         if(markArray.length!=0) {
@@ -299,7 +298,7 @@ function teacherMakeException(){
         var sectionName;
         $('.student-data-table input[name = "student-information-check"]:checked').each(function() {
             markArray.push($(this).val());
-            sectionName = ($(this).parent().next().text());
+            sectionName = ($(this).parent().siblings('.section-class').text());
         });
         if(markArray.length!=0){
             document.getElementById("exception-id").value = markArray;

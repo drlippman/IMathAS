@@ -874,22 +874,67 @@ class RosterController extends AppController
     public function actionMakeException()
     {
         if($this->getRequestParams()){
-        $courseId = $this->getParamVal('cid');
-            $section = "";
-        $course = Course::getById($courseId);
-        $assessments = Assessments::getByCourseId($courseId);
+            $courseId = $this->getParamVal('cid');
+            $course = Course::getById($courseId);
+            $assessments = Assessments::getByCourseId($courseId);
             $exceptionArray = array();
-        $studentArray = array();
-        if ($this->isPost()) {
-            $selectedStudents = $this->getRequestParams();
-            $section = $selectedStudents['section-data'];
-            $isActionForException = isset($selectedStudents['isException']) ? $selectedStudents['isException'] : 0;
-            if (!$isActionForException) {
-                if ($selectedStudents['student-data'] != '') {
-                    $selectedStudents = explode(',', $selectedStudents['student-data']);
-                    foreach ($selectedStudents as $studentId) {
-                        $student = User::getById($studentId);
-                        array_push($studentArray, $student->attributes);
+            $studentArray = array();
+            if ($this->isPost()) {
+                $params = $this->getRequestParams();
+                $section = $params['section-data'];
+                $isActionForException = isset($params['isException']) ? $params['isException'] : 0;
+                if (!$isActionForException) {
+                    if ($params['student-data'] != '') {
+                        $params = explode(',', $params['student-data']);
+                        foreach ($params as $studentId) {
+                            $student = User::getById($studentId);
+                            array_push($studentArray, $student->attributes);
+                            $exceptionList = array();
+                            foreach($assessments as $singleAssessment){
+                                $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
+                                if($query){
+                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate));
+                                    array_push($exceptionList,$tempArray);
+                                }
+                            }
+                            if($exceptionList){
+                                $assessmentList = array('Name' => ucfirst($student->LastName).', '.ucfirst($student->FirstName), 'assessments' => $exceptionList);
+                                array_push($exceptionArray,$assessmentList);
+                            }
+                        }
+                    } else {
+                        return $this->redirect('student-roster?cid=' . $courseId);
+                    }
+                }else{
+                    $studentArray = unserialize($params['studentInformation']);
+                    $courseId = $params['courseid'];
+                    $course = Course::getById($courseId);
+                    $assessments = Assessments::getByCourseId($courseId);
+                    $section = $params['section'];
+                    $exceptionArray = array();
+                    if($params['clears']){
+                        foreach($params['clears'] as $clearEntry){
+                            Exceptions::deleteExceptionById($clearEntry);
+                        }
+                    }
+                    if($params['addexc']){
+                        $startException = strtotime($params['startDate'].' '.$params['startTime']);
+                        $endException = strtotime($params['endDate'].' '.$params['endTime']);
+                        foreach($params['addexc'] as $assessment){
+                            foreach($studentArray as $student){
+                                $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
+                                if($presentException){
+                                    Exceptions::modifyExistingException($student['id'], $assessment,$startException,$endException);
+                                }
+                                else{
+                                    $param = array('userid' =>$student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException);
+                                    $exception = new Exceptions();
+                                    $exception->create($param);
+                                }
+                            }
+                        }
+                    }
+                    foreach($studentArray as $student){
                         $exceptionList = array();
                         foreach($assessments as $singleAssessment){
                             $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
@@ -897,40 +942,14 @@ class RosterController extends AppController
                                 $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate));
                                 array_push($exceptionList,$tempArray);
                             }
-
                         }
                         if($exceptionList){
-                       $assessmentList = array('Name' => ucfirst($student->LastName).', '.ucfirst($student->FirstName), 'assessments' => $exceptionList);
-                        array_push($exceptionArray,$assessmentList);
+                            $assessmentList = array('Name' => ucfirst($student['LastName']).', '.ucfirst($student['FirstName']), 'assessments' => $exceptionList);
+                            array_push($exceptionArray,$assessmentList);
                         }
                     }
 
-                } else {
-                    return $this->redirect('student-roster?cid=' . $courseId);
                 }
-            }else{
-                $user = $this->getAuthenticatedUser();
-                $studentArray = unserialize($selectedStudents['studentInformation']);
-                $courseId = $selectedStudents['courseid'];
-                $course = Course::getById($courseId);
-                $params = $this->getRequestParams();
-                if($params['addexc']){
-                $startException =strtotime($params['First_Date_Picker'].' '.$params['datetime_1']);
-                $endException = strtotime($params['Second_Date_Picker'].' '.$params['datetime_2']);
-                foreach($params['addexc'] as $assessment){
-                    foreach($studentArray as $student){
-                        $param = array('assessmentid' => $assessment, 'userid' =>$student['id'], 'startdate' => $startException, 'enddate' => $endException);
-//                        AppUtility::dump($param);
-                        $exception = new Exceptions();
-                        $exception->create($param);
-                    }
-                }
-
-
-
-                }
-
-            }
             $this->includeCSS(['site.css']);
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
             return $this->renderWithData('makeException', $responseData);

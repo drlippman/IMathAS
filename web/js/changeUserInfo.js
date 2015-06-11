@@ -1,5 +1,6 @@
 $(document).ready(function(){
     checkConfirmPassword();
+
 });
 
 function checkConfirmPassword(){

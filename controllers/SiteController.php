@@ -351,7 +351,7 @@ class SiteController extends AppController
         $model = new ChangeUserInfoForm();
 
         if ($model->load($this->getPostData()) && $model->checkPassword()) {
-            $params = Yii::$app->request->getBodyParams();
+            $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
 
@@ -360,6 +360,7 @@ class SiteController extends AppController
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
                 $model->remove=0;
                 User::saveUserRecord($params);
+                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
                 User::updateImgByUserId($userid);
             }
             if($model->remove == 1){
