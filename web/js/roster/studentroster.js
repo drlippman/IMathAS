@@ -25,7 +25,7 @@ function studentRosterSuccess(response)
     }
 }
 function showStudentInformation(students,isCode,isSection,imageSize)
-{
+{var courseId =  $( "#course-id" ).val();
     var html = "";
     var courseId =  $( "#course-id" ).val();
     $.each(students, function(index, student){

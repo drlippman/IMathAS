@@ -11,14 +11,20 @@ use app\models\forms\EnrollFromOtherCourseForm;
 use app\models\forms\EnrollStudentsForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\forms\StudentEnrollmentForm;
+use app\models\ForumPosts;
+use app\models\Forums;
+use app\models\InlineText;
+use app\models\Links;
 use app\models\LoginGrid;
 use app\models\LoginLog;
 use app\models\loginTime;
 use app\models\Message;
+use app\models\Questions;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
 use app\models\User;
+use app\models\Wiki;
 use Yii;
 use app\components\AppUtility;
 use app\controllers\AppController;
@@ -160,7 +166,7 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
-        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize, 'courseId' => $courseid );
+        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize );
 
         return $this->successResponse($responseData);
     }
@@ -888,20 +894,17 @@ class RosterController extends AppController
                         foreach($assessments as $singleAssessment){
                             $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                             if($query){
-//                                AppUtility::dump();
                                 $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate));
                                 array_push($exceptionList,$tempArray);
                             }
 
                         }
-//                        AppUtility::dump($exceptionList);
                         if($exceptionList){
                        $assessmentList = array('Name' => ucfirst($student->LastName).', '.ucfirst($student->FirstName), 'assessments' => $exceptionList);
                         array_push($exceptionArray,$assessmentList);
                         }
                     }
 
-//                    AppUtility::dump($exceptionArray);
                 } else {
                     return $this->redirect('student-roster?cid=' . $courseId);
                 }
@@ -911,9 +914,7 @@ class RosterController extends AppController
                 $courseId = $selectedStudents['courseid'];
                 $course = Course::getById($courseId);
                 $params = $this->getRequestParams();
-//                AppUtility::dump($params);
                 if($params['addexc']){
-//                AppUtility::dump($params);
                 $startException =strtotime($params['First_Date_Picker'].' '.$params['datetime_1']);
                 $endException = strtotime($params['Second_Date_Picker'].' '.$params['datetime_2']);
                 foreach($params['addexc'] as $assessment){
@@ -1016,22 +1017,107 @@ class RosterController extends AppController
         $userData = User::getById($userId);
         $userFullName = trim(ucfirst($userData['LastName']).", ".ucfirst($userData['FirstName']));
         $course = Course::getById($courseId);
+        $actions = array();
+        $lookups = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array());
 
         $orderBy = 'viewtime';
         $sortBy = AppConstant::DESCENDING;
         $loginLog = ActivityLog::getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy);
-        $wikiArray = array();
+
         foreach($loginLog as $log){
+            $actions =$loginLog;
            $subType = substr($log['type'],0,2);
-           if($subType == 'as'){
-               $tempArray = array(
-                   'typeId' => $log['typeid'],
-               );
-               array_push($wikiArray,$tempArray);
-           }
+            $lookups[$subType][] = intval($log['typeid']);
 
+            if ($subType=='fo') {
+                $ip = explode(';',$log['info']);
+                $lookups['forums'][] = $ip[0];
+            }
         }
-
+        $asnames = array();
+        if (count($lookups['as'])>0) {
+            $assessmentIds = array_unique($lookups['as']);
+            foreach($assessmentIds as $id){
+                $query = Assessments::getByAssessmentId($id);
+                $tempArray =array(
+                    'assesssmentId' => $query['id'],
+                    'assessmentName' => $query['name']
+                );
+                array_push($asnames,$tempArray);
+            }
+        }
+        $innames = array();
+        if (count($lookups['in'])>0) {
+            $inlineTextIds = array_unique($lookups['in']);
+            foreach($inlineTextIds as $id){
+                $query = InlineText::getById($id);
+                $tempArray =array(
+                    'inlineTextId' => $query['id'],
+                    'inlineTextName' => $query['title']
+                );
+                array_push($innames,$tempArray);
+            }
+        }
+        $linames = array();
+        if (count($lookups['li'])>0) {
+            $linkTextIds = array_unique($lookups['li']);
+            foreach($linkTextIds as $id){
+                $query = Links::getById($id);
+                $tempArray =array(
+                    'linkTextId' => $query['id'],
+                    'linlkTextName' => $query['title']
+                );
+                array_push($linames,$tempArray);
+            }
+        }
+        $winames = array();
+        if (count($lookups['wi'])>0) {
+            $wikiIds = array_unique($lookups['wi']);
+            foreach($wikiIds as $id){
+                $query = Wiki::getById($id);
+                $tempArray =array(
+                    'wikiId' => $query['id'],
+                    'wikiName' => $query['name']
+                );
+                array_push($winames,$tempArray);
+            }
+        }
+        $exnames = array();
+        if (count($lookups['ex'])>0) {
+            $extraCredit = array_unique($lookups['ex']);
+            foreach($extraCredit as $id){
+                $query = Questions::getByExtraCredit($id);
+                $tempArray =array(
+                    'extraId' => $query['id'],
+                    'extraName' => $query['assessmentid']
+                );
+                array_push($exnames,$tempArray);
+            }
+        }
+        $fpnames = array();
+        if (count($lookups['fo'])>0) {
+            $forumPosts = array_unique($lookups['fo']);
+            foreach($forumPosts as $id){
+                $query = ForumPosts::getbyidpost($id);
+                $tempArray =array(
+                    'forumPostId' => $query['id'],
+                    'forumPostName' => $query['subject']
+                );
+                array_push($fpnames,$tempArray);
+            }
+        }
+        $forumnames = array();
+        if (count($lookups['forums'])>0) {
+            $forums = array_unique($lookups['fo']);
+            foreach($forums as $id){
+                $query = Forums::getById($id);
+                $tempArray =array(
+                    'forumId' => $query['id'],
+                    'forumName' => $query['name']
+                );
+                array_push($forumnames,$tempArray);
+            }
+        }
         $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId);
         return $this->renderWithData('activityLog',$responseData);
     }
@@ -1040,6 +1126,4 @@ class RosterController extends AppController
         $params = $this->getBodyParams();
         Student::updateLockOrUnlockStudent($params);
     }
-
 }
-

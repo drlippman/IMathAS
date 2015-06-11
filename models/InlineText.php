@@ -15,11 +15,11 @@ class InlineText extends BaseImasInlinetext
 {
     public static function getByCourseId($courseId)
     {
-        return static::findAll(['courseid' => $courseId]);
+        return InlineText::findAll(['courseid' => $courseId]);
     }
 
     public static function getById($id)
     {
-        return static::findOne(['id' => $id]);
+        return InlineText::findOne(['id' => $id]);
     }
 } 
