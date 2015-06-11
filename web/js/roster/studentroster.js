@@ -27,6 +27,7 @@ function studentRosterSuccess(response)
 function showStudentInformation(students,isCode,isSection,imageSize)
 {
     var html = "";
+    var courseId =  $( "#course-id" ).val();
     $.each(students, function(index, student){
 
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
@@ -66,8 +67,9 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         html += "<td><a>Grades</a></td>";
         html += "<td><a>Exception</a></td>";
         html += "<td><a>Chg</a></td>";
-        if(student.locked == 0) { html += "<td><a>Lock</a></td>"; }
-        else{ html += "<td><a>Unlock</a></td>"; }
+        if(student.locked == 0) {
+            html += "<td><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
+        else{ html += "<td><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
@@ -308,4 +310,48 @@ function teacherMakeException(){
             e.preventDefault();
         }
     });
+}
+var picsize = 0;
+function rotatepics() {
+    picsize = (picsize+1)%3;
+    picshow(picsize);
+}
+function picshow(size) {
+    var course_id =  $( "#course-id" ).val();
+    if (size==0) {
+        els = document.getElementById("student-information").getElementsByTagName("img");
+        for (var i=0; i<els.length; i++) {
+            els[i].style.display = "none";
+        }
+    } else {
+        els = document.getElementById("student-information").getElementsByTagName("img");
+        for (var i=0; i<els.length; i++) {
+            els[i].style.display = "inline";
+            if (size==2) {
+                els[i].style.width = "100px";
+                els[i].style.height = "100px"
+            }
+            if (size==1) {
+                els[i].style.width = "50px";
+                els[i].style.height = "50px";
+            }
+        }
+    }
+
+}
+function lockUnlockStudent(lockOrUnlock,studentId)
+{
+    var courseId =  $( "#course-id" ).val();
+    if(lockOrUnlock == true){
+        lockOrUnlock = 1;
+    }else{
+        lockOrUnlock = 0;
+    }
+    var data = {lockOrUnlock: lockOrUnlock,studentId:studentId,courseId:courseId};
+    jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
+}
+function lockUnlockSuccess(response)
+{
+console.log(response);
+    location.reload();
 }

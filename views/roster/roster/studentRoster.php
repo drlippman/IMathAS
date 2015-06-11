@@ -109,33 +109,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <script type="text/javascript">
-    var picsize = 0;
-    function rotatepics() {
-        picsize = (picsize+1)%3;
-        picshow(picsize);
-    }
-    function picshow(size) {
-        var course_id =  $( "#course-id" ).val();
-        if (size==0) {
-            els = document.getElementById("student-information").getElementsByTagName("img");
-            for (var i=0; i<els.length; i++) {
-                els[i].style.display = "none";
-            }
-        } else {
-            els = document.getElementById("student-information").getElementsByTagName("img");
-            for (var i=0; i<els.length; i++) {
-                els[i].style.display = "inline";
-                    if (size==2) {
-                        els[i].style.width = "100px";
-                        els[i].style.height = "100px"
-                    }
-                if (size==1) {
-                    els[i].style.width = "50px";
-                    els[i].style.height = "50px";
-                }
-            }
-        }
 
-    }
 
 </script>

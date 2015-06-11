@@ -1035,6 +1035,11 @@ class RosterController extends AppController
         $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId);
         return $this->renderWithData('activityLog',$responseData);
     }
+    public  function actionLockUnlockAjax()
+    {
+        $params = $this->getBodyParams();
+        Student::updateLockOrUnlockStudent($params);
+    }
 
 }
 
