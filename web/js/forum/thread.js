@@ -166,6 +166,8 @@ function threadSuccess(response)
 
     if (response.status == 0) {
         var threads = response.data.threadArray;
+        //var uniquesDataArray = response.data.uniquesDataArray;
+
 
         var html = "";
         $.each(threads, function (index, thread) {
@@ -238,7 +240,10 @@ function threadSuccess(response)
 
      $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
-//        var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead><tbody><tr><td>sssss</td><td>'+uniquesDataArray+'</td></tr></tbody></table>';
+        var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead>' +
+            '<tbody><tr><td>sssss</td>' +
+            '<td>uniquesDataArray</td></tr>' +
+            '</tbody></table>';
 
 
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({

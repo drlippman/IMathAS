@@ -30,7 +30,7 @@ function showMessage(messageData, status) {
     if(status == 0)
     {
         $.each(messageData, function (index, msg) {
-
+            console.log(msg);
             if (msg.isread == 1 || msg.isread == 5 || msg.isread == 9 || msg.isread == 13) {
                 html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
             }
@@ -46,10 +46,18 @@ function showMessage(messageData, status) {
             }
             var rowid = msg.id;
             if (msg.isread < 7) {
-                html += "<td><img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                if(msg.hasuserimg == 0 ){
+                    html += "<td><img  class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                }else{
+                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                }
             }
             else {
-                html += "<td><img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+                if(msg.hasuserimg == 0 ){
+                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+                }else{
+                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+                }
             }
             html += "<td>" + msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1) + "</td>";
             html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
@@ -62,6 +70,7 @@ function showMessage(messageData, status) {
     createTableHeader();
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable();
+    $(".images").hide();
 
 }
 
@@ -314,31 +323,33 @@ function changeImage(element, temp, rowId) {
     var row = {rowId: rowId};
     jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
 }
-//var picsize = 0;
-//function rotatepics() {
-//    picsize = (picsize+1)%3;
-//    picshow(picsize);
-//}
-//function picshow(size) {
-//    var course_id =  $( "#course-id" ).val();
-//    if (size==0) {
-//        els = document.getElementById("student-information").getElementsByTagName("img");
-//        for (var i=0; i<els.length; i++) {
-//            els[i].style.display = "none";
-//        }
-//    } else {
-//        els = document.getElementById("student-information").getElementsByTagName("img");
-//        for (var i=0; i<els.length; i++) {
-//            els[i].style.display = "inline";
-//            if (size==2) {
-//                els[i].style.width = "100px";
-//                els[i].style.height = "100px"
-//            }
-//            if (size==1) {
-//                els[i].style.width = "50px";
-//                els[i].style.height = "50px";
-//            }
-//        }
-//    }
-//
-//}
+
+var picsize = 0;
+function rotatepics() {
+    picsize = (picsize+1)%3;
+    picshow(picsize);
+}
+function picshow(size) {
+    var course_id =  $( "#course-id" ).val();
+    if (size==0) {
+        els = document.getElementById("message-table display-message-table").getElementsByClassName("images");
+        for (var i=0; i<els.length; i++) {
+            els[i].style.display = "none";
+        }
+    } else {
+        els = document.getElementById("message-table display-message-table").getElementsByClassName("images");
+        for (var i=0; i<els.length; i++) {
+            els[i].style.display = "inline";
+            if (size==2) {
+                els[i].style.width = "100px";
+                els[i].style.height = "100px"
+            }
+            if (size==1) {
+                els[i].style.width = "50px";
+                els[i].style.height = "50px";
+            }
+        }
+    }
+
+}
+

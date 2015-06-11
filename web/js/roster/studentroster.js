@@ -69,6 +69,7 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         if(student.locked == 0) {
             html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
         else{ html += "<td class = 'lock-class'><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }
+
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
@@ -347,10 +348,35 @@ function lockUnlockStudent(lockOrUnlock,studentId)
         lockOrUnlock = 0;
     }
     var data = {lockOrUnlock: lockOrUnlock,studentId:studentId,courseId:courseId};
-    jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
+    //jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
 }
 function lockUnlockSuccess(response)
 {
 console.log(response);
     location.reload();
 }
+
+$("a[name=lock]").on("click", function () {
+    //var threadsid = $(this).attr("data-var");
+    var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "confirm": function () {
+                $(this).dialog("close");
+                var threadId = threadsid;
+                //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+});

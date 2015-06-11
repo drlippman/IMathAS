@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             | <a id="limit-to-tag-link" href="#">Limit to Tagged</a> <a id="show-all-link" href="#">Show All</a> | <a
                 href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent
                 Messages</a>
-            | <a class="btn btn-primary btn-sm">Picture</a></p>
+            |         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" ></p>
     </div>
     <div>
         <p><span class="select-text-margin pull-left"><b>Filter By Course :</b></span>

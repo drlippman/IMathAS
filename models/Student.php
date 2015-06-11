@@ -99,4 +99,21 @@ public function assignSectionAndCode($newEntry,$id)
     $this->code = $newEntry['4'];
     $this->save();
 }
+    public static function updateLockOrUnlockStudent($params)
+    {
+        $courseId = $params['courseId'];
+        $studentId = $params['studentId'];
+        $student = Student::findOne(['userid' => $studentId,'courseid' => $courseId]);
+        if($params['lockOrUnlock'] == 1){
+            $student->locked = 0;
+            $student->save();
+         }
+        if($params['lockOrUnlock'] == 0)
+        {
+            $student->locked = strtotime(date('F d, o g:i a'));
+            $student->save();
+        }
+
+
+    }
 } 

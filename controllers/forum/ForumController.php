@@ -205,7 +205,6 @@ class ForumController extends AppController
                 $uniquesData = ForumView::getbythreadId($data['threadid']);
                 $count = ForumView::uniqueCount($data['threadid']);
                 $tagged = ForumView::forumViews($data['threadid']);
-
                 if ($tagged[0]['tagged'] == 1) {
                     $temparray = array
                     (
