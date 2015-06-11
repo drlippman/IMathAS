@@ -17,14 +17,18 @@ $("#mess").click(function()
             if (body != ''){
                 jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }else{
+                var msg="Can not send empty message";
+                CommonPopUp(msg);
 
             }
 
         }else{
-            alert('Subject field cannot be blank');
+            var msg="Subject field cannot be blank";
+            CommonPopUp(msg);
         }
     }else{
-        alert('User is not selected');
+        var msg="Please select atleast one user";
+        CommonPopUp(msg);
     }
     });
 });

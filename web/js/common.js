@@ -49,3 +49,27 @@ function init() {
     var foo = initstack[i]();
     }
 }
+
+function CommonPopUp(message)
+{
+
+    var html = '<div><p>'+message+'</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Okay": function () {
+                $('#searchText').val(null);
+
+                $(this).dialog('destroy').remove();
+                return false;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+
+    });
+
+}

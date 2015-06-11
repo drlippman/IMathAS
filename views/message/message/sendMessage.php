@@ -1,13 +1,24 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+use yii\bootstrap\ActiveForm;
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-?><form>
+?>
+
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
 
+<?php $form = ActiveForm::begin([
+    'id' => 'login-form',
+    'options' => [],
+    'action' => '',
+    'fieldConfig' => [
+        'template' => "",
+        'labelOptions' => [],
+    ],
+]); ?>
 <div class="">
     <h2><b>New Message</b></h2>
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
@@ -43,4 +54,4 @@ $this->params['breadcrumbs'][] = $this->title;
         <a class="btn btn-primary" id="mess">Send Message</a>
     </div>
 </div>
-</form>
+<?php ActiveForm::end(); ?>
