@@ -1226,4 +1226,9 @@ class AppUtility extends Component
         return Yii::$app->session->get('tzname');
     }
 
+    public static function getBasePath()
+    {
+        return Yii::$app->getBasePath();
+    }
+
 }

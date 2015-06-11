@@ -1,4 +1,6 @@
 <?php
+use app\components\AppUtility;
+
 $graphfilterdir = rtrim(dirname(__FILE__), '/\\');
 require_once($graphfilterdir."/../../components/mathphp2.php");
 // ASCIIsvgIMG.php
@@ -88,7 +90,8 @@ function AStoIMG($w=200, $h=200) {
 	} else {
 		$this->img = imagecreate($w,$h);
 	}
-	$this->fontfile =  '/var/www/openmath/filter/graph/FreeSerifItalic.ttf';
+
+	$this->fontfile =  AppUtility::getBasePath().'/filter/graph/FreeSerifItalic.ttf';
 	$this->width = $w;
 	$this->height = $h;
 	$this->xunitlength = $w/10;
