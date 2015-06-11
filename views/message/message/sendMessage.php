@@ -33,15 +33,16 @@ $this->params['breadcrumbs'][] = $this->title;
             </option><?php } ?>
         </select>
         </span>
+        <label style="color: red" id="to">Please select atleast one user</label>
     </div>
     <br><br><br>
 
     <div>
         <span class="col-md-1"><b>Subject</b></span>
         <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
+        <label style="color: red"  id="subjecttext">Subject cannot be blank</label>
     </div>
     <br><br><br>
-
     <div>
         <span class="col-md-1"><b>Message</b></span>
         <?php echo "<span class='left col-md-11'><div class= 'editor'>

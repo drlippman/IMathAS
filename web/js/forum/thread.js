@@ -56,6 +56,8 @@ function postSearchSuccess(response)
 
     if (response.status == 0)
     {
+        $('#searchpost').empty();
+        var courseid = $('#courseid').val();
         var postData = response.data.data;
         $.each(postData, function(index, Data)
         {
@@ -67,7 +69,7 @@ function postSearchSuccess(response)
             html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
             html += "</div><div class=blockitems>";
             html += "<label id='message'>"+result+"</label>";
-            html += "<p><a href='#'</a>Show full thread</p>";
+            html += "<p><a href='post?courseid=" + courseid + "&threadid=" + Data.threadId +"&forumid="+ Data.forumiddata+"'</a>Show full thread</p>";
             html += "</div>\n";
             $('#searchpost').append(html);
         });
@@ -78,28 +80,9 @@ function postSearchSuccess(response)
     {
         $('#searchpost').hide();
         $('.forumResult').hide();
-            var html = '<div><p>No result found for your search</p></div>';
-            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons: {
-                    "Okay": function () {
-                        $('#searchText').val(null);
-
-                        $(this).dialog('destroy').remove();
-                        return false;
-                    }
-                },
-                close: function (event, ui) {
-                    $(this).remove();
-                }
-
-            });
-
-
+        var msg ="No result found for your search";
+        CommonPopUp(msg);
     }
-
 }
 
 function postSearchUnchecked(response)
@@ -108,6 +91,8 @@ function postSearchUnchecked(response)
 
     if (response.status == 0)
     {
+        $('#searchpost').empty();
+        var courseid = $('#courseid').val();
         var postData = response.data.data;
         $.each(postData, function(index, Data)
         {
@@ -119,7 +104,7 @@ function postSearchUnchecked(response)
             html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
             html += "</div><div class=blockitems>";
             html += "<label id='message'>"+result+"</label>";
-            html += "<p><a href='#'</a>Show full thread</p>";
+            html += "<p><a href='post?courseid=" + courseid + "&threadid=" + Data.threadId +"&forumid="+ Data.forumiddata+"'</a>Show full thread</p>";
             html += "</div>\n";
             $('#searchpost').append(html);
         });
@@ -130,32 +115,10 @@ function postSearchUnchecked(response)
     {
         $('.forumResult').hide();
         $('#searchpost').hide();
-        var html = '<div><p>No result found for your search</p></div>';
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Okay": function () {
-                    $('#searchText').val(null);
-
-                    $(this).dialog('destroy').remove();
-                    return false;
-                }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-
-        });
-
-
+        var msg ="No result found for your search";
+        CommonPopUp(msg);
     }
-
 }
-
-
-
 function threadSuccess(response)
 {
     response = JSON.parse(response);
@@ -184,10 +147,10 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
                     if (thread.tagged == 0) {
-                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + "  <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId +"&forumid="+ fid+"'>" + (thread.subject) + "</a> " + thread.name+"<img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
                     }
                     else {
-                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + "'>" + (thread.subject) + "</a> " + thread.name + "  <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + thread.threadId + " &forumid="+ fid+"'>" + (thread.subject) + "</a> " + thread.name + "  <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
                     }
 
                     html += "<td>" + count + "</td>";
@@ -240,10 +203,12 @@ function threadSuccess(response)
 
      $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
+
         var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead>' +
             '<tbody><tr><td>sssss</td>' +
             '<td>uniquesDataArray</td></tr>' +
             '</tbody></table>';
+
 
 
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({

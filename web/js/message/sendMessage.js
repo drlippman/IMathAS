@@ -1,5 +1,8 @@
 
 $(document).ready(function () {
+
+    $('#subjecttext').hide();
+    $('#to').hide();
     tinymce.init({
         selector: "textarea",
         toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
@@ -14,21 +17,21 @@ $("#mess").click(function()
     var body = $("#message").val();
     if(receiver != 0){
         if(subject != ''){
-            if (body != ''){
+                $('#subjecttext').hide();
+                $('#to').hide();
                 jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
-            }else{
-                var msg="Can not send empty message";
-                CommonPopUp(msg);
-
-            }
-
         }else{
-            var msg="Subject field cannot be blank";
-            CommonPopUp(msg);
+//            var msg="Subject field cannot be blank";
+//            CommonPopUp(msg);
+            $('#subjecttext').show();
+            $('#to').hide();
+
         }
     }else{
-        var msg="Please select atleast one user";
-        CommonPopUp(msg);
+//        var msg="Please select atleast one user";
+//        CommonPopUp(msg);
+        $('#to').show();
+        $('#subjecttext').hide();
     }
     });
 });
