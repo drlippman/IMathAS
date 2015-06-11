@@ -22,7 +22,8 @@ $(function() {
     $(".trl").attr("title","Transfer course ownership to someone else");
 });
 
-$('#ConfirmDelete').onClick(function() {
-    $('#messageBox').toggle();
-});
+    $('#ConfirmDelete').Click
+    {
+        $('#messageBox').toggle();
+    }
 

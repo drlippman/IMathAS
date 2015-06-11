@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'thread')->inline()->radioList(['subject' => 'All thread subjects' , 'post' => 'All Post']) ?>
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
-            <input type="button" id="forum_search" value="Search"/>
+            <input type="button" id="forum_search" class="btn btn-primary" value="Search"/>
         </div>
     </div>
     <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">

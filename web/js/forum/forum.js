@@ -66,21 +66,27 @@ function postSuccess(response)
     response = JSON.parse(response);
     if (response.status == 0)
     {
+        var html =" ";
+
         var postData = response.data.data;
         $.each(postData, function(index, Data)
         {
-            var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
-            var html = "<div class='block'>";
-            html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
-            html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumname+"</label>)";
-            html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
-            html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
-            html += "</div><div class=blockitems>";
-            html += "<label id='message'>"+result+"</label>";
-            html += "<p><a href='#'</a>Show full thread</p>";
-            html += "</div>\n";
-            $('#searchpost').append(html);
+        var a=0;
+               var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
+                html = "<div class='block'>";
+                html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
+                html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumname+"</label>)";
+                html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
+                html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
+                html += "</div><div class=blockitems>";
+                html += "<label id='message'>"+result+"</label>";
+                html += "<p><a href='#'</a>Show full thread</p>";
+                html += "</div>\n";
+                $('#searchpost').append(html);
+            alert(a);
+                a=a+1;
         });
+
     }
     else
     {
@@ -118,7 +124,7 @@ function threadSuccess(response)
 function forumsSuccess(response) {
 
     response = JSON.parse(response);
-    console.log(response);
+  
     if (response.status == 0)
     {
         var forums = response.data;
@@ -133,19 +139,16 @@ function forumsSuccess(response) {
         var html = "";
         $.each(forums, function (index, forum)
         {
-            if(forum.rights > 10)
-            {
 
+//            if(forum.rights > 10)
+//            {
+//                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
+//                html += "<td>" + forum.threads + "</td>";
+//                html += "<td>" + forum.posts + "</td>";
+//                html += "<td>" + forum.lastPostDate + "</td>";
+//            }
 
-
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
-                html += "<td>" + forum.threads + "</td>";
-                html += "<td>" + forum.posts + "</td>";
-                html += "<td>" + forum.lastPostDate + "</td>";
-
-            }
-
-            else(forum.enddate > forum.currenttime)
+            if(forum.enddate > forum.currenttime)
             {
                 html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
