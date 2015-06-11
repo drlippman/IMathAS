@@ -17,4 +17,9 @@ class Questions extends BaseImasQuestions
     {
         return static::findAll(['assessmentid' => $id]);
     }
+
+    public static function getByExtraCredit($id)
+    {
+        return static::findAll(['extracredit' => $id]);
+    }
 } 

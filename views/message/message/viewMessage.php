@@ -50,7 +50,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
         <a class="btn btn-primary  btn-danger" id="mark-delete"> Delete</a>&nbsp;
         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid); ?>">
             View Conversation </a>&nbsp;
-        <a href="" id="marked"> Gradebook</a>
+        <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>" id="marked"> Gradebook</a>
     <?php } ?>
 
     <?php $sent = $_GET['message'];
