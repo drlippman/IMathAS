@@ -90,7 +90,7 @@ $currentLevel = 0;
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
         <?php if ($index == (count($messages) - 1))
         {
-        for ($i = $DivCount;$i > 0;$i--){
+        for ($i = $DivCount;$i >= 0;$i--){
         ?>
     </div>
 <?php }

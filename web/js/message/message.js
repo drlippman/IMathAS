@@ -116,13 +116,17 @@ function courseDisplay(courseData) {
 function markAsUnread() {
     $('#mark-as-unread').click(function () {
         var markArray = [];
-        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-            $(this).closest('tr').css('font-weight', 'bold');
-            markArray.push($(this).val());
-            $(this).prop('checked', false);
-        });
-        var readMsg = {checkedMsg: markArray};
-        jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+        if(markArray.length != 0) {
+            $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                $(this).closest('tr').css('font-weight', 'bold');
+                markArray.push($(this).val());
+                $(this).prop('checked', false);
+            });
+            var readMsg = {checkedMsg: markArray};
+            jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+        } else {
+            alert("Nothing to Unread");
+        }
     });
 }
 
@@ -132,6 +136,7 @@ function markAsUnreadSuccess(response) {
 function markAsRead() {
     $("#mark-read").click(function () {
         var markArray = [];
+        if(markArray.length != 0){
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
             $(this).closest('tr').css('font-weight', 'normal');
@@ -139,7 +144,9 @@ function markAsRead() {
         });
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-read-ajax', readMsg, 'markAsReadSuccess');
-
+        }else{
+            alert('Nothing to Read');
+        }
     });
 }
 
@@ -288,3 +295,31 @@ function changeImage(element, temp, rowId) {
     var row = {rowId: rowId};
     jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
 }
+//var picsize = 0;
+//function rotatepics() {
+//    picsize = (picsize+1)%3;
+//    picshow(picsize);
+//}
+//function picshow(size) {
+//    var course_id =  $( "#course-id" ).val();
+//    if (size==0) {
+//        els = document.getElementById("student-information").getElementsByTagName("img");
+//        for (var i=0; i<els.length; i++) {
+//            els[i].style.display = "none";
+//        }
+//    } else {
+//        els = document.getElementById("student-information").getElementsByTagName("img");
+//        for (var i=0; i<els.length; i++) {
+//            els[i].style.display = "inline";
+//            if (size==2) {
+//                els[i].style.width = "100px";
+//                els[i].style.height = "100px"
+//            }
+//            if (size==1) {
+//                els[i].style.width = "50px";
+//                els[i].style.height = "50px";
+//            }
+//        }
+//    }
+//
+//}
