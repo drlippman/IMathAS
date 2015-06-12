@@ -25,19 +25,20 @@ function createTableHeader() {
 
 function showMessage(messageData, status) {
     var temp;
+    var cid = $(".send-msg").val();
     var html = "";
     var htmlCourse = "";
     if(status == 0)
     {
         $.each(messageData, function (index, msg) {
-            console.log(msg);
+
             if (msg.isread == 1 || msg.isread == 5 || msg.isread == 9 || msg.isread == 13) {
                 html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
             }
             else {
                 html += "<tr class='unread-message message-row message-row-" + msg.id + "'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
             }
-            html += "<td><a href='view-message?message=0&id=" + msg.id + "'> " + msg.title + "</a></td>";
+            html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> " + msg.title + "</a></td>";
             if (msg.replied == 1) {
                 html += "<th>Yes</th>";
             }

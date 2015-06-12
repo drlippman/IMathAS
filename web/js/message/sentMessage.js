@@ -37,12 +37,13 @@ function showMessageSuccess(response)
 
 function showMessage(messageData, status)
 {
+    var cid = $(".send-course-id").val();
     var html = "";
     var htmlCourse ="";
     if(status == 0){
         $.each(messageData, function(index, msg){
             html += "<tr> <td><input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ></td>";
-            html += "<td><a href='view-message?message=1&id= "+msg.id+"'> "+msg.title+"</a></td>";
+            html += "<td><a href='view-message?message=1&id="+msg.id+"&cid="+cid+"'> "+msg.title+"</a></td>";
             html += "<td>"+msg.FirstName.substr(0,1).toUpperCase()+ msg.FirstName.substr(1)+" "+msg.LastName.substr(0,1).toUpperCase()+ msg.LastName.substr(1)+"</td>";
             if(msg.isread==0)
             {
