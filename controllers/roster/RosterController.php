@@ -62,8 +62,9 @@ class RosterController extends AppController
                 }
             }
         }
-        $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css']);
-        $this->includeJS(['roster/studentroster.js', 'general.js']);
+        
+        $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeJS(['roster/studentroster.js', 'general.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent,'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
 
@@ -882,8 +883,6 @@ class RosterController extends AppController
 
     public function actionMakeException()
     {
-        $courseId = $this->getParamVal('cid');
-
         if($this->getRequestParams()){
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
@@ -928,7 +927,7 @@ class RosterController extends AppController
                             Exceptions::deleteExceptionById($clearEntry);
                         }
                     }
-                    if($params['addexc']){
+                    if(isset($params['addexc'])){
                         $startException = strtotime($params['startDate'].' '.$params['startTime']);
                         $endException = strtotime($params['endDate'].' '.$params['endTime']);
                         $waivereqscore = (isset($params['waivereqscore']))?1:0;
@@ -945,13 +944,24 @@ class RosterController extends AppController
                                 }
                             }
                         }
+                        if (isset($params['eatlatepass'])) {
+                            $n = intval($params['latepassn']);
+                            foreach($studentArray as $student){
+                                Student::reduceLatepasses($student['id'], $courseId, $n);
+                            }
+                        }
+//                        if (isset($params['sendmsg'])) {
+//                            $params['submit'] = "Message";
+//                            require("rosterMessage.php");
+//                            exit;
+//                        }
                     }
                     foreach($studentArray as $student){
                         $exceptionList = array();
                         foreach($assessments as $singleAssessment){
                             $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                             if($query){
-                                $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
+                                $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
                                 array_push($exceptionList,$tempArray);
                             }
                         }
@@ -961,18 +971,20 @@ class RosterController extends AppController
                         }
                     }
                 }
-                $this->includeCSS(['site.css']);
+                $sort_by = array_column($exceptionArray, 'Name');
+                array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $exceptionArray);
+                $sort_by = array_column($studentArray, 'LastName');
+                array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentArray);
                 $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
-
             return $this->renderWithData('makeException', $responseData);
         }
             return $this->redirect('student-roster?cid=' . $courseId);
     }
         else{
              $this->setErrorFlash(AppConstant::NO_USER_FOUND);
-//            return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         }
     }
+
 
     public  function actionSaveCsvFileAjax()
     {

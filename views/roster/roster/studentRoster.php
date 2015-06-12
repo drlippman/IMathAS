@@ -7,46 +7,31 @@ use yii\bootstrap\ActiveForm;
 $this->title = 'Roster';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-
-<link rel="stylesheet" type="text/css"
-      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-<script type="text/javascript" charset="utf8"
-        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 
 <div><h2>Student Roster </h2></div>
 <div class="cpmid">
-
-            <span class="column" style="width:auto;"><a
-                    href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View
-                    Login Grid</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid=' . $course->id); ?>">Assign
-                    Sections and/or Codes</a><br>
-            </span><span class="column" style="width:auto;"><a
-            href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid=' . $course->id); ?>">Manage
-            LatePasses</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid=' . $course->id); ?>">Manage
-                    Tutors</a><br/>
-            </span><span class="column" style="width:auto;"><a
-            href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid=' . $course->id . '&enroll=student'); ?>">Enroll
-            Student with known username</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $course->id); ?>">Enroll
-                    students from another course</a><br/>
-            </span><span class="column" style="width:auto;"><a
-            href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid=' . $course->id); ?>">Import
-            Students from File</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid=' . $course->id); ?>">Create
-                    and Enroll new student</a><br/>
+            <span class="column" style="width:auto;">
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View Login Grid</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid=' . $course->id); ?>">Assign Sections and/or Codes</a><br>
+            </span>
+            <span class="column" style="width:auto;">
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid=' . $course->id); ?>">Manage LatePasses</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid=' . $course->id); ?>">Manage Tutors</a><br/>
+            </span>
+            <span class="column" style="width:auto;">
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid=' . $course->id . '&enroll=student'); ?>">Enroll Student with known username</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $course->id); ?>">Enroll students from another course</a><br/>
+            </span>
+            <span class="column" style="width:auto;">
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid=' . $course->id); ?>">Import Students from File</a><br/>
+                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid=' . $course->id); ?>">Create and Enroll new student</a><br/>
             </span><br class="clear"/>
 </div>
-
 <div class="button-container">
     <form>
-        <span>
-            Check: <a class="check-all" href="#">All</a> /
-                <a class="non-locked" href="#">Non-locked</a> /
-                <a class="uncheck-all" href="#">None</a>
-                With Selected:</span>
+        <span>Check: <a class="check-all" href="#">All</a> / <a class="non-locked" href="#">Non-locked</a> / <a class="uncheck-all" href="#">None</a> With Selected:</span>
     </form>
     <form action="roster-email" method="post" id="roster-form">
         <input type="hidden" id="student-id" name="student-data" value=""/>
@@ -71,12 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy Emails"></span>
     </form>
     <form>
-<!--        <span> <a href="--><?php //echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?><!--"  class="btn btn-primary"-->
-<!--                  id="">Pictures</a></span>-->
         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >
     </form>
 </div>
-
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <table class="student-data-table" id="student-information" >
     <thead>
@@ -110,8 +92,3 @@ $this->params['breadcrumbs'][] = $this->title;
     </tbody>
 </table>
 
-
-<script type="text/javascript">
-
-
-</script>

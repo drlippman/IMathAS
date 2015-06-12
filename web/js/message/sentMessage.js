@@ -140,7 +140,8 @@ function markSentDelete()
         }
         else
         {
-            alert("Nothing to Remove");
+            var msg ="Select atleast one message to delete";
+            CommonPopUp(msg);
         }
     });
 
@@ -227,7 +228,8 @@ function markUnsend() {
         }
         else
         {
-            alert("Nothing to unsend");
+            var msg ="Select atleast one message to delete";
+            CommonPopUp(msg);
         }
     });
 }

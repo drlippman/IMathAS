@@ -7,8 +7,7 @@ $this->title = 'Make Exception';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher');
-date_default_timezone_set("Asia/Calcutta");
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
 <form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
@@ -103,7 +102,7 @@ date_default_timezone_set("Asia/Calcutta");
                         'name' => 'endTime',
                         'options' => ['placeholder' => 'Select operating time ...'],
                         'convertFormat' => true,
-                        'value' =>  date('10:00 AM'),
+                        'value' =>  AppUtility::tzdate("m/d/Y",$now),
                         'pluginOptions' => [
                             'format' => "m/d/Y g:i A",
                             'todayHighlight' => true,

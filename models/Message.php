@@ -70,28 +70,22 @@ class Message extends BaseImasMsgs
     public static function updateRead($msgId)
     {
         $message = Message::getById($msgId);
-        if($message->isread==0)
-        {
+        if($message->isread==0) {
             $message->isread=1;
         }
-        elseif($message->isread==1)
-        {
+        elseif($message->isread==1) {
             $message->isread=1;
         }
-        elseif($message->isread== 4)
-        {
+        elseif($message->isread== 4) {
             $message->isread = 5;
         }
         elseif($message->isread==5){
-
                 $message->isread=5;
         }
         elseif($message->isread==8){
-
             $message->isread=9;
         }
         elseif($message->isread==12){
-
             $message->isread=13;
         }
           $message->save();
@@ -108,63 +102,58 @@ class Message extends BaseImasMsgs
     public static function deleteFromReceivedMsg($msgId)
     {
         $message =Message::getById($msgId);
-        if($message->isread!=4)
+        if($message)
         {
-            if($message->isread==5 )
+            if($message->isread != 4){
+                if($message->isread == 5 ) {
+                    $message->delete();
+                }
+                elseif($message->isread == 1) {
+                    $message->isread = 3;
+                    $message->save();
+                }
+                elseif($message->isread == 0) {
+                    $message->isread = 2;
+                    $message->save();
+               }
+                else{
+                    $message->isread = 3;
+                   $message->save();
+                }
+            }
+            elseif($message->isread==4)
             {
                 $message->delete();
-            }
-            elseif($message->isread==1)
-            {
-                $message->isread=3;
-                $message->save();
-            }
-            elseif($message->isread==0)
-            {
-                $message->isread = 2;
-                $message->save();
-            }
-            else{
-                $message->isread = 3;
-                $message->save();
-            }
-
+             }
         }
-        elseif($message->isread==4)
-        {
-            $message->delete();
-        }
-
-
-
     }
     public static function deleteFromSentMsg($msgId)
     {
         $message =Message::getById($msgId);
-        if($message->isread==2)
-        {
-            $message->delete();
-        }
-        elseif($message->isread==3) {
-            $message->delete();
-        }
-        else
-        {
-            if($message->isread>=8)
-            {
-                $message->isread=$message->isread+4;
+        if($message){
+            if($message->isread==2) {
+                $message->delete();
+            }
+            elseif($message->isread==3) {
+                $message->delete();
             }
             else {
-                $message->isread = 4;
+                if($message->isread>=8) {
+                    $message->isread=$message->isread+4;
+                }
+                else {
+                    $message->isread = 4;
+                }
+                $message->save();
             }
-            $message->save();
         }
-
     }
     public static function sentUnsendMsg($msgId)
     {
         $message =Message::getById($msgId);
-            $message->delete();
+            if($message){
+                $message->delete();
+            }
     }
 
     public function createReply($params)
@@ -228,9 +217,6 @@ class Message extends BaseImasMsgs
     public static function updateFlagValue($row)
     {
         $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
-
-
     }
-
 }
 

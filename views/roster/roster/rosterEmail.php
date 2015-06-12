@@ -4,6 +4,7 @@ use app\components\AppUtility;
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <form action="roster-email" method="post" id="roster-form">
 <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>

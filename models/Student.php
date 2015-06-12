@@ -97,13 +97,13 @@ class Student extends BaseImasStudents {
         $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
         $student->delete();
     }
-public function assignSectionAndCode($newEntry,$id)
-{
-    $this->userid = $id;
-    $this->section = $newEntry['5'];
-    $this->code = $newEntry['4'];
-    $this->save();
-}
+    public function assignSectionAndCode($newEntry,$id)
+    {
+        $this->userid = $id;
+        $this->section = $newEntry['5'];
+        $this->code = $newEntry['4'];
+        $this->save();
+    }
     public static function updateLockOrUnlockStudent($params)
     {
         $courseId = $params['courseId'];
@@ -118,5 +118,16 @@ public function assignSectionAndCode($newEntry,$id)
             $student->locked = strtotime(date('F d, o g:i a'));
             $student->save();
         }
+    }
+    public static function reduceLatepasses($userid, $cid, $n)
+    {
+        $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
+        if($student->latepass > $n){
+            $student->latepass = $student->latepass - $n;
+        }
+        else{
+            $student->latepass = 0;
+        }
+        $student->save();
     }
 } 
