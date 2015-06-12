@@ -394,6 +394,8 @@ a:focus {
 #datepicker-id
 {
     padding-bottom: 3%;
+    border-radius: 0px;
+    border: none;
 }
 .margin-zero{
     margin-top: 25px;

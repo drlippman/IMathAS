@@ -167,7 +167,8 @@ function studentLock(){
         }
         else
         {
-            alert("No users selected.");
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
         }
     });
 }
@@ -235,7 +236,9 @@ function studentUnenroll(){
         }
         else
         {
-            alert("Please select the checkbox to Unenroll the students.");
+            e.preventDefault();
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
         }
     });
 }
@@ -255,7 +258,8 @@ function studentEmail(){
         }else
         {
             e.preventDefault();
-            alert("No users selected.");
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
         }
     });
 }
@@ -269,7 +273,8 @@ function studentMessage(){
             document.getElementById("message-id").value = markArray;
         }else
         {
-            alert("No users selected.");
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
             e.preventDefault();
         }
     });
@@ -287,7 +292,8 @@ function copyStudentEmail(){
             document.getElementById("email-id").value = markArray;
         }else
         {
-            alert("No users selected.");
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
             e.preventDefault();
         }
     });
@@ -306,7 +312,8 @@ function teacherMakeException(){
             document.getElementById("section-name").value = sectionName;
         }else
         {
-            alert("No users selected.");
+            var msg ="Select atleast one student.";
+            CommonPopUp(msg);
             e.preventDefault();
         }
     });

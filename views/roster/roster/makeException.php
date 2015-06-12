@@ -8,6 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher');
+date_default_timezone_set("Asia/Calcutta");
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
 <form action="make-exception" method="post" id="roster-form">

@@ -1,5 +1,4 @@
 <?php
-namespace app\controllers;
 use kartik\date\DatePicker;
 use app\components\AppUtility;
 use app\controllers\AppController;

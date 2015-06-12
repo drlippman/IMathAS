@@ -117,7 +117,7 @@ function markSentDelete()
                         });
                         return false;
                     },
-                    "confirm": function () {
+                    "Confirm": function () {
 //                            window.location = cancelUrl;
 
                         $('.message-table-body input[name="msg-check"]:checked').each(function () {
@@ -208,7 +208,7 @@ function markUnsend() {
                         });
                         return false;
                     },
-                    "confirm": function () {
+                    "Confirm": function () {
                         $('.message-table-body input[name="msg-check"]:checked').each(function () {
                             $(this).prop('checked', false);
                             $(this).closest('tr').remove();
