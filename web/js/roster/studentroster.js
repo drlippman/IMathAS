@@ -51,7 +51,6 @@ function showStudentInformation(students,isCode,isSection,imageSize)
             }else{
                 html += "<td>"+student.code+"</td>";
             }
-
         }
         if(student.locked ==0){ html += "<td class = 'LastName'>"+ capitalizeFirstLetter(student.lastname)+"</td>"; }else{html += "<td  class='LastName locked-student '>"+ capitalizeFirstLetter(student.lastname)+"</td>";}
         if(student.locked ==0){ html += "<td class = 'FirstName'>"+ capitalizeFirstLetter(student.firstname)+"</td>"; }else{html += "<td  class='FirstName locked-student '>"+ capitalizeFirstLetter(student.firstname)+"</td>";}
@@ -65,11 +64,10 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         else{ html += "<td><a>Is locked out</a></a></td>" }
         html += "<td><a>Grades</a></td>";
         html += "<td><a>Exception</a></td>";
-        html += "<td><a>Chg</a></td>";
+        html += "<td><a href='change-student-information?cid=" + courseId + "&uid="+ student.id +"'>Chg</a></td>";
         if(student.locked == 0) {
             html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
         else{ html += "<td class = 'lock-class'><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }
-
     });
     $('#student-information-table').append(html);
     $('.student-data-table').DataTable();
@@ -119,7 +117,6 @@ function datecal(a)
     time = month + '/' + day + '/' + year + '  ' + h + ':' + min + ' ' + ampm;
     return time;
 }
-
 function studentLock(){
     $('#lock-btn').click(function(e){
         var course_id =  $( "#course-id" ).val();
@@ -172,11 +169,9 @@ function studentLock(){
         }
     });
 }
-
 function markLockSuccess(response){
     location.reload();
 }
-
 function studentUnenroll(){
     $('#unenroll-btn').click(function(e){
         var course_id =  $( "#course-id" ).val();
@@ -187,7 +182,6 @@ function studentUnenroll(){
             dataArray.push( $(this).parent().siblings('.LastName').text()+' '+$(this).parent().siblings('.FirstName').text()+
             ' ('+$(this).parent().siblings('.Username').text()+')');
         });
-
         if(markArray.length!=0) {
             var html = '<div><p><b style = "color: red">Warning!</b>:&nbsp;This will delete ALL course data about these students. This action cannot be undone. ' +
                 'If you have a student who isn\'t attending but may return, use the Lock Out of course option instead of unenrolling them.</p><p>Are you SURE' +
@@ -242,11 +236,9 @@ function studentUnenroll(){
         }
     });
 }
-
 function markUnenrollSuccess(response){
     location.reload();
 }
-
 function studentEmail(){
     $('#roster-email').click(function(e){
         var markArray = [];
@@ -279,7 +271,6 @@ function studentMessage(){
         }
     });
 }
-
 function copyStudentEmail(){
     $('#roster-copy-emails').click(function(e){
         var markArray = [];
@@ -287,8 +278,6 @@ function copyStudentEmail(){
             markArray.push($(this).val());
         });
         if(markArray.length!=0){
-
-
             document.getElementById("email-id").value = markArray;
         }else
         {
@@ -298,7 +287,6 @@ function copyStudentEmail(){
         }
     });
 }
-
 function teacherMakeException(){
     $('#roster-makeExc').click(function(e){
         var markArray = [];
@@ -344,46 +332,42 @@ function picshow(size) {
             }
         }
     }
-
 }
 function lockUnlockStudent(lockOrUnlock,studentId)
 {
     var courseId =  $( "#course-id" ).val();
     if(lockOrUnlock == true){
         lockOrUnlock = 1;
+        var data = {lockOrUnlock: lockOrUnlock,studentId:studentId,courseId:courseId};
+        jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
     }else{
         lockOrUnlock = 0;
+        var html = '<div><p>Are you sure? You want to lock out student from course</p></div><p>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "confirm": function () {
+                    $('#searchText').val(null);
+                    $(this).dialog('destroy').remove();
+                    var data = {lockOrUnlock: lockOrUnlock,studentId:studentId,courseId:courseId};
+                    jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
+                    return true;
+                },
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
     }
-    var data = {lockOrUnlock: lockOrUnlock,studentId:studentId,courseId:courseId};
-    //jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
 }
 function lockUnlockSuccess(response)
 {
 console.log(response);
     location.reload();
 }
-
-$("a[name=lock]").on("click", function () {
-    //var threadsid = $(this).attr("data-var");
-    var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
-        closeText: "hide",
-        buttons: {
-            "Cancel": function () {
-                $(this).dialog('destroy').remove();
-                return false;
-            },
-            "confirm": function () {
-                $(this).dialog("close");
-                var threadId = threadsid;
-                //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
-                return true;
-            }
-        },
-        close: function (event, ui) {
-            $(this).remove();
-        }
-    });
-});
