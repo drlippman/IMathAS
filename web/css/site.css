@@ -139,7 +139,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 }
 
 .ui-dialog-titlebar-close{
-
+display: none;
 }
 
 
