@@ -18,7 +18,7 @@ echo $this->render('_toolbar',['course'=> $course]);
 </div>
 <!--Course name-->
 <div class="col-lg-9 container">
-<div class="course">
+<div class="">
     <h3>
         <b><?php echo $course->name ?></b>
     </h3>
