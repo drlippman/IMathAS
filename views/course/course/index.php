@@ -56,10 +56,25 @@ case 'Assessment': ?>
                             <?php }?>
                         <?php }?>
                     <?php } else {?>
-                        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
+                            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+                            <?php if ($assessment->enddate != 2000000000) { ?>
+                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+                                <!-- Use Late Pass here-->
+                                <?php if($students->latepass != 0) {
+                                    if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
+                                        ?>
+                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
+                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
+                                    <?php } ?>
+                                <?php } else {?>
+                                    <?php echo "<p>You have no late passes remaining.</p>";?>
+                                <?php }?>
+                            <?php }?>
                     <?php } ?>
                 <?php } else { ?>
-                    <input type="hidden" class="no-time-limit" id="no-time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+                    <?php if($assessment->password == '') {?>
                     <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
@@ -74,6 +89,24 @@ case 'Assessment': ?>
                             <?php echo "<p>You have no late passes remaining.</p>";?>
                         <?php }?>
                     <?php }?>
+                  <?php } else {?>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+                        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+                        <?php if ($assessment->enddate != 2000000000) { ?>
+                            <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+                            <!-- Use Late Pass here-->
+                            <?php if($students->latepass != 0) {
+                                if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
+                                    ?>
+                                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                    <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
+                                    <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
+                                <?php } ?>
+                            <?php } else {?>
+                                <?php echo "<p>You have no late passes remaining.</p>";?>
+                            <?php }?>
+                        <?php }?>
+                    <?php } ?>
                 <?php }?>
             </div>
             <div class="itemsum">
@@ -84,6 +117,7 @@ case 'Assessment': ?>
         <div class="item">
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
+                <?php if($assessment->password == '') {?>
                 <b>
                     <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="assessment-link"><?php echo $assessment->name ?></a>
                 </b>
@@ -94,7 +128,19 @@ case 'Assessment': ?>
                 <?php } else { ?>
                     <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
                     <BR>This assessment is in review mode - no scores will be saved.
-                <?php } ?>
+                    <?php } ?>
+                <?php } else {?>
+                        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
+                        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+                    <?php if ($assessment->reviewdate == 2000000000) { ?>
+                        <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
+                        <BR>This assessment is in review mode - no scores will be saved.
+                    <?php } else { ?>
+                        <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
+                        <BR>This assessment is in review mode - no scores will be saved.
+                    <?php } ?>
+                    <?php } ?>
+
             </div>
             <div class="itemsum">
                 <p><?php echo $assessment->summary ?></p>

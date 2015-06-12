@@ -17,7 +17,7 @@ $(document).ready(function(){
         var timelimit = Math.abs($('#time-limit'+linkId).val());
         var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
         var min = Math.floor((timelimit%3600)/60);
-        var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click OK to start or continue working on the assessment.</div>';
+        var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click confirm to start or continue working on the assessment.</div>';
         var cancelUrl = $(this).attr('href');
         e.preventDefault();
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
