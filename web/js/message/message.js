@@ -47,16 +47,16 @@ function showMessage(messageData, status) {
             var rowid = msg.id;
             if (msg.isread < 7) {
                 if(msg.hasuserimg == 0 ){
-                    html += "<td><img  class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                    html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
                 }else{
-                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                    html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
                 }
             }
             else {
                 if(msg.hasuserimg == 0 ){
-                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+                    html += "<td><img class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
                 }else{
-                    html += "<td><img class='images' width='50' height='50' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+                    html += "<td><img class='images circular-image' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
                 }
             }
             html += "<td>" + msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1) + "</td>";
@@ -311,7 +311,7 @@ function limitToTagShow() {
 }
 
 function changeImage(element, temp, rowId) {
-    console.log(temp);
+
     if(temp == false){
         element.src = element.bln ? "../../img/flagempty.gif" : "../../img/flagfilled.gif";
         element.bln = !element.bln;
@@ -341,8 +341,8 @@ function picshow(size) {
         for (var i=0; i<els.length; i++) {
             els[i].style.display = "inline";
             if (size==2) {
-                els[i].style.width = "100px";
-                els[i].style.height = "100px"
+                els[i].style.width = "85px";
+                els[i].style.height = "85px"
             }
             if (size==1) {
                 els[i].style.width = "50px";

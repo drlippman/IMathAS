@@ -58,13 +58,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
             if($user['hasuserimg']==0)
             {?>
-                <img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg" width="150" alt="file not found" /><br><br>
+                <img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg" class = "image" alt="file not found" /><br><br>
                <?php
                 echo "Upload profile picture";
             }
             else
             {?>
-                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" width="150" alt="file not found" /></br>
+                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" class = "image" alt="file not found" /></br>
                  <div class="update-checkbox">
                 <?= $form->field($model, 'remove')->checkbox() ?>
             </div>

@@ -873,6 +873,8 @@ class RosterController extends AppController
 
     public function actionMakeException()
     {
+        $courseId = $this->getParamVal('cid');
+
         if($this->getRequestParams()){
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
@@ -958,7 +960,8 @@ class RosterController extends AppController
             return $this->redirect('student-roster?cid=' . $courseId);
     }
         else{
-            return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
+             $this->setErrorFlash(AppConstant::NO_USER_FOUND);
+//            return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         }
     }
 

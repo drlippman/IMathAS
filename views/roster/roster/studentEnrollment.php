@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'section') ?>
     <?= $form->field($model, 'code') ?>
     <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-11">
+        <div class="col-lg-offset-2 col-lg-10">
             <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>

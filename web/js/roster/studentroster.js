@@ -31,9 +31,9 @@ function showStudentInformation(students,isCode,isSection,imageSize)
 
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
         if(student.hasuserimg == 0 ){
-            html += "<td><img  class='images' width='50' height='50' src='../../Uploads/dummy_profile.jpg' ></td>";
+            html += "<td><img  class='images circular-image'  src='../../Uploads/dummy_profile.jpg' ></td>";
         }else{
-            html += "<td><img  class='images' width='50' height='50' src='../../Uploads/" + student.id+".jpg' ></td>";
+            html += "<td><img  class='images circular-image' src='../../Uploads/" + student.id+".jpg' ></td>";
         }
 
         if(isSection == true)

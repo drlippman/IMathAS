@@ -401,3 +401,20 @@ a:focus {
     margin-top: 25px;
     margin-left: 0px;
 }
+
+.image{
+       width: 150px;
+}
+.table-image{
+    width: 50px;
+    height: 50px;
+}
+.circular-image{
+    width: 50px;
+    height: 50px;
+    border-radius: 50% ;
+    border-radius: 50%;
+    background-image: none;
+    background-position: center center;
+    background-size: cover;
+}

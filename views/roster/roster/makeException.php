@@ -11,7 +11,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
 date_default_timezone_set("Asia/Calcutta");
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
-<form action="make-exception" method="post" id="roster-form">
+<form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
     <div class="student-roster-exception">
         <input type="hidden" name="isException" value="1"/>
         <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
