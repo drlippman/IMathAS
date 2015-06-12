@@ -20,7 +20,6 @@ use app\components\AppUtility;
 <a href="#">Libraries</a><br>
 
 <p>Course Items</p>
-<a href="#">Roster</a><br>
 <a href="#">Copy</a><br>
 <a href="#">Export</a><br>
 <a href="#">Import</a><br>
@@ -28,7 +27,7 @@ use app\components\AppUtility;
 <p>Mass Change</p>
 <a href="#">Assessments</a><br>
 <a href="#">Forums</a><br>
-<a href="#">Blockes</a><br>
+<a href="#">Blocks</a><br>
 <a href="#">Dates</a><br>
 <a href="#">Time Shift</a><br><br>
 <a href="#">Course Settings</a><br>
