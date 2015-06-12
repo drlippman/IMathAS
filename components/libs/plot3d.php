@@ -1,7 +1,7 @@
 <?php
 //Basic 3D display, using Java applet.  Version 1.1, April 24, 2006
 //requires copying Viewer.class into assessment/libs directory
-
+use app\components\AppUtility;
 global $allowedmacros;
 array_push($allowedmacros,"plot3d","spacecurve");
 
@@ -125,7 +125,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 	  } else {
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'/js/3dviewer.js"></script>';
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		  } 
@@ -310,7 +310,7 @@ function spacecurve($func,$tmin,$tmax) {
 		  
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.$imasroot.'/javascript/3dviewer.js"></script>';
+			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'/js/3dviewer.js"></script>';
 		 } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		 } 

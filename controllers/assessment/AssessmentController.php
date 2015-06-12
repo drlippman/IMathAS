@@ -23,7 +23,7 @@ class AssessmentController extends AppController
         $params = $this->getRequestParams();
         $assessmentId = isset($params['id']) ? trim($params['id']) : "";
         $to = isset($params['to']) ? trim($params['to']) : 0;
-        $courseId = isset($params['id']) ? trim($params['cid']) : "";
+        $courseId = isset($params['cid']) ? trim($params['cid']) : "";
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $teacher = Teacher::getByUserId($user->getId(), $courseId);
         $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
@@ -147,5 +147,34 @@ class AssessmentController extends AppController
         }
         $returnData = array('model' => $model, 'assessments' => $assessment);
         return $this->renderWithData('setPassword', $returnData);
+    }
+
+    public function actionPrintTest()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $isTeacher = false;
+        $printData = '';
+        if($user)
+        {
+            $assessmentId = $this->getParam('aid');
+            $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
+            if($assessmentSession)
+            {
+                $courseId = $assessmentSession->assessment->course->id;
+                $teacher = Teacher::getByUserId($user->id, $courseId);
+                if($teacher)
+                {
+                    $isTeacher = true;
+                    $teacherId = $teacher->id;
+                }
+                $printData = AppUtility::printTest($teacherId, $isTeacher, $assessmentSession->id, $user);
+
+                $this->includeCSS(['showAssessment.css', 'mathtest.css', 'print.css']);
+                $responseData = array('response' => $printData);
+                return $this->renderWithData('printTest', $responseData);
+
+            }
+        }
     }
 } 

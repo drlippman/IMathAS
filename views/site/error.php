@@ -1,6 +1,8 @@
 <?php
 
 use yii\helpers\Html;
+use app\components\AppUtility;
+use app\components\AppConstant;
 
 /* @var $this yii\web\View */
 /* @var $name string */
@@ -8,21 +10,21 @@ use yii\helpers\Html;
 /* @var $exception Exception */
 
 $this->title = $name;
+$errorCode = $exception->getCode();
 ?>
 <div class="site-error">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
+    <div class="col-lg-offset-3 col-lg-6 center">
+        <?php if($errorCode == 2){ ?>
+                <p>
+                    Page not found!!!
+                </p>
+        <?php }else if($errorCode == 1){?>
+                <p>
+                    An internal server error occurred.
+                </p>
+        <?php }?>
+        <p>
+            Please contact us if you think this is a server error. Thank you.
+        </p>
     </div>
-
-    <p>
-        The above error occurred while the Web server was processing your request.
-    </p>
-
-    <p>
-        Please contact us if you think this is a server error. Thank you.
-    </p>
-
 </div>

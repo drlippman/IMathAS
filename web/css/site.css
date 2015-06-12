@@ -278,9 +278,9 @@ table tbody tr.odd {
     margin-left: 0px;
 }
 
-.dataTables_filter{
-    display: none;
-}
+/*.dataTables_filter{*/
+    /*display: none;*/
+/*}*/
 
 #enroll-btn {
     margin-left: 0px;

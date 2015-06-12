@@ -20,6 +20,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\components\AppUtility;
 use app\models\forms\ChangePasswordForm;
+use yii\web\HttpException;
 use yii\web\UploadedFile;
 
 class SiteController extends AppController

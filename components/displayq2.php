@@ -14,7 +14,7 @@ require("macros.php");
 require("../filter/filter.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $responseString, $myrights, $showtips, $urlmode, $CFG;
+	global $imasroot, $responseString, $printData, $myrights, $showtips, $urlmode, $CFG;
     $qnpointval = '';
     $showtips = 2;
 	
@@ -356,8 +356,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	eval("\$evaledqtext = \"$toevalqtxt\";");
 	eval("\$evaledsoln = \"$toevalsoln\";");
 	if ($returnqtxt===2) {
+         
 		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
+         
 		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
@@ -416,6 +418,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} 
 	
 	if ($returnqtxt) {
+         
 		return $returntxt;
 	}
 	if (isset($helptext) &&  $showhints) {
@@ -505,8 +508,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
     $responseString .= "</div>\n";
 	//echo 'time: '.(microtime(true) - $starttime);
 	if ($qdata['qtype']=="multipart" ) {
+         
 		return $anstypes;
 	} else {
+         
 		return array($qdata['qtype']);
 	}
 }
@@ -783,13 +788,16 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		}
 		//return array_sum($scores);
 		if (isset($scoremethod) && $scoremethod == "singlescore") {
+             
 			return array(round(array_sum($scores),3),implode('~',$raw));
 		} else if (isset($scoremethod) && $scoremethod == "allornothing") {
-			if (array_sum($scores)<.98) { return array(0,implode('~',$raw)); } else { return array(1,implode('~',$raw));}
+			if (array_sum($scores)<.98) {   return array(0,implode('~',$raw)); } else { return array(1,implode('~',$raw));}
 		} else if (isset($scoremethod) && $scoremethod == "acct") {
 			$sc = round(array_sum($scores)/$accpts,3);
+             
 			return (array($sc, implode('~',$raw)));
 		} else {
+             
 			return array(implode('~',$scores),implode('~',$raw));
 		}
 	} else {
@@ -809,6 +817,7 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
 		} else {
 			$GLOBALS['lastanswers'][$qnidx] .= '##'.$GLOBALS['partlastanswer'];
 		}
+         
 		return array(round($score,3),round($score,2));
 	}
 }

@@ -1201,7 +1201,7 @@ class AppUtility extends Component
             $responseString .= $earned."/".$poss."</p>";
         }
         if (!$isdiag && $testsettings['noprint']==0) {
-            $responseString .= "<p><a href='#' onclick=\"window.open('".AppUtility::getHomeURL()."assessment/printtest.php','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
+            $responseString .= "<p><a href='#' onclick=\"window.open('".AppUtility::getHomeURL()."assessment/assessment/print-test?aid=".$assessmentId."','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
         }
 
         $responseString .= "</div>\n";
@@ -1234,6 +1234,327 @@ class AppUtility extends Component
     public static function getBasePath()
     {
         return Yii::$app->getBasePath();
+    }
+
+    public static function printTest($teacherid, $isteacher, $assessmentSessionId, $user)
+    {
+        global $allowedmacros, $mathfuncs, $questions, $seeds, $responseString;
+        $allowedmacros = array();
+        $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+        $allowedmacros = $mathfuncs;
+        $userfullname = "";
+
+        $responseString = "";
+        $isteacher = (isset($teacherid) || $isteacher==true);
+
+        if (!isset($assessmentSessionId) && !$isteacher) {
+            echo "<html><body>Error. </body></html>\n";
+            exit;
+        }
+        if (isset($teacherid) && isset($_GET['scored'])) {
+            $scoredtype = $_GET['scored'];
+            $scoredview = true;
+            $showcolormark = true;
+        } else {
+            $scoredtype = 'last';
+            $scoredview = false;
+        }
+
+        include("displayq2.php");
+        include("testutil.php");
+        $flexwidth = true; //tells header to use non _fw stylesheet
+        if ($scoredview) {
+            $placeinhead = '<script type="text/javascript">
+			$(function() {
+				$(\'input[value="Preview"]\').click().hide();
+			});
+			</script>';
+        }
+        //$sessiondata['coursetheme'] = $coursetheme;
+
+        $responseString .= "<style type=\"text/css\" media=\"print\">.hideonprint {display:none;} p.tips {display: none;}\n input.btn {display: none;}\n textarea {display: none;}\n input.sabtn {display: none;} .question, .review {background-color:#fff;}</style>\n";
+        $responseString .= "<style type=\"text/css\">p.tips {	display: none;}\n </style>\n";
+        $responseString .= '<script type="text/javascript">function rendersa() { ';
+        $responseString .= '  el = document.getElementsByTagName("span"); ';
+        $responseString .= '   for (var i=0;i<el.length;i++) {';
+        $responseString .= '     if (el[i].className=="hidden") { ';
+        $responseString .= '         el[i].className = "shown";';
+        //echo '		 AMprocessNode(el)';
+        $responseString .= '     }';
+        $responseString .= '    }';
+        $responseString .= '} </script>';
+
+        if ($isteacher && isset($_GET['asid'])) {
+            $testid = $_GET['asid'];
+        } else {
+            $testid = $assessmentSessionId;
+        }
+
+        $connection = Yii::$app->getDb();
+        $query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
+        $line = $connection->createCommand($query)->queryOne();
+        if (strpos($line['questions'],';')===false) {
+            $questions = explode(",",$line['questions']);
+            $bestquestions = $questions;
+        } else {
+            list($questions,$bestquestions) = explode(";",$line['questions']);
+            $questions = explode(",",$questions);
+            $bestquestions = explode(",",$bestquestions);
+        }
+        if ($scoredtype=='last') {
+            $seeds = explode(",",$line['seeds']);
+            $sp = explode(';',$line['scores']);
+            $scores = explode(",",$sp[0]);
+            $rawscores = explode(',', $sp[1]);
+            $attempts = explode(",",$line['attempts']);
+            $lastanswers = explode("~",$line['lastanswers']);
+        } else {
+            $seeds = explode(",",$line['bestseeds']);
+            $sp = explode(';',$line['bestscores']);
+            $scores = explode(",",$sp[0]);
+            $rawscores = explode(',', $sp[1]);
+            $attempts = explode(",",$line['bestattempts']);
+            $lastanswers = explode("~",$line['bestlastanswers']);
+            $questions = $bestquestions;
+        }
+
+        $timesontask = explode("~",$line['timeontask']);
+
+        if ($isteacher) {
+            if ($line['userid'] != $user->id) {
+                $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
+                $row = $connection->createCommand($query)->queryOne();
+                $userfullname = $row[1]." ".$row[0];
+            }
+            $userid= $line['userid'];
+        }
+
+        $query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
+        $testsettings = $connection->createCommand($query)->queryOne();
+        list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
+
+        $qi = getquestioninfo($questions,$testsettings);
+
+
+
+        $now = time();
+        $isreview = false;
+        if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
+            $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
+
+            $row = $connection->createCommand($query)->queryOne();
+            if ($row!=null) {
+                if ($now<$row[0] || $row[1]<$now) { //outside exception dates
+                    if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+                        $isreview = true;
+                    } else {
+                        if (!$isteacher) {
+                            $responseString .= "Assessment is closed";
+                            $responseString .= "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+                            return $responseString;
+                        }
+                    }
+                }
+            } else { //no exception
+                if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+                    $isreview = true;
+                } else {
+                    if (!$isteacher) {
+                        $responseString .= "Assessment is closed";
+                        $responseString .= "<br/><a href=\"../course/course.php?cid={$testsettings['courseid']}\">Return to course page</a>";
+                        return $responseString;
+                    }
+                }
+            }
+        }
+        if ($isreview) {
+            $seeds = explode(",",$line['reviewseeds']);
+            $scores = explode(",",$line['reviewscores']);
+            $attempts = explode(",",$line['reviewattempts']);
+            $lastanswers = explode("~",$line['reviewlastanswers']);
+        }
+
+        $responseString .= "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
+        $responseString .= "<h3>".$testsettings['name']."</h3>\n";
+
+
+        $allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
+        $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
+        $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
+        $GLOBALS['useeditor']='reviewifneeded';
+        $responseString .= "<div class=breadcrumb>Print Ready Version</div>";
+
+        $endtext = '';  $intropieces = array();
+        if (strpos($testsettings['intro'], '[QUESTION')!==false) {
+            //embedded type
+            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
+            $introsplit = preg_split('/\[QUESTION\s+(\d+)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            for ($i=1;$i<count($introsplit);$i+=2) {
+                $intropieces[$introsplit[$i]] = $introsplit[$i-1];
+            }
+            //no specific start text - will just go before first question
+            $testsettings['intro'] = '';
+            $endtext = $introsplit[count($introsplit)-1];
+        } else if (strpos($testsettings['intro'], '[Q ')!==false) {
+            //question info type
+            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[Q $3]',$testsettings['intro']);
+            $introsplit = preg_split('/\[Q\s+(.*?)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
+            $testsettings['intro'] = $introsplit[0];
+            for ($i=1;$i<count($introsplit);$i+=2) {
+                $p = explode('-',$introsplit[$i]);
+                $intropieces[$p[0]] = $introsplit[$i+1];
+            }
+        }
+
+
+        $responseString .= '<div class=intro>'.$testsettings['intro'].'</div>';
+        if ($isteacher && !$scoredview) {
+            $responseString .= '<p>'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+        } else if ($isteacher) {
+            if ($scoredtype=='last') {
+                $responseString .= '<p>'._('Showing Last Attempts').' <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a></p>';
+            } else {
+                $responseString .= '<p>'._('Showing Scored View').' <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+            }
+
+        }
+        if ($testsettings['showans']=='N') {
+            $lastanswers = array_fill(0,count($questions),'');
+        }
+        for ($i = 0; $i < count($questions); $i++) {
+            //list($qsetid,$cat) = getqsetid($questions[$i]);
+            $qsetid = $qi[$questions[$i]]['questionsetid'];
+            $cat = $qi[$questions[$i]]['category'];
+
+            $showa = $isteacher;
+            if (isset($intropieces[$i+1])) {
+                $responseString .= '<div class="intro">'.$intropieces[$i+1].'</div>';
+            }
+            $responseString .= '<div class="nobreak">';
+            if (isset($_GET['descr'])) {
+                $query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
+                $result = $connection->createCommand($query)->queryOne();
+                $responseString .= '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
+            } else {
+                //list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
+                $points = $qi[$questions[$i]]['points'];
+                $qattempts = $qi[$questions[$i]]['attempts'];
+                if ($scoredview) {
+                    $responseString .= "<div>#".($i+1)." ";
+                    $responseString .= printscore($scores[$i], $i);
+                    $responseString .= "</div>";
+                } else {
+                    $responseString .= "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+                }
+            }
+            if ($scoredview) {
+                //$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
+                if (isset($rawscores[$i])) {
+                    //$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+                    if (strpos($rawscores[$i],'~')!==false) {
+                        $colors = explode('~',$rawscores[$i]);
+                    } else {
+                        $colors = array($rawscores[$i]);
+                    }
+                } else {
+                    $colors = array();
+                }
+                displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$colors);
+
+                $responseString .= '<div class="review">';
+                $laarr = explode('##',$lastanswers[$i]);
+
+                if (count($laarr)>1) {
+                    $responseString .= "Previous Attempts:";
+                    $cnt =1;
+                    for ($k=0;$k<count($laarr)-1;$k++) {
+                        if ($laarr[$k]=="ReGen") {
+                            $responseString .= ' ReGen ';
+                        } else {
+                            $responseString .= "  <b>$cnt:</b> " ;
+                            if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+                                $url = getasidfileurl($match[1]);
+                                $responseString .= "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
+                            } else {
+                                if (strpos($laarr[$k],'$f$')) {
+                                    if (strpos($laarr[$k],'&')) { //is multipart q
+                                        $laparr = explode('&',$laarr[$k]);
+                                        foreach ($laparr as $lk=>$v) {
+                                            if (strpos($v,'$f$')) {
+                                                $tmp = explode('$f$',$v);
+                                                $laparr[$lk] = $tmp[0];
+                                            }
+                                        }
+                                        $laarr[$k] = implode('&',$laparr);
+                                    } else {
+                                        $tmp = explode('$f$',$laarr[$k]);
+                                        $laarr[$k] = $tmp[0];
+                                    }
+                                }
+                                if (strpos($laarr[$k],'$!$')) {
+                                    if (strpos($laarr[$k],'&')) { //is multipart q
+                                        $laparr = explode('&',$laarr[$k]);
+                                        foreach ($laparr as $lk=>$v) {
+                                            if (strpos($v,'$!$')) {
+                                                $tmp = explode('$!$',$v);
+                                                $laparr[$lk] = $tmp[0];
+                                            }
+                                        }
+                                        $laarr[$k] = implode('&',$laparr);
+                                    } else {
+                                        $tmp = explode('$!$',$laarr[$k]);
+                                        $laarr[$k] = $tmp[0];
+                                    }
+                                }
+                                if (strpos($laarr[$k],'$#$')) {
+                                    if (strpos($laarr[$k],'&')) { //is multipart q
+                                        $laparr = explode('&',$laarr[$k]);
+                                        foreach ($laparr as $lk=>$v) {
+                                            if (strpos($v,'$#$')) {
+                                                $tmp = explode('$#$',$v);
+                                                $laparr[$lk] = $tmp[0];
+                                            }
+                                        }
+                                        $laarr[$k] = implode('&',$laparr);
+                                    } else {
+                                        $tmp = explode('$#$',$laarr[$k]);
+                                        $laarr[$k] = $tmp[0];
+                                    }
+                                }
+
+                                $responseString .= str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+                            }
+                            $cnt++;
+                        }
+
+                    }
+                    $responseString .= '. ';
+                }
+                if ($timesontask[$i]!='') {
+                    $responseString .= 'Average time per submission: ';
+                    $timesarr = explode('~',$timesontask[$i]);
+                    $avgtime = array_sum($timesarr)/count($timesarr);
+                    if ($avgtime<60) {
+                        $responseString .= round($avgtime,1) . ' seconds ';
+                    } else {
+                        $responseString .= round($avgtime/60,1) . ' minutes ';
+                    }
+                    $responseString .= '<br/>';
+                }
+                $responseString .= '</div>';
+
+            } else {
+                displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
+            }
+            $responseString .= "<hr />";
+            $responseString .= '</div>';
+
+        }
+        if ($endtext != '') {
+            $responseString .= '<div class="intro">'.$endtext.'</div>';
+        }
+        return $responseString;
     }
 
 }

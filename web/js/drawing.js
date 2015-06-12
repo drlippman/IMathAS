@@ -25,7 +25,7 @@ var curTarget = null;
 var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
-var imasroot = "";
+var imasroot = "/openmath/web";
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
