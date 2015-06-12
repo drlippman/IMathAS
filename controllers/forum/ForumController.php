@@ -510,5 +510,43 @@ class ForumController extends AppController
         }
     }
 
+    public function actionListPostByName()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $forumid = $params['forumid'];
+        $thread = ThreadForm::thread($forumid);
+        if($thread)
+        {
+                $threadArray = array();
+                foreach ($thread as $data)
+                {
+                    $username = User::getById($data['userid']);
+                       $temparray = array
+                        (
+                            'parent' => $data['parent'],
+                            'threadId' => $data['threadid'],
+                            'forumiddata' => $data['forumid'],
+                            'subject' => $data['subject'],
+                            'postdate' => date('F d, o g:i a', $data['postdate']),
+                           'message' => $data['message'],
+                            'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                        );
+                        array_push($threadArray, $temparray);
+                }
+                $responseData = array('threadArray' => $threadArray,'forumid' => $forumid);
+                return $this->renderWithData('listpostbyname',$responseData);
+        }
+        else
+        {
+
+
+        }
+
+
+
+    }
+
+
 
 }

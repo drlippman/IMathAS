@@ -8,13 +8,14 @@
 
 namespace app\models\forms;
 use app\components\AppUtility;
+use app\models\ForumPosts;
 use yii\base\Model;
 use Yii;
 class ThreadForm extends Model
 {
-    public static  function thread(){
+    public static  function thread($forumid){
 
-        $thread = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts ")->queryAll();
+        $thread = ForumPosts::findAll(['forumid' => $forumid]);
         return $thread;
 
     }
