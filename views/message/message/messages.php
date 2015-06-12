@@ -10,14 +10,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <!-- DataTables CSS -->
 <link rel="stylesheet" type="text/css"
-<!--      href="--><?php //echo AppUtility::getHomeURL() ?><!--js/DataTables-1.10.6/media/css/jquery.dataTables.css">-->
+      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript" charset="utf8"
         src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
     <?php if ($userRights->rights > 10) { ?>
-        <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
+        <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
         <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
     <?php
