@@ -1,15 +1,16 @@
 $(document).ready(function(){
-
-    //Display Calender
-
+    /**
+     *  Display Calender
+     */
     var date = new Date();
     var d = date.getDate();
     var m = date.getMonth();
     var y = date.getFullYear();
     calendar();
 
-    //Show Dialog Pop Up for Assessment time
-
+    /**
+     * Show Dialog Pop Up for Assessment time
+     */
     $('.confirmation-require').click(function(e){
 
         var linkId = $(this).attr('id');
@@ -41,8 +42,12 @@ $(document).ready(function(){
 
     });
 
+
 });
-// Display calendar
+
+/**
+ *  Display Calender
+ */
 function calendar() {
     var htmlMsg = "<div>Assessment</div>";
     var courseId = $('.calender-course-id').val();
@@ -66,7 +71,6 @@ function calendar() {
                     cid: courseId
                 },
                 success: function (response) {
-                    //console.log(response);
                     response = JSON.parse(response);
                     var assessmentData = response.data;
                     var events = [];
@@ -77,7 +81,9 @@ function calendar() {
                         {
                             eventColor = 'red';
                         }
-                        //alert(assessmentDetail.endDateString < now);
+                        /**
+                         * If assessment is in review mode, event
+                         */
                         if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > assessmentDetail.now)
                         {
                             events.push({
@@ -94,6 +100,9 @@ function calendar() {
                             });
 
                         }
+                        /**
+                         * If assessment is not in review mode, event
+                         */
                         else if(assessmentDetail.endDateString > assessmentDetail.now && assessmentDetail.startDateString < assessmentDetail.now)
                         {
                             events.push({
@@ -112,24 +121,28 @@ function calendar() {
             });
         },
         eventClick:  function(event, jsEvent, view) {
+            /**
+             * If assessment is in review mode, dialog pop up
+             */
             if(event.reviewMode == true)
             {
                 $("#demo").empty();
-                var title = "<p>" +event.title+"</p>";
-                var dateH = "Showing as Review until  " +event.reviewDat+"";
+                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
+                var reviewMode = "This assessment is in review mode - no scores will be saved";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                var ass = title + dateH;
-                $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>Showing as Review until  " +event.reviewDat+"</div>");
+                $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>"+dateH+"<br>"+reviewMode+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350});
             }
+            /**
+             * If assessment is not in review mode
+             */
             else
             {
                 $("#demo").empty();
-                var title = "<p><a href='../../assessment/assessment/show-assessment?id="+event.assessmentId+" '>"+event.title+"</a><br></p>";
+                var title = "<a href='../../assessment/assessment/show-assessment?id="+event.assessmentId+" '>"+event.title+"</a>";
                 var dateH = "Due " +event.startDat+"";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                var assessment =  title+" "+dateH;
-                $("#demo").append("<div> "+assessmentLogo+" "+title+" <br>"+dateH+"</div>");
+                $("#demo").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350});
             }
             $(this).close();

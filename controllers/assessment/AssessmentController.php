@@ -8,9 +8,11 @@ use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
+use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
 use Yii;
+use app\components\AppConstant;
 
 class AssessmentController extends AppController
 {
@@ -117,5 +119,33 @@ class AssessmentController extends AppController
         }
         $this->includeJS(['../js/latePass.js']);
         $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+    }
+
+    /**
+     * Display password, when assessment need password.
+     */
+    public function actionPassword()
+    {
+        $this->guestUserHandler();
+        $model = new SetPassword();
+        $assessmentId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
+        $assessment = Assessments::getByAssessmentId($assessmentId);
+        if ($this->isPostMethod())
+        {
+            $params = $this->getRequestParams();
+            $password = $params['SetPassword']['password'];
+            if($password == $assessment->password)
+            {
+                return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id));
+            }
+            else
+            {
+                $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
+            }
+        }
+        $returnData = array('model' => $model, 'assessments' => $assessment);
+        return $this->renderWithData('setPassword', $returnData);
     }
 } 

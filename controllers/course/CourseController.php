@@ -11,13 +11,13 @@ use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\forms\CourseSettingForm;
-use app\models\forms\SetPassword;
 use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
 use app\models\Items;
 use app\models\Questions;
 use app\models\QuestionSet;
+use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\InlineText;
@@ -249,7 +249,7 @@ class CourseController extends AppController
             $password = $params['SetPassword']['password'];
             if($password == $assessment->password)
             {
-                return $this->redirect(AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id));
+                return $this->redirect(AppUtility::getURLFromHome('course', 'course/password?id=' . $assessment->id.'&cid=' .$course->id));
             }
             else
             {

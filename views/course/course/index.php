@@ -35,7 +35,7 @@ case 'Assessment': ?>
         <div class="item">
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
             <div class="title">
-                <?php if($assessment->timelimit != 0) { //timelimit
+                <?php if($assessment->timelimit > 0) { //timelimit
                     if($assessment->password == '') {?> <!--Set password-->
                         <b>
                             <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a>
@@ -59,6 +59,7 @@ case 'Assessment': ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php } ?>
                 <?php } else { ?>
+                    <input type="hidden" class="no-time-limit" id="no-time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                     <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                     <?php if ($assessment->enddate != 2000000000) { ?>
                         <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
@@ -84,7 +85,7 @@ case 'Assessment': ?>
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
             <div class="title">
                 <b>
-                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link"><?php echo $assessment->name ?></a>
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="assessment-link"><?php echo $assessment->name ?></a>
                 </b>
                 <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                 <?php if ($assessment->reviewdate == 2000000000) { ?>
