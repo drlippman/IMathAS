@@ -106,7 +106,7 @@ class MessageController extends AppController
                 return $this->successResponse($newArray);
             }
             else{
-                return $this->terminateResponse('No message found.');
+                return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
         }
     }
@@ -148,7 +148,7 @@ class MessageController extends AppController
                 }
                 return $this->successResponse($newArray);
             } else {
-                return $this->terminateResponse('No message found.');
+                return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
         }
     }
@@ -169,7 +169,7 @@ class MessageController extends AppController
             }
             return $this->successResponse($teacherArray);
         } else {
-            return $this->terminateResponse('No Course found.');
+            return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }
     }
 
@@ -186,7 +186,7 @@ class MessageController extends AppController
                 return $this->successResponse();
             }else
             {
-                return $this->terminateResponse('No Course found.');
+                return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
     }
@@ -204,7 +204,7 @@ class MessageController extends AppController
                 return $this->successResponse();
             }else
             {
-                return $this->terminateResponse('No Course found.');
+                return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
     }
@@ -218,13 +218,15 @@ class MessageController extends AppController
         {
             return $this->successResponse($userData);
         } else {
-            return $this->terminateResponse('No User found.');
+            return $this->terminateResponse(AppConstant::NO_USER_FOUND);
         }
     }
 
     public function actionViewMessage()
     {
         $this->guestUserHandler();
+        $courseId = $this->getParam('cid');
+        $course = Course::getById($courseId);
         $msgId = $this->getParam('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId);
@@ -232,7 +234,7 @@ class MessageController extends AppController
             $fromUser = User::getById($messages->msgfrom);
             $this->includeCSS(['jquery-ui.css']);
             $this->includeJS(['message/viewmessage.js']);
-            $responseData = array('messages' => $messages, 'fromUser' => $fromUser);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course);
             return $this->renderWithData('viewMessage', $responseData);
         }
     }
@@ -263,7 +265,7 @@ class MessageController extends AppController
                 return $this->successResponse();
             }else
             {
-                return $this->terminateResponse('No Course found.');
+                return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
     }
@@ -292,7 +294,7 @@ class MessageController extends AppController
         }
         else
         {
-            return $this->terminateResponse('No Course found.');
+            return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }
     }
 
@@ -306,7 +308,7 @@ class MessageController extends AppController
         }
         else
         {
-            return $this->terminateResponse('No User found.');
+            return $this->terminateResponse(AppConstant::NO_USER_FOUND);
         }
     }
 
@@ -328,6 +330,8 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
+
+        $messageId = $this->getParam('message');
         $baseId = $this->getParam('baseid');
         $msgId = $this->getParam('id');
         $user = $this->getAuthenticatedUser();
@@ -359,7 +363,7 @@ class MessageController extends AppController
             }
             $this->includeJS(["message/viewConversation.js"]);
             $this->createChild($this->children[key($this->children)]);
-            $responseData = array('messages' => $this->totalMessages,'user' => $user);
+            $responseData = array('messages' => $this->totalMessages,'user' => $user, 'messageId' =>$messageId);
             return $this->renderWithData('viewConversation', $responseData);
         }
     }
@@ -395,7 +399,7 @@ class MessageController extends AppController
                 return $this->successResponse();
             }else
             {
-                return $this->terminateResponse('No message');
+                return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
         }
     }
@@ -408,7 +412,7 @@ class MessageController extends AppController
             Message::updateFlagValue($rowId);
             return $this->successResponse();
         }else{
-            return $this->terminateResponse('No message');
+            return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
         }
     }
 }

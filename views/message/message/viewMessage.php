@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Message';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid=' . $messages->courseid]];
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $messages->courseid]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
-echo $this->render('../../instructor/instructor/_toolbarTeacher');
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 
 <input type="hidden" class="msg-id" value="<?php echo $messages->id ?>">
@@ -44,7 +44,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher');
     <?php $sent = $_GET['message'];
     if ($sent != 1) {
         ?>
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id); ?>"
+        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'$cid='); ?>"
            class="btn btn-primary "> Reply</a>&nbsp;
         <a class="btn btn-primary" id="mark-as-unread"> Mark Unread </a>&nbsp;
         <a class="btn btn-primary  btn-danger" id="mark-delete"> Delete</a>&nbsp;
