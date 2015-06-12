@@ -1211,8 +1211,13 @@ class AppUtility extends Component
 
     public static function getRefererUri($refere){
         $home = self::getHomeURL();
-        $absUrl = str_replace(Yii::$app->request->hostInfo, '', $refere);
-        $refereUri = str_replace($home, '', $absUrl);
+        $hostInfo = Yii::$app->request->hostInfo;
+        $absUrl = str_replace($hostInfo, '', $refere);
+        $refereUri = $absUrl;
+        if(strpos($hostInfo, 'localhost') != false)
+        {
+            $refereUri = str_replace($home, '', $absUrl);
+        }
         return $refereUri;
     }
 
