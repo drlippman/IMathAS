@@ -32,12 +32,11 @@ use app\controllers\PermissionViolationException;
 use app\models\forms\ImportStudentForm;
 use yii\web\UploadedFile;
 use app\components\AppConstant;
+use app\models\forms\ChangeUserInfoForm;
 
 
 class RosterController extends AppController
 {
-
-   // public $studentInfo = array();
     //Controller method to display student information on student roster page.
     public function actionStudentRoster()
     {
@@ -45,10 +44,16 @@ class RosterController extends AppController
         $courseid = $this->getParam('cid');
         $course = Course::getById($courseid);
         $students = Student::findByCid($courseid);
+        $isImageColumnPresent = 0;
         if ($students) {
             $isCodePresent = false;
             $isSectionPresent = false;
             foreach ($students as $student) {
+                $users = User::getById($student['userid']);
+                if($users['hasuserimg'] == 1)
+                {
+                    $isImageColumnPresent = 1;
+                }
                 if ($student->code != '') {
                     $isCodePresent = true;
                 }
@@ -59,7 +64,7 @@ class RosterController extends AppController
         }
         $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css']);
         $this->includeJS(['roster/studentroster.js', 'general.js']);
-        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent);
+        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent,'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
 
     }
@@ -137,15 +142,19 @@ class RosterController extends AppController
     {
         $this->layout = false;
         $params = $this->getBodyParams();
-        $imageSize = $params['size'];
         $courseid = $params['course_id'];
         $Students = Student::findByCid($courseid);
         $isCodePresent = false;
         $isSectionPresent = false;
+        $isImageColumnPresent = 0;
         $studentArray = array();
         if ($Students) {
             foreach ($Students as $student) {
-
+                $users = User::getById($student['userid']);
+                if($users['hasuserimg'] == 1)
+                {
+                    $isImageColumnPresent = 1;
+                }
                 if ($student->code != '') {
                     $isCodePresent = true;
                 }
@@ -166,7 +175,7 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
-        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'imageSize' => $imageSize );
+        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'isImageColumnPresent' => $isImageColumnPresent );
 
         return $this->successResponse($responseData);
     }
@@ -1120,5 +1129,42 @@ class RosterController extends AppController
     {
         $params = $this->getBodyParams();
         Student::updateLockOrUnlockStudent($params);
+    }
+    public function actionChangeStudentInformation()
+    {
+        $this->guestUserHandler();
+        $tzname = AppUtility::getTimezoneName();
+        $params = $this->getRequestParams();
+        $userid = $params['uid'];
+        $courseId = $params['cid'];
+        $studentData = Student::getByCourseId($courseId, $userid);
+        $user = User::findByUserId($userid);
+        $model = new ChangeUserInfoForm();
+        if ($model->load($this->getPostData())) {
+            $params = $params['ChangeUserInfoForm'];
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if ($model->file ) {
+                $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+                $model->remove=0;
+
+                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
+                {
+                    User::updateImgByUserId($userid);
+                }
+            }
+            if($model->remove == 1){
+                User::deleteImgByUserId($userid);
+                unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+            }
+            User::saveUserRecord($params, $user);
+            Student::updateSectionAndCodeValue($params['section'] , $userid, $params['code'] , $courseId,$params);
+            $this->setSuccessFlash('Changes updated successfully.');
+            $this->redirect('student-roster?cid='.$courseId);
+        }
+        $this->includeCSS(['dashboard.css']);
+        $this->includeJS(['changeUserInfo.js']);
+        $responseData = array('model' => $model, 'user' => $user->attributes, 'tzname' => $tzname,'userId' => $userid,'studentData' => $studentData ,'courseId' => $courseId);
+        return $this->renderWithData('changeStudentInformation', $responseData);
+
     }
 }

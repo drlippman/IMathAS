@@ -348,19 +348,15 @@ class SiteController extends AppController
         $this->guestUserHandler();
         $tzname = AppUtility::getTimezoneName();
         $userid = $this->getUserId();
-        $user = $this->getAuthenticatedUser();
+        $user = User::findByUserId($userid);
         $model = new ChangeUserInfoForm();
-
         if ($model->load($this->getPostData()) && $model->checkPassword()) {
             $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
-
             if ($model->file ) {
-
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
                 $model->remove=0;
-                User::saveUserRecord($params);
                 if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
                 User::updateImgByUserId($userid);
             }
@@ -368,16 +364,15 @@ class SiteController extends AppController
                 User::deleteImgByUserId($userid);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
             }
+            User::saveUserRecord($params,$user);
             $this->setSuccessFlash('Changes updated successfully.');
             $this->redirect('dashboard');
         }
-
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);
         $responseData = array('model' => $model, 'user' => isset($user->attributes) ? $user->attributes : null, 'tzname' => $tzname,'userId' => $userid);
         return $this->renderWithData('changeUserinfo', $responseData);
     }
-
     public function actionStudentEnrollCourse()
     {
         $this->guestUserHandler();
@@ -385,7 +380,6 @@ class SiteController extends AppController
         $responseData = array('model' => $model,);
         return $this->renderWithData('studentEnrollCourse', $responseData);
     }
-
     public function actionHelperGuide()
     {
         return $this->renderWithData('help');

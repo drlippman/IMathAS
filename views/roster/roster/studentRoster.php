@@ -82,8 +82,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <thead>
     <tr>
         <th></th>
-        <th></th>
-        <?php if ($isSection == true) {
+        <?php if ($isImageColumnPresent == 1) {
+            ?>
+            <th></th>
+        <?php }
+            if ($isSection == true) {
             ?>
             <th>Section</th>
         <?php
@@ -99,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <th>Last Access</th>
         <th>Grades</th>
         <th>Due Dates</th>
-        <th>Chg Info</th>
+        <th>Change Info</th>
         <th>Lock Out</th>
     </tr>
     </thead>

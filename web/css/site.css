@@ -401,7 +401,6 @@ a:focus {
     margin-top: 25px;
     margin-left: 0px;
 }
-
 .image{
        width: 150px;
 }
@@ -409,12 +408,19 @@ a:focus {
     width: 50px;
     height: 50px;
 }
-.circular-image{
+.circular-image {
     width: 50px;
     height: 50px;
-    border-radius: 50% ;
+    border-radius: 50%;
     border-radius: 50%;
     background-image: none;
     background-position: center center;
     background-size: cover;
+}
+.back-button-change-student-info{
+    padding-top: 7px;
+    margin-left: 15px;
+}
+.div-change-student-info{
+    padding-left: 21px;
 }
