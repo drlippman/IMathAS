@@ -140,7 +140,6 @@ case 'Assessment': ?>
                         <BR>This assessment is in review mode - no scores will be saved.
                     <?php } ?>
                     <?php } ?>
-
             </div>
             <div class="itemsum">
                 <p><?php echo $assessment->summary ?></p>
