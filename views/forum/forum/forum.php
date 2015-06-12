@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $form->field($model, 'search')->textInput(['id' => 'search_text']); ?>
 
 </div>
-    <?= $form->field($model, 'thread')->inline()->radioList(['subject' => 'All thread subjects' , 'post' => 'All Post']) ?>
+    <?= $form->field($model, 'thread')->inline()->radioList(['subject' => 'All thread subjects' , 'post' => 'All Posts']) ?>
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
             <input type="button" id="forum_search" class="btn btn-primary" value="Search"/>
