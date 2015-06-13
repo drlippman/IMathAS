@@ -50,9 +50,13 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         }else {
             html += 'Due '+endDate;
         }
-
+        /**
+         * Timelimit in hour and minute
+         */
         $('#timercontent').append(html);
-
+        /**
+         * Count down for timelimit.
+         */
         window.onload = CreateTimer("timer",timer);
     });
 

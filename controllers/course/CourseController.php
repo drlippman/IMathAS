@@ -136,8 +136,8 @@ class CourseController extends AppController
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js']);
-        $this->includeJS(['student.js']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
+//        $this->includeJS(['student.js']);
         $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->render('index', $returnData);
     }

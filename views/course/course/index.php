@@ -52,7 +52,7 @@ case 'Assessment': ?>
                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                 <?php } ?>
                             <?php } else {?>
-                                <?php echo "<p>You have no late passes remaining.</p>";?>
+<!--                                --><?php //echo "<p>You have no late passes remaining.</p>";?>
                             <?php }?>
                         <?php }?>
                     <?php } else {?>
@@ -69,7 +69,7 @@ case 'Assessment': ?>
                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                     <?php } ?>
                                 <?php } else {?>
-                                    <?php echo "<p>You have no late passes remaining.</p>";?>
+<!--                                    --><?php //echo "<p>You have no late passes remaining.</p>";?>
                                 <?php }?>
                             <?php }?>
                     <?php } ?>
@@ -86,7 +86,7 @@ case 'Assessment': ?>
                                 <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                             <?php } ?>
                         <?php } else {?>
-                            <?php echo "<p>You have no late passes remaining.</p>";?>
+<!--                            --><?php //echo "<p>You have no late passes remaining.</p>";?>
                         <?php }?>
                     <?php }?>
                   <?php } else {?>
@@ -103,7 +103,7 @@ case 'Assessment': ?>
                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                 <?php } ?>
                             <?php } else {?>
-                                <?php echo "<p>You have no late passes remaining.</p>";?>
+<!--                                --><?php //echo "<p>You have no late passes remaining.</p>";?>
                             <?php }?>
                         <?php }?>
                     <?php } ?>
