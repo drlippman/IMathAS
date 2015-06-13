@@ -2,7 +2,13 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 $this->title = 'Message Conversation';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+if ($userRights->rights > 10){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;

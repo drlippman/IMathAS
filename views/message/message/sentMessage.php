@@ -3,7 +3,14 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 $this->title = 'Sent Messages';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+
+if ($userRights->rights > 10){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -13,9 +20,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
-    <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
-    <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
-    <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
+<!--    --><?php //echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
+<!--    <input type="hidden" class="send-course-id" value="--><?php //echo $course->id ?><!--">-->
+<!--    <input type="hidden" class="send-user-id" value="--><?php //echo $course->ownerid ?><!--">-->
+    <?php if ($userRights->rights > 10) { ?>
+        <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
+        <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
+        <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+    <?php } else {?>
+
+        <?php echo $this->render('../../course/course/_toolbar', ['course' => $course]);?>
+        <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
+        <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+    <?php } ?>
+
 </div>
 <div class="message-container">
     <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>

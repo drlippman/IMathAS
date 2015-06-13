@@ -201,12 +201,9 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         var timelimit_int = parseInt(timelimit);
         if((assessmentsession_int + timelimit_int) < now_int)
         {
-
             $("#timerwrap").hide();
             $("#timerhide").hide();
             $('#expired').show();
-
-
             var msg = '<div><p>Your time limit has expired </p>'+
                 '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
             $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
@@ -221,18 +218,11 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
                         $(this).dialog('destroy').remove();
 
                         return true;
-
                     }
-
                 }
-
             });
 
-
         }
-
     });
-
-
 </script>
 

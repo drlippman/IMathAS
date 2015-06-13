@@ -89,4 +89,12 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findOne(['id' => $Id]);
         return $ForumPost;
     }
+    public static function saveViews($threadid){
+
+        $views = ForumPosts::findOne($threadid);
+        $views->views++;
+//        AppUtility::dump($views->views);
+        $views->save();
+
+    }
 }

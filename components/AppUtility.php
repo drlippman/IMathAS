@@ -797,7 +797,7 @@ class AppUtility extends Component
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
             }
-
+       
             $useeqnhelper = $testsettings['eqnhelper'];
 
             $responseString .= '<div id="headershowtest" class="pagetitle">';

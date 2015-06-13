@@ -344,6 +344,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $courseid=$this->getParamVal('courseid');
         $threadId = $this->getParamVal('threadid');
+
         $data = ForumPosts::getbyid($threadId);
         foreach ($data as $postdata)
         {
@@ -361,9 +362,10 @@ class ForumController extends AppController
             $tempArray['postdate'] = date('F d, o g:i a', $postdate->lastposttime);
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['message'] = $postdata['message'];
-           $tempArray['level'] = $titleLevel['level'];
+            $tempArray['level'] = $titleLevel['level'];
             $this->postData[$postdata['id']] = $tempArray;
         }
+        ForumPosts::saveViews($threadId);
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/post.js']);

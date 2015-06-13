@@ -4,7 +4,13 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 
 $this->title = 'Messages';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+if ($userRights->rights > 10){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -20,11 +26,13 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
         <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
-    <?php
-    } else {
+    <?php } else {?>
 
-        echo $this->render('../../course/course/_toolbar', ['course' => $course]);
-    } ?>
+        <?php echo $this->render('../../course/course/_toolbar', ['course' => $course]);?>
+        <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
+        <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+    <?php } ?>
+
 </div>
 <div class="message-container">
     <div><p>
