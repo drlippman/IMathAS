@@ -148,6 +148,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
     }
 
     function toggletimer() {
+        $('#expired').hide();
         if ($("#timerhide").text()=="[x]") {
             $("#timercontent").hide();
             $("#timerhide").text(' [Show Timer]');
@@ -172,7 +173,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             closeText: "hide",
             buttons:
             {
-                "G0 Back": function ()
+                "Go Back": function ()
                 {
                     window.location ="../../course/course/index?cid="+courseId;
                     $(this).dialog('destroy').remove();
@@ -189,6 +190,8 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
     $(document).ready(function ()
     {
         var assessmentsession = $("#assessmentsession").val();
+
+        $("#expired").hide();
         var now = $("#now").val();
         var timelimit = $("#timelimit").val();
         var now_int = parseInt(now);
@@ -197,9 +200,9 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         if((assessmentsession_int + timelimit_int) < now_int)
         {
 
-//            $("#timerwrap").hide();
-//            $("#timerhide").hide();
-//            $('#expired').show();
+            $("#timerwrap").hide();
+            $("#timerhide").hide();
+            $('#expired').show();
 
 
             var msg = '<div><p>Your time limit has expired </p>'+

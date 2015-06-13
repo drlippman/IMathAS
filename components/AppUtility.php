@@ -797,12 +797,12 @@ class AppUtility extends Component
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
             }
-
+                                                                                                                        /*        <span  style="color: #000000;" class="time" id="expired">Time Expired</span>*/
             $useeqnhelper = $testsettings['eqnhelper'];
 
             $responseString .= '<div id="headershowtest" class="pagetitle">';
             $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
-            $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span></div>\n";
+            $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'>Time Expired</span> </div>\n";
 
             if ($testsettings['testtype']=="Practice" && !$isreview) {
                 echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
