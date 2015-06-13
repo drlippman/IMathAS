@@ -1,5 +1,6 @@
 $(document).ready(function () {
     var cid = $(".send-course-id").val();
+    alert(cid);
     var userId = $(".send-user-id").val();
     var inputData = {cid: cid, userId: userId};
     jQuerySubmit('display-sent-message-ajax',inputData, 'showMessageSuccess');
@@ -38,6 +39,7 @@ function showMessageSuccess(response)
 function showMessage(messageData, status)
 {
     var cid = $(".send-course-id").val();
+    alert(cid);
     var html = "";
     var htmlCourse ="";
     if(status == 0){
