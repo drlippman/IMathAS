@@ -34,7 +34,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <div class="form-group">
         <div class="col-lg-11">
             <br>
-            <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','name' => 'choose-button']) ?>
+            <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>

@@ -38,7 +38,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </fieldset>
     <div class="form-group">
         <div class="col-lg-offset-3 roster-submit">
-            <?= Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+            <?= Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
         </div>
     </div>
 </div>

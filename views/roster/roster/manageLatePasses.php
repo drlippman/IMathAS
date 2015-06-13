@@ -62,6 +62,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <?php }?>
         <tbody>
     </table>
-    <input type="submit" class="btn btn-primary" value="Save Changes">
+    <input type="submit" class="btn btn-primary" id="change-button" value="Save Changes">
 
  <?php ActiveForm::end(); ?>

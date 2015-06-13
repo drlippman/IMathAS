@@ -62,7 +62,7 @@ class RosterController extends AppController
                 }
             }
         }
-        
+
         $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['roster/studentroster.js', 'general.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent,'isImageColumnPresent' => $isImageColumnPresent);
@@ -206,8 +206,7 @@ class RosterController extends AppController
                     } else {
                         $student = new Student();
                         $student->createNewStudent($uid->id, $cid, $param);
-                        $this->setSuccessFlash('Student have been enrolled in course ' . $course->name . ' successfully');
-                        $model = new StudentEnrollmentForm();
+                        $this->redirect('student-roster?cid=' . $cid);
                     }
                 }
             }
@@ -354,9 +353,9 @@ class RosterController extends AppController
                     if (!$studentRecord) {
                         $student = new Student();
                         $student->insertNewStudent($studentData['id'], $studentData['courseId'], $studentData['section']);
-                        $this->setSuccessFlash('Enrolled Successfully');
                     }
                 }
+                $this->redirect('student-roster?cid=' . $cid);
             } else {
                 $this->setErrorFlash('Select student from list to enroll in a course');
             }

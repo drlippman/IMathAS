@@ -424,3 +424,7 @@ a:focus {
 .div-change-student-info{
     padding-left: 21px;
 }
+
+#submit_and_review{
+    margin: 2px 8px;
+}
