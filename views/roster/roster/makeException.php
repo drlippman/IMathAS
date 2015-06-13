@@ -47,7 +47,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                             }
                         echo "</ul></li>";
                 ?>
-            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' value='Record Changes'></div>";}
+            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' id='change-record' value='Record Changes'></div>";}
             else{
                 echo"<p>No exceptions currently exist for the selected students.</p></div>";
             }?>
@@ -102,7 +102,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                         'name' => 'endTime',
                         'options' => ['placeholder' => 'Select operating time ...'],
                         'convertFormat' => true,
-                        'value' =>  AppUtility::tzdate("m/d/Y",$now),
+                        'value' =>"10:00 AM",
                         'pluginOptions' => [
                             'format' => "m/d/Y g:i A",
                             'todayHighlight' => true,
@@ -118,7 +118,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                 <?php echo "<li><input type='checkbox' name='addexc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
                 <?php } ?>
             </ul>
-            <input type="submit" class="btn btn-primary " id="change-record" value="Record Changes">
+            <input type="submit" class="btn btn-primary" id="change-record" value="Record Changes">
         </div>
         <br>
         <div>
