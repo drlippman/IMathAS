@@ -67,5 +67,8 @@ class AppConstant
 
     const ASSET_TYPE_CSS = "css";
     const ASSET_TYPE_JS = "js";
-    const NO_USER_FOUND = "No student found";
+
+    const NO_USER_FOUND = "User not found.";
+    const NO_MESSAGE_FOUND = "No message found.";
+    const NO_COURSE_FOUND = "Course not found.";
 }

@@ -1,16 +1,12 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 $this->title = 'Message Conversation';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid=' . $messages[0]['courseId']]];
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $messages[0]['courseId']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
 ?>
-<meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge"/>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="../../../web/js/jquery.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/imascore.css" type="text/css"/>
@@ -31,18 +27,18 @@ $currentLevel = 0;
     </div>
 
     <div class="midwrapper">
-        <?php $sent = $_GET['message'];
+        <?php $sent = $messageId;
         if ($sent != 1) {
             ?>
             <p>
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id']); ?>">Back
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
                     to Message</a></p>
         <?php } ?>
-        <?php $sent = $_GET['message'];
+        <?php $sent = $messageId;
         if ($sent == 1) {
             ?>
             <p>
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id']); ?>">Back
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
                     to Message</a></p>
         <?php } ?>
         <button onclick="expandall()" class="btn btn-primary">Expand All</button>
@@ -77,7 +73,7 @@ $currentLevel = 0;
                 <span class=right>
 
                  <?php if ($user['id'] != $message['senderId']) { ?>
-                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id']); ?>">
+                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'].'&cid='.$course->id); ?>">
                          Reply</a>
                  <?php } ?>
                     <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"

@@ -275,10 +275,12 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $baseId = $this->getParam('baseid');
         $msgId = $this->getParam('id');
+        $courseId = $this->getParam('cid');
+        $course = Course::getById($courseId);
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
-            $responseData = array('messages' => $messages, 'fromUser' => $fromUser);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser,'course' => $course);
             $this->includeJS(["editor/tiny_mce.js","message/replyMessage.js"]);
             return $this->renderWithData('replyMessage', $responseData);
         }
@@ -330,7 +332,8 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
-
+        $courseId = $this->getParam('cid');
+        $course = Course::getById($courseId);
         $messageId = $this->getParam('message');
         $baseId = $this->getParam('baseid');
         $msgId = $this->getParam('id');
@@ -363,7 +366,7 @@ class MessageController extends AppController
             }
             $this->includeJS(["message/viewConversation.js"]);
             $this->createChild($this->children[key($this->children)]);
-            $responseData = array('messages' => $this->totalMessages,'user' => $user, 'messageId' =>$messageId);
+            $responseData = array('messages' => $this->totalMessages,'user' => $user, 'messageId' =>$messageId,'course' => $course);
             return $this->renderWithData('viewConversation', $responseData);
         }
     }

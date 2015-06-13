@@ -46,7 +46,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
       </select>
     </span>
     <div class="col-lg-offset-2 col-md-10"><br>
-        <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
+        <input type="submit" class="btn btn-primary" id="email-button" value="Send Email">
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>

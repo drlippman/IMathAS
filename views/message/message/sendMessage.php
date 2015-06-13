@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/mes
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
+<?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
 
 <?php $form = ActiveForm::begin([
     'id' => 'login-form',
