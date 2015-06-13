@@ -431,3 +431,6 @@ a:focus {
 #change-record{
     margin:0px;
 }
+.dataTables_filter{
+   display: none;
+}
