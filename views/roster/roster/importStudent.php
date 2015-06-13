@@ -4,15 +4,12 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 //use app\widgets\FileInput;
-
-
 $this->title = 'Import Students';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-
 <div class="site-login">
     <fieldset>
         <legend>Import Students from File</legend>
@@ -41,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </fieldset>
     <div class="form-group">
         <div class="col-lg-offset-3 roster-submit">
-            <?= Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
+            <?= Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
         </div>
     </div>
 </div>

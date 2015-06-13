@@ -44,18 +44,18 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <?php $sent = $_GET['message'];
     if ($sent != 1) {
         ?>
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'$cid='); ?>"
+        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
            class="btn btn-primary "> Reply</a>&nbsp;
         <a class="btn btn-primary" id="mark-as-unread"> Mark Unread </a>&nbsp;
         <a class="btn btn-primary  btn-danger" id="mark-delete"> Delete</a>&nbsp;
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid); ?>">
+        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>">
             View Conversation </a>&nbsp;
         <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>" id="marked"> Gradebook</a>
     <?php } ?>
 
     <?php $sent = $_GET['message'];
     if ($sent == 1) { ?>
-        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid); ?>">
+        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>">
             View Conversation </a>&nbsp;
     <?php } ?>
 

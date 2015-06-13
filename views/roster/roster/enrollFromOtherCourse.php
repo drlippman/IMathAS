@@ -9,6 +9,7 @@ $this->title = 'Enroll From Other Course';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='. $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <h2>Enroll Student From Another Course</h2>
 <div class="site-login">
@@ -33,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="col-lg-11">
             <br>
-            <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','name' => 'choose-button']) ?>
+            <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>

@@ -15,7 +15,7 @@ class StudentEnrollmentForm extends Model
     {
         return [
 
-            [['usernameToEnroll'], 'required'],
+            [['usernameToEnroll'], 'required', 'message'=>'Username cannot be blank'],
             [['section'],'string'],
             [['code'],'string'],
         ];

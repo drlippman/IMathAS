@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
 
-        <div class="row change-password-content">
+        <div class="change-password-content">
 
             <?= $form->field($model, 'oldPassword')->passwordInput() ?>
 

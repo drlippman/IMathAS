@@ -6,9 +6,9 @@ $this->title = 'Send Mass Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <form action="roster-message" method="post" id="roster-form">
-<?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
 <div class="student-roster-message">
     <input type="hidden" name="isMessage" value="1"/>
     <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>

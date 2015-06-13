@@ -47,7 +47,9 @@ class Exceptions extends BaseImasExceptions
     public static function deleteExceptionById($id)
     {
         $exception = Exceptions::getById($id);
+        if($exception){
         $exception->delete();
+        }
     }
 
 } 

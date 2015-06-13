@@ -17,6 +17,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
 <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/AMhelpers.js"></script>
 <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/drawing.js"></script>
 <style type="text/css">span.MathJax { font-size: 105%;}</style>
+
 <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessment->timelimit)?>">
 
 <html>
@@ -31,8 +32,20 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
     <input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
 
 
-<?php echo $response; ?>
+<input type="hidden" id="courseId" value='<?php echo $courseId ?>'/>
+<input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
+<input type="hidden" id="timelimit" value="<?php echo $assessment->timelimit;?>">
+<input type="hidden" id="now" value="<?php echo $now;?>">
 
+
+<?php if(!empty($isQuestions)){echo $response;}else{?>
+<script>
+        $(document).ready(function ()
+        {
+             noQuestionPopup();
+        });
+</script>
+<?php }?>
 <script type="text/javascript">
     $(document).ready(function(){
         var timer = $('#timerlimit').val();
@@ -107,6 +120,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         });
 
     });
+
     var Timer;
     var TotalSeconds;
 
@@ -144,5 +158,76 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             $("#timerhide").attr("title","Hide");
         }
     }
+
+
+    function noQuestionPopup(){
+
+        var courseId = $("#courseId").val();
+        var msg = '<div><p>This assessment does not have any questions right now</div>';
+
+        $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+        ({
+            modal: true, title: 'Warning', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons:
+            {
+                "G0 Back": function ()
+                {
+                    window.location ="../../course/course/index?cid="+courseId;
+                    $(this).dialog('destroy').remove();
+
+                }
+            },
+            close: function (event, ui)
+            {
+                $(this).remove();
+            }
+        });
+    }
+
+    $(document).ready(function ()
+    {
+        var assessmentsession = $("#assessmentsession").val();
+        var now = $("#now").val();
+        var timelimit = $("#timelimit").val();
+        var now_int = parseInt(now);
+        var assessmentsession_int =parseInt(assessmentsession);
+        var timelimit_int = parseInt(timelimit);
+        if((assessmentsession_int + timelimit_int) < now_int)
+        {
+
+//            $("#timerwrap").hide();
+//            $("#timerhide").hide();
+//            $('#expired').show();
+
+
+            var msg = '<div><p>Your time limit has expired </p>'+
+                '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+            ({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons:
+                {
+                    "Okay": function ()
+                    {
+                        $(this).dialog('destroy').remove();
+
+                        return true;
+
+                    }
+
+                }
+
+            });
+
+
+        }
+
+    });
+
+
 </script>
 

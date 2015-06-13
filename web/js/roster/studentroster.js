@@ -15,27 +15,27 @@ function studentRosterSuccess(response)
     response= JSON.parse(response);
     var isCode = response.data.isCode;
     var isSection = response.data.isSection;
-
-    var imageSize = response.data.imageSize;
+    var isImageColumnPresent = response.data.isImageColumnPresent;
     if (response.status == 0) {
         var students = response.data.query;
-        showStudentInformation(students,isCode,isSection,imageSize);
+        showStudentInformation(students,isCode,isSection,isImageColumnPresent);
         studentData = students;
     }
 }
-function showStudentInformation(students,isCode,isSection,imageSize)
+function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
 {var courseId =  $( "#course-id" ).val();
     var html = "";
     var courseId =  $( "#course-id" ).val();
     $.each(students, function(index, student){
 
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='"+student.id+"'></td>";
+        if(isImageColumnPresent == 1) {
         if(student.hasuserimg == 0 ){
             html += "<td><img  class='images circular-image'  src='../../Uploads/dummy_profile.jpg' ></td>";
         }else{
             html += "<td><img  class='images circular-image' src='../../Uploads/" + student.id+".jpg' ></td>";
         }
-
+        }
         if(isSection == true)
         {
             if(student.section == null){
@@ -64,7 +64,7 @@ function showStudentInformation(students,isCode,isSection,imageSize)
         else{ html += "<td><a>Is locked out</a></a></td>" }
         html += "<td><a>Grades</a></td>";
         html += "<td><a>Exception</a></td>";
-        html += "<td><a href='change-student-information?cid=" + courseId + "&uid="+ student.id +"'>Chg</a></td>";
+        html += "<td><a href='change-student-information?cid=" + courseId + "&uid="+ student.id +"'>Change</a></td>";
         if(student.locked == 0) {
             html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false,"+student.id+")'>Lock</a></td>"; }
         else{ html += "<td class = 'lock-class'><a href='#' onclick='lockUnlockStudent(true,"+student.id+")'>Unlock</a></td>"; }

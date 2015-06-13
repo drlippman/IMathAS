@@ -7,8 +7,7 @@ $this->title = 'Make Exception';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher');
-date_default_timezone_set("Asia/Calcutta");
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
 <form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
@@ -48,7 +47,7 @@ date_default_timezone_set("Asia/Calcutta");
                             }
                         echo "</ul></li>";
                 ?>
-            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' value='Record Changes'></div>";}
+            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' id='change-record' value='Record Changes'></div>";}
             else{
                 echo"<p>No exceptions currently exist for the selected students.</p></div>";
             }?>
@@ -103,7 +102,7 @@ date_default_timezone_set("Asia/Calcutta");
                         'name' => 'endTime',
                         'options' => ['placeholder' => 'Select operating time ...'],
                         'convertFormat' => true,
-                        'value' =>  date('10:00 AM'),
+                        'value' =>"10:00 AM",
                         'pluginOptions' => [
                             'format' => "m/d/Y g:i A",
                             'todayHighlight' => true,
@@ -119,7 +118,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php echo "<li><input type='checkbox' name='addexc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
                 <?php } ?>
             </ul>
-            <input type="submit" class="btn btn-primary " id="change-record" value="Record Changes">
+            <input type="submit" class="btn btn-primary" id="change-record" value="Record Changes">
         </div>
         <br>
         <div>

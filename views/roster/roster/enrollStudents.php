@@ -6,9 +6,10 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $this->title = 'Enroll From Other Course';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <h2>Enroll Student From Another Course</h2>
 
@@ -44,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="col-lg-offset-0 col-lg-10 ">
             <br>
-            <?= Html::submitButton('Enroll These Students', ['class' => 'btn btn-primary','name' => 'enroll-students']) ?>
+            <?= Html::submitButton('Enroll These Students', ['class' => 'btn btn-primary', 'id' => 'change-button','name' => 'enroll-students']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$cid)  ?>">Back</a>
         </div>
     </div>

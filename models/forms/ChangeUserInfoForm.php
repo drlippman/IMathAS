@@ -8,6 +8,7 @@ use Yii;
 use yii\base\Model;
 class ChangeUserInfoForm extends Model
 {
+    public $Username;
     public $FirstName;
     public $LastName;
     public $password;
@@ -24,7 +25,12 @@ class ChangeUserInfoForm extends Model
     public $NewMessagesNotesOnCourseList;
     public $NewPostsNotesOnCourseList;
     public $remove;
-
+    public $section;
+    public $code;
+    public $timelimitmult;
+    public $locked;
+    public $ispasswordchange;
+    public $hidefromcourselist;
     private $_user = false;
 
 
@@ -58,12 +64,19 @@ class ChangeUserInfoForm extends Model
             'changePassword'=>'Click here to change password',
             'FirstName' => 'Enter First Name',
             'LastName' => 'Enter Last Name',
-            'email' => 'Email',
+            'email' => ' Enter Email',
+            'Username' => 'Enter User Name (login name)',
             'NotifyMeByEmailWhenIReceiveANewMessage'=>'Notify me by email when I receive a new message',
             'file'=>'Picture',
             'message'=>'Messages/Posts per page',
             'homepage'=>'Show on home page',
             'remove' => 'Remove',
+            'section' => 'Section(optional)',
+            'code' => 'Code(optional)',
+            'timelimitmult' =>'Time Limit Multiplier',
+            'locked' => 'Lock out of course?',
+            'hidefromcourselist' =>'Student has course hidden from course list?',
+            'ispasswordchange' => 'Reset Password',
         ];
     }
 

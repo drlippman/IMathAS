@@ -8,7 +8,9 @@ use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
-use app\models\SetPassword;
+
+use app\models\Questions;
+
 use app\models\Student;
 use app\models\Teacher;
 use Yii;
@@ -19,6 +21,7 @@ class AssessmentController extends AppController
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
+
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $assessmentId = isset($params['id']) ? trim($params['id']) : "";
@@ -34,10 +37,13 @@ class AssessmentController extends AppController
         }
 
         $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
+
+        $isQuestions  = Questions::getByAssessmentId($assessmentId);
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response'=> $response, 'assessment' => $assessment);
+        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions,'courseId' => $courseId,'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession);
+
         return $this->render('ShowAssessment', $responseData);
 
     }

@@ -90,41 +90,35 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $this->authKey === $authKey;
     }
 
-    public static function saveUserRecord($params)
+    public static function saveUserRecord($params, $user)
     {
         $params = AppUtility::removeEmptyAttributes($params);
-        $user = User::findByUsername(\Yii::$app->user->identity->SID);
         if(isset($params['password']))
         {
             $params['password'] = AppUtility::passwordHash($params['password']);
         }
         $user->attributes = $params;
-        $user->save();
+         $user->save();
     }
-
     public static function findByEmail($email)
     {
         $user = static::findOne(['email' => $email]);
         return $user;
     }
-
     public static function findAllUser($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->all();
     }
-
     public static function findAllUsers($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => [20,40,60,75,100] ])->all();
 
     }
-
     public static function findAllUsersArray($sortBy, $order)
     {
         return User::find()->orderBy([$sortBy => $order])->where(['rights' => 0 ])->asArray()->all();
 
     }
-
     public static function createStudentAccount($params)
     {
         $params['SID'] = $params['username'];
@@ -133,30 +127,25 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user = new User();
         $user->attributes = $params;
         $user->save();
-
         if($user->id && isset($params['userid']) && isset($params['courseid']))
         {
             $student = new Student();
             $student->create($params);
         }
-
         if($user->id)
         {
             return true;
         }
         return false;
     }
-
     public static function findAllTeachers($sortBy, $order)
     {
         return User::find()->where(['rights' => [20,40,60,75,100]])->orderBy([$sortBy => $order])->asArray()->all();
     }
-
     public static function findUsers($params)
     {
         return User::findAll($params);
     }
-
     public static function updateRights($id, $rights, $groupId = 0)
     {
        $user = static::findOne(['id' =>$id]);
@@ -164,17 +153,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $user->groupid = $groupId;
         $user->save();
     }
-
     public static function getById($id)
     {
         return static::findOne($id);
     }
-
     public static function getByIdAndCode($id, $code)
     {
         return static::findOne(['id' => $id, 'remoteaccess' => $code]);
     }
-
     public static function getByName($uname)
     {
         return static::findAll(['SID'=>$uname]);
@@ -201,7 +187,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function findByUserId($uid)
     {
-        return static::findAll(['id'=>$uid]);
+        return static::findOne(['id'=>$uid]);
     }
     public static function updateImgByUserId($id){
         $user=User::getById($id);
@@ -221,5 +207,9 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function userAlreadyExist($StudentDataArray){
         $message = "Username {$StudentDataArray} already existed in system";
         return $message;
+    }
+    Public static function getByCourseId($courseId)
+    {
+        return static::find()->where(['id'=>$courseId])->all();
     }
 }

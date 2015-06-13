@@ -18,7 +18,6 @@ class Student extends BaseImasStudents {
         $this->attributes = $param;
         $this->save();
     }
-
     public static function getByCourseId($courseId, $userId)
     {
         return static::findOne(['courseid' => $courseId, 'userid' => $userId]);
@@ -48,9 +47,7 @@ class Student extends BaseImasStudents {
     }
     public static function findByCid($cId){
         return static::findAll(['courseid'=>$cId]);
-
     }
-
     public function insertNewStudent($studentId,$courseId,$section)
     {
         $this->userid = $studentId;
@@ -58,33 +55,41 @@ class Student extends BaseImasStudents {
         $this->section = empty($section) ? null : $section;
         $this->save();
     }
-    public static function updateSectionAndCodeValue($section, $userid, $code, $cid)
+    public static function updateSectionAndCodeValue($section, $userid, $code, $cid,$params = null)
     {
-
         $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
         $student->section = $section;
         $student->code = $code;
+        if($params != null)
+        {
+           if($params['locked'] == 1) {
+               $student->locked = strtotime(date('F d, o g:i a'));
+           }
+            else{
+                $student->locked = 0;
+            }
+           $student->hidefromcourselist = $params['hidefromcourselist'];
+
+            if($params['timelimitmult'] != 0)
+            {
+                $student->timelimitmult =  $params['timelimitmult'];
+            }
+        }
         $student->save();
-
-
     }
-
     public static function updateLatepasses($latepass,$userid,$cid)
     {
-
         $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
         $student->latepass = $latepass;
         $student->save();
     }
-
     public static function findByCourseId($cId,$sortBy, $order){
         return static::find()->where(['courseid'=>$cId])->groupBy('section')->orderBy([$sortBy => $order])->all();
     }
     public static function updateLocked($userid,$courseid)
     {
-
         $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
-        $student->locked = strtotime(date('F d, o g:i a'));;
+        $student->locked = strtotime(date('F d, o g:i a'));
         $student->save();
     }
     public static function deleteStudent($userid,$courseid)
@@ -92,13 +97,13 @@ class Student extends BaseImasStudents {
         $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
         $student->delete();
     }
-public function assignSectionAndCode($newEntry,$id)
-{
-    $this->userid = $id;
-    $this->section = $newEntry['5'];
-    $this->code = $newEntry['4'];
-    $this->save();
-}
+    public function assignSectionAndCode($newEntry,$id)
+    {
+        $this->userid = $id;
+        $this->section = $newEntry['5'];
+        $this->code = $newEntry['4'];
+        $this->save();
+    }
     public static function updateLockOrUnlockStudent($params)
     {
         $courseId = $params['courseId'];
@@ -113,7 +118,16 @@ public function assignSectionAndCode($newEntry,$id)
             $student->locked = strtotime(date('F d, o g:i a'));
             $student->save();
         }
-
-
+    }
+    public static function reduceLatepasses($userid, $cid, $n)
+    {
+        $student = Student::findOne(['userid' => $userid, 'courseid' => $cid]);
+        if($student->latepass > $n){
+            $student->latepass = $student->latepass - $n;
+        }
+        else{
+            $student->latepass = 0;
+        }
+        $student->save();
     }
 } 

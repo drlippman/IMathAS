@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/mes
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
+<?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
 
 <?php $form = ActiveForm::begin([
     'id' => 'login-form',
@@ -33,14 +33,14 @@ $this->params['breadcrumbs'][] = $this->title;
             </option><?php } ?>
         </select>
         </span>
-        <label style="color: red" id="to">Please select atleast one user</label>
+        <label style="color: white" id="to">Please select atleast one user</label>
     </div>
     <br><br><br>
 
     <div>
         <span class="col-md-1"><b>Subject</b></span>
         <span class="col-md-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
-        <label style="color: red"  id="subjecttext">Subject cannot be blank</label>
+        <label style="color: white"  id="subjecttext">Subject cannot be blank</label>
     </div>
     <br><br><br>
     <div>

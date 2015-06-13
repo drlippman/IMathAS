@@ -3,10 +3,11 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 $this->title = 'New Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='. $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <form action="roster-email" method="post" id="roster-form">
-<?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
 <div class="student-roster-email">
     <input type="hidden" name="isEmail" value="1"/>
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
@@ -45,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </select>
     </span>
     <div class="col-lg-offset-2 col-md-10"><br>
-        <input type="submit" class="btn btn-primary" id="email-button" value="Send Message">
+        <input type="submit" class="btn btn-primary" id="email-button" value="Send Email">
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>

@@ -3,19 +3,17 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 $this->title = 'Sent Messages';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $_GET['cid']]];
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$_GET['cid']]];
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
 
     <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
     <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
-    <?php echo $this->render('../../instructor/instructor/_toolbarTeacher'); ?>
+    <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
 </div>
@@ -43,6 +41,5 @@ $this->params['breadcrumbs'][] = $this->title;
             <a class="btn btn-primary btn-sm" id="mark-unsend">Unsend</a>
         </p>
     </div>
-
     <div class="message-div"></div>
     </div>
