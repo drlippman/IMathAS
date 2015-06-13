@@ -11,6 +11,7 @@ use app\models\Exceptions;
 
 use app\models\Questions;
 
+use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
 use Yii;
