@@ -51,5 +51,17 @@ class Exceptions extends BaseImasExceptions
         $exception->delete();
         }
     }
+//    public  function SaveData($param)
+//    {
+//
+//        AppUtility::dump($param);
+//      $this->assessmentid = $param['assessmentid'];
+//      $this->assessmentid = $param['assessmentid'];
+//      $this->assessmentid = $param['assessmentid'];
+//      $this->assessmentid = $param['assessmentid'];
+//
+//
+//
+//    }
 
 } 

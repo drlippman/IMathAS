@@ -179,6 +179,7 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
 
         $addtime = $course->latepasshrs * 60 * 60;
+        AppUtility::dump('hello');
         $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $usedlatepasses = round(($assessment->allowlate - $assessment->enddate) / ($course->latepasshrs * 3600));
         $startdate = $assessment->startdate;
@@ -193,9 +194,10 @@ class CourseController extends AppController
         $param['islatepass'] = 1;
 
         if (count($exception)) {
-
+            AppUtility::dump('Hello');
             if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate) < $course->latepasshrs * 3600))) {
                 $latepass = $student->latepass;
+                AppUtility::dump($latepass);
                 $student->latepass = $latepass - 1;
                 $exception->enddate = $exception->enddate + $addtime;
                 $exception->islatepass = $exception->islatepass + 1;

@@ -61,7 +61,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             html += "<b>Timelimit: "+hour+":"+min+" minutes.</b>" ;
             html += "<span id='timerwrap'><b>";
             html += "<span id='timer'></span> remaining </b></span>"
-
+            window.onload = toggleintroshow();
         }else {
             html += 'Due '+endDate;
         }

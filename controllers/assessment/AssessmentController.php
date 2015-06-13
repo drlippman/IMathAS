@@ -56,7 +56,7 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $studentId = $this->getUserId();
         $exception = Exceptions::getByAssessmentId($assessmentId);
-
+        //AppUtility::dump($exception);
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
         $course = Course::getById($courseId);
@@ -64,21 +64,21 @@ class AssessmentController extends AppController
         $addtime = $course->latepasshrs * 60 * 60;
         $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $usedlatepasses = round(($assessment->allowlate - $assessment->enddate)/($course->latepasshrs * 3600));
+        AppUtility::dump($usedlatepasses);
         $startdate = $assessment->startdate;
-        $enddate = $assessment->enddate + $addtime;
+        $enddate = (($assessment->enddate) + $addtime);
         $wave = 0;
-
         $param['assessmentid'] = $assessmentId;
         $param['userid'] = $studentId;
         $param['startdate'] = $startdate;
         $param['enddate'] = $enddate;
         $param['waivereqscore'] = $wave;
         $param['islatepass'] = 1;
-
         if(count($exception))
         {
             if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate)< $course->latepasshrs * 3600)))
             {
+                AppUtility::dump('aa');
                 $latepass = $student->latepass;
                 $student->latepass = $latepass - 1;
                 $exception->enddate = $exception->enddate + $addtime;
@@ -119,11 +119,14 @@ class AssessmentController extends AppController
             {
                 echo '<p>Invalid</p>';
             }
-            $exception->attributes = $param;
-            $exception->save();
+//            $exception->attributes = $param;
+            $exceptionData = new Exceptions();
+            $exceptionData->create($param);
+//             $exception->save();
+//            AppUtility::dump($a);
             $student->save();
-        }
-        $this->includeJS(['../js/latePass.js']);
+         }
+        $this->includeJS(['latePass.js']);
         $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
     }
 

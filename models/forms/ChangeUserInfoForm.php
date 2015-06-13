@@ -49,7 +49,8 @@ class ChangeUserInfoForm extends Model
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
             ['remove', 'boolean'],
             ['file','safe'],
-            [['file'],'file'],
+            [['file'], 'file', 'extensions' => 'gif, jpeg, jpg'],
+            //[['file'],'file'],
             [['password', 'oldPassword', 'rePassword'], 'validatePassword'],
         ];
 

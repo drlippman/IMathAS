@@ -1,7 +1,7 @@
 $('.confirmation-late-pass').click(function(e){
     var linkId = $(this).attr('id');
-    var latePass = $('#late-pass'+linkId).val(); //40
-    var latePassHrs = $('#late-pass-hrs'+linkId).val(); //24
+    var latePass = $('#late-pass'+linkId).val();
+    var latePassHrs = $('#late-pass-hrs'+linkId).val();
     var useLatePass = ((latePass%10) - 1);
     var html = '<div><p>You may use up to '+useLatePass+' more LatePass(es) on this assessment.</p>' +
         '<p>You have ' +latePass+'  LatePass(es) remaining.  You can redeem one LatePass for a '+latePassHrs+' hour extension on this assessment.</p> ' +
