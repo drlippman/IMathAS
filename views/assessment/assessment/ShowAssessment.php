@@ -50,6 +50,8 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
     $(document).ready(function(){
         var timer = $('#timerlimit').val();
         var html = '';
+        $('#expired').hide();
+        $("#timerhide").hide();
         var hour = $('#hour').val();
         var min = $('#min').val();
         var endDate = $('#endDate').val();
