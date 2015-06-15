@@ -77,5 +77,6 @@ use kartik\time\TimePicker;
     <div class="col-md-4  col-lg-offset-2">
     <input type="button" class="btn btn-primary" id="addNewThread" value="Post Thread">
         </div>
+    
 </div>
 

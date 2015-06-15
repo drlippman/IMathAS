@@ -54,6 +54,8 @@ class ForumView extends BaseImasForumViews
         $this->tagged = 0;
         $this->save();
 
+
+
     }
 
 } 

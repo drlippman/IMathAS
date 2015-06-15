@@ -5,6 +5,7 @@ $(document).ready(function () {
     });
     $("#addNewThread").click(function()
     {
+
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
             var subject = $(".subject").val();
