@@ -15,25 +15,30 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
 <div class="site-login">
 
-    <?php $form =ActiveForm::begin(
+    <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'template' => "{label}\n<div class = \"col-lg-3\">{input}</div>\n<div class = \"col-lg-7 col-lg-offset-2\">{error}</div>",
                 'labelOptions' => ['class' => 'col-lg-2'],
             ],
         ]
     ) ?>
     <div><br>
         <h4>Select students to enroll: </h4>
-        Check: <a id="checkAll" class="check-all" href="#">All</a> /
-        <a id="checkNone" class="uncheck-all" href="#">None</a>
+        Check: <a id = "checkAll" class = "check-all" href = "#">All</a> /
+        <a id = "checkNone" class = "uncheck-all" href = "#">None</a>
         <br><br>
-    <div id="list">
+    <div id = "list">
         <?php
         foreach($data as $value){
 
-            echo "<tr><td><input type='checkbox' name='studdent[".$value['id']."]' value='{$value['id']}' class='master'></td>"." " ."<td>{$value['lastName']}"." , " ."{$value['firstName']}</td></tr><br>";
+            echo "<tr><td>";
+            if($value['isCheck'] == 1)
+                echo  "<input type='checkbox' name = 'studdent[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'>";
+            else
+                echo  "<input type='checkbox' name = 'studdent[".$value['id']."]' value = '{$value['id']}' class = 'master'>";
+            echo "</td>"." " ."<td>{$value['lastName']}".", " ."{$value['firstName']}</td></tr><br>";
         }
         ?>
     </div>

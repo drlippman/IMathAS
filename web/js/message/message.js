@@ -70,7 +70,7 @@ function showMessage(messageData, status) {
     $('.message-div div').remove();
     createTableHeader();
     $(".message-table-body").append(html);
-    $('.display-message-table').DataTable();
+    $('.display-message-table').DataTable({"bPaginate": false});
     $(".images").hide();
 
 }

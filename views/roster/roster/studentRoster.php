@@ -30,7 +30,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 </div>
 <div class="button-container">
     <form>
-        <span>Check: <a class="check-all" href="#">All</a> / <a class="non-locked" href="#">Non-locked</a> / <a class="uncheck-all" href="#">None</a> With Selected:</span>
+        <span>Check: <a class="check-all" href="#">All</a>/<a class="non-locked" href="#">Non-locked</a>/<a class="uncheck-all" href="#">None</a> With Selected:</span>
     </form>
     <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">
         <input type="hidden" id="student-id" name="student-data" value=""/>

@@ -8,6 +8,7 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
+date_default_timezone_set("Asia/Calcutta");
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
 <form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
@@ -124,7 +125,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <div>
             <p><input type="checkbox" name="forceregen">Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.</p>
             <p><input type="checkbox" name="forceclear">Clear student's attempts?  Students will <b>not</b>  keep any scores earned, and must rework all problems.</p>
-            <p><input type="checkbox" name="eatlatepass">Deduct <input type="input" name="latepassn" size="1" value="1">  LatePass(es) from each student. These students all have 0 latepasses.</p>
+            <p><input type="checkbox" name="eatlatepass">Deduct <input type="input" name="latepassn" size="1" value="1">  LatePass(es) from each student.<?php echo $latepassMsg?></p>
             <p><input type="checkbox" name="waivereqscore"> Waive "show based on an another assessment" requirements, if applicable.</p>
             <p><input type="checkbox" name="sendmsg"> Send message to these students?</p>
         </div>

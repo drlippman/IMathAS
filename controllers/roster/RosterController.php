@@ -298,9 +298,11 @@ class RosterController extends AppController
         $courseDetails = array();
         if ($list) {
             foreach ($list as $teacher) {
-                $tempArray = array("id" => $teacher->course->id,
-                    "name" => $teacher->course->name);
-                array_push($courseDetails, $tempArray);
+                if($teacher->course->id != $cid){
+                    $tempArray = array("id" => $teacher->course->id,
+                        "name" => ucfirst($teacher->course->name));
+                    array_push($courseDetails, $tempArray);
+                }
             }
         }
         if ($this->isPost()) {
@@ -326,16 +328,32 @@ class RosterController extends AppController
         $course = Course::getById($cid);
         $model = new EnrollStudentsForm();
         $query = Student::findByCid($courseid);
+        $queryCheck = Student::findByCid($cid);
+        $checkedArray = array();
+        foreach($queryCheck as $check){
+            foreach($query as $singleCourse){
+                if($singleCourse->userid == $check->userid){
+                       array_push($checkedArray, $singleCourse->userid);
+                }
+            }
+        }
         $studentDetails = array();
         if ($query) {
             foreach ($query as $student) {
                 $users = User::getById($student->userid);
+                $isCheck = 0;
+                if(in_array($student->userid,$checkedArray)){
+                    $isCheck = 1;
+                }
                 $tempArray = array("id" => $student->userid,
-                    "firstName" => $users->FirstName,
-                    "lastName" => $users->LastName);
+                    "firstName" => ucfirst($users->FirstName),
+                    "lastName" => ucfirst($users->LastName),
+                    "isCheck" => $isCheck);
                 array_push($studentDetails, $tempArray);
             }
         }
+        $sort_by = array_column($studentDetails, 'lastName');
+        array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentDetails);
         if ($this->isPost()) {
             $params = $this->getRequestParams();
             $record = array();
@@ -878,9 +896,11 @@ class RosterController extends AppController
     public function actionMakeException()
     {
         if($this->getRequestParams()){
+            $data = $this->getRequestParams();
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
             $assessments = Assessments::getByCourseId($courseId);
+            $studentList = explode(',', $data['student-data']);
             $exceptionArray = array();
             $studentArray = array();
             if ($this->isPost()) {
@@ -889,15 +909,14 @@ class RosterController extends AppController
                 $isActionForException = isset($params['isException']) ? $params['isException'] : 0;
                 if (!$isActionForException) {
                     if ($params['student-data'] != '') {
-                        $params = explode(',', $params['student-data']);
-                        foreach ($params as $studentId) {
+                       foreach ($studentList as $studentId) {
                             $student = User::getById($studentId);
                             array_push($studentArray, $student->attributes);
                             $exceptionList = array();
                             foreach($assessments as $singleAssessment){
                                 $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                                 if($query){
-                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
+                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
                                     array_push($exceptionList,$tempArray);
                                 }
                             }
@@ -906,6 +925,8 @@ class RosterController extends AppController
                                 array_push($exceptionArray,$assessmentList);
                             }
                         }
+                        $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
+
                     } else {
                         return $this->redirect('student-roster?cid=' . $courseId);
                     }
@@ -955,7 +976,7 @@ class RosterController extends AppController
                         foreach($assessments as $singleAssessment){
                             $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
                             if($query){
-                                $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore, 'islatepass' => $query->islatepass);
+                                $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
                                 array_push($exceptionList,$tempArray);
                             }
                         }
@@ -964,21 +985,46 @@ class RosterController extends AppController
                             array_push($exceptionArray,$assessmentList);
                         }
                     }
+                    $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
                 }
                 $sort_by = array_column($exceptionArray, 'Name');
                 array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $exceptionArray);
                 $sort_by = array_column($studentArray, 'LastName');
                 array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentArray);
-                $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section);
-            return $this->renderWithData('makeException', $responseData);
+
         }
-            return $this->redirect('student-roster?cid=' . $courseId);
+            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latepassMsg' => $latepassMsg);
+            return $this->renderWithData('makeException', $responseData);
     }
         else{
              $this->setErrorFlash(AppConstant::NO_USER_FOUND);
         }
     }
 
+    public function  findLatepassMsg($studentArray, $courseid){
+        $studentRecord = array();
+        foreach($studentArray as $student){
+            array_push($studentRecord,Student::getByCourseId($courseid, $student['id']));
+
+        }
+        $latepassMin = $studentRecord[0]->latepass;
+        $latepassMax = $studentRecord[0]->latepass;
+        foreach($studentRecord as $record)
+        {
+            if($record->latepass < $latepassMin){ $latepassMin = $record->latepass; }
+            if($record->latepass > $latepassMax){ $latepassMax = $record->latepass; }
+        }
+        if(count($studentRecord) < 2){
+            $latepassMsg = "This student has $latepassMin latepasses.";
+        }
+        elseif($latepassMin == $latepassMax){
+            $latepassMsg = "These students all have $latepassMin latepasses.";
+        }
+        else{
+            $latepassMsg = "These students have $latepassMin-$latepassMax latepasses.";
+        }
+        return $latepassMsg;
+    }
 
     public  function actionSaveCsvFileAjax()
     {

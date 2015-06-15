@@ -44,7 +44,6 @@ $("#mess").click(function()
 function sendMessage(response)
 {
         var cid = $(".send-msg").val();
-        console.log(response);
         var result = JSON.parse(response);
         if(result.status == 0)
         {
