@@ -12,7 +12,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 <input type="hidden" class="courseId" value="<?php echo $courseid ?>">
 <?php $sectionArray = $section?>
 
-<div id="user-div"></div>
+<p><div id="user-div"></div></p>
 <h2>Manage Tutors</h2>
 
 <div>
@@ -61,4 +61,5 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <textarea name = "newtutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
 <a class = "btn btn-primary" id = "update-bttn">Update</a>
+<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
 
