@@ -44,5 +44,17 @@ class ForumView extends BaseImasForumViews
         return $count;
     }
 
+    public  function createThread($userId,$threadId)
+    {
+
+        $this->threadid = $threadId;
+        $postdate = strtotime(date('F d, o g:i a'));
+        $this->lastview = $postdate;
+        $this->userid = $userId;
+        $this->tagged = 0;
+        $this->save();
+
+    }
+
 } 
 

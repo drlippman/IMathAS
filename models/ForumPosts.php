@@ -81,6 +81,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->message = isset($params['body']) ? $params['body'] : null;
         $this->save();
+        return($this->threadid);
 
     }
 

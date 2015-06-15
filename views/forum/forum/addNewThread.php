@@ -74,8 +74,8 @@ use kartik\time\TimePicker;
             </span>
         </div>
  <?php }?>
-    <div class="col-md-4  col-lg-offset-2"  >
-    <a class="btn btn-primary" id="addthread`">Post Thread</a>
+    <div class="col-md-4  col-lg-offset-2">
+    <input type="button" class="btn btn-primary" id="addNewThread" value="Post Thread">
         </div>
 </div>
 

@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers\forum;
+use app\components\AppConstant;
 use app\models\Course;
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
@@ -460,6 +461,10 @@ class ForumController extends AppController
            $threadId = $newThread->createThread($params,$userId);
             $newThread = new ForumPosts();
             $newThread->createThread($params,$userId,$threadId);
+            $views = new ForumView();
+            $views->createThread($userId,$threadId);
+
+
             return $this->successResponse();
         }
     }
@@ -516,15 +521,19 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $sort = AppConstant::DESCENDING;
         $forumid = $params['forumid'];
-        $thread = ThreadForm::thread($forumid);
+        $forumname = Forums::getById($forumid);
+        $orderby = 'postdate';
+        $thread = ThreadForm::postByName($forumid,$sort,$orderby);
         if($thread)
         {
                 $threadArray = array();
                 foreach ($thread as $data)
                 {
                     $username = User::getById($data['userid']);
-                       $temparray = array
+
+                     $temparray = array
                         (
                             'parent' => $data['parent'],
                             'threadId' => $data['threadid'],
@@ -535,8 +544,9 @@ class ForumController extends AppController
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                         );
                         array_push($threadArray, $temparray);
+
                 }
-                $responseData = array('threadArray' => $threadArray,'forumid' => $forumid);
+                $responseData = array('threadArray' => $threadArray,'forumid' => $forumid,'forumname' => $forumname);
                 return $this->renderWithData('listpostbyname',$responseData);
         }
         else
