@@ -11,7 +11,7 @@ $this->title = 'Import Students';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-
+<input type="hidden" id="course-id" value="<?php echo $courseId ?>" >
 <div class="import-student">
     <fieldset>
 
@@ -41,7 +41,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
             if (isset($studentData['newUsers'])) {
                 $newStudentData = $studentData['newUsers'];
-               // AppUtility::dump($newStudentData);
                 foreach ($newStudentData as $singleRecord) {
                     ?>
                     <tr>
@@ -96,10 +95,12 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     function saveCsvFileSuccess(response)
     {
-//        var courseId =
+//        var startDate = $("#datepicker-id input").val();
+        var courseId = $("#course-id").val();
+
         if(status == 0)
         {
-  //           window.location = "student-roster?cid="+courseId;
+             window.location = "student-roster?cid="+courseId;
         }
     }
 

@@ -9,7 +9,6 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-
 <div><h2>Student Roster </h2></div>
 <div class="cpmid">
             <span class="column" style="width:auto;">

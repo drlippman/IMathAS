@@ -7,8 +7,8 @@ $(document).ready(function () {
     {
         tinyMCE.triggerSave();
         var cid = $(".send-msg").val();
-        var sender = $(".msg-sender").val();
-        var receiver = $(".msg-receiver").val();
+        var receiver = $(".msg-sender").val();
+        var sender = $(".msg-receiver").val();
         var subject = $(".subject").val();
         var body = $("#message").val();
         var parentId = $(".parent-id").val();

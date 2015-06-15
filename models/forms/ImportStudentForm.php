@@ -29,6 +29,9 @@ class ImportStudentForm extends Model
     public function rules()
     {
         return [
+            [['lastName', 'firstName','emailAddress'],'required'],
+            [['lastName', 'firstName','emailAddress'],'number'],
+            ['file', 'required', 'message' => 'Upload the CSV file'],
             ['file', 'safe'],
             [['file'], 'file'],
         ];

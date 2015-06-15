@@ -63,7 +63,7 @@ class RosterController extends AppController
             }
         }
 
-        $this->includeCSS(['jquery-ui.css', 'dataTables-jqueryui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeCSS(['jquery-ui.css','../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['roster/studentroster.js', 'general.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent,'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
@@ -208,6 +208,8 @@ class RosterController extends AppController
                         $student->createNewStudent($uid->id, $cid, $param);
                         $this->redirect('student-roster?cid=' . $cid);
                     }
+
+
                 }
             }
         }
@@ -243,7 +245,7 @@ class RosterController extends AppController
             }
             $this->redirect('student-roster?cid=' . $courseid);
         }
-        $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeCSS(['jquery-ui.css']);
         $this->includeJS(['roster/assignSectionsAndCodes.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('studentInformation' => $studentArray, 'cid' => $courseid, 'course' => $course);
         return $this->render('assignSectionsAndCodes', $responseData);
@@ -498,10 +500,9 @@ class RosterController extends AppController
                 $model->file->saveAs($filename);
             }
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
-
             $newUserRecords = array();
             $existUserRecords = array();
-
+        if($studentRecords['allUsers']){
             foreach ($studentRecords['allUsers'] as $users) {
                 array_push($newUserRecords, $users);
             }
@@ -517,8 +518,14 @@ class RosterController extends AppController
                 }
             }
             if ($filename) {
-                $this->redirect(array('show-import-student', 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords, 'course' => $course));
+                $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
             }
+        }else{
+            $this->includeJS(["courseSetting.js"]);
+            $responseData = array('model' => $model, 'course' => $course);
+            return $this->render('importStudent', $responseData);
+            setErrorFlash('All students from CSV file already exits.');
+        }
         }
         if (!$studentRecords) {
             $responseData = array('model' => $model, 'course' => $course);
@@ -530,6 +537,7 @@ class RosterController extends AppController
     {
         $course = Course::getById($courseId);
         $AllUserArray = array();
+        $newUserArray = array();
         $ExistingUser = array();
         if ($course) {
             $handle = fopen($fileName, 'r');
@@ -546,6 +554,7 @@ class RosterController extends AppController
                 }
                 $userData = User::getByName($StudentDataArray[0]);
                 if ($userData) {
+                    array_push($ExistingUser, $userData);
                 } else {
                     if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($StudentDataArray[0]) < 4) {
                         $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
@@ -569,13 +578,9 @@ class RosterController extends AppController
                     array_push($StudentDataArray, $password);
                     array_push($AllUserArray, $StudentDataArray);
                 }
-                if ($userData) {
-                    array_push($ExistingUser, $userData);
-                    array_push($AllUserArray, $StudentDataArray);
-                }
             }
-
             return (['allUsers' => $AllUserArray, 'existingUsers' => $ExistingUser]);
+
         }
         return false;
     }
@@ -646,23 +651,21 @@ class RosterController extends AppController
     public function actionShowImportStudent()
     {
         $studentInformation = $this->getRequestParams();
-        $isCodePresent = false;
-        $isSectionPresent = false;
-        foreach ($studentInformation['newUsers'] as $student) {
-
-            if ($student['4'] != 0) {
-                $isCodePresent = true;
-            }
-            if ($student['5'] != 0) {
-                $isSectionPresent = true;
-            }
-        }
-        $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-
-        $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent);
-
-        return $this->render('showImportStudent', $responseData);
+                $isCodePresent = false;
+                $isSectionPresent = false;
+                $courseId = $this->getParamVal('courseId');
+                foreach ($studentInformation['newUsers'] as $student) {
+                    if ($student['4'] != 0) {
+                        $isCodePresent = true;
+                    }
+                    if ($student['5'] != 0) {
+                        $isSectionPresent = true;
+                    }
+                }
+                $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+                $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId);
+                return $this->render('showImportStudent', $responseData);
     }
 
 //Controller method to assign lock on student.

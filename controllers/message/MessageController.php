@@ -322,6 +322,7 @@ class MessageController extends AppController
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
             $params = $this->getBodyParams();
+//            AppUtility::dump($params);
             if ($this->getAuthenticatedUser()) {
                 if ($params['receiver'] != 0 && $params['cid'] != null) {
                     $message = new Message();
@@ -368,6 +369,7 @@ class MessageController extends AppController
                 $tempArray['baseId'] = $message['baseid'];
                 $this->messageData[$message['id']] = $tempArray;
             }
+//            AppUtility::dump($this->messageData);
             $this->includeJS(["message/viewConversation.js"]);
             $this->createChild($this->children[key($this->children)]);
             $responseData = array('messages' => $this->totalMessages,'user' => $user, 'messageId' =>$messageId,'course' => $course,'userRights' =>$userRights);

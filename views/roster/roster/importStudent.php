@@ -9,6 +9,11 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
+$model->headerRow = 0;
+$model->userName = 0;
+$model->setPassword = 0;
+$model->codeNumber = 0;
+$model->sectionValue = 0;
 ?>
 <div class="site-login">
     <fieldset>
