@@ -52,81 +52,31 @@ class AssessmentController extends AppController
     public function actionLatePass()
     {
         $this->guestUserHandler();
-        $assessmentId = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $studentId = $this->getUserId();
-        $exception = Exceptions::getByAssessmentId($assessmentId);
-        //AppUtility::dump($exception);
+        $assessmentId = Yii::$app->request->get('id');
+        $courseId = Yii::$app->request->get('cid');
+        $studentId = Yii::$app->user->identity->id;
+        $exceptionAssessment = Exceptions::getByAssessmentId($assessmentId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
-        $course = Course::getById($courseId);
 
-        $addtime = $course->latepasshrs * 60 * 60;
-        $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
-        $usedlatepasses = round(($assessment->allowlate - $assessment->enddate)/($course->latepasshrs * 3600));
-        AppUtility::dump($usedlatepasses);
         $startdate = $assessment->startdate;
-        $enddate = (($assessment->enddate) + $addtime);
+        $enddate = $assessment->enddate;
         $wave = 0;
+
         $param['assessmentid'] = $assessmentId;
         $param['userid'] = $studentId;
         $param['startdate'] = $startdate;
         $param['enddate'] = $enddate;
         $param['waivereqscore'] = $wave;
-        $param['islatepass'] = 1;
-        if(count($exception))
-        {
-            if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate)< $course->latepasshrs * 3600)))
-            {
-                AppUtility::dump('aa');
-                $latepass = $student->latepass;
-                $student->latepass = $latepass - 1;
-                $exception->enddate = $exception->enddate + $addtime;
-                $exception->islatepass = $exception->islatepass + 1;
-            }
+        $latepass = $student->latepass;
+        $student->latepass = $latepass - 1;
+        $exception = new Exceptions();
+        $exception->attributes = $param;
+        $exception->save();
+        $student->save();
 
-            if($exception->islatepass != 0)
-            {
-                echo "<p>Un-use late-pass</p>";
 
-                if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * 60 * 60)
-                {
 
-                    echo '<p>Too late to un-use this LatePass</p>';
-                }
-                else {
-                    if ($currentTime < $assessment->enddate)
-                    {
-                        $exception->islatepass = $exception->islatepass - 1;
-                    }
-                    else {
-                        //figure how many are unused
-                        $n = floor(($exception->enddate - $currentTime)/($course->latepasshrs * 60 * 60));
-                        $newend = $exception->enddate - $n * $course->latepasshrs * 60 * 60;
-                        if ($exception->islatepass > $n)
-                        {
-                            $exception->islatepass = $exception->islatepass - $n;
-                            $exception->enddate = $newend;
-                        } else {
-                            //dnt push anything into db.
-                        }
-                    }
-                    echo "<p>Returning $n LatePass".($n > 1 ? "es":"")."</p>";
-                    $student->latepass = $student->latepass + $n;
-                }
-            }
-            else
-            {
-                echo '<p>Invalid</p>';
-            }
-//            $exception->attributes = $param;
-            $exceptionData = new Exceptions();
-            $exceptionData->create($param);
-//             $exception->save();
-//            AppUtility::dump($a);
-            $student->save();
-         }
-        $this->includeJS(['latePass.js']);
         $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
     }
 
