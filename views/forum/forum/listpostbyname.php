@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
         if($name != $data['name'])
             {?>
                     <div class=""><strong><?php echo $data['name']?></strong></div>
-                    <div class="block"><span class="right"><a href="#">Thread</a>
+                    <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
                     <a href="#">Reply</a>
                     </span><input type="button" value="+" onclick="toggleshow(2)" id="butn2">
                         <b><?php if($data['parent']!= 0){
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?php $name=$data['name'];
             }
             else{?>
-                    <div class="block"><span class="right"><a href="#">Thread</a>
+                    <div class="block"><span class="right"><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>">Thread</a>
                     <a href="#">Reply</a>
                     </span><input type="button" value="+" onclick="toggleshow(2)" id="butn2">
                              <b><?php if($data['parent']!= 0){
@@ -50,6 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                              echo  $data['subject'];
                          }
                          ?>
+                        <?php $name=$data['name'];?>
                      </b>,Posted: <?php echo $data['postdate']?></div>
                      <div id="m2" class="blockitems"><p><?php echo $data['message']?></p></div>
                      </div>
@@ -58,8 +59,8 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 }?>
 <input type="hidden" id="count" value="<?php echo $count;?>">
-<?php echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>";
-echo "<p><a href='#'>Back to Thread List</a></p>";?>
+<?php echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>"?>
+<a href="<?php AppUtility::getHomeURL('forum','forum/thread?cid='. $courseid.'&forumid='.$forumid);?>">Back to Thread List</a>
 
 <script>
 $(document).ready(function ()

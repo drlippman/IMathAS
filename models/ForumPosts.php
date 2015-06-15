@@ -94,7 +94,6 @@ class ForumPosts extends BaseImasForumPosts
 
         $views = ForumPosts::findOne($threadid);
         $views->views++;
-//        AppUtility::dump($views->views);
         $views->save();
 
     }

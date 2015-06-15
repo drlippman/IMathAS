@@ -521,6 +521,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $courseid = $this->getParamVal('cid');
         $sort = AppConstant::DESCENDING;
         $forumid = $params['forumid'];
         $forumname = Forums::getById($forumid);
@@ -528,6 +529,9 @@ class ForumController extends AppController
         $thread = ThreadForm::postByName($forumid,$sort,$orderby);
         if($thread)
         {
+                $nameArray = array();
+            $sortbyname = array();
+            $finalSortedArray = array();
                 $threadArray = array();
                 foreach ($thread as $data)
                 {
@@ -541,24 +545,31 @@ class ForumController extends AppController
                             'subject' => $data['subject'],
                             'postdate' => date('F d, o g:i a', $data['postdate']),
                            'message' => $data['message'],
-                            'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                            'name' => AppUtility::getFullName($username->LastName, $username->FirstName),
+
+
                         );
+                    if(!in_array($temparray['name'],$nameArray))
+                        array_push($nameArray,$temparray['name']);
                         array_push($threadArray, $temparray);
-
+                    }
+            sort($nameArray);
+            foreach($nameArray as $name){
+                foreach($threadArray as $threadA){
+                    if($name == $threadA['name']){
+                        array_push($finalSortedArray, $threadA);
+                    }
                 }
-                $responseData = array('threadArray' => $threadArray,'forumid' => $forumid,'forumname' => $forumname);
-                return $this->renderWithData('listpostbyname',$responseData);
+                array_push($sortbyname,$name);
+            }
+//            AppUtility::dump($finalSortedArray);
+//            AppUtility::dump($threadArray);
+//            $sort_by = array_column($threadArray, 'name');
+//            array_multisort($sort_by, SORT_ASC, $threadArray);
+            $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'courseid' => $courseid);
+            return $this->renderWithData('listpostbyname',$responseData);
         }
-        else
-        {
-
-
-        }
-
-
 
     }
-
-
 
 }

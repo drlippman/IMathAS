@@ -26,6 +26,7 @@ class ThreadForm extends Model
         $thread = ForumPosts::find()->where(['forumid' => $forumid])->orderBy([$orderby=>$sort])->all();
         return $thread;
 
+
     }
 
 

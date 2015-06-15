@@ -140,15 +140,6 @@ function forumsSuccess(response) {
         var html = "";
         $.each(forums, function (index, forum)
         {
-
-//            if(forum.rights > 10)
-//            {
-//                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
-//                html += "<td>" + forum.threads + "</td>";
-//                html += "<td>" + forum.posts + "</td>";
-//                html += "<td>" + forum.lastPostDate + "</td>";
-//            }
-
             if(forum.enddate > forum.currenttime)
             {
                 html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
@@ -161,7 +152,5 @@ function forumsSuccess(response) {
         $(".forum-table-body tr").remove();
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable();
-
     }
-
 

@@ -73,3 +73,14 @@ function CommonPopUp(message)
     });
 
 }
+
+function createDataTable(classNameHandler){
+    bPaginate = $('.'+classNameHandler).attr('bPaginate');
+    if(bPaginate.length>0){
+        bPaginate = $.parseJSON(bPaginate);;
+    }else{
+        bPaginate = true;
+    }
+    $('.'+classNameHandler).DataTable({"bPaginate": bPaginate});
+
+}

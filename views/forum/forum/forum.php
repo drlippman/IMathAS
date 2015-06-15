@@ -44,7 +44,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <th>Threads</th>
             <th>Posts</th>
             <th>Last Post Date</th>
-
         </tr>
         </thead>
         <tbody class="forum-table-body">
