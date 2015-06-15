@@ -901,7 +901,6 @@ class RosterController extends AppController
             $course = Course::getById($courseId);
             $assessments = Assessments::getByCourseId($courseId);
             $studentList = explode(',', $data['student-data']);
-            $exceptionArray = array();
             $studentArray = array();
             if ($this->isPost()) {
                 $params = $this->getRequestParams();
@@ -912,21 +911,9 @@ class RosterController extends AppController
                        foreach ($studentList as $studentId) {
                             $student = User::getById($studentId);
                             array_push($studentArray, $student->attributes);
-                            $exceptionList = array();
-                            foreach($assessments as $singleAssessment){
-                                $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
-                                if($query){
-                                    $tempArray = array( 'exceptionId' => $query->id, 'assessmentName' => $singleAssessment->name, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
-                                    array_push($exceptionList,$tempArray);
-                                }
-                            }
-                            if($exceptionList){
-                                $assessmentList = array('Name' => ucfirst($student->LastName).', '.ucfirst($student->FirstName), 'assessments' => $exceptionList);
-                                array_push($exceptionArray,$assessmentList);
-                            }
-                        }
-                        $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
-
+                       }
+                       $exceptionArray = $this->createExceptionList($studentArray, $assessments);
+                       $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
                     } else {
                         return $this->redirect('student-roster?cid=' . $courseId);
                     }
@@ -936,7 +923,6 @@ class RosterController extends AppController
                     $course = Course::getById($courseId);
                     $assessments = Assessments::getByCourseId($courseId);
                     $section = $params['section'];
-                    $exceptionArray = array();
                     if($params['clears']){
                         foreach($params['clears'] as $clearEntry){
                             Exceptions::deleteExceptionById($clearEntry);
@@ -957,6 +943,11 @@ class RosterController extends AppController
                                     $exception = new Exceptions();
                                     $exception->create($param);
                                 }
+                                if(isset($params['forceregen'])){
+                                //-----------------------------
+                                }elseif(isset($params['forceclear'])){
+                                    AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
+                                }
                             }
                         }
                         if (isset($params['eatlatepass'])) {
@@ -971,20 +962,7 @@ class RosterController extends AppController
 //                            exit;
 //                        }
                     }
-                    foreach($studentArray as $student){
-                        $exceptionList = array();
-                        foreach($assessments as $singleAssessment){
-                            $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
-                            if($query){
-                                $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
-                                array_push($exceptionList,$tempArray);
-                            }
-                        }
-                        if($exceptionList){
-                            $assessmentList = array('Name' => ucfirst($student['LastName']).', '.ucfirst($student['FirstName']), 'assessments' => $exceptionList);
-                            array_push($exceptionArray,$assessmentList);
-                        }
-                    }
+                    $exceptionArray = $this->createExceptionList($studentArray, $assessments);
                     $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
                 }
                 $sort_by = array_column($exceptionArray, 'Name');
@@ -999,6 +977,24 @@ class RosterController extends AppController
         else{
              $this->setErrorFlash(AppConstant::NO_USER_FOUND);
         }
+    }
+    public function  createExceptionList($studentArray, $assessments){
+        $exceptionArray = array();
+        foreach($studentArray as $student){
+            $exceptionList = array();
+            foreach($assessments as $singleAssessment){
+                $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
+                if($query){
+                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
+                    array_push($exceptionList,$tempArray);
+                }
+            }
+            if($exceptionList){
+                $assessmentList = array('Name' => ucfirst($student['LastName']).', '.ucfirst($student['FirstName']), 'assessments' => $exceptionList);
+                array_push($exceptionArray,$assessmentList);
+            }
+        }
+        return $exceptionArray;
     }
 
     public function  findLatepassMsg($studentArray, $courseid){

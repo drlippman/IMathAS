@@ -61,5 +61,5 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <textarea name = "newtutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
 <a class = "btn btn-primary" id = "update-bttn">Update</a>
-<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+<a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
 

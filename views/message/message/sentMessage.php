@@ -55,8 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <p>Check: <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all" href="#">None</a>
             With Selected:
-            <a class="btn btn-primary btn-sm"id="mark-sent-delete">Remove From Sent Message List</a>
-            <a class="btn btn-primary btn-sm" id="mark-unsend">Unsend</a>
+            <a class="btn btn-primary"id="mark-sent-delete">Remove From Sent Message List</a>
+            <a class="btn btn-primary" id="mark-unsend">Unsend</a>
         </p>
     </div>
     <div class="message-div"></div>

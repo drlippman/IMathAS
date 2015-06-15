@@ -434,3 +434,7 @@ a:focus {
 .dataTables_filter{
    display: none;
 }
+.back-btn{
+    width: 72px;
+    height: 35px;
+}

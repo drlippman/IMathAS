@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="message-container">
     <div><p>
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
-               class="btn btn-primary btn-sm">Send New Message</a>
+               class="btn btn-primary">Send New Message</a>
             | <a id="limit-to-tag-link" href="#">Limit to Tagged</a> <a id="show-all-link" href="#">Show All</a> | <a
                 href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent
                 Messages</a>

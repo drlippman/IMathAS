@@ -80,4 +80,12 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         return AssessmentSession::find()->where(['assessmentid' => $assessmentId ])->andWhere(['NOT LIKE', 'scores', -1 ])->all();
     }
+
+    public static function removeByUserIdAndAssessmentId($userId, $assessmentId)
+    {
+        $session = AssessmentSession::getAssessmentSession($userId, $assessmentId);
+        if($session){
+            $session->delete();
+        }
+    }
 } 

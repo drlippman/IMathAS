@@ -120,7 +120,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php } ?>
             </ul>
             <input type="submit" class="btn btn-primary" id="change-record" value="Record Changes">
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
         <br>
         <div>
