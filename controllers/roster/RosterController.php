@@ -520,7 +520,7 @@ class RosterController extends AppController
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
             $newUserRecords = array();
             $existUserRecords = array();
-            if($studentRecords['allUsers'] || $studentRecords['existingUsers']) {
+        if($studentRecords['allUsers']){
             foreach ($studentRecords['allUsers'] as $users) {
                 array_push($newUserRecords, $users);
             }
@@ -538,12 +538,11 @@ class RosterController extends AppController
             if ($filename) {
                 $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
             }
-
         }else{
-                $this->setErrorFlash('Add atleast one records in CSV file. ');
-                $responseData = array('model' => $model, 'course' => $course);
-                return $this->render('importStudent', $responseData);
-
+            $this->includeJS(["courseSetting.js"]);
+            $responseData = array('model' => $model, 'course' => $course);
+            return $this->render('importStudent', $responseData);
+            setErrorFlash('All students from CSV file already exits.');
         }
         }
         if (!$studentRecords) {
@@ -673,7 +672,6 @@ class RosterController extends AppController
                 $isCodePresent = false;
                 $isSectionPresent = false;
                 $courseId = $this->getParamVal('courseId');
-                if($studentInformation['newUsers']){
                 foreach ($studentInformation['newUsers'] as $student) {
                     if ($student['4'] != 0) {
                         $isCodePresent = true;
@@ -681,7 +679,7 @@ class RosterController extends AppController
                     if ($student['5'] != 0) {
                         $isSectionPresent = true;
                     }
-                }}
+                }
                 $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
                 $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
                 $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId);
@@ -946,10 +944,8 @@ class RosterController extends AppController
                                     $exception->create($param);
                                 }
                                 if(isset($params['forceregen'])){
-                                //this is not group safe
                                     $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
                                     if($query){
-//                                        AppUtility::dump($query->questions);
                                         if(strpos($query->questions,';') === false){
                                             $questions = explode(",",$query->questions);
                                         }else{
@@ -963,20 +959,29 @@ class RosterController extends AppController
                                             $scores[$i] = -1;
                                             $attempts[$i] = 0;
                                             $seeds[$i] = rand(1,9999);
-                                            $newla = array();
+                                            $newLastAns = array();
                                             $laarr = explode('##',$lastanswers[$i]);
                                             foreach ($laarr as $lael) {
                                                 if ($lael=="ReGen") {
-                                                    $newla[] = "ReGen";
+                                                    $newLastAns[] = "ReGen";
                                                 }
                                             }
-
+                                            $newLastAns[] = "ReGen";
+                                            $lastanswers[$i] = implode('##',$newLastAns);
                                         }
-//                                        print_r($laarr);die;
+                                        $scorelist = implode(',',$scores);
+                                        if (strpos($curscorelist,';')!==false) {
+                                            $scorelist = $scorelist.';'.$scorelist;
+                                        }
+                                        $attemptslist = implode(',',$attempts);
+                                        $seedslist = implode(',',$seeds);
+                                        $lastanswers = str_replace('~','',$lastanswers);
+                                        $lastanswerslist = implode('~',$lastanswers);
+                                        $lastanswerslist = addslashes(stripslashes($lastanswerslist));
+                                        $reattemptinglist = implode(',',$reattempting);
+                                        $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' =>$attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
+                                        AssessmentSession::modifyExistingSession($finalParams);
                                     }
-//                                    AppUtility::dump("He He");
-
-
                                 }elseif(isset($params['forceclear'])){
                                     AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
                                 }

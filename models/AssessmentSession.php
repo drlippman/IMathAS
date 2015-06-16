@@ -88,4 +88,16 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $session->delete();
         }
     }
+    public static function modifyExistingSession($params)
+    {
+        $session = AssessmentSession::getById($params['id']);
+        If($session){
+            $session->scores = $params['scores'];
+            $session->attempts = $params['attempts'];
+            $session->seeds = $params['seeds'];
+            $session->lastanswers = $params['lastanswers'];
+            $session->reattempting = $params['reattempting'];
+            $session->save();
+        }
+    }
 } 
