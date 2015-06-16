@@ -2,9 +2,10 @@
 use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppConstant;
 
 $this->title = 'Message';
-if ($userRights->rights > 10){
+if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
@@ -14,7 +15,7 @@ else{
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php if ($userRights->rights > 10) { ?>
+<?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
@@ -51,8 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
         </pre>
 </div>
 <div>
-    <?php $sent = $_GET['message'];
-    if ($sent != 1) {
+    <?php $sent = $messageId;
+    if ($sent != AppConstant::NUMERIC_ONE) {
         ?>
         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
            class="btn btn-primary "> Reply</a>&nbsp;
@@ -63,8 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>" id="marked"> Gradebook</a>
     <?php } ?>
 
-    <?php $sent = $_GET['message'];
-    if ($sent == 1) { ?>
+    <?php $sent = $messageId;
+    if ($sent == AppConstant::NUMERIC_ONE) { ?>
         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>">
             View Conversation </a>&nbsp;
     <?php } ?>

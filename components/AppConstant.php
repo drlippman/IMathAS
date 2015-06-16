@@ -52,6 +52,12 @@ class AppConstant
     const NUMERIC_SEVEN = 7;
     const NUMERIC_EIGHT = 8;
     const NUMERIC_NINE = 9;
+    const NUMERIC_TEN = 10;
+    const NUMERIC_ELEVEN = 11;
+    const NUMERIC_TWELVE = 12;
+    const NUMERIC_THIRTEEN = 13;
+    const NUMERIC_FOURTEEN = 14;
+    const NUMERIC_FIFTEEN = 15;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;

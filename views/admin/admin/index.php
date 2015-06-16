@@ -209,7 +209,7 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         var html = "";
         $.each(courses, function(index, course){
-            html += "<tr> <td><a href='#'>"+capitalizeFirstLetter(course.name)+"</a></td>";
+            html += "<tr> <td><a href='<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=')?>"+course.courseid+"'>"+capitalizeFirstLetter(course.name)+"</a></td>";
             html += "<td>"+course.courseid+"</td>";
             html += "<td>"+capitalizeFirstLetter(course.FirstName)+" "+capitalizeFirstLetter(course.LastName)+"</td>";
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid=')?>"+course.courseid+"'>Setting</a></td>";

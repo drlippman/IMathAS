@@ -1,8 +1,9 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+use app\components\AppConstant;
 $this->title = 'Message Conversation';
-if ($userRights->rights > 10){
+if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
@@ -11,7 +12,7 @@ else{
 }
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-$currentLevel = 0;
+$currentLevel = AppConstant::ZERO_VALUE;
 ?>
 <script src="../../../web/js/jquery.min.js" type="text/javascript"></script>
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"
@@ -34,14 +35,14 @@ $currentLevel = 0;
 
     <div class="midwrapper">
         <?php $sent = $messageId;
-        if ($sent != 1) {
+        if ($sent != AppConstant::NUMERIC_ONE) {
             ?>
             <p>
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
                     to Message</a></p>
         <?php } ?>
         <?php $sent = $messageId;
-        if ($sent == 1) {
+        if ($sent == AppConstant::NUMERIC_ONE) {
             ?>
             <p>
                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
@@ -53,11 +54,11 @@ $currentLevel = 0;
         <button onclick="hideall()" class="btn btn-primary">Hide All</button>
         <br><br>
         <?php
-        $DivCount = 0;
+        $DivCount = AppConstant::ZERO_VALUE;
         foreach ($messages as $index => $message){
         ?>
         <?php
-        if ($message['level'] != 0 && $message['level'] < $currentLevel)
+        if ($message['level'] != AppConstant::ZERO_VALUE && $message['level'] < $currentLevel)
         {
         $DivCount--;
         for ($i = $currentLevel;$message['level'] < $i;$i--){
@@ -67,10 +68,10 @@ $currentLevel = 0;
     }
     ?>
     <?php } ?>
-    <?php if ($message['level'] != 0 && $message['level'] > $currentLevel)
+    <?php if ($message['level'] != AppConstant::ZERO_VALUE && $message['level'] > $currentLevel)
     {
     $DivCount++;?>
-    <div class="forumgrp" id="block<?php echo $index - 1 ?>">
+    <div class="forumgrp" id="block<?php echo $index - AppConstant::NUMERIC_ONE ?>">
 
         <?php } ?>
         <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>"
@@ -90,16 +91,16 @@ $currentLevel = 0;
             <span style="color:red;">New</span>
         </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
-        <?php if ($index == (count($messages) - 1))
+        <?php if ($index == (count($messages) - AppConstant::NUMERIC_ONE))
         {
-        for ($i = $DivCount;$i >= 0;$i--){
+        for ($i = $DivCount;$i >= AppConstant::ZERO_VALUE;$i--){
         ?>
     </div>
 <?php }
 } ?>
     <?php
     $currentLevel = $message['level'];
-    $messageCount = (count($messages) - 1);
+    $messageCount = (count($messages) - AppConstant::NUMERIC_ONE);
     ?>
     <input type="hidden" id="messageCount" value="<?php echo $messageCount ?>">
     <?php } ?>

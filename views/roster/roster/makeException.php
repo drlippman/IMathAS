@@ -3,10 +3,10 @@ use app\components\AppUtility;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 
-$this->title = 'Make Exception';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
-$this->params['breadcrumbs'][] = $this->title;
+//$this->title = 'Make Exception';
+//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 date_default_timezone_set("Asia/Calcutta");
 ?>
@@ -21,7 +21,7 @@ date_default_timezone_set("Asia/Calcutta");
             <?php  if(sizeof((unserialize($studentDetails))) == 1){
                 foreach (unserialize($studentDetails) as $studentDetail) {
                     echo "<h3 class='name pull-left'>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName']);
-                    if($section != "")
+                    if($section != "" && $section != 'null')
                         echo "</h3><h4 class='pull-left margin-zero'>&nbsp;(section: ".$section.")</h4>";
                     else{
                         echo " </h3>";

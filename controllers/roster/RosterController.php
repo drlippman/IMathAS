@@ -900,6 +900,7 @@ class RosterController extends AppController
             $data = $this->getRequestParams();
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
+            $userId = $this->getParamVal('uid');
             $assessments = Assessments::getByCourseId($courseId);
             $studentList = explode(',', $data['student-data']);
             $studentArray = array();
@@ -994,11 +995,11 @@ class RosterController extends AppController
                                 Student::reduceLatepasses($student['id'], $courseId, $n);
                             }
                         }
-//                        if (isset($params['sendmsg'])) {
-//                            $params['submit'] = "Message";
-//                            require("rosterMessage.php");
-//                            exit;
-//                        }
+                        if (isset($params['sendmsg'])) {
+                            $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+                            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                            return $this->renderWithData('rosterMessage', $responseData);
+                        }
                     }
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
                     $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
@@ -1009,6 +1010,7 @@ class RosterController extends AppController
                 array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentArray);
 
         }
+
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latepassMsg' => $latepassMsg);
             return $this->renderWithData('makeException', $responseData);
     }

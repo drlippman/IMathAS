@@ -2,8 +2,9 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 use yii\bootstrap\ActiveForm;
+use app\components\AppConstant;
 $this->title = 'New Message';
-if ($userRights->rights > 10){
+if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
@@ -15,7 +16,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/mes
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?php if ($userRights->rights > 10) { ?>
+<?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
     <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">

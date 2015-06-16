@@ -33,7 +33,7 @@ class ImportStudentForm extends Model
             [['lastName', 'firstName','emailAddress'],'number'],
             ['file', 'required', 'message' => 'Upload the CSV file'],
             ['file', 'safe'],
-            [['file'], 'file'],
+            [['file'], 'file', 'extensions' => 'csv'],
         ];
     }
 

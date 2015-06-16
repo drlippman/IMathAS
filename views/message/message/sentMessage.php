@@ -2,9 +2,10 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
+use app\components\AppConstant;
 $this->title = 'Sent Messages';
 
-if ($userRights->rights > 10){
+if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
@@ -22,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
-    <?php if ($userRights->rights > 10) { ?>
+    <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
         <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
 
     <?php } else {?>

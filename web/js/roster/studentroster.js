@@ -23,10 +23,10 @@ function studentRosterSuccess(response) {
     }
 }
 
-function showStudentInformation(students, isCode, isSection, isImageColumnPresent) {
-    var courseId = $("#course-id").val();
+function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
+{
+    var courseId =  $( "#course-id" ).val();
     var html = "";
-    var courseId = $("#course-id").val();
     $.each(students, function (index, student) {
 
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='" + student.id + "'></td>";
@@ -81,8 +81,9 @@ function showStudentInformation(students, isCode, isSection, isImageColumnPresen
         else {
             html += "<td><a>Is locked out</a></a></td>"
         }
+
         html += "<td><a>Grades</a></td>";
-        html += "<td><a>Exception</a></td>";
+        html += "<td><a class ='roster-make-exception' href='make-exception?cid="+courseId+"&student-data="+ student.id +"&section-data="+ student.section +"'>Exception</a></td>";
         html += "<td><a href='change-student-information?cid=" + courseId + "&uid=" + student.id + "'>Change</a></td>";
         if (student.locked == 0) {
             html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false," + student.id + ")'>Lock</a></td>";
@@ -93,6 +94,7 @@ function showStudentInformation(students, isCode, isSection, isImageColumnPresen
     });
     $('#student-information-table').append(html);
     createDataTable('student-data-table');
+bindEvent();
     $(".images").hide();
 }
 function selectCheckBox() {
@@ -304,7 +306,7 @@ function copyStudentEmail() {
     });
 }
 function teacherMakeException() {
-    $('#roster-makeExc').click(function (e) {
+    $('#roster-makeExc').click(function (e) {alert('hhhh');
         var markArray = [];
         var sectionName;
         $('.student-data-table input[name = "student-information-check"]:checked').each(function () {
@@ -380,7 +382,23 @@ function lockUnlockStudent(lockOrUnlock, studentId) {
         });
     }
 }
-function lockUnlockSuccess(response) {
-    console.log(response);
+
+
+function lockUnlockSuccess(response)
+{
+
     location.reload();
+}
+
+function bindEvent(){
+$('.roster-make-exception').click(function(e) {
+    e.preventDefault();
+    var cancelUrl = $(this).attr('href');
+    var f = document.createElement('form');
+    f.style.display = 'none';
+    this.parentNode.appendChild(f);
+    f.method = 'post';
+    f.action = cancelUrl;
+    f.submit();
+    });
 }

@@ -27,15 +27,15 @@ class MessageController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
-        $cid = $this->getParam('cid');
+        $courseId = $this->getParamVal('cid');
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
-            $course = Course::getById($cid);
+            $course = Course::getById($courseId);
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
-            $teacher = Teacher::getTeachersById($cid);
+            $teacher = Teacher::getTeachersById($courseId);
             $this->includeJS(["message/message.js"]);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights);
             return $this->renderWithData('messages', $responseData);
@@ -45,18 +45,18 @@ class MessageController extends AppController
     public function actionSendMessage()
     {
         $this->guestUserHandler();
-        $userRights= $this->getAuthenticatedUser();
-        $cid = $this->getParam('cid');
+        $userRights = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
         if ($this->getAuthenticatedUser()) {
-            $course = Course::getById($cid);
-            $teacher = Teacher::getTeachersById($cid);
+            $course = Course::getById($courseId);
+            $teacher = Teacher::getTeachersById($courseId);
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
             $users = User::findAllUsers($sortBy, $order);
-            $uid = $this->getUserId();
+            $userId = $this->getUserId();
             $this->includeCSS(["message.css"]);
-            $this->includeJS(['message/sendMessage.js',"editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js']);
-            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $uid,'userRights' =>  $userRights);
+            $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
+            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId, 'userRights' => $userRights);
             return $this->renderWithData('sendMessage', $responseData);
         }
     }
@@ -65,11 +65,11 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
-            $uid = $this->getUserId();
-            if ($params['receiver'] != 0 && $params['cid'] != null) {
+            $params = $this->getRequestParams();
+            $userId = $this->getUserId();
+            if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                 $message = new Message();
-                $message->create($params, $uid);
+                $message->create($params, $userId);
             }
             return $this->successResponse();
         }
@@ -78,16 +78,15 @@ class MessageController extends AppController
     public function actionDisplayMessageAjax()
     {
         if (!$this->isGuestUser()) {
-            $uid = $this->getUserId();
-            $params = $this->getBodyParams();
+            $userId = $this->getUserId();
+            $params = $this->getRequestParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
-            $messages = Message::getUsersToDisplay($uid);
-            if($messages)
-            {
+            $messages = Message::getUsersToDisplay($userId);
+            if ($messages) {
                 $dateArray = array();
                 if ($ShowRedFlagRow == 1) {
                     foreach ($messages as $message) {
-                        if ($message['isread'] == 8 || $message['isread'] == 9 || $message['isread'] == 12 || $message['isread'] == 13) {
+                        if ($message['isread'] == AppConstant::NUMERIC_EIGHT || $message['isread'] == AppConstant::NUMERIC_NINE || $message['isread'] == AppConstant::NUMERIC_TWELVE || $message['isread'] == AppConstant::NUMERIC_THIRTEEN) {
                             $dateArray[] = $message;
                         }
                     }
@@ -105,8 +104,7 @@ class MessageController extends AppController
                     $newArray[] = $singleDate;
                 }
                 return $this->successResponse($newArray);
-            }
-            else{
+            } else {
                 return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
         }
@@ -115,18 +113,18 @@ class MessageController extends AppController
     public function actionSentMessage()
     {
         $this->guestUserHandler();
-        $cid = $this->getParam('cid');
-        $userRights= $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $userRights = $this->getAuthenticatedUser();
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
-            $course = Course::getById($cid);
+            $course = Course::getById($courseId);
             $sortBy = 'FirstName';
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
-            $teacher = Teacher::getTeachersById($cid);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher,'userRights' => $userRights);
+            $teacher = Teacher::getTeachersById($courseId);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
             $this->includeJS(['message/sentMessage.js']);
-            return $this->renderWithData('sentMessage',$responseData );
+            return $this->renderWithData('sentMessage', $responseData);
         }
     }
 
@@ -161,8 +159,7 @@ class MessageController extends AppController
         $userId = $params['userId'];
         $teachers = Teacher::getTeacherByUserId($userId);
         $teacherArray = array();
-        if($teachers)
-        {
+        if ($teachers) {
             foreach ($teachers as $teacher) {
                 $tempArray = array('courseId' => $teacher->course->id,
                     'courseName' => $teacher->course->name);
@@ -178,15 +175,14 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $msgIds = $params['checkedMsg'];
-            if($msgIds){
+            if ($msgIds) {
                 foreach ($msgIds as $msgId) {
                     Message::updateUnread($msgId);
                 }
                 return $this->successResponse();
-            }else
-            {
+            } else {
                 return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
@@ -196,15 +192,14 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $msgIds = $params['checkedMsg'];
-            if($msgIds){
+            if ($msgIds) {
                 foreach ($msgIds as $messageId) {
                     Message::updateRead($messageId);
                 }
                 return $this->successResponse();
-            }else
-            {
+            } else {
                 return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
@@ -215,8 +210,7 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $userId = $this->getUserId();
         $userData = Message::getUsersToUserMessage($userId);
-        if($userData)
-        {
+        if ($userData) {
             return $this->successResponse($userData);
         } else {
             return $this->terminateResponse(AppConstant::NO_USER_FOUND);
@@ -226,17 +220,18 @@ class MessageController extends AppController
     public function actionViewMessage()
     {
         $this->guestUserHandler();
-        $userRights= $this->getAuthenticatedUser();
-        $courseId = $this->getParam('cid');
+        $userRights = $this->getAuthenticatedUser();
+        $messageId = $this->getParamVal('message');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $msgId = $this->getParam('id');
+        $msgId = $this->getParamVal('id');
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
             $fromUser = User::getById($messages->msgfrom);
             $this->includeCSS(['jquery-ui.css']);
             $this->includeJS(['message/viewmessage.js']);
-            $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course,'userRights' =>  $userRights);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId);
             return $this->renderWithData('viewMessage', $responseData);
         }
     }
@@ -245,7 +240,7 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $msgIds = $params['checkedMsg'];
             foreach ($msgIds as $msgId) {
                 Message::deleteFromReceivedMsg($msgId);
@@ -258,15 +253,14 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $msgIds = $params['checkedMsgs'];
-            if($msgIds){
+            if ($msgIds) {
                 foreach ($msgIds as $msgId) {
                     Message::deleteFromSentMsg($msgId);
                 }
                 return $this->successResponse();
-            }else
-            {
+            } else {
                 return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
             }
         }
@@ -275,16 +269,16 @@ class MessageController extends AppController
     public function actionReplyMessage()
     {
         $this->guestUserHandler();
-        $userRights= $this->getAuthenticatedUser();
-        $baseId = $this->getParam('baseid');
-        $msgId = $this->getParam('id');
-        $courseId = $this->getParam('cid');
+        $userRights = $this->getAuthenticatedUser();
+        $baseId = $this->getParamVal('baseid');
+        $msgId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         if ($this->getAuthenticatedUser()) {
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
-            $responseData = array('messages' => $messages, 'fromUser' => $fromUser,'course' => $course,'userRights' => $userRights);
-            $this->includeJS(["editor/tiny_mce.js","message/replyMessage.js"]);
+            $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights);
+            $this->includeJS(["editor/tiny_mce.js", "message/replyMessage.js"]);
             return $this->renderWithData('replyMessage', $responseData);
         }
     }
@@ -294,11 +288,9 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $userId = $this->getUserId();
         $message = Message::getUsersToCourseMessage($userId);
-        if($message){
+        if ($message) {
             return $this->successResponse($message);
-        }
-        else
-        {
+        } else {
             return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }
     }
@@ -308,11 +300,9 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $userId = $this->getUserId();
         $message = Message::getSentUsersMessage($userId);
-        if($message){
+        if ($message) {
             return $this->successResponse($message);
-        }
-        else
-        {
+        } else {
             return $this->terminateResponse(AppConstant::NO_USER_FOUND);
         }
     }
@@ -321,10 +311,9 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
-//            AppUtility::dump($params);
+            $params = $this->getRequestParams();
             if ($this->getAuthenticatedUser()) {
-                if ($params['receiver'] != 0 && $params['cid'] != null) {
+                if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                     $message = new Message();
                     $message->createReply($params);
                 }
@@ -336,19 +325,18 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
-        $courseId = $this->getParam('cid');
-        $userRights= $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $userRights = $this->getAuthenticatedUser();
         $course = Course::getById($courseId);
-        $messageId = $this->getParam('message');
-        $baseId = $this->getParam('baseid');
-        $msgId = $this->getParam('id');
+        $messageId = $this->getParamVal('message');
+        $baseId = $this->getParamVal('baseid');
+        $msgId = $this->getParamVal('id');
         $user = $this->getAuthenticatedUser();
-        if($baseId == 0)
-        {
+        if ($baseId == AppConstant::ZERO_VALUE) {
             $baseId = $msgId;
         }
         $messages = Message::getByBaseId($msgId, $baseId);
-        if($messages){
+        if ($messages) {
             foreach ($messages as $message) {
                 $this->children[$message['parent']][] = $message['id'];
                 $tempArray = array();
@@ -369,15 +357,14 @@ class MessageController extends AppController
                 $tempArray['baseId'] = $message['baseid'];
                 $this->messageData[$message['id']] = $tempArray;
             }
-//            AppUtility::dump($this->messageData);
             $this->includeJS(["message/viewConversation.js"]);
             $this->createChild($this->children[key($this->children)]);
-            $responseData = array('messages' => $this->totalMessages,'user' => $user, 'messageId' =>$messageId,'course' => $course,'userRights' =>$userRights);
+            $responseData = array('messages' => $this->totalMessages, 'user' => $user, 'messageId' => $messageId, 'course' => $course, 'userRights' => $userRights);
             return $this->renderWithData('viewConversation', $responseData);
         }
     }
 
-    public function createChild($childArray, $arrayKey = 0)
+    public function createChild($childArray, $arrayKey = AppConstant::ZERO_VALUE)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
         foreach ($childArray as $superKey => $child) {
@@ -393,21 +380,20 @@ class MessageController extends AppController
         if (count($this->children)) {
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
-     }
+    }
 
     public function actionMarkSentUnsendAjax()
     {
         $this->guestUserHandler();
         if ($this->isPostMethod()) {
-            $params = $this->getBodyParams();
+            $params = $this->getRequestParams();
             $msgIds = $params['checkedMsgs'];
-            if($msgIds){
+            if ($msgIds) {
                 foreach ($msgIds as $msgId) {
                     Message::sentUnsendMsg($msgId);
                 }
                 return $this->successResponse();
-            }else
-            {
+            } else {
                 return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
             }
         }
@@ -415,12 +401,12 @@ class MessageController extends AppController
 
     public function actionChangeImageAjax()
     {
-        $params = $this->getBodyParams();
+        $params = $this->getRequestParams();
         $rowId = $params['rowId'];
-        if($rowId){
+        if ($rowId) {
             Message::updateFlagValue($rowId);
             return $this->successResponse();
-        }else{
+        } else {
             return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
         }
     }

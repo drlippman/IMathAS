@@ -44,7 +44,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </form>
         <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
         <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
-    <form action="make-exception?cid=<?php echo $course->id ?>" method="post">
+    <form action="make-exception?cid=<?php echo $course->id ?>" name="teacherMakeException" id="make-student" method="post">
         <input type="hidden" id="exception-id" name="student-data" value=""/>
         <input type="hidden" id="section-name" name="section-data" value=""/>
         <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
