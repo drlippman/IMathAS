@@ -4,34 +4,23 @@ $(document).ready(function () {
         selector: "textarea",
         toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
     });
-
+validateForm();
 });
 
-
-function getEmailData(){
-    $("#email-button").click(function()
-    {
+function validateForm(){
+    $('#email-button').click(function() {
         tinyMCE.triggerSave();
-        var cid = $(".send-msg").val();
-        var subject = $(".subject").val();
-        var body = $("#message").val();
-        var whomToSend = $("#send-to").val();
-        var assessmentName = $("#roster-assessment-data").val();
-        var allData = {cid: cid, subject: subject, body: body,whomToSend: whomToSend, assessmentName: assessmentName }
-        alert(allData);
-        if(receiver != 0){
-            if(subject != ''){
-                if (body != ''){
-                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
-                }else{
-                    alert('Body field cannot be blank');
-                }
-
-            }else{
-                alert('Subject field cannot be blank');
-            }
-        }else{
-            alert('User is not selected');
+        var messageBody =$("#message").val();
+        var subjectBody = document.forms["myEmailForm"]["subject"].value;
+        if (subjectBody == null || subjectBody == "") {
+            var msg = "Subject cannot be blank.";
+            CommonPopUp(msg);
+            return false;
+        }
+        else if (messageBody == null || messageBody == "") {
+            var msg = "Message body cannot be blank.";
+            CommonPopUp(msg);
+            return false;
         }
     });
 }

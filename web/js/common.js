@@ -84,3 +84,4 @@ function createDataTable(classNameHandler){
     $('.'+classNameHandler).DataTable({"bPaginate": bPaginate});
 
 }
+

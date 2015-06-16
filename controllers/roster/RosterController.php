@@ -37,7 +37,7 @@ use app\models\forms\ChangeUserInfoForm;
 
 class RosterController extends AppController
 {
-    //Controller method to display student information on student roster page.
+//Controller method to display student information on student roster page.
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
@@ -70,7 +70,7 @@ class RosterController extends AppController
 
     }
 
-    //Controller method for redirect to Login Grid View page.
+//Controller method for redirect to Login Grid View page.
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
@@ -82,7 +82,7 @@ class RosterController extends AppController
         return $this->render('loginGridView', $responseData);
     }
 
-    //Controller ajax method to retrieve student data form Login grid table
+//Controller ajax method to retrieve student data form Login grid table
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();
@@ -217,7 +217,7 @@ class RosterController extends AppController
         return $this->render('studentEnrollment', $responseData);
     }
 
-    // Controller method to redirect on Assign and Section Codes page with student information
+// Controller method to redirect on Assign and Section Codes page with student information
     public function actionAssignSectionsAndCodes()
     {
         $this->guestUserHandler();
@@ -286,7 +286,7 @@ class RosterController extends AppController
         return $this->render('manageLatePasses', $responseData);
     }
 
-    // Controller method to display the dynamic radio list of courses
+// Controller method to display the dynamic radio list of courses
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
@@ -318,7 +318,7 @@ class RosterController extends AppController
         return $this->render('enrollFromOtherCourse', $responseData);
     }
 
-    // Controller method to dynamically create student list with checkbox and enroll students displayed in a list in current course.
+// Controller method to dynamically create student list with checkbox and enroll students displayed in a list in current course.
     public function actionEnrollStudents()
     {
         $this->guestUserHandler();
@@ -946,7 +946,37 @@ class RosterController extends AppController
                                     $exception->create($param);
                                 }
                                 if(isset($params['forceregen'])){
-                                //-----------------------------
+                                //this is not group safe
+                                    $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
+                                    if($query){
+//                                        AppUtility::dump($query->questions);
+                                        if(strpos($query->questions,';') === false){
+                                            $questions = explode(",",$query->questions);
+                                        }else{
+                                            list($questions,$bestquestions) = explode(";",$query->questions);
+                                            $questions = explode(",",$query->questions);
+                                        }
+                                        $lastanswers = explode('~',$query->lastanswers);
+                                        $curscorelist = $query->scores;
+                                        $scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
+                                        for ($i=0; $i<count($questions); $i++) {
+                                            $scores[$i] = -1;
+                                            $attempts[$i] = 0;
+                                            $seeds[$i] = rand(1,9999);
+                                            $newla = array();
+                                            $laarr = explode('##',$lastanswers[$i]);
+                                            foreach ($laarr as $lael) {
+                                                if ($lael=="ReGen") {
+                                                    $newla[] = "ReGen";
+                                                }
+                                            }
+
+                                        }
+//                                        print_r($laarr);die;
+                                    }
+//                                    AppUtility::dump("He He");
+
+
                                 }elseif(isset($params['forceclear'])){
                                     AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
                                 }
@@ -980,6 +1010,7 @@ class RosterController extends AppController
              $this->setErrorFlash(AppConstant::NO_USER_FOUND);
         }
     }
+
     public function  createExceptionList($studentArray, $assessments){
         $exceptionArray = array();
         foreach($studentArray as $student){

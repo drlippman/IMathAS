@@ -7,7 +7,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<form action="roster-email" method="post" id="roster-form">
+<form name="myEmailForm" action="roster-email" method="post" id="roster-form">
 <div class="student-roster-email">
     <input type="hidden" name="isEmail" value="1"/>
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
@@ -47,6 +47,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </span>
     <div class="col-lg-offset-2 col-md-10"><br>
         <input type="submit" class="btn btn-primary" id="email-button" value="Send Email">
+        <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>
