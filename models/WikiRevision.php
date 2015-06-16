@@ -27,6 +27,10 @@ class WikiRevision extends BaseImasWikiRevisions
     {
         return WikiRevision::find()->where(['id'=> $wikiId])->all();
     }
+    public static function getFirstWikiData($sortBy, $order)
+        {
+            return WikiRevision::find()->all();
+        }
 
     public static function getRevisionId($id)
     {

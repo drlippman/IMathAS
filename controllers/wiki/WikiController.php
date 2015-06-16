@@ -109,7 +109,6 @@ class WikiController extends AppController
             $sortBy = $singleWikiData->id;
             $wikiRevisionSortedById = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
         }
-//        AppUtility::dump($wikiRevisionSortedById[0]['attributes']);
         $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
         return $this->successResponse($responseData);
     }
@@ -121,17 +120,33 @@ class WikiController extends AppController
         $cid = $params['courseId'];
         $wikiId = $params['wikiId'];
         $wikiData = WikiRevision::getByWikiId($wikiId);
-        AppUtility::dump($wikiData);
         $wikiRevisionSortedById = '';
         foreach($wikiData as $singleWikiData){
-        $order = AppConstant::DESCENDING;
+        $order = AppConstant::ASCENDING;
         $sortBy = $singleWikiData->id;
-        $wikiRevisionSortedById = WikiRevision::getEditedWiki($sortBy, $order,$wikiData->id);
-            AppUtility::dump($wikiRevisionSortedById);
+        $wikiRevisionSortedById = WikiRevision::getFirstWikiData($sortBy, $order);
         }
-//        AppUtility::dump($wikiRevisionSortedById);
         $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
-//        AppUtility::dump($responseData);
+         return $this->successResponse($responseData);
+    }
+    public function actionGetNewerDataAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = $params['courseId'];
+        $wikiId = $params['wikiId'];
+        $wikiData = WikiRevision::getByWikiId($wikiId);
+        $wikiRevisionSortedById = '';
+        $sortBy = '';
+        foreach($wikiData as $singleWikiData){
+//          $order = AppConstant::DESCENDING;
+            $sortBy = $singleWikiData->id;
+       // $wikiRevisionSortedById = WikiRevision::getFirstWikiData($sortBy, $order);
+            $sortBy ++;
+        }
+        AppUtility::dump($sortBy);
+        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
+//           $responseData = array('wikiRevisionSortedById'=> $sortBy);
          return $this->successResponse($responseData);
     }
 }

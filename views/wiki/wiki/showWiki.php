@@ -38,7 +38,7 @@ if ($numrevisions>1) {
     Revision history:
     <a href="#" name="first-link" id="first" data-var="1">First</a>
     <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
-    echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a>
+    echo '<a name="newer-link" id="newer" class="grayout" href="#" data-var="3">Newer</a>
     <a href="#" name="last-link" class="grayout" id="last" data-var="2">Last</a>
     <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
 }
@@ -63,6 +63,7 @@ if ($numrevisions>1) {
         });
         getLastData();
         getFirstData();
+        getNewerData();
     });
 
     /**
@@ -91,6 +92,19 @@ if ($numrevisions>1) {
             jQuerySubmit('get-first-data-ajax', firstData, 'getFirstSuccess');
         });
     }
+    /**
+     * to get selected wiki's newer data
+     */
+    function getNewerData(){
+        $("a[name=newer-link]").on("click", function ()
+        {
+            var newerVar = $(this).attr("data-var");
+            var wikiId = $(".wiki-id").val();
+            var courseId = $(".course-id").val();
+            var newerData = { newerVar : newerVar, wikiId : wikiId, courseId : courseId };
+            jQuerySubmit('get-newer-data-ajax', newerData, 'getNewerSuccess');
+        });
+    }
 
     /**
      *  last wiki's response
@@ -114,8 +128,24 @@ if ($numrevisions>1) {
      */
     function getFirstSuccess(response)
     {
+//        alert(JSON.stringify(response));
         var result = JSON.parse(response);
-        console.log(result);
+        if(result.status == 0){
+            var wikiData = result.data;
+            $.each(wikiData, function(index, wikiDataDetails)
+            {
+                var revision = wikiDataDetails.revision;
+                $('#wikicontent').val(revision);
+            });
+        }
+    }
+    /**
+     *  first wiki's response
+     */
+    function getNewerSuccess(response)
+    {
+        alert(response);
+        var result = JSON.parse(response);
 //        if(result.status == 0){
 //            var wikiData = result.data;
 //            $.each(wikiData, function(index, wikiDataDetails)
@@ -123,7 +153,6 @@ if ($numrevisions>1) {
 //                var revision = wikiDataDetails.revision;
 //                $('#wikicontent').val(revision);
 //            });
-//
 //        }
     }
 </script>
