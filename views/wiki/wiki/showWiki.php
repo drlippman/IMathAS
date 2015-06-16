@@ -2,12 +2,20 @@
 use app\components\AppUtility;
 echo $this->render('_toolbar',['course'=> $course]);
 //AppUtility::dump($course->id);?>
+<script type="text/css">
+    textarea {
+        color: red! important;
+        outline: none! important;
+        border: transparent! important;
+    }
+</script>
 <div id="wikiName">
     <h2><?php echo $wiki->name; ?></h2>
    <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
    <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
 
 </div>
+
 <?php
 $lasteditedby = $userData->FirstName.',' .$userData->LastName;
 foreach($wikiRevisionData as $key => $singleData) {
@@ -40,10 +48,10 @@ if ($numrevisions>1) {
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
            class="btn btn-primary btn-sm">Edit this page</a></span>
         <?php foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
-            <div id="wikicontent" class="wikicontent" ><input type="text" value="" />
+    <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
                 <?php $text = $singleWikiRevision->revision; ?>
-                    <p><?php echo $text; ?></p>
-            </div>
+                    <?php echo $text; ?>
+    </textarea>
     <?php }?>
 </div>
 <script>
@@ -53,32 +61,69 @@ if ($numrevisions>1) {
                 $("#revcontrol").toggle();
             });
         });
-        getFirstLastData();
+        getLastData();
+        getFirstData();
     });
 
     /**
+     * to get selected wiki's last data
+     */
+    function getLastData(){
+        $("a[name=last-link]").on("click", function ()
+        {
+            var lastVar = $(this).attr("data-var");
+            var wikiId = $(".wiki-id").val();
+            var courseId = $(".course-id").val();
+            var lastData = { lastVar : lastVar, wikiId : wikiId, courseId : courseId };
+            jQuerySubmit('get-last-data-ajax', lastData, 'getLastSuccess');
+        });
+    }
+    /**
      * to get selected wiki's first data
      */
-    function getFirstLastData(){
+    function getFirstData(){
         $("a[name=first-link]").on("click", function ()
         {
             var firstVar = $(this).attr("data-var");
             var wikiId = $(".wiki-id").val();
             var courseId = $(".course-id").val();
             var firstData = { firstVar : firstVar, wikiId : wikiId, courseId : courseId };
-            jQuerySubmit('get-first-last-data-ajax', firstData, 'getFirstLastSuccess');
+            jQuerySubmit('get-first-data-ajax', firstData, 'getFirstSuccess');
         });
     }
 
-    function getFirstLastSuccess(response)
+    /**
+     *  last wiki's response
+     */
+    function getLastSuccess(response)
     {
        var result = JSON.parse(response);
-        console.log(result);
         if(result.status == 0){
         var wikiData = result.data;
-            alert('hi');
-            $('#wikicontent').val(wikiData);
-//alert(wikiData.wikiRevisionSortedById.revision));
+            $.each(wikiData, function(index, wikiDataDetails)
+            {
+               var revision = wikiDataDetails.revision;
+                $('#wikicontent').val(revision);
+            });
+
         }
+    }
+
+    /**
+     *  first wiki's response
+     */
+    function getFirstSuccess(response)
+    {
+        var result = JSON.parse(response);
+        console.log(result);
+//        if(result.status == 0){
+//            var wikiData = result.data;
+//            $.each(wikiData, function(index, wikiDataDetails)
+//            {
+//                var revision = wikiDataDetails.revision;
+//                $('#wikicontent').val(revision);
+//            });
+//
+//        }
     }
 </script>

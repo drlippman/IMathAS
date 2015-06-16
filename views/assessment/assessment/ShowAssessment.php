@@ -17,41 +17,37 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
 <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/AMhelpers.js"></script>
 <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/drawing.js"></script>
 <style type="text/css">span.MathJax { font-size: 105%;}</style>
-
 <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessment->timelimit)?>">
 
 <html>
 <!--    Show total time and remaining time-->
-    <?php
-    /*Conversion into hour, minute and seconds*/
-    $hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
-    $min = floor((abs($assessment->timelimit)%3600)/60);
-    ?>
-    <input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
-    <input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
-    <input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
-
+<?php
+/*Conversion into hour, minute and seconds*/
+$hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
+$min = floor((abs($assessment->timelimit)%3600)/60);
+?>
+<input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
+<input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
+<input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
 
 <input type="hidden" id="courseId" value='<?php echo $courseId ?>'/>
 <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
 <input type="hidden" id="timelimit" value="<?php echo $assessment->timelimit;?>">
 <input type="hidden" id="now" value="<?php echo $now;?>">
 
-
 <?php if(!empty($isQuestions)){echo $response;}else{?>
-<script>
+    <script>
         $(document).ready(function ()
         {
-             noQuestionPopup();
+            noQuestionPopup();
         });
-</script>
+    </script>
 <?php }?>
+
 <script type="text/javascript">
     $(document).ready(function(){
         var timer = $('#timerlimit').val();
         var html = '';
-        $('#expired').hide();
-        $("#timerhide").hide();
         var hour = $('#hour').val();
         var min = $('#min').val();
         var endDate = $('#endDate').val();
@@ -61,7 +57,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             html += "<b>Timelimit: "+hour+":"+min+" minutes.</b>" ;
             html += "<span id='timerwrap'><b>";
             html += "<span id='timer'></span> remaining </b></span>"
-            window.onload = toggleintroshow();
+
         }else {
             html += 'Due '+endDate;
         }
@@ -101,11 +97,11 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         e.preventDefault();
         var questionId= $(".question-id").val();
         var html = '<div><p><Strong>Question License</Strong></p>' +
-                   '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
-                   '<p> This question was written by Lippman, David. This work is licensed under the<a target="Licence" href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
-                  +'<p>The code that generated this question can be obtained by instructors by emailing abhishek.prajapati@tudip.com</p></div>';
-         $('<div  id="dialog"></div>').appendTo('body').html(html).dialog
-         ({
+            '<p>Question ID '+questionId +' (Universal ID 11435814263779)</p>'  +
+            '<p> This question was written by Lippman, David. This work is licensed under the<a target="Licence" href="http://www.imathas.com/communitylicense.html"> IMathAS Community License (GPL + CC-BY)</a> </p>'
+            +'<p>The code that generated this question can be obtained by instructors by emailing abhishek.prajapati@tudip.com</p></div>';
+        $('<div  id="dialog"></div>').appendTo('body').html(html).dialog
+        ({
             modal: true, title: 'License', zIndex: 10, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
@@ -122,7 +118,6 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
         });
 
     });
-
     var Timer;
     var TotalSeconds;
 
@@ -161,8 +156,6 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             $("#timerhide").attr("title","Hide");
         }
     }
-
-
     function noQuestionPopup(){
 
         var courseId = $("#courseId").val();
@@ -188,7 +181,6 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             }
         });
     }
-
     $(document).ready(function ()
     {
         var assessmentsession = $("#assessmentsession").val();
@@ -206,7 +198,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
             $('#expired').show();
             var msg = '<div><p>Your time limit has expired </p>'+
                 '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
-            $('<div  id="dialog"></div>').appendTo('body').html(msg).dialog
+            $('<div id="dialog"></div>').appendTo('body').html(msg).dialog
             ({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,

@@ -96,7 +96,7 @@ class WikiController extends AppController
         }
     }
 
-    public function actionGetFirstLastDataAjax()
+    public function actionGetLastDataAjax()
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
@@ -114,15 +114,24 @@ class WikiController extends AppController
         return $this->successResponse($responseData);
     }
 
-//    public function actionGetFirstLastDataAjax()
-//    {
-//        $this->guestUserHandler();
-//        $params = $this->getRequestParams();
-//        $cid = $params['courseId'];
-//        $wikiId = $params['wikiId'];
-//        $wikiData = WikiRevision::getByWikiId($wikiId);
-//        $responseData = array('wikiId'=> $wikiId);
-////        AppUtility::dump($responseData);
-//         return $this->successResponse($responseData);
-//    }
+    public function actionGetFirstDataAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = $params['courseId'];
+        $wikiId = $params['wikiId'];
+        $wikiData = WikiRevision::getByWikiId($wikiId);
+        AppUtility::dump($wikiData);
+        $wikiRevisionSortedById = '';
+        foreach($wikiData as $singleWikiData){
+        $order = AppConstant::DESCENDING;
+        $sortBy = $singleWikiData->id;
+        $wikiRevisionSortedById = WikiRevision::getEditedWiki($sortBy, $order,$wikiData->id);
+            AppUtility::dump($wikiRevisionSortedById);
+        }
+//        AppUtility::dump($wikiRevisionSortedById);
+        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
+//        AppUtility::dump($responseData);
+         return $this->successResponse($responseData);
+    }
 }
