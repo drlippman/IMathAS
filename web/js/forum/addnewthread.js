@@ -9,8 +9,19 @@ $(document).ready(function () {
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
             var subject = $(".subject").val();
+
+        var postType = "";
+        var selected = $("#post-type-radio-list input[type='radio']:checked");
+        if (selected.length > 0) {
+            postType = selected.val();
+        }
+        var alwaysReplies = "";
+        var selected = $("#always-replies-radio-list input[type='radio']:checked");
+        if (selected.length > 0) {
+            alwaysReplies = selected.val();
+        }
             var body = $("#message").val();
-            var threadDetails = {forumId:forumId,subject:subject,body:body};
+            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies};
             jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
     });
 
@@ -18,7 +29,6 @@ $(document).ready(function () {
 });
 function newThreadSuccess(response)
 {
-    console.log(JSON.parse(response));
     var forumId = $("#forumId").val();
     var courseId = $('#courseId').val();
     response = JSON.parse(response);

@@ -40,8 +40,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <table id="forum-table displayforum" class="forum-table">
             <thead>
-
             <th>Topic</th>
+            <th></th>
             <th>Replies</th>
             <th>Views(Unique)</th>
             <th>Last Post Date</th>

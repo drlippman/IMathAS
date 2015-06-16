@@ -28,20 +28,20 @@ use kartik\time\TimePicker;
     {?>
          <div >
             <span class="col-md-2"><b>Post Type:</b></span>
-        <span class="col-md-10" id="rdaiobtn">
-            <input type="radio" name="PostType" id="self" value="Regular" checked="checked"> Regular<br>
-            <input type="radio" name="PostType" id="self" value="Displayedattopoflist" >Displayed at top of list<br>
-            <input type="radio" name="PostType" id="self" value="Displayedattopandlocked"> Displayed at top and locked (no replies)<br>
-            <input type="radio" name="PostType" id="self" value="onlyStudentscansee"> Displayed at top and students can only see their own replies <br>
+        <span class="col-md-10" id="post-type-radio-list">
+            <input type="radio" name="post-type" id="regular" value="0" checked > Regular<br>
+            <input type="radio" name="post-type" id="displayed_at_top_of_list" value="1" >Displayed at top of list<br>
+            <input type="radio" name="post-type" id="displayed_at_top_and_locked" value="2"> Displayed at top and locked (no replies)<br>
+            <input type="radio" name="post-type" id="only_students_can_see" value="3"> Displayed at top and students can only see their own replies <br>
             </span>
         </div>
         <div>
             <span class="col-md-2"><b>Always Replies:</b></span>
-        <span class="col-md-10">
-            <input type="radio" name="AlwaysReplies" id="self" value="Usedefault" checked="checked"> Use default<br>
-            <input type="radio" name="PostType" id="self" value="Always" >Always<br>
-            <input type="radio" name="PostType" id="self" value="Never"> Never<br>
-            <input type="radio" name="PostType" class="end pull-left"  id="self" value="Before"><label class="end pull-left">Before</label>
+        <span class="col-md-10" id="always-replies-radio-list" >
+            <input type="radio" name="always-replies" id="always" value="0" checked > Use default<br>
+            <input type="radio" name="always-replies" id="always" value="1" >Always<br>
+            <input type="radio" name="always-replies" id="always" value="2"> Never<br>
+            <input type="radio" name="always-replies" class="end pull-left"  id="always" value="3"><label class="end pull-left">Before</label>
 
 
                 <div class="col-md-3 " id="datepicker-id">

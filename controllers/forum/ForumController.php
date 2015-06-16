@@ -173,7 +173,7 @@ class ForumController extends AppController
         $forumid = $this->getParamVal('forumid');
         $user = $this->getAuthenticatedUser();
         $this->includeCSS(['forums.css']);
-        $this->includeJS(['forum/thread.js']);
+        $this->includeJS(['forum/thread.js?ver='.time().'']);
         $responseData = array('cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course);
         return $this->renderWithData('thread',$responseData);
     }
@@ -208,6 +208,7 @@ class ForumController extends AppController
                         'tagged' => $tagged[0]['tagged'],
                         'userright' => $userRights['rights'],
                         'countArray' =>$count,
+                        'posttype' => $data['posttype'],
                     );
                     array_push($threadArray, $temparray);
                     array_push($uniquesDataArray, $uniquesData);
@@ -234,6 +235,7 @@ class ForumController extends AppController
                     'tagged' => $tagged[0]['tagged'],
                     'userright' => $userRights['rights'],
                     'countArray' =>$count,
+                    'posttype' => $data['posttype'],
                 );
                 array_push($threadArray, $temparray);
                 array_push($uniquesDataArray, $uniquesData);
@@ -456,11 +458,13 @@ class ForumController extends AppController
         if ($this->isPost())
         {
             $params = $this->getRequestParams();
+            $postType = $params['postType'];
+            $alwaysReplies = $params['alwaysReplies'];
             $userId = $this->getUserId();
             $newThread = new ForumThread();
-           $threadId = $newThread->createThread($params,$userId);
+            $threadId = $newThread->createThread($params,$userId);
             $newThread = new ForumPosts();
-            $newThread->createThread($params,$userId,$threadId);
+            $newThread->createThread($params,$userId,$threadId,$postType);
             $views = new ForumView();
             $views->createThread($userId,$threadId);
 
@@ -474,7 +478,7 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
         ForumView::updateFlagValue($rowId);
-        return $this->successResponse();
+        return $this->successResponse() ;
     }
 
 /*Controller Action To Search Post Of That Forum*/
