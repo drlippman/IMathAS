@@ -95,4 +95,34 @@ class WikiController extends AppController
            }
         }
     }
+
+    public function actionGetFirstLastDataAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = $params['courseId'];
+        $wikiId = $params['wikiId'];
+        $wikiData = WikiRevision::getByWikiId($wikiId);
+        $wikiRevisionSortedById = '';
+        $order = AppConstant::DESCENDING;
+        foreach($wikiData as $singleWikiData){
+            $sortBy = $singleWikiData->id;
+            $wikiRevisionSortedById = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
+        }
+//        AppUtility::dump($wikiRevisionSortedById[0]['attributes']);
+        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
+        return $this->successResponse($responseData);
+    }
+
+//    public function actionGetFirstLastDataAjax()
+//    {
+//        $this->guestUserHandler();
+//        $params = $this->getRequestParams();
+//        $cid = $params['courseId'];
+//        $wikiId = $params['wikiId'];
+//        $wikiData = WikiRevision::getByWikiId($wikiId);
+//        $responseData = array('wikiId'=> $wikiId);
+////        AppUtility::dump($responseData);
+//         return $this->successResponse($responseData);
+//    }
 }

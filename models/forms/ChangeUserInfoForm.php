@@ -40,7 +40,6 @@ class ChangeUserInfoForm extends Model
     public function rules()
     {
         return [
-
             [['FirstName', 'LastName', 'email'], 'required'],
             ['rePassword', 'compare', 'compareAttribute'=>'password'],
             [['FirstName', 'LastName','oldPassword'], 'string'],

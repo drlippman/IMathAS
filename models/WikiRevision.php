@@ -32,4 +32,9 @@ class WikiRevision extends BaseImasWikiRevisions
     {
         return WikiRevision::findAll(['id' => $id]);
     }
+
+    public static function getByWikiId($wikiId)
+    {
+        return WikiRevision::findAll(['wikiid' =>$wikiId]);
+    }
 }

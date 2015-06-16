@@ -24,8 +24,6 @@ class ForumThread extends BaseImasForumThreads
         $this->views = 0;
         $this->save();
         return($this->id);
-
-
     }
 
 
