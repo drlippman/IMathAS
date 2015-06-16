@@ -893,6 +893,7 @@ class RosterController extends AppController
         $message->create($tempArray, $user->id);
     }
 
+//Controller method to make exception
     public function actionMakeException()
     {
         if($this->getRequestParams()){
