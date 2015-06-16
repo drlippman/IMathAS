@@ -38,7 +38,7 @@ class BaseImasMsgs extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'title', 'message', 'msgto', 'msgfrom'], 'required'],
+            [['courseid', 'title', 'msgto', 'msgfrom'], 'required'],
             [['courseid', 'msgto', 'msgfrom', 'senddate', 'isread', 'replied', 'parent', 'baseid'], 'integer'],
             [['message'], 'string'],
             [['title'], 'string', 'max' => 254]
