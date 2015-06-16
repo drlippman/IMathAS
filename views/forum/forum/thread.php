@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" id="forumid" value="<?php echo $forumid ?>">
     <input type="hidden" id="courseid" value="<?php echo $course->id ?>">
 
-    <div>
+    <div id="data">
         <table id="forum-table displayforum" class="forum-table">
             <thead>
             <th>Topic</th>

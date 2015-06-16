@@ -8,9 +8,9 @@ $(document).ready(function ()
     jQuerySubmit('get-thread-ajax',{forumid: forumid,ShowRedFlagRow:ShowRedFlagRow },'threadSuccess');
     limitToTagShow();
 
-    $('.forum-table').dataTable( {
-        "aaSorting": [['asc', 0]]
-    } );
+//    $('.forum-table').dataTable( {
+//        "aaSorting": [[0, 0]]
+//    } );
 
 
     $('#change-button').click(function(){
@@ -171,8 +171,11 @@ function threadSuccess(response)
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable();
     }
-    else if (result.status == -1) {
-        $('#forum-table').hide;
+    else if (response.status == -1) {
+
+        $('#data').hide();
+        $('#result').show();
+
     }
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");

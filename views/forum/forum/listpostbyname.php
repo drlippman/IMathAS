@@ -10,8 +10,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div><h3>Post by Name- <?php echo $forumname->name?></h3></div>
 <br>
 <div class="midwrapper">
-    <button id="expand" onclick="expandall()" class="btn btn-primary">Expand All</button>
-    <button  onclick="markall()" class="btn btn-primary">Mark All</button>
+    <input type="button" id="expand" onclick="expandall()" class="btn btn-primary" value="Expand All">
+    <input type="button" id="collapse" onclick="collapseall()" class="btn btn-primary" value="Collapse All">
+    <button  onclick="markall()" class="btn btn-primary">Mark All Read</button>
     <br><br>
 </div>
 <?$count =0;?>
@@ -25,8 +26,8 @@ $this->params['breadcrumbs'][] = $this->title;
             {?>
                     <div class=""><strong><?php echo $data['name']?></strong></div>
                     <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
-                    <a href="#">Reply</a>
-                    </span><input type="button" value="+" onclick="toggleshow(2)" id="butn2">
+                    <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid='. $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
+                    </span><input type="button" value="+" onclick="toggleshow($data['id'])" id="butn">
                         <b><?php if($data['parent']!= 0){
                             echo '<span style="color:green;">';
                             echo  $data['subject'];
@@ -41,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             else{?>
                     <div class="block"><span class="right"><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>">Thread</a>
-                    <a href="#">Reply</a>
+                    <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid=' . $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
                     </span><input type="button" value="+" onclick="toggleshow(2)" id="butn2">
                              <b><?php if($data['parent']!= 0){
                                      echo '<span style="color:green;">';
@@ -59,14 +60,16 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 }?>
 <input type="hidden" id="count" value="<?php echo $count;?>">
-<?php echo "<p>Color code<br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>"?>
-<a href="<?php AppUtility::getHomeURL('forum','forum/thread?cid='. $courseid.'&forumid='.$forumid);?>">Back to Thread List</a>
+<?php echo "<p><Bold><strong>Color code:</strong></Bold><br/>Black: New thread</br><span style=\"color:green;\">Green: Reply</span></p>"?>
+<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $courseid.'&forumid='.$forumid);?>">Back to Thread List</a></div>
 
 <script>
 $(document).ready(function ()
 {
+
         hidebody();
-        $('#butn2').click(function()
+        $('#collapse').hide();
+        $('#butn').click(function()
         {
             ExpandOne();
         });
@@ -85,16 +88,34 @@ $(document).ready(function ()
     function expandall()
     {
         var count = $('#count').val();
-        for(var i=0; i< count; i++){
-
-            $('.blockitems').show();
+        for(var i=0; i< count; i++)
+        {
+                $('.blockitems').show();
         }
+
+        $('#collapse').show();
+        $('#expand').hide()
+
+
+    }
+
+    function collapseall()
+    {
+
+        var count = $('#count').val();
+        for(var i=0; i< count; i++)
+        {
+            $('.blockitems').hide();
+        }
+
+        $('#collapse').hide();
+        $('#expand').show()
 
     }
 
 
     function toggleshow(bnum) {
-        var node = document.getElementById('m'+bnum);
+        var node = document.getElementById(bnum);
         var butn = document.getElementById('butn'+bnum);
         if (node.className == 'blockitems') {
             node.className = 'hidden';
@@ -108,20 +129,19 @@ $(document).ready(function ()
 
      function showall()
      {
-
          var count = $('#count').val();
          for(var i=0; i< count; i++){
 
-//             var node = document.getElementById('btn2'+i);
-//             var butn = document.getElementById(count+i);
-//             node.className = 'blockitems';
-//             butn.value = '-';
              $('.blockitems').show(i);
 
          }
 
      }
 
+    function markall(){
+
+        alert("nbndb");
+    }
 
 
 
