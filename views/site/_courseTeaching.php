@@ -11,11 +11,13 @@ use app\components\AppUtility;
         <?php
         foreach ($teachers as $teacher) {
             if ($teacher) {
+                if(($teacher->course->available & 2) == 0){
                 ?>
-                <li>
-                    <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid='. $teacher->course->id) ?>"><?php echo isset($teacher->course->name) ? ucfirst($teacher->course->name) : ""; ?></a>
-                </li>
+                    <li>
+                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid='. $teacher->course->id) ?>"><?php echo isset($teacher->course->name) ? ucfirst($teacher->course->name) : ""; ?></a>
+                    </li>
             <?php
+                }
             }
         }
         ?>

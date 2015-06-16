@@ -12,12 +12,14 @@ $isCourseHidden = false;
             foreach ($students as $student) {
                 if ($student) {
                     if(!$student->hidefromcourselist){
+                        if(($student->course['available'] & 1) == 0){
                         ?>
-                        <li>
-                            <span class="delx" onclick="return hidefromcourselist(this, $student->courseid);" title="Hide from course list">x</span>
-                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
-                        </li>
+                            <li>
+                                <span class="delx" onclick="return hidefromcourselist(this, $student->courseid);" title="Hide from course list">x</span>
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
+                            </li>
                     <?php
+                        }
                     }
                     elseif($student->hidefromcourselist)
                     {
