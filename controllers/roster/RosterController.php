@@ -520,7 +520,7 @@ class RosterController extends AppController
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
             $newUserRecords = array();
             $existUserRecords = array();
-        if($studentRecords['allUsers']){
+            if($studentRecords['allUsers'] || $studentRecords['existingUsers']) {
             foreach ($studentRecords['allUsers'] as $users) {
                 array_push($newUserRecords, $users);
             }
@@ -538,11 +538,12 @@ class RosterController extends AppController
             if ($filename) {
                 $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
             }
+
         }else{
-            $this->includeJS(["courseSetting.js"]);
-            $responseData = array('model' => $model, 'course' => $course);
-            return $this->render('importStudent', $responseData);
-            setErrorFlash('All students from CSV file already exits.');
+                $this->setErrorFlash('Add atleast one records in CSV file. ');
+                $responseData = array('model' => $model, 'course' => $course);
+                return $this->render('importStudent', $responseData);
+
         }
         }
         if (!$studentRecords) {
@@ -672,6 +673,7 @@ class RosterController extends AppController
                 $isCodePresent = false;
                 $isSectionPresent = false;
                 $courseId = $this->getParamVal('courseId');
+                if($studentInformation['newUsers']){
                 foreach ($studentInformation['newUsers'] as $student) {
                     if ($student['4'] != 0) {
                         $isCodePresent = true;
@@ -679,7 +681,7 @@ class RosterController extends AppController
                     if ($student['5'] != 0) {
                         $isSectionPresent = true;
                     }
-                }
+                }}
                 $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
                 $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
                 $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId);

@@ -15,11 +15,9 @@ use Yii;
 class ThreadForm extends Model
 {
     public static  function thread($forumid){
-        $orderBy = 'posttype';
         $sortBy = AppConstant::DESCENDING;
-        $thread = ForumPosts::find()->where(['forumid' => $forumid])->orderBy(['posttype'=> $sortBy])->all();
+        $thread = ForumPosts::find()->where(['forumid' => $forumid])->orderBy(['posttype'=> $sortBy ,'id' => $sortBy])->all();
         return $thread;
-
     }
 
     public static  function postByName($forumid,$sort,$orderby){

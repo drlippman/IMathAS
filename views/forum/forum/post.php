@@ -53,7 +53,7 @@ src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLo
 
 
         <?php $cnt = 0;
-            foreach($postdata as $index => $data){ ?>
+            foreach($postdata as $index => $data){?>
 
                 <?php if($data['level'] != 0 && $data['level'] < $currentLevel)
                     { $cnt--;
@@ -63,11 +63,7 @@ src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLo
                             </div>
                         <?php }?>
 
-
                     <?php } ?>
-
-
-
 
                 <?php if($data['level'] != 0 && $data['level'] > $currentLevel)
                   { $cnt++;?>
@@ -76,7 +72,9 @@ src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLo
             <?php }?>
                 <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
                         <span class=right>
+                       <?php if( $data['posttype'] != 2  ){ ?>
                         <a href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'].'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>" > Reply</a >
+                           <?php } ?>
                         <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
                         </span>
                         <b><?php echo $data['subject'] ?></b><br/>Posted by: <a

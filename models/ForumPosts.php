@@ -70,7 +70,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->save();
     }
-    public function createThread($params,$userId,$threadId,$postType)
+    public function createThread($params,$userId,$threadId,$postType,$alwaysReplies)
     {
 
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
@@ -81,6 +81,14 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->message = isset($params['body']) ? $params['body'] : null;
         $this->posttype = $postType;
+        if($alwaysReplies == 1){
+        $this->replyby = 2000000000;
+        }elseif($alwaysReplies == 2) {
+            $this->replyby = 0;
+        }
+//        }elseif($alwaysReplies == 3){
+//            $this->replyby = 2000000000;
+//        }
         $this->save();
         return($this->threadid);
 

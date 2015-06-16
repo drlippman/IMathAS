@@ -90,8 +90,42 @@ $this->params['breadcrumbs'][] = $this->title;
 <script>
     function saveStudentData() {
         var studentInformation= <?php echo json_encode($studentData ); ?>;
-        var studentData = studentInformation['newUsers'];
-        jQuerySubmit('save-csv-file-ajax', {studentData:studentData}, 'saveCsvFileSuccess');
+        var existingData = studentInformation['existingUsers'];
+        var NewStudentData = studentInformation['newUsers'];
+
+
+
+        var html = '<div><p>Existing students detail : </p></div><p>';
+        html +='* Already existing in system'+  '<br>';
+        $.each(existingData, function (index, thread) {
+            html += thread.userName+'<br>';
+        });
+        html += '<br>'+'* Already enrolled in course[Skip them]'+  '<br>';
+        $.each(existingData, function (index, thread) {
+            html +=  thread.userName+'<br>';
+        });
+
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "confirm": function () {
+                    $('#searchText').val(null);
+                    $(this).dialog('destroy').remove();
+                    jQuerySubmit('save-csv-file-ajax', {studentData:NewStudentData}, 'saveCsvFileSuccess');
+                    return true;
+                },
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+
     }
     function saveCsvFileSuccess(response)
     {

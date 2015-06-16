@@ -194,6 +194,7 @@ class ForumController extends AppController
                 $uniquesData = ForumView::getbythreadId($data['threadid']);
                 $count = ForumView::uniqueCount($data['threadid']);
                 $tagged = ForumView::forumViews($data['threadid']);
+                AppUtility::dump($tagged);
                 if ($tagged[0]['tagged'] == 1) {
                     $temparray = array
                     (
@@ -209,6 +210,7 @@ class ForumController extends AppController
                         'userright' => $userRights['rights'],
                         'countArray' =>$count,
                         'posttype' => $data['posttype'],
+                        'replyby' => $data['replyby'],
                     );
                     array_push($threadArray, $temparray);
                     array_push($uniquesDataArray, $uniquesData);
@@ -236,6 +238,7 @@ class ForumController extends AppController
                     'userright' => $userRights['rights'],
                     'countArray' =>$count,
                     'posttype' => $data['posttype'],
+                    'replyby' => $data['replyby'],
                 );
                 array_push($threadArray, $temparray);
                 array_push($uniquesDataArray, $uniquesData);
@@ -345,6 +348,7 @@ class ForumController extends AppController
     public function actionPost()
     {
         $this->guestUserHandler();
+        $CurrentUserId = $this->getAuthenticatedUser();
         $courseid=$this->getParamVal('courseid');
         $threadId = $this->getParamVal('threadid');
 
@@ -363,6 +367,7 @@ class ForumController extends AppController
             $tempArray['subject'] = $titleLevel['title'];
             $tempArray['forumname'] = ucfirst($forumname->name);
             $tempArray['postdate'] = date('F d, o g:i a', $postdate->lastposttime);
+            $tempArray['posttype'] = $postdata['posttype'];
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
@@ -372,7 +377,7 @@ class ForumController extends AppController
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/post.js']);
-        $responseData = array('postdata' => $this->totalPosts,'courseid' => $courseid);
+        $responseData = array('postdata' => $this->totalPosts,'courseid' => $courseid,'CurrentUserId' => $CurrentUserId);
         return $this->render('post', $responseData);
     }
     public function createChild($childArray, $arrayKey = 0)
@@ -464,11 +469,9 @@ class ForumController extends AppController
             $newThread = new ForumThread();
             $threadId = $newThread->createThread($params,$userId);
             $newThread = new ForumPosts();
-            $newThread->createThread($params,$userId,$threadId,$postType);
+            $newThread->createThread($params,$userId,$threadId,$postType,$alwaysReplies);
             $views = new ForumView();
             $views->createThread($userId,$threadId);
-
-
             return $this->successResponse();
         }
     }
