@@ -218,5 +218,9 @@ class Message extends BaseImasMsgs
     {
         $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
     }
+    public static function getByCourseIdAndUserId($courseid, $userId)
+    {
+        return Message::find()->where(['courseid' => $courseid, 'msgto' => $userId])->all();
+    }
 }
 

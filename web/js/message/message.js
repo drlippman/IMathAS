@@ -1,9 +1,10 @@
 $(document).ready(function () {
     $("#show-all-link").hide();
     var cid = $(".send-msg").val();
+    var isNewMessage = $(".msg-type").val();
     var ShowRedFlagRow = -1;
     var userId = $(".send-userId").val();
-    var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
+    var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
     jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
     jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
@@ -75,7 +76,7 @@ function showMessage(messageData, status) {
 
 }
 
-function showMessageSuccess(response) {
+function showMessageSuccess(response) {    console.log(response);
     response = JSON.parse(response);
     messageData = response.data;
     if(response.status == 0)

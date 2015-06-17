@@ -22,14 +22,13 @@ use app\components\AppConstant;
         </div>
         <div id="homefullwidth">
             <?php
-
             if ($user->rights > AppConstant::GUEST_RIGHT) {
                 if ($user->rights > AppConstant::TEACHER_RIGHT) {
-                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers]);
+                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT) {
-                    echo $this->render('_courseTeaching',['teachers' => $teachers]);
+                    echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);
                 }
-                echo $this->render('_courseTaking', ['students' => $students]);
+                echo $this->render('_courseTaking', ['students' => $students, 'msgRecord' => $msgRecord]);
             } ?>
 
         </div>

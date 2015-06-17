@@ -10,6 +10,7 @@ use app\models\forms\ForgotUsernameForm;
 use app\models\forms\LoginForm;
 use app\models\forms\RegistrationForm;
 use app\models\forms\ResetPasswordForm;
+use app\models\Message;
 use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentRegisterForm;
@@ -300,12 +301,28 @@ class SiteController extends AppController
             $user = $this->getAuthenticatedUser();
             $students = Student::getByUserId($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
+            $isreadArray = array(0, 4, 8, 12);
+            $msgCountArray = array();
+            if($teachers){
+                foreach ($teachers as $teacher) {
+                    $messageList = Message::getByCourseIdAndUserId($teacher->courseid, $user->id);
+                    if($messageList){
+                        $count = 0;
+                        foreach($messageList as $message){
+                            if(in_array($message->isread, $isreadArray))
+                                $count++;
+                        }
+                    }
+                    $tempArray = array('courseid' => $teacher->courseid, 'msgCount' => $count);
+                    array_push($msgCountArray,$tempArray);
+                }
+            }
             if ($user) {
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
 
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'msgRecord' => $msgCountArray];
                 return $this->renderWithData('dashboard', $userData);
             }
         }

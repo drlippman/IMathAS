@@ -438,3 +438,12 @@ a:focus {
     width: 72px;
     height: 35px;
 }
+.msg-notification{
+    color: red;
+}
+a.msg-notification:hover{
+    color: red;
+}
+a.msg-notification:visited{
+    color: red;
+}

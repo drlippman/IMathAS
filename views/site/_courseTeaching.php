@@ -15,6 +15,19 @@ use app\components\AppUtility;
                 ?>
                     <li>
                         <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid='. $teacher->course->id) ?>"><?php echo isset($teacher->course->name) ? ucfirst($teacher->course->name) : ""; ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $teacher->course->id) ?>" class="msg-notification">
+                            <?php
+                            if($msgRecord){
+                                foreach($msgRecord as $record){
+                                    if($teacher->courseid == $record['courseid']){
+                                        if($record['msgCount'] != 0){
+                                            echo "Messages (".$record['msgCount'].")" ;
+                                        }
+                                    }
+                                }
+                            }
+                            ?>
+                        </a>
                     </li>
             <?php
                 }

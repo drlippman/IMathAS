@@ -5,7 +5,13 @@ use app\components\AppUtility;
 
 
 <p>Communication</p>
-<a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a><br>
+<a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a>
+<a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid=' . $course->id) . '&newmsg=1' ?>" class="msg-notification">
+    <?php
+    if($messageList)
+    echo "New (".count($messageList).")";
+?></a>
+<br>
 <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"> Forums</a><br>
 
 <p>Tools</p>

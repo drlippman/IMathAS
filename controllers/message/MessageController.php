@@ -28,6 +28,7 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
+        $isNewMessage = $this->getParamVal('newmsg');
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
@@ -37,7 +38,7 @@ class MessageController extends AppController
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeJS(["message/message.js"]);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage);
             return $this->renderWithData('messages', $responseData);
         }
     }
@@ -81,7 +82,21 @@ class MessageController extends AppController
             $userId = $this->getUserId();
             $params = $this->getRequestParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
-            $messages = Message::getUsersToDisplay($userId);
+            $showNewMsg = $params['showNewMsg'];
+            $isreadArray = array(0, 4, 8, 12);
+            $messages = array();
+            if($showNewMsg == 1){
+                $query = Message::getUsersToDisplay($userId);
+                if($query){
+                    foreach($query as $message){
+                         if(in_array($message['isread'], $isreadArray)){
+                             array_push($messages, $message);
+                         }
+                    }
+                }
+            }else{
+                $messages = Message::getUsersToDisplay($userId);
+            }
             if ($messages) {
                 $dateArray = array();
                 if ($ShowRedFlagRow == 1) {

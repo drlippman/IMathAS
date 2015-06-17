@@ -21,7 +21,7 @@ $(document).ready(function () {
 });
 
 function replyMessage(response)
-{console.log(response);
+{
     var cid = $(".send-msg").val();
     console.log(response);
     var result = JSON.parse(response);

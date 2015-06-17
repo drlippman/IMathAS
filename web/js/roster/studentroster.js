@@ -306,7 +306,7 @@ function copyStudentEmail() {
     });
 }
 function teacherMakeException() {
-    $('#roster-makeExc').click(function (e) {alert('hhhh');
+    $('#roster-makeExc').click(function (e) {
         var markArray = [];
         var sectionName;
         $('.student-data-table input[name = "student-information-check"]:checked').each(function () {

@@ -64,8 +64,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <tr>
         <th></th>
         <?php if ($isImageColumnPresent == 1) {
-            ?>
-            <th></th>
+            ?><th></th>
         <?php }
             if ($isSection == true) {
             ?>
