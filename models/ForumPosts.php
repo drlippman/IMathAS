@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumPosts;
 
@@ -70,12 +71,16 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->save();
     }
-    public function createThread($params,$userId,$threadId,$postType,$alwaysReplies)
+    public function createThread($params,$userId,$threadId,$postType,$alwaysReplies,$date)
     {
 
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
         $this->threadid = isset($threadId) ? $threadId : null;
-        $this->subject = isset($params['subject']) ? $params['subject'] : null;
+        if(empty($params['subject']))
+        {
+                $params['subject'] = '(None)';
+        }
+        $this->subject = $params['subject'];
         $this->userid = isset($userId) ?  $userId : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;
@@ -83,12 +88,11 @@ class ForumPosts extends BaseImasForumPosts
         $this->posttype = $postType;
         if($alwaysReplies == 1){
         $this->replyby = 2000000000;
-        }elseif($alwaysReplies == 2) {
-            $this->replyby = 0;
+        }elseif($alwaysReplies == AppConstant::NUMERIC_ZERO) {
+            $this->replyby = AppConstant::NUMERIC_ZERO;
+        }elseif($alwaysReplies == AppConstant::NUMERIC_THREE){
+            $this->replyby = $date;
         }
-//        }elseif($alwaysReplies == 3){
-//            $this->replyby = 2000000000;
-//        }
         $this->save();
         return($this->threadid);
 
@@ -105,5 +109,16 @@ class ForumPosts extends BaseImasForumPosts
         $views->views++;
         $views->save();
 
+    }
+    public static function getbyThreadIdAndUserID($threadId,$CurrentUserId)
+    {
+
+        $ForumPost = ForumPosts::findAll(['threadid' => $threadId,'userid' => $CurrentUserId]);
+        return $ForumPost;
+    }
+    public  static function getbyParentId($parent)
+    {
+        $parentThread = ForumPosts::findOne(['threadid' => $parent]);
+        return $parentThread;
     }
 }

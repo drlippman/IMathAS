@@ -3,6 +3,8 @@ $this->title = 'Add New Thread';
 $this->params['breadcrumbs'][] = $this->title;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
+use app\components\AppUtility;
+date_default_timezone_set("Asia/Calcutta");
 ?>
 <div class="" xmlns="http://www.w3.org/1999/html">
     <h3><b>Add Thread - <?php echo $forumName->name;?></h3>
@@ -45,28 +47,30 @@ use kartik\time\TimePicker;
 
 
                 <div class="col-md-3 " id="datepicker-id">
-                   <?php
-                   echo DatePicker::widget([
-                       'name' => 'date_picker',
-                       'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                       'value' => date("m-d-Y",strtotime("+1 week ")),
-                       'pluginOptions' => [
-                           'autoclose' => true,
-                           'format' => 'mm-dd-yyyy'
-                       ]
-                   ]);
+                    <?php
+                    echo DatePicker::widget([
+                        'name' => 'endDate',
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        'value' => date("m/d/Y",strtotime("+1 week")),
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                            'format' => 'mm/dd/yyyy' ]
+                    ]);
                  echo '</div>';?>
 
-                   <?php
                    echo '<label class="end pull-left "> At</label>';
                    echo '<div class="pull-left col-lg-4">';
-                   echo TimePicker::widget([
-                       'name' => 'end_time',
-                       'pluginOptions' => [
-                           'showSeconds' => false,
-                           'class' => 'time'
-                       ]
-                   ]);
+
+                    echo TimePicker::widget([
+                        'name' => 'startTime',
+                        'options' => ['placeholder' => 'Select operating time ...'],
+                        'convertFormat' => true,
+                        'value' => date('g:i A'),
+                        'pluginOptions' => [
+                            'format' => "m/d/Y g:i A",
+                            'todayHighlight' => true,
+                        ]
+                    ]);
 
                    echo '</div>';?>
             </div>

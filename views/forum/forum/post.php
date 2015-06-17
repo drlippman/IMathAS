@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
+use app\components\AppConstant;
 
 //AppUtility::dump($postdata);
 $this->title = 'Post';
@@ -18,10 +19,10 @@ $currentLevel = 0;
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/imascore.css" type="text/css"/>
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/default.css" type="text/css"/>
 <link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/handheld.css"
-media="handheld,only screen and (max-device-width:480px)"/>
+      media="handheld,only screen and (max-device-width:480px)"/>
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
 <script type="text/javascript"
-src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
+        src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
 <script src="<?php echo AppUtility::getHomeURL() ?>js/ASCIIsvg_min.js" type="text/javascript"></script>
 
 <div id="postlabel">
@@ -52,57 +53,77 @@ src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLo
         <br><br>
 
 
-        <?php $cnt = 0;
-            foreach($postdata as $index => $data){?>
+        <?php $cnt = AppConstant::NUMERIC_ZERO;
+        foreach ($postdata as $index => $data){
+        ?>
 
-                <?php if($data['level'] != 0 && $data['level'] < $currentLevel)
-                    { $cnt--;
+        <?php if ($data['level'] != AppConstant::NUMERIC_ZERO && $data['level'] < $currentLevel)
+        {
+        $cnt--;
 
-                        for($i=$currentLevel;$data['level']<$i;$i--){?>
+        for ($i = $currentLevel;
+        $data['level'] < $i;
+        $i--){
+        ?>
 
-                            </div>
-                        <?php }?>
+    </div>
+    <?php }?>
 
-                    <?php } ?>
+    <?php } ?>
 
-                <?php if($data['level'] != 0 && $data['level'] > $currentLevel)
-                  { $cnt++;?>
-                    <div class="forumgrp" id="block<?php echo $index-1 ?>">
+    <?php if ($data['level'] != 0 && $data['level'] > $currentLevel)
+    {
+    $cnt++;?>
+    <div class="forumgrp" id="block<?php echo $index - 1 ?>">
 
-            <?php }?>
-                <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>" src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif" onClick="toggleshow(<?php echo $index ?>)"/> </span>
+        <?php }?>
+        <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>"
+                                                     src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif"
+                                                     onClick="toggleshow(<?php echo $index ?>)"/> </span>
                         <span class=right>
-                       <?php if( $data['posttype'] != 2  ){ ?>
-                        <a href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'].'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>" > Reply</a >
-                           <?php } ?>
-                        <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
+                      <?php if ($data['userRights'] > AppConstant::STUDENT_RIGHT && $data['posttype'] != AppConstant::NUMERIC_TWO) {
+                          ?>
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                              Reply</a>
+                      <?php
+                      } else if ($data['posttype'] <= AppConstant::NUMERIC_ONE && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                              Reply</a>
+
+                      <?php } else if ($data['posttype'] < strtotime(date('F d, o g:i a')) && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                              Reply</a>
+                      <?php } ?>
+                            <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"
+                                   onClick="toggleitem(<?php echo $index ?>)">
                         </span>
-                        <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
-                        href="mailto:<?php echo '#' ?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?>
-                        <span style="color:red;">New</span>
-                </div>
-                <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
-            <?php
+            <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
+                href="mailto:<?php echo '#' ?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?>
+            <span style="color:red;">New</span>
+        </div>
+        <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
+        <?php
 
-                  if($index == (count($data)-1))
-                  {
+        if ($index == (count($data) - AppConstant::NUMERIC_ONE))
+        {
 
-                    for($i = $cnt; $i > 0; $i--)
-                    {?>
-                        </div>
-                     <?php }
-                  }?>
-            <?php
-            $currentLevel = $data['level'];
-             $postCount = (count($data) - 1);
-            ?>
-            <input type="hidden" id="postCount" value="<?php echo $postCount ?>">
-            <?php      }?>
-
+        for ($i = $cnt;
+        $i > AppConstant::NUMERIC_ZERO;
+        $i--)
+        {
+        ?>
+    </div>
+<?php }
+}?>
+    <?php
+    $currentLevel = $data['level'];
+    $postCount = (count($data) - 1);
+    ?>
+    <input type="hidden" id="postCount" value="<?php echo $postCount ?>">
+    <?php } ?>
 </div>
 </div>
 </div>
 </div>
 <script type="text/javascript">
-
 </script>

@@ -159,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="footerwrapper"></div>
 </div>
 <script type="text/javascript">
-    $(document).ready(function () {
+     $(document).ready(function () {
 
         jQuerySubmit('get-all-course-user-ajax',{},'getAllCourseSuccess');
 
@@ -222,7 +222,6 @@ $this->params['breadcrumbs'][] = $this->title;
         bindEvent();
     }
 
-
     function createUsersTable(users)
     { var html = "";
         $.each(users, function(index, users){
@@ -238,5 +237,4 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".user-table-body").append(html);
         $('.user-table').DataTable();
     }
-
 </script>

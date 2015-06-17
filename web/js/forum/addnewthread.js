@@ -9,7 +9,8 @@ $(document).ready(function () {
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
             var subject = $(".subject").val();
-
+        var date = $( "#datepicker-id input" ).val();
+        var time = $("#w1").val();
         var postType = "";
         var selected = $("#post-type-radio-list input[type='radio']:checked");
         if (selected.length > 0) {
@@ -21,7 +22,7 @@ $(document).ready(function () {
             alwaysReplies = selected.val();
         }
             var body = $("#message").val();
-            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies};
+            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time };
             jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
     });
 

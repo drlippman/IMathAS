@@ -8,11 +8,6 @@ $(document).ready(function ()
     jQuerySubmit('get-thread-ajax',{forumid: forumid,ShowRedFlagRow:ShowRedFlagRow },'threadSuccess');
     limitToTagShow();
 
-//    $('.forum-table').dataTable( {
-//        "aaSorting": [[0, 0]]
-//    } );
-
-
     $('#change-button').click(function(){
 
 
@@ -36,7 +31,6 @@ $(document).ready(function ()
                     $('#searchpost').show();
                     $('#flash-message').hide();
                     jQuerySubmit('get-only-post-ajax',{search: searchText, courseid: courseid,forumid:forumid},'postSearchUnchecked');
-
 
                 }
             }
@@ -169,7 +163,10 @@ function threadSuccess(response)
            }
         });
         $(".forum-table-body").append(html);
-        $('.forum-table').DataTable();
+        $('.forum-table').DataTable({"ordering": false});
+
+
+
     }
     else if (response.status == -1) {
 
