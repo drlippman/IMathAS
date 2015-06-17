@@ -77,7 +77,7 @@ class WikiController extends AppController
         $stugroupid = 0;
         $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
         $wikiTotalData = Wiki::getAllData($wikiId);
-        $responseData = array('courseId'=>$courseId, 'wikiId'=>$wikiId, 'revisionTotalData' => $revisionTotalData, 'wikiTotalData' => $wikiTotalData);
+        $responseData = array('courseId'=>$courseId, 'wikiId'=>$wikiId, 'revisionTotalData' => $revisionTotalData, 'wikiTotalData' => $wikiTotalData,'countOfRevision' => $wikiRevisionData);
         return $this->renderWithData('wikiRev', $responseData);
     }
     public function wikiEditedRevisionData($wikiRevisionData, $wikiData)
