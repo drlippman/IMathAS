@@ -41,34 +41,10 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
     </script>
 <?php }?>
 
+<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>
+<div id="eh" class="eh"></div>
+
 <script type="text/javascript">
-    $(document).ready(function(){
-        var timer = $('#timerlimit').val();
-        var html = '';
-        var hour = $('#hour').val();
-        var min = $('#min').val();
-        var endDate = $('#endDate').val();
-
-        initEditor();
-
-        if(timer != 0)
-        {
-            html += "<b>Timelimit: "+hour+":"+min+" minutes.</b>" ;
-            html += "<span id='timerwrap'><b>";
-            html += "<span id='timer'></span> remaining </b></span>"
-
-        }else {
-            html += 'Due '+endDate;
-        }
-        /**
-         * Timelimit in hour and minute
-         */
-        $('#timercontent').append(html);
-        /**
-         * Count down for timelimit.
-         */
-        window.onload = CreateTimer("timer",timer);
-    });
 
     function toggleintroshow(n) {
         var link = document.getElementById("introtoggle"+n);
@@ -180,7 +156,7 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
             }
         });
     }
-    $(document).ready(function ()
+    $(document).ready(function (e)
     {
         var assessmentsession = $("#assessmentsession").val();
 
@@ -214,6 +190,7 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
             });
 
         }
+//        eqtipBindEvent()
     });
 </script>
 
