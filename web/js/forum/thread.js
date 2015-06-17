@@ -127,8 +127,8 @@ function threadSuccess(response)
     var courseId = $('#course-id').val();
     if (response.status == 0) {
         var threads = response.data.threadArray;
-        //var uniquesDataArray = response.data.uniquesDataArray;
-
+        var uniquesDataArray = response.data.uniquesDataArray;
+console.log(uniquesDataArray);
         var html = "";
         $.each(threads, function (index, thread) {
             if (fid == thread.forumiddata) {
@@ -144,12 +144,19 @@ function threadSuccess(response)
                 if(thread.parent == 0){
 
                     html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +  "</a>"+ thread.name+" </td>";
-                    if (thread.tagged == 0 ) {
-                        html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                    if (thread.tagged == 0 && thread.posttype == 0 ) {
+                        html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
                     }
-                    else {
-                        html += " <td> <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")' ><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                    else if(thread.posttype == 0 ){
+                        html += " <td> <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")'></td> ";
+                    }else {
+                        html += " <td> - </td> ";
                     }
+                    if(thread.userright > 10) {
+                        html += " <td><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                    }else if(thread.currentUserId == thread.postUserId){
+                        html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
+                    }else { html += " <td> - </td> "; }
                     html += "<td>" + count + "</td>";
                     $.each(thread.countArray, function (index, count) {
                         count.usercount--;
@@ -159,7 +166,7 @@ function threadSuccess(response)
                             html += "<td>" + thread.views + "(" + count.usercount + ")" + "</td>";
                          }
                     });
-                    html += "<td>" + thread.postdate + "</td>";
+                    html += "<td>" + thread .postdate + "</td>";
                 }
            }
         });
@@ -178,6 +185,7 @@ function threadSuccess(response)
     }
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
+        alert(threadsid);
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -211,11 +219,20 @@ function threadSuccess(response)
 
 
 
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide"
-        });
+         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+             width: 'auto', resizable: false,
+             closeText: "hide",
+             buttons: {
+                 "Cancel": function () {
+                     $(this).dialog('destroy').remove();
+                     return false;
+                 }
+              },
+             close: function (event, ui) {
+                 $(this).remove();
+             }
+         });
 
     });
 }

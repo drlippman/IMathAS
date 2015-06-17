@@ -21,7 +21,7 @@ class ForumView extends BaseImasForumViews
     public static function getbythreadId($threadid)
     {
 
-        $views = Yii::$app->db->createCommand("SELECT userid,lastview FROM imas_forum_views where threadid = $threadid ")->queryAll();
+        $views = Yii::$app->db->createCommand("SELECT userid,threadid,lastview FROM imas_forum_views where threadid = $threadid ")->queryAll();
         return $views;
     }
     public static  function forumViews($threadid){

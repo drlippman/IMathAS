@@ -14,16 +14,6 @@ $currentLevel = 0;
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge"/>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="../../../web/js/jquery.min.js" type="text/javascript"></script>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/imascore.css" type="text/css"/>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/default.css" type="text/css"/>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/handheld.css"
-      media="handheld,only screen and (max-device-width:480px)"/>
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
-<script type="text/javascript"
-        src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
-<script src="<?php echo AppUtility::getHomeURL() ?>js/ASCIIsvg_min.js" type="text/javascript"></script>
 
 <div id="postlabel">
     <div id="post">
@@ -76,20 +66,26 @@ $currentLevel = 0;
     $cnt++;?>
     <div class="forumgrp" id="block<?php echo $index - 1 ?>">
 
-        <?php }?>
+        <?php }  ?>
         <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>"
                                                      src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif"
                                                      onClick="toggleshow(<?php echo $index ?>)"/> </span>
                         <span class=right>
-                      <?php if ($data['userRights'] > AppConstant::STUDENT_RIGHT && $data['posttype'] != AppConstant::NUMERIC_TWO) {
-                          ?>
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
-                              Reply</a>
-                      <?php
-                      } else if ($data['posttype'] <= AppConstant::NUMERIC_ONE && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
-                              Reply</a>
+                      <?php if ($data['userRights'] >= AppConstant::STUDENT_RIGHT && $data['posttype'] != AppConstant::NUMERIC_TWO) {
+                              if ($currentUser['rights'] > AppConstant::STUDENT_RIGHT) {
+                                  ?>
 
+                                  <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Move</a>&nbsp;<a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a> <?php
+                              } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
+                              <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a><?php } ?>
+
+                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                                  Reply</a>
+                          <?php } else if ($data['posttype'] == AppConstant::NUMERIC_TWO) {
+                              if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
+                              <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a><?php
+                              } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] > AppConstant::STUDENT_RIGHT) { ?>
+                                  <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Move</a>&nbsp;<a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a>Remove</a><?php } ?>
                       <?php } else if ($data['posttype'] < strtotime(date('F d, o g:i a')) && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
                           <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
                               Reply</a>
@@ -125,5 +121,7 @@ $currentLevel = 0;
 </div>
 </div>
 </div>
-<script type="text/javascript">
-</script>
+
+
+<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
+<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/forum/post.js?ver=<?php echo time()?>"></script>

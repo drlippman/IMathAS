@@ -54,7 +54,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
         </div>
         <br>
-        <div class=" col-lg-10 col-lg-offset-2 user-image">
+
+        <div class="col-lg-10 col-lg-offset-2 user-image">
+
         <?php
             if($user['hasuserimg']==0)
             {?>

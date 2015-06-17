@@ -15,7 +15,7 @@ class ForumPosts extends BaseImasForumPosts
     public static function updatePostMoveThread($threadId,$moveThreadId)
     {
 
-        $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
+        $ForumPost = ForumPosts::findOne(['id' => $threadId]);
         $ForumPost->threadid = $moveThreadId;
         $ForumPost->parent = $moveThreadId;
         $ForumPost->save();
@@ -35,7 +35,7 @@ class ForumPosts extends BaseImasForumPosts
 
     public static  function modifyThread($threadId,$message,$subject)
     {
-        $threadPost = ForumPosts::findOne(['threadid' => $threadId]);
+        $threadPost = ForumPosts::findOne(['id' => $threadId]);
         $threadPost->subject = $subject;
         $threadPost->message = $message;
         $threadPost->save();

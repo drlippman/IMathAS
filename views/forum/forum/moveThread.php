@@ -20,11 +20,11 @@
         <?php $currentTime = time();
 
         foreach ($forums as $forum) {
-            if($forum['enddate'] > $currentTime) { ?>
+             ?>
             <input type="radio" id="<?php echo $forum['forumId'] ?>" name="forum-name"
                    value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
 
-        <?php } } ?>
+        <?php  } ?>
     </div>
 </div>
 
