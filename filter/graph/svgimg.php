@@ -1,11 +1,13 @@
 <?php
-	$dbsetup = true; //to prevent database connection
-	require("../../config.php");
+////	$dbsetup = true; //to prevent database connection
+////	require("../../config.php");
+//
 	if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
 		 $urlmode = 'https://';
 	 } else {
 		 $urlmode = 'http://';
 	 }
+    $fn = '';
 	$imgdir = 'imgs/'; //relative to current dir
 	$host  = $_SERVER['HTTP_HOST'];
 	$uri  = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
@@ -24,9 +26,9 @@
 		if (!file_exists($imgdir.$fn.'.png')) {
 			include("asciisvgimg.php");
 			$AS = new AStoIMG(300,300);
-			$AS->processShortScript($_GET['sscr']);
-			$AS->outputimage($imgdir.$fn.'.png');
+//			$AS->processShortScript($_GET['sscr']);
+//			$AS->outputimage($imgdir.$fn.'.png');
 		}
 	}
-	header("Location: $urlmode$host$uri/$imgdir$fn.png");
-?>
+//	header("Location: $urlmode$host$uri/$imgdir$fn.png");
+//?>

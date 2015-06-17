@@ -37,10 +37,7 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
 
 <?php if(!empty($isQuestions)){echo $response;}else{?>
     <script>
-        $(document).ready(function ()
-        {
             noQuestionPopup();
-        });
     </script>
 <?php }?>
 
@@ -51,6 +48,8 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
         var hour = $('#hour').val();
         var min = $('#min').val();
         var endDate = $('#endDate').val();
+
+        initEditor();
 
         if(timer != 0)
         {

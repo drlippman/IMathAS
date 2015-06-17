@@ -282,41 +282,40 @@ function chkAllNone(frmid, arr, mark, skip) {
 
 function initeditor(edmode,edids,css) {
 	var cssmode = css || 0;
+    var fileBrowserCallBackFunc = null;
 	var edsetup = {
 	    mode : edmode,
 	    theme : "advanced",
-	    theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,pasteword,undo,redo",
-	    theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,anchor,link,unlink,charmap,image,"+((fileBrowserCallBackFunc != null)?"attach,":"") + "table"+(document.documentElement.clientWidth<900?"":",tablecontrols,separator")+",code,separator,asciimath,asciimathcharmap,asciisvg",
-	    theme_advanced_buttons3 : "",
-	    theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
-	    theme_advanced_toolbar_location : "top",
-	    theme_advanced_toolbar_align : "left",
-	    theme_advanced_statusbar_location : "bottom",
-	    theme_advanced_source_editor_height: "500",
-	    plugins : 'asciimath,asciisvg,dataimage,table,inlinepopups,paste,media,advlist'+((fileBrowserCallBackFunc != null)?",attach":""),
-	    gecko_spellcheck : true,
-	    extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
-	    content_css : imasroot+(cssmode==1?'/assessment/mathtest.css,':'/imascore.css,')+imasroot+'/themes/'+coursetheme,
-	    popup_css_add : imasroot+'/themes/'+coursetheme,
-	    theme_advanced_resizing : true,
-	    table_styles: "Gridded=gridded;Gridded Centered=gridded centered",
-	    cleanup_callback : "imascleanup",
-	    convert_urls: false,
-	    AScgiloc : imasroot+'/filter/graph/svgimg.php',
-	    ASdloc : imasroot+'/javascript/d.svg',
-	    file_browser_callback : fileBrowserCallBackFunc
+        width: "100%",
+        theme_advanced_buttons1 : "fontselect,fontsizeselect,formatselect,bold,italic,underline,strikethrough,separator,sub,sup,separator,cut,copy,paste,pasteword,undo,redo",
+        theme_advanced_buttons2 : "justifyleft,justifycenter,justifyright,justifyfull,separator,numlist,bullist,outdent,indent,separator,forecolor,backcolor,separator,hr,anchor,link,unlink,charmap,image,advlist,table,tablecontrols,separator,code,separator,asciimath,asciimathcharmap,asciisvg",
+        theme_advanced_buttons3 : "",
+        theme_advanced_fonts : "Arial=arial,helvetica,sans-serif,Courier New=courier new,courier,monospace,Georgia=georgia,times new roman,times,serif,Tahoma=tahoma,arial,helvetica,sans-serif,Times=times new roman,times,serif,Verdana=verdana,arial,helvetica,sans-serif",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_source_editor_height: "500",
+        plugins : 'asciimath,asciisvg,dataimage,table,inlinepopups,paste,media,advlist',
+        gecko_spellcheck : true,
+        extended_valid_elements : 'iframe[src|width|height|name|align],param[name|value],@[sscr]',
+        theme_advanced_resizing : true,
+        table_styles: "Gridded=gridded;Gridded Centered=gridded centered",
+        cleanup_callback : "imascleanup",
+        convert_urls: false,
+        AScgiloc : '../../../filter/graph/svgimg.php',
+        ASdloc : '/js/d.svg'
 	}
 	if (edmode=="exact") {
 		edsetup.elements = edids
 	} else if (edmode=="textareas") {
 		edsetup.editor_selector = edids;
 	}
-	    
-	tinyMCE.init(edsetup);	
+
+	tinyMCE.init(edsetup);
 }
 
 function fileBrowserCallBack(field_name, url, type, win) {
-	var connector = imasroot+"/editor/file_manager.php";
+	var connector = "/editor/file_manager.php";
 	my_field = field_name;
 	my_win = win;
 	switch (type) {
@@ -330,10 +329,10 @@ function fileBrowserCallBack(field_name, url, type, win) {
 	tinyMCE.activeEditor.windowManager.open({
 		file : connector,
 		title : 'File Manager',
-		width : 350,  
+		width : 350,
 		height : 450,
 		resizable : "yes",
-		inline : "yes",  
+		inline : "yes",
 		close_previous : "no"
 	    }, {
 		window : win,
