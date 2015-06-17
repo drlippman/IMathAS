@@ -20,17 +20,17 @@ class WikiRevision extends BaseImasWikiRevisions
         $postdate = strtotime(date('F d, o g:i a'));
         $this->time = $postdate;
         $this->save();
-       // AppUtility::dump($this);
     }
 
     public static function getEditedWiki($sortBy, $order,$wikiId)
     {
         return WikiRevision::find()->where(['id'=> $wikiId])->all();
     }
+
     public static function getFirstWikiData($sortBy, $order)
-        {
+    {
             return WikiRevision::find()->all();
-        }
+    }
 
     public static function getRevisionId($id)
     {
