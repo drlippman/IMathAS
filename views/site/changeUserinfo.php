@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-2\">{error}</div>",
                 'labelOptions' => ['class' => 'col-lg-2'],
             ],
         ]); ?>
@@ -69,7 +69,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'remove')->checkbox() ?>
             </div>
            <?php }?>
-        </div>
+        </div >
+
         <?= $form->field($model, 'file')->fileInput() ?>
 
         <?= $form->field($model, 'message')->dropDownList(array(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) ?>
