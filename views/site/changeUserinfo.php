@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'action' => '',
             'fieldConfig' => [
                 'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 '],
+                'labelOptions' => ['class' => 'col-lg-2'],
             ],
         ]); ?>
 
@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
         </div>
         <br>
-        <div class="col-lg-offset-2 user-image">
+        <div class=" col-lg-10 col-lg-offset-2 user-image">
         <?php
             if($user['hasuserimg']==0)
             {?>
