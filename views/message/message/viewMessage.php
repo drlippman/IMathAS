@@ -48,6 +48,9 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div>
         <pre>
+           <?php  if (($p = strpos($messages['message'],'<hr'))!==false) {
+		$messages['message'] = substr($messages['message'],0,$p).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">[Show trimmed content]</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$p).'</div>';
+	} ?>
             <?php echo $messages->message ?>
         </pre>
 </div>

@@ -60,3 +60,13 @@ function markAsDeleteSuccess(response) {
         window.location = "index?cid=" + cid;
     }
 }
+
+function showtrimmedcontent(el) {alert(el);
+    if (el.innerHTML.match(/Show/)) {
+        document.getElementById("trimmed").style.display="block";
+        el.innerHTML = "[Hide trimmed content]";
+    } else {
+        document.getElementById("trimmed").style.display="none";
+        el.innerHTML = "[Show trimmed content]";
+    }
+}

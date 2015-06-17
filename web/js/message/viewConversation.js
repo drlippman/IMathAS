@@ -56,3 +56,12 @@ function hideall() {
         buti.value = "Show";
     }
 }
+function showtrimmedcontent(el,n) {alert(el);alert(n);
+    if (el.innerHTML.match(/Show/)) {
+        document.getElementById("trimmed"+n).style.display="block";
+        el.innerHTML = "[Hide trimmed content]";
+    } else {
+        document.getElementById("trimmed"+n).style.display="none";
+        el.innerHTML = "[Show trimmed content]";
+    }
+}

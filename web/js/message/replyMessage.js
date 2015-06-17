@@ -1,32 +1,25 @@
 $(document).ready(function () {
-    tinymce.init({
-        selector: "textarea",
-        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
-    });
-    $("#msg-btn").click(function()
-    {
+    initEditor();
+    $("#msg-btn").click(function () {
         tinyMCE.triggerSave();
         var cid = $(".send-msg").val();
         var receiver = $(".msg-sender").val();
         var sender = $(".msg-receiver").val();
         var subject = $(".subject").val();
-        var body = $("#message").val();
+        var body = $("#message").val();alert(body);
         var parentId = $(".parent-id").val();
         var baseId = $(".base-id").val();
         var isReplied = $(".is-replied").val();
-        var messageDetails = {cid: cid , sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied};
-        jQuerySubmit('reply-message-ajax',messageDetails,'replyMessage');
+        var messageDetails = {cid: cid, sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied};
+        jQuerySubmit('reply-message-ajax', messageDetails, 'replyMessage');
     });
 
 });
 
-function replyMessage(response)
-{
+function replyMessage(response) {
     var cid = $(".send-msg").val();
-    console.log(response);
     var result = JSON.parse(response);
-    if(result.status == 0)
-    {
-        window.location = "index?cid="+cid;
+    if (result.status == 0) {
+        window.location = "index?cid=" + cid;
     }
 }

@@ -293,7 +293,7 @@ class MessageController extends AppController
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
             $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights);
-            $this->includeJS(["editor/tiny_mce.js", "message/replyMessage.js"]);
+            $this->includeJS(["editor/tiny_mce.js", "message/replyMessage.js","general.js"]);
             return $this->renderWithData('replyMessage', $responseData);
         }
     }

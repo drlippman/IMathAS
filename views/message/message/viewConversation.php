@@ -2,12 +2,12 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 use app\components\AppConstant;
+
 $this->title = 'Message Conversation';
-if ($userRights->rights > AppConstant::STUDENT_RIGHT){
+if ($userRights->rights > AppConstant::STUDENT_RIGHT) {
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
+} else {
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
 }
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
@@ -38,14 +38,14 @@ $currentLevel = AppConstant::ZERO_VALUE;
         if ($sent != AppConstant::NUMERIC_ONE) {
             ?>
             <p>
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back
                     to Message</a></p>
         <?php } ?>
         <?php $sent = $messageId;
         if ($sent == AppConstant::NUMERIC_ONE) {
             ?>
             <p>
-                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'].'&cid='.$course->id); ?>">Back
+                <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-message?message=' . $sent . '&id=' . $messages[0]['id'] . '&cid=' . $course->id); ?>">Back
                     to Message</a></p>
         <?php } ?>
         <button onclick="expandall()" class="btn btn-primary">Expand All</button>
@@ -80,7 +80,7 @@ $currentLevel = AppConstant::ZERO_VALUE;
                 <span class=right>
 
                  <?php if ($user['id'] != $message['senderId']) { ?>
-                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'].'&cid='.$course->id); ?>">
+                     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'] . '&cid=' . $course->id); ?>">
                          Reply</a>
                  <?php } ?>
                     <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"
@@ -90,13 +90,18 @@ $currentLevel = AppConstant::ZERO_VALUE;
                 href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
             <span style="color:red;">New</span>
         </div>
-        <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $message['message'] ?></p></div>
+        <div class="blockitems" id="item<?php echo $index ?>"><p><?php
+                if (($p = strpos($message['message'],'<hr'))!==false) {
+                    $message['message'] = substr($message['message'],0,$p).'<a href="#" class="small" onclick="showtrimmedcontent(this,\''.$message['id'].'\');return false;">[Show trimmed content]</a><div id="trimmed'.$message['id'].'" style="display:none;">'.substr($message['message'],$p).'</div>';
+                }
+                echo $message['message'] ?></p></div>
         <?php if ($index == (count($messages) - AppConstant::NUMERIC_ONE))
         {
         for ($i = $DivCount;$i >= AppConstant::ZERO_VALUE;$i--){
         ?>
     </div>
-<?php }
+<?php
+}
 } ?>
     <?php
     $currentLevel = $message['level'];
@@ -104,5 +109,4 @@ $currentLevel = AppConstant::ZERO_VALUE;
     ?>
     <input type="hidden" id="messageCount" value="<?php echo $messageCount ?>">
     <?php } ?>
-
 </div>
