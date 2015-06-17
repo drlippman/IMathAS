@@ -22,4 +22,10 @@ class Wiki extends BaseImasWikis
     {
         return static::findOne(['id' => $id]);
     }
+
+    public static function getAllData($wikiId)
+    {
+        $query =\Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryAll();
+        return $query;
+    }
 } 

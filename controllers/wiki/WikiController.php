@@ -1,14 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 5/6/15
- * Time: 1:21 PM
- */
-
 namespace app\controllers\wiki;
-
-
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\controllers\AppController;
@@ -29,15 +20,23 @@ class WikiController extends AppController
         $course = Course::getById($courseId);
         $subject = $this->getBodyParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
+        $stugroupid = 0;
+        $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
+        $wikiTotalData = Wiki::getAllData($wikiId);
+//        AppUtility::dump($wikiTotalData);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
+        $count = $wikiRevisionData ;
         $wikiRevisionSortedByTime = '';
         foreach($wikiRevisionData as $singleWikiData){
+           // $count = $singleWikiData->id;
+
             $sortBy = $singleWikiData->id;
             $order = AppConstant::DESCENDING;
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
-        }
 
-        $responseData = array('body' => $subject,'course' => $course, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
+        }
+        $this->includeJS(['viewwiki.js']);
+        $responseData = array('body' => $subject,'course' => $course, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
         return $this->renderWithData('showWiki', $responseData);
     }
     /**
@@ -67,7 +66,20 @@ class WikiController extends AppController
         $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
         return $this->renderWithData('editPage', $responseData);
     }
-
+    public function actionWikiRev()
+    {
+        $userData = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('courseId');
+        $course = Course::getById($courseId);
+        $wikiId = $this->getParamVal('wikiId');
+        $wiki = Wiki::getById($wikiId);
+        $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
+        $stugroupid = 0;
+        $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
+        $wikiTotalData = Wiki::getAllData($wikiId);
+        $responseData = array('courseId'=>$courseId, 'wikiId'=>$wikiId, 'revisionTotalData' => $revisionTotalData, 'wikiTotalData' => $wikiTotalData);
+        return $this->renderWithData('wikiRev', $responseData);
+    }
     public function wikiEditedRevisionData($wikiRevisionData, $wikiData)
     {
         $revisiontext = $wikiRevisionData->revision;
