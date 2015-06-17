@@ -56,4 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div id="result">
     <h5><Strong>No result found for your search.</Strong></h5>
 </div>
+<div id="noThread">
+    <h5><Strong>No posts have been made yet. Click Add New Thread to start a new discussion</Strong></h5>
+</div>
 

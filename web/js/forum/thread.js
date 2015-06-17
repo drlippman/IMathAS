@@ -4,6 +4,7 @@ $(document).ready(function ()
     var ShowRedFlagRow = -1;
     $("#show-all-link").hide();
     $('#result').hide();
+    $('#noThread').hide();
     $('.forumResult').hide();
     jQuerySubmit('get-thread-ajax',{forumid: forumid,ShowRedFlagRow:ShowRedFlagRow },'threadSuccess');
     limitToTagShow();
@@ -171,7 +172,8 @@ function threadSuccess(response)
     else if (response.status == -1) {
 
         $('#data').hide();
-        $('#result').show();
+        $('#noThread').show();
+
 
     }
     $("a[name=tabs]").on("click", function () {
