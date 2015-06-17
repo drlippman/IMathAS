@@ -125,7 +125,7 @@ function plot3d($func,$umin,$umax,$vmin,$vmax) {
 	  } else {
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'/js/3dviewer.js"></script>';
+			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'js/3dviewer.js"></script>';
 		  } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		  } 
@@ -310,7 +310,7 @@ function spacecurve($func,$tmin,$tmax) {
 		  
 	  	 if (!isset($GLOBALS['3dplotcnt'])) {
 			  $r = 1;
-			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'/js/3dviewer.js"></script>';
+			  $html .= '<script type="text/javascript" src="'.AppUtility::getHomeURL().'js/3dviewer.js"></script>';
 		 } else {
 			  $r = $GLOBALS['3dplotcnt']+1;
 		 } 
