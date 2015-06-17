@@ -8,6 +8,7 @@
  */
 
 namespace app\models;
+use app\components\AppConstant;
 use Yii;
 
 use app\components\AppUtility;
@@ -53,10 +54,49 @@ class ForumView extends BaseImasForumViews
         $this->userid = $userId;
         $this->tagged = 0;
         $this->save();
+    }
+    public static  function removeThread($threadId)
+    {
+        $threads = ForumView::findAll(['threadid' => $threadId]);
+        if($threads)
+        {
+            foreach($threads as $thread)
+            {
+                $thread->delete();
+            }
+        }
+    }
 
+    public function  updateData($threadId,$CurrentUser)
+    {
 
+        $users = ForumView::find(['lastview','tagged'])->where(['threadid' => $threadId,'userid' => $CurrentUser['id']])->all();
+        if($users)
+        {
+            foreach($users as $user){
+                        $lastView = strtotime(date('F d, o g:i a'));
+                        $user->lastview = $lastView;
+                        $user->save();
+            }
+        }
+        else{
+            $this->userid = $CurrentUser->id;
+            $this->threadid = $threadId;
+            $lastView = strtotime(date('F d, o g:i a'));
+            $this->lastview = $lastView;
+            $this->tagged = AppConstant::NUMERIC_ZERO;
+            $this->save();
+        }
+    }
+
+    public static  function getById($threadId,$CurrentUser)
+    {
+
+        $lastview = ForumView::find(['lastview'])->where(['threadid' => $threadId,'userid' => $CurrentUser['id']])->all();
+        return $lastview;
 
     }
 
-} 
+
+}
 

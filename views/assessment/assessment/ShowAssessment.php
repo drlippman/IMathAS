@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+
 ?>
 <script type="text/javascript">var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";</script>
 <script src="<?php echo AppUtility::getHomeURL() ?>js/ASCIIMathTeXImg_min.js?ver=092314\" type=\"text/javascript\"></script>
@@ -25,6 +26,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
 /*Conversion into hour, minute and seconds*/
 $hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
 $min = floor((abs($assessment->timelimit)%3600)/60);
+
 ?>
 <input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
 <input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
@@ -34,17 +36,31 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
 <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
 <input type="hidden" id="timelimit" value="<?php echo $assessment->timelimit;?>">
 <input type="hidden" id="now" value="<?php echo $now;?>">
+<input type="hidden" id="to" value="<?php echo $isShowExpiredTime;?>">
 
 <?php if(!empty($isQuestions)){echo $response;}else{?>
-    <script>
-            noQuestionPopup();
-    </script>
+  <input type="hidden" id="noQuestion" value="1">
 <?php }?>
+
 
 <div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>
 <div id="eh" class="eh"></div>
 
 <script type="text/javascript">
+    $(document).ready(function(){
+        var noQuestion = $('#noQuestion').val();
+        if(noQuestion == 1){
+            noQuestionPopup();
+        }
+
+        var timer = $('#timerlimit').val();
+        var html = '';
+        var hour = $('#hour').val();
+        var min = $('#min').val();
+        var endDate = $('#endDate').val();
+
+        initEditor();
+    });
 
     function toggleintroshow(n) {
         var link = document.getElementById("introtoggle"+n);
@@ -132,39 +148,49 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
     }
     $(document).ready(function (e)
     {
-        var assessmentsession = $("#assessmentsession").val();
-
+        var questionId = $('#to').val();
         $("#expired").hide();
-        var now = $("#now").val();
-        var timelimit = $("#timelimit").val();
-        var now_int = parseInt(now);
-        var assessmentsession_int =parseInt(assessmentsession);
-        var timelimit_int = parseInt(timelimit);
-        if((assessmentsession_int + timelimit_int) < now_int)
+        if(!questionId)
         {
+            var assessmentsession = $("#assessmentsession").val();
+            var now = $("#now").val();
+            var timelimit = $("#timelimit").val();
+            var now_int = parseInt(now);
+            var assessmentsession_int =parseInt(assessmentsession);
+            var timelimit_int = parseInt(timelimit);
+            if((assessmentsession_int + timelimit_int) < now_int)
+            {
+                $("#timerwrap").hide();
+                $("#timerhide").hide();
+                $('#expired').show();
+                var msg = '<div><p>Your time limit has expired </p>'+
+                    '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
+                $('<div id="dialog"></div>').appendTo('body').html(msg).dialog
+                ({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Okay": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+
+                            return true;
+                        }
+                    }
+                });
+
+            }
+        }
+        else{
+
             $("#timerwrap").hide();
             $("#timerhide").hide();
             $('#expired').show();
-            var msg = '<div><p>Your time limit has expired </p>'+
-                '<p>If you submit any questions, your assessment will be marked overtime, and will have to be reviewed by your instructor.</p></div>';
-            $('<div id="dialog"></div>').appendTo('body').html(msg).dialog
-            ({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons:
-                {
-                    "Okay": function ()
-                    {
-                        $(this).dialog('destroy').remove();
-
-                        return true;
-                    }
-                }
-            });
-
         }
 //        eqtipBindEvent()
     });
+
 </script>
 

@@ -95,7 +95,9 @@ $currentLevel = 0;
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
                 href="mailto:<?php echo '#' ?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?>
-            <span style="color:red;">New</span>
+            <?php if($data['postdate']>$data['lastview']){?>
+                   <span style="color:red;">New</span>
+            <?php }?>
         </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
         <?php

@@ -384,6 +384,7 @@ class ForumController extends AppController
             $username = User::getById($postdata['userid']);
             $postdate = Thread::getById($postdata['threadid']);
             $forumname = Forums::getById($postdata['forumid']);
+            $isNew = ForumView::getById($postdata['threadid'],$CurrentUser);
             $titleLevel = AppUtility::calculateLevel($postdata['subject']);
             $tempArray = array();
             $tempArray['id'] = $postdata['id'];
@@ -396,12 +397,15 @@ class ForumController extends AppController
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userRights'] = $username->rights;
             $tempArray['userId'] = $username->id;
+            $tempArray['lastview'] = $isNew[0]['lastview'];
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
             $tempArray['replyby'] = $postdata['replyby'];
             $this->postData[$postdata['id']] = $tempArray;
         }
         ForumPosts::saveViews($threadId);
+        $viewsData = new ForumView();
+        $viewsData->updateData($threadId,$CurrentUser);
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['forums.css']);
         //$this->includeJS(['forum/post.js']);
@@ -412,7 +416,6 @@ class ForumController extends AppController
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
         foreach ($childArray as $superKey => $child) {
-
             array_push($this->totalPosts, $this->postData[$child]);
 
             unset($this->children[$arrayKey][$superKey]);
@@ -433,6 +436,8 @@ class ForumController extends AppController
             $params = $this->getBodyParams();
             $threadid = $params['threadId'];
             ForumPosts::removeThread($threadid);
+            ForumThread::removeThread($threadid);
+            ForumView::removeThread($threadid);
             return $this->successResponse();
     }
     /*Controller Action To Reply To A Post*/
@@ -603,9 +608,17 @@ class ForumController extends AppController
                 array_push($sortbyname,$name);
             }
 
-            $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'courseid' => $courseid);
-            return $this->renderWithData('listpostbyname',$responseData);
+            $status = AppConstant::NUMERIC_ONE;
+            $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'courseid' => $courseid,'status' => $status);
+            return $this->renderWithData('listPostByName',$responseData);
         }
+        else{
+                $status = AppConstant::NUMERIC_ZERO;
+            $responseData = array('status' => $status,'forumid' => $forumid,'courseid' => $courseid);
+            return $this->renderWithData('listPostByName',$responseData);
+
+        }
+
 
     }
 

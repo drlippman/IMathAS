@@ -20,7 +20,7 @@ $(document).ready(function ()
 });
 
 function replyPostSuccess(response)
-{alert('ihhihi');
+{
     console.log(response);
     response = JSON.parse(response);
     var courseId = $(".courseid").val();

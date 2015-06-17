@@ -254,6 +254,7 @@ function changeImage(element,checkFlagValue, rowId) {
 function changeImageSuccess(response) {
 }
 function markAsRemoveSuccess(response) {
+    console.log(response);
     var forumid = $("#forumid").val();
     var courseid = $("#course-id").val();
     var result = JSON.parse(response);
