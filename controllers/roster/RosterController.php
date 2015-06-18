@@ -781,9 +781,9 @@ class RosterController extends AppController
                 } elseif ($selectedStudents['emailCopyToSend'] == 'allTeacher') {
                     $instructors = Teacher::getTeachersById($selectedStudents['courseId']);
                     foreach ($instructors as $instructor) {
-                        AppUtility::sendMail($subject, $message, $instructor->user->email);
+                        AppUtility::sendMail($subject, $messageToTeacher, $instructor->user->email);
                     }
-                    $this->sendEmailToSelectedUser($subject, $messageToTeacher, $studentArray);
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
                 }
                 return $this->redirect('student-roster?cid=' . $courseId);
             }
