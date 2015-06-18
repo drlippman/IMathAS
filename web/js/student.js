@@ -132,10 +132,10 @@ function calendar() {
                 $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>"+dateH+"<br>"+reviewMode+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
-                    Cancel: function() {
-                        $(this).dialog('destroy').remove();
-                        return false;
-                    }
+                        "Ok": function() {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        }
                 }
                 });
             }
@@ -151,8 +151,8 @@ function calendar() {
                 $("#demo").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
-                        Ok: function() {
-                            $(this).dialog('close').remove();
+                        "Ok": function() {
+                            $(this).dialog('destroy').remove();
                             return false;
                         }
                     }
