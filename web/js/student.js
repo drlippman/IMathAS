@@ -126,10 +126,10 @@ function calendar() {
             if(event.reviewMode == true)
             {
                 $("#demo").empty();
-                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
-                var reviewMode = "This assessment is in review mode - no scores will be saved";
+                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>.<br>";
+                var reviewMode =  "<&nbsp;&nbsp; This assessment is in review mode - no scores will be saved";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>"+dateH+"<br>"+reviewMode+"</div>");
+                $("#demo").append("<div> "+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+reviewMode+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
                         "Ok": function() {
@@ -158,7 +158,6 @@ function calendar() {
                     }
                 });
             }
-            $(this).close();
         }
     });
 }

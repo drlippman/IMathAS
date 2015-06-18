@@ -23,7 +23,6 @@ class WikiController extends AppController
         $stugroupid = 0;
         $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
         $wikiTotalData = Wiki::getAllData($wikiId);
-//        AppUtility::dump($wikiTotalData);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
         $count = $wikiRevisionData ;
         $wikiRevisionSortedByTime = '';
@@ -153,7 +152,6 @@ class WikiController extends AppController
         foreach($wikiData as $singleWikiData){
 //          $order = AppConstant::DESCENDING;
             $sortBy = $singleWikiData->id;
-       // $wikiRevisionSortedById = WikiRevision::getFirstWikiData($sortBy, $order);
             $sortBy ++;
         }
         AppUtility::dump($sortBy);
