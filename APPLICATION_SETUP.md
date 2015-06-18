@@ -11,13 +11,21 @@
  
 ##### Database Configuration
  - Edit the file config/db.php with real data, for example:
+     
      - return [
+     
       'class' => 'yii\db\Connection',
+     
       'dsn' => 'mysql:host=localhost;dbname=imathasdb',
+     
       'username' => 'root',
+     
       'password' => '1234',
+      
       'charset' => 'utf8',
+      
      ];
+     
 
 ##### Application Assets
  - Try to access  basic stack using url http://localhost/openmath/web, It will probably show you error with permissions.
