@@ -1,10 +1,13 @@
 <?php
-$this->title = 'Add New Thread';
-$this->params['breadcrumbs'][] = $this->title;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
 date_default_timezone_set("Asia/Calcutta");
+$this->title = 'Add New Thread';
+$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseid]];
+$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseid.'&forumid='.$forumName->id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="" xmlns="http://www.w3.org/1999/html">
     <h3><b>Add Thread - <?php echo $forumName->name;?></h3>
@@ -57,8 +60,8 @@ date_default_timezone_set("Asia/Calcutta");
                             'format' => 'mm/dd/yyyy' ]
                     ]);
                  echo '</div>';?>
-
-                   echo '<label class="end pull-left "> At</label>';
+                    <?php
+                    echo '<label class="end pull-left "> At</label>';
                    echo '<div class="pull-left col-lg-4">';
 
                     echo TimePicker::widget([
