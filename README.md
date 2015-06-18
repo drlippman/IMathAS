@@ -1,89 +1,60 @@
-Yii 2 Basic Application Template
-================================
+# OpenMath Application Setup
+- Before starting this setup, make sure that you are using PHP 5.4 or above.
+- MySql
 
-Yii 2 Basic Application Template is a skeleton Yii 2 application best for
-rapidly creating small projects.
+#### Following are the steps to setup OpenMath application
+ - Goto root directory of your machine.
+ - For Windows user: C:/XAMPP/htdocs
+ - For Linux user: /var/www (For Ubuntu 14.04 /var/www/html)
+ - For Mac user: /Applications/XAMPP/htdocs
+ - Take the clone of application from Github (git clone -b branch https://github.com/lumenlearning/IMathAS.git openmath).
+ 
+##### Database Configuration
+ - Edit the file config/db.php with real data, for example:
+     
+     - return [
+     
+      'class' => 'yii\db\Connection',
+     
+      'dsn' => 'mysql:host=localhost;dbname=imathasdb',
+     
+      'username' => 'root',
+     
+      'password' => '1234',
+      
+      'charset' => 'utf8',
+      
+     ];
+     
 
-The template contains the basic features including user login/logout and a contact page.
-It includes all commonly used configurations that would allow you to focus on adding new
-features to your application.
+##### Application Assets
+ - Try to access  basic stack using url http://localhost/openmath/web, It will probably show you error with permissions.
+ - Create assets directory in web (web/assets)
+ - Give correct permissions to project directory
+    - Command for linux and mac: sudo chmod -R 777 path/to/these/directory.(Note:Don't use 777 permissions on servers, just use it on your local machine).
+    - Now again try to hit same url, It may show you error with cookie validations. 
+    - To fix this you need to set value for cookieValidationKey  in config file located <project-root>/config/web.php.
+    - Set some random alphanumeric key here.
 
+           'request' => [
+            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
+            
+            'cookieValidationKey' => 'RqIC5VL10EWZYovFLgGbVYDtKTl73u7G',
+            
+      		'parsers' => [
+      		
+      				        'application/json' => 'yii\web\JsonParser',
+      				        
+        				]
+        				
+           ], 
+           
+    - Thats it! Its all DONE and you are ready to go from here with OpenMath application.
+    - For more detail about Yii2 go through http://stuff.cebe.cc/yii2-guide.pdf
 
-DIRECTORY STRUCTURE
--------------------
-
-      assets/             contains assets definition
-      commands/           contains console commands (controllers)
-      config/             contains application configurations
-      controllers/        contains Web controller classes
-      mail/               contains view files for e-mails
-      models/             contains model classes
-      runtime/            contains files generated during runtime
-      tests/              contains various tests for the basic application
-      vendor/             contains dependent 3rd-party packages
-      views/              contains view files for the Web application
-      web/                contains the entry script and Web resources
-
-
-
-REQUIREMENTS
-------------
-
-The minimum requirement by this application template that your Web server supports PHP 5.4.0.
-
-
-INSTALLATION
-------------
-
-### Install from an Archive File
-
-Extract the archive file downloaded from [yiiframework.com](http://www.yiiframework.com/download/) to
-a directory named `basic` that is directly under the Web root.
-
-You can then access the application through the following URL:
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-### Install via Composer
-
-If you do not have [Composer](http://getcomposer.org/), you may install it by following the instructions
-at [getcomposer.org](http://getcomposer.org/doc/00-intro.md#installation-nix).
-
-You can then install this application template using the following command:
-
-~~~
-php composer.phar global require "fxp/composer-asset-plugin:1.0.0-beta2"
-php composer.phar create-project --prefer-dist --stability=dev yiisoft/yii2-app-basic basic
-~~~
-
-Now you should be able to access the application through the following URL, assuming `basic` is the directory
-directly under the Web root.
-
-~~~
-http://localhost/basic/web/
-~~~
-
-
-CONFIGURATION
--------------
-
-### Database
-
-Edit the file `config/db.php` with real data, for example:
-
-```php
-return [
-    'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '1234',
-    'charset' => 'utf8',
-];
-```
-
-**NOTE:** Yii won't create the database for you, this has to be done manually before you can access it.
-
-Also check and edit the other files in the `config/` directory to customize your application.
+ ##### Following are some useful links: 
+ - http://www.yiiframework.com/download/
+ - http://www.yiiframework.com/doc-2.0/guide-tutorial-advanced-app.html
+ - http://stuff.cebe.cc/yii2-guide.pdf
+ - http://stackoverflow.com/questions/25788838/whats-a-difference-between-yii-2-advanced-application-and-basic
+ - https://www.youtube.com/watch?v=SKXh0mGlnLM

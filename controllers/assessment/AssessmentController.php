@@ -26,7 +26,7 @@ class AssessmentController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $assessmentId = isset($params['id']) ? trim($params['id']) : "";
-        $to = isset($params['to']);
+        $to = isset($params['to']) ? $params['to'] : 0;
         $courseId = isset($params['cid']) ? trim($params['cid']) : "";
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $teacher = Teacher::getByUserId($user->getId(), $courseId);
@@ -38,6 +38,7 @@ class AssessmentController extends AppController
         }
 
         $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
+
 
         $isQuestions  = Questions::getByAssessmentId($assessmentId);
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
