@@ -1,9 +1,7 @@
-
 $(document).ready(function () {
-initEditor();
-validateForm();
+    initEditor();
+    validateForm();
 });
-
 function validateForm(){
     $('#email-button').click(function() {
         tinyMCE.triggerSave();
