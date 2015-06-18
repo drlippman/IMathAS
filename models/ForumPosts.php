@@ -105,10 +105,13 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function saveViews($threadid){
 
-        $views = ForumPosts::findOne($threadid);
-        $views->views++;
-        $views->save();
 
+        $views = ForumPosts::find('views')->where(['threadid' => $threadid])->all();
+        foreach ($views as $view)
+        {
+            $view->views++;
+            $view->save();
+        }
     }
     public static function getbyThreadIdAndUserID($threadId,$CurrentUserId)
     {

@@ -117,7 +117,7 @@ class ForumController extends AppController
             return $this->successResponse($responseData);
         }else
         {
-          return $this->terminateResponse(message);
+          return $this->terminateResponse('No data');
         }
     }
 /*Controller Action To Display All The Forums*/
@@ -136,7 +136,7 @@ class ForumController extends AppController
                 $threadCount = count($forum->imasForumThreads);
                 $postCount = count($forum->imasForumPosts);
                 $lastObject = '';
-                if ($postCount > 0) {
+                if ($postCount > AppConstant::NUMERIC_ZERO) {
                     $lastObject = $forum->imasForumPosts[$postCount - 1];
                 }
                 $tempArray = array
@@ -160,7 +160,7 @@ class ForumController extends AppController
         }
         else
         {
-            return $this->terminateResponse(message);
+            return $this->terminateResponse('No data');
         }
     }
 
@@ -193,9 +193,10 @@ class ForumController extends AppController
 
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getbythreadId($thread['threadid']);
+                    $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid']);
-                    if ($tagged[0]['tagged'] == 1) {
+                    if ($tagged[0]['tagged'] == AppConstant::NUMERIC_ONE) {
                         $temparray = array
                         (
                             'parent' => $thread['parent'],
@@ -207,6 +208,7 @@ class ForumController extends AppController
                             'postdate' => date('F d, o g:i a', $thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                             'tagged' => $tagged[0]['tagged'],
+                            'lastview' =>date('F d, o g:i a', $lastView[0]['lastview']),
                             'userright' => $currentUser['rights'],
                             'postUserId' => $username->id,
                             'currentUserId' => $currentUser['id'],
@@ -223,6 +225,8 @@ class ForumController extends AppController
 
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getbythreadId($thread['threadid']);
+                    $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
+
                     $tagged = ForumView::forumViews($thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $temparray = array
@@ -237,18 +241,16 @@ class ForumController extends AppController
                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                         'tagged' => $tagged[0]['tagged'],
                         'userright' => $currentUser['rights'],
+                        'lastview' =>date('F d, o g:i a', $lastView[0]['lastview']),
                         'postUserId' => $username->id,
                         'currentUserId' => $currentUser['id'],
                         'countArray' => $count,
                         'posttype' => $thread['posttype'],
                     );
                     array_push($threadArray, $temparray);
-//                    foreach($uniquesData as )
-//                    {
-//
-//                    }
-                    array_push($uniquesDataArray, $uniquesData);
+                  array_push($uniquesDataArray, $uniquesData);
                 }
+
             }
         }
         else
@@ -365,9 +367,10 @@ class ForumController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $courseid=$this->getParamVal('courseid');
         $threadId = $this->getParamVal('threadid');
+        $isNew = ForumView::getById( $threadId,$currentUser);
         $Fullthread = ForumPosts::getbyid($threadId);
         $data = array();
-        if($currentUser['rights'] == 10 && $Fullthread[0]['posttype']== 3 ){
+        if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $Fullthread[0]['posttype']== AppConstant::NUMERIC_THREE ){
             $forumPostData = ForumPosts::getbyThreadIdAndUserID($threadId,$currentUser['id']);
             $parentThread = ForumPosts::getbyParentId($forumPostData[0]['parent']);
              array_push($data,$parentThread);
@@ -382,9 +385,10 @@ class ForumController extends AppController
         {
             $this->children[$postdata['parent']][] = $postdata['id'];
             $username = User::getById($postdata['userid']);
-            $postdate = Thread::getById($postdata['threadid']);
+
+
             $forumname = Forums::getById($postdata['forumid']);
-            $isNew = ForumView::getById($postdata['threadid'],$CurrentUser);
+
             $titleLevel = AppUtility::calculateLevel($postdata['subject']);
             $tempArray = array();
             $tempArray['id'] = $postdata['id'];
@@ -392,7 +396,7 @@ class ForumController extends AppController
             $tempArray['forumiddata'] = $postdata['forumid'];
             $tempArray['subject'] = $titleLevel['title'];
             $tempArray['forumname'] = ucfirst($forumname->name);
-            $tempArray['postdate'] = date('F d, o g:i a', $postdate->lastposttime);
+            $tempArray['postdate'] = date('F d, o g:i a', $postdata->postdate);
             $tempArray['posttype'] = $postdata['posttype'];
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userRights'] = $username->rights;
@@ -405,14 +409,14 @@ class ForumController extends AppController
         }
         ForumPosts::saveViews($threadId);
         $viewsData = new ForumView();
-        $viewsData->updateData($threadId,$CurrentUser);
+        $viewsData->updateData($threadId,$currentUser);
         $this->createChild($this->children[key($this->children)]);
         $this->includeCSS(['forums.css']);
         //$this->includeJS(['forum/post.js']);
         $responseData = array('postdata' => $this->totalPosts,'courseid' => $courseid,'currentUser' => $currentUser);
         return $this->render('post', $responseData);
     }
-    public function createChild($childArray, $arrayKey = 0)
+    public function createChild($childArray, $arrayKey = AppConstant::NUMERIC_ZERO)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
         foreach ($childArray as $superKey => $child) {
@@ -496,10 +500,10 @@ class ForumController extends AppController
         if ($this->isPost())
         {
             $params = $this->getRequestParams();
-            if($this->getAuthenticatedUser()->rights >10){
+            if($this->getAuthenticatedUser()->rights >AppConstant::NUMERIC_TEN){
                 $postType = $params['postType'];
             }
-            $postType = 0;
+            $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = $params['alwaysReplies'];
             $date =strtotime($params['date'].' '.$params['time']);
             $userId = $this->getUserId();

@@ -17,7 +17,9 @@ class ForumThread extends BaseImasForumThreads
 
     public function createThread($params,$userId)
     {
+        $maxid = $this->find()->max('id');
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
+        $this->id = $maxid + 1;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->lastposttime = $postdate;
         $this->lastpostuser = $userId;

@@ -97,6 +97,13 @@ class ForumView extends BaseImasForumViews
 
     }
 
+ public static function getLastView($currentUser,$threadId)
+ {
+
+     return ForumView::find(['lastview'])->where(['threadid' =>$threadId,'userid' => $currentUser['id']])->all();
+
+ }
+
 
 }
 

@@ -128,9 +128,10 @@ function threadSuccess(response)
     if (response.status == 0) {
         var threads = response.data.threadArray;
         var uniquesDataArray = response.data.uniquesDataArray;
-console.log(uniquesDataArray);
+
         var html = "";
         $.each(threads, function (index, thread) {
+            console.log(thread);
             if (fid == thread.forumiddata) {
                 count =0;
                 $.each(threads,function (index,data)
@@ -166,7 +167,17 @@ console.log(uniquesDataArray);
                             html += "<td>" + thread.views + "(" + count.usercount + ")" + "</td>";
                          }
                     });
-                    html += "<td>" + thread .postdate + "</td>";
+                    if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                    {
+
+                           html += "<td>" + thread .postdate + "&nbsp;<span style='color: red'>New</span></td>";
+                    }
+                    else
+                    {
+
+                        html += "<td>" + thread .postdate + "</td>";
+                    }
+
                 }
            }
         });

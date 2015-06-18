@@ -95,7 +95,8 @@ $currentLevel = 0;
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
                 href="mailto:<?php echo '#' ?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?>
-            <?php if($data['postdate']>$data['lastview']){?>
+            <?php
+            if(strtotime($data['postdate'])>=$data['lastview']){?>
                    <span style="color:red;">New</span>
             <?php }?>
         </div>
@@ -123,7 +124,5 @@ $currentLevel = 0;
 </div>
 </div>
 </div>
-
-
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/forum/post.js?ver=<?php echo time()?>"></script>
