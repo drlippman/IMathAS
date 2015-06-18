@@ -96,7 +96,6 @@ function calendar() {
                                 assessmentId: assessmentDetail.assessmentId,
                                 color: eventColor,
                                 reviewMode: true
-
                             });
 
                         }
@@ -127,11 +126,18 @@ function calendar() {
             if(event.reviewMode == true)
             {
                 $("#demo").empty();
-                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
-                var reviewMode = "This assessment is in review mode - no scores will be saved";
+                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>.<br>";
+                var reviewMode =  "<&nbsp;&nbsp; This assessment is in review mode - no scores will be saved";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $("#demo").append("<div> "+assessmentLogo+" "+event.title+"<br>"+dateH+"<br>"+reviewMode+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350});
+                $("#demo").append("<div> "+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+reviewMode+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        }
+                }
+                });
             }
             /**
              * If assessment is not in review mode
@@ -143,9 +149,15 @@ function calendar() {
                 var dateH = "Due " +event.startDat+"";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
                 $("#demo").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350});
+                $("#demo").dialog({ modal: true, title: event.message, width:350,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        }
+                    }
+                });
             }
-            $(this).close();
         }
     });
 }

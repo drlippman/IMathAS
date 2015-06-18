@@ -1,5 +1,29 @@
 $(document).ready(function () {
-
+    $("a[name=tabs]").on("click", function () {
+        var threadid = $(this).attr("data-var");
+        alert(threadid);
+        var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "confirm": function () {
+                    $(this).dialog("close");
+                    var threadId = threadid;
+                    //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+    });
 });
 
 function toggleshow(bnum) {

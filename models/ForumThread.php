@@ -26,5 +26,17 @@ class ForumThread extends BaseImasForumThreads
         return($this->id);
     }
 
+    public static  function removeThread($threadId)
+    {
+        $threads = ForumThread::findAll(['id' => $threadId]);
+        if($threads)
+        {
+            foreach($threads as $thread)
+            {
+                $thread->delete();
+            }
+        }
+    }
+
 
 }
