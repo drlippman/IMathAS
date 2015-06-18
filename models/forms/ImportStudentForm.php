@@ -29,7 +29,9 @@ class ImportStudentForm extends Model
     public function rules()
     {
         return [
-            [['lastName', 'firstName','emailAddress'],'required'],
+            [['lastName'],'required','message' => 'Last name field cannot be blank'],
+            [['firstName'],'required','message' => 'First name field cannot be blank'],
+            [['emailAddress'],'required','message' => 'Email field cannot be blank'],
             [['lastName', 'firstName','emailAddress'],'number'],
             ['file', 'required', 'message' => 'Upload the CSV file'],
             ['file', 'safe'],

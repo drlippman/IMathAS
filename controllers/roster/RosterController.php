@@ -520,7 +520,7 @@ class RosterController extends AppController
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
             $newUserRecords = array();
             $existUserRecords = array();
-        if($studentRecords['allUsers']){
+            if($studentRecords['allUsers'] || $studentRecords['existingUsers']) {
             foreach ($studentRecords['allUsers'] as $users) {
                 array_push($newUserRecords, $users);
             }
@@ -539,9 +539,9 @@ class RosterController extends AppController
                 $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
             }
         }else{
-            $this->includeJS(["courseSetting.js"]);
-            $responseData = array('model' => $model, 'course' => $course);
-            return $this->render('importStudent', $responseData);
+                $this->setErrorFlash('Add atleast one records in CSV file. ');
+                $responseData = array('model' => $model, 'course' => $course);
+                return $this->render('importStudent', $responseData);
             setErrorFlash('All students from CSV file already exits.');
         }
         }
@@ -672,17 +672,32 @@ class RosterController extends AppController
                 $isCodePresent = false;
                 $isSectionPresent = false;
                 $courseId = $this->getParamVal('courseId');
+                $newStudents = array();
+                if($studentInformation['newUsers']){
                 foreach ($studentInformation['newUsers'] as $student) {
-                    if ($student['4'] != 0) {
+                    if (!empty($student['4'])) {
                         $isCodePresent = true;
                     }
-                    if ($student['5'] != 0) {
+                    if (!empty($student['5'])) {
                         $isSectionPresent = true;
                     }
+                    array_push($newStudents,$student);
+                }}
+                $tempArray = array();
+                $uniqueStudents = array();
+                $duplicateStudents = array();
+                foreach ($newStudents as $singleStudent) {
+                    if (!in_array($singleStudent[0], $tempArray)) {
+                        array_push($uniqueStudents,$singleStudent);
+                        array_push($tempArray,$singleStudent[0]);
+                    }else{
+                        array_push($duplicateStudents,$singleStudent);
+                    }
                 }
+//        AppUtility::dump($duplicateStudents);
                 $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
                 $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId);
+                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents);
                 return $this->render('showImportStudent', $responseData);
     }
 
@@ -1067,13 +1082,19 @@ class RosterController extends AppController
     {
         $params = $this->getBodyParams();
         $studentdata = $params['studentData'];
+       if($studentdata){
         foreach($studentdata as $newEntry){
-            $user = new User();
-            $student = new Student();
-            $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
-            $student->assignSectionAndCode($newEntry,$id);
+                   $user = new User();
+                   $student = new Student();
+                   $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
+                   $student->assignSectionAndCode($newEntry,$id);
+
         }
         $this->setSuccessFlash('Imported student successfully.');
+
+       }else{
+           $this->setSuccessFlash('All the student from file already exits.');
+       }
         return $this->successResponse();
     }
 

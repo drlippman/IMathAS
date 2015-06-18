@@ -94,7 +94,7 @@ function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
     });
     $('#student-information-table').append(html);
     createDataTable('student-data-table');
-bindEvent();
+    bindEvent();
     $(".images").hide();
 }
 function selectCheckBox() {

@@ -447,3 +447,8 @@ a.msg-notification:hover{
 a.msg-notification:visited{
     color: red;
 }
+.show-import-student-duplicate-table
+{
+    padding-top: 22px;
+    padding-left: 5px;
+}

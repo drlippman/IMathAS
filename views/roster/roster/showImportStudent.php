@@ -11,12 +11,12 @@ $this->title = 'Import Students';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<input type="hidden" id="course-id" value="<?php echo $courseId ?>" >
+<input type="hidden" id="course-id" value="<?php echo $courseId ?>" xmlns="http://www.w3.org/1999/html">
 <div class="import-student">
     <fieldset>
 
-
-        <table id="user-table displayUser"  class="display-user-table">
+<h3><strong>New students Record</strong> </h3>
+        <table id="user-table displayUser"  class="display-user-table" bPaginate="false">
             <thead>
             <tr>
                 <th>Username</th>
@@ -33,15 +33,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     ?>
                     <th>Section</th>
                 <?php } ?>
-
-
             </tr>
             </thead>
             <tbody class="user-table-body" >
             <?php
-            if (isset($studentData['newUsers'])) {
-                $newStudentData = $studentData['newUsers'];
-                foreach ($newStudentData as $singleRecord) {
+            if (isset($uniqueStudents)) {
+                foreach ($uniqueStudents as $singleRecord) {
+
                     ?>
                     <tr>
                         <td><?php echo $singleRecord[0] ?></td>
@@ -60,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </tr>
 
                 <?php   $index++; } ?>
-            <?php } ?>
+            <?php }?>
             <?php
             if (isset($studentData['existingUsers'])) {
                 $existStudentData = $studentData['existingUsers'];
@@ -73,8 +71,53 @@ $this->params['breadcrumbs'][] = $this->title;
                             <td><?php echo $singleRecord[$key] ?></td>
                         <?php } ?>
                     </tr>
+                <?php }  }?>
+            </tbody>
+        </table>
+
+        <span class="pull-left "><h3><strong>Duplicate students Records</strong></h3> </span><span class="pull-left show-import-student-duplicate-table "><strong>(These students will not be saved)</strong></span>
+        <table class="display-user-table" bPaginate="false">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+
+                <?php if ($isCodePresent == true) {
+                    ?>
+                    <th>Code</th>
+                <?php
+                }
+                if ($isSectionPresent == true) {
+                    ?>
+                    <th>Section</th>
                 <?php } ?>
-            <?php } ?>
+            </tr>
+            </thead>
+            <tbody class="user-table-body" >
+            <?php
+            if (isset($duplicateStudents)) {
+                foreach ($duplicateStudents as $singleRecord) {
+
+                    ?>
+                    <tr>
+                        <td><?php echo $singleRecord[0] ?></td>
+                        <td><?php echo $singleRecord[1] ?></td>
+                        <td><?php echo $singleRecord[2] ?></td>
+                        <td><?php echo $singleRecord[3] ?></td>
+                        <?php if ($isCodePresent == 1) {
+                            ?>
+                            <th><?php echo $singleRecord[4] ?></th>
+                        <?php
+                        }
+                        if ($isSectionPresent == 1) {
+                            ?>
+                            <th><?php echo $singleRecord[5] ?></th>
+                        <?php } ?>
+                    </tr>
+            <?php } }?>
+
             </tbody>
         </table>
 
@@ -87,22 +130,23 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<script>
+<script type="application/javascript">
+    $(document).ready(function(){
+        createDataTable('display-user-table');
+    });
     function saveStudentData() {
-        var studentInformation= <?php echo json_encode($studentData ); ?>;
+        var studentInformation = <?php echo json_encode($studentData ); ?>;
         var existingData = studentInformation['existingUsers'];
-        var NewStudentData = studentInformation['newUsers'];
-
-
-
+        var NewStudentData =  <?php echo json_encode($uniqueStudents ); ?>;
+        if(existingData){
         var html = '<div><p>Existing students detail : </p></div><p>';
-        html +='* Already existing in system'+  '<br>';
+        html += '* Already existing in system' + '<br>';
         $.each(existingData, function (index, thread) {
-            html += thread.userName+'<br>';
+            html += thread.userName + '<br>';
         });
-        html += '<br>'+'* Already enrolled in course[Skip them]'+  '<br>';
+        html += '<br>' + '* Already enrolled in course[Skip them]' + '<br>';
         $.each(existingData, function (index, thread) {
-            html +=  thread.userName+'<br>';
+            html += thread.userName + '<br>';
         });
 
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
@@ -113,7 +157,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 "confirm": function () {
                     $('#searchText').val(null);
                     $(this).dialog('destroy').remove();
-                    jQuerySubmit('save-csv-file-ajax', {studentData:NewStudentData}, 'saveCsvFileSuccess');
+                    jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData}, 'saveCsvFileSuccess');
                     return true;
                 },
                 "Cancel": function () {
@@ -125,11 +169,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 $(this).remove();
             }
         });
+    }else {
+            jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData}, 'saveCsvFileSuccess');
+        }
 
     }
     function saveCsvFileSuccess(response)
     {
-//        var startDate = $("#datepicker-id input").val();
         var courseId = $("#course-id").val();
 
         if(status == 0)
