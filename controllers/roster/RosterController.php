@@ -571,7 +571,7 @@ class RosterController extends AppController
                 $userData = User::getByName($StudentDataArray[0]);
                 if ($userData) {
                     array_push($ExistingUser, $userData);
-                } else {
+                }
                     if (($params['ImportStudentForm']['setPassword'] == 0 || $params['ImportStudentForm']['setPassword'] == 1) && strlen($StudentDataArray[0]) < 4) {
                         $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
                     } else {
@@ -593,7 +593,6 @@ class RosterController extends AppController
                     }
                     array_push($StudentDataArray, $password);
                     array_push($AllUserArray, $StudentDataArray);
-                }
             }
             return (['allUsers' => $AllUserArray, 'existingUsers' => $ExistingUser]);
 
@@ -692,7 +691,6 @@ class RosterController extends AppController
                         array_push($duplicateStudents,$singleStudent);
                     }
                 }
-//        AppUtility::dump($duplicateStudents);
                 $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
                 $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
                 $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents);

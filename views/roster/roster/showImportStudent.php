@@ -6,8 +6,7 @@ use app\components\AppConstant;
 
 //use app\widgets\FileInput;
 $this->title = 'Import Students';
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => ['/instructor/instructor/index?cid='.$_GET['cid']]];
-//$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$_GET['cid']]];
+
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -59,19 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?php   $index++; } ?>
             <?php }?>
-            <?php
-            if (isset($studentData['existingUsers'])) {
-                $existStudentData = $studentData['existingUsers'];
-                foreach ($existStudentData as $singleRecord) {
-                    ?>
-                    <tr>
-                        <?php
-                        foreach ($singleRecord as $key => $data) {
-                            ?>
-                            <td><?php echo $singleRecord[$key] ?></td>
-                        <?php } ?>
-                    </tr>
-                <?php }  }?>
+
             </tbody>
         </table>
 
