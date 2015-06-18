@@ -802,7 +802,7 @@ class AppUtility extends Component
 
             $responseString .= '<div id="headershowtest" class="pagetitle">';
             $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
-            $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'>Time Expired</span> </div>\n";
+            $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'></span> </div>\n";
 
             if ($testsettings['testtype']=="Practice" && !$isreview) {
                 echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
