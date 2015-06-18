@@ -101,10 +101,24 @@ switch($_GET['action']) {
 		break;
 	case "modify":
 	case "addcourse":
+		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
+		$isadminview = false;
 		if ($_GET['action']=='modify') {
 			$query = "SELECT * FROM imas_courses WHERE id='{$_GET['id']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			if (mysql_num_rows($result)==0) {break;}
 			$line = mysql_fetch_array($result, MYSQL_ASSOC);
+			if ($myrights<75 && $line['ownerid']!=$userid) {
+				echo "You don't have the authority for this action"; break;
+			} else if ($myrights > 74 && $line['ownerid']!=$userid) {
+				$isadminview = true;
+				$query = "SELECT iu.FirstName, iu.LastName, iu.groupid, ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON ig.id=iu.groupid WHERE iu.id={$line['ownerid']}";
+				$result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+				$udat = mysql_fetch_array($result, MYSQL_ASSOC);
+				if ($myrights===75 && $udat['groupid']!=$groupid) {
+					echo "You don't have the authority for this action"; break;
+				}
+			}
 			$courseid = $line['id'];
 			$name = $line['name'];
 			$ekey = $line['enrollkey'];
@@ -188,6 +202,10 @@ switch($_GET['action']) {
 		if ($_GET['action']=="modify") { echo "&id={$_GET['id']}"; }
 		echo "\">\n";
 		echo "<span class=form>Course ID:</span><span class=formright>$courseid</span><br class=form>\n";
+		if ($isadminview) {
+			echo '<span class="form">Owner:</span><span class="formright">';
+			echo $udat['LastName'].', '.$udat['FirstName'].' ('.$udat['name'].')</span><br class="form"/>';
+		}
 		echo "<span class=form>Enter Course name:</span><input class=form type=text size=80 name=\"coursename\" value=\"$name\"><BR class=form>\n";
 		echo "<span class=form>Enter Enrollment key:</span><input class=form type=text size=30 name=\"ekey\" value=\"$ekey\"><BR class=form>\n";
 		echo '<span class=form>Available?</span><span class=formright>';
