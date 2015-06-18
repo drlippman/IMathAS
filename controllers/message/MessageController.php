@@ -94,7 +94,7 @@ class MessageController extends AppController
                          }
                     }
                 }
-            }else{
+            }else {
                 $messages = Message::getUsersToDisplay($userId);
             }
             if ($messages) {

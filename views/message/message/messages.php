@@ -3,8 +3,12 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
+if($isNewMessage == 1){
+    $this->title = 'New Messages';
+}else{
+    $this->title = 'Messages';
+}
 
-$this->title = 'Messages';
 if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
@@ -54,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </span> <span class="select-text-margin pull-left"><b>By Sender :</b></span>
         <span class="col-md-3">
         <select name="seluid" class="show-users form-control" id="user-id">
-            <option value="0">Select a user</option>
+            <option value="0">All Users</option>
         </select>
         </span></p>
     </div>

@@ -47,7 +47,6 @@ $( document ).ready(function() {
 });
 
 function updateSuccess(response) {
-    console.log(response);
     var data = JSON.parse(response);
     if (data.status) {
         $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');

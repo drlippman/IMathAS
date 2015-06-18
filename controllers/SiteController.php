@@ -306,8 +306,8 @@ class SiteController extends AppController
             if($teachers){
                 foreach ($teachers as $teacher) {
                     $messageList = Message::getByCourseIdAndUserId($teacher->courseid, $user->id);
+                    $count = 0;
                     if($messageList){
-                        $count = 0;
                         foreach($messageList as $message){
                             if(in_array($message->isread, $isreadArray))
                                 $count++;

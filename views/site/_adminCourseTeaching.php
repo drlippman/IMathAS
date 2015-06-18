@@ -38,4 +38,4 @@ use app\components\AppUtility;
                 Page</a>
         </div>
     </div>
-</div>'msgRecord' => $msgCountArray
+</div>

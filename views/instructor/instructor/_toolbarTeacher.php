@@ -9,7 +9,7 @@ use app\components\AppUtility;
     <div class="headerwrapper">
         <div id="navlistcont">
             <ul id="navlist">
-                <li><a class="activetab" href="#">Course</a></li>
+                <li><a class="activetab" href="<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>">Course</a></li>
                 <li><a class="ahrefAlign" href="#">Messages</a></li>
                 <li><a class="ahrefAlign" href="#">Forums</a></li>
                 <li><a class="ahrefAlign" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>">Roster</a></li>

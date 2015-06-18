@@ -16,7 +16,9 @@ $(document).ready(function () {
 });
 
 var messageData;
-
+var cid = $(".send-msg").val();
+var selectedUserId = $('#user-id').val();
+var selectedCourseId = $('#course-id').val();
 function createTableHeader() {
     var html = "<table id='message-table display-message-table' class='message-table display-message-table'>";
     html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
@@ -82,15 +84,19 @@ function showMessageSuccess(response) {    console.log(response);
     if(response.status == 0)
     {
         var filterArrayForUser = [];
+        var filteredArray = [];
         $.each(response.data, function (index, msg) {
                 filterArrayForUser.push(msg.msgfrom);
+            if(cid == msg.courseid){
+                filteredArray.push(msg);
+            }
         });
     }
     else if(response.status == -1)
     {
 
     }
-    showMessage(response.data, response.status);
+    showMessage(filteredArray, response.status);
 }
 
 function selectCheckBox() {
@@ -119,7 +125,11 @@ function getCourseSuccess(response) {
 function courseDisplay(courseData) {
     var html = "";
     $.each(courseData, function (index, courseData) {
-        html += "<option value = " + courseData.courseId + ">" + courseData.courseName + "</option>"
+        if(courseData.courseId != cid){
+            html += "<option value = " + courseData.courseId + ">" + courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
+        }else{
+            html += "<option selected='selected' value = " + courseData.courseId + ">" +  courseData.courseName.substr(0, 1).toUpperCase() + courseData.courseName.substr(1) + "</option>"
+        }
     });
     $(".show-course").append(html);
 }
@@ -184,13 +194,62 @@ function markAsReadSuccess(response) {
 function filterByCourse() {
     $('#course-id').on('change', function () {
         var filteredArray = [];
-        var selectedCourseId = this.value;
-        if (selectedCourseId == 0) {
+        selectedCourseId = this.value;
+        if (selectedCourseId == 0 && selectedUserId == 0) {
             showMessage(messageData, status = 0);
-        } else {
+        } else if(selectedCourseId == 0 && selectedUserId != 0){
+            $.each(messageData, function (index, msg) {
+                if (selectedUserId == msg.msgfrom) {
+                    filteredArray.push(msg);
+                }
+                showMessage(filteredArray, status = 0);
+            });
+        } else if(selectedCourseId != 0 && selectedUserId == 0){
             $.each(messageData, function (index, msg) {
                 if (selectedCourseId == msg.courseid) {
                     filteredArray.push(msg);
+                }
+                showMessage(filteredArray, status = 0);
+            });
+        } else {
+            $.each(messageData, function (index, msg) {
+                if (selectedCourseId == msg.courseid) {
+                    if (selectedUserId == msg.msgfrom) {
+                        filteredArray.push(msg);
+                    }
+                }
+                showMessage(filteredArray, status = 0);
+            });
+        }
+    });
+}
+
+function filterByUser() {
+    $('#user-id').on('change', function () {
+        var filteredArray = [];
+        selectedUserId = this.value;
+        if (selectedCourseId == 0 && selectedUserId == 0) {
+            showMessage(messageData, status = 0);
+        } else if(selectedCourseId == 0 && selectedUserId != 0){
+            $.each(messageData, function (index, msg) {
+                if (selectedUserId == msg.msgfrom) {
+                    filteredArray.push(msg);
+                }
+                showMessage(filteredArray, status = 0);
+            });
+        } else if(selectedCourseId != 0 && selectedUserId == 0){
+            $.each(messageData, function (index, msg) {
+                if (selectedCourseId == msg.courseid) {
+                    filteredArray.push(msg);
+                }
+                showMessage(filteredArray, status = 0);
+            });
+        } else {
+            $.each(messageData, function (index, msg) {
+                if (selectedCourseId == msg.courseid) {
+                    if (selectedUserId == msg.msgfrom) {
+                        filteredArray.push(msg);
+                    }
                 }
                 showMessage(filteredArray, status = 0);
             });
@@ -210,7 +269,7 @@ function getUserSuccess(response) {
 function userDisplay(userData) {
     var html = "";
     $.each(userData, function (index, userData) {
-        html += "<option value = " + userData.id + ">" + userData.FirstName + " " + userData.LastName + "</option>"
+        html += "<option value = " + userData.id + ">"+ userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1) +" "+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1) + "</option>"
     });
     $(".show-users").append(html);
 }
@@ -267,26 +326,9 @@ function markAsDelete() {
 function markAsDeleteSuccess() {
 }
 
-function filterByUser() {
-    $('#user-id').on('change', function () {
-        var filteredArray = [];
-        var selectedUserId = this.value;
-        if (selectedUserId == 0) {
-            showMessage(messageData, status = 0);
-        } else {
-            $.each(messageData, function (index, msg) {
-                if (selectedUserId == msg.msgfrom) {
-
-                    filteredArray.push(msg);
-                }
-                showMessage(filteredArray, status = 0);
-            });
-        }
-    });
-}
-
 function changeImageSuccess(response) {
 }
+
 function limitToTagShow() {
 
     $("#limit-to-tag-link").click(function () {

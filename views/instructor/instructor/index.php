@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--<div class="mainbody">-->
 
      <div>
-        <?php echo $this->render('_toolbarTeacher'); ?>
+        <?php echo $this->render('_toolbarTeacher', ['course' => $course]); ?>
     </div>
 
 
