@@ -124,9 +124,9 @@ date_default_timezone_set("Asia/Calcutta");
         </div>
         <br>
         <div>
-            <p><input type="checkbox" name="forceregen">Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.</p>
-            <p><input type="checkbox" name="forceclear">Clear student's attempts?  Students will <b>not</b>  keep any scores earned, and must rework all problems.</p>
-            <p><input type="checkbox" name="eatlatepass">Deduct <input type="input" name="latepassn" size="1" value="1">  LatePass(es) from each student.<?php echo $latepassMsg?></p>
+            <p><input type="checkbox" name="forceregen"> Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.</p>
+            <p><input type="checkbox" name="forceclear"> Clear student's attempts?  Students will <b>not</b>  keep any scores earned, and must rework all problems.</p>
+            <p><input type="checkbox" name="eatlatepass"> Deduct <input type="input" name="latepassn" size="1" value="1">  LatePass(es) from each student.<?php echo $latepassMsg?></p>
             <p><input type="checkbox" name="waivereqscore"> Waive "show based on an another assessment" requirements, if applicable.</p>
             <p><input type="checkbox" name="sendmsg"> Send message to these students?</p>
         </div>

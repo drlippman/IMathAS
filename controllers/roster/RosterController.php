@@ -50,8 +50,7 @@ class RosterController extends AppController
             $isSectionPresent = false;
             foreach ($students as $student) {
                 $users = User::getById($student['userid']);
-                if($users['hasuserimg'] == 1)
-                {
+                if ($users['hasuserimg'] == 1) {
                     $isImageColumnPresent = 1;
                 }
                 if ($student->code != '') {
@@ -63,9 +62,9 @@ class RosterController extends AppController
             }
         }
 
-        $this->includeCSS(['jquery-ui.css','../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['roster/studentroster.js', 'general.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent,'isImageColumnPresent' => $isImageColumnPresent);
+        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
 
     }
@@ -152,8 +151,7 @@ class RosterController extends AppController
         if ($Students) {
             foreach ($Students as $student) {
                 $users = User::getById($student['userid']);
-                if($users['hasuserimg'] == 1)
-                {
+                if ($users['hasuserimg'] == 1) {
                     $isImageColumnPresent = 1;
                 }
                 if ($student->code != '') {
@@ -176,7 +174,7 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
-        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent,'isImageColumnPresent' => $isImageColumnPresent );
+        $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent, 'isImageColumnPresent' => $isImageColumnPresent);
 
         return $this->successResponse($responseData);
     }
@@ -298,7 +296,7 @@ class RosterController extends AppController
         $courseDetails = array();
         if ($list) {
             foreach ($list as $teacher) {
-                if($teacher->course->id != $cid){
+                if ($teacher->course->id != $cid) {
                     $tempArray = array("id" => $teacher->course->id,
                         "name" => ucfirst($teacher->course->name));
                     array_push($courseDetails, $tempArray);
@@ -330,10 +328,10 @@ class RosterController extends AppController
         $query = Student::findByCid($courseid);
         $queryCheck = Student::findByCid($cid);
         $checkedArray = array();
-        foreach($queryCheck as $check){
-            foreach($query as $singleCourse){
-                if($singleCourse->userid == $check->userid){
-                       array_push($checkedArray, $singleCourse->userid);
+        foreach ($queryCheck as $check) {
+            foreach ($query as $singleCourse) {
+                if ($singleCourse->userid == $check->userid) {
+                    array_push($checkedArray, $singleCourse->userid);
                 }
             }
         }
@@ -342,7 +340,7 @@ class RosterController extends AppController
             foreach ($query as $student) {
                 $users = User::getById($student->userid);
                 $isCheck = 0;
-                if(in_array($student->userid,$checkedArray)){
+                if (in_array($student->userid, $checkedArray)) {
                     $isCheck = 1;
                 }
                 $tempArray = array("id" => $student->userid,
@@ -353,7 +351,7 @@ class RosterController extends AppController
             }
         }
         $sort_by = array_column($studentDetails, 'lastName');
-        array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentDetails);
+        array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentDetails);
         if ($this->isPost()) {
             $params = $this->getRequestParams();
             $record = array();
@@ -534,16 +532,16 @@ class RosterController extends AppController
                     );
                     array_push($existUserRecords, $tempArray);
                 }
-            }
-            if ($filename) {
-                $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
-            }
-        }else{
-                $this->setErrorFlash('Add atleast one records in CSV file. ');
+
+                }
+                if ($filename) {
+                    $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
+                }
+            } else {
+                $this->setErrorFlash('Add atleast one records in file.');
                 $responseData = array('model' => $model, 'course' => $course);
                 return $this->render('importStudent', $responseData);
-            setErrorFlash('All students from CSV file already exits.');
-        }
+            }
         }
         if (!$studentRecords) {
             $responseData = array('model' => $model, 'course' => $course);
@@ -731,67 +729,67 @@ class RosterController extends AppController
                         $student = User::getById($studentId);
                         array_push($studentArray, $student->attributes);
                     }
-                    $this->includeJS(['roster/rosterEmail.js','editor/tiny_mce.js' , 'editor/tiny_mce_src.js','', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+                    $this->includeJS(['roster/rosterEmail.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', '', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
                     return $this->renderWithData('rosterEmail', $responseData);
                 } else {
                     return $this->redirect('student-roster?cid=' . $courseId);
                 }
-            }else{
+            } else {
                 $students = array();
                 $studentArray = array();
                 $sendToStudents = array();
                 $filteredStudents = array();
                 $studentsInfo = unserialize($selectedStudents['studentInformation']);
 
-                if($selectedStudents['roster-assessment-data']!=0){
+                if ($selectedStudents['roster-assessment-data'] != 0) {
                     $query = AssessmentSession::getStudentByAssessments($selectedStudents['roster-assessment-data']);
-                    if($query){
-                        foreach($query as $entry){
-                            foreach($studentsInfo as $record){
-                                if($entry['userid'] == $record['id']){
-                                    array_push($students,$record['id']);
+                    if ($query) {
+                        foreach ($query as $entry) {
+                            foreach ($studentsInfo as $record) {
+                                if ($entry['userid'] == $record['id']) {
+                                    array_push($students, $record['id']);
                                 }
                             }
                         }
                     }
                 }
-                foreach($studentsInfo as $student){
-                    if (!in_array($student['id'],$students)) {
-                        array_push($filteredStudents,$student['id']);
+                foreach ($studentsInfo as $student) {
+                    if (!in_array($student['id'], $students)) {
+                        array_push($filteredStudents, $student['id']);
 
-                    $tempArray = array(
-                        'firstName' => $student['FirstName'],
-                        'lastName' => $student['LastName'],
-                        'emailId' => $student['email'],
-                        'userId' => $student['id'],
-                    );
-                    array_push($studentArray, $tempArray);
-                    $sendto = trim(ucfirst($student['LastName']).', '.ucfirst($student['FirstName']));
-                    array_push($sendToStudents, $sendto);
+                        $tempArray = array(
+                            'firstName' => $student['FirstName'],
+                            'lastName' => $student['LastName'],
+                            'emailId' => $student['email'],
+                            'userId' => $student['id'],
+                        );
+                        array_push($studentArray, $tempArray);
+                        $sendto = trim(ucfirst($student['LastName']) . ', ' . ucfirst($student['FirstName']));
+                        array_push($sendToStudents, $sendto);
                     }
                 }
-                $toList = implode("<br>",$sendToStudents);
+                $toList = implode("<br>", $sendToStudents);
                 $message = $selectedStudents['message'];
                 $subject = $selectedStudents['subject'];
                 $courseId = $selectedStudents['courseId'];
                 $course = Course::getById($courseId);
-                $messageToTeacher = $message.addslashes("<p>Instructor note: Email sent to these students from course $course->name: <br>$toList\n");
-                if($selectedStudents['emailCopyToSend'] == 'singleStudent'){
-                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
-                }elseif($selectedStudents['emailCopyToSend'] == 'selfStudent'){
+                $messageToTeacher = $message . addslashes("<p>Instructor note: Email sent to these students from course $course->name: <br>$toList\n");
+                if ($selectedStudents['emailCopyToSend'] == 'singleStudent') {
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
+                } elseif ($selectedStudents['emailCopyToSend'] == 'selfStudent') {
                     AppUtility::sendMail($subject, $messageToTeacher, $emailSender['email']);
-                    $this->sendEmailToSelectedUser($subject,$message, $studentArray);
-                }elseif($selectedStudents['emailCopyToSend'] == 'allTeacher'){
+                    $this->sendEmailToSelectedUser($subject, $message, $studentArray);
+                } elseif ($selectedStudents['emailCopyToSend'] == 'allTeacher') {
                     $instructors = Teacher::getTeachersById($selectedStudents['courseId']);
                     foreach ($instructors as $instructor) {
                         AppUtility::sendMail($subject, $message, $instructor->user->email);
                     }
-                    $this->sendEmailToSelectedUser($subject,$messageToTeacher, $studentArray);
+                    $this->sendEmailToSelectedUser($subject, $messageToTeacher, $studentArray);
                 }
                 return $this->redirect('student-roster?cid=' . $courseId);
             }
-        }else{
+        } else {
             $courseId = $this->getParamVal('cid');
             return $this->redirect('student-roster?cid=' . $courseId);
         }
@@ -894,7 +892,7 @@ class RosterController extends AppController
                     return $this->redirect('student-roster?cid=' . $courseId);
                 }
             }
-        }else{
+        } else {
             $courseId = $this->getParamVal('cid');
             return $this->redirect('student-roster?cid=' . $courseId);
         }
@@ -911,7 +909,7 @@ class RosterController extends AppController
 //Controller method to make exception
     public function actionMakeException()
     {
-        if($this->getRequestParams()){
+        if ($this->getRequestParams()) {
             $data = $this->getRequestParams();
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
@@ -925,88 +923,90 @@ class RosterController extends AppController
                 $isActionForException = isset($params['isException']) ? $params['isException'] : 0;
                 if (!$isActionForException) {
                     if ($params['student-data'] != '') {
-                       foreach ($studentList as $studentId) {
+                        foreach ($studentList as $studentId) {
                             $student = User::getById($studentId);
                             array_push($studentArray, $student->attributes);
-                       }
-                       $exceptionArray = $this->createExceptionList($studentArray, $assessments);
-                       $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
+                        }
+                        $exceptionArray = $this->createExceptionList($studentArray, $assessments);
+                        $latepassMsg = $this->findLatepassMsg($studentArray, $courseId);
                     } else {
                         return $this->redirect('student-roster?cid=' . $courseId);
                     }
-                }else{
+                } else {
                     $studentArray = unserialize($params['studentInformation']);
                     $courseId = $params['courseid'];
                     $course = Course::getById($courseId);
                     $assessments = Assessments::getByCourseId($courseId);
                     $section = $params['section'];
-                    if($params['clears']){
-                        foreach($params['clears'] as $clearEntry){
+                    if ($params['clears']) {
+                        foreach ($params['clears'] as $clearEntry) {
                             Exceptions::deleteExceptionById($clearEntry);
                         }
                     }
-                    if(isset($params['addexc'])){
-                        $startException = strtotime($params['startDate'].' '.$params['startTime']);
-                        $endException = strtotime($params['endDate'].' '.$params['endTime']);
-                        $waivereqscore = (isset($params['waivereqscore']))?1:0;
-                        foreach($studentArray as $student){
-                        foreach($params['addexc'] as $assessment){
+                    if (isset($params['addexc'])) {
+                        $startException = strtotime($params['startDate'] . ' ' . $params['startTime']);
+                        $endException = strtotime($params['endDate'] . ' ' . $params['endTime']);
+                        $waivereqscore = (isset($params['waivereqscore'])) ? 1 : 0;
+                        foreach ($studentArray as $student) {
+                            foreach ($params['addexc'] as $assessment) {
                                 $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
-                                if($presentException){
+                                if ($presentException) {
                                     Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waivereqscore);
-                                }
-                                else{
-                                    $param = array('userid' =>$student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
+                                } else {
+                                    $param = array('userid' => $student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
                                     $exception = new Exceptions();
                                     $exception->create($param);
                                 }
-                                if(isset($params['forceregen'])){
+                                if (isset($params['forceregen'])) {
                                     $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
-                                    if($query){
-                                        if(strpos($query->questions,';') === false){
-                                            $questions = explode(",",$query->questions);
-                                        }else{
-                                            list($questions,$bestquestions) = explode(";",$query->questions);
-                                            $questions = explode(",",$query->questions);
+                                    if ($query) {
+                                        if (strpos($query->questions, ';') === false) {
+                                            $questions = explode(",", $query->questions);
+                                        } else {
+                                            list($questions, $bestquestions) = explode(";", $query->questions);
+                                            $questions = explode(",", $query->questions);
                                         }
-                                        $lastanswers = explode('~',$query->lastanswers);
+                                        $lastanswers = explode('~', $query->lastanswers);
                                         $curscorelist = $query->scores;
-                                        $scores = array(); $attempts = array(); $seeds = array(); $reattempting = array();
-                                        for ($i=0; $i<count($questions); $i++) {
+                                        $scores = array();
+                                        $attempts = array();
+                                        $seeds = array();
+                                        $reattempting = array();
+                                        for ($i = 0; $i < count($questions); $i++) {
                                             $scores[$i] = -1;
                                             $attempts[$i] = 0;
-                                            $seeds[$i] = rand(1,9999);
+                                            $seeds[$i] = rand(1, 9999);
                                             $newLastAns = array();
-                                            $laarr = explode('##',$lastanswers[$i]);
+                                            $laarr = explode('##', $lastanswers[$i]);
                                             foreach ($laarr as $lael) {
-                                                if ($lael=="ReGen") {
+                                                if ($lael == "ReGen") {
                                                     $newLastAns[] = "ReGen";
                                                 }
                                             }
                                             $newLastAns[] = "ReGen";
-                                            $lastanswers[$i] = implode('##',$newLastAns);
+                                            $lastanswers[$i] = implode('##', $newLastAns);
                                         }
-                                        $scorelist = implode(',',$scores);
-                                        if (strpos($curscorelist,';')!==false) {
-                                            $scorelist = $scorelist.';'.$scorelist;
+                                        $scorelist = implode(',', $scores);
+                                        if (strpos($curscorelist, ';') !== false) {
+                                            $scorelist = $scorelist . ';' . $scorelist;
                                         }
-                                        $attemptslist = implode(',',$attempts);
-                                        $seedslist = implode(',',$seeds);
-                                        $lastanswers = str_replace('~','',$lastanswers);
-                                        $lastanswerslist = implode('~',$lastanswers);
+                                        $attemptslist = implode(',', $attempts);
+                                        $seedslist = implode(',', $seeds);
+                                        $lastanswers = str_replace('~', '', $lastanswers);
+                                        $lastanswerslist = implode('~', $lastanswers);
                                         $lastanswerslist = addslashes(stripslashes($lastanswerslist));
-                                        $reattemptinglist = implode(',',$reattempting);
-                                        $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' =>$attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
+                                        $reattemptinglist = implode(',', $reattempting);
+                                        $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' => $attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
                                         AssessmentSession::modifyExistingSession($finalParams);
                                     }
-                                }elseif(isset($params['forceclear'])){
+                                } elseif (isset($params['forceclear'])) {
                                     AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
                                 }
                             }
                         }
                         if (isset($params['eatlatepass'])) {
                             $n = intval($params['latepassn']);
-                            foreach($studentArray as $student){
+                            foreach ($studentArray as $student) {
                                 Student::reduceLatepasses($student['id'], $courseId, $n);
                             }
                         }
@@ -1017,68 +1017,70 @@ class RosterController extends AppController
                         }
                     }
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
-                    $latepassMsg = $this->findLatepassMsg($studentArray,$courseId);
+                    $latepassMsg = $this->findLatepassMsg($studentArray, $courseId);
                 }
                 $sort_by = array_column($exceptionArray, 'Name');
-                array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $exceptionArray);
+                array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $exceptionArray);
                 $sort_by = array_column($studentArray, 'LastName');
-                array_multisort($sort_by, SORT_ASC|SORT_NATURAL|SORT_FLAG_CASE, $studentArray);
+                array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
 
-        }
+            }
 
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latepassMsg' => $latepassMsg);
             return $this->renderWithData('makeException', $responseData);
-    }
-        else{
-             $this->setErrorFlash(AppConstant::NO_USER_FOUND);
+        } else {
+            $this->setErrorFlash(AppConstant::NO_USER_FOUND);
         }
     }
 
-    public function  createExceptionList($studentArray, $assessments){
+    public function  createExceptionList($studentArray, $assessments)
+    {
         $exceptionArray = array();
-        foreach($studentArray as $student){
+        foreach ($studentArray as $student) {
             $exceptionList = array();
-            foreach($assessments as $singleAssessment){
-                $query = Exceptions::getByAssessmentIdAndUserId($student['id'],$singleAssessment['id']);
-                if($query){
-                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a',$query->startdate).' - '.date('m/d/y g:i a',$query->enddate), 'waivereqscore' => $query->waivereqscore);
-                    array_push($exceptionList,$tempArray);
+            foreach ($assessments as $singleAssessment) {
+                $query = Exceptions::getByAssessmentIdAndUserId($student['id'], $singleAssessment['id']);
+                if ($query) {
+                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a', $query->startdate) . ' - ' . date('m/d/y g:i a', $query->enddate), 'waivereqscore' => $query->waivereqscore);
+                    array_push($exceptionList, $tempArray);
                 }
             }
-            if($exceptionList){
-                $assessmentList = array('Name' => ucfirst($student['LastName']).', '.ucfirst($student['FirstName']), 'assessments' => $exceptionList);
-                array_push($exceptionArray,$assessmentList);
+            if ($exceptionList) {
+                $assessmentList = array('Name' => ucfirst($student['LastName']) . ', ' . ucfirst($student['FirstName']), 'assessments' => $exceptionList);
+                array_push($exceptionArray, $assessmentList);
             }
         }
         return $exceptionArray;
     }
 
-    public function  findLatepassMsg($studentArray, $courseid){
+    public function  findLatepassMsg($studentArray, $courseid)
+    {
         $studentRecord = array();
-        foreach($studentArray as $student){
-            array_push($studentRecord,Student::getByCourseId($courseid, $student['id']));
+        foreach ($studentArray as $student) {
+            array_push($studentRecord, Student::getByCourseId($courseid, $student['id']));
 
         }
         $latepassMin = $studentRecord[0]->latepass;
         $latepassMax = $studentRecord[0]->latepass;
-        foreach($studentRecord as $record)
-        {
-            if($record->latepass < $latepassMin){ $latepassMin = $record->latepass; }
-            if($record->latepass > $latepassMax){ $latepassMax = $record->latepass; }
+        foreach ($studentRecord as $record) {
+            if ($record->latepass < $latepassMin) {
+                $latepassMin = $record->latepass;
+            }
+            if ($record->latepass > $latepassMax) {
+                $latepassMax = $record->latepass;
+            }
         }
-        if(count($studentRecord) < 2){
+        if (count($studentRecord) < 2) {
             $latepassMsg = "This student has $latepassMin latepasses.";
-        }
-        elseif($latepassMin == $latepassMax){
+        } elseif ($latepassMin == $latepassMax) {
             $latepassMsg = "These students all have $latepassMin latepasses.";
-        }
-        else{
+        } else {
             $latepassMsg = "These students have $latepassMin-$latepassMax latepasses.";
         }
         return $latepassMsg;
     }
 
-    public  function actionSaveCsvFileAjax()
+    public function actionSaveCsvFileAjax()
     {
         $params = $this->getBodyParams();
         $studentdata = $params['studentData'];
@@ -1088,7 +1090,6 @@ class RosterController extends AppController
                    $student = new Student();
                    $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
                    $student->assignSectionAndCode($newEntry,$id);
-
         }
         $this->setSuccessFlash('Imported student successfully.');
 
@@ -1131,20 +1132,20 @@ class RosterController extends AppController
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('uid');
         $userData = User::getById($userId);
-        $userFullName = trim(ucfirst($userData['LastName']).", ".ucfirst($userData['FirstName']));
+        $userFullName = trim(ucfirst($userData['LastName']) . ", " . ucfirst($userData['FirstName']));
         $course = Course::getById($courseId);
         $orderBy = 'logintime';
         $sortBy = AppConstant::DESCENDING;
-        $loginLog = LoginLog::getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy);
+        $loginLog = LoginLog::getByCourseIdAndUserId($courseId, $userId, $orderBy, $sortBy);
         $loginLogData = array();
-        foreach($loginLog as $log){
+        foreach ($loginLog as $log) {
             $tempArray = array(
                 'logDateTime' => AppUtility::tzdate('l, F j, Y, g:i a', $log['logintime']),
                 'action' => $log['lastaction'],
             );
             array_push($loginLogData, $tempArray);
         }
-        $responseData = array('course' => $course, 'userFullName' =>$userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId);
+        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId);
         return $this->renderWithData('loginLog', $responseData);
     }
 
@@ -1153,85 +1154,85 @@ class RosterController extends AppController
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('uid');
         $userData = User::getById($userId);
-        $userFullName = trim(ucfirst($userData['LastName']).", ".ucfirst($userData['FirstName']));
+        $userFullName = trim(ucfirst($userData['LastName']) . ", " . ucfirst($userData['FirstName']));
         $course = Course::getById($courseId);
         $actions = array();
-        $actionsArray = array('as'=>array(), 'in'=>array(), 'li'=>array(), 'ex'=>array(), 'wi'=>array(), 'fo'=>array(), 'forums'=>array());
+        $actionsArray = array('as' => array(), 'in' => array(), 'li' => array(), 'ex' => array(), 'wi' => array(), 'fo' => array(), 'forums' => array());
         $orderBy = 'viewtime';
         $sortBy = AppConstant::DESCENDING;
-        $loginLog = ActivityLog::getByCourseIdAndUserId($courseId,$userId,$orderBy,$sortBy);
-        foreach($loginLog as $log){
-            $actions =$loginLog;
-            $subType = substr($log['type'],0,2);
+        $loginLog = ActivityLog::getByCourseIdAndUserId($courseId, $userId, $orderBy, $sortBy);
+        foreach ($loginLog as $log) {
+            $actions = $loginLog;
+            $subType = substr($log['type'], 0, 2);
             $actionsArray[$subType][] = intval($log['typeid']);
 
-            if ($subType=='fo') {
-                $ip = explode(';',$log['info']);
+            if ($subType == 'fo') {
+                $ip = explode(';', $log['info']);
                 $actionsArray['forums'][] = $ip[0];
             }
         }
         $assessmentName = array();
-        if (count($actionsArray['as'])>0) {
+        if (count($actionsArray['as']) > 0) {
             $assessmentIds = array_unique($actionsArray['as']);
-            foreach($assessmentIds as $id){
+            foreach ($assessmentIds as $id) {
                 $query = Assessments::getByAssessmentId($id);
-                $assessmentName[ $query['id']] = $query['name'];
+                $assessmentName[$query['id']] = $query['name'];
             }
         }
         $inlineTextName = array();
-        if (count($actionsArray['in'])>0) {
+        if (count($actionsArray['in']) > 0) {
             $inlineTextIds = array_unique($actionsArray['in']);
-            foreach($inlineTextIds as $id){
+            foreach ($inlineTextIds as $id) {
                 $query = InlineText::getById($id);
                 $inlineTextName[$query['id']] = $query['title'];
             }
         }
         $linkName = array();
-        if (count($actionsArray['li'])>0) {
+        if (count($actionsArray['li']) > 0) {
             $linkTextIds = array_unique($actionsArray['li']);
-            foreach($linkTextIds as $id){
+            foreach ($linkTextIds as $id) {
                 $query = Links::getById($id);
                 $linkName[$query['id']] = $query['title'];
             }
         }
         $wikiName = array();
-        if (count($actionsArray['wi'])>0) {
+        if (count($actionsArray['wi']) > 0) {
             $wikiIds = array_unique($actionsArray['wi']);
-            foreach($wikiIds as $id){
+            foreach ($wikiIds as $id) {
                 $query = Wiki::getById($id);
                 $wikiName[$query['id']] = $query['name'];
             }
         }
         $exnames = array();
-        if (count($actionsArray['ex'])>0) {
+        if (count($actionsArray['ex']) > 0) {
             $extraCredit = array_unique($actionsArray['ex']);
-            foreach($extraCredit as $id){
+            foreach ($extraCredit as $id) {
                 $query = Questions::getById($id);
                 $exnames[$query['id']] = $query['assessmentid'];
             }
         }
         $forumPostName = array();
-        if (count($actionsArray['fo'])>0) {
+        if (count($actionsArray['fo']) > 0) {
             $forumPosts = array_unique($actionsArray['fo']);
-            foreach($forumPosts as $id){
+            foreach ($forumPosts as $id) {
                 $query = ForumPosts::getPostById($id);
-                $forumPostName[$query['id']]= $query['subject'];
+                $forumPostName[$query['id']] = $query['subject'];
             }
         }
         $forumName = array();
-        if (count($actionsArray['forums'])>0) {
+        if (count($actionsArray['forums']) > 0) {
             $forums = array_unique($actionsArray['fo']);
-            foreach($forums as $id){
+            foreach ($forums as $id) {
                 $query = Forums::getById($id);
                 $forumName[$query['id']] = $query['name'];
             }
         }
-        $responseData = array('course' => $course, 'userFullName' =>$userFullName,  'userId' => $userId,'exnames' => $exnames,'forumPostName' => $forumPostName,
-                             'actions' => $actions,'assessmentName'=>$assessmentName ,'inlineTextName' => $inlineTextName,'linkName'=> $linkName,'wikiName' => $wikiName,'forumName' => $forumName);
-        return $this->renderWithData('activityLog',$responseData);
+        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'userId' => $userId, 'exnames' => $exnames, 'forumPostName' => $forumPostName,
+            'actions' => $actions, 'assessmentName' => $assessmentName, 'inlineTextName' => $inlineTextName, 'linkName' => $linkName, 'wikiName' => $wikiName, 'forumName' => $forumName);
+        return $this->renderWithData('activityLog', $responseData);
     }
 
-    public  function actionLockUnlockAjax()
+    public function actionLockUnlockAjax()
     {
         $params = $this->getBodyParams();
         Student::updateLockOrUnlockStudent($params);
@@ -1250,27 +1251,26 @@ class RosterController extends AppController
         if ($model->load($this->getPostData())) {
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->file ) {
+            if ($model->file) {
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                $model->remove=0;
+                $model->remove = 0;
 
-                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
-                {
+                if (AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg') {
                     User::updateImgByUserId($userid);
                 }
             }
-            if($model->remove == 1){
+            if ($model->remove == 1) {
                 User::deleteImgByUserId($userid);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
             }
             User::saveUserRecord($params, $user);
-            Student::updateSectionAndCodeValue($params['section'] , $userid, $params['code'] , $courseId,$params);
+            Student::updateSectionAndCodeValue($params['section'], $userid, $params['code'], $courseId, $params);
             $this->setSuccessFlash('Changes updated successfully.');
-            $this->redirect('student-roster?cid='.$courseId);
+            $this->redirect('student-roster?cid=' . $courseId);
         }
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);
-        $responseData = array('model' => $model, 'user' => $user->attributes, 'tzname' => $tzname,'userId' => $userid,'studentData' => $studentData ,'courseId' => $courseId);
+        $responseData = array('model' => $model, 'user' => $user->attributes, 'tzname' => $tzname, 'userId' => $userid, 'studentData' => $studentData, 'courseId' => $courseId);
         return $this->renderWithData('changeStudentInformation', $responseData);
 
     }
