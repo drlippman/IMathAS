@@ -130,4 +130,20 @@ class Student extends BaseImasStudents {
         }
         $student->save();
     }
+    public static function updateHideFromCourseList($userId, $courseId)
+    {
+        $student = Student::findOne(['userid' => $userId, 'courseid' => $courseId]);
+        if($student){
+            if($student->hidefromcourselist == 0){
+                $student->hidefromcourselist = 1;
+            }else{
+                $student->hidefromcourselist = 0;
+            }
+            $student->save();
+        }
+    }
+    public static function findHiddenCourse($userId)
+    {
+        return static::find()->where(['userid'=>$userId])->andWhere(['NOT LIKE', 'hidefromcourselist', 0 ])->all();
+    }
 } 

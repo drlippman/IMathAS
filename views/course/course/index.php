@@ -1,7 +1,6 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-
 ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <!--Get current time-->
@@ -14,7 +13,7 @@ echo $this->render('_toolbar',['course'=> $course]);
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 
 <div class=" col-lg-3 needed">
-    <?php echo $this->render('_leftSide',['course'=> $course]);?>
+    <?php echo $this->render('_leftSide',['course'=> $course, 'messageList' => $messageList]);?>
 </div>
 <!--Course name-->
 <div class="col-lg-9 container">

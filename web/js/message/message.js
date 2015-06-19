@@ -78,7 +78,7 @@ function showMessage(messageData, status) {
 
 }
 
-function showMessageSuccess(response) {    console.log(response);
+function showMessageSuccess(response) {
     response = JSON.parse(response);
     messageData = response.data;
     if(response.status == 0)

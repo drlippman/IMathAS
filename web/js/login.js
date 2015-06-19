@@ -2,8 +2,6 @@ var AMnoMathML = true;var ASnoSVG = true;var AMisGecko = 0;var AMnoTeX = false;
 var thedate = new Date();
 document.getElementById("tzoffset").value = thedate.getTimezoneOffset();
 var tz = jstz.determine();
-console.log('hi');
-console.log(tz.name());
 document.getElementById("tzname").value = tz.name();
 
 function updateloginarea() {

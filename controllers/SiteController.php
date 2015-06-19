@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\AppConstant;
+use app\models\Course;
 use app\models\forms\ChangeUserInfoForm;
 use app\models\forms\DiagnosticForm;
 use app\models\forms\ForgotPasswordForm;
@@ -301,11 +302,16 @@ class SiteController extends AppController
             $user = $this->getAuthenticatedUser();
             $students = Student::getByUserId($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
+            if($students){
+                $users = $students;
+            }else{
+                $users = $teachers;
+            }
             $isreadArray = array(0, 4, 8, 12);
             $msgCountArray = array();
-            if($teachers){
-                foreach ($teachers as $teacher) {
-                    $messageList = Message::getByCourseIdAndUserId($teacher->courseid, $user->id);
+            if($users){
+                foreach ($users as $singleUser) {
+                    $messageList = Message::getByCourseIdAndUserId($singleUser->courseid, $user->id);
                     $count = 0;
                     if($messageList){
                         foreach($messageList as $message){
@@ -313,7 +319,7 @@ class SiteController extends AppController
                                 $count++;
                         }
                     }
-                    $tempArray = array('courseid' => $teacher->courseid, 'msgCount' => $count);
+                    $tempArray = array('courseid' => $singleUser->courseid, 'msgCount' => $count);
                     array_push($msgCountArray,$tempArray);
                 }
             }
@@ -321,8 +327,7 @@ class SiteController extends AppController
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'msgRecord' => $msgCountArray];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray];
                 return $this->renderWithData('dashboard', $userData);
             }
         }
@@ -406,4 +411,35 @@ class SiteController extends AppController
     {
         return $this->renderWithData('document');
     }
+    public function actionHideFromCourseList()
+    {
+        if (!$this->isGuestUser()) {
+            $userId = $this->getUserId();
+            $course = $this->getRequestParams();
+            Student::updateHideFromCourseList($userId, $course['courseId']);
+            return $this->successResponse();
+            } else {
+                return $this->terminateResponse(AppConstant::NO_MESSAGE_FOUND);
+            }
+    }
+    public function actionUnhideFromCourseList()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $userId = $this->getUserId();
+        if($params){
+            $courseId = $this->getParamVal('cid');
+            Student::updateHideFromCourseList($userId,$courseId);
+        }
+        $students = Student::findHiddenCourse($userId);
+        $courseDetails = array();
+        if($students){
+            foreach($students  as $student){
+                array_push($courseDetails, Course::getById($student->courseid));
+            }
+        }
+        $responsedata = array('courseDetails' => $courseDetails);
+        return $this->renderWithData('unhideFromCourseList',$responsedata);
+    }
+
 }

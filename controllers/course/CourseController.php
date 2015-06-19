@@ -15,6 +15,7 @@ use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
 use app\models\Items;
+use app\models\Message;
 use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\SetPassword;
@@ -135,9 +136,19 @@ class CourseController extends AppController
 
         $course = Course::getById($cid);
         $student = Student::getByCId($cid);
+        $user = $this->getAuthenticatedUser();
+        $message = Message::getByCourseIdAndUserId($cid, $user->id);
+        $isreadArray = array(0, 4, 8, 12);
+        $msgList = array();
+        if($message){
+            foreach($message as $singleMessage){
+                if(in_array($singleMessage->isread, $isreadArray))
+                    array_push($msgList,$singleMessage);
+            }
+        }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
+        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList);
         return $this->render('index', $returnData);
     }
 

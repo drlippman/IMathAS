@@ -452,3 +452,9 @@ a.msg-notification:visited{
     padding-top: 22px;
     padding-left: 5px;
 }
+.course-list{
+    margin-top: 5px;
+    list-style-type: none;
+    margin-left: 15px;
+    padding-left: 0px;
+}
