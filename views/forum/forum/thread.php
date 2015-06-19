@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript" charset="utf8"
         src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <input type="hidden" id="course-id" value="<?php echo $cid ?>">
-<div class="forumResult"><h2>Forum Search Results</h2></div>
+<div class="forumResult"><h4><strong>Forum Search Results</strong></h4></div>
 <div class="threadDetails">
     <div id="search">
         <span>Search: <input type=text id="searchText" name="search" /></span>

@@ -28,7 +28,7 @@ class ForumForm extends Model
     }
     public static  function byAllSubject($search ){
 
-        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where subject LIKE '$search%' ")->queryAll();
+        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where subject LIKE '$search%' order by postdate desc")->queryAll();
         return $subject;
 
     }
@@ -36,7 +36,7 @@ class ForumForm extends Model
 
     public static  function byAllpost($search ){
 
-        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where (subject LIKE '%$search%') OR (message LIKE '%$search%') ")->queryAll();
+        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where (subject LIKE '%$search%') OR (message LIKE '%$search%') order by postdate desc")->queryAll();
         return $subject;
 
     }
