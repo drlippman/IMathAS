@@ -2,6 +2,7 @@
 namespace app\controllers\wiki;
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\WikiUtility;
 use app\controllers\AppController;
 use app\models\Course;
 use app\models\Wiki;
@@ -34,9 +35,14 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-        $this->includeJS(['viewwiki.js']);
-        $responseData = array('body' => $subject,'course' => $course, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
+//        $this->includeJS(['viewwiki.js']);
+        $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
         return $this->renderWithData('showWiki', $responseData);
+    }
+
+    public function actionGetRevisions(){
+        $revisions = WikiUtility::getWikiRevision();
+        return $revisions;
     }
     /**
      * to edit wiki page
@@ -150,7 +156,6 @@ class WikiController extends AppController
         $wikiRevisionSortedById = '';
         $sortBy = '';
         foreach($wikiData as $singleWikiData){
-//          $order = AppConstant::DESCENDING;
             $sortBy = $singleWikiData->id;
             $sortBy ++;
         }
