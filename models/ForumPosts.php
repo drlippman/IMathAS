@@ -40,10 +40,14 @@ class ForumPosts extends BaseImasForumPosts
         $threadPost->message = $message;
         $threadPost->save();
     }
-    public static function removeThread($threadId)
+    public static function removeThread($threadId,$checkPostOrThread)
     {
-        $threads = ForumPosts::findAll(['threadid' => $threadId]);
-        if($threads)
+        if($checkPostOrThread == 1) {
+            $threads = ForumPosts::findAll(['threadid' => $threadId]);
+        }else{
+            $threads = ForumPosts::findAll(['id' => $threadId]);
+        }
+            if($threads)
         {
             foreach($threads as $thread)
             {
@@ -124,4 +128,5 @@ class ForumPosts extends BaseImasForumPosts
         $parentThread = ForumPosts::findOne(['threadid' => $parent]);
         return $parentThread;
     }
+
 }

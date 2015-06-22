@@ -9,9 +9,17 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
+<!--<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">-->
+<!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>-->
+<!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>-->
+
+<!--<link rel="stylesheet" type="text/css" href="--><?php //echo AppUtility::getHomeURL() ?><!--css/dataTables.bootstrap.css"/>-->
+
+<!--<script type="text/javascript" charset="utf8"-->
+<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/dataTables.bootstrap.js"></script>-->
+<!--<script type="text/javascript" charset="utf8"-->
+<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/jquery.dataTables.min.js"></script>-->
+
 <div class="site-login">
 
     <?php $form = ActiveForm::begin([
@@ -37,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
     <?php if(!empty($forum)){?>
    <div id="display">
-    <table id="forum-table displayforum" class="forum-table">
+    <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table">
         <thead>
         <tr>
             <th>Forum Name</th>

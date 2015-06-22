@@ -458,3 +458,7 @@ a.msg-notification:visited{
     margin-left: 15px;
     padding-left: 0px;
 }
+
+.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+    background-color: #DDFFFF !important;
+}

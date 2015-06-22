@@ -3,10 +3,10 @@ function toggleshow(bnum) {
     var butn = document.getElementById('butb' + bnum);
     if (node.className == 'forumgrp') {
         node.className = 'hidden';
-        butn.src = imasroot + '/img/expand.gif';
+        butn.src = '../../img/expand.gif';
     } else {
         node.className = 'forumgrp';
-        butn.src = imasroot + '/img/collapse.gif';
+        butn.src = '../../img/collapse.gif';
     }
 }
 function toggleitem(inum) {
@@ -26,7 +26,7 @@ function expandall() {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
         node.className = 'forumgrp';
-        butn.src = imasroot + '/img/collapse.gif';
+        butn.src = '../../img/collapse.gif';;
     }
 }
 function collapseall() {
@@ -35,7 +35,7 @@ function collapseall() {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
         node.className = 'hidden';
-        butn.src = imasroot + '/img/expand.gif';
+        butn.src = '../../img/expand.gif';
     }
 }
 function showall() {

@@ -690,7 +690,7 @@ class RosterController extends AppController
                     }else{
                         array_push($duplicateStudents,$singleStudent);
                     }
-                }
+                }AppUtility::dump($studentInformation['newUsers']);
                 $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
                 $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
                 $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents);

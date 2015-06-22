@@ -158,6 +158,7 @@ function forumsSuccess(response) {
         });
         $(".forum-table-body tr").remove();
         $(".forum-table-body").append(html);
-        $('.forum-table').DataTable();
+        $('.forum-table').DataTable(
+        );
     }
 

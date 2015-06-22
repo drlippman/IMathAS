@@ -8,6 +8,7 @@
 
 namespace app\models;
 
+use app\components\AppConstant;
 use Yii;
 use yii\db\Exception;
 use app\components\AppUtility;
@@ -97,7 +98,10 @@ class Message extends BaseImasMsgs
 
     public static function getByMsgId($msgId)
     {
-        return Message::findOne($msgId);
+        $message = Message::findOne($msgId);
+        $message ->replied = AppConstant::NUMERIC_ONE;
+        $message->save();
+        return $message;
     }
     public static function deleteFromReceivedMsg($msgId)
     {

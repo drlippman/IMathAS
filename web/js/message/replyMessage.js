@@ -6,7 +6,7 @@ $(document).ready(function () {
         var receiver = $(".msg-sender").val();
         var sender = $(".msg-receiver").val();
         var subject = $(".subject").val();
-        var body = $("#message").val();alert(body);
+        var body = $("#message").val();
         var parentId = $(".parent-id").val();
         var baseId = $(".base-id").val();
         var isReplied = $(".is-replied").val();

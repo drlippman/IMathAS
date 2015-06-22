@@ -128,10 +128,8 @@ function threadSuccess(response)
     if (response.status == 0) {
         var threads = response.data.threadArray;
         var uniquesDataArray = response.data.uniquesDataArray;
-
         var html = "";
         $.each(threads, function (index, thread) {
-            console.log(thread);
             if (fid == thread.forumiddata) {
                 count =0;
                 $.each(threads,function (index,data)
@@ -165,12 +163,12 @@ function threadSuccess(response)
                             html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + count.usercount + ")" + "</a></td>";
                         } else {
                             html += "<td>" + thread.views + "(" + count.usercount + ")" + "</td>";
-                         }
+                        }
                     });
-                    if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                    if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId || !thread.lastview)
                     {
 
-                           html += "<td>" + thread .postdate + "&nbsp;<span style='color: red'>New</span></td>";
+                        html += "<td>" + thread .postdate + "&nbsp;<span style='color: red'>New</span></td>";
                     }
                     else
                     {
@@ -179,7 +177,7 @@ function threadSuccess(response)
                     }
 
                 }
-           }
+            }
         });
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
@@ -196,7 +194,7 @@ function threadSuccess(response)
     }
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
-        alert(threadsid);
+        var checkPostOrThread =1;
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -210,40 +208,45 @@ function threadSuccess(response)
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadsid;
-                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
                     return true;
                 }
             },
             close: function (event, ui) {
                 $(this).remove();
             }
-         });
+        });
     });
 
-     $("a[name=view-tabs]").on("click", function () {
+    $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
+        //var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead>' +
+        //    '<tbody><tr><td>sssss</td>' +
+        //    '<td>uniquesDataArray</td></tr>' +
+        //    '</tbody></table>';
+        var html = '<div><p>Thread Views : </p></div><p>';
+        html +=  '<span class="col-lg-11" >Name </span><span>LastView </span><br>';
+        $.each(uniquesDataArray, function (index, uniqueEntry) {
+            if(threadsid == uniqueEntry.threadId){
+                html += '<span class="col-lg-12 pull-left " >'+ uniqueEntry.name +'</span><span class="">'+uniqueEntry.lastView+'</span><br>';
+            }
 
-        var html = '<div><p><strong>Thread views</strong> </p></div><br><table><thead><tr><th>Name</th><th>Last Views</th></tr></thead>' +
-            '<tbody><tr><td>sssss</td>' +
-            '<td>uniquesDataArray</td></tr>' +
-            '</tbody></table>';
+        });
 
-
-
-         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-             width: 'auto', resizable: false,
-             closeText: "hide",
-             buttons: {
-                 "Cancel": function () {
-                     $(this).dialog('destroy').remove();
-                     return false;
-                 }
-              },
-             close: function (event, ui) {
-                 $(this).remove();
-             }
-         });
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
 
     });
 }
@@ -265,7 +268,6 @@ function changeImage(element,checkFlagValue, rowId) {
 function changeImageSuccess(response) {
 }
 function markAsRemoveSuccess(response) {
-    console.log(response);
     var forumid = $("#forumid").val();
     var courseid = $("#course-id").val();
     var result = JSON.parse(response);
@@ -302,4 +304,3 @@ function limitToTagShow() {
 
     });
 }
-
