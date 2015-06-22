@@ -5,16 +5,15 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 
 $this->title = 'ListPostByName';
-//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->session->get('referrer'))]];
-//$this->params['breadcrumbs'][] = ['label' => 'Forums', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseid]];
 $this->params['breadcrumbs'][] = $this->title;
-?>
-<?php if($status == AppConstant::NUMERIC_ONE){?>
+if($status == AppConstant::NUMERIC_ONE){?>
 <div><h3>Post by Name- <?php echo $forumname->name?></h3></div>
 <br>
 <div class="midwrapper">
-    <input type="button" id="expand" onclick="expandall()" class="btn btn-primary" value="Expand All">
-    <input type="button" id="collapse" onclick="collapseall()" class="btn btn-primary" value="Collapse All">
+    <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary" value="Expand All">
+<!--    <input type="button" id="collapse" onclick="collapseall()" class="btn btn-primary" value="Collapse All">-->
     <button  onclick="markall()" class="btn btn-primary">Mark All Read</button>
     <br><br>
 </div>
@@ -29,8 +28,11 @@ $this->params['breadcrumbs'][] = $this->title;
             {?>
                     <div class=""><strong><?php echo $data['name']?></strong></div>
                     <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
-                    <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid='. $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
-                    </span><input type="button" value="+" onclick="toggleshow($data['id'])" id="butn">
+                            <?php if($userRights > AppConstant::NUMERIC_TEN){?>
+                                <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
+                            <?php }?>
+                            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid='. $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
+                    </span><input type="button" value="+" onclick="toggleshow(<?php echo $i ?>)" id="butn<?php echo $i ?>">
                         <b><?php if($data['parent']!= AppConstant::NUMERIC_ZERO){
                             echo '<span style="color:green;">';
                             echo  $data['subject'];
@@ -39,14 +41,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                             ?>
                         </b>,Posted: <?php echo $data['postdate']?></div>
-                    <div id="message2" class="blockitems"><p><?php echo $data['message']?></p></div>
+                    <div id="item<?php echo $i ?>" class="blockitems"><p><?php echo $data['message']?></p></div>
                     </div>
                     <?php $name=$data['name'];
             }
             else{?>
                     <div class="block"><span class="right"><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>">Thread</a>
+                           <?php if($userRights > AppConstant::NUMERIC_TEN){?>
+                           <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
+                           <?php }?>
                     <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid=' . $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
-                    </span><input type="button" value="+" onclick="toggleshow(2)" id="butn2">
+                    </span><input type="button" value="+" onclick="toggleshow(<?php echo $i ?>)" id="butn<?php echo $i ?>">
                              <b><?php if($data['parent']!= AppConstant::NUMERIC_ZERO){
                                      echo '<span style="color:green;">';
                                      echo  $data['subject'];
@@ -56,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                          ?>
                         <?php $name=$data['name'];?>
                      </b>,Posted: <?php echo $data['postdate']?></div>
-                     <div id="message2" class="blockitems"><p><?php echo $data['message']?></p></div>
+                     <div id="item<?php echo $i ?>" class="blockitems"><p><?php echo $data['message']?></p></div>
                      </div>
 
           <?php }
@@ -87,6 +92,31 @@ $(document).ready(function ()
         {
             ExpandOne();
         });
+
+    $("a[name=tabs]").on("click", function () {
+        var threadid = $(this).attr("data-var");
+        var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "confirm": function () {
+                    $(this).dialog("close");
+                    var threadId = threadid;
+                    //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+    });
 });
 
     function hidebody()
@@ -95,48 +125,54 @@ $(document).ready(function ()
 
         for(var i=0; i< count; i++){
 
-            $('.blockitems').hide();
+            var node = document.getElementById('item'+i);
+            node.className = 'hidden';
         }
 
     }
+    function collapseall()
+    {
+        var count = $('#count').val();
+        for(var i=0; i< count; i++)
+        {
+            var node = document.getElementById('item' + i);
+            var buti = document.getElementById('butn' + i);
+            node.className = 'blockitems';
+            buti.value = '-';
+        }
+        document.getElementById("expand").value = 'Collapse All';
+        document.getElementById("expand").onclick = expandall;
+    }
+
+
     function expandall()
     {
         var count = $('#count').val();
         for(var i=0; i< count; i++)
         {
-                $('.blockitems').show();
-        }
-
-        $('#collapse').show();
-        $('#expand').hide()
-
-
-    }
-
-    function collapseall()
-    {
-
-        var count = $('#count').val();
-        for(var i=0; i< count; i++)
-        {
-            $('.blockitems').hide();
-        }
-
-        $('#collapse').hide();
-        $('#expand').show()
-
-    }
-
-
-    function toggleshow(bnum) {
-        var node = document.getElementById(bnum);
-        var butn = document.getElementById('butn'+bnum);
-        if (node.className == 'blockitems') {
+            var node = document.getElementById('item' + i);
+            var buti = document.getElementById('butn' + i);
             node.className = 'hidden';
-            butn.value = '+';
-        } else {
+            buti.value = '+';
+        }
+        document.getElementById("expand").value = 'Expand All';
+        document.getElementById("expand").onclick = collapseall;
+    }
+
+
+    function toggleshow(inum)
+    {
+        var node = document.getElementById('item' + inum);
+        var buti = document.getElementById('butn' + inum);
+        if (node.className == 'blockitems')
+        {
+            node.className = 'hidden';
+            buti.value = '+';
+        }
+        else
+        {
             node.className = 'blockitems';
-            butn.value = '-';
+            buti.value = '-';
         }
     }
 

@@ -34,7 +34,7 @@ class ForumView extends BaseImasForumViews
     }
     public static function updateFlagValue($row)
     {
-        $query = Yii::$app->db->createCommand("UPDATE imas_forum_views SET tagged=(tagged^1) WHERE threadid='$row';'")->queryAll();
+        Yii::$app->db->createCommand("UPDATE imas_forum_views SET tagged=(tagged^1) WHERE threadid=".$row)->execute();
 
     }
 
@@ -103,7 +103,22 @@ class ForumView extends BaseImasForumViews
      return ForumView::find(['lastview'])->where(['threadid' =>$threadId,'userid' => $currentUser['id']])->all();
 
  }
+   public static function inserIntoTable($threadArray)
+   {
 
 
+   }
+
+ public static function deleteByUserIdAndThreadId($threadId,$userId)
+ {
+     $threads = ForumView::find()->where(['threadid' => $threadId,'userid' => $userId])->all();
+     if($threads)
+     {
+         foreach($threads as $thread)
+         {
+             $thread->delete();
+         }
+     }
+ }
 }
 

@@ -1,3 +1,8 @@
+<?php
+//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseId]];
+//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseId.'&forumid='.$forumId]];
+//$this->params['breadcrumbs'][] = $this->title;?>
 <div>
     <h2><b>Modify Post</b></h2>
 

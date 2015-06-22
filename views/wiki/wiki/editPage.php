@@ -25,7 +25,6 @@ $lasteditedby = $userData->FirstName.',' .$userData->LastName;
                     <?php }?>
                 </textarea>
             </div>
-
         <div class="col-lg-offset-1 col-md-8">
             <input type="submit" class="btn btn-primary" value="Save Revision">
         </div>

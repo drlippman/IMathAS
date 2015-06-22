@@ -144,6 +144,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 "confirm": function () {
                     $('#searchText').val(null);
                     $(this).dialog('destroy').remove();
+                    console.log(NewStudentData);
                     jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData}, 'saveCsvFileSuccess');
                     return true;
                 },

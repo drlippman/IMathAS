@@ -1,4 +1,9 @@
-<?php use app\components\AppUtility;?>
+<?php
+//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseId]];
+//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseId.'&forumid='.$forumId]];
+//$this->params['breadcrumbs'][] = $this->title;
+ use app\components\AppUtility;?>
 <form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $courseId ?>&threadId=<?php echo $threadId ?>">
 
 <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >

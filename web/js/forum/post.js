@@ -1,7 +1,16 @@
 $(document).ready(function () {
-    $("a[name=tabs]").on("click", function () {
+    var tagValue = $("#tag-id").val();
+    if(tagValue == 0){
+        $('#unflag-link').hide();
+    }else{
+        $('#flag-link').hide();
+    }
+
+    $("a[name=remove]").on("click", function () {
         var threadid = $(this).attr("data-var");
-        alert(threadid);
+
+        var checkPostOrThread = 0;
+
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -15,7 +24,7 @@ $(document).ready(function () {
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadid;
-                    //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
                     return true;
                 }
             },
@@ -33,12 +42,12 @@ function toggleshow(bnum) {
         node.className = 'hidden';
         //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
         //       butn.value = 'Expand';
-        butn.src = imasroot + '/img/expand.gif';
+        butn.src = '../../img/expand.gif';
     } else {
         node.className = 'forumgrp';
         //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
         //       butn.value = 'Collapse';
-        butn.src = imasroot + '/img/collapse.gif';
+        butn.src = '../../img/Collapse.gif';
     }
 }
 function toggleitem(inum) {
@@ -60,7 +69,7 @@ function expandall() {
         node.className = 'forumgrp';
         //     butn.value = 'Collapse';
         //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
-        butn.src = imasroot + '/img/collapse.gif';
+        butn.src = '../../img/Collapse.gif';
     }
 }
 function collapseall() {
@@ -71,7 +80,7 @@ function collapseall() {
         node.className = 'hidden';
         //     butn.value = 'Expand';
         //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
-        butn.src = imasroot + '/img/expand.gif';
+        butn.src = '../../img/expand.gif';
     }
 }
 function showall() {
@@ -91,4 +100,44 @@ function hideall() {
         node.className = "hidden";
         buti.value = "Show";
     }
+}
+function markAsRemoveSuccess(response) {
+    var forumid = $("#forum-id").val();
+    var courseid = $("#course-id").val();
+    var result = JSON.parse(response);
+    if(result.status == 0)
+    {
+        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+    }
+
+}
+function changeImage(checkFlagValue, rowId) {
+
+    if(checkFlagValue == false){
+        $('#flag-link').hide();
+        $('#unflag-link').show();
+    }
+    if(checkFlagValue ==true ){
+        $('#unflag-link').hide();
+        $('#flag-link').show();
+    }
+    var row = {rowId: rowId};
+    jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
+
+}
+function changeImageSuccess(response) {
+    var forumid = $("#forum-id").val();
+    var courseid = $("#course-id").val();
+    var result = JSON.parse(response);
+    if(result.status == 0)
+    {
+        window.location = "thread?cid="+courseid+"&forumid="+forumid;
+    }
+}
+function markAsUnreadPost(){
+    var threadId = $("#thread-id").val();
+    var userId = $("#user-id").val();
+    rowId = -1;
+    var row = {rowId: rowId,userId:userId,threadId:threadId};
+    jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
 }
