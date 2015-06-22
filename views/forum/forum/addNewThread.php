@@ -34,22 +34,22 @@ $this->params['breadcrumbs'][] = $this->title;
          <div >
             <span class="col-md-2"><b>Post Type:</b></span>
         <span class="col-md-10" id="post-type-radio-list">
-            <input type="radio" name="post-type" id="regular" value="0" checked > Regular<br>
+            <input type="radio" name="post-type" id="regular" value="0" checked >Regular<br>
             <input type="radio" name="post-type" id="displayed_at_top_of_list" value="1" >Displayed at top of list<br>
-            <input type="radio" name="post-type" id="displayed_at_top_and_locked" value="2"> Displayed at top and locked (no replies)<br>
-            <input type="radio" name="post-type" id="only_students_can_see" value="3"> Displayed at top and students can only see their own replies <br>
+            <input type="radio" name="post-type" id="displayed_at_top_and_locked" value="2">Displayed at top and locked (no replies)<br>
+            <input type="radio" name="post-type" id="only_students_can_see" value="3">Displayed at top and students can only see their own replies <br>
             </span>
         </div>
         <div>
             <span class="col-md-2"><b>Always Replies:</b></span>
         <span class="col-md-10" id="always-replies-radio-list" >
-            <input type="radio" name="always-replies" id="always" value="0" checked > Use default<br>
-            <input type="radio" name="always-replies" id="always" value="1" >Always<br>
-            <input type="radio" name="always-replies" id="always" value="2"> Never<br>
-            <input type="radio" name="always-replies" class="end pull-left"  id="always" value="3"><label class="end pull-left">Before</label>
+            <input type="radio" name="always-replies" value="0" checked >Use default<br>
+            <input type="radio" name="always-replies"  value="1" >Always<br>
+            <input type="radio" name="always-replies"  value="2">Never<br>
+            <input type="radio" name="always-replies" class="end pull-left "  id="always" value="3"><label class="end pull-left ">Before</label>
 
 
-                <div class="col-md-3 " id="datepicker-id">
+                <div class="col-md-3" id="datepicker-id">
                     <?php
                     echo DatePicker::widget([
                         'name' => 'endDate',
@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                  echo '</div>';?>
                     <?php
-                    echo '<label class="end pull-left "> At</label>';
+                    echo '<label class="end pull-left  select-text-margin"> At</label>';
                    echo '<div class="pull-left col-lg-4">';
 
                     echo TimePicker::widget([

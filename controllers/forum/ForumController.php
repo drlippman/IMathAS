@@ -136,14 +136,14 @@ class ForumController extends AppController
     {
         $params = $this->getBodyParams();
         $currentUser = $this->getAuthenticatedUser();
-        $ShowRedFlagRow = $params['ShowRedFlagRow'];
+        $isValue = $params['isValue'];
         $forumid = $params['forumid'];
         $threads = ThreadForm::thread($forumid);
         $threadArray = array();
         $uniquesDataArray = array();
         if(!empty($threads))
         {
-            if ($ShowRedFlagRow == 1) {
+            if ($isValue == 1) {
                 foreach ($threads as $thread) {
 
                     $username = User::getById($thread['userid']);
@@ -176,7 +176,7 @@ class ForumController extends AppController
 
                     }
                 }
-            }else if ($ShowRedFlagRow == 2)
+            }else if ($isValue == 2 || $isValue == 3)
             {
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
@@ -204,9 +204,18 @@ class ForumController extends AppController
                             'posttype' => $thread['posttype'],
                         );
 
-                        array_push($threadArray, $temparray);
+                       if($isValue == 3)
+                       {
+                            array_push($threadArray, $temparray);
+                           $ViewData = new ForumView();
+                           $ViewData->inserIntoTable($threadArray);
+//                           $ViewData->updateData($threadArray[0]['threadId'],$currentUser);
+                       }
+                       else
+                       {
+                            array_push($threadArray, $temparray);
+                       }
                         array_push($uniquesDataArray, $uniquesData);
-
                     }
                 }
             }
@@ -260,7 +269,7 @@ class ForumController extends AppController
 
         }
         $this->includeJS(['forum/forum.js']);
-        $responseData = array('threadArray' => $threadArray,'uniquesDataArray' => $FinalUniquesData);
+        $responseData = array('threadArray' => $threadArray,'uniquesDataArray' => $FinalUniquesData,'isValue'=>  $isValue);
         return $this->successResponse($responseData);
 
     }

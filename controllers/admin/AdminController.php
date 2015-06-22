@@ -22,8 +22,9 @@ class AdminController extends AppController
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
-        $this->includeCSS(['dashboard.css']);
-      //  $this->includeJS(['adminIndex.js']);
+        $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css']);
+        $this->includeJS(['adminindex.js','general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+
         return $this->renderWithData('index', ['users' => $users]);
     }
 

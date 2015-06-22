@@ -41,14 +41,21 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <div class="drop-down">
         <span class="col-md-1"><b>To</b></span>
-        <span class="col-md-4">
-        <select name="seluid" class="dropdown form-control" id="seluid">
+        <?php if($newTo){?>
+
+        <span class="col-md-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
+
+       <?php }else
+       {?>
+            <span class="col-md-4">
+            <select name="seluid" class="dropdown form-control" id="seluid">
             <option value="0">Select a recipient</option>
             <?php foreach ($teachers as $teacher) { ?>
             <option value="<?php echo $teacher->user->id ?>">
                 <?php echo ucfirst($teacher->user->FirstName) . " " . ucfirst($teacher->user->LastName); ?>
             </option><?php } ?>
         </select>
+        <?php }?>
         </span>
         <label style="color: white" id="to">Please select atleast one user</label>
     </div>

@@ -9,14 +9,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <title>OpenMath - OpenMathAdministration</title>
     <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
     <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css"
-          href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8"
-            src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 
 <div class=mainbody>
 <div class="headerwrapper"></div>
@@ -25,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Courses</h3>
 
     <div class=item>
-        <table id="course-table displayCourse" class="display course-table">
+        <table id="course-table displayCourse" class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
                 <th>Name</th>
@@ -101,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Diagnostics</h3>
 
     <div class=item>
-        <table class=gb width="90%" id="diagTable">
+        <table class="gb" width="90%" id="diagTable">
             <thead>
             <tr>
                 <th>Name</th>
@@ -133,7 +125,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h3>Pending Users</h3>
 
     <div class=item>
-        <table id="user-table displayCourse" class="display user-table">
+        <table id="user-table displayCourse" class="display user-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
                 <th>Name</th>

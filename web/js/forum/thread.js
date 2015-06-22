@@ -1,12 +1,12 @@
 $(document).ready(function ()
 {
     var forumid= $('#forumid').val();
-    var ShowRedFlagRow = -1;
+    var isValue = -1;
     $("#show-all-link").hide();
     $('#result').hide();
     $('#noThread').hide();
     $('.forumResult').hide();
-    jQuerySubmit('get-thread-ajax',{forumid: forumid,ShowRedFlagRow:ShowRedFlagRow },'threadSuccess');
+    jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
     limitToTagShow();
 
     $('#change-button').click(function(){
@@ -132,6 +132,7 @@ function threadSuccess(response)
     if (response.status == 0) {
         var threads = response.data.threadArray;
         var uniquesDataArray = response.data.uniquesDataArray;
+        var isValue = response.data.isValue;
         var checkFlagValue;
         var html = "";
         $.each(threads, function (index, thread) {
@@ -148,7 +149,7 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
 
-                    html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +  "</a>"+ thread.name+" </td>";
+                    html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
                     if (thread.tagged == 0 && thread.posttype == 0 ) {
                         html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
                     }
@@ -190,13 +191,15 @@ function threadSuccess(response)
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
 
-
     }
     else if (response.status == -1) {
 
         $('#data').hide();
         $('#noThread').show();
-
+    }
+    if(isValue == 3)
+    {
+        window.location.reload();
 
     }
     $("a[name=tabs]").on("click", function () {
@@ -254,6 +257,7 @@ function threadSuccess(response)
     });
 }
 
+var isValue;
 function changeImage(element,checkFlagValue, rowId) {
 
     if(checkFlagValue == false){
@@ -286,9 +290,9 @@ function limitToTagShow() {
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();
-        var ShowRedFlagRow = 1;
+        var isValue = 1;
         var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , ShowRedFlagRow: ShowRedFlagRow};
+        var thread = {forumid: forumid , isValue: isValue};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
@@ -297,9 +301,9 @@ function limitToTagShow() {
         $("#limit-to-tag-link").show();
         $("#show-all-link").hide();
         $("#limit-to-new-link").show();
-        ShowRedFlagRow = 0;
+        isValue = 0;
         var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , ShowRedFlagRow: ShowRedFlagRow};
+        var thread = {forumid: forumid , isValue: isValue};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
@@ -308,19 +312,17 @@ function limitToTagShow() {
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();
-        var ShowRedFlagRow = 2;
+        var isValue = 2;
         var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , ShowRedFlagRow: ShowRedFlagRow};
+        var thread = {forumid: forumid , isValue: isValue};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
 
     $('#markRead').click(function(){
-        var ShowRedFlagRow = 3;
+        var isValue = 3;
         var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , ShowRedFlagRow: ShowRedFlagRow};
+        var thread = {forumid: forumid , isValue: isValue};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
-
-
     });
 }

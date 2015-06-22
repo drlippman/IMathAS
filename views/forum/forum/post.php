@@ -48,7 +48,7 @@ $currentLevel = 0;
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?forumid='.$forumId.'&courseid='.$courseId.'&threadid='.$threadId.'&next=2'); ?>"">Next</a> &nbsp;
         <?php }else{?>
              <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?forumid='.$forumId.'&courseid='.$courseId.'&threadid='.$threadId.'&next=2'); ?>"">Next</a> &nbsp;
-<!--    <span>Next</span>-->
+
 <?php } ?>
 
         <a href="#" onclick="markAsUnreadPost()" >Mark Unread</a>&nbsp;|
@@ -111,7 +111,7 @@ $currentLevel = 0;
                                    onClick="toggleitem(<?php echo $index ?>)">
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
-                href="mailto:<?php echo '#' ?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?>
+                <a href="<?php echo AppUtility::getURLFromHome('message','message/send-message?cid='.$courseId.'&userid='.$data['userId'].'&new=1')?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?></a>
             <?php
             if(strtotime($data['postdate'])>=$data['lastview']){?>
                 <span style="color:red;">New</span>

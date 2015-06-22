@@ -69,8 +69,7 @@ class ForumView extends BaseImasForumViews
 
     public function  updateData($threadId,$CurrentUser)
     {
-
-        $users = ForumView::find(['lastview','tagged'])->where(['threadid' => $threadId,'userid' => $CurrentUser['id']])->all();
+         $users = ForumView::find(['lastview','tagged'])->where(['threadid' => $threadId,'userid' => $CurrentUser['id']])->all();
         if($users)
         {
             foreach($users as $user){
@@ -103,9 +102,24 @@ class ForumView extends BaseImasForumViews
      return ForumView::find(['lastview'])->where(['threadid' =>$threadId,'userid' => $currentUser['id']])->all();
 
  }
-   public static function inserIntoTable($threadArray)
+   public function inserIntoTable($threadArray)
    {
 
+        foreach($threadArray as $thread)
+        {
+
+            $users = ForumView::find(['lastview','tagged'])->where(['threadid' =>  $thread['threadId'],'userid' => $thread['currentUserId']])->all();
+
+            if(!$users)
+            {
+                $this->userid = $thread['currentUserId'];
+                $this->threadid = $thread['threadId'];
+                $lastView = strtotime(date('F d, o g:i a'));
+                $this->lastview = $lastView;
+                $this->tagged = AppConstant::NUMERIC_ZERO;
+                $this->save();
+            }
+        }
 
    }
 

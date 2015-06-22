@@ -47,7 +47,10 @@ class MessageController extends AppController
     {
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser();
+        $newTo = $this->getParamVal('new');
         $courseId = $this->getParamVal('cid');
+        $UserId = $this->getParamVal('userid');
+        $userName = User::getById($UserId);
         if ($this->getAuthenticatedUser()) {
             $course = Course::getById($courseId);
             $teacher = Teacher::getTeachersById($courseId);
@@ -57,7 +60,7 @@ class MessageController extends AppController
             $userId = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
-            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId, 'userRights' => $userRights);
+            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId, 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);
             return $this->renderWithData('sendMessage', $responseData);
         }
     }
