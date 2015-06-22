@@ -40,7 +40,7 @@ class CourseController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
-
+        $user = $this->getAuthenticatedUser();
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $cid = $this->getParamVal('cid');
@@ -97,6 +97,8 @@ class CourseController extends AppController
                         switch ($item->itemtype) {
                             case 'Assessment':
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
+//                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
+//                                AppUtility::dump($exception);
                                 $tempAray[$item->itemtype] = $assessment;
                                 array_push($responseData, $tempAray);
                                 array_push($calendarCount, $assessment);

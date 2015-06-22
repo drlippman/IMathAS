@@ -24,3 +24,16 @@ function UpdateTimer() {
     Timer.innerHTML = hour +':'+ Math.floor((TotalSeconds%3600)/60) +':' + sec;
 }
 
+function toggletimer() {
+    $('#expired').hide();
+    if ($("#timerhide").text()=="[x]") {
+        $("#timercontent").hide();
+        $("#timerhide").text(' [Show Timer]');
+        $("#timerhide").attr("title","Show Timer");
+    } else {
+        $("#timercontent").show();
+        $("#timerhide").text("[x]");
+        $("#timerhide").attr("title","Hide");
+    }
+}
+

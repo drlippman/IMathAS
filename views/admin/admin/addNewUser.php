@@ -8,7 +8,6 @@ use yii\helpers\ArrayHelper;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\changeUserInfoForm */
 
 $this->title = 'Add new user';
 $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];

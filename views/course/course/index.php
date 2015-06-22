@@ -977,7 +977,6 @@ case 'Assessment': ?>
 </div>
 
 
-<div id="demo">
-</div>
+
 
 
