@@ -127,4 +127,11 @@ class Course extends BaseImasCourses {
         $student->latepasshrs = $latepasshours;
         $student->save();
     }
+
+    public static function setItemOrder($itemList,$courseId)
+    {
+        $course = Course::findOne(['id' => $courseId]);
+        $course->itemorder = $itemList;
+        $course->save();
+    }
 } 

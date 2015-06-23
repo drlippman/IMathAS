@@ -9,17 +9,32 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\models\_base\BaseImasItems;
 
 class Items extends BaseImasItems
 {
     public static function getByCourseId($courseId)
     {
-        return static::findAll(['courseid' => $courseId]);
+        return Items::findAll(['courseid' => $courseId]);
     }
 
     public static function getById($id)
     {
-        return static::findOne(['id' => $id]);
+        return Items::findOne(['id' => $id]);
+    }
+
+    public function create($cid,$item)
+    {
+        $this->courseid = $cid;
+        $this->itemtype = $item;
+        $this->typeid = AppConstant::NUMERIC_ZERO;
+        $this->save();
+        return $this->id;
+    }
+
+    public static function deletedItems($id)
+    {
+        return Items::deleteAll(['id' => $id]);
     }
 }
