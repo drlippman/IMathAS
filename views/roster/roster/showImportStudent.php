@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <fieldset>
 
 <h3><strong>New students Record</strong> </h3>
-        <table id="user-table displayUser"  class="display-user-table" bPaginate="false">
+        <table id="user-table displayUser"  class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
             <thead>
             <tr>
                 <th>Username</th>
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </table>
 
         <span class="pull-left "><h3><strong>Duplicate students Records</strong></h3> </span><span class="pull-left show-import-student-duplicate-table "><strong>(These students will not be saved)</strong></span>
-        <table class="display-user-table" bPaginate="false">
+        <table class="display-user-table table table-bordered table-striped table-hover data-table" bPaginate="false">
             <thead>
             <tr>
                 <th>Username</th>

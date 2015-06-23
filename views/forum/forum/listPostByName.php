@@ -3,10 +3,16 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-
 $this->title = 'ListPostByName';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseid]];
+if ($userRights > AppConstant::STUDENT_RIGHT){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 if($status == AppConstant::NUMERIC_ONE){?>
 <div><h3>Post by Name- <?php echo $forumname->name?></h3></div>
@@ -27,11 +33,11 @@ if($status == AppConstant::NUMERIC_ONE){?>
         if($name != $data['name'])
             {?>
                     <div class=""><strong><?php echo $data['name']?></strong></div>
-                    <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
+                    <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
                             <?php if($userRights > AppConstant::NUMERIC_TEN){?>
-                                <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
+                                <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
                             <?php }?>
-                            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid='. $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
+                            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid='. $course->id.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
                     </span><input type="button" value="+" onclick="toggleshow(<?php echo $i ?>)" id="butn<?php echo $i ?>">
                         <b><?php if($data['parent']!= AppConstant::NUMERIC_ZERO){
                             echo '<span style="color:green;">';
@@ -46,11 +52,11 @@ if($status == AppConstant::NUMERIC_ONE){?>
                     <?php $name=$data['name'];
             }
             else{?>
-                    <div class="block"><span class="right"><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $courseid.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>">Thread</a>
+                    <div class="block"><span class="right"><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>">Thread</a>
                            <?php if($userRights > AppConstant::NUMERIC_TEN){?>
-                           <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$courseid.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
+                           <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
                            <?php }?>
-                    <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid=' . $courseid.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
+                    <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post-by-name?cid=' . $course->id.'&threadId='.$data['threadId'].'&forumid='.$data['forumiddata'].'&replyto='.$data['id']); ?>">Reply</a>
                     </span><input type="button" value="+" onclick="toggleshow(<?php echo $i ?>)" id="butn<?php echo $i ?>">
                              <b><?php if($data['parent']!= AppConstant::NUMERIC_ZERO){
                                      echo '<span style="color:green;">';
@@ -76,7 +82,7 @@ if($status == AppConstant::NUMERIC_ONE){?>
     <input type="hidden" id="isData" value="0">
 
 <?php }?>
-<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $courseid.'&forumid='.$forumid);?>">Back to Thread List</a></div>
+<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumid);?>">Back to Thread List</a></div>
 <script>
 $(document).ready(function ()
 {

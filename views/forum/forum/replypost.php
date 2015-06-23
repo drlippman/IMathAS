@@ -8,11 +8,12 @@ use app\components\AppUtility;
     <input type="hidden" class="forumid" value="<?php echo $forumid ?>">
     <input type="hidden" class="courseid" value="<?php echo $courseid ?>">
     <input type="hidden" class="threadid" value="<?php echo $threadid ?>">
+    <input type="hidden" class="parent-id" value="<?php echo $parentId ?>">
     <h2><b>Post Reply</h2>
     <br><br>
     <div>
         <div class="col-md-1"><b>Subject</b></div>
-        <div class="col-md-8"><input class="textbox subject" type="text" value="Re:<?php echo $reply[0]['subject'] ?>">
+        <div class="col-md-8"><input class="textbox subject" type="text" value="Re: <?php echo $reply[0]['subject'] ?>">
         </div>
     </div>
     <br><br><br>

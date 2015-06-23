@@ -90,7 +90,7 @@ class ForumController extends AppController
                 $postCount = count($forum->imasForumPosts);
                 $lastObject = '';
                 if ($postCount > AppConstant::NUMERIC_ZERO) {
-                    $lastObject = $forum->imasForumPosts[$postCount - 1];
+                    $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
                 }
                 $tempArray = array
                 (
@@ -124,11 +124,11 @@ class ForumController extends AppController
         $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         $forumid = $this->getParamVal('forumid');
-        $user = $this->getAuthenticatedUser();
+        $users = $this->getAuthenticatedUser();
         $this->setReferrer();
-        $this->includeCSS(['dataTables.bootstrap.css','forums.css']);
-        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','forum/thread.js?ver='.time().'']);
-        $responseData = array('cid' => $cid, 'users' => $user, 'forumid' => $forumid,'course' =>$course);
+        $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js?ver=012115','forum/thread.js?ver='.time().'']);
+        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumid,'course' =>$course);
         return $this->renderWithData('thread',$responseData);
     }
     /*Controller Action To Display The Thraeds Present In That Particular Forum */
@@ -331,7 +331,7 @@ class ForumController extends AppController
             }
             $this->setReferrer();
             $this->includeJS(['forum/movethread.js']);
-            $responseData = array('forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'courseId'=>$courseId);
+            $responseData = array('forums' => $forumArray,'threads' => $threadArray,'threadId'=>$threadId,'forumId'=>$forumId,'course'=>$course,'user' => $user);
             return $this->renderWithData('moveThread',$responseData);
         }
     }
@@ -340,6 +340,8 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
+        $course = Course::getById($courseId);
+        $currentUser = $this->getAuthenticatedUser();
         $threadId = $this->getParamVal('threadId');
         $forumId = $this->getParamVal('forumId');
         $thread = ThreadForm::thread($forumId);
@@ -359,7 +361,7 @@ class ForumController extends AppController
             }
          }
         $this->setReferrer();
-        $responseData = array('threadId' => $threadId,'forumId'=>$forumId,'courseId'=>$courseId,'thread'=>$threadArray);
+        $responseData = array('threadId' => $threadId,'forumId'=>$forumId,'course'=>$course,'thread'=>$threadArray,'currentUser' => $currentUser);
         return $this->renderWithData('modifyPost',$responseData);
     }
     //controller ajax method for fetch modified thread from Modify page and store in database.
@@ -379,7 +381,8 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $currentUser = $this->getAuthenticatedUser();
-        $courseid=$this->getParamVal('courseid');
+        $courseId=$this->getParamVal('courseid');
+        $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $prev = $this->getParamVal('prev');
         $next = $this->getParamVal('next');
@@ -436,7 +439,7 @@ class ForumController extends AppController
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/post.js']);
-        $responseData = array('postdata' => $this->totalPosts,'courseId' => $courseid,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray);
+        $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray);
         return $this->render('post', $responseData);
     }
     public function createChild($childArray, $arrayKey = AppConstant::NUMERIC_ZERO)
@@ -472,7 +475,7 @@ class ForumController extends AppController
    public function actionReplyPost()
    {
        $this->guestUserHandler();
-        $courseId = $this->getParamVal('courseid');
+       $courseId = $this->getParamVal('courseid');
        $forumId = $this->getParamVal('forumid');
        $Id = $this->getParamVal('id');
        $threadid = $this->getParamVal('threadId');
@@ -489,7 +492,7 @@ class ForumController extends AppController
                array_push($threadArray, $temparray);
        }
        $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/replypost.js']);
-       $responseData = array('reply' => $threadArray,'courseid' => $courseId,'forumid' => $forumId,'threadid' => $threadid);
+       $responseData = array('reply' => $threadArray,'courseid' => $courseId,'forumid' => $forumId,'threadid' => $threadid,'parentId' => $Id);
        return $this->renderWithData('replypost', $responseData);
    }
     public function actionReplyPostAjax()
@@ -511,10 +514,11 @@ class ForumController extends AppController
         $userId = $this->getUserId();
         $rights =$users->rights;
         $forumId = $this->getParamVal('forumid');
-        $courseid =  $this->getParamVal('cid');
+        $courseId =  $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $forumName = Forums::getById($forumId);
         $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/addnewthread.js']);
-        $responseData = array('forumName' => $forumName, 'courseid' => $courseid,'userId' => $userId,'rights' =>$rights);
+        $responseData = array('forumName' => $forumName, 'course' => $course,'userId' => $userId,'rights' =>$rights);
         return $this->renderWithData('addNewThread',$responseData);
     }
 /*Controller Action To Save The Newly Added Thread In Database*/
@@ -531,10 +535,11 @@ class ForumController extends AppController
             $alwaysReplies = $params['alwaysReplies'];
             $date =strtotime($params['date'].' '.$params['time']);
             $userId = $this->getUserId();
-            $newThread = new ForumThread();
-            $threadId = $newThread->createThread($params,$userId);
+
             $newThread = new ForumPosts();
-            $newThread->createThread($params,$userId,$threadId,$postType,$alwaysReplies,$date);
+            $threadId = $newThread->createThread($params,$userId,$postType,$alwaysReplies,$date);
+            $newThread = new ForumThread();
+           $newThread->createThread($params,$userId,$threadId);
             $views = new ForumView();
             $views->createThread($userId,$threadId);
             return $this->successResponse();
@@ -545,11 +550,11 @@ class ForumController extends AppController
     {
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
-        if($rowId == -1){
+        if($rowId == AppConstant::RETURN_ERROR){
             $threadId = $params['threadId'];
             $userId = $params['userId'];
             ForumView::deleteByUserIdAndThreadId($threadId,$userId);
-        }else if($rowId != -1){
+        }else if($rowId != AppConstant::RETURN_ERROR){
         ForumView::updateFlagValue($rowId);
     }
         return $this->successResponse() ;
@@ -676,7 +681,8 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser()->rights;
         $params = $this->getRequestParams();
-        $courseid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $sort = AppConstant::DESCENDING;
         $forumid = $params['forumid'];
         $forumname = Forums::getById($forumid);
@@ -720,12 +726,12 @@ class ForumController extends AppController
             }
             $this->setReferrer();
             $status = AppConstant::NUMERIC_ONE;
-            $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'courseid' => $courseid,'status' => $status,'userRights' => $userRights);
+            $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'course' => $course,'status' => $status,'userRights' => $userRights);
             return $this->renderWithData('listPostByName',$responseData);
         }
         else{
                 $status = AppConstant::NUMERIC_ZERO;
-            $responseData = array('status' => $status,'forumid' => $forumid,'courseid' => $courseid);
+            $responseData = array('status' => $status,'forumid' => $forumid,'course' => $course);
             return $this->renderWithData('listPostByName',$responseData);
 
         }

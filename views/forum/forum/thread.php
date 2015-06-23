@@ -3,22 +3,20 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
+use app\components\AppConstant;
 $this->title = 'Thread';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+if ($users->rights > AppConstant::STUDENT_RIGHT){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"
-      xmlns="http://www.w3.org/1999/html"/>
-<!--<link rel="stylesheet" type="text/css" href="--><?php //echo AppUtility::getHomeURL() ?><!--css/forums.css"/>-->
-<!-- DataTables CSS -->
-<!--<link rel="stylesheet" type="text/css"-->
-<!--      href="--><?php //echo AppUtility::getHomeURL() ?><!--js/DataTables-1.10.6/media/css/jquery.dataTables.css">-->
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<!--<script type="text/javascript" charset="utf8"-->
-<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>-->
 <input type="hidden" id="course-id" value="<?php echo $cid ?>">
 <div class="forumResult"><h4><strong>Forum Search Results</strong></h4></div>
 <div class="threadDetails">

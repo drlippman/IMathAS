@@ -2,11 +2,19 @@
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
+use app\components\AppConstant;
 date_default_timezone_set("Asia/Calcutta");
 $this->title = 'Add New Thread';
-$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseid]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseid.'&forumid='.$forumName->id]];
+if ($rights > AppConstant::STUDENT_RIGHT){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumName->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="" xmlns="http://www.w3.org/1999/html">
@@ -26,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <br>
         <input type="hidden" id="userId" value="<?php echo $userId; ?>">
         <input type="hidden" id="forumId" value="<?php echo $forumName->id; ?>">
-        <input type="hidden" id="courseId" value="<?php echo $courseid; ?>">
+        <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
 
     </div>
     <?php if($rights > 10)

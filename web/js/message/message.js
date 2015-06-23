@@ -20,7 +20,7 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId = $('#course-id').val();
 function createTableHeader() {
-    var html = "<table id='message-table display-message-table' class='message-table display-message-table'>";
+    var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
     html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
     html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);

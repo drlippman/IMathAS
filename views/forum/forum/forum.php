@@ -4,22 +4,17 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Forums';
+if ($users->rights > AppConstant::STUDENT_RIGHT){
 
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->session->get('referrer'))]];
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => [AppUtility::getRefererUri(Yii::$app->session->get('referrer'))]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!-- DataTables CSS -->
-<!--<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css">-->
-<!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>-->
-<!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>-->
-
-<!--<link rel="stylesheet" type="text/css" href="--><?php //echo AppUtility::getHomeURL() ?><!--css/dataTables.bootstrap.css"/>-->
-
-<!--<script type="text/javascript" charset="utf8"-->
-<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/dataTables.bootstrap.js"></script>-->
-<!--<script type="text/javascript" charset="utf8"-->
-<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/jquery.dataTables.min.js"></script>-->
-
 <div class="site-login">
 
     <?php $form = ActiveForm::begin([
@@ -58,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </tbody>
     </table>
      </div>
-    <?php } else if($users->rights== 20){
+    <?php } else if($users->rights== AppConstant::TEACHER_RIGHT){
             echo "<p>There are no active forums at this time,you can add new using course page.</p>";
 
             }

@@ -1,10 +1,18 @@
 <?php
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseId]];
-//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseId.'&forumid='.$forumId]];
-//$this->params['breadcrumbs'][] = $this->title;
- use app\components\AppUtility;?>
-<form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $courseId ?>&threadId=<?php echo $threadId ?>">
+use app\components\AppConstant;
+use app\components\AppUtility;
+$this->title = 'Move Thread';
+if ($user->rights > AppConstant::STUDENT_RIGHT){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
+$this->params['breadcrumbs'][] = $this->title;?>
+<form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
 
 <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
 
@@ -50,6 +58,6 @@
 
 
     <input type=submit class="btn btn-primary" id="move-button" value="Move">
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$courseId.'&forumid='.$forumId)  ?>">Cancel</a>
+    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>">Cancel</a>
 </form>
 

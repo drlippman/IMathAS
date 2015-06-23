@@ -163,9 +163,13 @@ function threadSuccess(response)
                     }else if(thread.currentUserId == thread.postUserId){
                         html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
                     }else { html += " <td> - </td> "; }
-                    html += "<td>" + count + "</td>";
+                    if(count >= 0){
+                    html += "<td>" + count + "</td>";}
                     $.each(thread.countArray, function (index, count) {
                         count.usercount--;
+                        if(count.usercount == -1){
+                            count.usercount = '';
+                        }
                         if (thread.userright >= 20) {
                             html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + count.usercount + ")" + "</a></td>";
                         } else {

@@ -20,12 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css"
-      href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<script type="text/javascript" charset="utf8"
-        src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
         <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>

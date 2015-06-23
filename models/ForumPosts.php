@@ -69,22 +69,24 @@ class ForumPosts extends BaseImasForumPosts
         $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->subject = isset($params['subject']) ? $params['subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
-        $this->parent = $params['threadid'];
+            $this->parent = $params['parentId'];
         $this->message = isset($params['body']) ? $params['body'] : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;
         $this->save();
     }
-    public function createThread($params,$userId,$threadId,$postType,$alwaysReplies,$date)
+    public function createThread($params,$userId,$postType,$alwaysReplies,$date)
     {
-
+        $maxid = $this->find()->max('id');
+        $maxid = $maxid + 1;
+        $this->id = $maxid;
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
-        $this->threadid = isset($threadId) ? $threadId : null;
+        $this->threadid = isset($maxid) ? $maxid : null;
         if(empty($params['subject']))
         {
                 $params['subject'] = '(None)';
         }
-        $this->subject = $params['subject'];
+        $this->subject = trim($params['subject']);
         $this->userid = isset($userId) ?  $userId : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;

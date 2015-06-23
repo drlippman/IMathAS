@@ -62,8 +62,8 @@ class RosterController extends AppController
             }
         }
 
-        $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-        $this->includeJS(['roster/studentroster.js', 'general.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','roster/studentroster.js', 'general.js' ]);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
 
@@ -690,9 +690,9 @@ class RosterController extends AppController
                     }else{
                         array_push($duplicateStudents,$singleStudent);
                     }
-                }AppUtility::dump($studentInformation['newUsers']);
-                $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
-                $this->includeJS(['general.js?', 'roster/importstudent.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+                }
+                $this->includeCSS(['dataTables.bootstrap.css']);
+                $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','roster/importstudent.js', 'general.js' ]);
                 $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents);
                 return $this->render('showImportStudent', $responseData);
     }

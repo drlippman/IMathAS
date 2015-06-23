@@ -15,11 +15,6 @@ else{
 $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/css/jquery.dataTables.css">
-    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js?ver=012115"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script type="text/javascript" charset="utf8" src="<?php echo AppUtility::getHomeURL() ?>js/DataTables-1.10.6/media/js/jquery.dataTables.js"></script>
 <div>
     <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">

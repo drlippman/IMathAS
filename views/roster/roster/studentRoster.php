@@ -59,7 +59,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </form>
 </div>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-<table class="student-data-table" id="student-information" bPaginate="false" >
+<table class="student-data-table table table-bordered table-striped table-hover data-table" id="student-information" bPaginate="false" >
     <thead>
     <tr>
         <th></th>

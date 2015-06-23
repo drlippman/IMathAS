@@ -37,7 +37,9 @@ class MessageController extends AppController
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $this->includeJS(["message/message.js"]);
+            $this->includeCSS(['dataTables.bootstrap.css']);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/message.js', 'general.js' ]);
+
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage);
             return $this->renderWithData('messages', $responseData);
         }
@@ -141,7 +143,8 @@ class MessageController extends AppController
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
-            $this->includeJS(['message/sentMessage.js']);
+            $this->includeCSS(['dataTables.bootstrap.css']);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/sentMessage.js', 'general.js' ]);
             return $this->renderWithData('sentMessage', $responseData);
         }
     }

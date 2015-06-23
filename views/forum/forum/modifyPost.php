@@ -1,15 +1,24 @@
 <?php
 //$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$courseId]];
-//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$courseId.'&forumid='.$forumId]];
-//$this->params['breadcrumbs'][] = $this->title;?>
+use app\components\AppConstant;
+$this->title = 'Modify Thread';
+if ($currentUser->rights > AppConstant::STUDENT_RIGHT){
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+}
+$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
+$this->params['breadcrumbs'][] = $this->title;?>
 <div>
     <h2><b>Modify Post</b></h2>
 
     <br><br><br>
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">
     <input type="hidden" id="forum-id" value="<?php echo $forumId ?>">
-    <input type="hidden" id="course-id" value="<?php echo $courseId ?>">
+    <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
     <div>
         <span class="col-md-1"><b>Subject:</b></span>
         <span class="col-md-8"><input class="textbox subject" type="text" value="<?php echo $thread[0]['subject'] ?>"></span>
