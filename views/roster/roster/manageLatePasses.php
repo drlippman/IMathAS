@@ -39,11 +39,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
             <?php } ?>
     <p><em>To all students: <input type="text" size="3" id="txt_add" name="addpass" value="1"/>
-            <input type="button" name="add" value="Add" class="btn btn-primary" onclick="addText()">
-     <input type="button" name="replace" value="Replace" class="btn btn-primary" onclick="replaceText()">
+            <input type="button" class="btn btn-primary" onclick="addReplaceMultiplyTextValue(1)">
+     <input type="button" class="btn btn-primary" onclick="addReplaceMultiplyTextValue(2)">
 
 
-    <table class="student-data" id="student-data-table">
+    <table class="student-data table table-bordered table-striped table-hover data-table" id="student-data-table">
         <thead>
         <tr>
             <th>Name</th>

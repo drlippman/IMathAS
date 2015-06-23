@@ -9,7 +9,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 <input type="hidden" class="course-info" name="course-info" value="<?php echo $course->id; ?>"/>
 <input type="hidden" class="user-info" name="user-info" value="<?php echo $user->id; ?>"/>
 <div class="cpmid">
-    Offline Grades: <a href="#">Add</a>, <a href="#">Manage</a> | <select id="exportsel" onchange="chgexport()"><option value="0">Export to...</option></select> |
+    Offline Grades: <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id); ?>">Add</a>, <a href="#">Manage</a> | <select id="exportsel" onchange="chgexport()"><option value="0">Export to...</option></select> |
     <a href="#">GB Settings</a> | <a href="#">Averages</a> | <a href="#">Comments</a> | <input type="button" id="lockbtn" class="btn-primary"onclick="lockcol()" value="Lock headers"> |
     Color:      <select id="colorsel" onchange="updateColors(this)"><option value="0">None</option></select> | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a><br><br>
     Category:   <select id="filtersel" onchange="chgfilter()"><option value="-1">All</option><option value="0">Default</option><option value="-2" selected="1">Category Totals</option></select> |

@@ -8,6 +8,7 @@ use app\models\_base\BaseImasDiags;
 use app\models\Assessments;
 use app\models\Course;
 use app\models\Diags;
+use app\models\forms\AddGradesForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\GbScheme;
 use app\models\Items;
@@ -225,5 +226,34 @@ class GradebookController extends AppController
 
         AppUtility::dump($gradebooks[0]);
         return $this->successResponse();
+    }
+    public function actionAddGrades()
+    {
+        $model = new AddGradesForm();
+        $this->guestUserHandler();
+        $courseid = $this->getParamVal('cid');
+        $studentData = Student::findByCid($courseid);
+        $course = Course::getById($courseid);
+        $studentArray = array();
+        if ($studentData) {
+            foreach ($studentData as $student) {
+                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                    'Section' => $student->section,
+                    'StudenId' => $student->id,
+                    'userid' => $student->userid
+                );
+                array_push($studentArray, $tempArray);
+            }
+        }
+
+        if ($this->isPost()){
+            $paramas = $_POST;
+//            AppUtility::dump($paramas);
+        }
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ,'gradebook/addgrades.js','roster/managelatepasses.js']);
+        $responseData = array('model' => $model,'studentInformation' => $studentArray);
+        return $this->renderWithData('addGrades', $responseData);
+
     }
 }

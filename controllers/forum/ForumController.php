@@ -549,11 +549,11 @@ class ForumController extends AppController
     {
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
-        if($rowId == AppConstant::RETURN_ERROR){
+        if($rowId == -1){
             $threadId = $params['threadId'];
             $userId = $params['userId'];
             ForumView::deleteByUserIdAndThreadId($threadId,$userId);
-        }else if($rowId != AppConstant::RETURN_ERROR){
+        }else{
         ForumView::updateFlagValue($rowId);
     }
         return $this->successResponse() ;

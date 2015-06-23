@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <div id="searchthread">
-    <table id="forumsearch-table displayforum" class="forumsearch-table">
+    <table id="forumsearch-table displayforum" class="forumsearch-table table table-bordered table-striped table-hover data-table">
         <thead>
 
         <th>Topic</th>
