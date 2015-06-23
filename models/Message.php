@@ -13,6 +13,7 @@ use Yii;
 use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasMsgs;
+use yii\db\Query;
 
 class Message extends BaseImasMsgs
 {
@@ -205,22 +206,45 @@ class Message extends BaseImasMsgs
     }
 
     public static function getUsersToUserMessage($userId){
-        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgfrom=imas_users.id WHERE imas_msgs.msgto='$userId'")->queryAll();
-        return $query;
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.LastName', 'imas_users.FirstName'])
+            ->distinct()
+            ->from('imas_users')
+            ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_users.id = imas_msgs.msgfrom')
+            ->where(['imas_msgs.msgto' => $userId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public static function getUsersToCourseMessage($userId){
-        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_courses.id,imas_courses.name FROM imas_courses,imas_msgs WHERE imas_courses.id=imas_msgs.courseid AND imas_msgs.msgfrom='$userId'")->queryAll();
-        return $query;
+        $query = new Query();
+        $query	->select(['imas_courses.id', 'imas_courses.name'])
+            ->distinct()
+            ->from('imas_courses')
+            ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_courses.id=imas_msgs.courseid')
+            ->where(['imas_msgs.msgfrom' => $userId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public static function getSentUsersMessage($userId){
-        $query = Yii::$app->db->createCommand("SELECT DISTINCT imas_users.id, imas_users.LastName, imas_users.FirstName FROM imas_users JOIN imas_msgs ON imas_msgs.msgto=imas_users.id WHERE imas_msgs.msgfrom='$userId'")->queryAll();
-        return $query;
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.LastName', 'imas_users.FirstName'])
+            ->distinct()
+            ->from('imas_users')
+            ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_users.id = imas_msgs.msgto')
+            ->where(['imas_msgs.msgfrom' => $userId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
     public static function updateFlagValue($row)
     {
-        $query = Yii::$app->db->createCommand("UPDATE imas_msgs SET isread=(isread^8) WHERE id='$row';'")->queryAll();
+        $query = Message::getByMsgId($row);
+        $query->isread = ($query->isread)^8;
+        $query->save();
     }
     public static function getByCourseIdAndUserId($courseid, $userId)
     {

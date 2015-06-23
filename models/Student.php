@@ -146,4 +146,9 @@ class Student extends BaseImasStudents {
     {
         return static::find()->where(['userid'=>$userId])->andWhere(['NOT LIKE', 'hidefromcourselist', 0 ])->all();
     }
+
+    public static function findDistinctSection($courseId)
+    {
+        return static::find()->select('section')->distinct()->where(['courseid' => $courseId])->all();
+    }
 } 

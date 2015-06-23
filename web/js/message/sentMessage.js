@@ -13,7 +13,7 @@ $(document).ready(function () {
 var messageData;
 var cid = $(".send-course-id").val();
 var selectedUserId = $('#user-sent-id').val();
-var selectedCourseId = $('#course-sent-id').val();
+var selectedCourseId;
 function createTableHeader()
 {
     var html = "<table id='message-table-show display-message-table' class='message-table-show display-message-table table table-bordered table-striped table-hover data-table'>";
@@ -82,7 +82,7 @@ function selectCheckBox(){
     });
 }
 
-function getCourseSuccess(response) {
+function getCourseSuccess(response) {   console.log(response);
     var result = JSON.parse(response);
     if (result.status == 0) {
         var courseData = result.data;
@@ -217,6 +217,7 @@ function filterByUser()
     $('#user-sent-id').on('change', function() {
         var filteredArray = [];
         selectedUserId = this.value;
+        selectedCourseId = $('#course-sent-id').val();
         if (selectedCourseId == 0 && selectedUserId == 0) {
             showMessage(messageData, status = 0);
         } else if(selectedCourseId == 0 && selectedUserId != 0){
@@ -295,5 +296,6 @@ function markUnsend() {
         }
     });
 }
-function markUnsendSuccess(){}
+function markUnsendSuccess(){
+}
 

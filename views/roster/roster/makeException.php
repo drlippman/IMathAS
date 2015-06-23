@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 
-$this->title = 'Make Exception';
+$this->title = 'Manage Exception';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;

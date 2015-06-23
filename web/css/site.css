@@ -462,3 +462,6 @@ a.msg-notification:visited{
 .table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
     background-color: #DDFFFF !important;
 }
+#lockbtn{
+    height: auto;
+}

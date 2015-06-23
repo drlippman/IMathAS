@@ -18,7 +18,7 @@ $(document).ready(function () {
 var messageData;
 var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
-var selectedCourseId = $('#course-id').val();
+var selectedCourseId ;
 function createTableHeader() {
     var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
     html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
@@ -228,6 +228,7 @@ function filterByUser() {
     $('#user-id').on('change', function () {
         var filteredArray = [];
         selectedUserId = this.value;
+        selectedCourseId = $('#course-id').val();
         if (selectedCourseId == 0 && selectedUserId == 0) {
             showMessage(messageData, status = 0);
         } else if(selectedCourseId == 0 && selectedUserId != 0){
