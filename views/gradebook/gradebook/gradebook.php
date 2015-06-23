@@ -7,6 +7,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 ?>
 <h2>Gradebook</h2>
 <input type="hidden" class="course-info" name="course-info" value="<?php echo $course->id; ?>"/>
+<input type="hidden" class="user-info" name="user-info" value="<?php echo $user->id; ?>"/>
 <div class="cpmid">
     Offline Grades: <a href="#">Add</a>, <a href="#">Manage</a> | <select id="exportsel" onchange="chgexport()"><option value="0">Export to...</option></select> |
     <a href="#">GB Settings</a> | <a href="#">Averages</a> | <a href="#">Comments</a> | <input type="button" id="lockbtn" class="btn-primary"onclick="lockcol()" value="Lock headers"> |
@@ -60,9 +61,9 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                     <th style="cursor: default;"><div style="width: 14px; height: 77px;">&nbsp;</div></th>
                     <th class="nocolorize"><div style="width: 63px;">Section<br><select id="secfiltersel" onchange="chgsecfilter()">
                                 <option value="-1" selected="1">All</option>
-                            <?php foreach ($sections as $section){
-                                echo "<option value='{$section->section}'>{$section->section}</option>";
-                            }?>
+<!--                            --><?php //foreach ($sections as $section){
+//                                echo "<option value='{$section->section}'>{$section->section}</option>";
+//                            }?>
                             </select></div></th>
                     <th class="nocolorize"><div style="width: 46px;">Code</div></th>
                     <th class="cat0"><div style="width: 56px;">test<br>0&nbsp;pts<br><a class="small" href="addassessment.php?id=1&amp;cid=5&amp;from=gb">[Settings]</a><br><a class="small" href="isolateassessgrade.php?cid=5&amp;aid=1">[Isolate]</a></div></th>

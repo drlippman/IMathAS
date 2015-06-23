@@ -1,12 +1,13 @@
 $(document).ready(function () {
     var courseId = $(".course-info").val();
-    var allMessage = {courseId: courseId};
+    var userId = $(".user-info").val();
+    var allMessage = {courseId: courseId, userId:userId};
     jQuerySubmit('display-gradebook-ajax', allMessage, 'showGradebookSuccess');
     selectCheckBox();
 });
 
 function showGradebookSuccess(response){
-
+console.log(response);
 }
 function selectCheckBox() {
     $('.check-all').click(function () {
