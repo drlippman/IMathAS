@@ -11,7 +11,9 @@ $this->title = 'Post';
 //else{
 //    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
 //}
+
 //$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+
 //$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
 //$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -52,8 +54,9 @@ $currentLevel = 0;
          if($threadId < $prevNextValueArray['maxThread']){?>
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?forumid='.$forumId.'&courseid='.$course->id.'&threadid='.$threadId.'&next=2'); ?>"">Next</a> &nbsp;
         <?php }else{?>
+
              <span>Next</span>
-<!--    <span>Next</span>-->
+
 <?php } ?>
 
         <a href="#" onclick="markAsUnreadPost()" >Mark Unread</a>&nbsp;|
@@ -86,9 +89,13 @@ $currentLevel = 0;
     <div class="forumgrp" id="block<?php echo $index - 1 ?>">
 
         <?php }  ?>
-        <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>"
-                                                     src="<?php echo AppUtility::getHomeURL()?>img/collapse.gif"
-                                                     onClick="toggleshow(<?php echo $index ?>)"/> </span>
+        <?php $imageUrl = $data['userId'].''.".jpg";?>
+        <div class=block id="<?php echo $data['id']?>"><span class="leftbtns">
+                <?php if($data['hasImg'] == 1){ ?>
+                <img class="circular-profile-image" id="img<?php echo $imgCount?>"src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $data['id']?>); /> </span>
+                <?php }else{?>
+                <img class="circular-profile-image" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
+                <?php }?>
                         <span class=right>
                       <?php if ($data['userRights'] >= AppConstant::STUDENT_RIGHT && $data['posttype'] != AppConstant::NUMERIC_TWO) {
                           if ($currentUser['rights'] > AppConstant::STUDENT_RIGHT) {
@@ -114,12 +121,19 @@ $currentLevel = 0;
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
                 <a href="<?php echo AppUtility::getURLFromHome('message','message/send-message?cid='.$courseId.'&userid='.$data['userId'].'&new=1')?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?></a>
+
             <?php
             if(strtotime($data['postdate'])>=$data['lastview']){?>
+
                 <span style="color:red;">New</span>
             <?php }?>
-        </div>
+
+               &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/likedgray.png" title="" onclick="saveLikes(this)">
+                <span class="pointer" id="likecnt266" onclick=""></span>
+
+            </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
+
         <?php
         if ($index ==count($postdata)  - AppConstant::NUMERIC_ONE)
         {
@@ -134,10 +148,10 @@ $currentLevel = 0;
 }?>
     <?php
     $currentLevel = $data['level'];
-    $postCount = (count($data) - 1);
+    $postCount = (count($postdata) - 1);
     ?>
     <input type="hidden" id="postCount" value="<?php echo $postCount ?>">
-    <?php } ?>
+<?php } ?>
 </div>
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
 <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/forum/post.js?ver=<?php echo time()?>"></script>

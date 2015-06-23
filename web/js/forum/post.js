@@ -141,3 +141,26 @@ function markAsUnreadPost(){
     var row = {rowId: rowId,userId:userId,threadId:threadId};
     jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
 }
+var  flag =0;
+function changeProfileImage(element,id)
+{
+    if(flag == 0 )
+    {
+       element.style.width = "100px";
+        element.style.height = "105px";
+        document.getElementById(id).style.height = "109px";
+        flag =1;
+    }else
+    {
+        element.style.width = "47px";
+        element.style.height = "47px";
+        document.getElementById(id).style.height = "10%";
+        flag=0;
+    }
+
+}
+
+function saveLikes(element)
+{
+  alert("HI ALL");
+}

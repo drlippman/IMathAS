@@ -410,8 +410,6 @@ class ForumController extends AppController
         {
             $this->children[$postdata['parent']][] = $postdata['id'];
             $username = User::getById($postdata['userid']);
-
-
             $forumname = Forums::getById($postdata['forumid']);
 
             $titleLevel = AppUtility::calculateLevel($postdata['subject']);
@@ -426,6 +424,7 @@ class ForumController extends AppController
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userRights'] = $username->rights;
             $tempArray['userId'] = $username->id;
+            $tempArray['hasImg'] = $username->hasuserimg;
             $tempArray['lastview'] = $isNew[0]['lastview'];
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
@@ -697,19 +696,18 @@ class ForumController extends AppController
                 foreach ($thread as $data)
                 {
                     $username = User::getById($data['userid']);
-
                      $temparray = array
                         (
                             'id' => $data['id'],
                             'parent' => $data['parent'],
                             'threadId' => $data['threadid'],
                             'forumiddata' => $data['forumid'],
+                            'userId' => $username->id,
+                            'hasImg' => $username->hasuserimg,
                             'subject' => $data['subject'],
                             'postdate' => date('F d, o g:i a', $data['postdate']),
                            'message' => $data['message'],
                             'name' => AppUtility::getFullName($username->LastName, $username->FirstName),
-
-
                         );
                     if(!in_array($temparray['name'],$nameArray))
                         array_push($nameArray,$temparray['name']);
@@ -725,18 +723,17 @@ class ForumController extends AppController
                 array_push($sortbyname,$name);
             }
             $this->setReferrer();
+            $this->includeCSS(['forums.css']);
             $status = AppConstant::NUMERIC_ONE;
             $responseData = array('threadArray' => $finalSortedArray,'forumid' => $forumid,'forumname' => $forumname,'course' => $course,'status' => $status,'userRights' => $userRights);
             return $this->renderWithData('listPostByName',$responseData);
         }
-        else{
+        else
+        {
                 $status = AppConstant::NUMERIC_ZERO;
             $responseData = array('status' => $status,'forumid' => $forumid,'course' => $course);
             return $this->renderWithData('listPostByName',$responseData);
-
         }
-
-
     }
 
     function actionReplyPostByName()

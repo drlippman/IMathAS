@@ -32,7 +32,15 @@ if($status == AppConstant::NUMERIC_ONE){?>
         <?php
         if($name != $data['name'])
             {?>
-                    <div class=""><strong><?php echo $data['name']?></strong></div>
+                <div class="" id="<?php echo $data['userId']?>">
+                <?php $imageUrl = $data['userId'].''.".jpg";?>
+                <?php if($data['hasImg'] == 1){ ?>
+                <img class="circular-profile-image" id="img<?php echo $imgCount?>"src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $data['userId']?>); />
+                <?php }else{?>
+                <img class="circular-profile-image" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
+                <?php }?>
+                    <strong><?php echo $data['name']?></strong>
+                </div>
                     <div class="block"><span class="right"><a href='<?php echo AppUtility::getURLFromHome('forum', 'forum/post?courseid='. $course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata']); ?>'>Thread</a>
                             <?php if($userRights > AppConstant::NUMERIC_TEN){?>
                                 <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="tabs" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a>
@@ -198,7 +206,22 @@ $(document).ready(function ()
 
         alert("nbndb");
     }
+var  flag =0;
+function changeProfileImage(element,id)
+{
+    if(flag == 0 )
+    {
+        element.style.width = "200px";
+        element.style.height = "175px";
+        flag =1;
+    }else
+    {
+        element.style.width = "47px";
+        element.style.height = "47px";
+        flag=0;
+    }
 
+}
 
 
 

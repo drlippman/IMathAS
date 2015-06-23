@@ -581,10 +581,10 @@ a.attach {
     background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;
     padding-left: 20px;
 }
-div.forumgrp img {
-	max-width: 90%;
-	height: auto;
-}
+/*div.forumgrp img {*/
+	/*max-width: 90%;*/
+	/*height: auto;*/
+/*}*/
 div.multisel {
 	display: inline-block;
 }
