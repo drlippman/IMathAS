@@ -7,6 +7,7 @@ use app\components\AppUtility;
 use app\models\AppModel;
 use app\models\AssessmentSession;
 use app\models\Blocks;
+use app\models\CalItem;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
@@ -50,7 +51,6 @@ class CourseController extends AppController
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
             if (count($itemOrders)) {
-
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
                     if (is_array($itemOrder)) {
@@ -69,7 +69,7 @@ class CourseController extends AppController
                                         array_push($calendarCount, $assessment);
                                         break;
                                     case 'Calendar':
-                                        $tempItem[$item->itemtype] = 1;
+                                        $tempItem[$item->itemtype] = $itemOrder;
                                         break;
                                     case 'Forum':
                                         $form = Forums::getById($item->typeid);
@@ -105,7 +105,7 @@ class CourseController extends AppController
                                 array_push($calendarCount, $assessment);
                                 break;
                             case 'Calendar':
-                                $tempAray[$item->itemtype] = 1;
+                                $tempAray[$item->itemtype] = $itemOrder;
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'Forum':
@@ -591,6 +591,7 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $cid = $params['cid'];
         $assessments = Assessments::getByCourseId($cid);
+        $calendarItems = CalItem::getByCourseId($cid);
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -607,6 +608,91 @@ class CourseController extends AppController
                 'courseId' => $assessment['courseid']
             );
         }
-        return $this->successResponse($assessmentArray);
+
+        $calendarArray = array();
+        foreach ($calendarItems as $calendarItem)
+        {
+            $calendarArray[] = array(
+                'courseId' => $calendarItem['courseid'],
+                'date' => AppUtility::getFormattedDate($calendarItem['date']),
+                'title' => $calendarItem['title'],
+                'tag' => $calendarItem['tag']
+            );
+        }
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray);
+        return $this->successResponse($responseData);
+    }
+
+    public function actionBlockIsolate()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $cid = $this->getParamVal('cid');
+        $cid = $this->getParamVal('cid');
+        $responseData = array();
+        $calendarCount = array();
+        $course = Course::getById($cid);
+        if ($course) {
+            $itemOrders = unserialize($course->itemorder);
+            if (count($itemOrders)) {
+                foreach ($itemOrders as $key => $itemOrder) {
+                    $tempAray = array();
+                    if (is_array($itemOrder)) {
+                        $tempAray['Block'] = $itemOrder;
+                        $blockItems = $itemOrder['items'];
+
+                        $tempItemList = array();
+                        if (count($blockItems)) {
+                            foreach ($blockItems as $blockKey => $blockItem) {
+                                $tempItem = array();
+                                $item = Items::getById($blockItem);
+                                switch ($item->itemtype) {
+                                    case 'Assessment':
+                                        $assessment = Assessments::getByAssessmentId($item->typeid);
+                                        $tempItem[$item->itemtype] = $assessment;
+                                        array_push($calendarCount, $assessment);
+                                        break;
+                                    case 'Calendar':
+                                        $tempItem[$item->itemtype] = 1;
+                                        break;
+                                    case 'Forum':
+                                        $form = Forums::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $form;
+                                        break;
+                                    case 'Wiki':
+                                        $wiki = Wiki::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $wiki;
+                                        break;
+                                    case 'LinkedText':
+                                        $linkedText = Links::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $linkedText;
+                                        break;
+                                    case 'InlineText':
+                                        $inlineText = InlineText::getById($item->typeid);
+                                        $tempItem[$item->itemtype] = $inlineText;
+                                        break;
+                                }
+                                array_push($tempItemList, $tempItem);
+                            }
+                        }
+                        $tempAray['itemList'] = $tempItemList;
+                        array_push($responseData, $tempAray);
+                    }
+                }
+            }
+        }
+        $message = Message::getByCourseIdAndUserId($cid, $user->id);
+        $isreadArray = array(0, 4, 8, 12);
+        $msgList = array();
+        if($message){
+            foreach($message as $singleMessage){
+                if(in_array($singleMessage->isread, $isreadArray))
+                    array_push($msgList,$singleMessage);
+            }
+        }
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
+        $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData);
+        return $this->render('blockIsolate', $returnData);
     }
 }

@@ -72,9 +72,12 @@ function calendar() {
                 },
                 success: function (response) {
                     response = JSON.parse(response);
+
+
                     var assessmentData = response.data;
+//                    console.log(assessmentData.calendarArray);
                     var events = [];
-                    $.each(assessmentData, function (index, assessmentDetail) {
+                    $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';
 
                         if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > assessmentDetail.now)
@@ -111,8 +114,24 @@ function calendar() {
                                 courseId: assessmentDetail.courseId,
                                 assessmentId: assessmentDetail.assessmentId,
                                 message: 'Assessment',
-                                color: eventColor
+                                color: eventColor,
+                                reviewMode: false
                             });
+                        }
+                    });
+                    $.each(assessmentData.calendarArray, function (index, calendarItem) {
+                        var eventColor = '#00FFCC';
+//                        console.log(calendarItem);
+                        if(calendarItem != 0)
+                        {
+                            events.push({
+                                title: calendarItem.tag,
+                                start: calendarItem.date,
+                                tagTitle:calendarItem.title,
+                                color: eventColor
+
+                            });
+
                         }
                     });
                     callback(events);
@@ -133,7 +152,7 @@ function calendar() {
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
                         "Ok": function() {
-                            $(this).dialog('destroy').remove();
+                            $(this).dialog('close');
                             return false;
                         }
                 }
@@ -142,7 +161,7 @@ function calendar() {
             /**
              * If assessment is not in review mode
              */
-            else
+            else if(event.reviewMode == false)
             {
                 $("#demo").empty();
                 var title = "<a href='../../assessment/assessment/show-assessment?id="+event.assessmentId+" '>"+event.title+"</a>";
@@ -152,7 +171,22 @@ function calendar() {
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
                         "Ok": function() {
-                            $(this).dialog('destroy').remove();
+                            $(this).dialog('close');
+                            return false;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                $("#demo").empty();
+                var title = event.tagTitle;
+                var tag = event.title;
+                $("#demo").append("<div> "+tag+"<br>"+title+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog('close');
                             return false;
                         }
                     }

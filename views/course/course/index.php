@@ -405,18 +405,19 @@ case 'Assessment': ?>
     <!-- Calender Here-->
 <?php case 'Calendar':?>
     <div class ='calendar'>
-            <div id="demo"></div>
+            <a id="demo" href="#"></a>
     </div>
     <?php break; ?>
 
     <!--  Block here-->
 <?php case 'Block': ?>
-    <?php $block = $item[key($item)];?>
+    <?php $block = $item[key($item)];
+    $blockId = $block['id'];?>
     <?php if ($block['avail'] != 0 && $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
         <div class=block>
             <?php if (strlen($block['SH']) == 1 || $block['SH'][1] == 'O') { ?>
                 <span class=left>
-                        <img alt="expand/collapse" style="cursor:pointer;" id="img3" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                        <img alt="expand/collapse" style="cursor:pointer;" id="img3" onClick="toggleblock()" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
                     </span>
             <?php } elseif (strlen($block['SH']) > 1) { ?>
                 <span class=left>
@@ -433,7 +434,7 @@ case 'Assessment': ?>
             <?php }?>
             <div class=title>
                         <span class="right">
-                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
+                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>">Isolate</a>
                         </span>
                 <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
             </div>

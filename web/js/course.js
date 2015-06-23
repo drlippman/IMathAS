@@ -49,7 +49,8 @@ function ahahDone(url, target) {
    
 var loadedblocks = new Array();
 
-function toggleblock(bnum,folder) {
+function toggleblock(bnum) {
+    alert('hhii');
       var node = document.getElementById('block'+bnum);
       //var butn = document.getElementById('but'+bnum);
       var img = document.getElementById('img'+bnum);
@@ -63,7 +64,7 @@ function toggleblock(bnum,folder) {
           node.className = 'hidden';
           //butn.value = 'Expand';
 	  if (img != null) {
-		  img.src = imasroot+'/img/expand.gif';
+		  img.src = 'http://localhost/openmath/web/' +'/img/expand.gif';
 	  }
           if (loc>-1) {oblist.splice(loc,1);}
       } else { 
@@ -76,7 +77,7 @@ function toggleblock(bnum,folder) {
           node.className = 'blockitems';
           //butn.value = 'Collapse';
 	  if (img != null) {
-		  img.src = imasroot+'/img/collapse.gif';
+		  img.src = 'http://localhost/openmath/web/'+'/img/collapse.gif';
 	  }
           if (loc==-1) {oblist.push(bnum);} 
       }
