@@ -178,7 +178,8 @@ case 'Assessment': ?>
 
     <!-- ////////////////// Wiki here //////////////////-->
 <?php case 'Wiki': ?>
-    <?php $wikis = $item[key($item)]; ?>
+    <?php $wikis = $item[key($item)];
+    $hasNew = false;?>
     <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
         <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
             <div class="item">
@@ -404,7 +405,7 @@ case 'Assessment': ?>
     <!-- Calender Here-->
 <?php case 'Calendar':?>
     <div class ='calendar'>
-
+            <div id="demo"></div>
     </div>
     <?php break; ?>
 

@@ -45,11 +45,13 @@ if (count($countOfRevision)>1) {
     <span>
         <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
            class="btn btn-primary btn-sm">Edit this page</a></span>
-        <?php if(!empty($wikiRevisionData)){ ?>
-        <?php foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
+        <?php if(!empty($wikiRevisionData)){
+            foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
-                <?php $text = $singleWikiRevision->revision; ?>
-                <?php echo filter($text);?>
+                <?php $text = $singleWikiRevision->revision;
+                $text = str_replace(array("\r","\n", "<p>", "</p>"),' ', $text);
+                $text = preg_replace('/\s+/',' ', $text);
+                 echo $text; ?>
     </textarea>
     <?php }?>
     <?php }?>
@@ -94,14 +96,6 @@ if (count($countOfRevision)>1) {
         if (usingASCIIMath) {
             rendermathnode(contentdiv);
         }
-    }
-    /**
-     * To get last data of updated wiki page.
-     */
-    function lastUpdateOfWiki()
-    {
-            var lastRevision = JSON.stringify(jsonData.o);
-            $('#wikicontent').val(lastRevision);
     }
 
     /**

@@ -28,12 +28,12 @@ class WikiUtility extends Component
         if (1 == 0) {
             $overwriteBody = 1;
             $body = "Error - need course id";
-        } else if (2 == 0) {
+        } else if (7 == 0) {
             $overwriteBody = 1;
             $body = "Error - need wiki id";
         } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
             $connection = Yii::$app->getDb();
-            $query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id= 5";
+            $query = "SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id= 7";
             $qdata = $connection->createCommand($query)->queryOne();
 
             $wikiname = $qdata['name'];
@@ -52,7 +52,7 @@ class WikiUtility extends Component
                 $connection = Yii::$app->getDb();
                 $query = "SELECT i_w_r.id as revision_id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id as user_id FROM ";
                 $query .= "imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid ";
-                $query .= "WHERE i_w_r.wikiid= 5 AND i_w_r.stugroupid= 0 ORDER BY i_w_r.id DESC";
+                $query .= "WHERE i_w_r.wikiid= 7 AND i_w_r.stugroupid= 0 ORDER BY i_w_r.id DESC";
                 $allRevisions = $connection->createCommand($query)->queryAll();
                 $numrevisions = array();
                 $revisions = $allRevisions[0];

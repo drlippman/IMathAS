@@ -50,6 +50,7 @@ class CourseController extends AppController
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
             if (count($itemOrders)) {
+
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
                     if (is_array($itemOrder)) {

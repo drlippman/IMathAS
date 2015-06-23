@@ -10,14 +10,13 @@ class WikiRevision extends BaseImasWikiRevisions
     {
         return WikiRevision::findAll(['wikiid' => $wikiId]);
     }
-    public function saveRevision($params, $user, $wikicontent)
+    public function saveRevision($params)
     {
         $this->wikiid = isset($params['wikiId']) ? $params['wikiId'] : null;
-        $this->userid = isset($user) ? $user : null;
-        $this->revision = isset($wikicontent) ? $wikicontent : null;
+        $this->userid = 3;
+        $this->revision = isset($params['wikicontent']) ? $params['wikicontent'] : null;
         $this->stugroupid = 0;
-        $postdate = strtotime(date('F d, o g:i a'));
-        $this->time = $postdate;
+        $this->time = isset($params['time']) ? $params['time'] : null;
         $this->save();
     }
 
@@ -41,9 +40,10 @@ class WikiRevision extends BaseImasWikiRevisions
         return WikiRevision::findAll(['wikiid' =>$wikiId]);
     }
 
-    public static function getCountOfId($wikiId, $stugroupid)
+    public static function getRevisionTotalData($wikiId, $stugroupid, $userId)
     {
-        $query = \Yii::$app->db->createCommand("SELECT i_w_r.id,i_w_r.userid,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM  imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid='$wikiId' AND i_w_r.stugroupid='$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
+//        $query = \Yii::$app->db->createCommand("SELECT i_w_r.id,i_w_r.userid,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM  imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid='$wikiId' AND i_w_r.stugroupid='$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
+        $query = \Yii::$app->db->createCommand("SELECT i_w_r.id as revision_id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id as user_id FROM imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid= '$wikiId' AND i_w_r.stugroupid= '$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
         return $query;
     }
 }

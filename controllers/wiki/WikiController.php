@@ -16,26 +16,24 @@ class WikiController extends AppController
     public function actionShowWiki()
     {
         $userData = $this->getAuthenticatedUser();
+        $userId = $userData->id;
         $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('wikiId');
         $course = Course::getById($courseId);
         $subject = $this->getBodyParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
         $stugroupid = 0;
-        $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
+        $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupid, $userId);
         $wikiTotalData = Wiki::getAllData($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
         $count = $wikiRevisionData ;
         $wikiRevisionSortedByTime = '';
         foreach($wikiRevisionData as $singleWikiData){
-           // $count = $singleWikiData->id;
-
             $sortBy = $singleWikiData->id;
             $order = AppConstant::DESCENDING;
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-//        $this->includeJS(['viewwiki.js']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
         return $this->renderWithData('showWiki', $responseData);
     }
@@ -50,40 +48,30 @@ class WikiController extends AppController
     public function actionEditPage()
     {
         $userData = $this->getAuthenticatedUser();
-        $courseId = $this->getParamVal('courseId');
-        $course = Course::getById($courseId);
-        $wikiId = $this->getParamVal('wikiId');
-        $wiki = Wiki::getById($wikiId);
-        $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
-        $wikiRevisionSortedByTime = '';
-        foreach($wikiRevisionData as $singleWikiData){
-            $sortBy = $singleWikiData->id;
-            $order = AppConstant::DESCENDING;
-            $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
-        }
-
-        $wikiRevision = WikiRevision::getByRevisionId($wikiId);
-        if ($this->isPost()) {
-            $data = $this->getRequestParams();
-        }
-
-        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-        $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
-        return $this->renderWithData('editPage', $responseData);
-    }
-    public function actionWikiRev()
-    {
-        $userData = $this->getAuthenticatedUser();
+//        $userId = $userData->id;
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $wikiId = $this->getParamVal('wikiId');
         $wiki = Wiki::getById($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
         $stugroupid = 0;
-        $revisionTotalData = WikiRevision::getCountOfId($wikiId, $stugroupid);
-        $wikiTotalData = Wiki::getAllData($wikiId);
-        $responseData = array('courseId'=>$courseId, 'wikiId'=>$wikiId, 'revisionTotalData' => $revisionTotalData, 'wikiTotalData' => $wikiTotalData,'countOfRevision' => $wikiRevisionData);
-        return $this->renderWithData('wikiRev', $responseData);
+        $wikiRevisionSortedByTime = '';
+        $wikiRevision = WikiRevision::getByRevisionId($wikiId);
+        foreach($wikiRevisionData as $singleWikiData){
+            $sortBy = $singleWikiData->id;
+            $order = AppConstant::DESCENDING;
+            $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
+        }
+        if ($this->isPost())
+        {
+            $params = $this->getRequestParams();
+            $saveRevision = new WikiRevision();
+            $saveRevision->saveRevision($params);
+        }
+
+        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+        $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
+        return $this->renderWithData('editPage', $responseData);
     }
     public function wikiEditedRevisionData($wikiRevisionData, $wikiData)
     {
@@ -111,57 +99,5 @@ class WikiController extends AppController
                 $wikicontent = '**wver'.$wikiver.'**'.$wikicontent;
            }
         }
-    }
-
-    public function actionGetLastDataAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $cid = $params['courseId'];
-        $wikiId = $params['wikiId'];
-        $wikiData = WikiRevision::getByWikiId($wikiId);
-        $wikiRevisionSortedById = '';
-        $order = AppConstant::DESCENDING;
-        foreach($wikiData as $singleWikiData){
-            $sortBy = $singleWikiData->id;
-            $wikiRevisionSortedById = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
-        }
-        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
-        return $this->successResponse($responseData);
-    }
-
-    public function actionGetFirstDataAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $cid = $params['courseId'];
-        $wikiId = $params['wikiId'];
-        $wikiData = WikiRevision::getByWikiId($wikiId);
-        $wikiRevisionSortedById = '';
-        foreach($wikiData as $singleWikiData){
-        $order = AppConstant::ASCENDING;
-        $sortBy = $singleWikiData->id;
-        $wikiRevisionSortedById = WikiRevision::getFirstWikiData($sortBy, $order);
-        }
-        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
-         return $this->successResponse($responseData);
-    }
-    public function actionGetNewerDataAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $cid = $params['courseId'];
-        $wikiId = $params['wikiId'];
-        $wikiData = WikiRevision::getByWikiId($wikiId);
-        $wikiRevisionSortedById = '';
-        $sortBy = '';
-        foreach($wikiData as $singleWikiData){
-            $sortBy = $singleWikiData->id;
-            $sortBy ++;
-        }
-        AppUtility::dump($sortBy);
-        $responseData = array('wikiRevisionSortedById'=> $wikiRevisionSortedById[0]['attributes']);
-//           $responseData = array('wikiRevisionSortedById'=> $sortBy);
-         return $this->successResponse($responseData);
     }
 }
