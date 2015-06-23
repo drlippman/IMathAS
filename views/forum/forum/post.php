@@ -4,16 +4,16 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = 'Post';
-if ($currentUser->rights > AppConstant::STUDENT_RIGHT){
-
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
+//if ($currentUser->rights > AppConstant::STUDENT_RIGHT){
+//
+//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+//}
+//else{
+//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+//}
 //$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
+//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
 $this->params['breadcrumbs'][] = $this->title;
 
 $currentLevel = 0;
@@ -52,9 +52,8 @@ $currentLevel = 0;
          if($threadId < $prevNextValueArray['maxThread']){?>
         <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?forumid='.$forumId.'&courseid='.$course->id.'&threadid='.$threadId.'&next=2'); ?>"">Next</a> &nbsp;
         <?php }else{?>
-             <a href="<?php echo AppUtility::getURLFromHome('forum','forum/post?forumid='.$forumId.'&courseid='.$course->id.'&threadid='.$threadId.'&next=2'); ?>"">Next</a> &nbsp;
+             <span>Next</span>
 <!--    <span>Next</span>-->
->>>>>>> Stashed changes
 <?php } ?>
 
         <a href="#" onclick="markAsUnreadPost()" >Mark Unread</a>&nbsp;|
