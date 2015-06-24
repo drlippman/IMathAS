@@ -24,6 +24,9 @@ return [
     'Error' => 'Erreur',
     'File upload failed.' => 'Le téléchargement du fichier a échoué.',
     'Home' => 'Accueil',
+    'Welcome' => 'bienvenue',
+    'First Name' => 'Prénom',
+    'New User username' => "Nouveau nom d' utilisateur",
     'Invalid data received for parameter "{param}".' => 'Données non valides reçues pour le paramètre « {param} ».',
     'Login Required' => 'Identifiant requis',
     'Missing required arguments: {params}' => 'Arguments manquants requis : {params}',
@@ -102,4 +105,5 @@ return [
     '{n} MB' => '{n} Mo',
     '{n} PB' => '{n} Po',
     '{n} TB' => '{n} To',
+
 ];

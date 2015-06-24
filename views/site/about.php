@@ -8,7 +8,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>IMathAS is a web based mathematics assessment and course management platform. </p>
+<!--    <p>IMathAS is a web based mathematics assessment and course management platform. </p>-->
+    <!--    <p>--><?//= Yii::t('yii', 'IMathAS is a web based mathematics assessment and course management platform.') ?><!--</p>-->
+    <?php echo Yii::t('yii', 'Welcome'); ?>
     <table>
         <tbody>
         <tr>

@@ -16,7 +16,7 @@ $isCourseHidden = false;
                         ?>
                             <li>
                                 <span class="delx" onclick="return hidefromcourselist(<?php echo $student->courseid ?>,this);" title="Hide from course list">x</span>
-                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid) ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $student->courseid .'&isCalendar=false') ?>"><?php echo isset($student->course['name']) ? ucfirst($student->course['name']) : ""; ?></a>
                                 <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $student->courseid) ?>" class="msg-notification">
                                     <?php
                                     if($msgRecord){

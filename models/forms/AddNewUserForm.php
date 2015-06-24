@@ -25,8 +25,8 @@ class AddNewUserForm extends Model
             [['FirstName', 'LastName','username','password','email'],'required'],
             [['rights'],'required'],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens(-).'],
-             [['FirstName', 'LastName'], 'string'],
-             ['email','email'],
+            [['FirstName', 'LastName'], 'string'],
+            ['email','email'],
         ];
 
     }
@@ -34,9 +34,9 @@ class AddNewUserForm extends Model
     public function attributeLabels()
     {
         return [
-            'SID'=>'New User username',
-            'FirstName'=>'First Name',
-            'LastName'=>'Last Name',
+            'SID' => Yii::t('yii', 'New User username'),
+            'FirstName'=> Yii::t('yii', 'First Name'),
+            'LastName'=> Yii::t('yii','Last Name'),
             'email'=>'Email',
             'password'=>'Password',
             'rights'=>'Set User Rights to',
