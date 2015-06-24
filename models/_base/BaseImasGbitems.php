@@ -36,7 +36,7 @@ class BaseImasGbitems extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'name', 'showdate', 'gbcategory', 'outcomes'], 'required'],
+//            [['courseid', 'name', 'showdate', 'gbcategory', 'outcomes'], 'required'],
             [['courseid', 'points', 'showdate', 'gbcategory', 'rubric', 'cntingb', 'tutoredit'], 'integer'],
             [['outcomes'], 'string'],
             [['name'], 'string', 'max' => 254]
