@@ -5,6 +5,7 @@ use app\models\Course;
 use app\models\forms\ForumForm;
 use app\controllers\AppController;
 use app\models\forms\ThreadForm;
+use app\models\ForumLike;
 use app\models\ForumPosts;
 use app\models\ForumThread;
 use app\models\ForumView;
@@ -406,13 +407,15 @@ class ForumController extends AppController
         }else{
             $data = ForumPosts::getbyid($threadId);
         }
+
          foreach ($data as $postdata)
         {
             $this->children[$postdata['parent']][] = $postdata['id'];
             $username = User::getById($postdata['userid']);
             $forumname = Forums::getById($postdata['forumid']);
-
             $titleLevel = AppUtility::calculateLevel($postdata['subject']);
+            $likeimage = ForumLike::checkStatus($postdata['id'],$currentUser);
+
             $tempArray = array();
             $tempArray['id'] = $postdata['id'];
             $tempArray['threadId'] = $postdata['threadid'];
@@ -424,7 +427,9 @@ class ForumController extends AppController
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userRights'] = $username->rights;
             $tempArray['userId'] = $username->id;
+            $tempArray['settings'] = $forumname->settings;
             $tempArray['hasImg'] = $username->hasuserimg;
+            $tempArray['likeimage'] = $likeimage;
             $tempArray['lastview'] = $isNew[0]['lastview'];
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
@@ -435,10 +440,14 @@ class ForumController extends AppController
         $viewsData = new ForumView();
         $viewsData->updateData($threadId,$currentUser);
         $this->createChild($this->children[key($this->children)]);
+        $Count = new ForumLike();
+        $likeCount =$Count->findCOunt($threadId);
+        $mylikes = $Count->UserLikes($threadId,$currentUser);
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/post.js']);
-        $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray);
+
+        $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray,'likeCount' =>$likeCount,'mylikes'=>$mylikes);
         return $this->render('post', $responseData);
     }
     public function createChild($childArray, $arrayKey = AppConstant::NUMERIC_ZERO)
@@ -474,7 +483,7 @@ class ForumController extends AppController
    public function actionReplyPost()
    {
        $this->guestUserHandler();
-       $courseId = $this->getParamVal('courseid');
+       $courseId = $this->getParamVal('cid');
        $forumId = $this->getParamVal('forumid');
        $Id = $this->getParamVal('id');
        $threadid = $this->getParamVal('threadId');
@@ -770,6 +779,53 @@ class ForumController extends AppController
             $reply->createReply($params,$user);
             return $this->successResponse();
         }
+    }
+
+    public function actionLikePostAjax()
+    {
+        $this->guestUserHandler();
+        $userId = $this->getAuthenticatedUser()->id;
+        $params = $this->getRequestParams();
+        $like = $params['like'];
+        if ($this->isPost())
+        {
+
+            if($like == 0)
+            {
+                $like = new ForumLike();
+                $like->InsertLike($params,$userId);
+
+                $count = new ForumLike();
+                $count->checkCOunt($params);
+            }
+            elseif($like == 1)
+            {
+                $like = new ForumLike();
+                $like->DeleteLike($params,$userId);
+            }
+        }
+
+
+        return $this->successResponse();
+    }
+
+    public function actionDataLikePostAjax()
+    {
+        $this->guestUserHandler();
+        $userId = $this->getAuthenticatedUser()->id;
+        $params = $this->getRequestParams();
+        $count = new ForumLike();
+        $displayCountData =  $count->checkCOunt($params);
+        $countDataArray = array();
+
+        foreach($displayCountData as $data){
+             $user = User::getById($data->userid);
+            $temparray = array('id' => $data->userid, 'userName' => AppUtility::getFullName($user->FirstName,$user->LastName));
+            array_push($countDataArray, $temparray);
+        }
+
+        $responseData = array('displayCountData' =>$countDataArray);
+        return $this->successResponse($responseData);
     }
 
 }

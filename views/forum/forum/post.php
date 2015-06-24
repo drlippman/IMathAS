@@ -4,6 +4,7 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = 'Post';
+
 //if ($currentUser->rights > AppConstant::STUDENT_RIGHT){
 //
 //    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
@@ -18,12 +19,14 @@ $this->title = 'Post';
 $this->params['breadcrumbs'][] = $this->title;
 
 $currentLevel = 0;
+
 ?>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" xmlns="http://www.w3.org/1999/html"/>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <input type="hidden" id="course-id" value="<?php echo $course->id?>" >
+
 <input type="hidden" id="forum-id" value="<?php echo $forumId?>" >
 <input type="hidden" id="tag-id" value="<?php echo $tagValue?>" >
 <input type="hidden" id="thread-id" value="<?php echo $threadId?>" >
@@ -104,7 +107,7 @@ $currentLevel = 0;
                           } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
                           <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a><?php } ?>
 
-                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?cid='.$course->id.'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
                               Reply</a>
                       <?php } else if ($data['posttype'] == AppConstant::NUMERIC_TWO) {
                           if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
@@ -112,7 +115,7 @@ $currentLevel = 0;
                           } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] > AppConstant::STUDENT_RIGHT) { ?>
                               <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Move</a>&nbsp;<a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="remove" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a><?php } ?>
                       <?php } else if ($data['posttype'] < strtotime(date('F d, o g:i a')) && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?cid='.$course->id .'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
                               Reply</a>
                       <?php } ?>
                             <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"
@@ -126,10 +129,18 @@ $currentLevel = 0;
 
                 <span style="color:red;">New</span>
             <?php }?>
+                <?php $allowLikes = (($data['settings']&8)==8);{?>
+<!--                --><?php //foreach($likeCount as $like){
+//                        $count = $like['count'];
+//                     }?>
+                        <?php if($data['likeimage'] == 1){?>
+                        &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/liked.png" title="" onclick="saveLikes(this,false,<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)">
+                        <?php }else{?>
+                        &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/likedgray.png" title="" onclick="saveLikes(this,true,<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)">
+                            <?php }?>
 
-               &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/likedgray.png" title="" onclick="saveLikes(this)">
-                <span class="pointer" id="likecnt266" onclick=""></span>
-
+                        <span class="pointer" id="likecnt<?php echo $data['id']?>" onclick=countPopup(<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)>count</span>
+                <?php }?>
             </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
 
