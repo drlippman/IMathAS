@@ -44,7 +44,7 @@ class AssessmentController extends AppController
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions,'courseId' => $courseId,'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to);
+        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to);
 
         return $this->render('ShowAssessment', $responseData);
 
