@@ -1,8 +1,10 @@
 $(document).ready(function ()
 {
         initEditor();
-    $("#reply-btn").click(function()
+    $("#reply-btn").one('click',function()
     {
+        document.getElementById("reply-btn").disabled = 'true';
+
         tinyMCE.triggerSave();
         var courseid = $(".courseid").val();
         var forumid = $(".forumid").val();
@@ -24,6 +26,7 @@ function replyPost(response)
     var threadId = $(".threadid").val();
     if(response.status == 0)
     {
+        document.getElementById("reply-btn").disabled = 'false';
         window.location = "post?courseid="+courseId+"&forumid="+forumId+"&threadid="+threadId;
     }
 }

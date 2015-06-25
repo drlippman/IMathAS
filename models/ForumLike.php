@@ -84,9 +84,15 @@ class ForumLike extends BaseImasForumLikes
         }
     }
 
-    public function checkCOunt($params)
+    public function checkCount($params)
     {
         $count = ForumLike::findAll(['postid'  => $params['id'],'type' => $params['type']]);
+        return $count;
+    }
+
+    public function CalculateCount($postid)
+    {
+        $count = ForumLike::findAll(['postid'  => $postid]);
         return $count;
     }
 } 

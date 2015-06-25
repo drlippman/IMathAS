@@ -382,6 +382,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $currentUser = $this->getAuthenticatedUser();
+
         $courseId=$this->getParamVal('courseid');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
@@ -407,7 +408,7 @@ class ForumController extends AppController
         }else{
             $data = ForumPosts::getbyid($threadId);
         }
-
+        $titleCountArray = array();
          foreach ($data as $postdata)
         {
             $this->children[$postdata['parent']][] = $postdata['id'];
@@ -415,7 +416,31 @@ class ForumController extends AppController
             $forumname = Forums::getById($postdata['forumid']);
             $titleLevel = AppUtility::calculateLevel($postdata['subject']);
             $likeimage = ForumLike::checkStatus($postdata['id'],$currentUser);
+            $count = new ForumLike();
+            $likecnt = $count->CalculateCount($postdata['id']);
 
+            $studentCount = AppConstant::NUMERIC_ZERO;
+            $teacherCount = AppConstant::NUMERIC_ZERO;
+
+            foreach($likecnt as $like)
+            {
+                $Rights = User::getById($like['userid']);
+                if($Rights->rights == AppConstant::STUDENT_RIGHT)
+                {
+                   $studentCount = $studentCount + 1;
+
+                }elseif($Rights->rights >= AppConstant::TEACHER_RIGHT)
+                {
+                    $teacherCount = $teacherCount + 1;
+                }
+                $tempArray = array(
+                    'postId' => $like['postid'],
+                    'studentCount' => $studentCount,
+                    'teacherCount' => $teacherCount,
+                );
+
+            }
+            array_push($titleCountArray,$tempArray);
             $tempArray = array();
             $tempArray['id'] = $postdata['id'];
             $tempArray['threadId'] = $postdata['threadid'];
@@ -430,12 +455,17 @@ class ForumController extends AppController
             $tempArray['settings'] = $forumname->settings;
             $tempArray['hasImg'] = $username->hasuserimg;
             $tempArray['likeimage'] = $likeimage;
+            $tempArray['studentCount'] = $studentCount;
+            $tempArray['teacherCount'] = $teacherCount;
+            $tempArray['likecnt'] =count($likecnt);
             $tempArray['lastview'] = $isNew[0]['lastview'];
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
             $tempArray['replyby'] = $postdata['replyby'];
             $this->postData[$postdata['id']] = $tempArray;
+
         }
+
         ForumPosts::saveViews($threadId);
         $viewsData = new ForumView();
         $viewsData->updateData($threadId,$currentUser);
@@ -447,7 +477,7 @@ class ForumController extends AppController
         $this->includeCSS(['forums.css']);
         $this->includeJS(['forum/post.js']);
 
-        $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray,'likeCount' =>$likeCount,'mylikes'=>$mylikes);
+        $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray,'likeCount' =>$likeCount,'mylikes'=>$mylikes,'titleCountArray' =>$titleCountArray);
         return $this->render('post', $responseData);
     }
     public function createChild($childArray, $arrayKey = AppConstant::NUMERIC_ZERO)
@@ -795,8 +825,8 @@ class ForumController extends AppController
                 $like = new ForumLike();
                 $like->InsertLike($params,$userId);
 
-                $count = new ForumLike();
-                $count->checkCOunt($params);
+//                $count = new ForumLike();
+//                $count->checkCOunt($params);
             }
             elseif($like == 1)
             {
@@ -815,7 +845,7 @@ class ForumController extends AppController
         $userId = $this->getAuthenticatedUser()->id;
         $params = $this->getRequestParams();
         $count = new ForumLike();
-        $displayCountData =  $count->checkCOunt($params);
+        $displayCountData =  $count->checkCount($params);
         $countDataArray = array();
 
         foreach($displayCountData as $data){
@@ -823,7 +853,6 @@ class ForumController extends AppController
             $temparray = array('id' => $data->userid, 'userName' => AppUtility::getFullName($user->FirstName,$user->LastName));
             array_push($countDataArray, $temparray);
         }
-
         $responseData = array('displayCountData' =>$countDataArray);
         return $this->successResponse($responseData);
     }

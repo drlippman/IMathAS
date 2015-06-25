@@ -190,6 +190,7 @@ function likepostresponse(response)
     console.log(response);
     if(response.status == 0)
     {
+        window.location.reload();
 
     }
 }
@@ -209,20 +210,20 @@ function showPopup(response)
     {
         var countData = response.data.displayCountData;
 
-        var html = '<div><p>Post Likes : </p></div><p>';
-
+        var html = '<div id="postid"><p>Post Likes : </p></div><p>';
         $.each(countData, function (index, data) {
          html += '<pre><span class="col-lg-12 pull-left " >'+ data.userName +'</span></pre>'
          });
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Post Likes', zIndex: 10000, autoOpen: true,
-            width: 'auto',height:'auto', resizable: false,
+            title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
                 "Cancel": function () {
                     $(this).dialog('destroy').remove();
                     return false;
                 }
+
             },
             close: function (event, ui) {
                 $(this).remove();

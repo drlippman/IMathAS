@@ -1,7 +1,8 @@
 $(document).ready(function () {
     initEditor();
-    $("#addNewThread").click(function()
+    $("#addNewThread").one('click',function()
     {
+        document.getElementById("addNewThread").disabled = 'true';
 
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
@@ -32,6 +33,7 @@ function newThreadSuccess(response)
     response = JSON.parse(response);
     if (response.status == 0)
     {
+        document.getElementById("addNewThread").disabled = 'false';
 
         window.location = "thread?cid="+courseId+"&forumid="+forumId;
     }

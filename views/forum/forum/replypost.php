@@ -23,6 +23,6 @@ use app\components\AppUtility;
     </div>
     <div class="col-lg-offset-1 col-md-8">
         <br>
-        <a class="btn btn-primary" id="reply-btn">Post Reply</a>
+        <input type="submit" class="btn btn-primary" id="reply-btn" value="Post Reply">
     </div>
 </div>

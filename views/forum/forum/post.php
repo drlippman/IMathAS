@@ -126,20 +126,15 @@ $currentLevel = 0;
 
             <?php
             if(strtotime($data['postdate'])>=$data['lastview']){?>
-
                 <span style="color:red;">New</span>
             <?php }?>
-                <?php $allowLikes = (($data['settings']&8)==8);{?>
-<!--                --><?php //foreach($likeCount as $like){
-//                        $count = $like['count'];
-//                     }?>
+                <?php $allowLikes = (($data['settings']&8)==8);if($allowLikes){?>
                         <?php if($data['likeimage'] == 1){?>
                         &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/liked.png" title="" onclick="saveLikes(this,false,<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)">
                         <?php }else{?>
                         &nbsp;&nbsp;<img id="like-icon" class="" src="<?php echo AppUtility::getAssetURL()?>img/likedgray.png" title="" onclick="saveLikes(this,true,<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)">
-                            <?php }?>
-
-                        <span class="pointer" id="likecnt<?php echo $data['id']?>" onclick=countPopup(<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)>count</span>
+                         <?php }?>
+                        <span class="pointer" id="likecnt<?php echo $data['id']?>" onclick=countPopup(<?php echo $data['id']?>,<?php echo $data['threadId']?>,<?php echo $data['posttype']?>)><label><?php echo $data['likecnt']?></label>   </span>
                 <?php }?>
             </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
