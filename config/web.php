@@ -11,7 +11,10 @@ $config = [
             'class' => 'app\module\api\apiModule',
         ],
     ],
-	'components' => [
+    'language' => 'fr',
+    'sourceLanguage' => 'en_us',
+
+    'components' => [
 		'core' => [
 				'class' => 'app\components\AppCore',
 		],
@@ -62,6 +65,20 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'i18n' => [
+            'translations' => [
+                'app*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'basePath' => "@app/messages",
+                    'sourceLanguage' => 'en_US',
+                    'fileMap' => [
+                        'app' => 'yii.php',
+                        'app/error' => 'error.php',
+                    ],
+//                    'on missingTranslation' => ['app\components\TranslationEventHandler', 'handleMissingTranslation']
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];

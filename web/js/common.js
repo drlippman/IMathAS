@@ -15,6 +15,7 @@ function jQuerySubmit(url, data, successCallBack) {
 }
 
 function jQuerySubmitAjax(url, type, data, successCallBack, errorCallBack) {
+    alert(url);
     $.ajax({
         url: url,
         type:type,
@@ -76,8 +77,8 @@ function CommonPopUp(message)
 
 function createDataTable(classNameHandler){
     bPaginate = $('.'+classNameHandler).attr('bPaginate');
-    if(bPaginate.length>0){
-        bPaginate = $.parseJSON(bPaginate);;
+    if(bPaginate.length > 0){
+        bPaginate = $.parseJSON(bPaginate);
     }else{
         bPaginate = true;
     }

@@ -405,7 +405,7 @@ case 'Assessment': ?>
     <!-- Calender Here-->
 <?php case 'Calendar':?>
     <div class ='calendar'>
-            <a id="demo" href="#"></a>
+            <div id="demo"></div>
     </div>
     <?php break; ?>
 
@@ -417,8 +417,11 @@ case 'Assessment': ?>
         <div class=block>
             <?php if (strlen($block['SH']) == 1 || $block['SH'][1] == 'O') { ?>
                 <span class=left>
-                        <img alt="expand/collapse" style="cursor:pointer;" id="img3" onClick="toggleblock()" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
-                    </span>
+                    <div class="img">
+<!--                        <img class="pointer" id="expand" src="--><?php //echo AppUtility::getHomeURL() ?><!--img/expand.gif" />-->
+                        <img class="pointer" id="collapse" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif" />
+                    </div>
+                </span>
             <?php } elseif (strlen($block['SH']) > 1) { ?>
                 <span class=left>
                         <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -685,6 +688,7 @@ case 'Assessment': ?>
             <?php }?>
         <?php }?>
         </div>
+
         <div class="clear"></div>
     <?php } elseif ($block['avail'] == 2) { ?>
         <!--Show Always-->
@@ -977,6 +981,18 @@ case 'Assessment': ?>
 
 <?php }?>
 </div>
+<script>
+    $(document).ready(function(){
+        $(function() {
+            $(".block").click(function() {
+                $(".blockitems").toggle();
 
+            });
+        });
+        $(".img").click(function() {
+            $(this).find('img').toggle();
+        });
+    });
 
+</script>
 

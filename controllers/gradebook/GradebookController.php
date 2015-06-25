@@ -10,6 +10,7 @@ use app\models\Course;
 use app\models\Diags;
 use app\models\forms\AddGradesForm;
 use app\models\forms\ManageTutorsForm;
+use app\models\GbItems;
 use app\models\GbScheme;
 use app\models\Items;
 use app\models\loginTime;
@@ -231,28 +232,32 @@ class GradebookController extends AppController
     {
         $model = new AddGradesForm();
         $this->guestUserHandler();
-        $courseid = $this->getParamVal('cid');
-        $studentData = Student::findByCid($courseid);
-        $course = Course::getById($courseid);
+        $user = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $studentData = Student::findByCid($courseId);
+        $course = Course::getById($courseId);
         $studentArray = array();
         if ($studentData) {
             foreach ($studentData as $student) {
                 $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
                     'Section' => $student->section,
-                    'StudenId' => $student->id,
+                    'StudentId' => $student->id,
                     'userid' => $student->userid
                 );
                 array_push($studentArray, $tempArray);
             }
         }
-
-        if ($this->isPost()){
-            $paramas = $_POST;
-//            AppUtility::dump($paramas);
+        if($this->isPost()){
+            $params = $_POST;
+//            AppUtility::dump($params);
+            $GbItems = new GbItems();
+            $GbItems->createGbItemsByCourseId($courseId,$params);
+            $responseData = array('course' => $course, 'user' => $user);
+            return $this->renderWithData('gradebook', $responseData);
         }
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ,'gradebook/addgrades.js','roster/managelatepasses.js']);
-        $responseData = array('model' => $model,'studentInformation' => $studentArray);
+        $responseData = array('model' => $model,'studentInformation' => $studentArray,'course' => $course);
         return $this->renderWithData('addGrades', $responseData);
 
     }

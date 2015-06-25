@@ -25,4 +25,5 @@ $(document).ready(function(){
     $("#coursesettingform-messagesystem :radio:first").prop('checked', true);
 
     $("#addnewuserform-rights :radio:first").prop('checked', true);
+
 })

@@ -49,9 +49,13 @@ if (count($countOfRevision)>1) {
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
                 <?php $text = $singleWikiRevision->revision;
-                $text = str_replace(array("\r","\n", "<p>", "</p>"),' ', $text);
-                $text = preg_replace('/\s+/',' ', $text);
-                 echo $text; ?>
+                echo strip_tags($text);
+//                $htmlawedconfig = array('elements'=>'*-script');
+//                $text = serhatozles\htmlawed\htmLawed::htmLawed(stripslashes($text), $htmlawedconfig);
+////                $text = serhatozles\htmlawed\htmLawed::htmLawed($text, array('tidy'=>'1'));
+//                //                $text = str_replace(array("\r","\n", "<p>", "</p>"),' ', $text);
+////                $text = preg_replace('/\s+/',' ', $text);
+//                 echo $text; ?>
     </textarea>
     <?php }?>
     <?php }?>
