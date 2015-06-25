@@ -595,6 +595,7 @@ class CourseController extends AppController
         $cid = $params['cid'];
         $assessments = Assessments::getByCourseId($cid);
         $calendarItems = CalItem::getByCourseId($cid);
+        $CalendarLinkItems = Links::getByCourseId($cid);
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -622,7 +623,19 @@ class CourseController extends AppController
                 'tag' => $calendarItem['tag']
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray);
+        $calendarLinkArray = array();
+        foreach ($CalendarLinkItems as $CalendarLinkItem)
+        {
+            $calendarLinkArray[] = array(
+                'courseId' => $CalendarLinkItem['courseid'],
+                'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
+                'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'startDateString' => $CalendarLinkItem['startdate'],
+                'endDateString' => $CalendarLinkItem['enddate'],
+                'calTag' => $CalendarLinkItem['caltag']
+            );
+        }
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray);
         return $this->successResponse($responseData);
     }
 
@@ -698,4 +711,5 @@ class CourseController extends AppController
         $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData);
         return $this->render('blockIsolate', $returnData);
     }
+
 }
