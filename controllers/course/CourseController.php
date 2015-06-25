@@ -45,22 +45,17 @@ class CourseController extends AppController
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $cid = $this->getParamVal('cid');
-        $isCalendar = $this->getParamVal('isCalendar');
-//        AppUtility::dump($isCalendar);
         $responseData = array();
         $calendarCount = array();
         $course = Course::getById($cid);
-//        $isCalendar = false;
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
             if (count($itemOrders)) {
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
                     if (is_array($itemOrder)) {
-
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
-
                         $tempItemList = array();
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
@@ -68,42 +63,30 @@ class CourseController extends AppController
                                 $item = Items::getById($blockItem);
                                 switch ($item->itemtype) {
                                     case 'Assessment':
-                                        if($isCalendar == false)
-                                        {
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
                                         array_push($calendarCount, $assessment);
-                                        }
                                         break;
 
                                     case 'Calendar':
                                         $tempItem[$item->itemtype] = $itemOrder;
                                         break;
                                     case 'Forum':
-                                        if($isCalendar == false)
-                                        {
                                         $form = Forums::getById($item->typeid);
-
-                                             $tempItem[$item->itemtype] = $form;}
+                                        $tempItem[$item->itemtype] = $form;
                                         break;
                                     case 'Wiki':
-                                        if($isCalendar == false)
-                                        {
                                         $wiki = Wiki::getById($item->typeid);
-
-                                             $tempItem[$item->itemtype] = $wiki;}
+                                        $tempItem[$item->itemtype] = $wiki;
                                         break;
                                     case 'LinkedText':
-                                        if($isCalendar == false)
-                                        {
+
                                         $linkedText = Links::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $linkedText;}
+                                        $tempItem[$item->itemtype] = $linkedText;
                                         break;
                                     case 'InlineText':
-                                        if($isCalendar == false)
-                                        {
                                         $inlineText = InlineText::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $inlineText;}
+                                        $tempItem[$item->itemtype] = $inlineText;
                                         break;
                                 }
                                 array_push($tempItemList, $tempItem);
@@ -115,53 +98,37 @@ class CourseController extends AppController
                         $item = Items::getById($itemOrder);
                         switch ($item->itemtype) {
                             case 'Assessment':
-                                if($isCalendar == false)
-                                {
                                     $assessment = Assessments::getByAssessmentId($item->typeid);
 //                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
 //                                AppUtility::dump($exception);
                                     $tempAray[$item->itemtype] = $assessment;
                                     array_push($responseData, $tempAray);
                                     array_push($calendarCount, $assessment);
-                                }
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = $itemOrder;
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'Forum':
-                                if($isCalendar == false)
-                                {
                                     $form = Forums::getById($item->typeid);
                                     $tempAray[$item->itemtype] = $form;
                                     array_push($responseData, $tempAray);
-                                }
 
                                 break;
                             case 'Wiki':
-                                if($isCalendar == false)
-                                {
                                     $wiki = Wiki::getById($item->typeid);
                                     $tempAray[$item->itemtype] = $wiki;
                                     array_push($responseData, $tempAray);
-                                }
-
                                 break;
                             case 'InlineText':
-                                if($isCalendar == false)
-                                {
                                     $inlineText = InlineText::getById($item->typeid);
                                     $tempAray[$item->itemtype] = $inlineText;
                                     array_push($responseData, $tempAray);
-                                }
                                 break;
                             case 'LinkedText':
-                                if($isCalendar == false)
-                                {
                                     $linkedText = Links::getById($item->typeid);
                                     $tempAray[$item->itemtype] = $linkedText;
                                     array_push($responseData, $tempAray);
-                                }
                                   break;
          }
 
