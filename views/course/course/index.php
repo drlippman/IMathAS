@@ -405,7 +405,7 @@ case 'Assessment': ?>
     <!-- Calender Here-->
 <?php case 'Calendar':?>
     <div class ='calendar'>
-            <div id="demo"></div>
+            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
     </div>
     <?php break; ?>
 

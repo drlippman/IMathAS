@@ -75,7 +75,7 @@ function calendar() {
 
 
                     var assessmentData = response.data;
-//                    console.log(assessmentData.calendarArray);
+                    console.log(assessmentData.calendarLinkArray);
                     var events = [];
                     $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';
@@ -128,7 +128,25 @@ function calendar() {
                                 title: calendarItem.tag,
                                 start: calendarItem.date,
                                 tagTitle:calendarItem.title,
-                                color: eventColor
+                                color: eventColor,
+                                calItem: true
+
+                            });
+
+                        }
+                    });
+                    console.log(assessmentData.calendarLinkArray);
+                    $.each(assessmentData.calendarLinkArray, function (index, calendarLinkItem) {
+                        var eventColor = '#59FF59';
+                        if(calendarLinkItem.startDateString < calendarLinkItem.now && calendarLinkItem.endDateString > calendarLinkItem.now)
+                        {
+
+                            events.push({
+                                title: calendarLinkItem.calTag,
+                                start: calendarLinkItem.startDate,
+                                end: calendarLinkItem.endDate,
+                                color: eventColor,
+                                calLinkItem: true
 
                             });
 
@@ -145,10 +163,10 @@ function calendar() {
             if(event.reviewMode == true)
             {
                 $("#demo").empty();
-                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>.<br>";
-                var reviewMode =  "<&nbsp;&nbsp; This assessment is in review mode - no scores will be saved";
+                var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
+                var reviewMode= "<p style='margin-left:21px!important;'>This assessment is in review mode - no scores will be saved</p>";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $("#demo").append("<div> "+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+reviewMode+"</div>");
+                $("#demo").append("<div>"+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+"."+reviewMode+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
                         "Ok": function() {
@@ -164,7 +182,7 @@ function calendar() {
             else if(event.reviewMode == false)
             {
                 $("#demo").empty();
-                var title = "<a href='../../assessment/assessment/show-assessment?id="+event.assessmentId+" '>"+event.title+"</a>";
+                var title = "<a class='link'style='color: #0000ff' href='../../assessment/assessment/show-assessment?id="+event.assessmentId+"&cid="+event.courseId+" '>"+event.title+"</a>";
                 var dateH = "Due " +event.startDat+"";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
                 $("#demo").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
@@ -177,12 +195,26 @@ function calendar() {
                     }
                 });
             }
-            else
+            else if(event.calItem == true)
             {
                 $("#demo").empty();
                 var title = event.tagTitle;
                 var tag = event.title;
                 $("#demo").append("<div> "+tag+"<br>"+title+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog('close');
+                            return false;
+                        }
+                    }
+                });
+            }
+            else if(event.calLinkItem == true)
+            {
+                $("#demo").empty();
+                var tag = event.title;
+                $("#demo").append("<div> "+tag+"</div>");
                 $("#demo").dialog({ modal: true, title: event.message, width:350,
                     buttons: {
                         "Ok": function() {
