@@ -383,7 +383,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $currentUser = $this->getAuthenticatedUser();
 
-        $courseId=$this->getParamVal('courseid');
+        $courseId=$this->getParamVal('cid');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $prev = $this->getParamVal('prev');
@@ -514,6 +514,7 @@ class ForumController extends AppController
    {
        $this->guestUserHandler();
        $courseId = $this->getParamVal('cid');
+       $course = Course::getById($courseId);
        $forumId = $this->getParamVal('forumid');
        $Id = $this->getParamVal('id');
        $threadid = $this->getParamVal('threadId');
@@ -530,7 +531,7 @@ class ForumController extends AppController
                array_push($threadArray, $temparray);
        }
        $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/replypost.js']);
-       $responseData = array('reply' => $threadArray,'courseid' => $courseId,'forumid' => $forumId,'threadid' => $threadid,'parentId' => $Id);
+       $responseData = array('reply' => $threadArray,'course' => $course,'forumid' => $forumId,'threadid' => $threadid,'parentId' => $Id);
        return $this->renderWithData('replypost', $responseData);
    }
     public function actionReplyPostAjax()
