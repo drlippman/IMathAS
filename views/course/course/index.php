@@ -148,15 +148,16 @@ case 'Assessment': ?>
     <?php break; ?>
 
     <!-- ///////////////////////////// Forum here /////////////////////// -->
-<?php case 'Forum': ?>
-    <?php $forum = $item[key($item)]; ?>
+<?php case 'Forum':?>
+    <?php $forum = $item[key($item)] ?>
     <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
         <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
             <div class="item">
             <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
         <div class="title">
-            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
-                    <?php echo $forum->name ?></a></b>
+            <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+            <?php echo $forum->name ?></a></b>
+
         </div>
         <div class="itemsum">
             <p><p>&nbsp;<?php echo $forum->description ?></p></p>
@@ -506,7 +507,7 @@ case 'Assessment': ?>
                                 <div class="item">
                                 <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
                             <div class="title">
-                                <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
+                                <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
                                         <?php echo $forum->name ?></a></b>
                             </div>
                             <div class="itemsum"><p>
