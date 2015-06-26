@@ -472,7 +472,9 @@ echo $html;
 
     <!-- Calender Here-->
 <?php case 'Calendar':?>
-    <pre><a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?id='.$item['Calendar'].'&block='.$parent.'&cid='.$course->id.'&remove='.true); ?>">Delete</a> | <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress'); ?>">Manage Events</a></pre>
+    <pre><a href="<?php echo AppUtility::getURLFromHome(
+            'instructor','instructor/index?id='.$item['Calendar'].'&block='.$parent.'&cid='.$course->id.'&remove='.true); ?>">Delete</a> | <a href="
+            <?php echo AppUtility::getURLFromHome('instructor','instructor/manage-events?cid='.$course->id); ?>">Manage Events</a></pre>
     <div class ='calendar'>
         <div id="demo">
         </div>

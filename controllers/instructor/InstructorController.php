@@ -4,6 +4,7 @@ namespace app\controllers\instructor;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\models\CalItem;
 use app\models\Course;
 use app\models\Message;
 use app\models\AssessmentSession;
@@ -23,6 +24,7 @@ use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Wiki;
 use app\models\User;
+use app\models\forms\ManageEventForm;
 use Yii;
 use app\controllers\AppController;
 
@@ -37,6 +39,11 @@ class InstructorController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseData = $this->getRequestParams();
+        $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
+        if (!($teacherId)) {
+            echo AppConstant::UNAUTHORIZED_ACCESS;
+            exit;
+        }
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $courseId = $this->getParamVal('cid');
@@ -57,7 +64,7 @@ class InstructorController extends AppController
          */
         if ($course && !isset($courseData['tb']) && !isset($courseData['remove'])) {
             $itemOrders = unserialize($course->itemorder);
-            if (count($itemOrders)) {
+            if ($itemOrders) {
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
                     if (is_array($itemOrder)) {
@@ -153,19 +160,19 @@ class InstructorController extends AppController
             $itemCalender = new Items();
             $itemId = $itemCalender->create($courseId,$calender);
             $items = unserialize($course['itemorder']);
-            $blockTree = explode('-',$block);
-            $sub =& $items;
-            for ($i=1;$i<count($blockTree);$i++) {
-                $sub =& $sub[$blockTree[$i]-1]['items'];
-            }
-            if ($filter=='b') {
-                $sub[] = $itemId;
-            } else if ($filter=='t') {
-                array_unshift($sub,$itemId);
-            }
-            $itemOrder = addslashes(serialize($items));
-            Course::setItemOrder($itemOrder, $courseId);
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
+                    $blockTree = explode('-',$block);
+                    $sub =& $items;
+                    for ($i=1;$i<count($blockTree);$i++) {
+                        $sub =& $sub[$blockTree[$i]-1]['items'];
+                    }
+                    if ($filter=='b') {
+                        $sub[] = $itemId;
+                    } else if ($filter=='t') {
+                        array_unshift($sub,$itemId);
+                    }
+                    $itemOrder = addslashes(serialize($items));
+                    Course::setItemOrder($itemOrder, $courseId);
+                    return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
             }
             /*
              *Delete calendar
@@ -280,7 +287,6 @@ class InstructorController extends AppController
         $starttime = time();
         $deffeedbacktext = addslashes($assessment->deffeedbacktext);
         $ltisourcedid = '';
-
         $param['questions'] = $qlist;
         $param['seeds'] = $seedlist;
         $param['userid'] = $id;
@@ -339,6 +345,76 @@ class InstructorController extends AppController
             );
         }
         return $this->successResponse($assessmentArray);
+    }
+
+    public function actionManageEvents()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+
+
+        $eventData = $this->getRequestParams();
+        $courseId = $eventData['cid'];
+        $teacherId = Teacher::getByUserId($user->id, $courseId);
+        if (!($teacherId)) {
+            echo AppConstant::UNAUTHORIZED_ACCESS;
+            exit;
+        }
+        if (isset($eventData['from']) && $eventData['from']=='cal') {
+            $from = 'cal';
+        } else {
+            $from = 'indexPage';
+        }
+        if ($this->isPost()) {
+            //delete any marked for deletion
+            if (isset($eventData['delete']) && count($eventData['delete'])>0) {
+                foreach ($eventData['delete'] as $id=>$val) {
+                    if($val == AppConstant::NUMERIC_ONE){
+                        CalItem::deleteByCourseId($id,$courseId);
+                    }
+                }
+            }
+
+            if (isset($eventData['tag']) && count($eventData['tag'])>0) {
+                foreach ($eventData['tag'] as $id=>$tag) {
+                    $date = $eventData['EventDate'.$id];
+                    $title = $eventData['eventDetails'][$id];
+                    preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
+                    $date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+                    CalItem::setEvent($date,$tag,$title,$id);
+                }
+            }
+
+            //add new
+            if (trim($eventData['ManageEventForm']['newEventDetails'])!='' || $eventData['ManageEventForm']['newTag'] != '!') {
+                $date = $eventData['startDate'];
+                $tag = $eventData['ManageEventForm']['newTag'];
+                $title = $eventData['ManageEventForm']['newEventDetails'];
+                preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
+                $newdate = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+                $items = new CalItem();
+                $items->createEvent($newdate,$tag,$title,$courseId);
+            }
+
+            if ($eventData['Submit']=='Save') {
+                if ($from=='indexPage') {
+                    return $this->redirect('index?cid='. $courseId);
+                } else {
+
+//                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showcalendar.php?cid=$cid");
+                }
+                exit;
+            }else{
+                return $this->redirect('manage-events?cid='. $courseId);
+            }
+        }
+        $model = new ManageEventForm();
+        $course = Course::getById($courseId);
+        $eventItems = CalItem::getByCourse($courseId);
+        $returnData = array('course' => $course, 'eventItems'=> $eventItems, 'model' => $model);
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+        return $this->renderWithData('manageEvent',$returnData);
     }
 }
 

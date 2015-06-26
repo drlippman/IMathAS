@@ -77,6 +77,7 @@ class MessageController extends AppController
                 $message = new Message();
                 $message->create($params, $userId);
             }
+            $this->setSuccessFlash('Message sent successfully.');
             return $this->successResponse();
         }
     }
@@ -338,6 +339,7 @@ class MessageController extends AppController
                     $message = new Message();
                     $message->createReply($params);
                 }
+                $this->setSuccessFlash('Message sent successfully.');
                 return $this->successResponse();
             }
         }

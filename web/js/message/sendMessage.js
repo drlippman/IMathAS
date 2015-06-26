@@ -40,7 +40,6 @@ function sendMessage(response)
         var result = JSON.parse(response);
         if(result.status == 0)
         {
-            alert('Message sent successfully')
             window.location = "index?cid="+cid;
         }
 }
