@@ -33,7 +33,7 @@ $this->title = 'Change student Information';
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => 'change-student-information?cid='.$courseId.'&uid='.$userId,
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-2\">{error}</div>",
                 'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
             ],
         ]); ?>

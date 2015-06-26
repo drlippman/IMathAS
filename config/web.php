@@ -11,7 +11,7 @@ $config = [
             'class' => 'app\module\api\apiModule',
         ],
     ],
-    'language' => 'fr',
+    'language' => 'en',
     'sourceLanguage' => 'en_us',
 
     'components' => [
