@@ -73,9 +73,8 @@ function calendar() {
                 success: function (response) {
                     response = JSON.parse(response);
 
-
                     var assessmentData = response.data;
-                    console.log(assessmentData.calendarLinkArray);
+                    console.log(assessmentData.$calendarInlineTextArray);
                     var events = [];
                     $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';
@@ -119,6 +118,9 @@ function calendar() {
                             });
                         }
                     });
+                    /**
+                     * Display Managed events by admin
+                     */
                     $.each(assessmentData.calendarArray, function (index, calendarItem) {
                         var eventColor = '#00FFCC';
 //                        console.log(calendarItem);
@@ -128,6 +130,7 @@ function calendar() {
                                 title: calendarItem.tag,
                                 start: calendarItem.date,
                                 tagTitle:calendarItem.title,
+                                message: 'Managed Events',
                                 color: eventColor,
                                 calItem: true
 
@@ -135,27 +138,50 @@ function calendar() {
 
                         }
                     });
-                    console.log(assessmentData.calendarLinkArray);
+                    /**
+                     * Display Linked text's tag on enddate with title as URL
+                     */
                     $.each(assessmentData.calendarLinkArray, function (index, calendarLinkItem) {
                         var eventColor = '#59FF59';
                         if(calendarLinkItem.startDateString < calendarLinkItem.now && calendarLinkItem.endDateString > calendarLinkItem.now)
                         {
-
                             events.push({
                                 title: calendarLinkItem.calTag,
-                                start: calendarLinkItem.startDate,
-                                end: calendarLinkItem.endDate,
+                                linkTitle: calendarLinkItem.title,
+                                start: calendarLinkItem.endDate,
+                                linkedId: calendarLinkItem.linkedId,
                                 color: eventColor,
+                                courseId: calendarLinkItem.courseId,
+                                message: 'Linked text events',
                                 calLinkItem: true
 
                             });
+                        }
+                    });
+                    /**
+                     * Display Inline text on calendar
+                     */
+                    $.each(assessmentData.calendarInlineTextArray, function (index, calendarInlineTextItem) {
+                        var eventColor = '#FF6666';
+                        if(calendarInlineTextItem.startDateString < calendarInlineTextItem.now && calendarInlineTextItem.endDateString > calendarInlineTextItem.now)
+                        {
+                            events.push({
+                                title: calendarInlineTextItem.calTag,
+                                start: calendarInlineTextItem.endDate,
+                                color: eventColor,
+                                message: 'Inline text events',
+                                calInlineTextItem: true
 
+                            });
                         }
                     });
                     callback(events);
                 }
             });
         },
+        /**
+         * Onclick event
+         */
         eventClick:  function(event, jsEvent, view) {
             /**
              * If assessment is in review mode, dialog pop up
@@ -173,7 +199,7 @@ function calendar() {
                             $(this).dialog('close');
                             return false;
                         }
-                }
+                    }
                 });
             }
             /**
@@ -195,6 +221,9 @@ function calendar() {
                     }
                 });
             }
+            /**
+             * Managed event by admin pop up.
+             */
             else if(event.calItem == true)
             {
                 $("#demo").empty();
@@ -211,6 +240,21 @@ function calendar() {
                 });
             }
             else if(event.calLinkItem == true)
+            {
+                $("#demo").empty();
+                var tag = event.title;
+                var title = "<a class='link'style='color: #0000ff' href='../../course/course/show-linked-text?cid="+event.courseId+"&id="+event.linkedId+" '>"+event.linkTitle+"</a>";
+                $("#demo").append("<div> "+tag+"<br>"+title+"</div>");
+                $("#demo").dialog({ modal: true, title: event.message, width:350,
+                    buttons: {
+                        "Ok": function() {
+                            $(this).dialog('close');
+                            return false;
+                        }
+                    }
+                });
+            }
+            else if(event.calInlineTextItem == true)
             {
                 $("#demo").empty();
                 var tag = event.title;

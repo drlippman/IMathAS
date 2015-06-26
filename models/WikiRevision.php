@@ -42,7 +42,6 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getRevisionTotalData($wikiId, $stugroupid, $userId)
     {
-//        $query = \Yii::$app->db->createCommand("SELECT i_w_r.id,i_w_r.userid,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName FROM  imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid='$wikiId' AND i_w_r.stugroupid='$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
         $query = \Yii::$app->db->createCommand("SELECT i_w_r.id as revision_id,i_w_r.revision,i_w_r.time,i_u.LastName,i_u.FirstName,i_u.id as user_id FROM imas_wiki_revisions as i_w_r JOIN imas_users as i_u ON i_u.id=i_w_r.userid WHERE i_w_r.wikiid= '$wikiId' AND i_w_r.stugroupid= '$stugroupid' ORDER BY i_w_r.id DESC")->queryAll();
         return $query;
     }

@@ -42,9 +42,11 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $userId = $user->id;
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $cid = $this->getParamVal('cid');
+        $exception = Exceptions::getTotalData($userId);
         $responseData = array();
         $calendarCount = array();
         $course = Course::getById($cid);
@@ -98,9 +100,14 @@ class CourseController extends AppController
                         $item = Items::getById($itemOrder);
                         switch ($item->itemtype) {
                             case 'Assessment':
-                                    $assessment = Assessments::getByAssessmentId($item->typeid);
-//                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
-//                                AppUtility::dump($exception);
+                                $assessment = Assessments::getByAssessmentId($item->typeid);
+                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
+                                if($exception)
+                                {
+                                    $assessment->startdate = $exception->startdate;
+                                    $assessment->enddate = $exception->enddate;
+//                                    $tempAray['exception'] = array('exceptionStartdate' =>$exceptionStartDate, 'exceptionEnddate' =>$exceptionEndDate);
+                                }
                                     $tempAray[$item->itemtype] = $assessment;
                                     array_push($responseData, $tempAray);
                                     array_push($calendarCount, $assessment);
@@ -154,7 +161,7 @@ class CourseController extends AppController
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList);
+        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
     }
 
@@ -596,6 +603,7 @@ class CourseController extends AppController
         $assessments = Assessments::getByCourseId($cid);
         $calendarItems = CalItem::getByCourseId($cid);
         $CalendarLinkItems = Links::getByCourseId($cid);
+        $calendarInlineTextItems = InlineText::getByCourseId($cid);
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -628,14 +636,30 @@ class CourseController extends AppController
         {
             $calendarLinkArray[] = array(
                 'courseId' => $CalendarLinkItem['courseid'],
+                'title' => $CalendarLinkItem['title'],
                 'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $CalendarLinkItem['startdate'],
                 'endDateString' => $CalendarLinkItem['enddate'],
+                'linkedId' => $CalendarLinkItem['id'],
                 'calTag' => $CalendarLinkItem['caltag']
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray);
+
+        $calendarInlineTextArray = array();
+        foreach ($calendarInlineTextItems as $calendarInlineTextItem)
+        {
+            $calendarInlineTextArray[] = array(
+                'courseId' => $calendarInlineTextItem['courseid'],
+                'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
+                'startDateString' => $calendarInlineTextItem['startdate'],
+                'endDateString' => $calendarInlineTextItem['enddate'],
+                'calTag' => $calendarInlineTextItem['caltag']
+            );
+        }
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
         return $this->successResponse($responseData);
     }
 

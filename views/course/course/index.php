@@ -9,6 +9,12 @@ $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 
 echo $this->render('_toolbar',['course'=> $course]);
+//$exceptions;
+//if($exception != '')
+//{
+//        $exceptions['id'] = $exception;
+//}
+
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 
@@ -26,9 +32,11 @@ echo $this->render('_toolbar',['course'=> $course]);
 <!-- ////////////////// Assessment here //////////////////-->
 <?php if(count($courseDetail)){
 foreach($courseDetail as $key => $item){
+
 switch(key($item)):
 case 'Assessment': ?>
     <?php $assessment = $item[key($item)];
+
     if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
         ?>
         <div class="item">
@@ -53,7 +61,8 @@ case 'Assessment': ?>
                             <?php } else {?>
 <!--                                --><?php //echo "<p>You have no late passes remaining.</p>";?>
                             <?php }?>
-                        <?php }?>
+                        <?php }
+//                        }?>
                     <?php } else {?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
@@ -996,4 +1005,52 @@ case 'Assessment': ?>
     });
 
 </script>
-
+<?php
+//
+//    function upsendexceptions(&$items) {
+//    global $exceptions;
+//    $minsdate = 9999999999;
+//    $maxedate = 0;
+//    foreach ($items as $k=>$item) {
+//    if (is_array($item)) {
+//    $hasexc = upsendexceptions($items[$k]['items']);
+//
+//    if ($hasexc!=FALSE) {
+//    if ($hasexc[0]<$items[$k]['startdate']) {
+//
+//    $items[$k]['startdate'] = $hasexc[0];
+//    }
+//    if ($hasexc[1]>$items[$k]['enddate']) {
+//    $items[$k]['enddate'] = $hasexc[1];
+//
+//    }
+//    //return ($hasexc);
+//    if ($hasexc[0]<$minsdate) {
+//    $minsdate = $hasexc[0];
+//    }
+//    if ($hasexc[1]>$maxedate) {
+//    $maxedate = $hasexc[1];
+//    }
+//    }
+//    } else {
+//    if (isset($exceptions[$item])) {
+//    // return ($exceptions[$item]);
+//
+//    if ($exceptions[$item][0]<$minsdate) {
+//
+//    $minsdate = $exceptions[$item][0];
+//    }
+//    if ($exceptions[$item][1]>$maxedate) {
+//
+//    $maxedate = $exceptions[$item][1];}
+//    }
+//    }
+//    }
+//    if ($minsdate<9999999999 || $maxedate>0) {
+//    return (array($minsdate,$maxedate));
+//    } else {
+//    return false;
+//    }
+//    }
+//?>
+<!---->
