@@ -33,7 +33,7 @@ class BaseImasGrades extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['gradetypeid', 'userid', 'feedback'], 'required'],
+//            [['gradetypeid', 'userid', 'feedback'], 'required'],
             [['gradetypeid', 'refid', 'userid'], 'integer'],
             [['score'], 'number'],
             [['feedback'], 'string'],

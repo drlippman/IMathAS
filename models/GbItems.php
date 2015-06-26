@@ -18,7 +18,7 @@ class GbItems extends BaseImasGbitems
 {
     public function createGbItemsByCourseId($courseId,$params)
     {
-        AppUtility::dump($params['AddGradesForm']['TutorAccess']);
+//        AppUtility::dump($params['AddGradesForm']['TutorAccess']);
         $this->courseid = $courseId;
         $name = $params['AddGradesForm']['Name'];
         $this->name = isset($name) ? $name : null;
@@ -30,11 +30,11 @@ class GbItems extends BaseImasGbitems
         }
         $this->showdate = $showdate;
         $this->gbcategory = $params['AddGradesForm']['GradeBookCategory'];
+        $this ->rubric = $params['rubric'];
         $this->cntingb = $params['AddGradesForm']['Count'];
         $this->tutoredit = $params['AddGradesForm']['TutorAccess'];
-
-
         $this->save();
+        return $this->id;
     }
 
 

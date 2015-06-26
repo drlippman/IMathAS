@@ -16,6 +16,7 @@ class AddGradesForm extends Model
     public $AssessmentSnapshot;
     public $AddReplaceGrades;
     public $AssessmentToSnapshot;
+    public $Gradetype;
 
 
     /**

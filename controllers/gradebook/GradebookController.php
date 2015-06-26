@@ -5,6 +5,7 @@ namespace app\controllers\gradebook;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasDiags;
+use app\models\_base\BaseImasGrades;
 use app\models\Assessments;
 use app\models\Course;
 use app\models\Diags;
@@ -12,8 +13,10 @@ use app\models\forms\AddGradesForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\GbItems;
 use app\models\GbScheme;
+use app\models\Grades;
 use app\models\Items;
 use app\models\loginTime;
+use app\models\Rubrics;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
@@ -232,10 +235,14 @@ class GradebookController extends AppController
     {
         $model = new AddGradesForm();
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
+        $currentUser = $this->getAuthenticatedUser();
+//        $user = $this->getAuthenticatedUser();
+//        AppUtility::dump($currentUser['id']);
         $courseId = $this->getParamVal('cid');
         $studentData = Student::findByCid($courseId);
         $course = Course::getById($courseId);
+        $rubricsData = Rubrics::getByUserId($currentUser['id']);
+//        AppUtility::dump($rubricsData);
         $studentArray = array();
         if ($studentData) {
             foreach ($studentData as $student) {
@@ -249,15 +256,38 @@ class GradebookController extends AppController
         }
         if($this->isPost()){
             $params = $_POST;
-//            AppUtility::dump($params);
-            $GbItems = new GbItems();
-            $GbItems->createGbItemsByCourseId($courseId,$params);
-            $responseData = array('course' => $course, 'user' => $user);
+//            AppUtility::dump($params['rubric']);
+            $gbItems = new GbItems();
+            $gbItemsId = $gbItems->createGbItemsByCourseId($courseId,$params);
+//            AppUtility::dump();
+            if($params['grade_text'] || $params['feedback_text']){
+
+                $gradeTextArray = array();
+                foreach($params['grade_text'] as $index => $grade)
+                {
+                    foreach($params['feedback_text'] as $key => $feedback) {
+                        if($index == $key){
+                        $tempArray = array(
+                            'studentId' => $index,
+                            'gradeText' => $grade,
+                            'feedbackText' => $feedback,
+                        );
+                        array_push($gradeTextArray, $tempArray);
+                        }
+                    }
+                }
+                foreach($gradeTextArray as $single){
+                    $grades = new Grades();
+                    $grades->createGradesByUserId($single,$gbItemsId);
+                }
+
+            }
+            $responseData = array('course' => $course, 'user' => $currentUser);
             return $this->renderWithData('gradebook', $responseData);
         }
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ,'gradebook/addgrades.js','roster/managelatepasses.js']);
-        $responseData = array('model' => $model,'studentInformation' => $studentArray,'course' => $course);
+        $responseData = array('model' => $model,'studentInformation' => $studentArray,'course' => $course,'rubricsData' => $rubricsData);
         return $this->renderWithData('addGrades', $responseData);
 
     }
