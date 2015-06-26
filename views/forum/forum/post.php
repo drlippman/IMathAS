@@ -97,8 +97,9 @@ $currentLevel = 0;
         <div class=block id="<?php echo $data['id']?>"><span class="leftbtns">
                 <?php if($data['hasImg'] == 1){ ?>
                 <img class="circular-profile-image" id="img<?php echo $imgCount?>"src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl?>" onclick=changeProfileImage(this,<?php echo $data['id']?>); /> </span>
-                <?php }else{?>
-                <img class="circular-profile-image" id="img"src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
+                <?php }else
+                {?>
+                <img class="circular-profile-image" id="img"src="<?php echo AppUtility::getAssetURL()?>Uploads/dummy_profile.jpg"/></span>
                 <?php }?>
                         <span class=right>
                       <?php if ($data['userRights'] >= AppConstant::STUDENT_RIGHT && $data['posttype'] != AppConstant::NUMERIC_TWO) {
