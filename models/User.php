@@ -99,6 +99,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         {
             $params['password'] = AppUtility::passwordHash($params['password']);
         }
+        $user->SID = $params['Username'];
         $user->attributes = $params;
          $user->save();
     }
