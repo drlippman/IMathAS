@@ -383,7 +383,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $currentUser = $this->getAuthenticatedUser();
 
-        $courseId=$this->getParamVal('cid');
+        $courseId=$this->getParamVal('courseid');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $prev = $this->getParamVal('prev');
@@ -513,7 +513,7 @@ class ForumController extends AppController
    public function actionReplyPost()
    {
        $this->guestUserHandler();
-       $courseId = $this->getParamVal('cid');
+       $courseId = $this->getParamVal('courseid');
        $course = Course::getById($courseId);
        $forumId = $this->getParamVal('forumid');
        $Id = $this->getParamVal('id');

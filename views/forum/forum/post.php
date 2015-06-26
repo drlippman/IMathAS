@@ -4,19 +4,20 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = 'Post';
-if ($currentUser->rights > AppConstant::STUDENT_RIGHT)
-{
-
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else
-{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
+//
+//if ($currentUser->rights > AppConstant::STUDENT_RIGHT)
+//{
+//
+//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+//}
+//else
+//{
+//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
+//}
+////$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
+//
+//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
 
@@ -108,7 +109,7 @@ $currentLevel = 0;
                           } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
                           <a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a><?php } ?>
 
-                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?cid='.$course->id.'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
+                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid='.$course->id.'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">
                               Reply</a>
 
                       <?php } else if ($data['posttype'] == AppConstant::NUMERIC_TWO) {
@@ -118,7 +119,7 @@ $currentLevel = 0;
                               <a href="<?php echo AppUtility::getURLFromHome('forum','forum/move-thread?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Move</a>&nbsp;<a href="<?php echo AppUtility::getURLFromHome('forum','forum/modify-post?forumId='.$data['forumiddata'].'&courseId='.$course->id.'&threadId='.$data['id']); ?>">Modify</a>&nbsp;<a href="#" name="remove" data-var="<?php echo $data['id']?>" class="mark-remove" >Remove</a><?php } ?>
                       <?php } else if ($data['posttype'] < strtotime(date('F d, o g:i a')) && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
 
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?cid='.$course->id .'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">Reply</a>
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid='.$course->id .'&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumiddata']); ?>">Reply</a>
 
                       <?php } ?>
                             <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"
