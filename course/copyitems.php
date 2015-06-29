@@ -34,7 +34,7 @@ if (!(isset($teacherid))) {
 		$query .= " AND imas_teachers.userid='$userid' AND imas_courses.id='{$_POST['ctc']}'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());
 		if (mysql_num_rows($result)==0) {
-			$query = "SELECT enrollkey,copyrights FROM imas_courses WHERE id='{$_POST['ctc']}'";
+			$query = "SELECT enrollkey,copyrights,termsurl FROM imas_courses WHERE id='{$_POST['ctc']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$copyrights = mysql_result($result,0,1)*1;
 			if ($copyrights<2) {
@@ -59,6 +59,22 @@ if (!(isset($teacherid))) {
 						$oktocopy = 1;
 					}
 				}
+			}
+		}
+		$query = "SELECT termsurl FROM imas_courses WHERE id='{$_POST['ctc']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$termsurl = mysql_result($result,0,0);
+		if ($termsurl != '' && $_GET['action']=="select") {
+			if (!isset($_POST['termsagree'])) {
+				$oktocopy = 0;
+				$overwriteBody = 1;
+				$body = "Must agree to course terms of use to copy it.  <a href=\"copyitems.php?cid=$cid\">Try Again</a>";
+			} else {
+				$now = time();
+				$ctc = intval($_POST['ctc']);
+				$userid = intval($userid);
+				$query = "INSERT INTO imas_log (time,log) VALUES($now,'User $userid agreed to terms of use on course $cid')";
+				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
 		}
 	} 
@@ -364,37 +380,59 @@ if (!(isset($teacherid))) {
 				}
 			}	
 			
-			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
 			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
 			$courseGroupResults = mysql_query($query) or die("Query failed : $query: " . mysql_error());
 			
 			
 		} else { //DATA MANIPULATION FOR DEFAULT LOAD
 		
-			$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$i=0;
+			$query = "SELECT ic.id,ic.name,ic.termsurl FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' and ic.id<>'$cid' AND ic.available<4 ORDER BY ic.name";
+			$myCourseResult = mysql_query($query) or die("Query failed : " . mysql_error());
+		/*	$i=0;
 			$page_mineList = array();
 			while ($row = mysql_fetch_row($result)) {
 				$page_mineList['val'][$i] = $row[0];
 				$page_mineList['label'][$i] = $row[1];
 				$i++;
 			}	
-			
-			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
+		*/	
+			$query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,ic.termsurl FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
 			$query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupid' AND iu.id<>'$userid' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
 			$courseTreeResult = mysql_query($query) or die("Query failed : " . mysql_error());
 			$lastteacher = 0;
 			
 			
 			//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' AND ic.available<4 ORDER BY ic.name";
-			$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
+			$query = "SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
 			$courseTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 			
-			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+			$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
 			$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 			$groupTemplateResults = mysql_query($query) or die("Query failed : " . mysql_error());
 		}
+	}
+}
+function writeCourseInfo($line, $skipcopyright = false) {
+	$itemclasses = array();
+	if ($line['copyrights']<2 && !$skipcopyright) {
+		$itemclasses[] = 'copyr';
+	} 
+	if ($line['termsurl']!='') {
+		$itemclasses[] = 'termsurl';
+	}
+	echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.((count($itemclasses)>0)?'class="'.implode(' ',$itemclasses).'"':'');
+	if ($line['termsurl']!='') {
+		echo ' data-termsurl="'.$line['termsurl'].'"';
+	}
+	echo '>';
+	echo $line['name'];
+	if (!$skipcopyright) {
+		if ($line['copyrights']<2) {
+			echo "&copy;\n"; 
+		} else {
+			echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
+		}	
 	}
 }
 /******* begin html output ********/
@@ -417,13 +455,20 @@ $placeinhead .= '<script type="text/javascript">
 			} else {
 				$("#ekeybox").hide();
 			}
+			if ($(this).hasClass("termsurl")) {
+				$("#termsbox").show();
+				console.log($(this).data("termsurl"));
+				$("#termsurl").attr("href",$(this).data("termsurl"));
+			} else {
+				$("#termsbox").hide();
+			}
 		});
 	});	
 		</script>';
 require("../header.php");
 }
 if ($overwriteBody==1) {
-	echo $body;
+	echo $body;                             
 } else {
 	if (!isset($_GET['loadothers'])) {
 ?>
@@ -648,13 +693,8 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 						<li>
 							<span class=dd>-</span>
 							<?php
-							echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
-							echo $line['name'];
-							if ($line['copyrights']<2) {
-								echo "&copy;\n"; 
-							} else {
-								echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-							}
+							//do class for has terms.  Attach data-termsurl attribute.
+							writeCourseInfo($line);
 							?>  
 						</li>
 	<?php
@@ -688,6 +728,12 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 					} else {
 						$("#ekeybox").hide();
 					}
+					if ($(this).hasClass("termsurl")) {
+						$("#termsbox").show();
+						$("#termsurl").attr("href",$(this).data("termsurl"));
+					} else {
+						$("#termsbox").hide();
+					}
 				});
 			});
 			othersloaded = true;
@@ -711,11 +757,13 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 				<ul class=hide id="mine">
 <?php
 //my items
-		for ($i=0;$i<count($page_mineList['val']);$i++) {
+		while ($line = mysql_fetch_array($myCourseResult, MYSQL_ASSOC)) {
 ?>		
 
 					<li><span class=dd>-</span>
-						<input type=radio name=ctc value="<?php echo $page_mineList['val'][$i] ?>"><?php echo $page_mineList['label'][$i] . "\n" ?>
+						<?php
+						writeCourseInfo($line, true);
+						?> 
 					</li>
 <?php
 		}
@@ -758,13 +806,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 							<li>
 								<span class=dd>-</span>
 								<?php
-								echo '<input type="radio" name="ctc" value="'.$line['id'].'" '.(($line['copyrights']<2)?'class="copyr"':'').'>';
-								echo $line['name'];
-								if ($line['copyrights']<1) {
-									echo "&copy;\n"; 
-								} else {
-									echo " <a href=\"course.php?cid={$line['id']}\" target=\"_blank\">Preview</a>";
-								}
+								writeCourseInfo($line);
 								?>  
 							</li>
 <?php
@@ -803,18 +845,12 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 			<ul class=hide id="template">
 
 <?php			
-			while ($row = mysql_fetch_row($courseTemplateResults)) {
+			while ($line = mysql_fetch_assoc($courseTemplateResults)) {
 ?>			
 				<li>
 					<span class=dd>-</span>
 					<?php
-					echo '<input type="radio" name="ctc" value="'.$row[0].'" '.(($row[2]<2)?'class="copyr"':'').'>';
-					echo $row[1];
-					if ($row[2]<2) {
-						echo "&copy;\n"; 
-					} else {
-						echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
-					}
+					writeCourseInfo($line);
 					?>
 				</li>
 
@@ -835,18 +871,12 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 			<ul class=hide id="gtemplate">
 
 <?php			
-			while ($row = mysql_fetch_row($groupTemplateResults)) {
+			while ($line = mysql_fetch_assoc($groupTemplateResults)) {
 ?>			
 				<li>
 					<span class=dd>-</span>
-					<input type=radio name=ctc value="<?php echo $row[0] ?>">
-					<?php echo $row[1] ?>
-					<?php 
-						if ($row[2]<1) {
-							echo "&copy;\n"; 
-						} else {
-							echo " <a href=\"course.php?cid={$row[0]}\" target=\"_blank\">Preview</a>";
-						}
+					<?php
+					writeCourseInfo($line);
 					?>
 				</li>
 
@@ -860,6 +890,11 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		<p id="ekeybox" style="display:none;">
 		For courses marked with &copy;, you must supply the course enrollment key to show permission to copy the course.<br/>
 		Enrollment key: <input type=text name=ekey id=ekey size=30></p>
+		
+		<p id="termsbox" style="display:none;">
+		This course has additional <a href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>
+		<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</p>
+		
 		<input type=submit value="Select Course Items">
 		<p>&nbsp;</p>
 	</form>

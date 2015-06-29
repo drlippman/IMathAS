@@ -75,6 +75,17 @@ if (isset($_POST['createcourse'])) {
 	if (mysql_num_rows($result)>0) {
 		$cid = intval($_POST['createcourse']);
 	} else {
+		$_POST['createcourse'] = intval($_POST['createcourse']);
+		//log terms agreement if needed
+		$query = "SELECT termsurl FROM imas_courses WHERE id='{$_POST['createcourse']}'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$row = mysql_fetch_row($result);
+		if ($row[0]!='') { //has terms of use url
+			$now = time();
+			$userid = intval($userid);
+			$query = "INSERT INTO imas_log (time,log) VALUES($now,'User $userid agreed to terms of use on course {$_POST['createcourse']}')";
+			mysql_query($query) or die("Query failed : " . mysql_error());	
+		}
 		//creating a copy of a template course
 		$blockcnt = 1;
 		$itemorder = addslashes(serialize(array()));
@@ -197,10 +208,21 @@ if ($hasplacement && $placementtype=='course') {
 $pagetitle = "LTI Home";
 require("header.php");
 if (!$hascourse || isset($_GET['chgcourselink'])) {
+	echo '<script type="text/javscript">
+	function updateCourseSelector(el) {
+		if ($(el).find(":selected").data("termsurl")) { 
+			$("#termsbox").show(); 
+			$("#termsurl").attr("href",$(el).find(":selected").data("termsurl")); 
+		}
+		else { 
+			$("#termsbox").hide();
+		}
+	}
+	</script>';
 	echo '<h3>Link courses</h3>';
 	echo '<form method="post" action="ltihome.php">';
 	echo "<p>This course on your LMS has not yet been linked to a course on $installname.";
-	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse"> ';
+	echo 'Select a course to link with.  If it is a template course, a copy will be created for you:<br/> <select name="createcourse" onchange="updateCourseSelector(this)"> ';
 	$query = "SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userid' AND ic.available<4 ORDER BY ic.name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
@@ -211,17 +233,22 @@ if (!$hascourse || isset($_GET['chgcourselink'])) {
 		echo '</optgroup>';
 	}
 	
-	$query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
+	$query = "SELECT id,name,copyrights,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		echo '<optgroup label="Template Courses">';
 		while ($row = mysql_fetch_row($result)) {
-			echo '<option value="'.$row[0].'">'.$row[1].'</option>';
+			echo '<option value="'.$row[0].'"';
+			if ($row[3]!='') {
+				echo ' data-termsurl="'.$row[3].'"';
+			}
+			echo '>'.$row[1].'</option>';
 		}
 		echo '</optgroup>';
 	}
 	
 	echo '</select>';
+	echo '<p id="termsbox" style="display:none;">This course has special <a id="termsurl">Terms of Use</a>.  By copying this course, you agree to these terms.</p>';
 	echo '<input type="Submit" value="Create"/>';
 	echo "<p>If you want to create a new course, log directly into $installname to create new courses</p>";
 	echo '</form>';

@@ -500,21 +500,32 @@ switch($_GET['action']) {
 			//$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
 			$globalcourse = array();
 			$groupcourse = array();
-			$query = "SELECT id,name,copyrights,istemplate FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name";
+			$terms = array();
+			$query = "SELECT id,name,copyrights,istemplate,termsurl FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$globalcourse[$row[0]] = $row[1];
+				if ($row[4]!='') {
+					$terms[$row[0]] = $row[4];
+				}
 			}
-			$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+			$query = "SELECT ic.id,ic.name,ic.copyrights,ic.termsurl FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
 			$query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			while ($row = mysql_fetch_row($result)) {
 				$groupcourse[$row[0]] = $row[1];
+				if ($row[3]!='') {
+					$terms[$row[0]] = $row[3];
+				}
 			}
 			if (count($groupcourse)>0) {
 				echo '<optgroup label="Group Templates">';
 				foreach ($groupcourse as $id=>$name) {
-					echo '<option value="'.$id.'">'.$name.'</option>';
+					echo '<option value="'.$id.'"';
+					if (isset($terms[$id])) {
+						echo ' data-termsurl="'.$terms[$id].'"';
+					}
+					echo '>'.$name.'</option>';
 				}
 				echo '</optgroup>';
 			}
@@ -523,18 +534,27 @@ switch($_GET['action']) {
 					echo '<optgroup label="System-wide Templates">';
 				}
 				foreach ($globalcourse as $id=>$name) {
-					echo '<option value="'.$id.'">'.$name.'</option>';
+					echo '<option value="'.$id.'"';
+					if (isset($terms[$id])) {
+						echo ' data-termsurl="'.$terms[$id].'"';
+					}
+					echo '>'.$name.'</option>';
 				}
 				if (count($groupcourse)>0) {
 					echo '</optgroup>';
 				}
 			}
-			
-			echo '</select><span id="templatepreview"></span></span><br class="form" />';
+			echo '</select><span id="templatepreview"></span>';
+			echo '<span id="termsbox" style="display:none;"><br/>';
+			echo 'This course has additional <a href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>';
+			echo '<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</span>';
+			echo '</span><br class="form" />';
 			echo '<script type="text/javascript"> function templatepreviewupdate(el) {';
 			echo '  var outel = document.getElementById("templatepreview");';
 			echo '  if (el.value>0) {';
-			echo '  outel.innerHTML = "<a href=\"'.$imasroot.'/course/course.php?cid="+el.value+"\" target=\"preview\">Preview</a>";';
+			echo '    outel.innerHTML = "<a href=\"'.$imasroot.'/course/course.php?cid="+el.value+"\" target=\"preview\">Preview</a>";';
+			echo '    if ($(el).find(":selected").data("termsurl")) { $("#termsbox").show(); $("#termsurl").attr("href",$(el).find(":selected").data("termsurl")); }';
+			echo '      else { $("#termsbox").hide(); }';
 			echo '  } else {outel.innerHTML = "";}';
 			echo '}</script>';
 		}
