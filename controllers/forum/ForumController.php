@@ -177,7 +177,7 @@ class ForumController extends AppController
 
                     }
                 }
-            }else if ($isValue == 2 || $isValue == 3)
+            }else if ($isValue == AppConstant::NUMERIC_TWO || $isValue == AppConstant::NUMERIC_THREE)
             {
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
@@ -185,7 +185,7 @@ class ForumController extends AppController
                     $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid']);
-                    if ($thread['postdate'] >=$lastView[0]['lastview'] && $currentUser['id'] != $username->id) {
+                    if ($thread['postdate'] >=$lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id) {
                         $temparray = array
                         (
                             'parent' => $thread['parent'],
@@ -458,7 +458,7 @@ class ForumController extends AppController
             $tempArray['studentCount'] = $studentCount;
             $tempArray['teacherCount'] = $teacherCount;
             $tempArray['likecnt'] =count($likecnt);
-            $tempArray['lastview'] = $isNew[0]['lastview'];
+            $tempArray['lastview'] = $isNew[AppConstant::NUMERIC_ZERO]['lastview'];
             $tempArray['message'] = $postdata['message'];
             $tempArray['level'] = $titleLevel['level'];
             $tempArray['replyby'] = $postdata['replyby'];
@@ -688,6 +688,7 @@ class ForumController extends AppController
             $searchpost = array();
             foreach ($query as $data)
             {
+
                 if($forumid == $data['forumid'])
                 {
                     $username = User::getById($data['userid']);
@@ -696,6 +697,7 @@ class ForumController extends AppController
                     $temparray = array
                     (
                         'forumiddata' => $data['forumid'],
+                        'threadId' => $data['threadid'],
                         'subject' => $data['subject'],
                         'views' => $data['views'],
                         'forumname' => ucfirst($forumname->name),
@@ -821,15 +823,13 @@ class ForumController extends AppController
         if ($this->isPost())
         {
 
-            if($like == 0)
+            if($like == AppConstant::NUMERIC_ZERO)
             {
                 $like = new ForumLike();
                 $like->InsertLike($params,$userId);
 
-//                $count = new ForumLike();
-//                $count->checkCOunt($params);
             }
-            elseif($like == 1)
+            elseif($like == AppConstant::NUMERIC_ONE)
             {
                 $like = new ForumLike();
                 $like->DeleteLike($params,$userId);

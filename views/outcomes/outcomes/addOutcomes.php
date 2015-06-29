@@ -13,39 +13,34 @@ $this->params['breadcrumbs'][] = $this->title;
 <a href="#">View Outcomes Report</a>
 </div>
 <div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups.
-<input type="button" class="btn btn-primary" id="Save-changes" disabled="disabled" value="Save Changes" onclick="submitChanges()">
-<span id="submitnotice" style="color:red;"></span>
+<input type="button" class="btn btn-primary" id="Save-changes"  value="Save Changes">
+<input type="hidden" id="course-id" value="<?php echo $courseid?>">
 </div>
 <div><ul id="qviewtree" class="qview"></ul></div>
 <button  onclick=addoutcomegrp() class="btn btn-primary ">Add Outcome Group</button>
 <button  onclick=addoutcome() class="btn btn-primary ">Add Outcome</button>
 <style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>
+
 <script>
+
+    var cnt=0;
     function addoutcomegrp(){
         var html = '<li class="blockli" id="newgrp"><span class=icon style="background-color:#66f">G</span>';
-        html += '<input class="outcome" type="text" size="60" id="newg" onkeyup=txtchg()> ';
+        html += '<input class="outcome" type="text" size="60" id="newgrp'+cnt+'" > ';
         html += '<a href="#" onclick=removeoutcomegrp(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
+        $("#newgrp"+cnt).focus();
+        cnt++;
 
-//        ("#newgrp"+cnt).focus();
-//        if (!sortIt.haschanged) {
-//            sortIt.haschanged = true;
-//            sortIt.fireEvent('onFirstChange', null);
-//            window.onbeforeunload = function() {return unsavedmsg;}
-//        }
     }
     function addoutcome() {
         var html = '<li id="newocnt"><span class=icon style="background-color:#0f0">O</span>';
-        html += '<input class="outcome" type="text" size="60" id="new" onkeyup=txtchg()>';
+        html += '<input class="outcome" type="text" size="60" id="new'+cnt+'">';
         html += '<a href="#" onclick=removeoutcome(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
-//        j("#new"+ocnt).focus();
-//        ocnt++;
-//        if (!sortIt.haschanged) {
-//            sortIt.haschanged = true;
-//            sortIt.fireEvent(\'onFirstChange\', null);
-//            window.onbeforeunload = function() {return unsavedmsg;}
-//        }
+        $("#new"+cnt).focus();
+        cnt++;
+
     }
     function removeoutcome(el)
     {
@@ -65,17 +60,22 @@ $this->params['breadcrumbs'][] = $this->title;
         });
         deleteoutcome.remove();
     }
-    var unsavedmsg = "You have unrecorded changes.  Are you sure you want to abandon your changes?";
-    function txtchg()
+    $('#Save-changes').click(function()
     {
-        if (!sortIt.haschanged) {
-            sortIt.haschanged = true;
-            sortIt.fireEvent('onFirstChange', null);
-            window.onbeforeunload = function()
-            {
-                return unsavedmsg;
-            }
+     var outcomearray= [];
+        var els = $(".outcome");
+        var courseid = $('#course-id').val();
+        $('#Save-changes').parent().append('<span id="submitnotice" style="color:red;">Saving Changes...</span>');
+        for (var i=0; i<els.length; i++)
+        {
+            var outcome = $('#new' + i).val();
+            outcomearray.push(outcome);
         }
-    }
+        jQuerySubmit('get-outcome-ajax',{outcomearray:outcomearray,courseid:courseid},'outcomeResponse');
+     });
 
+    function outcomeResponse(response)
+    {
+        $('#submitnotice').remove();
+    }
 </script>

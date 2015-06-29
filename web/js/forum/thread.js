@@ -97,6 +97,7 @@ function postSearchUnchecked(response)
         var postData = response.data.data;
         $.each(postData, function(index, Data)
         {
+                    console.log(data);
             var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
             var html = "<div class='block'>";
             html += "<b><label  class='subject'>"+Data.subject+"</label></b>";

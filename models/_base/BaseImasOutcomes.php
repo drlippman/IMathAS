@@ -30,7 +30,7 @@ class BaseImasOutcomes extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'name', 'ancestors'], 'required'],
+//            [['courseid', 'name', 'ancestors'], 'required'],
             [['courseid'], 'integer'],
             [['ancestors'], 'string'],
             [['name'], 'string', 'max' => 255]
