@@ -386,14 +386,15 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				} //end if quoteq
 			}
 		}
-		$query = "SELECT name,settings,forumtype,taglist FROM imas_forums WHERE id='$forumid'";
+		$query = "SELECT name,settings,forumtype,taglist,postinstr,replyinstr FROM imas_forums WHERE id='$forumid'";
 		$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-		$allowanon = mysql_result($result,0,1)%2;
+		$forumsettings = mysql_fetch_assoc($result);
+		$allowanon = $forumsettings['settings']%2;
 		if ($_GET['modify']=='new') {
-			echo mysql_result($result,0,0).'</h2>';
+			echo $forumsettings['name'].'</h2>';
 		}
-		$forumtype = mysql_result($result,0,2);
-		$taglist = mysql_result($result,0,3);
+		$forumtype = $forumsettings['forumtype'];
+		$taglist = $forumsettings['taglist'];
 		if ($replyby!=null && $replyby<2000000000 && $replyby>0) {
 			$replybydate = tzdate("m/d/Y",$replyby);
 			$replybytime = tzdate("g:i a",$replyby);	
@@ -401,7 +402,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$replybydate = tzdate("m/d/Y",time()+7*24*60*60);
 			$replybytime = tzdate("g:i a",time()+7*24*60*60);
 		}
-		
+		if ($forumsettings['postinstr'] != '' && $_GET['modify']=="new") {
+			echo '<h4>'._('Posting Instructions').'</h4>';
+			echo '<div>'.$forumsettings['postinstr'].'</div><br/>';
+		} else if ($forumsettings['replyinstr'] != '' && $_GET['modify']=="reply") {
+			echo '<h4>'._('Reply Instructions').'</h4>';
+			echo '<div>'.$forumsettings['replyinstr'].'</div><br/>';
+		}
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"$returnurl&modify={$_GET['modify']}&replyto={$_GET['replyto']}\">\n";
 		echo '<input type="hidden" name="MAX_FILE_SIZE" value="10485760" />';
 		if (isset($notice) && $notice!='') {
