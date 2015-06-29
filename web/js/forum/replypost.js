@@ -7,6 +7,7 @@ $(document).ready(function ()
 
         tinyMCE.triggerSave();
         var courseid = $(".courseid").val();
+
         var forumid = $(".forumid").val();
         var threadid = $(".threadid").val();
         var subject = $(".subject").val();
@@ -22,6 +23,7 @@ function replyPost(response)
 {
   response = JSON.parse(response);
     var courseId = $(".courseid").val();
+
     var forumId = $(".forumid").val();
     var threadId = $(".threadid").val();
     if(response.status == 0)

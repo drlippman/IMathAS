@@ -1,25 +1,25 @@
 <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
-$this->title = 'Reply';
-//if ($currentUser->rights > AppConstant::STUDENT_RIGHT)
-//{
-//
-//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-//}
-//else
-//{
-//    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' .$course->id]];
-//}
-//$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-//$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumid]];
-//$this->params['breadcrumbs'][] = ['label' => 'post', 'url' => ['/forum/forum/post?cid='.$course->id.'&forumid='.$forumid.'&threadid='.$threadid]];
-$this->params['breadcrumbs'][] = $this->title;
 
+$this->title = 'Reply';
+if ($currentUser->rights > AppConstant::STUDENT_RIGHT)
+{
+
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+}
+else
+{
+    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' .$course->id]];
+}
+    $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
+    $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumid]];
+    $this->params['breadcrumbs'][] = ['label' => 'post', 'url' => ['/forum/forum/post?courseid='.$course->id.'&forumid='.$forumid.'&threadid='.$threadid]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="replypost">
     <input type="hidden" class="forumid" value="<?php echo $forumid ?>">
-    <input type="hidden" class="courseid" value="<?php echo $courseid ?>">
+    <input type="hidden" class="courseid" value="<?php echo $course->id ?>">
     <input type="hidden" class="threadid" value="<?php echo $threadid ?>">
     <input type="hidden" class="parent-id" value="<?php echo $parentId ?>">
     <h2><b>Post Reply</h2>
