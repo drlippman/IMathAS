@@ -14,7 +14,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 <form method="post" action="assign-sections-and-codes?cid=<?php echo $cid ?>">
     <input type="hidden" id="course-id" value="<?php echo $cid ?>">
 
-    <table class="student-data" id="student-data-table">
+    <table class="student-data table table-bordered table-striped table-hover data-table" bPaginate="false" id="student-data-table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -36,5 +36,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         </tbody>
     </table>
     <input type="submit" class="btn btn-primary" id="change-button">
+    <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
 </form>
 

@@ -94,14 +94,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function saveUserRecord($params, $user)
     {
+
         $params = AppUtility::removeEmptyAttributes($params);
         if(isset($params['password']))
         {
             $params['password'] = AppUtility::passwordHash($params['password']);
         }
-        $user->SID = $params['Username'];
         $user->attributes = $params;
-         $user->save();
+        $user->save();
     }
     public static function findByEmail($email)
     {

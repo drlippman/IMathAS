@@ -12,7 +12,7 @@ use kartik\time\TimePicker;
 /* @var $model app\models\changeUserInfoForm */
 $this->title = 'Add Offline Grades';
 ?>
-<fieldset xmlns="http://www.w3.org/1999/html">
+<fieldset xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
         <legend>Add Offline Grades</legend>
         <?php $form = ActiveForm::begin([
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
@@ -49,7 +49,7 @@ $this->title = 'Add Offline Grades';
             <?php } ?>
         </select>
     </div>
-    <div class="select-text-margin"><a>Add new rubric</a> | <a>Edit rubrics</a><div>
+    <div class="select-text-margin"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric') ?>" >Add new rubric</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric') ?>"  >Edit rubrics</a><div>
 
         <br><div class="col-lg-offset-3 ">  <?= $form->field($model, 'UploadGrades')-> checkbox(); ?>
           <a class="btn btn-primary col-lg-offset-2"  href="#">Submit</a>
@@ -60,8 +60,18 @@ $this->title = 'Add Offline Grades';
         </div>
 
         <div class="change-assessment-snapshot-content">
-            <?= $form->field($model, 'AssessmentToSnapshot')->dropDownList([]) ?>
-            <?= $form->field($model, 'Gradetype')->radioList([AppConstant::NUMERIC_ONE =>'Current score',AppConstant::NUMERIC_TWO =>'Participation: give full credit if ≥ <input type="text" size="4" value="100"> % of problems attempted and ≥ <input type="text" size="4" value="0"> points earned.' ]) ?>
+
+            <label class="col-lg-3 select-text-margin pull-left">Assessment To Snapshot</label>
+            <div class="col-lg-4">
+                <select name="rubric" class="form-control"  >
+<!--                    <option value="0" selected>None</option>-->
+                    <?php foreach ($assessmentData as $single) { ?>
+                        <option
+                            value="<?php echo $single['id'] ?>"><?php echo $single['name']; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+           <br><br> <?= $form->field($model, 'Gradetype')->radioList([AppConstant::NUMERIC_ONE =>'Current score',AppConstant::NUMERIC_TWO =>'Participation: give full credit if ≥ <input type="text" size="4" value="100"> % of problems attempted and ≥ <input type="text" size="4" value="0"> points earned.' ]) ?>
 
         </div>
 
@@ -113,8 +123,8 @@ $this->title = 'Add Offline Grades';
                 <tr>
                     <td><?php echo $singleStudentInformation['Name']?></td>
                     <td><?php echo $singleStudentInformation['Section']?></td>
-                    <td><input type="text" name="grade_text[<?php echo $singleStudentInformation['StudentId'] ?>]"  class="latepass-text-id" size="4"/></td>
-                    <td><textarea type="text" name="feedback_text[<?php echo $singleStudentInformation['StudentId'] ?>]" class="feedback-text-id"></textarea> </td>
+                    <td><input type="text" name="grade_text<?php echo $singleStudentInformation['StudentId'] ?>"  class="latepass-text-id" size="4"/></td>
+                    <td><textarea type="text" name="feedback_text<?php echo $singleStudentInformation['StudentId'] ?>" class="feedback-text-id"></textarea> </td>
                 </tr>
             <?php }?>
             <tbody>
@@ -124,7 +134,7 @@ $this->title = 'Add Offline Grades';
     <div class="form-group">
         <div class=" col-lg-8 display_field">
             <?= Html::submitButton('Save', ['class' => 'btn btn-primary col-lg-offset-3']) ?>
-<!--            <a class="btn btn-primary back-button-change-student-info"  href="--><?php //echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$courseId) ?><!--">Back</a>-->
+            <a class="btn btn-primary back-button-change-student-info"  href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$courseId) ?>">Back</a>
         </div>
     </div>
 </div>

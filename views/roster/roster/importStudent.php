@@ -44,6 +44,7 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
     <div class="form-group">
         <div class="col-lg-offset-3 roster-submit">
             <?= Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>
 </div>

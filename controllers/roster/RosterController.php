@@ -673,6 +673,7 @@ class RosterController extends AppController
                 $isCodePresent = false;
                 $isSectionPresent = false;
                 $courseId = $this->getParamVal('courseId');
+                $course = Course::getById($courseId);
                 $newStudents = array();
                 if($studentInformation['newUsers']){
                 foreach ($studentInformation['newUsers'] as $student) {
@@ -697,7 +698,7 @@ class RosterController extends AppController
                 }
                 $this->includeCSS(['dataTables.bootstrap.css']);
                 $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','roster/importstudent.js', 'general.js' ]);
-                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents);
+                $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent,'courseId' => $courseId,'uniqueStudents' => $uniqueStudents,'duplicateStudents' => $duplicateStudents,'course' => $course);
                 return $this->render('showImportStudent', $responseData);
     }
 

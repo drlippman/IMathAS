@@ -375,6 +375,7 @@ class SiteController extends AppController
         if ($model->load($this->getPostData()) && $model->checkPassword()) {
             $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
+
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file ) {
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');

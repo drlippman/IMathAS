@@ -10,6 +10,7 @@ use app\models\Assessments;
 use app\models\Course;
 use app\models\Diags;
 use app\models\forms\AddGradesForm;
+use app\models\forms\AddRubricForm;
 use app\models\forms\ManageTutorsForm;
 use app\models\GbItems;
 use app\models\GbScheme;
@@ -243,6 +244,8 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $rubricsData = Rubrics::getByUserId($currentUser['id']);
 //        AppUtility::dump($rubricsData);
+        $assessmentData = Assessments::getByCourseId($courseId);
+//        AppUtility::dump($assessmentData);
         $studentArray = array();
         if ($studentData) {
             foreach ($studentData as $student) {
@@ -287,8 +290,62 @@ class GradebookController extends AppController
         }
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ,'gradebook/addgrades.js','roster/managelatepasses.js']);
-        $responseData = array('model' => $model,'studentInformation' => $studentArray,'course' => $course,'rubricsData' => $rubricsData);
+        $responseData = array('model' => $model,'studentInformation' => $studentArray,'course' => $course,'rubricsData' => $rubricsData,'assessmentData' => $assessmentData);
         return $this->renderWithData('addGrades', $responseData);
+
+    }
+    public function actionAddRubric()
+    {
+        $model = new AddRubricForm();
+        $currentUser = $this->getAuthenticatedUser();
+        $rubricId = $this->getParamVal('rubricId');
+        $edit = false;
+        $rubicData = Rubrics::getByUserIdAndRubricId($currentUser['id'],$rubricId);
+
+        if($rubicData){
+        $rubricItems = unserialize($rubicData['rubric']);
+            $edit = true;
+        }
+        if($this->isPost()) {
+            $params = $_POST;
+            $rubricData = new Rubrics();
+            $nonSerializeArrayOfData = array();
+
+            $gradeTextArray = array();
+            foreach($params['rubitem'] as $index => $feedback)
+            {
+                foreach($params['rubnote'] as $key => $note) {
+                    if($index == $key){
+                    foreach($params['feedback'] as $k => $percentage) {
+                    if($k == $key){
+                        $tempArray = array(
+                            'feedback' => $feedback,
+                            'note' => $note,
+                            'percentage' => $percentage,
+                        );
+                        array_push($gradeTextArray, $tempArray);}
+                    }}
+                }
+
+            }
+
+//            array_push($nonSerializeArrayOfData,$params['rubitem']);
+//            array_push($nonSerializeArrayOfData,$params['rubnote']);
+//            array_push($nonSerializeArrayOfData,$params['feedback']);
+            $rubricTextDataArray = serialize($gradeTextArray);
+//            AppUtility::dump($gradeTextArray);
+            $rubricData->createNewEntry($params,$currentUser['id'],$rubricTextDataArray);
+        }
+        $responseData = array('model' => $model,'rubricItems' => $rubricItems,'edit' => $edit);
+        return $this->renderWithData('addRubric', $responseData);
+
+    }
+    public function actionEditRubric()
+    {
+        $currentUser = $this->getAuthenticatedUser();
+        $rubicData = Rubrics::getByUserId($currentUser['id']);
+        $responseData = array('rubicData' => $rubicData);
+        return $this->renderWithData('editRubric', $responseData);
 
     }
 }

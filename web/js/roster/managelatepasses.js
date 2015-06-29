@@ -1,5 +1,6 @@
 
 $(document).ready(function () {
+    createDataTable('student-data');
     $('.student-data').DataTable();
 });
 function addReplaceMultiplyTextValue(value)

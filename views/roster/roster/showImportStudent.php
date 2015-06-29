@@ -5,8 +5,10 @@ use app\components\AppUtility;
 use app\components\AppConstant;
 
 //use app\widgets\FileInput;
-$this->title = 'Import Students';
-
+$this->title = 'Show imported students details';
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Import student', 'url' => ['/roster/roster/import-student?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -113,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="roster-submit">
 
             <input type="button" onclick="saveStudentData()" value="Submit" class ="btn btn-primary">
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$courseId)  ?>">Back</a>
         </div>
     </div>
 </div>

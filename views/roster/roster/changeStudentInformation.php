@@ -11,7 +11,7 @@ $this->title = 'Change student Information';
 ?>
 <div>
     <?php
-    $model->Username = AppUtility::getStringVal($user['SID']);
+    $model->SID = AppUtility::getStringVal($user['SID']);
     $model->FirstName = AppUtility::getStringVal($user['FirstName']);
     $model->LastName = AppUtility::getStringVal($user['LastName']);
     $model->email = AppUtility::getStringVal($user['email']);
@@ -37,7 +37,7 @@ $this->title = 'Change student Information';
                 'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
             ],
         ]); ?>
-        <?= $form->field($model, 'Username')->textInput(); ?>
+        <?= $form->field($model, 'SID')->textInput(); ?>
 
         <?= $form->field($model, 'FirstName')->textInput(); ?>
 

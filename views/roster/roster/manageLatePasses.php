@@ -39,11 +39,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
             <?php } ?>
     <p><em>To all students: <input type="text" size="3" id="txt_add" name="addpass" value="1"/>
-            <input type="button" class="btn btn-primary" onclick="addReplaceMultiplyTextValue(1)">
-     <input type="button" class="btn btn-primary" onclick="addReplaceMultiplyTextValue(2)">
+            <input type="button" class="btn btn-primary" value="Add" onclick="addReplaceMultiplyTextValue(1)"/>
+     <input type="button" class="btn btn-primary" value="Replace" onclick="addReplaceMultiplyTextValue(2)"/>
 
 
-    <table class="student-data table table-bordered table-striped table-hover data-table" id="student-data-table">
+    <table class="student-data table table-bordered table-striped table-hover data-table" bPaginate="false" id="student-data-table">
         <thead>
         <tr>
             <th>Name</th>
@@ -63,5 +63,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <tbody>
     </table>
     <input type="submit" class="btn btn-primary" id="change-button" value="Save Changes">
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
 
  <?php ActiveForm::end(); ?>

@@ -8,7 +8,7 @@ use Yii;
 use yii\base\Model;
 class ChangeUserInfoForm extends Model
 {
-    public $Username;
+    public $SID;
     public $FirstName;
     public $LastName;
     public $password;
@@ -64,7 +64,7 @@ class ChangeUserInfoForm extends Model
             'FirstName' => 'Enter First Name',
             'LastName' => 'Enter Last Name',
             'email' => ' Enter Email',
-            'Username' => 'Enter User Name (login name)',
+            'SID' => 'Enter User Name (login name)',
             'NotifyMeByEmailWhenIReceiveANewMessage'=>'Notify me by email when I receive a new message',
             'file'=>'Picture',
             'message'=>'Messages/Posts per page',
