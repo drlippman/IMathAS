@@ -736,4 +736,16 @@ class CourseController extends AppController
         return $this->render('blockIsolate', $returnData);
     }
 
+    public function actionCalendar()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $userId = $user->id;
+        $id = $this->getParamVal('id');
+        $cid = $this->getParamVal('cid');
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
+        return $this->render('calendar');
+    }
+
 }

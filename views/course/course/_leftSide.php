@@ -13,7 +13,7 @@ use app\components\AppUtility;
         ?></a>
     <br>
     <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"> Forums</a><br>
-    <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Calendar</a><br>
+    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/calendar?cid=' .$course->id) ?>">Calendar</a><br>
     <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Gradebook</a><br>
     <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>">Help Using IMathAS</a>
 </p>
