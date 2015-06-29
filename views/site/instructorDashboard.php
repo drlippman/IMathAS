@@ -14,6 +14,7 @@ use app\components\AppUtility;
                 IMathAS, <?php echo AppUtility::getFullName($user->FirstName, $user->LastName); ?></h2></div>
         <div id="homefullwidth">
             <?php echo $this->render('_courseTeaching'); ?>
+            <?php echo $this->render('_courseTutoring');?>
             <?php echo $this->render('_courseTaking'); ?>
         </div>
         <div class="clear"></div>

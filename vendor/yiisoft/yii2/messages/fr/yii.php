@@ -29,7 +29,7 @@ return [
     'request an account' => 'demander un compte',
     'Welcome' => 'bienvenue',
     'First Name' => 'Prénom',
-     'IMathAS is a web based mathematics assessment and course management platform.' => 'IMathAS est une évaluation en mathématiques et bien sûr la plate-forme de gestion basée sur le Web.',
+    'IMathAS is a web based mathematics assessment and course management platform.' => 'IMathAS est une évaluation en mathématiques et bien sûr la plate-forme de gestion basée sur le Web.',
     'This system is designed for mathematics, providing delivery of homework, quizzes, tests, practice
                     tests,and diagnostics with rich mathematical content. Students can receive immediate feedback on
                     algorithmically generated questions with numerical or algebraic expression answers.' => 'Ce système est conçu pour les mathématiques , la fourniture livraison des devoirs , des quiz , des tests , de la pratique
@@ -37,13 +37,11 @@ return [
                     algorithme généré questions avec réponses expression numérique ou algébrique .',
     'If you already have an account, you can log on using the box to the right.' => 'Si vous avez déjà un compte, vous pouvez vous connecter en utilisant la boîte à la droite.',
     'If you are a new student to the system,' => 'Si vous êtes un nouvel étudiant au système ,',
-    'Register as a new student' => 'Créer un nouvel étudiant',
     'If you are an instructor, you can' => 'Si vous êtes un instructeur , vous pouvez',
-    'request an account' => 'demander un compte',
     'Also available:' => 'Aussi disponible:',
     'Help for student with entering answers' => 'Aide pour les étudiants avec des réponses entrant',
     'Instructor Documentation' => "Documentation de l'instructeur'",
-     'New User username' => "Nouveau nom d' utilisateur",
+    'New User username' => "Nouveau nom d' utilisateur",
     'Invalid data received for parameter "{param}".' => 'Données non valides reçues pour le paramètre « {param} ».',
     'Login Required' => 'Identifiant requis',
     'Missing required arguments: {params}' => 'Arguments manquants requis : {params}',

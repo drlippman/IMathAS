@@ -17,6 +17,7 @@ class AppConstant
     const ADMIN_RIGHT = 100;
     const STUDENT_RIGHT = 10;
     const TEACHER_RIGHT = 20;
+    const TUTOR_RIGHT = 20;
     const GUEST_RIGHT = 5;
     const LIMITED_COURSE_CREATOR_RIGHT = 40;
     const DIAGNOSTIC_CREATOR_RIGHT = 60;

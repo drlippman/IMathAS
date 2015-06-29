@@ -44,4 +44,8 @@ class Tutor extends BaseImasTutors
         $tutor->section = $section;
         $tutor->save();
     }
+    public static function getByUser($userId)
+    {
+        return static::findAll(['userid' => $userId]);
+    }
 } 

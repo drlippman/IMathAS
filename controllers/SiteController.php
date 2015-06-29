@@ -16,6 +16,7 @@ use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentRegisterForm;
 use app\models\Teacher;
+use app\models\Tutor;
 use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -301,11 +302,14 @@ class SiteController extends AppController
         if (!$this->isGuestUser()) {
             $user = $this->getAuthenticatedUser();
             $students = Student::getByUserId($user->id);
+            $tutors = Tutor::getByUser($user->id);
             $teachers = Teacher::getTeacherByUserId($user->id);
             if($students){
                 $users = $students;
-            }else{
+            }else if($teachers){
                 $users = $teachers;
+            } elseif($tutors){
+                $user = $tutors;
             }
             $isreadArray = array(0, 4, 8, 12);
             $msgCountArray = array();
@@ -327,7 +331,7 @@ class SiteController extends AppController
                 $this->includeCSS(['dashboard.css']);
                 $this->getView()->registerJs('var usingASCIISvg = true;');
                 $this->includeJS(["dashboard.js", "ASCIIsvg_min.js", "tablesorter.js"]);
-                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray];
+                $userData = ['user' => $user, 'students' => $students, 'teachers' => $teachers, 'users' => $users, 'msgRecord' => $msgCountArray, 'tutors' => $tutors];
                 return $this->renderWithData('dashboard', $userData);
             }
         }
@@ -442,5 +446,17 @@ class SiteController extends AppController
         $responsedata = array('courseDetails' => $courseDetails);
         return $this->renderWithData('unhideFromCourseList',$responsedata);
     }
+
+    public function actionHelpForStudentAnswer()
+    {
+        $this->includeCSS(['infopages.css']);
+        return $this->renderWithData('helpForStudentAnswer');
+    }
+    public function actionInstructorDocument()
+    {
+        $this->includeCSS(['doc.css']);
+        return $this->renderWithData('instructorDocument');
+    }
+
 
 }

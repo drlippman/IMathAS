@@ -30,6 +30,8 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
 <input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
 <input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
 <input type="hidden" id="endDateString" name="endDate" value="<?php echo $assessment->enddate; ?>">
+<input type="hidden" id="startDateString" name="endDate" value="<?php echo $assessment->startdate; ?>">
+<input type="hidden" id="reviewDateString" name="endDate" value="<?php echo $assessment->reviewdate; ?>">
 
 <input type="hidden" id="courseId" value='<?php echo $courseId ?>'/>
 <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
@@ -52,7 +54,8 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
         var min = $('#min').val();
         var endDate = $('#endDate').val();
         var endDateString = $('#endDateString').val();
-
+        var startDateString = $('#startDateString').val();
+        var reviewDateString = $('#reviewDateString').val();
         var noQuestion = $('#noQuestion').val();
         if(noQuestion == 1){
             noQuestionPopup();
@@ -65,10 +68,14 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
             html += "<span id='timerwrap'><b>";
             html += "<span id='timer'></span> remaining </b></span>"
 
-        }else if(endDateString != 2000000000){
+        }else if(endDateString == 2000000000 && startDateString == 0 && (reviewDateString == 2000000000 || reviewDateString == 0 || reviewDateString != 0)){
             $("#expired").hide();
             $("#timerhide").hide();
-            html += 'Due '+endDate;
+        }
+        else{
+            $("#expired").hide();
+            $("#timerhide").hide();
+            html = 'Due '+endDate;
         }
         /**
          * Timelimit in hour and minute

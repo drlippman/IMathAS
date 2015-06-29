@@ -24,7 +24,23 @@ return [
     'Delete' => 'Löschen',
     'Error' => 'Fehler',
     'File upload failed.' => 'Das Hochladen der Datei ist gescheitert.',
-    'Home' => 'Home',
+    'Home' => 'Zuhause',
+    'About Us' => 'Über Uns',
+    'Register as a new student' => 'Als neuer Student registrieren',
+    'request an account' => 'fordern Sie ein Konto',
+    'IMathAS is a web based mathematics assessment and course management platform.' => 'IMathAS ist eine webbasierte Mathematik Bewertung und Kurs-Management-Plattform.',
+    'This system is designed for mathematics, providing delivery of homework, quizzes, tests, practice
+                    tests,and diagnostics with rich mathematical content. Students can receive immediate feedback on
+                    algorithmically generated questions with numerical or algebraic expression answers.' => 'Dieses System ist für die Mathematik entwickelt und bietet Lieferung von Hausaufgaben, Tests, Prüfungen, Praxis
+                     Tests und Diagnose mit reichen mathematischen Inhalten. Die Schüler können eine unmittelbare Rückmeldung über erhalten
+                     algorithmisch generierte Fragen mit numerischen oder algebraischen Ausdruck Antworten.',
+    'If you already have an account, you can log on using the box to the right.' => 'Wenn Sie bereits über ein Konto verfügen, können Sie sich mit der Box auf der rechten Seite einloggen.',
+    'If you are a new student to the system,' => 'Wenn Sie ein neuer Schüler an das System sind,',
+    'If you are an instructor, you can' => 'Wenn Sie ein Lehrer sind, können Sie',
+    'Also available:' => 'Auch verfügbar:',
+    'Help for student with entering answers' => 'Hilfe für Schüler mit Eingabe Antworten',
+    'Instructor Documentation' => "Instructor Dokumentation'",
+    'New User username' => "Neuer Benutzer Benutzername",
     'Invalid data received for parameter "{param}".' => 'Ungültige Daten erhalten für Parameter "{param}".',
     'Login Required' => 'Anmeldung erforderlich',
     'Missing required arguments: {params}' => 'Pflichtargumente fehlen: {params}',

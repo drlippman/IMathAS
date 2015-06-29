@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 
 $this->title = Yii::t('yii', 'About Us');
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
@@ -24,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p><?= Yii::t('yii', 'If you already have an account, you can log on using the box to the right.') ?></p>
 
                 <p><?= Yii::t('yii', 'If you are a new student to the system,') ?> <a href="<?php echo AppUtility::getURLFromHome('site', 'student-register') ?>"><?= Yii::t('yii', 'Register as a new student') ?></a></p>
-                <p><?= Yii::t('yii', 'If you are an instructor, you can') ?><a href="<?php echo AppUtility::getURLFromHome('site', 'registration') ?>"><?= Yii::t('yii', 'request an account') ?></a></p>
+                <p><?= Yii::t('yii', 'If you are an instructor, you can ') ?><a href="<?php echo AppUtility::getURLFromHome('site', 'registration') ?>"><?= Yii::t('yii', 'request an account') ?></a></p>
 
             </td>
         </tr>
@@ -32,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </table>
     <p><?= Yii::t('yii', 'Also available:') ?>
     <ul>
-        <li><a href="#"><?= Yii::t('yii', 'Help for student with entering answers') ?></a></li>
-        <li><a href="#"><?= Yii::t('yii','Instructor Documentation') ?></a></li>
+        <li><a href="<?php echo AppUtility::getURLFromHome('site', 'help-for-student-answer') ?>"><?= Yii::t('yii', 'Help for student with entering answers') ?></a></li>
+        <li><a href="<?php echo AppUtility::getURLFromHome('site', 'instructor-document') ?>"><?= Yii::t('yii','Instructor Documentation') ?></a></li>
     </ul>
 </div>

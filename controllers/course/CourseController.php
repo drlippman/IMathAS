@@ -106,7 +106,6 @@ class CourseController extends AppController
                                 {
                                     $assessment->startdate = $exception->startdate;
                                     $assessment->enddate = $exception->enddate;
-//                                    $tempAray['exception'] = array('exceptionStartdate' =>$exceptionStartDate, 'exceptionEnddate' =>$exceptionEndDate);
                                 }
                                     $tempAray[$item->itemtype] = $assessment;
                                     array_push($responseData, $tempAray);
@@ -217,7 +216,6 @@ class CourseController extends AppController
         $param['islatepass'] = 1;
 
         if (count($exception)) {
-            AppUtility::dump('Hello');
             if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate) < $course->latepasshrs * 3600))) {
                 $latepass = $student->latepass;
                 AppUtility::dump($latepass);
@@ -396,7 +394,6 @@ class CourseController extends AppController
         $order = AppConstant::ASCENDING;
         $users = User::findAllUsers($sortBy, $order);
         $course = Course::getById($cid);
-        //$this->includeJS(['/course/transfercourse.js']);
         $this->includeCSS(['dashboard.css']);
         $returnData = array('users' => $users, 'course' => $course);
         return $this->renderWithData('transferCourse', $returnData);
