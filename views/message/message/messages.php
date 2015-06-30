@@ -8,7 +8,6 @@ if($isNewMessage == 1){
 }else{
     $this->title = 'Messages';
 }
-
 if ($userRights->rights > AppConstant::STUDENT_RIGHT){
 
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
@@ -18,7 +17,6 @@ else{
 }
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
 <!-- DataTables CSS -->
 <div>
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
@@ -58,7 +56,6 @@ $this->params['breadcrumbs'][] = $this->title;
         </span></p>
     </div>
     <br><br>
-
     <div>
         <p>Check: <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all"
                                                                               href="#">None</a>

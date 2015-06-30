@@ -59,6 +59,7 @@ class AppConstant
     const NUMERIC_THIRTEEN = 13;
     const NUMERIC_FOURTEEN = 14;
     const NUMERIC_FIFTEEN = 15;
+    const NUMERIC_NEGATIVE_ONE = -1;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;

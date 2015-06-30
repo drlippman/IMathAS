@@ -66,16 +66,13 @@ function showMessage(messageData, status) {
             html += "<td>" + msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1) + "</td>";
             html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
             html += "<td>" + msg.senddate + "</td>";
-
         });
-
     }
     $('.message-div div').remove();
     createTableHeader();
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable({"bPaginate": false});
     $(".images").hide();
-
 }
 
 function showMessageSuccess(response) {
@@ -174,7 +171,7 @@ function markAsRead() {
         });
         if( markArray.length !=0){
         var readMsg = {checkedMsg: markArray};
-        jQuerySubmit('mark-as-read-ajax', readMsg, 'markAsReadSuccess');
+        jQuerySubmit('mark-as-read-ajax', readMsg,{ });
 
 
     }
@@ -186,9 +183,6 @@ function markAsRead() {
 
 
     });
-}
-
-function markAsReadSuccess(response) {
 }
 
 function filterByCourse() {
@@ -307,7 +301,7 @@ function markAsDelete() {
                         $(this).dialog("close");
 
                         var readMsg = {checkedMsg: markArray};
-                        jQuerySubmit('mark-as-delete-ajax', readMsg, 'markAsDeleteSuccess');
+                        jQuerySubmit('mark-as-delete-ajax', readMsg,{ });
                         return true;
                     }
                 },
@@ -322,12 +316,6 @@ function markAsDelete() {
             CommonPopUp(msg);
         }
     });
-}
-
-function markAsDeleteSuccess() {
-}
-
-function changeImageSuccess(response) {
 }
 
 function limitToTagShow() {
@@ -366,7 +354,7 @@ function changeImage(element, temp, rowId) {
         element.bln = !element.bln;
     }
     var row = {rowId: rowId};
-    jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
+    jQuerySubmit('change-image-ajax', row,{ });
 }
 
 var picsize = 0;
