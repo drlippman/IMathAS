@@ -22,4 +22,10 @@ class Forums extends BaseImasForums {
     {
         return static::findOne(['id' => $id]);
     }
+
+
+    public static function getByCourseIdOrdered($courseId,$sort,$orderBy)
+    {
+        return Forums::find()->where(['courseid' => $courseId])->orderBy([$orderBy=>$sort])->all();
+    }
 } 

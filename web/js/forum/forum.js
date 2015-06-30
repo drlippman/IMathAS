@@ -76,7 +76,7 @@ function postSuccess(response)
                var result = Data.message.replace(/<[\/]{0,1}(p)[^><]*>/ig,"");
                 html = "<div class='block'>";
                 html += "<b><label  class='subject'>"+Data.subject+"</label></b>";
-                html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumname+"</label>)";
+                html += "&nbsp;&nbsp;&nbsp;in(&nbsp;<label class='forumname'>"+Data.forumName+"</label>)";
                 html += "<br/>Posted by:&nbsp;&nbsp;<label class='postedby'>"+Data.name+"</label>";
                 html += "&nbsp;&nbsp;<label id='postdate'>"+Data.postdate+"</label>";
                 html += "</div><div class=blockitems>";
@@ -84,9 +84,7 @@ function postSuccess(response)
                 html += "<p><a href='post?courseid=" + courseId + "&threadid=" + Data.threadId +"&forumid="+ Data.forumiddata+"'</a>Show full thread</p>";
                 html += "</div>\n";
                 $('#searchpost').append(html);
-
         });
-
     }
     else
     {
@@ -158,7 +156,6 @@ function forumsSuccess(response) {
         });
         $(".forum-table-body tr").remove();
         $(".forum-table-body").append(html);
-        $('.forum-table').DataTable(
-        );
+        $('.forum-table').DataTable({"ordering": false});
     }
 

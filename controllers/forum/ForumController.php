@@ -79,7 +79,9 @@ class ForumController extends AppController
         $currentTime = time();
         $param = $this->getRequestParams();
         $cid = $param['cid'];
-        $forums = Forums::getByCourseId($cid);
+        $sort = AppConstant::DESCENDING;
+        $orderBy = 'id';
+        $forums = Forums::getByCourseIdOrdered($cid,$sort,$orderBy);
         $user = $this->getAuthenticatedUser();
         if ($forums)
         {
@@ -414,7 +416,6 @@ class ForumController extends AppController
             $likeImage = ForumLike::checkStatus($postData['id'],$currentUser);
             $count = new ForumLike();
             $likeCnt = $count->CalculateCount($postData['id']);
-
             $studentCount = AppConstant::NUMERIC_ZERO;
             $teacherCount = AppConstant::NUMERIC_ZERO;
 
@@ -434,7 +435,6 @@ class ForumController extends AppController
                     'studentCount' => $studentCount,
                     'teacherCount' => $teacherCount,
                 );
-
             }
             array_push($titleCountArray,$tempArray);
             $tempArray = array();
@@ -462,7 +462,7 @@ class ForumController extends AppController
 
         }
 
-        ForumPosts::saveViews($threadId);
+       ForumPosts::saveViews($threadId);
         $viewsData = new ForumView();
         $viewsData->updateData($threadId,$currentUser);
         $this->createChild($this->children[key($this->children)]);
@@ -728,13 +728,15 @@ class ForumController extends AppController
         if($thread)
         {
                 $nameArray = array();
-            $sortByName = array();
-            $finalSortedArray = array();
+                $sortByName = array();
+                $finalSortedArray = array();
                 $threadArray = array();
                 foreach ($thread as $data)
                 {
                     $username = User::getById($data['userid']);
-                     $tempArray = array
+                    $isNew = ForumView::getLastViewOfPost( $data['threadid'], $this->getAuthenticatedUser()->id);
+
+                    $tempArray = array
                         (
                             'id' => $data['id'],
                             'parent' => $data['parent'],
@@ -742,6 +744,7 @@ class ForumController extends AppController
                             'forumIdData' => $data['forumid'],
                             'userId' => $username->id,
                             'hasImg' => $username->hasuserimg,
+                            'lastView' => $isNew[0]['lastview'],
                             'subject' => $data['subject'],
                             'postdate' => date('F d, o g:i a', $data['postdate']),
                            'message' => $data['message'],
@@ -760,6 +763,7 @@ class ForumController extends AppController
                 }
                 array_push($sortByName,$name);
             }
+
             $this->setReferrer();
             $this->includeCSS(['forums.css']);
             $status = AppConstant::NUMERIC_ONE;
@@ -788,7 +792,7 @@ class ForumController extends AppController
             $tempArray = array
             (
                 'subject' => $data['subject'],
-
+                'parent' => $data['id'],
             );
             array_push($threadArray, $tempArray);
         }
@@ -850,6 +854,17 @@ class ForumController extends AppController
         }
         $responseData = array('displayCountData' =>$countDataArray);
         return $this->successResponse($responseData);
+    }
+
+    public function actionMarkAllReadAjax()
+    {
+
+        $this->guestUserHandler();
+        $userId = $this->getAuthenticatedUser()->id;
+        $viewsData = new ForumView();
+        $viewsData->updateDataForPostByName($userId);
+        return $this->successResponse();
+
     }
 
 }

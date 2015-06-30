@@ -5,15 +5,16 @@ $(document).ready(function ()
         toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
     });
 
-    $(".reply-btn").click(function()
+    $(".reply-btn").one('click',function()
     {
         tinyMCE.triggerSave();
         var courseid = $(".courseid").val();
         var forumid = $(".forumid").val();
         var threadid = $(".threadid").val();
         var subject = $("#sub").val();
+        var parentId =$(".parent").val();
         var body = $("#postreply").val();
-        var replyDetails = {couserid : courseid,forumid : forumid,threadid : threadid,subject : subject,body : body};
+        var replyDetails = {couserid : courseid,parentId : parentId,forumid : forumid,threadid : threadid,subject : subject,body : body};
         jQuerySubmit('reply-list-post-ajax',replyDetails,'replyPostSuccess');
     });
 

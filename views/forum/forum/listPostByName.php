@@ -19,7 +19,6 @@ if($status == AppConstant::NUMERIC_ONE){?>
 <br>
 <div class="midwrapper">
     <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary" value="Expand All">
-<!--    <input type="button" id="collapse" onclick="collapseall()" class="btn btn-primary" value="Collapse All">-->
     <button  onclick="markall()" class="btn btn-primary">Mark All Read</button>
     <br><br>
 </div>
@@ -54,7 +53,12 @@ if($status == AppConstant::NUMERIC_ONE){?>
                         echo  $data['subject'];
                             }
                             ?>
-                        </b>,Posted: <?php echo $data['postdate']?></div>
+                        </b>,Posted: <?php echo $data['postdate']?>
+                <?php
+                if(strtotime($data['postdate']) >= $data['lastView'] ){?>
+                    <span  class="New" style="color:red;">New</span>
+                <?php }?>
+                    </div>
                     <div id="item<?php echo $i ?>" class="blockitems"><p><?php echo $data['message']?></p></div>
                     </div>
                     <?php $name=$data['name'];
@@ -74,7 +78,12 @@ if($status == AppConstant::NUMERIC_ONE){?>
                          }
                          ?>
                         <?php $name=$data['name'];?>
-                     </b>,Posted: <?php echo $data['postdate']?></div>
+                     </b>,Posted: <?php echo $data['postdate']?>
+                        <?php
+                        if(strtotime($data['postdate']) > $data['lastView'] || $data['lastView']== null){?>
+                            <span  class="New" style="color:red;">New</span>
+                        <?php }?>
+                    </div>
                      <div id="item<?php echo $i ?>" class="blockitems"><p><?php echo $data['message']?></p></div>
                      </div>
 
@@ -90,7 +99,7 @@ if($status == AppConstant::NUMERIC_ONE){?>
     <input type="hidden" id="isData" value="0">
 
 <?php }?>
-<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumId);?>">Back to Thread List</a></div>
+<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumid);?>">Back to Thread List</a></div>
 <script>
 $(document).ready(function ()
 {
@@ -122,7 +131,7 @@ $(document).ready(function ()
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadid;
-                    //jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
                     return true;
                 }
             },
@@ -202,10 +211,17 @@ $(document).ready(function ()
 
      }
 
-    function markall(){
-
-        alert("nbndb");
+    function markall()
+    {
+        jQuerySubmit('mark-all-read-ajax',{ },'markAllReadSuccess');
     }
+
+function markAllReadSuccess()
+{
+
+    window.location.reload();
+}
+
 var  flag =0;
 function changeProfileImage(element,id)
 {

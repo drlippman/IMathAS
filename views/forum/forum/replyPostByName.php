@@ -2,11 +2,14 @@
 $this->title = 'ReplyPostByName';
 $this->params['breadcrumbs'][] = $this->title;
 use app\components\AppUtility;
+
 ?>
 <div class="replypost">
     <input type="hidden" class="forumid" value="<?php echo $forumid ?>">
     <input type="hidden" class="courseid" value="<?php echo $courseid ?>">
     <input type="hidden" class="threadid" value="<?php echo $threadid ?>">
+    <?php $parentId = $reply[0]['parent'];?>
+    <input type="hidden" class="parent" value="<?php echo $parentId?>">
     <h2><b>Post Reply</h2>
     <br><br>
     <div>

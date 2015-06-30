@@ -4,23 +4,18 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = 'Post';
-
 if ($currentUser->rights > AppConstant::STUDENT_RIGHT)
 {
-
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
 else
 {
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
 }
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
-
 ?>
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" xmlns="http://www.w3.org/1999/html"/>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
@@ -128,7 +123,7 @@ $currentLevel = 0;
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
                 <a href="<?php echo AppUtility::getURLFromHome('message','message/send-message?cid='.$courseId.'&userid='.$data['userId'].'&new=1')?>"><?php echo $data['name'] ?></a>, <?php echo $data['postdate'] ?></a>
-
+            ;
             <?php
             if(strtotime($data['postdate'])>=$data['lastView']){?>
                 <span style="color:red;">New</span>

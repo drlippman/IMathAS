@@ -92,6 +92,7 @@ class ForumView extends BaseImasForumViews
     {
 
         $lastview = ForumView::find(['lastview'])->where(['threadid' => $threadId,'userid' => $CurrentUser['id']])->all();
+
         return $lastview;
 
     }
@@ -123,16 +124,41 @@ class ForumView extends BaseImasForumViews
 
    }
 
- public static function deleteByUserIdAndThreadId($threadId,$userId)
- {
-     $threads = ForumView::find()->where(['threadid' => $threadId,'userid' => $userId])->all();
-     if($threads)
+     public static function deleteByUserIdAndThreadId($threadId,$userId)
      {
-         foreach($threads as $thread)
+         $threads = ForumView::find()->where(['threadid' => $threadId,'userid' => $userId])->all();
+         if($threads)
          {
-             $thread->delete();
+             foreach($threads as $thread)
+             {
+                 $thread->delete();
+             }
          }
      }
- }
+
+    public static  function getLastViewOfPost($threadId,$CurrentUser)
+    {
+
+        $lastview = ForumView::find()->select(['lastview'])->where(['threadid' => $threadId,'userid' => $CurrentUser])->all();
+        return $lastview;
+
+    }
+    public function  updateDataForPostByName($currentUser)
+    {
+        $users = ForumView::findAll(['userid' => $currentUser]);
+        if($users)
+        {
+            foreach($users as $user){
+
+                $lastView = strtotime(date('F d, o g:i a'));
+                $user->lastview = $lastView;
+                $user->save();
+            }
+
+         }
+
+    }
+
+
 }
 
