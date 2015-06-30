@@ -1,11 +1,5 @@
 <?php
 namespace app\components;
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 18/6/15
- * Time: 10:45 PM
- */
 use Yii;
 use yii\base\Component;
 require_once("diff.php");
@@ -17,13 +11,9 @@ class WikiUtility extends Component
 
     public static function getWikiRevision()
     {
-
-        /*** pre-html data manipulation, including function code *******/
-
-//set some page specific variables and counters
         $overwriteBody = 0;
         $body = "";
-        $responseBody = "";
+        $responseBody = " ";
 
         if (1 == 0) {
             $overwriteBody = 1;
@@ -104,7 +94,6 @@ class WikiUtility extends Component
 
                     $keys = array_keys($revisionusers);
                     $i = 0;
-                    //$users = '{';
                     $users = array();
                     foreach ($keys as $uid) {
 
@@ -113,12 +102,12 @@ class WikiUtility extends Component
                     }
 
                 } else {
-                    $users = array(); //'{}';
-                    $revisionhistory = array(); //'[]';
+                    $users = array();
+                    $revisionhistory = array();
                 }
                 $text = diffstringsplit($text);
                 foreach ($text as $k => $v) {
-                    $text[$k] = filter($v); //str_replace(array("\n","\r",'"'),array('','','\\"'),filter($v));
+                    $text[$k] = filter($v);
                 }
             }
         }

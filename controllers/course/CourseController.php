@@ -45,11 +45,11 @@ class CourseController extends AppController
         $userId = $user->id;
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $cid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $exception = Exceptions::getTotalData($userId);
         $responseData = array();
         $calendarCount = array();
-        $course = Course::getById($cid);
+        $course = Course::getById($courseId);
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
             if (count($itemOrders)) {
@@ -136,20 +136,17 @@ class CourseController extends AppController
                                     $tempAray[$item->itemtype] = $linkedText;
                                     array_push($responseData, $tempAray);
                                   break;
-         }
-
+                            }
+                        }
                     }
                 }
-            }
-
         } else {
 // @TODO Need to add logic here
         }
-
-        $course = Course::getById($cid);
-        $student = Student::getByCId($cid);
+        $course = Course::getById($courseId);
+        $student = Student::getByCId($courseId);
         $user = $this->getAuthenticatedUser();
-        $message = Message::getByCourseIdAndUserId($cid, $user->id);
+        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
         $isreadArray = array(0, 4, 8, 12);
         $msgList = array();
         if($message){
@@ -177,7 +174,6 @@ class CourseController extends AppController
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
-
         $this->saveAssessmentSession($assessment, $id);
 
         $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css']);
@@ -199,38 +195,36 @@ class CourseController extends AppController
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
         $course = Course::getById($courseId);
-
-        $addtime = $course->latepasshrs * 60 * 60;
-        AppUtility::dump('hello');
+        $addTime = $course->latepasshrs * 60 * 60;
         $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $usedlatepasses = round(($assessment->allowlate - $assessment->enddate) / ($course->latepasshrs * 3600));
         $startdate = $assessment->startdate;
-        $enddate = $assessment->enddate + $addtime;
-        $wave = 0;
+        $enddate = $assessment->enddate + $addTime;
+        $wave = AppConstant::NUMERIC_ZERO;
 
         $param['assessmentid'] = $assessmentId;
         $param['userid'] = $studentId;
         $param['startdate'] = $startdate;
         $param['enddate'] = $enddate;
         $param['waivereqscore'] = $wave;
-        $param['islatepass'] = 1;
+        $param['islatepass'] = AppConstant::NUMERIC_ONE;
 
         if (count($exception)) {
-            if ((($assessment->allowlate % 10) == 1 || ($assessment->allowlate % 10) - 1 > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate) < $course->latepasshrs * 3600))) {
+            if ((($assessment->allowlate % 10) == AppConstant::NUMERIC_ONE || ($assessment->allowlate % 10) - AppConstant::NUMERIC_ONE > $usedlatepasses) && ($currentTime < $exception->enddate || ($assessment->allowlate > 10 && ($currentTime - $exception->enddate) < $course->latepasshrs * 3600))) {
                 $latepass = $student->latepass;
                 AppUtility::dump($latepass);
-                $student->latepass = $latepass - 1;
-                $exception->enddate = $exception->enddate + $addtime;
-                $exception->islatepass = $exception->islatepass + 1;
+                $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
+                $exception->enddate = $exception->enddate + $addTime;
+                $exception->islatepass = $exception->islatepass + AppConstant::NUMERIC_ONE;
             }
 
-            if ($exception->islatepass != 0) {
+            if ($exception->islatepass != AppConstant::NUMERIC_ZERO) {
                 echo "<p>Un-use late-pass</p>";
                 if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * 60 * 60) {
                     echo '<p>Too late to un-use this LatePass</p>';
                 } else {
                     if ($currentTime < $assessment->enddate) {
-                        $exception->islatepass = $exception->islatepass - 1;
+                        $exception->islatepass = $exception->islatepass - AppConstant::NUMERIC_ONE;
                     } else {
                         //figure how many are unused
                         $n = floor(($exception->enddate - $currentTime) / ($course->latepasshrs * 60 * 60));
@@ -242,11 +236,9 @@ class CourseController extends AppController
                             // @TODO push anything into db.
                         }
                     }
-                    echo "<p>Returning $n LatePass" . ($n > 1 ? "es" : "") . "</p>";
+                    echo "<p>Returning $n LatePass" . ($n > AppConstant::NUMERIC_ONE ? "es" : "") . "</p>";
                     $student->latepass = $student->latepass + $n;
                 }
-            } else {
-                echo '<p>Invalid</p>';
             }
             $exception->attributes = $param;
             $exception->save();
@@ -282,7 +274,6 @@ class CourseController extends AppController
         $returnData = array('model' => $model, 'assessments' => $assessment);
         return $this->renderWithData('setPassword', $returnData);
     }
-
     /**
      * Create new course at admin side
      */
@@ -325,9 +316,8 @@ class CourseController extends AppController
     public function actionCourseSetting()
     {
         $this->guestUserHandler();
-        $cid = $this->getParamVal('cid');
-        $user = $this->getAuthenticatedUser();
-        $course = Course::getById($cid);
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         if ($course) {
             $model = new CourseSettingForm();
 
@@ -356,24 +346,21 @@ class CourseController extends AppController
                 $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
                 return $this->renderWithData('courseSetting', $returnData);
             }
-
         }
         return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
-
     }
-
     /**
      * To delete existing course.
      */
     public function actionDeleteCourse()
     {
         $model = new DeleteCourseForm();
-        $cid = $this->getParamVal('cid');
-        $course = Course::getById($cid);
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         if ($course) {
             $status = Course::deleteCourse($course->id);
             if ($status) {
-                $this->setSuccessFlash('Deleted successfully.');
+                $this->setSuccessFlash(AppConstant::DELETED_SUCCESSFULLY);
             } else {
                 $this->setErrorFlash(AppConstant::SOMETHING_WENT_WRONG);
             }
@@ -382,18 +369,18 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
-
     /**
      * @return string
      */
     public function actionTransferCourse()
     {
         $this->guestUserHandler();
-        $cid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllUsers($sortBy, $order);
-        $course = Course::getById($cid);
+        $course = Course::getById($courseId);
+
         $this->includeCSS(['dashboard.css']);
         $returnData = array('users' => $users, 'course' => $course);
         return $this->renderWithData('transferCourse', $returnData);
@@ -404,10 +391,10 @@ class CourseController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
 
-            if ($this->getAuthenticatedUser()->rights == 75) // 75 is instructor right
+            if ($this->getAuthenticatedUser()->rights == AppConstant::GROUP_ADMIN_RIGHT) // 75 is instructor right
             {
 
-            } elseif ($this->getAuthenticatedUser()->rights > 75) {
+            } elseif ($this->getAuthenticatedUser()->rights > AppConstant::GROUP_ADMIN_RIGHT) {
                 $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
                 if ($course) {
                     $course->ownerid = $params['newOwner'];
@@ -417,11 +404,10 @@ class CourseController extends AppController
                     if ($teacher) {
                         $teacher->delete();
                     }
-
                     $newTeacher = new Teacher();
                     $newTeacher->create($params['oldOwner'], $params['cid']);
                 }
-            } elseif ($this->getAuthenticatedUser()->rights > 40) {
+            } elseif ($this->getAuthenticatedUser()->rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
                 if ($params['oldOwner'] == $this->getUserId()) {
                     $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
                     if ($course) {
@@ -433,7 +419,6 @@ class CourseController extends AppController
             return $this->successResponse();
         }
     }
-
     public function actionAddRemoveCourse()
     {
         $this->guestUserHandler();
@@ -447,11 +432,11 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $params = Yii::$app->request->getBodyParams();
-        $cid = $params['cid'];
+        $courseId = $params['cid'];
         $sortBy = 'FirstName';
         $order = AppConstant::ASCENDING;
         $users = User::findAllTeachers($sortBy, $order);
-        $teachers = Teacher::getAllTeachers($cid);
+        $teachers = Teacher::getAllTeachers($courseId);
         $nonTeacher = array();
         $teacherIds = array();
         $teacherList = array();
@@ -461,7 +446,6 @@ class CourseController extends AppController
                 $teacherIds[$teacher['userid']] = true;
             }
         }
-
         if ($users) {
             foreach ($users as $user) {
                 if (isset($teacherIds[$user['id']])) {
@@ -473,20 +457,17 @@ class CourseController extends AppController
         }
         return $this->successResponse(array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher));
     }
-
     public function actionAddTeacherAjax()
     {
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
 
             $teacher = new Teacher();
-
             if ($params['userId'] != null && $params['cid'] != null) {
                 $teacher->create($params['userId'], $params['cid']);
             }
             return $this->successResponse();
         }
-
     }
 
     public function actionRemoveTeacherAjax()
@@ -495,26 +476,23 @@ class CourseController extends AppController
             $params = $this->getRequestParams();
 
             $teacher = new Teacher();
-
             if ($params['userId'] != null && $params['cid'] != null) {
                 $teacher->removeTeacher($params['userId'], $params['cid']);
             }
             return $this->successResponse();
         }
     }
-
     public function actionAddAllAsTeacherAjax()
     {
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            $cid = $params['cid'];
+            $courseId = $params['cid'];
             $usersIds = json_decode($params['usersId']);
 
             for ($i = 0; $i < count($usersIds); $i++) {
                 $teacher = new Teacher();
-                $teacher->create($usersIds[$i], $cid);
+                $teacher->create($usersIds[$i], $courseId);
             }
-
             return $this->successResponse();
         }
     }
@@ -524,18 +502,16 @@ class CourseController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
 
-            $cid = $params['cid'];
+            $courseId = $params['cid'];
             $usersIds = json_decode($params['usersId']);
 
             for ($i = 0; $i < count($usersIds); $i++) {
                 $teacher = new Teacher();
-                $teacher->removeTeacher($usersIds[$i], $cid);
+                $teacher->removeTeacher($usersIds[$i], $courseId);
             }
-
             return $this->successResponse();
         }
     }
-
     /**
      * @param $assessment
      * @param $param
@@ -581,14 +557,14 @@ class CourseController extends AppController
      */
     public function actionShowLinkedText()
     {
-        $cid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $id = Yii::$app->request->get('id');
-        $course = Course::getById($cid);
+        $course = Course::getById($courseId);
         $link = Links::getById($id);
+
         $returnData = array('course' => $course, 'links' => $link);
         return $this->renderWithData('showLinkedText', $returnData);
     }
-
     /**
      * To handle event on calendar.
      */
@@ -596,11 +572,17 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
-        $cid = $params['cid'];
-        $assessments = Assessments::getByCourseId($cid);
-        $calendarItems = CalItem::getByCourseId($cid);
-        $CalendarLinkItems = Links::getByCourseId($cid);
-        $calendarInlineTextItems = InlineText::getByCourseId($cid);
+        $courseId = $params['cid'];
+        $assessments = Assessments::getByCourseId($courseId);
+        $calendarItems = CalItem::getByCourseId($courseId);
+        $CalendarLinkItems = Links::getByCourseId($courseId);
+        $calendarInlineTextItems = InlineText::getByCourseId($courseId);
+
+        /**
+         * Display assessment Modes:
+         *                         - Normal assessment
+         *                         - Review mode assessment
+         */
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -618,6 +600,9 @@ class CourseController extends AppController
             );
         }
 
+        /**
+         * Display managed events by admin.
+         */
         $calendarArray = array();
         foreach ($calendarItems as $calendarItem)
         {
@@ -628,6 +613,9 @@ class CourseController extends AppController
                 'tag' => $calendarItem['tag']
             );
         }
+        /**
+         * Display link text: tags.
+         */
         $calendarLinkArray = array();
         foreach ($CalendarLinkItems as $CalendarLinkItem)
         {
@@ -644,6 +632,9 @@ class CourseController extends AppController
             );
         }
 
+        /**
+         * Display inline text: tags.
+         */
         $calendarInlineTextArray = array();
         foreach ($calendarInlineTextItems as $calendarInlineTextItem)
         {
@@ -664,11 +655,10 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
-        $cid = $this->getParamVal('cid');
-        $cid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $responseData = array();
         $calendarCount = array();
-        $course = Course::getById($cid);
+        $course = Course::getById($courseId);
         if ($course) {
             $itemOrders = unserialize($course->itemorder);
             if (count($itemOrders)) {
@@ -718,7 +708,7 @@ class CourseController extends AppController
                 }
             }
         }
-        $message = Message::getByCourseIdAndUserId($cid, $user->id);
+        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
         $isreadArray = array(0, 4, 8, 12);
         $msgList = array();
         if($message){
@@ -736,10 +726,6 @@ class CourseController extends AppController
     public function actionCalendar()
     {
         $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
-        $userId = $user->id;
-        $id = $this->getParamVal('id');
-        $cid = $this->getParamVal('cid');
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
         return $this->render('calendar');

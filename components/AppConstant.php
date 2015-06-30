@@ -79,4 +79,5 @@ class AppConstant
     const NO_USER_FOUND = "User not found.";
     const NO_MESSAGE_FOUND = "No message found.";
     const NO_COURSE_FOUND = "Course not found.";
+    const DELETED_SUCCESSFULLY = "Deleted successfully.";
 }
