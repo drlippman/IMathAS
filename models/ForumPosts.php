@@ -69,7 +69,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->subject = isset($params['subject']) ? $params['subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
-            $this->parent = $params['parentId'];
+        $this->parent = $params['parentId'];
         $this->message = isset($params['body']) ? $params['body'] : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;

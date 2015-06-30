@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;?>
         foreach ($threads as $thread) { ?>
             <?php
 
-            if ( $thread['forumiddata'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == 0 ) { ?>
+            if ( $thread['forumIdData'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) { ?>
              <input type="radio" id="<?php echo $thread['threadId'] ?>" name="thread-name" value="<?php echo $thread['threadId'] ?>"><?php echo $thread['subject']?><br>
             <?php }
         } ?>

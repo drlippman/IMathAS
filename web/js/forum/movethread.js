@@ -17,7 +17,6 @@ $(document).ready(function() {
 
 
         $("#move-button").click(function () {
-            //var thread_id =  $( "#thread-id" ).val();
             var forum_id =  $('input[name="forum-name"]:checked', '#myForm').val();
 
         });

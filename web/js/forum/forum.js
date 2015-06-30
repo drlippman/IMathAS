@@ -106,8 +106,8 @@ function threadSuccess(response)
         var html = "";
         $.each(searchdata, function(index, search)
         {
-            html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + search.threadId +"&forumid="+ search.forumiddata+"'>" +(search.subject) +"</a> "+ search.name+" </td> ";
-            html += "<td>" + search.replyby + "</td>";
+            html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + search.threadId +"&forumid="+ search.forumIdData+"'>" +(search.subject) +"</a> "+ search.name+" </td> ";
+            html += "<td>" + search.replyBy + "</td>";
             html += "<td>" + search.views + "</td>";
             html += "<td>" + search.postdate + "</td>";
        });
@@ -142,14 +142,14 @@ function forumsSuccess(response) {
         {
             if(forum.rights > 10)
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
+                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumName) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";
             }
-            else if(forum.enddate > forum.currenttime )
+            else if(forum.endDate > forum.currentTime )
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumname) + "</a></td>+ <a href='Modify'> ";
+                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumName) + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";
