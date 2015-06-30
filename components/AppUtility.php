@@ -1034,7 +1034,7 @@ class AppUtility extends Component
 
                     $responseString .= "<a name=\"beginquestions\"></a>\n";
                     basicshowq($next);
-                    showqinfobar($next ,true,true);
+                    showqinfobar($next, true, true);
                     $responseString .= '<input type="submit" class="btn btn-primary" value="'. _('Submit'). '" />';
                     if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
                         $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';

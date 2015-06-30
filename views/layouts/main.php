@@ -29,8 +29,8 @@ AppAsset::register($this);
         <?php
         $basePath = '/site/';
             NavBar::begin([
-                'brandLabel' => 'IMathAS',
-                'brandUrl' => Yii::$app->homeUrl,
+                'brandLabel' => 'OpenMath',
+                'brandUrl' => Yii::$app->homeUrl.'site/login',
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
@@ -39,12 +39,12 @@ AppAsset::register($this);
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
                     Yii::$app->user->isGuest ?
-                    ['label' => 'Home', 'url' => [$basePath.'index']]:
+                    ['label' => 'Home', 'url' => [$basePath.'login']]:
                         ['label' => 'Home', 'url' => [$basePath.'dashboard']],
                     Yii::$app->user->isGuest ?
-                    ['label' => 'About Us', 'url' => [$basePath.'about']]:'',
+                    ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
                     Yii::$app->user->isGuest ?
-                        ['label' => 'Login', 'url' => [$basePath.'login']] :
+                        ['label' => ''] :
                         ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
                             'url' => ['/site/logout'],
                             'linkOptions' => ['data-method' => 'post']],

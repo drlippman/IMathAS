@@ -57,13 +57,14 @@ function calendar() {
     var startDate = $('.start-date').val();
 
     $('.calendar').fullCalendar({
-        height: 400,
+        aspectRatio: 2.5,
         header: {
             left: 'prev,next today',
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
         editable: false,
+        fixedWeekCount: false,
         events: function (start, end, timezone, callback) {
             $.ajax({
                 url: 'get-assessment-data-ajax',
@@ -270,6 +271,7 @@ function calendar() {
             }
         }
     });
+
 }
 
 

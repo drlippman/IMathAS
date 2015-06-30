@@ -1,6 +1,7 @@
 <?php
 //Inequality graphing functions.  Version 1.0, Oct 30, 2006
 
+use app\components\AppUtility;
 global $allowedmacros;
 array_push($allowedmacros,"ineqplot","ineqbetweenplot");
 
@@ -159,11 +160,11 @@ function ineqplot($funcs) {
 		}
 		$commands .= $shades;
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
-		return $alt;
-	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
-	}
+//	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+//		return $alt;
+//	} else {
+		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src=".AppUtility::getHomeURL()."js/d.svg' script='$commands' />\n";
+//	}
 }
 
 //ineqbetweenplot("funcstring",[xmin,xmax,ymin,ymax,labels,grid,width,height])
@@ -172,7 +173,7 @@ function ineqplot($funcs) {
 //
 //funcstring format: (function and filltype are required) - one string or array
 //  function of x,above or below,linecolor,dash,strokewidth
-function ineqbetweenplot($funcs) { 
+function ineqbetweenplot($funcs) {
 	if (!is_array($funcs)) {
 		settype($funcs,"array");
 	}
@@ -313,11 +314,11 @@ function ineqbetweenplot($funcs) {
 		}
 	}
 	$commands .= $shades;
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
-		return $alt;
-	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
-	}
+//	if ($GLOBALS['sessiondata']['graphdisp']== 0) {
+//		return $alt;
+//	} else {
+		return "<embed type='image/svg+xml' align='middle' width='$settings[6]' height='$settings[7]' src= ".AppUtility::getHomeURL()."js/d.svg script='$commands' />\n";
+//	}
 }
 
 ?>

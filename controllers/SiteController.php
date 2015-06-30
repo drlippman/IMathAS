@@ -67,9 +67,10 @@ class SiteController extends AppController
     public function actionIndex()
     {
         if (!$this->isGuestUser()) {
-            return $this->redirect('site/dashboard');
+            return $this->redirect(AppUtility::getURLFromHome('site','dashboard'));
         } else {
-            return $this->renderWithData('index');
+
+            return $this->redirect(AppUtility::getURLFromHome('site','login'));
         }
     }
 
@@ -99,9 +100,9 @@ class SiteController extends AppController
      * @return string
      * Controller for about us page
      */
-    public function actionAbout()
+    public function actionDiagnostics()
     {
-        return $this->renderWithData('about');
+        return $this->renderWithData('diagnostics');
     }
 
     /**
@@ -293,7 +294,7 @@ class SiteController extends AppController
     {
         if ($this->getAuthenticatedUser()) {
             Yii::$app->user->logout();
-            return $this->goHome();
+            return $this->redirect(AppUtility::getURLFromHome('site', 'login'));
         }
     }
 

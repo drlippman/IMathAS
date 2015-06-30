@@ -1,5 +1,6 @@
 <?php
 //Interval functions, Version 1.1 March 2, 2010
+use app\components\AppUtility;
 
 global $allowedmacros;
 array_push($allowedmacros,"linegraph","linegraphbrackets","forminterval","intervalstodraw");
@@ -94,11 +95,11 @@ function linegraph($intvs) {
 			$commands .= ');';
 		}
 	}
-	if ($GLOBALS['sessiondata']['graphdisp']==0) {
-		return $alt;
-	} else {
-		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src='{$GLOBALS['imasroot']}/javascript/d.svg' script='$commands' />\n";
-	}
+//	if ($GLOBALS['sessiondata']['graphdisp']==0) {
+//		return $alt;
+//	} else {
+		return "<embed type='image/svg+xml' align='middle' width='$settings[3]' height='$settings[4]' src=".AppUtility::getHomeURL()."js/d.svg' script='$commands' />\n";
+//	}
 	
 }
 

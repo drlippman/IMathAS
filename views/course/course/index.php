@@ -12,11 +12,11 @@ echo $this->render('_toolbar',['course'=> $course]);
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 
-<div class=" col-lg-3 needed">
+<div class=" col-lg-2 needed">
     <?php echo $this->render('_leftSide',['course'=> $course, 'messageList' => $messageList]);?>
 </div>
 <!--Course name-->
-<div class="col-lg-9 container">
+<div class="col-lg-10">
 <div class="">
     <h3>
         <b><?php echo $course->name ?></b>
