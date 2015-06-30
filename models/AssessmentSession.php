@@ -11,6 +11,7 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasAssessmentSessions;
+use yii\db\Query;
 
 class AssessmentSession extends BaseImasAssessmentSessions
 {
@@ -99,5 +100,14 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $session->reattempting = $params['reattempting'];
             $session->save();
         }
+    }
+
+    public static function getByUserCourseAssessmentId($assessmentId,$courseId,$user){
+        $query = new Query();
+        $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')->join('INNER JOIN','imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
+            ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId])->count();
+            $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
     }
 } 

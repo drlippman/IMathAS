@@ -137,4 +137,70 @@ class AssessmentController extends AppController
             }
         }
     }
+
+    public function actionAddAssessment(){
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId =$this->getParamVal('cid');
+        $course = Course::getById($courseId);
+        $assessmentId = $params['id'];
+        if (isset($assessmentId)) {
+            $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId,$user);
+            $assessmentData = Assessments::getByAssessmentId($assessmentId);
+            list($testType,$showAnswer) = explode('-',$assessmentData['deffeedback']);
+            $startDate = $assessmentData['startdate'];
+            $endDate = $assessmentData['enddate'];
+            $gradebookCategory = $assessmentData['gbcategory'];
+            if ($testType=='Practice') {
+                $pointCountInGb = $assessmentData['cntingb'];
+                $CountInGb = AppConstant::NUMERIC_ONE;
+            } else {
+                $CountInGb = $assessmentData['cntingb'];
+                $pointCountInGb = AppConstant::NUMERIC_THREE;
+            }
+            $showQuestionCategory = $assessmentData['showcat'];
+            $timeLimit = $assessmentData['timelimit']/60;
+            if ($assessmentData['isgroup']==0) {
+                $assessmentData['groupsetid']=0;
+            }
+            if ($assessmentData['deffeedbacktext']=='') {
+                $usedEfFeedback = false;
+                $defFeedback = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+            } else {
+                $usedEfFeedback = true;
+                $defFeedback = $assessmentData['deffeedbacktext'];
+            }
+            if ($assessmentData['summary']=='') {
+                //	$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
+            }
+            if ($assessmentData['intro']=='') {
+                //	$line['intro'] = "<p>Enter intro/instructions</p>";
+            }
+            $savetitle = "Save Changes";
+        }else{//page load in add mode set default values
+
+        }
+        $now = time();
+        if ($assessmentData['minscore']>10000) {
+            $assessmentData['minscore'] -= 10000;
+            $minScoreType = AppConstant::NUMERIC_ONE; //pct;
+        } else {
+            $minScoreType = AppConstant::NUMERIC_ZERO; //points;
+        }
+        if ($assessmentData['reviewdate'] > 0) {
+            if ($assessmentData['reviewdate']=='2000000000') {
+                $reviewDate = tzdate("m/d/Y",$assessmentData['enddate']+7*24*60*60);
+                $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
+            } else {
+                $reviewDate = tzdate("m/d/Y",$assessmentData['reviewdate']);
+                $reviewTime = tzdate("g:i a",$assessmentData['reviewdate']);
+            }
+        } else {
+            $reviewDate = tzdate("m/d/Y",$assessmentData['enddate']+7*24*60*60);
+            $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
+        }
+
+        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js"]);
+        return $this->renderWithData('addAssessment',['course' => $course]);
+    }
 } 

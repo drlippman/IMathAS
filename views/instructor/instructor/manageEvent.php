@@ -9,9 +9,6 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 //$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
-foreach ($eventItems as $item){
-
-}
 
 ?>
 <div class="calendar-manage-event">
@@ -38,7 +35,7 @@ foreach ($eventItems as $item){
                 $title = $item['title'];
                 $model->tag = AppUtility::getStringVal($tag);
                 $model->eventDetails = AppUtility::getStringVal($title);?>
-            <tr><td class="col-lg-1"><?= $form->field($model, 'delete')->checkbox(['name'=>'delete['.$item->id.']']); ?></td>
+            <tr><td class="col-lg-1"><?= $form->field($model, 'delete')->checkbox(['name'=>'delete['.$item->id.']','class'=>'col-lg-12']); ?></td>
                 <td class="col-lg-2">     <?php
                     echo DatePicker::widget([
                         'name' => 'EventDate'.$item->id,
