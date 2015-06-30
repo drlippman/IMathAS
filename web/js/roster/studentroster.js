@@ -89,8 +89,8 @@ function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
             html += "<td class = 'lock-class'><a  href='#' onclick='lockUnlockStudent(false," + student.id + ")'>Lock</a></td>";
         }
         else {
-            html += "<td class = 'lock-class'><a href='#' onclick='lockUnlockStudent(true," + student.id + ")'>Unlock</a></td>";
-        }
+            html += "<td class = 'lock-class'><img src='../../img/lock.png'>&nbsp;<a href='#' onclick='lockUnlockStudent(true," + student.id + ")'>Unlock</a></td>";
+         }
     });
     $('#student-information-table').append(html);
     createDataTable('student-data-table');

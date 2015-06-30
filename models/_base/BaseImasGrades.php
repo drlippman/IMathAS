@@ -64,4 +64,5 @@ class BaseImasGrades extends \yii\db\ActiveRecord
     {
         return $this->hasOne(BaseImasUsers::className(), ['id' => 'userid']);
     }
+
 }

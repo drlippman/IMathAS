@@ -78,6 +78,48 @@ function checkAssessmentSnapshot() {
         $(".change-non-assessment-snapshot-content").hide();
     }
 }
-$("#quickadd").keypress(function() {
-    console.log( "Handler for .keypress() called." );
-});
+
+studentDetails = [];
+var courseId = $('#course-id').val();
+jQuerySubmit('quick-search-ajax',{courseId:courseId},'quickSearchAjax');
+//jQuerySubmit('quick-search-ajax',{ },'abcd');
+function quickSearchAjax(response){
+    response = JSON.parse(response);
+    studentDetails = response.data;
+
+    $(function() {
+
+        $( "#project" ).autocomplete({
+            minLength: 0,
+            source: studentDetails,
+            focus: function( event, ui ) {
+
+                $( "#project" ).val( ui.item.label );
+                //console.log(dd);
+                return false;
+            },
+            select: function( event, ui ) {
+                $( "#project" ).val( ui.item.label );
+
+                $( "#project-id" ).val( ui.item.value );
+                //$( "#project-description" ).html( ui.item.desc );
+
+
+                return false;
+            }
+        })
+            .autocomplete( "instance" )._renderItem = function( ul, item ) {
+
+            //function quickSearchSuccess()
+            //{
+            //
+            //}
+            return $( "<li>" )
+                .append( "<a>" + item.label + "</a>" )
+                .appendTo( ul );
+//alert('njo');
+
+        };
+
+    });
+}

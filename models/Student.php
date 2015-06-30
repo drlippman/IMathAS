@@ -151,4 +151,5 @@ class Student extends BaseImasStudents {
     {
         return static::find()->select('section')->distinct()->where(['courseid' => $courseId])->all();
     }
+
 } 

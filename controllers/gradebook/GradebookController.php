@@ -249,7 +249,7 @@ class GradebookController extends AppController
         $studentArray = array();
         if ($studentData) {
             foreach ($studentData as $student) {
-                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                $tempArray = array('Name' => ucfirst($student->user->FirstName). ' ' . ucfirst($student->user->LastName),
                     'Section' => $student->section,
                     'StudentId' => $student->id,
                     'userid' => $student->userid
@@ -347,5 +347,28 @@ class GradebookController extends AppController
         $responseData = array('rubicData' => $rubicData);
         return $this->renderWithData('editRubric', $responseData);
 
+    }
+    public function actionQuickSearchAjax()
+    {
+        $courseId = $this->getRequestParams();
+        $studentInformation = Student::findByCid($courseId);
+        $studentDetails = array();
+        foreach($studentInformation as $singleStudentInformation){
+//            AppUtility::dump($singleStudentInformation->user->grades->score);
+            $tempArray = array(
+                'id' => $singleStudentInformation->id,
+                'value' => $singleStudentInformation->user->id,
+                'section' => $singleStudentInformation->section,
+                'label' =>ucfirst($singleStudentInformation->user->FirstName).''.ucfirst($singleStudentInformation->user->LastName),
+
+//                'grade' => $singleStudentInformation->grades->score,
+//                'feedback' => $singleStudentInformation->grade->feedback,
+
+            );
+//            $studentData = User::findByCidAndName($text,$singleStudentInformation['userid']);
+            array_push($studentDetails,$tempArray);
+        }
+        $responseData = $studentDetails;
+        return $this->successResponse($responseData);
     }
 }

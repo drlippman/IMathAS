@@ -22,6 +22,7 @@ $this->title = 'Add Offline Grades';
                 'labelOptions' => ['class' => 'col-lg-3 select-text-margin'],
             ],
         ]); ?>
+    <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <?php
         $model->Points = AppUtility::getStringVal(AppConstant::NUMERIC_ZERO);
         $model->ShowGrade = AppUtility::getStringVal(AppConstant::NUMERIC_TWO);
@@ -107,10 +108,10 @@ $this->title = 'Add Offline Grades';
             </thead>
             <tbody>
 
-            <tr id="quickadd" style="display:none;"><td><input type="text" id="qaname" /></td>
+            <tr id="quickadd" style="display:none;"><td><input type="text" id="project" /></td>
                 <td></td>
 
-                <td><input type="text" id="score-text" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>
+                <td><input type="text" id="project-id" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>
                 <td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
                     <input type="button" value="Next" onfocus="addsuggest()" /></td></tr>
 

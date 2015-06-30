@@ -42,11 +42,6 @@ class RosterController extends AppController
     {
         $this->guestUserHandler();
         $courseid = $this->getParamVal('cid');
-        $flashmessage = $this->getParamVal('flash');
-        if($flashmessage == true){
-            $this->setSuccessFlash('Updated student information successfully.');
-
-        }
         $course = Course::getById($courseid);
         $students = Student::findByCid($courseid);
         $isImageColumnPresent = 0;
@@ -1268,7 +1263,8 @@ class RosterController extends AppController
             }
             User::saveUserRecord($params, $user);
             Student::updateSectionAndCodeValue($params['section'], $userid, $params['code'], $courseId, $params);
-            $this->redirect('student-roster?cid=' . $courseId.'&flash=true');
+            $this->setSuccessFlash('Student information updated successfully.');
+            return $this->redirect('student-roster?cid=' . $courseId);
         }
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);
