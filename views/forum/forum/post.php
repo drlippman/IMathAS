@@ -161,5 +161,7 @@ $currentLevel = 0;
     <a  href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='.$course->id.'&forumid='.$forumId)?>">Back to Forum Topics</a>
         </div>
 </div>
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/forum/post.js?ver=<?php echo time()?>"></script>
+
+<?php
+AppUtility::includeJS('general.js');
+AppUtility::includeJS('forum/post.js'); ?>

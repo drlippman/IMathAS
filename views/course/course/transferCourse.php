@@ -7,7 +7,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/in
 $this->params['breadcrumbs'][] = $this->title;
 ?>
     <title>Transfer Course Owner</title>
-    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
+    <?php AppUtility::includeCSS('dashboard.css');?>
     <!-- DataTables CSS -->
 
 <div class=mainbody>

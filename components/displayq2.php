@@ -12,6 +12,7 @@ require_once("mathphp2.php");
 require("interpret5.php");
 require("macros.php");
 require("../filter/filter.php");
+
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
 	global $imasroot, $responseString, $printData, $myrights, $showtips, $urlmode, $CFG;

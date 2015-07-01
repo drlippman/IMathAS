@@ -2,11 +2,13 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
+use app\components\AppUtility;
 
 $this->title = 'Diagnostic Setup';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="../../../web/css/adminDiagnostic.css"/>
+<?php AppUtility::includeCSS('adminDiagnostic.css');?>
+
 <div class="site-login">
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',

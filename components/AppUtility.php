@@ -58,6 +58,14 @@ class AppUtility extends Component
         return Yii::$app->homeUrl;
     }
 
+    public static function includeCSS($cssFile){
+        echo "<link rel='stylesheet' type='text/css' href='" . AppUtility::getHomeURL()."css/" .$cssFile . "?ver=".AppConstant::VERSION_NUMBER."'/>";
+    }
+
+    public static function includeJS($jsFile){
+        echo "<script type='text/javascript' src='" . AppUtility::getHomeURL()."js/" .$jsFile . "?ver=".AppConstant::VERSION_NUMBER."'></script>";
+    }
+
     public static function getAssetURL(){
         return self::getHomeURL();
     }

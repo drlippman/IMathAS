@@ -6,12 +6,12 @@ use app\components\AppConstant;
 date_default_timezone_set("Asia/Calcutta");
 $this->title = 'Add New Thread';
 if ($rights > AppConstant::STUDENT_RIGHT){
-
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 }
 else{
     $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
 }
+
 //$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumName->id]];

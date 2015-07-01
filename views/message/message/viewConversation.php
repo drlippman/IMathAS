@@ -14,17 +14,14 @@ $this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/mes
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = AppConstant::ZERO_VALUE;
 ?>
-<script src="../../../web/js/jquery.min.js" type="text/javascript"></script>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/forums.css"
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/imascore.css" type="text/css"/>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/default.css" type="text/css"/>
-<link rel="stylesheet" href="<?php echo AppUtility::getHomeURL() ?>css/handheld.css"
-      media="handheld,only screen and (max-device-width:480px)"/>
-
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
-<script type="text/javascript"
-        src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
-<script src="<?php echo AppUtility::getHomeURL() ?>js/ASCIIsvg_min.js" type="text/javascript"></script>
+<?php
+AppUtility::includeCSS('forums.css');
+AppUtility::includeCSS('imascore.css');
+AppUtility::includeCSS('default.css');
+AppUtility::includeCSS('handheld.css');
+AppUtility::includeJS('general.js'); ?>
+<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
+<?php AppUtility::includeJS('ASCIIsvg_min.js');?>
 <div class=mainbody>
     <div class="headerwrapper">
         <div id="navlistcont">

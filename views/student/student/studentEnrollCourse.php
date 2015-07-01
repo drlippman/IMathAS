@@ -6,7 +6,6 @@ use app\components\AppUtility;
 $this->title = 'Enroll in a course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!--<link rel="stylesheet" href="../../../web/css/studEnrollCourse.css"/>-->
 <div class="site-login">
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal'],

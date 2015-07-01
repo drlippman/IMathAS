@@ -6,7 +6,7 @@ use app\components\AppConstant;
 $this->title = $course->name;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<?php AppUtility::includeCSS('fullcalendar.print.css');?>
 <!--<div class="mainbody">-->
 
      <div>

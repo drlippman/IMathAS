@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
-<link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
+<?php AppUtility::includeCSS('fullcalendar.print.css');?>
 <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
