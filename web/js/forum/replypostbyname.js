@@ -1,20 +1,16 @@
 $(document).ready(function ()
 {
-    tinymce.init({
-        selector: "textarea",
-        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
-    });
-
+    initEditor();
     $(".reply-btn").one('click',function()
     {
         tinyMCE.triggerSave();
-        var courseid = $(".courseid").val();
-        var forumid = $(".forumid").val();
-        var threadid = $(".threadid").val();
+        var courseId = $(".course-id").val();
+        var forumId = $(".forum-id").val();
+        var threadId = $(".thread-id").val();
         var subject = $("#sub").val();
         var parentId =$(".parent").val();
-        var body = $("#postreply").val();
-        var replyDetails = {couserid : courseid,parentId : parentId,forumid : forumid,threadid : threadid,subject : subject,body : body};
+        var body = $("#post-reply").val();
+        var replyDetails = {courseId : courseId,parentId : parentId,forumId : forumId,threadId : threadId,subject : subject,body : body};
         jQuerySubmit('reply-list-post-ajax',replyDetails,'replyPostSuccess');
     });
 
@@ -24,9 +20,9 @@ function replyPostSuccess(response)
 {
     console.log(response);
     response = JSON.parse(response);
-    var courseId = $(".courseid").val();
-    var forumId = $(".forumid").val();
-    var threadId = $(".threadid").val();
+    var courseId = $(".course-id").val();
+    var forumId = $(".forum-id").val();
+    var threadId = $(".thread-id").val();
     if(response.status == 0)
     {
         window.location = "list-post-by-name?cid="+courseId+"&forumid="+forumId;

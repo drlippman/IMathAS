@@ -65,8 +65,8 @@ class ForumPosts extends BaseImasForumPosts
 
     public function createReply($params, $user)
     {
-        $this->threadid = isset($params['threadid']) ? $params['threadid'] : null;
-        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
+        $this->threadid = isset($params['threadId']) ? $params['threadId'] : null;
+        $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
         $this->subject = isset($params['subject']) ? $params['subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
         $this->parent = $params['parentId'];

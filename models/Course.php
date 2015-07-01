@@ -135,7 +135,26 @@ class Course extends BaseImasCourses {
         $course->save();
     }
 
+
     public static function getOutcome($courseId){
         return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
     }
-} 
+
+
+    public function SaveOutcomes($courseId,$outcomeGrp)
+    {
+
+        $isRecord = Course::findAll(['id' =>$courseId]);
+        if($isRecord)
+        {
+               foreach($isRecord as $outcome)
+               {
+                   $outcome->outcomes = $outcomeGrp;
+                   $outcome->save();
+               }
+        }
+
+    }
+
+}
+

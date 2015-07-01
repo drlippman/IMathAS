@@ -17,6 +17,10 @@ class Outcomes extends BaseImasOutcomes {
             $this->save();
 
     }
+    public static function getByCourseId($courseId)
+    {
+         return Outcomes::findAll(['courseid' => $courseId]);
+    }
 
     public static function getByCourseId($courseId){
         return Outcomes::find()->select('id,name')->where(['courseid' => $courseId])->all();

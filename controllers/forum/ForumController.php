@@ -20,6 +20,7 @@ class ForumController extends AppController
     public $postData = array();
     public $totalPosts = array();
     public $children = array();
+
 /*Controller Action To Redirect To Search Forum Page*/
     public function actionSearchForum()
     {
@@ -518,17 +519,17 @@ class ForumController extends AppController
        $threadArray = array();
        foreach ($threadData as $data)
        {
-               $temparray = array
+               $tempArray = array
                (
 
                    'subject' => $data['subject'],
 
                );
-               array_push($threadArray, $temparray);
+               array_push($threadArray, $tempArray);
        }
        $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/replypost.js']);
-       $responseData = array('reply' => $threadArray,'course' => $course,'forumid' => $forumId,'threadid' => $threadId,'parentId' => $Id);
-       return $this->renderWithData('replypost', $responseData);
+       $responseData = array('reply' => $threadArray,'course' => $course,'forumId' => $forumId,'threadId' => $threadId,'parentId' => $Id);
+       return $this->renderWithData('replyPost', $responseData);
    }
     public function actionReplyPostAjax()
     {
@@ -766,6 +767,7 @@ class ForumController extends AppController
 
             $this->setReferrer();
             $this->includeCSS(['forums.css']);
+            $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ONE;
             $responseData = array('threadArray' => $finalSortedArray,'forumId' => $forumId,'forumName' => $forumName,'course' => $course,'status' => $status,'userRights' => $userRights);
             return $this->renderWithData('listPostByName',$responseData);
@@ -773,7 +775,7 @@ class ForumController extends AppController
         else
         {
                 $status = AppConstant::NUMERIC_ZERO;
-            $responseData = array('status' => $status,'forumid' => $forumId,'course' => $course);
+            $responseData = array('status' => $status,'forumId' => $forumId,'course' => $course);
             return $this->renderWithData('listPostByName',$responseData);
         }
     }
@@ -782,6 +784,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $forumId = $this->getParamVal('forumid');
         $Id = $this->getParamVal('replyto');
         $threadId = $this->getParamVal('threadId');
@@ -797,7 +800,7 @@ class ForumController extends AppController
             array_push($threadArray, $tempArray);
         }
         $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/replypostbyname.js']);
-        $responseData = array('reply' => $threadArray,'courseid' => $courseId,'forumid' => $forumId,'threadid' => $threadId);
+        $responseData = array('reply' => $threadArray,'courseId' => $courseId,'forumId' => $forumId,'threadId' => $threadId,'course' => $course);
         return $this->renderWithData('replyPostByName',$responseData);
     }
     public function actionReplyListPostAjax()

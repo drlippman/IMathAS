@@ -1,31 +1,26 @@
 $(document).ready(function ()
-{
-        initEditor();
+{    initEditor();
     $("#reply-btn").one('click',function()
     {
         document.getElementById("reply-btn").disabled = 'true';
-
         tinyMCE.triggerSave();
-        var courseid = $(".courseid").val();
-
-        var forumid = $(".forumid").val();
-        var threadid = $(".threadid").val();
+        var courseId = $(".course-id").val();
+        var forumId = $(".forum-id").val();
+        var threadId = $(".thread-id").val();
         var subject = $(".subject").val();
-        var body = $("#postreply").val();
+        var body = $("#post-reply").val();
         var parentId = $(".parent-id").val();
-        var replyDetails = {couserid:courseid,forumid:forumid,threadid:threadid,subject:subject,body:body,parentId:parentId};
+        var replyDetails = {courseId:courseId,forumId:forumId,threadId:threadId,subject:subject,body:body,parentId:parentId};
         jQuerySubmit('reply-post-ajax',replyDetails,'replyPost');
     });
-
 });
 
 function replyPost(response)
 {
   response = JSON.parse(response);
-    var courseId = $(".courseid").val();
-
-    var forumId = $(".forumid").val();
-    var threadId = $(".threadid").val();
+    var courseId = $(".course-id").val();
+    var forumId = $(".forum-id").val();
+    var threadId = $(".thread-id").val();
     if(response.status == 0)
     {
         document.getElementById("reply-btn").disabled = 'false';

@@ -12,12 +12,12 @@ use Yii;
 class OutcomesController extends AppController
 {
 
-    public function actionAddoutcomes()
+    public function actionAddOutcomes()
     {
         $this->guestUserHandler();
-        $courseid = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $this->includeCSS(['outcomes.css']);
-        return $this->render('addOutcomes',['courseid' => $courseid]);
+        return $this->render('addOutcomes',['courseId' => $courseId]);
 
     }
 
@@ -25,15 +25,60 @@ class OutcomesController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
-        $courseid = $params['courseid'];
-        $outcomearray = array();
-        $outcomearray = $params['outcomearray'];
-        foreach($outcomearray as $outcome)
+        $courseId = $params['courseId'];
+        $outcomeArray = $params['outcomeArray'];
+        foreach($outcomeArray as $outcome)
         {
             $saveOutcome = new Outcomes();
-            $saveOutcome->SaveOutcomes($courseid,$outcome);
+            $saveOutcome->SaveOutcomes($courseId,$outcome);
         }
         return $this->successResponse();
+    }
+    public function actionGetOutcomeGrpAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $courseId = $params['courseId'];
+        $outcomeGrpArray = $params['outcomeGrpArray'];
+        foreach($outcomeGrpArray as $outcomeGrp)
+        {
+            $serializedOutcomeGrp = serialize($outcomeGrp);
+            $saveOutcome = new Course();
+            $saveOutcome->SaveOutcomes($courseId,$serializedOutcomeGrp);
+        }
+        return $this->successResponse();
+    }
+
+    public function actionGetOutcomeDataAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $courseId = $params['courseId'];
+        $courseOutcomeArray = array();
+        $courseOutcomeData = Course::getById($courseId);
+        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
+        foreach ($courseOutcome as $outcome)
+        {
+            if(is_array($outcome))
+            {
+
+                $tempArray = array(
+                    'outcomes' => $outcome['name'],
+                );
+                array_push($courseOutcomeArray,$tempArray['outcomes']);
+             }
+        }
+        $outcomeData = Outcomes::getByCourseId($courseId);
+        $outcomeDataArray = array();
+        foreach($outcomeData as $data){
+            $tempArray = array(
+
+                'name' =>$data['name'],
+            );
+            array_push($outcomeDataArray,$tempArray);
+        }
+        $responseData = array('courseOutcome' => $courseOutcomeArray,'outcomeData' => $outcomeDataArray);
+        return $this->successResponse($responseData);
     }
 
 }

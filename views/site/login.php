@@ -30,7 +30,7 @@ $this->title = 'About';
                 <p><?= Yii::t('yii', 'If you already have an account, you can log on using the box to the right.') ?></p>
 
                 <p><?= Yii::t('yii', 'If you are a new student to the system,') ?> <a href="<?php echo AppUtility::getURLFromHome('site', 'student-register') ?>"><?= Yii::t('yii', 'Register as a new student') ?></a></p>
-                <p><?= Yii::t('yii', 'If you are an instructor, you can') ?><a href="<?php echo AppUtility::getURLFromHome('site', 'registration') ?>"><?= Yii::t('yii', 'request an account') ?></a></p>
+                <p><?= Yii::t('yii', 'If you are an instructor, you can ') ?><a href="<?php echo AppUtility::getURLFromHome('site', 'registration') ?>"><?= Yii::t('yii', 'request an account') ?></a></p>
 
             </td>
         </tr>
