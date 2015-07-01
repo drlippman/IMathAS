@@ -145,7 +145,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$la = $laarr[count($laarr)-1];
 	if ($la=="ReGen") {$la = '';}
 	if ($clearla) {$la = '';}
-
+	if (isset($requestclearla) && !isset($GLOBALS['questionscoreref'])) { $la = '';}
+	
 	//$la = $GLOBALS['lastanswers'][$qnidx];
 	
 	if (isset($choices) && !isset($questions)) {
