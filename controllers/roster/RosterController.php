@@ -505,6 +505,7 @@ class RosterController extends AppController
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
                 $model->file->saveAs($filename);
+
             }
             $studentRecords = $this->ImportStudentCsv($filename, $courseId, $params);
             $newUserRecords = array();
@@ -664,6 +665,24 @@ class RosterController extends AppController
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $newStudents = array();
+        $existingStudent = array();
+        $existingStudentUsernameArray = array();
+//        AppUtility::dump($studentInformation);
+         if($studentInformation['existingUsers']){
+        foreach ($studentInformation['existingUsers'] as $singleExistingStudent) {
+            array_push($existingStudentUsernameArray, $singleExistingStudent['userName']);
+
+        }
+             $tempArrayForExistingStudent = array();
+             $uniqueStudentsForExistingStudent = array();
+             foreach ($studentInformation['existingUsers'] as $singleStudent) {
+
+                 if (!in_array($singleStudent['userName'], $tempArrayForExistingStudent)) {
+                     array_push($uniqueStudentsForExistingStudent, $singleStudent);
+                     array_push($tempArrayForExistingStudent, $singleStudent['userName']);
+                 }
+             }
+         }
         if ($studentInformation['newUsers']) {
             foreach ($studentInformation['newUsers'] as $student) {
                 if (!empty($student['4'])) {
@@ -672,23 +691,34 @@ class RosterController extends AppController
                 if (!empty($student['5'])) {
                     $isSectionPresent = true;
                 }
-                array_push($newStudents, $student);
+
+                if (in_array($student[0],  $existingStudentUsernameArray)) {
+                    array_push($existingStudent, $student);
+                } else {
+                    array_push($newStudents, $student);
+                }
             }
         }
-        $tempArray = array();
-        $uniqueStudents = array();
-        $duplicateStudents = array();
+//        AppUtility::dump($existingStudent);
+        $tempArrayForNewStudent = array();
+        $uniqueStudentsForNewStudent = array();
+        $duplicateStudentsForNewStudent = array();
         foreach ($newStudents as $singleStudent) {
-            if (!in_array($singleStudent[0], $tempArray)) {
-                array_push($uniqueStudents, $singleStudent);
-                array_push($tempArray, $singleStudent[0]);
+            if (!in_array($singleStudent[0], $tempArrayForNewStudent)) {
+                array_push($uniqueStudentsForNewStudent, $singleStudent);
+                array_push($tempArrayForNewStudent, $singleStudent[0]);
             } else {
-                array_push($duplicateStudents, $singleStudent);
+                array_push($duplicateStudentsForNewStudent, $singleStudent);
             }
         }
+        if(count($uniqueStudentsForNewStudent) == 0){
+            $this->setErrorFlash('Entered record(s) already exist in file.');
+        }
+
+//        AppUtility::dump($uniqueStudentsForNewStudent);
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/importstudent.js', 'general.js']);
-        $responseData = array('studentData' => $studentInformation, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent, 'courseId' => $courseId, 'uniqueStudents' => $uniqueStudents, 'duplicateStudents' => $duplicateStudents, 'course' => $course);
+        $responseData = array('existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent, 'courseId' => $courseId, 'uniqueStudents' => $uniqueStudentsForNewStudent, 'duplicateStudents' => $duplicateStudentsForNewStudent, 'course' => $course);
         return $this->render('showImportStudent', $responseData);
     }
 
@@ -910,7 +940,6 @@ class RosterController extends AppController
             $data = $this->getRequestParams();
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
-            $userId = $this->getParamVal('uid');
             $assessments = Assessments::getByCourseId($courseId);
             $studentList = explode(',', $data['student-data']);
             $studentArray = array();
@@ -946,7 +975,7 @@ class RosterController extends AppController
                         if($startException > $endException){
                             $this->setErrorFlash("Available date(Available After) cannot be greater than end date(Available Until).");
                         }else{
-                            $waivereqscore = (isset($params['waivereqscore'])) ? 1 : 0;
+                            $waivereqscore = (isset($params['waivereqscore'])) ? AppConstant::NUMERIC_ONE : AppConstant::NUMERIC_ZERO;
                             foreach ($studentArray as $student) {
                                 foreach ($params['addexc'] as $assessment) {
                                     $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
@@ -973,8 +1002,8 @@ class RosterController extends AppController
                                             $seeds = array();
                                             $reattempting = array();
                                             for ($i = 0; $i < count($questions); $i++) {
-                                                $scores[$i] = -1;
-                                                $attempts[$i] = 0;
+                                                $scores[$i] = AppConstant::NUMERIC_NEGATIVE_ONE;
+                                                $attempts[$i] = AppConstant::NUMERIC_ZERO;
                                                 $seeds[$i] = rand(1, 9999);
                                                 $newLastAns = array();
                                                 $laarr = explode('##', $lastanswers[$i]);

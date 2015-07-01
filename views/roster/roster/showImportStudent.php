@@ -38,6 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </thead>
             <tbody class="user-table-body" >
             <?php
+
             if (isset($uniqueStudents)) {
                 foreach ($uniqueStudents as $singleRecord) {
 
@@ -125,8 +126,9 @@ $this->params['breadcrumbs'][] = $this->title;
         createDataTable('display-user-table');
     });
     function saveStudentData() {
-        var studentInformation = <?php echo json_encode($studentData ); ?>;
-        var existingData = studentInformation['existingUsers'];
+        var existingData = <?php echo json_encode($existingStudent ); ?>;
+//        var existingData = studentInformation['existingUsers'];
+        console.log(existingData);
         var NewStudentData =  <?php echo json_encode($uniqueStudents ); ?>;
         if(existingData){
         var html = '<div><p>Existing students detail : </p></div><p>';

@@ -140,14 +140,14 @@ function forumsSuccess(response) {
         {
             if(forum.rights > 10)
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumName) + "</a></td>+ <a href='Modify'> ";
+                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";
             }
             else if(forum.endDate > forum.currentTime )
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + capitalizeFirstLetter(forum.forumName) + "</a></td>+ <a href='Modify'> ";
+                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
                 html += "<td>" + forum.threads + "</td>";
                 html += "<td>" + forum.posts + "</td>";
                 html += "<td>" + forum.lastPostDate + "</td>";

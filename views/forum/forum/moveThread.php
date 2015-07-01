@@ -31,12 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;?>
 <div id="move-forum">Move to forum:
     <div>
         <?php $currentTime = time();
-
         foreach ($forums as $forum) {
-             ?>
-            <input type="radio" id="<?php echo $forum['forumId'] ?>" name="forum-name"
+             if($forum['forumId'] == $forumId){?>
+            <input type="radio" checked id="<?php echo $forum['forumId'] ?>" name="forum-name"
                    value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
-
+<?php }else{?>
+                 <input type="radio" id="<?php echo $forum['forumId'] ?>" name="forum-name"
+                        value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
+      <?php           }?>
         <?php  } ?>
     </div>
 </div>
