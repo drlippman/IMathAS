@@ -11,12 +11,12 @@ class Assessments extends BaseImasAssessments
 {
     public static function getByCourseId($courseId)
     {
-        return static::findAll(['courseid' => $courseId]);
+        return Assessments::findAll(['courseid' => $courseId]);
     }
 
     public static function getByAssessmentId($id)
     {
-        return static::findOne(['id' => $id]);
+        return Assessments::findOne(['id' => $id]);
     }
 
     public function create($values)
@@ -24,6 +24,7 @@ class Assessments extends BaseImasAssessments
         $this->attributes = $values;
         $this->save();
     }
+
     public static function findAllAssessmentForGradebook($courseId, $canviewall, $istutor, $isteacher, $catfilter, $time){
         $query = new Query();
         $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
@@ -46,5 +47,10 @@ class Assessments extends BaseImasAssessments
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+
+    public static function getByCourse($courseId)
+    {
+        return Assessments::find()->select('id,name')->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 } 

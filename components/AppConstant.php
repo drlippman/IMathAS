@@ -59,6 +59,7 @@ class AppConstant
     const NUMERIC_THIRTEEN = 13;
     const NUMERIC_FOURTEEN = 14;
     const NUMERIC_FIFTEEN = 15;
+    const NUMERIC_THOUSAND = 10000;
     const NUMERIC_NEGATIVE_ONE = -1;
 
     const GB_USE_WEIGHT = 0;
@@ -81,4 +82,15 @@ class AppConstant
     const NO_MESSAGE_FOUND = "No message found.";
     const NO_COURSE_FOUND = "Course not found.";
     const DELETED_SUCCESSFULLY = "Deleted successfully.";
+    const WEEK_TIME = 604800;
+    const SECONDS = 60;
+    const DEFAULT_FEEDBACK = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+    const SAVE_BUTTON = "Save Changes";
+    const DEFAULT_OUTCOMES = 'No default outcome selected';
+    const GROUP_SET ='Create new set of groups';
+    const NONE = "None";
+    const UNLIMITED = "Unlimited";
+    const TUTOR_NO_ACCESS = "No access";
+    const TUTOR_READ_SCORES = "View Scores";
+    const TUTOR_READ_WRITE_SCORES = "View and Edit Scores";
 }

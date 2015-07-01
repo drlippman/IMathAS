@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 29/6/15
- * Time: 5:35 PM
- */
+
 
 namespace app\models;
 
@@ -14,13 +9,17 @@ use app\models\_base\BaseImasOutcomes;
 
 class Outcomes extends BaseImasOutcomes {
 
-    public  function SaveOutcomes($courseid,$outcome)
+    public  function SaveOutcomes($courseId,$outcome)
     {
 
             $this->name =$outcome;
-            $this->courseid = $courseid;
+            $this->courseid = $courseId;
             $this->save();
 
+    }
+
+    public static function getByCourseId($courseId){
+        return Outcomes::find()->select('id,name')->where(['courseid' => $courseId])->all();
     }
 
 } 

@@ -11,49 +11,44 @@ $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 
-<?php
-//if (isset($_GET['id'])) {
-//    echo '<div class="cp"><a href="addquestions.php?aid='.$_GET['id'].'&amp;cid='.$cid.'" onclick="return confirm(\''._('This will discard any changes you have made on this page').'\');">'._('Add/Remove Questions').'</a></div>';
-//}
-?>
 <?php echo $page_isTakenMsg ?>
 
 <form method=post action="<?php echo $page_formActionTag ?>">
     <p></p>
 <span class=form>Assessment Name:</span>
-<span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$line['name']);?>"></span><BR class=form>
+<span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>"></span><BR class=form>
 
 Summary:<BR>
 <div >
     <?php echo "<div class='left col-md-11'><div class= 'editor'>
-        <textarea cols=50 rows=15 id=summary name=summary style=width: 100%></textarea></div></div><br>"; ?>
+        <textarea cols=50 rows=15 id=summary name=summary style='width: 100%'>$assessmentData->summary</textarea></div></div><br>"; ?>
 </div><BR>
 Intro/Instructions:<BR>
 <div>
-    <?php echo "<div class='left col-md-11'><div class= 'editor'>
-    <textarea cols=50 rows=20 id=intro name=intro style=width: 100%></textarea></div></div><br>"; ?>
+    <?php echo "<div class='left col-md-11'><div>
+    <textarea cols=50 rows=20 id='intro' name='intro' style='width: 100%'>$assessmentData->intro</textarea></div></div><br>"; ?>
 </div><BR>
 
 <span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php /*writeHtmlChecked($line['avail'],0)*/;?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php /*writeHtmlChecked($line['avail'],1)*/;?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
 		</span><br class="form"/>
 
-<!--<div id="datediv" style="display:--><?php //echo ($line['avail']==1)?"block":"none"; ?><!--">-->
+<div id="datediv" style="display:<?php echo ($assessmentData['avail']==AppConstant::NUMERIC_ONE)?"block":"none"; ?>">
 
     <span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,"0",0); ?>/>
+			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/>
 			Always until end date<br/>
-			<input type=radio name="sdatetype" class="pull-left" value="sdate" <?php writeHtmlChecked($startdate,"0",1); ?>/>
+			<input type=radio name="sdatetype" class="pull-left" value="sdate" <?php writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/>
 
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
                 'name' => 'EventDate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y"),
+                'value' => date("m/d/Y",$assessmentData['startdate']),
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -78,15 +73,15 @@ Intro/Instructions:<BR>
 
     <span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,"2000000000",0); ?>/>
+			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($assessmentData['enddate'],"2000000000",0); ?>/>
 			 Always after start date<br/>
-			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php writeHtmlChecked($enddate,"2000000000",1); ?>/>
+			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php writeHtmlChecked($assessmentData['enddate'],"2000000000",1); ?>/>
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
                 'name' => 'EventDate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y"),
+                'value' => date("m/d/Y",$assessmentData['enddate']),
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -111,16 +106,16 @@ Intro/Instructions:<BR>
 
     <span class="form">Keep open as review:</span>
 		<span class="formright">
-			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($line['reviewdate'],0,0); ?>> Never<br/>
-			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($line['reviewdate'],2000000000,0); ?>> Always after due date<br/>
-			<input type=radio name="doreview" class="pull-left " value="rdate" <?php if ($line['reviewdate']>0 && $line['reviewdate']<2000000000) { echo "checked=1";} ?>>
+			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>> Never<br/>
+			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($assessmentData['reviewdate'],2000000000,AppConstant::NUMERIC_ZERO); ?>> Always after due date<br/>
+			<input type=radio name="doreview" class="pull-left " value="rdate" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>>
             <?php
             echo '<label class="end pull-left"> Until</label>';
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
                 'name' => 'EventDate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y"),
+                'value' => date("m/d/Y",$assessmentData['enddate']),
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -146,18 +141,18 @@ Intro/Instructions:<BR>
 <span class=form></span>
 		<span class=formright>
 <!--            button name should be dynamic-->
-			<input type=submit value="<?php echo 'Create Assessment';?>"> now or continue below for Assessment Options
+			<input type=submit value="<?php echo $saveTitle;?>"> now or continue below for Assessment Options
 		</span><br class=form>
 
 <fieldset><legend>Assessment Options</legend>
 <?php
-if (count($page_copyFromSelect['val'])>0) {
+if (count($pageCopyFromSelect['val'])>AppConstant::NUMERIC_ZERO) {
     ?>
     <span class=form>Copy Options from:</span>
     <span class=formright>
 
 <?php
-writeHtmlSelect ("copyfrom",$page_copyFromSelect['val'],$page_copyFromSelect['label'],0,"None - use settings below",0," onChange=\"chgcopyfrom()\"");
+writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],AppConstant::NUMERIC_ZERO,"None - use settings below",AppConstant::NUMERIC_ZERO," onChange=\"chgcopyfrom()\"");
 ?>
 		</span><br class=form>
 <?php
@@ -181,158 +176,158 @@ writeHtmlSelect ("copyfrom",$page_copyFromSelect['val'],$page_copyFromSelect['la
 <div id="customoptions" class="show">
 <fieldset><legend>Core Options</legend>
     <span class=form>Require Password (blank for none):</span>
-    <span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo $line['password'];?>" autocomplete="off"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
+    <span class=formright><input type="password" name="assmpassword" id="assmpassword" value="<?php echo $assessmentData['password'];?>" autocomplete="off"> <a href="#" onclick="apwshowhide(this);return false;">Show</a></span><br class=form />
     <span class=form>Time Limit (minutes, 0 for no time limit): </span>
-			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timelimit);?>">
-				<input type="checkbox" name="timelimitkickout" <?php if ($timelimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
+			<span class=formright><input type=text size=4 name=timelimit value="<?php echo abs($timeLimit);?>">
+				<input type="checkbox" name="timelimitkickout" <?php if ($timeLimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit</span><BR class=form>
     <span class=form>Display method: </span>
 			<span class=formright>
 				<select name="displaymethod">
-                    <option value="AllAtOnce" <?php writeHtmlSelected($line['displaymethod'],"AllAtOnce",0) ?>>Full test at once</option>
-                    <option value="OneByOne" <?php writeHtmlSelected($line['displaymethod'],"OneByOne",0) ?>>One question at a time</option>
-                    <option value="Seq" <?php writeHtmlSelected($line['displaymethod'],"Seq",0) ?>>Full test, submit one at time</option>
-                    <option value="SkipAround" <?php writeHtmlSelected($line['displaymethod'],"SkipAround",0) ?>>Skip Around</option>
-                    <option value="Embed" <?php writeHtmlSelected($line['displaymethod'],"Embed",0) ?>>Embedded</option>
-                    <option value="VideoCue" <?php writeHtmlSelected($line['displaymethod'],"VideoCue",0) ?>>Video Cued</option>
+                    <option value="AllAtOnce" <?php writeHtmlSelected($assessmentData['displaymethod'],"AllAtOnce",AppConstant::NUMERIC_ZERO) ?>>Full test at once</option>
+                    <option value="OneByOne" <?php writeHtmlSelected($assessmentData['displaymethod'],"OneByOne",AppConstant::NUMERIC_ZERO) ?>>One question at a time</option>
+                    <option value="Seq" <?php writeHtmlSelected($assessmentData['displaymethod'],"Seq",AppConstant::NUMERIC_ZERO) ?>>Full test, submit one at time</option>
+                    <option value="SkipAround" <?php writeHtmlSelected($assessmentData['displaymethod'],"SkipAround",AppConstant::NUMERIC_ZERO) ?>>Skip Around</option>
+                    <option value="Embed" <?php writeHtmlSelected($assessmentData['displaymethod'],"Embed",AppConstant::NUMERIC_ZERO) ?>>Embedded</option>
+                    <option value="VideoCue" <?php writeHtmlSelected($assessmentData['displaymethod'],"VideoCue",AppConstant::NUMERIC_ZERO) ?>>Video Cued</option>
                 </select>
 			</span><BR class=form>
 
     <span class=form>Default points per problem: </span>
-    <span class=formright><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>></span><BR class=form>
+    <span class=formright><input type=text size=4 name=defpoints value="<?php echo $assessmentData['defpoints'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>></span><BR class=form>
 
     <span class=form>Default attempts per problem (0 for unlimited): </span>
 			<span class=formright>
-				<input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>" >
-				<span id="showreattdiffver" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
-	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($line['shuffle']&8,8); ?>/> Reattempts different versions</span>
+				<input type=text size=4 name=defattempts value="<?php echo $assessmentData['defattempts'];?>" >
+				<span id="showreattdiffver" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?>">
+	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_EIGHT,AppConstant::NUMERIC_EIGHT); ?>/> Reattempts different versions</span>
 	 		</span><BR class=form>
 
     <span class=form>Default penalty:</span>
 			<span class=formright>
-				<input type=text size=4 name=defpenalty value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {echo 'disabled=disabled';}?>>%
-			   	<select name="skippenalty" <?php if ($taken) {echo 'disabled=disabled';}?>>
-                    <option value="0" <?php if ($skippenalty==0) {echo "selected=1";} ?>>per missed attempt</option>
-                    <option value="1" <?php if ($skippenalty==1) {echo "selected=1";} ?>>per missed attempt, after 1</option>
-                    <option value="2" <?php if ($skippenalty==2) {echo "selected=1";} ?>>per missed attempt, after 2</option>
-                    <option value="3" <?php if ($skippenalty==3) {echo "selected=1";} ?>>per missed attempt, after 3</option>
-                    <option value="4" <?php if ($skippenalty==4) {echo "selected=1";} ?>>per missed attempt, after 4</option>
-                    <option value="5" <?php if ($skippenalty==5) {echo "selected=1";} ?>>per missed attempt, after 5</option>
-                    <option value="6" <?php if ($skippenalty==6) {echo "selected=1";} ?>>per missed attempt, after 6</option>
-                    <option value="10" <?php if ($skippenalty==10) {echo "selected=1";} ?>>on last possible attempt only</option>
+				<input type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>%
+			   	<select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
+                    <option value="0" <?php if ($skipPenalty==AppConstant::NUMERIC_ZERO) {echo "selected=1";} ?>>per missed attempt</option>
+                    <option value="1" <?php if ($skipPenalty==AppConstant::NUMERIC_ONE) {echo "selected=1";} ?>>per missed attempt, after 1</option>
+                    <option value="2" <?php if ($skipPenalty==AppConstant::NUMERIC_TWO) {echo "selected=1";} ?>>per missed attempt, after 2</option>
+                    <option value="3" <?php if ($skipPenalty==AppConstant::NUMERIC_THREE) {echo "selected=1";} ?>>per missed attempt, after 3</option>
+                    <option value="4" <?php if ($skipPenalty==AppConstant::NUMERIC_FOUR) {echo "selected=1";} ?>>per missed attempt, after 4</option>
+                    <option value="5" <?php if ($skipPenalty==AppConstant::NUMERIC_FIVE) {echo "selected=1";} ?>>per missed attempt, after 5</option>
+                    <option value="6" <?php if ($skipPenalty==AppConstant::NUMERIC_SIX) {echo "selected=1";} ?>>per missed attempt, after 6</option>
+                    <option value="10" <?php if ($skipPenalty==AppConstant::NUMERIC_TEN) {echo "selected=1";} ?>>on last possible attempt only</option>
                 </select>
 			</span><BR class=form>
 
     <span class=form>Feedback method: </span>
 			<span class=formright>
 				<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
-                    <option value="NoScores" <?php if ($testtype=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
-                    <option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
-                    <option value="EachAtEnd" <?php if ($testtype=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
-                    <option value="EndReview" <?php if ($testtype=="EndReview") {echo "SELECTED";} ?>>Reshow question with score at the end of the test </option>
+                    <option value="NoScores" <?php if ($testType=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
+                    <option value="EndScore" <?php if ($testType=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
+                    <option value="EachAtEnd" <?php if ($testType=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
+                    <option value="EndReview" <?php if ($testType=="EndReview") {echo "SELECTED";} ?>>Reshow question with score at the end of the test </option>
 
-                    <option value="AsGo" <?php if ($testtype=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
-                    <option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
-                    <option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
+                    <option value="AsGo" <?php if ($testType=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
+                    <option value="Practice" <?php if ($testType=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
+                    <option value="Homework" <?php if ($testType=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
                 </select>
 			</span><BR class=form>
 
     <span class=form>Show Answers: </span>
 			<span class=formright>
-				<span id="showanspracspan" class="<?php if ($testtype=="Practice" || $testtype=="Homework") {echo "show";} else {echo "hidden";} ?>">
+				<span id="showanspracspan" class="<?php if ($testType=="Practice" || $testType=="Homework") {echo "show";} else {echo "hidden";} ?>">
 				<select name="showansprac">
-                    <option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
-                    <option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
-                    <option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
-                    <option value="J" <?php if ($showans=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
-                    <option value="0" <?php if ($showans=="0") {echo "SELECTED";} ?>>Always</option>
-                    <option value="1" <?php if ($showans=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
-                    <option value="2" <?php if ($showans=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
-                    <option value="3" <?php if ($showans=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
-                    <option value="4" <?php if ($showans=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
-                    <option value="5" <?php if ($showans=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
+                    <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
+                    <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
+                    <option value="F" <?php if ($showAnswer=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
+                    <option value="J" <?php if ($showAnswer=="J") {echo "SELECTED";} ?>>After last attempt or Jump to Ans button (Skip Around only)</option>
+                    <option value="0" <?php if ($showAnswer=="0") {echo "SELECTED";} ?>>Always</option>
+                    <option value="1" <?php if ($showAnswer=="1") {echo "SELECTED";} ?>>After 1 attempt</option>
+                    <option value="2" <?php if ($showAnswer=="2") {echo "SELECTED";} ?>>After 2 attempts</option>
+                    <option value="3" <?php if ($showAnswer=="3") {echo "SELECTED";} ?>>After 3 attempts</option>
+                    <option value="4" <?php if ($showAnswer=="4") {echo "SELECTED";} ?>>After 4 attempts</option>
+                    <option value="5" <?php if ($showAnswer=="5") {echo "SELECTED";} ?>>After 5 attempts</option>
                 </select>
 				</span>
-				<span id="showansspan" class="<?php if ($testtype!="Practice" && $testtype!="Homework") {echo "show";} else {echo "hidden";} ?>">
+				<span id="showansspan" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?>">
 				<select name="showans">
-                    <option value="V" <?php if ($showans=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
-                    <option value="N" <?php if ($showans=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
-                    <option value="I" <?php if ($showans=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
-                    <option value="F" <?php if ($showans=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
-                    <option value="A" <?php if ($showans=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
+                    <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
+                    <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
+                    <option value="I" <?php if ($showAnswer=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
+                    <option value="F" <?php if ($showAnswer=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
+                    <option value="A" <?php if ($showAnswer=="A") {echo "SELECTED";} ?>>After due date (in gradebook)</option>
                 </select>
 				</span>
 			</span><br class=form>
     <span class="form">Use equation helper?</span>
 			<span class="formright">
 				<select name="eqnhelper">
-                    <option value="0" <?php writeHtmlSelected($line['eqnhelper'],0) ?>>No</option>
+                    <option value="0" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                     <?php
                     //start phasing these out; don't show as option if not used.
-                    if ($line['eqnhelper']==1 || $line['eqnhelper']==2) {
+                    if ($assessmentData['eqnhelper']==AppConstant::NUMERIC_ONE || $assessmentData['eqnhelper']==AppConstant::NUMERIC_TWO) {
                         ?>
-                        <option value="1" <?php writeHtmlSelected($line['eqnhelper'],1) ?>>Yes, simple form (no logs or trig)</option>
-                        <option value="2" <?php writeHtmlSelected($line['eqnhelper'],2) ?>>Yes, advanced form</option>
+                        <option value="1" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ONE) ?>>Yes, simple form (no logs or trig)</option>
+                        <option value="2" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_TWO) ?>>Yes, advanced form</option>
                     <?php
                     }
                     ?>
-                    <option value="3" <?php writeHtmlSelected($line['eqnhelper'],3) ?>>MathQuill, simple form</option>
-                    <option value="4" <?php writeHtmlSelected($line['eqnhelper'],4) ?>>MathQuill, advanced form</option>
+                    <option value="3" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_THREE) ?>>MathQuill, simple form</option>
+                    <option value="4" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_FOUR) ?>>MathQuill, advanced form</option>
                 </select>
 			</span><br class="form" />
     <span class=form>Show hints and video/text buttons when available?</span>
 			<span class=formright>
-				<input type="checkbox" name="showhints" <?php writeHtmlChecked($line['showhints'],1); ?>>
+				<input type="checkbox" name="showhints" <?php writeHtmlChecked($assessmentData['showhints'],AppConstant::NUMERIC_ONE); ?>>
 			</span><br class=form>
 
     <span class=form>Show "ask question" links?</span>
 			<span class=formright>
-				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($line['msgtoinstr'],1); ?>/> Show "Message instructor about this question" links<br/>
-				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($line['posttoforum'],0,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$page_forumSelect['val'],$page_forumSelect['label'],$line['posttoforum']); ?>
+				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($assessmentData['msgtoinstr'],AppConstant::NUMERIC_ONE); ?>/> Show "Message instructor about this question" links<br/>
+				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($assessmentData['posttoforum'],AppConstant::NUMERIC_ZERO,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$pageForumSelect['val'],$pageForumSelect['label'],$assessmentData['posttoforum']); ?>
 			</span><br class=form>
 
     <span class=form>Show answer entry tips?</span>
 			<span class=formright>
 				<select name="showtips">
-                    <option value="0" <?php writeHtmlSelected($line['showtips'],0) ?>>No</option>
-                    <option value="1" <?php writeHtmlSelected($line['showtips'],1) ?>>Yes, after question</option>
-                    <option value="2" <?php writeHtmlSelected($line['showtips'],2) ?>>Yes, under answerbox</option>
+                    <option value="0" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ZERO) ?>>No</option>
+                    <option value="1" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ONE) ?>>Yes, after question</option>
+                    <option value="2" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_TWO) ?>>Yes, under answerbox</option>
                 </select>
 			</span><br class=form>
 
     <span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
-                writeHtmlSelect("allowlate",$page_allowlateSelect['val'],$page_allowlateSelect['label'],$line['allowlate']%10);
+                writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN);
                 ?>
-                <label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>10,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+                <label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>AppConstant::NUMERIC_TEN,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
 			</span><BR class=form>
 
     <span class=form>Make hard to print?</span>
 			<span class=formright>
-				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($line['noprint'],0); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],1); ?>/> Yes
+				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($assessmentData['noprint'],AppConstant::NUMERIC_ZERO); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],AppConstant::NUMERIC_ONE); ?>/> Yes
 			</span><br class=form>
 
 
     <span class=form>Shuffle item order: </span>
-			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE); ?>>
 			</span><BR class=form>
     <span class=form>Gradebook Category:</span>
 			<span class=formright>
 
 <?php
-writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbcat,"Default",0);
+writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCategorySelect['label'],$gradebookCategory,"Default",AppConstant::NUMERIC_ZERO);
 ?>
 			</span><br class=form>
     <span class=form>Count: </span>
-			<span <?php if ($testtype=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
-				<input type=radio name="cntingb" value="1" <?php writeHtmlChecked($cntingb,1,0); ?> /> Count in Gradebook<br/>
-				<input type=radio name="cntingb" value="0" <?php writeHtmlChecked($cntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
-				<input type=radio name="cntingb" value="3" <?php writeHtmlChecked($cntingb,3,0); ?> /> Don't count in grade total<br/>
-				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($cntingb,2,0); ?> /> Count as Extra Credit
+			<span <?php if ($testType=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
+				<input type=radio name="cntingb" value="1" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO); ?> /> Count in Gradebook<br/>
+				<input type=radio name="cntingb" value="0" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="cntingb" value="3" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
+				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_ZERO); ?> /> Count as Extra Credit
 			</span>
-			<span <?php if ($testtype!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
-				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pcntingb,0,0); ?> /> Don't count in grade total and hide from students<br/>
-				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pcntingb,3,0); ?> /> Don't count in grade total<br/>
+			<span <?php if ($testType!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
+				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
 			</span><br class=form />
     <?php
     if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
@@ -340,7 +335,7 @@ writeHtmlSelect("gbcat",$page_gbcatSelect['val'],$page_gbcatSelect['label'],$gbc
         <span class="form">Tutor Access:</span>
         <span class="formright">
 <?php
-writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$line['tutoredit']);
+writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$assessmentData['tutoredit']);
 ?>
 			</span><br class="form" />
     <?php
@@ -348,8 +343,8 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
     ?>
     <span class="form">Calendar icon:</span>
 			<span class="formright">
-				Active: <input name="caltagact" type=text size=4 value="<?php echo $line['caltag'];?>"/>,
-				Review: <input name="caltagrev" type=text size=4 value="<?php echo $line['calrtag'];?>"/>
+				Active: <input name="caltagact" type=text size=4 value="<?php echo $assessmentData['caltag'];?>"/>,
+				Review: <input name="caltagrev" type=text size=4 value="<?php echo $assessmentData['calrtag'];?>"/>
 			</span><br class="form" />
 
 </fieldset>
@@ -357,96 +352,96 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 <fieldset><legend>Advanced Options</legend>
     <span class=form>Minimum score to receive credit: </span>
 			<span class=formright>
-				<input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
-				<input type="radio" name="minscoretype" value="0" <?php writeHtmlChecked($minscoretype,0);?>> Points
-				<input type="radio" name="minscoretype" value="1" <?php writeHtmlChecked($minscoretype,1);?>> Percent
+				<input type=text size=4 name=minscore value="<?php echo $assessmentData['minscore'];?>">
+				<input type="radio" name="minscoretype" value="0" <?php writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>> Points
+				<input type="radio" name="minscoretype" value="1" <?php writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ONE);?>> Percent
 			</span><BR class=form>
 
     <span class=form>Show based on another assessment: </span>
 			<span class=formright>Show only after a score of
-				<input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
+				<input type=text size=4 name=reqscore value="<?php echo $assessmentData['reqscore'];?>">
 		   		points is obtained on
                 <?php
-                writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$line['reqscoreaid'],"Dont Use",0,null);
+                writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null);
                 ?>
 			</span><br class=form>
     <span class="form">Default Feedback Text:</span>
 			<span class="formright">
-				Use? <input type="checkbox" name="usedeffb" <?php writeHtmlChecked($usedeffb,true); ?>><br/>
-				Text: <input type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$deffb);?>" />
+				Use? <input type="checkbox" name="usedeffb" <?php writeHtmlChecked($useDefFeedback,true); ?>><br/>
+				Text: <input type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$defFeedback);?>" />
 			</span><br class="form" />
     <span class=form>All items same random seed: </span>
 			<span class=formright>
-				<input type="checkbox" name="sameseed" <?php writeHtmlChecked($line['shuffle']&2,2); ?>>
+				<input type="checkbox" name="sameseed" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_TWO); ?>>
 			</span><BR class=form>
     <span class=form>All students same version of questions: </span>
 			<span class=formright>
-				<input type="checkbox" name="samever" <?php writeHtmlChecked($line['shuffle']&4,4); ?>>
+				<input type="checkbox" name="samever" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_FOUR,AppConstant::NUMERIC_FOUR); ?>>
 			</span><BR class=form>
 
     <span class=form>Penalty for questions done while in exception/LatePass: </span>
 			<span class=formright>
-				<input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
+				<input type=text size=4 name="exceptionpenalty" value="<?php echo $assessmentData['exceptionpenalty'];?>">%
 			</span><BR class=form>
 
     <span class=form>Group assessment: </span>
 			<span class=formright>
-				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($line['isgroup'],0); ?> />Not a group assessment<br/>
-				<input type="radio" name="isgroup" value="1" <?php writeHtmlChecked($line['isgroup'],1); ?> />Students can add members with login passwords<br/>
-				<input type="radio" name="isgroup" value="2" <?php writeHtmlChecked($line['isgroup'],2); ?> />Students can add members without passwords<br/>
-				<input type="radio" name="isgroup" value="3" <?php writeHtmlChecked($line['isgroup'],3); ?> />Students cannot add members, and can't start the assessment until you add them to a group
+				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> />Not a group assessment<br/>
+				<input type="radio" name="isgroup" value="1" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ONE); ?> />Students can add members with login passwords<br/>
+				<input type="radio" name="isgroup" value="2" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_TWO); ?> />Students can add members without passwords<br/>
+				<input type="radio" name="isgroup" value="3" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_THREE); ?> />Students cannot add members, and can't start the assessment until you add them to a group
 			</span><br class="form" />
     <span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
-				<input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
+				<input type="text" name="groupmax" value="<?php echo $assessmentData['groupmax'];?>" />
 			</span><br class="form" />
 			<span class="form">Use group set:<?php
-                if ($taken) {
-                    if ($line['isgroup']==0) {
+                if ($assessmentSessionData) {
+                    if ($assessmentData['isgroup']== AppConstant::NUMERIC_ZERO) {
                         echo '<br/>Only empty group sets can be used after the assessment has started';
                     } else {
                         echo '<br/>Cannot change group set after the assessment has started';
                     }
                 }?></span>
 			<span class="formright">
-				<?php writeHtmlSelect('groupsetid',$page_groupsets['val'],$page_groupsets['label'],$line['groupsetid'],null,null,($taken && $line['isgroup']>0)?'disabled="disabled"':''); ?>
+				<?php writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
 			</span><br class="form" />
     <span class="form">Default Outcome:</span>
 			<span class="formright"><select name="defoutcome">
                     <?php
-                    $ingrp = false;
-                    $issel = false;
-//                    foreach ($page_outcomeslist as $oc) {
-//                        if ($oc[1]==1) {//is group
-//                            if ($ingrp) { echo '</optgroup>';}
-//                            echo '<optgroup label="'.htmlentities($oc[0]).'">';
-//                            $ingrp = true;
-//                        } else {
-//                            echo '<option value="'.$oc[0].'" ';
-//                            if ($line['defoutcome'] == $oc[0]) { echo 'selected="selected"'; $issel = true;}
-//                            echo '>'.$page_outcomes[$oc[0]].'</option>';
-//                        }
-//                    }
-                    if ($ingrp) { echo '</optgroup>';}
+                    $inGroup = false;
+                    $isSelected = false;
+                    foreach ($pageOutcomesList as $outcome) {
+                        if ($outcome[1]==AppConstant::NUMERIC_ZERO) {//is group
+                            if ($inGroup) { echo '</optgroup>';}
+                            echo '<optgroup label="'.htmlentities($outcome[0]).'">';
+                            $inGroup = true;
+                        } else {
+                            echo '<option value="'.$outcome[0].'" ';
+                            if ($assessmentData['defoutcome'] == $outcome[0]) { echo 'selected="selected"'; $isSelected = true;}
+                            echo '>'.$pageOutcomes[$outcome[0]].'</option>';
+                        }
+                    }
+                    if ($inGroup) { echo '</optgroup>';}
                     ?>
                 </select>
 			</span><br class="form" />
     <span class=form>Show question categories:</span>
 			<span class=formright>
-				<input name="showqcat" type="radio" value="0" >No <br />
-				<input name="showqcat" type="radio" value="1" >In Points Possible bar <br />
-				<input name="showqcat" type="radio" value="2" >In navigation bar (Skip-Around only)
+				<input name="showqcat" type="radio" value="0" <?php writeHtmlChecked($showQuestionCategory,"0"); ?>>No <br />
+				<input name="showqcat" type="radio" value="1" <?php writeHtmlChecked($showQuestionCategory,"1"); ?>>In Points Possible bar <br />
+				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showQuestionCategory,"2"); ?>>In navigation bar (Skip-Around only)
 			</span><br class="form" />
 
     <span class=form>Display for tutorial-style questions: </span>
 			<span class=formright>
-				<input type="checkbox" name="istutorial" >
+				<input type="checkbox" name="istutorial" <?php writeHtmlChecked($assessmentData['istutorial'],AppConstant::NUMERIC_ONE); ?>>
 			</span><BR class=form>
 
 </fieldset>
 </div>
 </fieldset>
-<div class=submit><input class=""  type=submit name="" value="Create Assessment"></div>
+<div class=submit><input class=""  type=submit name="" value="<?php echo $saveTitle;?>"></div>
 <?php
 
 function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
@@ -553,3 +548,42 @@ function getHtmlSelected ($var,$test,$notEqual=null) {
     }
 }
 ?>
+    <script>
+        function chgfb() {
+            if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
+                document.getElementById("showanspracspan").className = "show";
+                document.getElementById("showansspan").className = "hidden";
+                document.getElementById("showreattdiffver").className = "hidden";
+            } else {
+                document.getElementById("showanspracspan").className = "hidden";
+                document.getElementById("showansspan").className = "show";
+                document.getElementById("showreattdiffver").className = "show";
+            }
+            if (document.getElementById("deffeedback").value=="Practice") {
+                document.getElementById("stdcntingb").className = "hidden";
+                document.getElementById("praccntingb").className = "formright";
+            } else {
+                document.getElementById("stdcntingb").className = "formright";
+                document.getElementById("praccntingb").className = "hidden";
+            }
+        }
+        function chgcopyfrom() {
+            if (document.getElementById('copyfrom').value==0) {
+                document.getElementById('customoptions').className="show";
+                document.getElementById('copyfromoptions').className="hidden";
+            } else {
+                document.getElementById('customoptions').className="hidden";
+                document.getElementById('copyfromoptions').className="show";
+            }
+        }
+        function apwshowhide(s) {
+            var el = document.getElementById("assmpassword");
+            if (el.type == "password") {
+                el.type = "text";
+                s.innerHTML = "Hide";
+            } else {
+                el.type = "password";
+                s.innerHTML = "Show";
+            }
+        }
+    </script>

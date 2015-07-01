@@ -134,4 +134,8 @@ class Course extends BaseImasCourses {
         $course->itemorder = $itemList;
         $course->save();
     }
+
+    public static function getOutcome($courseId){
+        return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
+    }
 } 

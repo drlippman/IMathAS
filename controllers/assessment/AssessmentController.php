@@ -9,10 +9,14 @@ use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
 
+use app\models\Forums;
+use app\models\GbCats;
+use app\models\Outcomes;
 use app\models\Questions;
 
 use app\models\SetPassword;
 use app\models\Student;
+use app\models\StuGroupSet;
 use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
@@ -144,63 +148,166 @@ class AssessmentController extends AppController
         $courseId =$this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
-        if (isset($assessmentId)) {
-            $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId,$user);
+        if($assessmentId) {
             $assessmentData = Assessments::getByAssessmentId($assessmentId);
-            list($testType,$showAnswer) = explode('-',$assessmentData['deffeedback']);
-            $startDate = $assessmentData['startdate'];
-            $endDate = $assessmentData['enddate'];
-            $gradebookCategory = $assessmentData['gbcategory'];
-            if ($testType=='Practice') {
-                $pointCountInGb = $assessmentData['cntingb'];
-                $CountInGb = AppConstant::NUMERIC_ONE;
+            if (isset($params['id'])) {
+                $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId,$user);
+                list($testType,$showAnswer) = explode('-',$assessmentData['deffeedback']);
+                $startDate = $assessmentData['startdate'];
+                $endDate = $assessmentData['enddate'];
+                $gradebookCategory = $assessmentData['gbcategory'];
+                if ($testType=='Practice') {
+                    $pointCountInGb = $assessmentData['cntingb'];
+                    $CountInGb = AppConstant::NUMERIC_ONE;
+                } else {
+                    $CountInGb = $assessmentData['cntingb'];
+                    $pointCountInGb = AppConstant::NUMERIC_THREE;
+                }
+                $showQuestionCategory = $assessmentData['showcat'];
+                $timeLimit = $assessmentData['timelimit']/AppConstant::SECONDS;
+                if ($assessmentData['isgroup']==AppConstant::NUMERIC_ZERO) {
+                    $assessmentData['groupsetid']=AppConstant::NUMERIC_ZERO;
+                }
+                if ($assessmentData['deffeedbacktext']=='') {
+                    $useDefFeedback = false;
+                    $defFeedback = AppConstant::DEFAULT_FEEDBACK;
+                } else {
+                    $useDefFeedback = true;
+                    $defFeedback = $assessmentData['deffeedbacktext'];
+                }
+                if ($assessmentData['summary']=='') {
+                }
+                if ($assessmentData['intro']=='') {
+                }
+                $saveTitle = AppConstant::SAVE_BUTTON;
+            }else{//page load in add mode set default values
+            }
+            $now = time();
+            if ($assessmentData['minscore']>AppConstant::NUMERIC_THOUSAND) {
+                $assessmentData['minscore'] -= AppConstant::NUMERIC_THOUSAND;
+                $minScoreType = AppConstant::NUMERIC_ONE; //pct;
             } else {
-                $CountInGb = $assessmentData['cntingb'];
-                $pointCountInGb = AppConstant::NUMERIC_THREE;
+                $minScoreType = AppConstant::NUMERIC_ZERO; //points;
             }
-            $showQuestionCategory = $assessmentData['showcat'];
-            $timeLimit = $assessmentData['timelimit']/60;
-            if ($assessmentData['isgroup']==0) {
-                $assessmentData['groupsetid']=0;
-            }
-            if ($assessmentData['deffeedbacktext']=='') {
-                $usedEfFeedback = false;
-                $defFeedback = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+            if ($assessmentData['reviewdate'] > AppConstant::NUMERIC_ZERO) {
+                if ($assessmentData['reviewdate']=='2000000000') {
+                    $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
+                    $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
+                } else {
+                    $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['reviewdate']);
+                    $reviewTime = AppUtility::tzdate("g:i a",$assessmentData['reviewdate']);
+                }
             } else {
-                $usedEfFeedback = true;
-                $defFeedback = $assessmentData['deffeedbacktext'];
-            }
-            if ($assessmentData['summary']=='') {
-                //	$line['summary'] = "<p>Enter summary here (shows on course page)</p>";
-            }
-            if ($assessmentData['intro']=='') {
-                //	$line['intro'] = "<p>Enter intro/instructions</p>";
-            }
-            $savetitle = "Save Changes";
-        }else{//page load in add mode set default values
-
-        }
-        $now = time();
-        if ($assessmentData['minscore']>10000) {
-            $assessmentData['minscore'] -= 10000;
-            $minScoreType = AppConstant::NUMERIC_ONE; //pct;
-        } else {
-            $minScoreType = AppConstant::NUMERIC_ZERO; //points;
-        }
-        if ($assessmentData['reviewdate'] > 0) {
-            if ($assessmentData['reviewdate']=='2000000000') {
-                $reviewDate = tzdate("m/d/Y",$assessmentData['enddate']+7*24*60*60);
+                $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
                 $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
-            } else {
-                $reviewDate = tzdate("m/d/Y",$assessmentData['reviewdate']);
-                $reviewTime = tzdate("g:i a",$assessmentData['reviewdate']);
             }
-        } else {
-            $reviewDate = tzdate("m/d/Y",$assessmentData['enddate']+7*24*60*60);
-            $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
-        }
 
+            if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO}==='L') {
+                $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'],AppConstant::NUMERIC_ONE);
+                $skipPenalty=AppConstant::NUMERIC_TEN;
+            } else if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO}==='S') {
+                $skipPenalty = $assessmentData['defpenalty']{AppConstant::NUMERIC_ONE};
+                $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'],AppConstant::NUMERIC_TWO);
+            } else {
+                $skipPenalty = AppConstant::NUMERIC_ZERO;
+            }
+
+            $query = Assessments::getByCourse($courseId);
+            $pageCopyFromSelect = array();
+            $key=AppConstant::NUMERIC_ZERO;
+            if ($query) {
+                foreach ($query as $singleData) {
+                    $pageCopyFromSelect['val'][$key] = $singleData['id'];
+                    $pageCopyFromSelect['label'][$key] = $singleData['name'];
+                    $key++;
+                }
+            }
+
+            $query = GbCats::getByCourseId($courseId);
+            $pageGradebookCategorySelect = array();
+            if ($query) {
+                foreach ($query as $singleData) {
+                    $pageGradebookCategorySelect['val'][$key] = $singleData['id'];
+                    $pageGradebookCategorySelect['label'][$key] = $singleData['name'];
+                    $key++;
+                }
+            }
+
+            $query = Outcomes::getByCourseId($courseId);
+            $pageOutcomes = array();
+            if ($query) {
+                foreach($query as $singleData) {
+                    $pageOutcomes[$singleData['id']] = $singleData['name'];
+                    $key++;
+                }
+            }
+            $pageOutcomes[0] = AppConstant::DEFAULT_OUTCOMES;
+
+            $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO));
+            if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
+                $query = $course['outcomes'];
+                $outcomeArray = unserialize($query);
+                function flattenarr($outcomesData) {
+                    global $pageOutcomesList;
+                    foreach ($outcomesData as $singleData) {
+                        if (is_array($singleData)) { //outcome group
+                            $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                            flattenarr($singleData['outcomes']);
+                        } else {
+                            $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                        }
+                    }
+                }
+                flattenarr($outcomeArray);
+            }
+            $query = StuGroupSet::getByCourseId($courseId);
+            $pageGroupSets = array();
+            if ($assessmentSessionData && $assessmentData['isgroup']==AppConstant::NUMERIC_ZERO) {
+                $query = StuGroupSet::getByJoin($courseId);
+            } else {
+                $query = StuGroupSet::getByCourseId($courseId);
+            }
+
+            $pageGroupSets['val'][0] = AppConstant::NUMERIC_ZERO;
+            $pageGroupSets['label'][0] = AppConstant::GROUP_SET;
+            foreach ($query as $singleData) {
+                $pageGroupSets['val'][$key] = $singleData['id'];
+                $pageGroupSets['label'][$key] = $singleData['name'];
+                $key++;
+            }
+
+            $pageTutorSelect['label'] = array(AppConstant::TUTOR_NO_ACCESS,AppConstant::TUTOR_READ_SCORES,AppConstant::TUTOR_READ_WRITE_SCORES);
+            $pageTutorSelect['val'] = array(AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE);
+
+            $pageForumSelect = array();
+            $query = Forums::getByCourse($courseId);
+            $pageForumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
+            $pageForumSelect['label'][0] = AppConstant::NONE;
+            foreach ($query as $singleData) {
+                $pageForumSelect['val'][] = $singleData['id'];
+                $pageForumSelect['label'][] = $singleData['name'];
+            }
+
+            $pageAllowLateSelect = array();
+            $pageAllowLateSelect['val'][0] = AppConstant::NUMERIC_ZERO;
+            $pageAllowLateSelect['label'][0] = AppConstant::NONE;
+            $pageAllowLateSelect['val'][1] = AppConstant::NUMERIC_ONE;
+            $pageAllowLateSelect['label'][1] = AppConstant::UNLIMITED;
+            for ($key=AppConstant::NUMERIC_ONE;$key<AppConstant::NUMERIC_NINE;$key++) {
+                $pageAllowLateSelect['val'][] = $key+AppConstant::NUMERIC_ONE;
+                $pageAllowLateSelect['label'][] = "Up to $key";
+            }
+
+        }
         $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js"]);
-        return $this->renderWithData('addAssessment',['course' => $course]);
+        return $this->renderWithData('addAssessment',['course' => $course,'assessmentData' => $assessmentData,
+        'saveTitle'=>$saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
+        'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType,'skipPenalty' => $skipPenalty,
+        'showAnswer' => $showAnswer,'startDate' => $startDate,'endDate' => $endDate, 'pageForumSelect' => $pageForumSelect,
+        'pageAllowLateSelect' => $pageAllowLateSelect,'pageGradebookCategorySelect' => $pageGradebookCategorySelect,
+        'gradebookCategory'=> $gradebookCategory, 'countInGradebook' => $CountInGb, 'pointCountInGradebook' => $pointCountInGb,
+        'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
+        'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets,'pageOutcomesList' => $pageOutcomesList,
+        'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory]);
     }
-} 
+}

@@ -26,4 +26,8 @@ class GbCats extends BaseImasGbcats
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getByCourseId($courseId){
+        return GbCats::find()->select('id,name')->where(['courseid' => $courseId])->all();
+    }
 }
