@@ -443,16 +443,56 @@ echo $html;
         <!-- ////////////////// Inline text here //////////////////-->
     <?php case 'InlineText': ?>
     <?php $inline = $item[key($item)]; ?>
-    <?php if ($inline->avail != 0 && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
+        <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
+            <div class="item">
+            <!--Hide title and icon-->
+            <?php if ($inline->title != '##hidden##') {
+                $endDate = AppUtility::formatDate($inline->enddate);?>
+                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <div class="title">
+                    <b><?php echo $inline->title ?></b> <br>
+            </div>
+            <div class="itemsum"><p>
+            <?php } ?>
+                <?php if($inline->avail == 2) {
+                    echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                }
+                else {
+                    if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
+                    {
+                        echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                    }
+                    else{
+                        echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                    }
+                }
+                ?>
+
+
+            <p><?php echo $inline->text ?></p>
+        </div>
+        <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
+            <ul class="fileattachlist">
+                <li>
+                    <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                </li>
+            </ul>
+        <?php } ?>
+    </div>
+<?php } elseif($inline->avail == 0) { ?>
         <div class="item">
             <!--Hide title and icon-->
-            <?php if ($inline->title != '##hidden##') { ?>
-                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
-                <div class="title">
-                    <b><?php echo $inline->title ?></b>
-                </div>
-            <?php } ?>
+            <?php if ($inline->title != '##hidden##') {
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+        <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <div class="title">
+                <b><?php echo $inline->title ?></b> <br>
+            </div>
             <div class="itemsum"><p>
+              <?php  }
+                 echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                 ?>
+
                 <p><?php echo $inline->text ?></p>
             </div>
             <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -463,11 +503,8 @@ echo $html;
                 </ul>
             <?php } ?>
         </div>
-        <div class="clear"></div>
-    <?php } elseif ($inline->avail == 2) { ?> <!--Hide ends and displays show always-->
-</div>
-    <div class="clear"></div>
-<?php } ?>
+            <div class="clear"></div>
+            <?php }?>
 <?php break; ?>
 
     <!-- Calender Here-->

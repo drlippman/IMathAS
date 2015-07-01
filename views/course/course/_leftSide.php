@@ -1,10 +1,8 @@
 <?php
 use app\components\AppUtility;
-
 ?>
 
 <p>
-
     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"> Messages</a>
     <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid=' . $course->id) . '&newmsg=1' ?>" class="msg-notification">
         <?php

@@ -714,12 +714,29 @@ class CourseController extends AppController
         return $this->render('blockIsolate', $returnData);
     }
 
+//    Display calendar on click of menuBars
     public function actionCalendar()
     {
         $this->guestUserHandler();
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
         return $this->render('calendar');
+    }
+
+    /**
+     * Modify inline text: Teacher
+     */
+    public function actionModifyInlineText()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParamVal('courseId');
+        $inlineId = $this->getParamVal('id');
+        $course = Course::getById($courseId);
+        $inlineText = InlineText::getById($inlineId);
+        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+//        $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+        $returnData = array('course' => $course, 'inlineText' => $inlineText);
+        return $this->render('modifyInlineText', $returnData);
     }
 
 }

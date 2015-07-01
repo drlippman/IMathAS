@@ -1,10 +1,6 @@
 <?php
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
-
 ?>
-<?php AppUtility::includeCSS('_leftSide.css');?>
 <div class=mainbody>
     <div class="headerwrapper">
         <div id="navlistcont">
