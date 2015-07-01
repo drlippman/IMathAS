@@ -9,11 +9,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 </div>
-
 <h2>Guides</h2>
 <h4>Use Guides</h4>
 <ul>
-    <li><a href="http://localhost/openmath/web/GettingStarted.pdf" target="_blank">Getting Started in WAMAP</a> (PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/GettingStarted.pdf" target="_blank">Getting Started in WAMAP</a> (PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
         version is specific to the WAMAP installation of IMathAS, but applies to any installation.</li>
     <li><a href="#getting-started">Getting Started in IMathAS</a>.  A walkthrough of creating
         your first IMathAS course.</li>
@@ -25,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 </ul>
 
+
 <h4>Video Guides</h4>
 <ul>
     <li><a href="#getting-started">Getting Started in IMathAS</a> video guide.</li>
@@ -34,24 +34,27 @@ $this->params['breadcrumbs'][] = $this->title;
         course assignments created by your colleagues.</li>
     <li><a href="#">Video versions of several other guides</a> are also available.</p></li>
 </ul>
+
+
 <h4>Question Writing Guides</h4>
 <ul>
-    <li><a href="#">Intro to Question Writing in IMathAS</a>.  A step-by-step guide for writing
+    <li><a href="#intro-question-writing">Intro to Question Writing in IMathAS</a>.  A step-by-step guide for writing
         your first IMathAS question.</li>
-    <li><a href="#">More Question Examples</a>.  Examples of several questions, with explanation.</li>
-    <li><a href="#">Question Oddities</a>.  Common pitfalls and oddities in the IMathAS question language.</li>
-    <li><a href="#">Language Quick Reference</a>.  Short document with quick function reference.</li>
+    <li><a href="#more-question-examples">More Question Examples</a>.  Examples of several questions, with explanation.</li>
+    <li><a href="#question-oddities">Question Oddities</a>.  Common pitfalls and oddities in the IMathAS question language.</li>
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/langquickref.doc" target="_blank">Language Quick Reference</a>.  Short document with quick function reference.</li>
 </ul>
+
 
 <h2>Documentation</h2>
 <ul>
-    <li><a href="#">Help file</a>.  Detailed documentation of all of IMathAS's features and
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">Help file</a>.  Detailed documentation of all of IMathAS's features and
         question language</li>
-    <li><a href="#">Getting enrolled for students</a>.  Not so much documentation, but
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/AccessingOnlineHomeworkinWAMAP.doc">Getting enrolled for students</a>.  Not so much documentation, but
         a word document containing instructions for students to sign up and enroll in your course.  Suitable for including
         in your syllabus or handing out to students</li>
-    <li><a href="#">ASCIIMath syntax reference</a>.  A reference sheet for ASCIIMath symbol entry.</li>
-    <li><a href="#">Installation</a>.  Step-by-step installation instructions, part of the system's
+    <li><a href="#asciimath-syntax">ASCIIMath syntax reference</a>.  A reference sheet for ASCIIMath symbol entry.</li>
+    <li><a href="#installation">Installation</a>.  Step-by-step installation instructions, part of the system's
         readme file.  This is only needed for server installation - teachers should not need this</li>
 </ul>
 
@@ -60,13 +63,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Getting started with IMathAS-->
 <div id="getting-started">
 
-    <div class=title>
-        <h1>Getting Started with IMathAS</h1>
-    </div>
     <h2>Purpose of this document</h2>
     <p>This document will guide you through the process of creating your first IMathAS
         course and setting up a few items and assessments.  This is not a comprehensive
-        guide; please refer to the <a href="http://localhost/openmath/help.html" target="_blank">help file</a> for more
+        guide; please refer to the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a> for more
         detailed information on any process.</p>
 
     <p>This document presumes that you have Limited Course Creator rights.  If you have
@@ -276,7 +276,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <h2>Purpose of this document</h2>
 <p>This document will guide you through many common tasks an instructor would
     perform in IMathAS.  This is not a comprehensive
-    guide; please refer to the <a href="http://localhost/openmath/help.html" target="_blank">help file</a> for more
+    guide; please refer to the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a> for more
     detailed information on any process.</p>
 
 
@@ -436,11 +436,9 @@ student's password to the default password of &quot;password&quot;.
 <p>When done, click &quot;Copy Items&quot; to copy the items.</p>
 
 
-
-
 <a name="assessments"></a>
 <h2>Setting up Assessments</h2>
-<p>The <a href="gettingstarted.html">Getting Started</a> guide explained the assessment options.  Here are some other
+<p>The <a href="<?php echo AppUtility::getHomeURL()?>docs/gettingstarted.html">Getting Started</a> guide explained the assessment options.  Here are some other
     aspects of setting up assessments</p>
 <h4>Arranging and Grouping Questions</h4>
 <p>Once you have added questions to an assessment, you can use the pulldown select boxes next to each question to
@@ -510,7 +508,7 @@ student's password to the default password of &quot;password&quot;.
     <p>This document will guide you through managing questions and libraries in IMathAS.
         These tasks are commonly done when you are writing new questions or recategorizing
         existing questions.  This is not a comprehensive
-        guide; please refer to the <a href="http://localhost/openmath/help.html" target="_blank">help file</a> for more
+        guide; please refer to the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a> for more
         detailed information.</p>
 
     <h2>Managing Libraries</h2>
@@ -630,7 +628,7 @@ student's password to the default password of &quot;password&quot;.
 <div id="administrator">
     <h2>Purpose of this document</h2>
     <p>This document contains information on administrating an IMathAS installation.  For
-        information on specific features, you might find more info in the <a href="http://localhost/openmath/help.html" target="_blank">help file</a>.</p>
+        information on specific features, you might find more info in the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a>.</p>
 
     <h2>Administration Styles</h2>
     <p>There are several ways in which you can administer an IMathAS installation:</p>
@@ -752,4 +750,1114 @@ student's password to the default password of &quot;password&quot;.
         everyone to use, you can use the "One Time Passwords" link on the Admin page to generate a list of one-time-use passwords that can be
         distributed individually to students.</p>
     </hr>
+</div>
+
+<!--//////////////////////////////////////////////////// Writing questions and librarirs/////////////////////////////////-->
+
+<div id="intro-question-writing">
+    <h2>Purpose of this document</h2>
+    <p>This document will guide you through the process of writing an example IMathAS
+        Question.  This is meant to be an introduction.  This is not a comprehensive
+        guide; please refer to the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a> for more
+        detailed information.</p>
+
+
+    <h2>Getting Started</h2>
+    <p>Start out by clicking the "Manage Question Set" link from the grey control
+        box on the course page.  Click "Add New Question".  This will take you to the
+        question editor</p>
+
+
+    <h2>Question Parts</h2>
+    <p>A question has several parts:</p>
+    <ul>
+        <li>Description: What displays to the instructor in the question list.  Be specific in
+            your question descriptions.</li>
+        <li>Use Rights:  What you will allow others to do with this questions</li>
+        <li>Author: This is automatically set by the system.</li>
+        <li>Assign to Library:  Which question library your question will be recorded in</li>
+        <li>Question Type:  What the question type is (number, function, matrix, etc)</li>
+        <li>Common Control:  Code common to both the question and the answer</li>
+        <li>Question Control:  Code only needed for the question text</li>
+        <li>Question Text:  Where you actually write the question to be displayed to students</li>
+        <li>Answer:  Code defining the answer</li>
+    </ul>
+    <p><b>Note:</b> It is not necessary to use the Question Control and Answer boxes;  you can place all
+        your control code in the Common Control box.  For short questions, using just
+        Common Control and Question Text is fine.  For complicated questions, you may find using all four
+        boxes helpful.</p>
+    <p>Each question type has specific requirements.  You can click the "Writing Questions Help" link above
+        the Common Control box to pop up that section of the help file</p>
+
+
+    <h2>Description</h2>
+    <p>For this example, let's write a question asking students to write the equation for a graphed parabola.
+        In the description box, enter something like "Write equation for parabola, form y=a(x-b)^2+c"</p>
+
+
+    <h2>Use Rights</h2>
+    <p>Let's leave this as the default "Allow use, use as template, no modifications".  This allows other to use
+        your question or derive new questions based on this one, but they cannot modify this question itself.</p>
+
+
+    <h2>Assign to Library</h2>
+    <p>If you have set up a scratch-work library, click the "Select Library" button and choose that library.  Otherwise, it
+        is fine to leave this as "Unassigned" for now</p>
+
+
+    <h2>Question Type</h2>
+    <p>We want students to enter an equation for the curve, so select the type "Function" from the pull-down.</p>
+
+
+    <h2>Common Control</h2>
+    <p>To write our question, we need to pick values for a, b, and c.  In order for the question to change
+        for each student, we need to have these values randomly chosen.  Enter:</p>
+<pre>
+$b,$c = nonzerodiffrands(-3,3,2)
+$a = nonzerorand(-2,2)
+$eqn = makepretty("$a*(x-$b)^2+$c")
+</pre>
+    <p>The first line defines two variables, $b and $c.  Notice that variables start with a dollar sign.  The randomizer
+        we are using is "nonzerodiffrands" which, as you might guess, will return different, nonzero integers.  We have specified that
+        we want numbers between -3 and 3, and want 2 of them.</p>
+    <p>The second line defines the variable $a.  The randomizer "nonzerorand" returns a single nonzero random number, in this case between
+        -2 and 2.</p>
+    <p>If we simply entered the question as "$a*(x-$b)^2+$c", it will not display the way we want if $b or $c are negative.  To fix this, we
+        use the function "makepretty", which cleans up double sign problems.  We put the equation in quotes because it is a string, not a calculation
+        we want to perform.</p>
+
+
+    <p>We have not defined the variables in our equation or its domain.  These default to "x" for the variable, and -5 to 5 for the domain,
+        so we really don't need to in this case.</p>
+
+
+    <h2>Question Control</h2>
+    <p>We want to display a graph to the student.  We'll define the graph here:</p>
+<pre>
+$graph = showplot("$eqn,red",-6,6,-6,6)
+</pre>
+    <p>"showplot" creates a graph.  In quotes is the definition of the function to be graphed.  It's equation is given by y=$eqn,
+        and we want it graphed in red.  Additional options allow defining a limited domain, open and closed dots, width, dashing, etc.
+        The next numbers (-6,6,-6,6) define the viewing window.  Additional options allow changing the axis labeling, grid spacing, and the
+        display size of the graph</p>
+
+
+    <h2>Question Text</h2>
+    <p>Time to actually write the question!  Enter</p>
+<pre>
+Find an equation for the graph shown below.  (&lt;i&gt;Hint&lt;/i&gt;: use the form `y=a(x-h)^2+k`)
+
+
+$graph
+
+
+`y=` $answerbox
+</pre>
+
+
+
+    <p>Notice the use of the HTML tag &lt;i&gt; to create italic text.  All HTML tags are
+        valid in IMathAS questions.  An empty line, however, is automatically turned into a paragraph break. </p>
+    <p>Notice also that the equation in the hint is enclosed in backticks, \`.  Anything enclosed in backticks
+        is rendered as pretty math.  Enter the math using standard calculator-style notation.  There are also ways
+        to display more advanced math (example: \`int_3^5 x^2 dx\` would display as `int_3^5 x^2 dx`)</p>
+
+    <p>On the last line, the variable $answerbox is used.  This variable allows you to place the answer entry box
+        anywhere in the question.  It is not necessary to do so, but in this case, I wanted to preface the answer box
+        with "y=" so the student would know they don't need to enter the "y=" part of the equation</p>
+
+
+    <h2>Answer</h2>
+    <p>Time to specify the answer.  Enter:</p>
+<pre>
+$answer = $eqn
+$showanswer = "`y=$eqn`"
+</pre>
+    <p>The first line defines the answer.  In this case, the answer was just the equation we used for graphing.  The second
+        line defines the answer to show to students (if the show answers option is selected).</p>
+    <p>We could have given more detail in the $showanswer.  For example, we could have written (without line breaks):</p>
+
+<pre>
+$testx = $b+1
+$testy = $a*($testx - $b)^2+$c
+$showanswer = "Notice the vertex is at ($b,$c).  Using the form `y=a(x-h)^2+k`,
+   this gives `y=a(x-($b))^2+($c)`.  Plugging in the point ($testx,$testy)
+   for `x` and `y` allows us to solve for a, leading to `y=$eqn`"
+</pre>
+
+
+    <h2>Try it Out</h2>
+    <p>Click the "Save and Test Question" button at the bottom of the page.  This will save the question and pop up a window
+        displaying the question.  Try entering the answer and clicking "Submit".  The system will display your score
+        on the question, and display a new version of the question.  Testing a question several times is essential to ensuring
+        that it is behaving the way you want, and you didn't miss something (like not using nonzero random numbers).</p>
+    <p>When you are done, click "Update Question", or just navigate back to the Manage Question Set page.  You should now see
+        your question in the list (unless you assigned it to a different library than you're currently viewing).</p>
+
+
+    <h2>Use as Template</h2>
+    <p>To create a new question, it is often quickest to not start from scratch.  If you click on the Template link next to any question,
+        it will create a new question, starting with all the code from an existing question.  This way you can create a similar but new
+        question without starting from scratch and without losing the original question.</p>
+
+
+    <hr/>
+</div>
+
+<!--More question examples-->
+<div id="more-question-examples">
+<h2>Purpose of this document</h2>
+<p>This document contains example IMathAS questions with explanation of the
+    code used.  For detailed question language reference, please refer to the
+    <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a>.</p>
+
+<h2>Example of Function type</h2>
+<h4>Common Control</h4>
+<pre>
+$a,$b = nonzerodiffrands(-8,8,2)
+$variables = "x"
+$domain = "-5,5"
+</pre>
+<p>
+    The first line defines two variables, $a and $b, as different, nonzero random integers.
+    The first two arguments specify that the integers should be chosen between -8 and 8.  The
+    third argument specifies that 2 random integers should be chosen</p>
+<p>
+    $variables is used to define the variables in the expression.  If more than one variable
+    is used, enter a list of variables, like $variables = "x,y,x".  This defaults to "x", so
+    this line is not really necessary in this problem.</p>
+
+
+<p>$domain specifies the domain on which the student's answer should be compared to
+    the given answer.  Enter as a list "min,max".  The same domain will apply to all
+    variables in the expression.  This defaults to -10 to 10</p>
+
+
+<h4>Question Control</h4>
+<pre>
+$ansprompt = "Ans="
+</pre>
+<p>Rather than place the $answerbox in the question text, I'm going to have the
+    system place the default answer box at the end of the question.  The $ansprompt
+
+    variable specifies that the box should have "Ans=" displayed in front of the answer box</p>
+
+
+<h4>Question Text</h4>
+<pre>
+Simplify `x^$a/x^$b`
+
+
+Write your answer with positive exponents only.
+</pre>
+
+
+<h4>Answer</h4>
+<pre>
+$p = abs($a - $b)
+$answer = "x^($p)" if ($a>$b)
+$answer = "1/x^($p)" if ($a<$b)
+
+
+$showanswer = "x^($a-$b) = $answer"
+
+
+$requiretimes = "^,<2,-,=0"
+</pre>
+<p>The first three lines define the answer.  Note that it would have worked just
+    fine to define <code>$answer = makepretty("x^($a-$b)")</code>, but because I want
+    to use the answer in the $showanswer to show students later, I instead defined the answer
+    using "if" statements.  The "if" allows you define different values to a variable depending
+    on values of other variables</p>
+<p>The $showanswer line defines the answer to show to students.  There is no default value
+    for Function type questions, so you must specify something if you want an answer to be available
+    to students.  In this case, I showed the first step as well as the answer</p>
+
+
+<p>$requiretimes places format requirements on the student's answer.  The list in quotes is in pairs;
+    the first value is the symbol to look for, and the second value indicates the number of times that symbol
+    should appear.  In this example, the ^ symbol should show up less than two times, and the - symbol should
+    show up zero times.  The first rule requires that students cannot simply reenter the original expression
+    and get credit.  The second rule requires that students cannot enter negative exponents</p>
+
+<h2>Example of Matching type</h2>
+<h4>Common Control</h4>
+<pre>
+$qarr = array("`sin x`","`cos x`","`x^2`","`x^3`","`e^x`","`log x`","`2^x`")
+$aarr = array("`cos x`","`-sin x`","`2x`","`3x^2`","`e^x`","`1/x`","`2^x ln2`")
+
+
+$questions,$answers = jointshuffle($qarr,$aarr,4,5)
+
+$questiontitle = "`f(x)`";
+$answertitle = "`f'(x)`";
+</pre>
+<p>The first two lines define arrays of functions ($qarr) and their derivatives ($aarr)</p>
+
+
+<p>The third line creates two new arrays, $questions and $answers, by jointly shuffling the arrays
+    (retaining respective pairing), and picking 4 elements of the $qarr, and 5 elements of the $aarr.</p>
+
+
+<p>The last two lines define the titles (column headers) for the $questions and $answers lists.</p>
+
+
+<h4>Question Text</h4>
+<pre>
+Match each function with it's derivative.
+</pre>
+
+
+<h4>Answer</h4>
+<p>There is no need to specify anything here</p>
+<p>The Matching type requires a $questions array and $answers array.  The $questions will display on the left with
+    entry boxes next to each.  The $answers will display on the right, lettered.  If each answer is used at most once,
+    then you do not have to do anything else - the first entry of the $answers array will be assumed to be the answer to the first
+    entry of the $questions array.  If there are more entries in $answers than $questions, the left over answers are presumed
+    to never be used.  If you want an answer to be used more than once, you will need to define a $matchlist</p>
+
+<h2>Load Library Example (Number type)</h2>
+Example of using loadlibrary to access functions in a macro file (mean from stats library in this case)
+
+<h4>Common Control</h4>
+<pre>
+$a = nonzerodiffrands(1,10,5)
+</pre>
+
+
+<p>This line defines an array variable $a to be 5 different nonzero integers between 1 and 10.  Note that since
+    a single variable was defined, it was created as an array variable</p>
+
+
+<h4>Question Control</h4>
+<pre>
+$table = showarrays("x",$a)
+</pre>
+<p>This defines $table using a standard display macro that creates a tabular display of the array $a
+    with title (header) "x".  If you want to display two lists side-by-side, you can do so, for example: showarrays("x",$a,"y",$b)</p>
+
+
+<h4>Question Text</h4>
+<pre>
+Find `bar x`
+
+
+$table
+</pre>
+
+
+<p>Recall that items in backticks are rendered as math.  The math command "bar" will place a bar over the item that follows it</p>
+
+
+<h4>Answer</h4>
+<pre>
+loadlibrary("stats")
+$answer = mean($a)
+</pre>
+<p>The first line loads the stats macro library.  Admins can install new Macro libraries to extend the functionality
+    of IMathAS.  The Macro Library Help link will show what libraries are currently installed and the functions they
+    provide.</p>
+<p>Here we are using the mean function from the stats library to determine the answer.</p>
+
+
+<h2>Another Example of Matching Type</h2>
+<h4>Common Control</h4>
+<pre>$a,$b,$c = rands(-3,3,3)
+</pre>
+<p>This selects three random numbers between -3 and 3</p>
+<pre>$cols = singleshuffle("red,green,blue")
+</pre>
+<p>shuffles the list of colors, placing it in the array $cols</p>
+<pre>$graphs = array("$a*x^2+$b*x+$c,$cols[0]","2*$a*x+$b,$cols[1]","$a*x^3/3+$b*x^2/2+$c*x,$cols[2]")
+</pre>
+<p>We're going to be using the showplot macro.  The first argument is a
+    single function or an array of functions.  In this case, we're giving an array of
+    functions, though we're only specifying the function and the color.  There
+    are other options available.</p>
+
+
+<pre>$plot = showplot($graphs,-3,3,-5,5,off,off)
+
+</pre>
+<p>this actually calls the showplot macro.  After the
+    function, the window is specified, then we're setting the
+    labels to off, and grid is set to off</p>
+
+
+
+
+<pre>$questions = array("`f(x)`","`f'(x)`","`int f(x)dx`")
+$answers = $cols</pre>
+<p>this defines the questions and answers.  Note that they
+    are matched - the first entry in $answers is the answer
+    the first entry in $questions.  Notice that the primary randomization
+    in this question is the shuffling of the color array.</p>
+
+
+<h4>Question Control</h4>
+<pre>$questiontitle = "Function"
+$answertitle = "Graph Color"</pre>
+<p>these set titles for the list of questions and answers</p>
+
+
+<h4>Question Text</h4>
+<pre>Match each function with its graph
+
+
+$plot</pre>
+<h4>Answer</h4>
+<p>Nothing is needed here.  The answers are automatically associated with the questions based
+    on array order</p>
+
+
+<h2>Example of Multipart Type</h2>
+<h4>Common Control</h4></pre>
+<pre>$anstypes = array("calculated","calculated")
+$a,$b = nonzerodiffrands(-8,8,2)
+$c = nonzerorand(-30,30)</pre>
+<p>The first line defines that there will be two parts, both of
+    type calculated.  Refer the help for valid anstypes.</p>
+<p>The next two lines define our random variables</p>
+
+
+<h4>Question Control</h4>
+<pre>$question = makeprettydisp("{$a}x+{$b}y=$c")
+</pre>
+<p>Set up the equation</p>
+
+
+<pre>$hidepreview[1] = true</pre>
+<p>in some multipart questions, it might be useful to hide
+    the preview button usually provided with calculated and
+    function answer types.  You can set $hidepreview to
+    hide the preview button.  Note that it is suffixed with
+    a [1].  This specifies to apply the option to the
+    second calculated type.  All options should be suffixed
+    like this in a multipart problem unless the option applies
+    to all parts of the problem.</p>
+<p>Note that this is a silly example; there is no good reason
+    to hide the preview on one part of this question but not the other</p>
+
+
+<h4>Question Text</h4>
+<pre>Find the x and y intercepts of $question
+
+
+x-int: `x=`$answerbox[0]&lt;br/&gt
+y-int: `y=`$answerbox[1]</pre>
+<h4>Answer</h4>
+<p>Note the use of the $answerbox above.  This places the
+    answerboxes in the problem text.  Make sure you put the
+    boxes in numerical order; entry tips are given assuming
+    this.</p>
+
+
+<pre>$answer[0] = $c/$a
+$answer[1] = $c/$b
+</pre>
+<p>like with other options, the $answer also needs to be
+    suffixed with the question part.</p>
+
+
+<h2>Example of Number Type</h2>
+<h4>Common Control</h4>
+<pre>$a = nonzerorand(-5,5)
+</pre>
+<p>Set $a to be a nonzero random number between -5 and 5</p>
+
+
+<pre>$b = rrand(.1,5,.1) if ($a &lt; 0)
+$b = rrand(-5,-.1,.1) if ($a &gt; 0)
+</pre>
+<p>a decimal number between -5 and 5, with one decimal place.
+    We're going to ensure that $a and $b are different signs
+    using the "if" conditional</p>
+
+
+<pre>$c,$d = nonzerodiffrands(-5,5,2)</pre>
+<p>two different, nonzero integers</p>
+
+
+<h4>Question Control</h4>
+<pre>$prob = "`$a + $b + $c + $d`"
+</pre>
+<p>this could show up as:  -4 + -2.3 + 3 + -1
+    the backquotes tell it to display as math</p>
+
+
+<pre>$prob2 = makeprettydisp("$a + $b + $c + $d")</pre>
+<p>if we want to simplify it like: -4 - 2.3 + 3 - 1</p>
+
+
+<h4>Question Text</h4>
+<pre>Find: $prob
+
+
+or equivalently: $prob2</pre>
+<h4>Answer</h4>
+<pre>$answer = $a + $b + $c + $d</pre>
+<p>for number, we just need to specify the answer.  No
+    quotes here because we're calculating, not creating
+    a display string</p>
+
+
+<p>by default, numbers are allowed a .001 relative error.<br/>
+    $reltolerance = .0001 would require a higher accuracy<br/>
+    $abstolerance = .01 would require an absolute error under .01<br/>
+    $answer = "[-10,8)" would accept any answer where
+    `-10 &lt;= givenanswer &lt; 8`</p>
+
+
+<h2>Example of Calculated Type</h2>
+<h4>Common Control</h4>
+<pre>$a,$b = randsfrom("2,3,5,7,11",2)
+</pre>
+<p>choose two numbers from a list.  Can also choose from
+    an array</p>
+
+<pre>$c = rand(1,10) where ($c % $a != 0)
+$d = rand(1,10) where ($d % $b != 0)
+</pre>
+<p>the "where" statement is used with randomizers. It allows
+    you to avoid a specific case.  In this case, we're requiring
+    that $a not divide evenly into $c.  The modulus operator, %, gives
+    the remainder upon division</p>
+
+
+<pre>$answerformat = "reducedfraction"</pre>
+<p>note that the student could enter 2/5*6/7 and get the
+    correct answer.  We can prevent this by adding this line.  $answerformat = "fraction" is also
+    an option, if you don't care if the answer is reduced.</p>
+
+
+<h4>Question Control</h4>
+
+
+<h4>Question Text</h4>
+<pre>Multiply: `$c/$a * $d/$b`
+
+
+Enter your answer as a single, reduced fraction</pre>
+
+
+<h4>Answer</h4>
+
+
+<pre>$answer = $c/$a * $d/$b</pre>
+<p>like with the Number type, we supply a number as the
+    answer.  The only difference is that the student can
+    enter a calculation instead of a number</p>
+
+
+<h2>Example of Multiple-Choice Type</h2>
+<h4>Common Control</h4></pre>
+<pre>$a,$b = nonzerodiffrands(-5,5,2)
+</pre>
+<p>pick two different nonzero numbers. The numbers are important here to ensure that all the
+    choices will be different.</p>
+
+
+
+
+<pre>$questions[0] = $a+$b
+$questions[1] = $a-$b
+$questions[2] = $a*$b</pre>
+
+
+<p>we can either define the entire $questions array
+    at once, or define each piece separately.  The former
+    would look like:  $questions = array($a+$b,$a-$b,...</p>
+
+
+<h4>Question Control</h4>
+<pre>$displayformat = "horiz"
+$text = makeprettydisp("$a+$b")</pre>
+
+
+<p>The first line above will lay out the choices horizontally.  To do
+    a standard vertical layout, just omit this line</p>
+
+
+<h4>Question Text</h4>
+<pre>Find $text</pre>
+
+
+<h4>Answer</h4></pre>
+<pre>$answer = 0</pre>
+<p>Here the answer is the INDEX into the questions array
+    that holds the correct answer.  Arrays are zero-indexed,
+    so the first entry is at index 0.</p>
+<p>In multiple-choice questions, the question order is automatically randomized
+    unless you specify otherwise, so it's fine for $answer to always be 0; the location
+    of the correct answer will be shuffled</p>
+
+
+<h2>Example of Multiple Answer Type</h2>
+<h4>Common Control</h4>
+<pre>$questions = listtoarray("`sin(x)`,`sin^-1(x)`,`tan(x)`,`csc(x)`,`x^2`")</pre>
+<p>the $questions array is a list of the options.
+    The listtoarray macro converts a list of numbers or
+    strings to an array.  Use calclisttoarray to convert
+    a list of calculations to an array of numbers</p>
+
+
+<h4>Question Control</h4>
+
+
+<h4>Question Text</h4>
+<pre>Select all the functions that are periodic</pre>
+
+
+<h4>Answer</h4>
+
+
+<pre>$answers = "0,2,3"
+</pre>
+<p>the answer here is a list of indexes into the $questions
+    array that contain correct answers.  Remember that
+    arrays are 0-indexed.  Like with multiple-choice, the question order is randomized automatically.</p>
+
+
+<p>Normally, each part is given equal weight (each checkbox is worth 1/5 point).  If you wish
+    to divide the point score only by the number of correct
+    answers, use this line: $scoremethod = "answers"</p>
+
+
+<h2>A Graphing Example (Multipart)</h2>
+<h4>Common Control</h4>
+<pre>$anstypes = listtoarray("number,number,number,number")
+</pre>
+
+<p>Specify the answer types.  In this case, four number answers</p>
+
+
+
+
+<pre>$graphs[0] = "-x-5,black,-5,-1,,closed"
+$graphs[1] = "-2x+3,black,-1,2,open"
+$graphs[2] = "-2x+3,black,2,5,open"</pre>
+<p>Define the graphs.  For each graph, it's:
+    function,color,xmin,xmax,startmark,endmark</p>
+
+
+<pre>$graphs[3] = "2,black,2,2,closed"
+</pre>
+<p>last one is really just a dot, but we define it as
+    a function</p>
+
+
+<pre>$plot = showplot($graphs,-5,5,-5,5,1,1)</pre>
+<p>The inputs here are: graphs,xmin,xmax,ymin,ymax,label spacing,grid spacing</p>
+
+
+<h4>Question Control</h4>
+<p>this question is not randomized; it's just meant for
+    illustration of graphing options.</p>
+
+
+<h4>Question Text</h4>
+<pre>The graph below is the function `f(x)`
+
+
+$plot
+
+
+Find `lim_(x-&gt;-1^+) \ f(x)`  $answerbox[0]
+
+
+Find `lim_(x-&gt;-1^-) \ f(x)`  $answerbox[1]
+
+
+Find `lim_(x-&gt;-1) \ f(x)`  $answerbox[2]
+
+
+Find `lim_(x-&gt;2) \ f(x)` $answerbox[3]
+</pre>
+<p>the backslashes above add extra spacing between the
+    limit and the f(x)</p>
+<h4>Answer</h4>
+<pre>
+$answer[0] = 5
+$answer[1] = -4
+$answer[2] = "DNE"
+$answer[3] = -1
+</pre>
+<p>Define the part answers.  "DNE" and "oo" (for infinity) are allowed string
+    answers to number questions</p>
+
+<hr/>
+</div>
+
+<!--question oddities-->
+<div id="question-oddities">
+    <h2>Purpose of this document</h2>
+    <p>This document describes some of the common pitfalls and oddities of the IMathAS question language.
+        For detailed question language reference, please refer to the
+        <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a>.</p>
+
+    <h2>IMathAS Question Writing Oddities</h2>
+
+    <h4>Fractional Exponent Display</h4>
+    <p>
+        Fractional exponents do not seem to display well with MathML.  For example, x^(2/3) will display as `x^(2/3)`.
+        The best approach is to try x^(2//3), which renders as `x^(2//3)`.  If you want to raise up the exponent higher,
+        a silly trick to try is x^({::}^(2/3)).  The {::} creates an invisible item.  This renders as `x^({::}^(2/3))`.
+    </p>
+
+    <h4>Curly Braces</h4>
+    <p>
+        Beware of using curly braces {}.  While curly braces can be used for display or for grouping, like in the TeX-style
+        \frac{3}{5}, strange things can happen if you place variables inside the curly braces.  This is because PHP, the back-end
+        interpreter, uses curly braces to isolate variables from surrounding text.
+    </p><p>
+        For example, if you wanted to display `3x` rather than `3*x`, then you need to enter 3x rather than 3*x.  With a
+        variable coefficient, writing $ax doesn't work, since the interpreter thinks that "$ax" is the variable.  Curly braces
+        can avoid this, allowing you to write {$a}x to achieve the desired result.  Alternatively, writing $a x works as well.  In
+        rendered math (inside backticks), extra spaces are removed.
+    </p><p>
+        As a side effect, writing \frac{$a}{$b} causes problems, since the interpreter essentially removes the curly braces
+        during variable interpolation, leaving \frac34 (if $a=3,$b=4).  A simple way to avoid this is to add spaces:  enter
+        \frac{ $a }{ $b } instead, and the interpreter will leave the curly braces alone, leaving \frac{ 3 }{ 4 }, which will
+        correctly display as the desired `3/4`.
+    </p>
+
+    <h4>Dollar sign</h4>
+    <p>
+        Because dollar signs are used for variables, entering a dollar sign in question text requires caution.
+        If $a=5, entering $$a will display correctly as $5, but entering ${$a} will not (it's something called a "variable variable" in
+        PHP).  To be extra safe, entering $ $a is recommended, or \$$a (the backslash says "don't try to interpret the next symbol").
+    </p>
+
+    <h4>Array Variables</h4>
+    <p>
+        You can define array variables, like $a = rands(1,5,3).  $a is now an array of three numbers;
+        the elements can be accessed as $a[0], $a[1], and $a[2] (note that arrays are zero-indexed).
+        If you use this approach, enclose the variable reference in parenthesis in calculations, like
+        $new = ($a[0])^2, and in curly brackets inside strings, like $string = "there were {$a[0]} people".
+    </p>
+
+    <h4>Variables with numbers in the name</h4>
+    <p>Variables like $a1 are fine to use, but like array variables, should be enclosed in parentheses to prevent
+        misinterpretation.  For example, use ($a1)^($a2) instead of $a1^$a2</p>
+
+    <h4>Function type $variables that share letters with functions</h4>
+    <p>When defining variables for Function type answer, beware that if the variable shares a letter with a function being
+        used, you have to be a bit careful.  For example, if $variables="r", and you typed $answer = "rsqrt(2)", the system will
+        get confused.  This can be solved by putting an explicit multiplication between the r and the square root:  $answer = "r*sqrt(2)".
+        Students in their entry will also need to either put an explicit multiplication sign, or at least leave a space between the variable
+        and the function name</p>
+
+    <h4>Makepretty</h4>
+    <p>
+        If you define:
+<pre>
+$a,$b,$c = rand(-5,5,3)
+$eqn = "$a x^2 + $b x + $c"
+</pre>
+    <p>then there is potential your $eqn would display as `4x^2+-3x+2` (that's 4x^2+-3x+2).  To clean up the
+        double sign issue, use the makepretty function:</p>
+<pre>
+$eqn = makepretty("$a x^2 + $b x + $c")
+</pre>
+    </p>
+    <p>Makepretty is automatically run on $answer for Function type problems</p>
+
+    <h4>Less than and Greater than signs</h4>
+    <p>Because HTML uses angle brackets to denote HTML tags, and since IMathAS allows HTML tags for formatting
+        purposes, the use of &lt; and &gt; in problem text can sometimes be problematic.  The system attempts to
+        differential between HTML tags and inequalities, but does not always do so successfully.</p>
+
+    <p>Generally, same direction inequalities are handled okay, such as 3 &lt; x &lt 5.  But mixed inequalities, such
+        as "x &lt; 3 and x &gt; 1" are sometimes mishandled.  To avoid this, it is recommended that you use the HTML &amp;lt; and &amp;gt;
+        in place of &lt; and &gt;.  Inside backticks (rendered as math), lt and gt are sufficient to denote &lt; and &gt;.  You can also
+        use le and ge or leq and geq inside backticks for `le` and `ge`.</p>
+    <hr/>
+</div>
+
+<div id="asciimath-syntax">
+    <p>This document is a symbol reference for the ASCIIMath language.</p>
+    <p>For a more tutorial-style approach, try <a href="http://www.wjagray.co.uk/maths/ASCIIMathTutorial.html">this site</a>.</p>
+
+    <table>
+        <tr><th>Basic Operations</th><th>Relations</th><th>Calculus</th><th>Symbols</th></tr>
+        <tr valign="top"><td>
+                <table class=centered>
+                    <tr><th>Type</th><th>See</th></tr>
+                    <tr><td>+	</td><td>`+`	</td></tr>
+                    <tr><td>-	</td><td>`-`	</td></tr>
+                    <tr><td>+-	</td><td>`+-`	</td></tr>
+                    <tr><td>*	</td><td>`*`	</td></tr>
+                    <tr><td>**	</td><td>`**`	</td></tr>
+                    <tr><td>-:	</td><td>`-:`	</td></tr>
+                    <tr><td>1/2	</td><td>`1/2`	</td></tr>
+                    <tr><td>1//2	</td><td>`1//2`	</td></tr>
+                    <tr><td>xx	</td><td>`xx`	</td></tr>
+                    <tr><td>3^4	</td><td>`3^4`	</td></tr>
+                    <tr><td>f@g	</td><td>`f@g`	</td></tr>
+                    <tr><td>sqrt(5)	</td><td>`sqrt(5)`	</td></tr>
+                    <tr><td>root(3)(5)	</td><td>`root(3)(5)`	</td></tr>
+                    <tr><td>sin^-1(x)	</td><td>`sin^-1(x)`	</td></tr>
+                </table>
+            </td>
+
+            <td>
+                <table class=centered>
+                    <tr><th>Type</th><th>See</th></tr>
+                    <tr><td>!=	</td><td>`!=`	</td></tr>
+                    <tr><td>&lt; or lt</td><td>`lt`	</td></tr>
+                    <tr><td>&gt; or gt</td><td>`gt`	</td></tr>
+                    <tr><td>&lt;= or leq</td><td>`leq`	</td></tr>
+                    <tr><td>&gt;= or geq</td><td>`geq`	</td></tr>
+                    <tr><td>in	</td><td>`in`	</td></tr>
+                    <tr><td>-=	</td><td>`-=`	</td></tr>
+                    <tr><td>~=	</td><td>`~=`	</td></tr>
+                    <tr><td>~~	</td><td>`~~`	</td></tr>
+                    <tr><td>rarr	</td><td>`rarr`	</td></tr>
+                    <tr><td>->	</td><td>`->`	</td></tr>
+                    <tr><td>=>	</td><td>`=>`	</td></tr>
+                    <tr><td>iff	</td><td>`iff`	</td></tr>
+                </table>
+            </td>
+
+            <td>
+                <table class=centered>
+                    <tr><th>Type</th><th>See</th></tr>
+                    <tr><td>int	</td><td>`int`	</td></tr>
+                    <tr><td>int_3^5</td><td>`int_3^5`	</td></tr>
+                    <tr><td>sum	</td><td>`sum`	</td></tr>
+                    <tr><td>sum_(i=0)^oo	</td><td>`sum_(i=0)^oo`	</td></tr>
+                    <tr><td>lim_(x->2^+)	</td><td>`lim_(x->2^+)`	</td></tr>
+                    <tr><td>oint	</td><td>`oint`	</td></tr>
+                    <tr><td>del	</td><td>`del`	</td></tr>
+                    <tr><td>grad	</td><td>`grad`	</td></tr>
+                    <tr><td>oo	</td><td>`oo`	</td></tr>
+                </table>
+            </td>
+
+            <td>
+                <table class=centered>
+                    <tr><th>Type</th><th>See</th></tr>
+                    <tr><td>4^@	</td><td>`4^@`	</td></tr>
+                    <tr><td>O/	</td><td>`O/`	</td></tr>
+                    <tr><td>/_	</td><td>`/_`	</td></tr>
+                    <tr><td>RR	</td><td>`RR`	</td></tr>
+                    <tr><td>bb A	</td><td>`bb A`	</td></tr>
+                    <tr><td>bbb A	</td><td>`bbb A`	</td></tr>
+                    <tr><td>hat x	</td><td>`hat x`	</td></tr>
+                    <tr><td>bar x	</td><td>`bar x`	</td></tr>
+                    <tr><td>vec x	</td><td>`vec x`	</td></tr>
+                    <tr><td>dot x	</td><td>`dot x`	</td></tr>
+                    <tr><td>(: 4,2 :)	</td><td>`(: 4,2 :)`	</td></tr>
+                    <tr><td>[(1,2),(3,4)]	</td><td>`[(1,2),(3,4)]`	</td></tr>
+                    <tr><td>{(x,x lt 1),<br/>(2,x ge 1):}</td><td>`{(x,x lt 1),(2,x ge 1) :}`	</td></tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="4">
+                Greek letters:
+                alpha `alpha`
+                beta `beta`
+                chi `chi`
+                delta `delta`
+                Delta `Delta`
+                epsilon `epsilon`
+                varepsilon `varepsilon`
+                eta `eta`
+                gamma `gamma`
+                Gamma `Gamma`
+                iota `iota`
+                kappa `kappa`
+                lambda `lambda`
+                Lambda `Lambda`
+                mu `mu`
+                nu `nu`
+                omega `omega`
+                Omega `Omega`
+                phi `phi`
+                varphi `varphi`
+                Phi `Phi`
+                pi `pi`
+                Pi `Pi`
+                psi `psi`
+                Psi `Psi`
+                rho `rho`
+                sigma `sigma`
+                Sigma `Sigma`
+                tau `tau`
+                theta `theta`
+                vartheta `vartheta`
+                Theta `Theta`
+                upsilon `upsilon`
+                xi `xi`
+                Xi `Xi`
+                zeta `zeta`
+            </td>
+    </table>
+
+    <p>For more examples and full syntax details, please visit <a href="http://www1.chapman.edu/~jipsen/mathml/asciimathsyntax.html">ASCIIMath's</a>
+        website.  ASCIIMathML was developed by <a href="http://www1.chapman.edu/~jipsen/">Peter Jipsen</a>, Chapman University.</p>
+
+    <hr/>
+</div>
+
+<!--Installation.-->
+<div id="installation">
+<p>The most recent version of the code is available on <a href="https://github.com/drlippman/imathas">GitHub</a></p>
+
+<h3>What is IMathAS</h3>
+<p>IMathAS is an Internet Mathematics Assessment System. It is primarily a
+    web-based math assessment tool for delivery and automatic grading of math homework
+    and tests. Questions are algorithmically generated and numerical and math expression
+    answers can be computer graded. Beyond that, IMathAS includes learning management tools,
+    including posting of announcements, text files, and attachments, as well as discussion
+    forums and a full gradebook. In postings and assessments, IMathAS allows accurate display
+    of math and graphs, with simple calculator-style math entry and point-and-click graph
+    creation.   It is most similar to (and inspired by) <a href="http://webwork.math.rochester.edu/">WebWork</a>
+    and <a href="http://wims.unice.fr/">WIMS</a>, and similar to commercial and publisher-produced systems
+    like iLrn, MathXL, WebAssign, etc.</p>
+
+<p>IMathAS was written by <a href="http://www.pierce.ctc.edu/dlippman">David Lippman</a> (c) 2006-2014,
+    with with partial support from the
+    <a href="http://www.lumenlearning.com">Lumen Learning</a>,
+    <a href="http://www.sbctc.ctc.edu/College/_g-elchome.aspx">WA State E-Learning Council</a>, the
+    <a href="http://www.transitionmathproject.org/">Transition Math Project</a>, and
+    <a href="http://www.pierce.ctc.edu">Pierce College</a>.  It is distributed under
+    the <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a>.  See the <a href="<?php echo AppUtility::getHomeURL()?>docs/license.txt">license.txt</a> file distributed with IMathAS for more details
+    and credits for components attributed to others.</p>
+
+<h3>Features</h3>
+<h4>IMathAS was built on three primary philosophies:</h4>
+<ul>
+    <li><b>Math</b>:  The system was designed for Math assessment; no effort was made for the system to be multi-purpose.</li>
+    <li><b>Sharing</b>:  The system was setup to encourage sharing of questions within a system and outside.  Questions are grouped into
+        question libraries, and are not tied directly to a specific assessment.  Unless marked Private, questions can be used by
+        anyone on the system, or used as a template for writing new questions.  Assessments and course setups can be copied
+        between users with permission.  Export and Import allows the
+        sharing of question sets between systems.  Also, macro libraries allow for the expansion of IMathAS's question language.
+        Users with expertise in a field can develop macro extensions, and share them with other users.</li>
+    <li><b>Ease of Install</b>:  The system uses standard PHP and MySQL.  It requires no special compilation options or installation
+        of external programs.</li>
+</ul>
+
+<h4>Core Features include:</h4>
+<ul>
+    <li>Display:</li>
+    <ul>
+        <li>Rich Math and Graph display, using standards-based MathML and SVG, powered
+            by Peter Jipsen's <a href="http://www1.chapman.edu/~jipsen/svg/asciisvg.html">ASCIIsvg</a> and
+            <a href="http://www1.chapman.edu/~jipsen/mathml/asciimath.html">ASCIIMathML</a>, or using image fallbacks</li>
+        <li>Rich Text Editor with built-in Math and Graph support for text items displayed in a course and forum posts</li>
+        <li>Alternate display options for screenreaders and browsers without needed support</li>
+    </ul>
+    <li>Assessment:</li>
+    <ul>
+        <li>Question types including:</li>
+        <ul>
+            <li>Functions, with answers like "sin(x)"</li>
+            <li>Numbers, compared to a given tolerance</li>
+            <li>Calculated Numbers, like 5/3 or 2^5</li>
+            <li>Multiple-Choice</li>
+            <li>Multiple-Answer</li>
+            <li>Matching</li>
+            <li>String</li>
+            <li>Essay (not computer graded)</li>
+            <li>Numerical Matrix</li>
+            <li>Calculated Matrix</li>
+            <li>Interval</li>
+            <li>Calculated Interval</li>
+            <li>N-tuples</li>
+            <li>Drawing / Graphing</li>
+            <li>File Upload</li>
+            <li>Multipart</li>
+        </ul>
+        <li>Multiple display options and assessment settings, including an option for practice sets, and
+            due date exceptions for individual students</li>
+        <li>Algorithmically generated questions, with a relatively simple-to-use question language
+            (loosely based on PHP) with many built-in randomizers and display macros</li>
+        <li>Group assessments</li>
+        <li>Expandable question language, by installing additional macros</li>
+    </ul>
+    <li>Other Course Management Features:</li>
+    <ul>
+        <li>Post text items, uploaded files, or web links to the classroom</li>
+        <li>Discussion Forums, optionally gradable </li>
+        <li>Full gradebook with support for online and offline grades and flexible grading schemes</li>
+    </ul>
+    <li>Administration:</li>
+    <ul>
+        <li>Flexible administration:  IMathAS can be centrally administered,
+            or teachers can be given rights to create their own courses</li>
+        <li>Teachers can be grouped by school or other division, with one or more group administrators</li>
+        <li>Courses can have one or more teachers</li>
+    </ul>
+    <li>Mash-ups:</li>
+    <ul>
+        <li>Support for <a href="http://www.imsglobal.org/toolsinteroperability2.cfm">LTI 1.1</a>, both as a consumer and producer</li>
+    </ul>
+</ul>
+
+<h4>Details</h4>
+For details on how the system works, look over the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">Help File</a> or view
+<a href="http://www.imathas.com/support.html">training and support</a> resources.
+
+<h3>Why a new system</h3>
+<p>You may be wondering why another system, when excellent systems already exist.</p>
+
+<p>For my purposes, WebWork and WIMS were too difficult to install (since I don't have direct
+    access to my school's webserver).  I didn't want to use commercial or publisher produced systems
+    because I don't want students with used books to incur additional cost.</p>
+
+
+<h3>Installation</h3>
+<p>
+<ol>
+    <li>Download IMathAS, extract it, and copy the files to your webserver.</li>
+    <li>Alternatively, if you have shell access to your server, enter the directory you want IMathAS in,
+        and checkout the code from SVN:  <i>svn checkout http://imathas.googlecode.com/svn/trunk/</i>.
+        Using SVN greatly simplifies upgrading.</li>
+    <li>If your web host requires that you create databases through the web panel, create a database
+        and database user for IMathAS now.  If you have a username/password with database
+        creation priviledges, you can wait and use it later in the install process.</li>
+    <li>Open a browser and access install.php.  This script will write the config.php file, change directory
+        permissions, copy distribution files, and set up the database.  At the end of the install you
+        will be given the opportunity to install a small set of example questions.  <i>Note</i>:
+        If you are running on a Windows server, you may need to set directory permissions manually.</li>
+    <li>Log into IMathAS.  If you didn't change the
+        initial imathas user settings when running install.php, log in as 'root' with password 'root'.
+        If you did not change the inital imathas user settings, click the "Change Password"
+        link now to change the password to something substantial.  Alternatively, you can
+        go into the Admin page, create a new user with Admin rights, then delete the 'root'
+        admin.</li>
+    <li>Edit loginpage.php and infoheader.php if desired.  If you plan to use the new instructor account
+        request page, edit newinstructor.php</li>
+</ol>
+</p>
+
+<h3>Upgrading</h3>
+To upgrade your installation:
+<p>
+<ol>
+    <li>If you installed using SVN checkout, then run <i>svn update</i> to update the code files.</li>
+    <li>If you copied files to your webserver to install, copy the updated files to your server to overwrite the old ones.  It is
+        recommended that you <i>not</i> delete the original files first, or you will lose your configuration files and
+        and the database upgrade record file (upgradecounter.txt).</li>
+    <li><i>Note:</i> Several files (config.php, loginpage.php, newinstructor.php, and infoheader.php) were copied from corresponding
+        distribution files when you first installed, and will not be overwritten when you update, whether you follow method 1 or 2.</li>
+    <li>Log into your installation using an Administrator account, and access the /upgrade.php file to make any necessary
+        database upgrades</li>
+</ol>
+</p>
+
+<h3>Installation Issues/Troubleshooting</h3>
+<p>
+<ul>
+    <li>If you receive an 500 access error trying to access install.php, try deleting the .htaccess file in the
+        IMathAS root directory.  This file is used to give some advice to the web server about file compression
+        and file types, but could potentially cause problems depending on the server configuration</li>
+    <li>If you find graphics not displaying, make sure your PHP installation supports GD2.</li>
+</ul>
+</p>
+
+
+<h3>Upgrading</h3>
+<p>If you are upgrading from IMathAS 1.6 or later, access update.php to install any new database changes
+    and learn about any other changes necessary.  If you are upgrading from a version earlier
+    than 1.6, you'll need to manually apply changes from the upgrade.txt file.
+</p>
+
+<h3>System Requirements</h3>
+<h4>Versions</h4>
+<p>PHP 5 and MySQL 4+ are recommended, and required from some features.
+    Most of the system will work with PHP 4.2+
+    and MySQL 3.23, but future compatibility is not guaranteed.</p>
+<p>PHP with GD2 and Freetype are recommended for best image-based graph support</p>
+<p>IMathAS will <b>not work</b> with the suhosin extension for PHP, which disables the predictable random number generation IMathAS relies on.</p>
+
+<h4>Server Requirements</h4>
+<p>An installation serving 7000+ students
+    with 300+ concurrent users has operated well on a commercial shared web server.</p>
+
+<h4>Security</h4>
+<p>IMathAS uses a standard databased-stored sessions-based system.  If a user does
+    not log out, the session is cleared from database after 24 hours.</p>
+
+<p>Questions (written by teachers) are passed through an interpreter that only allows
+    authorized functions to be used.  Student answers are evaluated client-side using
+    JavaScript, and are never evaled server-side.</p>
+
+<h3>Install Notes</h3>
+<p>
+    The install.php script automatically handles the following install steps.  They're
+    listed here in case anything goes wrong:
+<ul>
+    <li>Change permissions (chmod) of the following directories to allow the webserver process
+        to write to the directories:
+        <ul>
+            <li>assessment/libs</li>
+            <li>assessment/qimages</li>
+            <li>admin/import</li>
+            <li>course/files</li>
+            <li>filter/graph/imgs</li>
+            <li>filestore (if you're not using S3 for file storeage)</li>
+        </ul>
+        <br/>
+        <i>Note</i>: If you are running on a Windows server, you may need to set directory permissions manually. <br/>
+        <i>Note</i>: For security, the admin/import directory should not be web-readable.  A .htaccess file is included to
+        prevent access.  If your server doesn't obey .htaccess files, you may need to do additional tweaking. </li>
+    <li>Rename (in the main directory):
+        <ul>
+            <li>config.php.dist to config.php</li>
+            <li>infoheader.php.dist to infoheader.php</li>
+            <li>loginpage.php.dist to loginpage.php</li>
+            <li>newinstructor.php.dist to newinstructor.php</li>
+        </ul></li>
+    <li>Edit config.php.  Change these options to your liking:</li>
+    <ul>
+        <li>$dbserver:  The address of your database server.  Probably www.yoursite.edu or localhost</li>
+        <li>$dbname:  The name of the IMathAS database</li>
+        <li>$dbusername:  The username of the IMathAS database user.</li>
+        <li>$dbpassword:  The password for the IMathAS database user.  Choose something really complicated</li>
+        <li>$installname: The name of your installation, for personalization.</li>
+        <li>$longloginprompt:  How you want to prompt new students for a username</li>
+        <li>$loginprompt:  How you want to prompt students for a username</li>
+        <li>$loginformat:  Enforce a format requirement on the username</li>
+        <li>$emailconfirmation:  If set to true, new users will have to respond to an email sent by the system
+            before being able to enroll in any classes</li>
+        <li>$sendfrom:  An email address to send confirmation and notification emails from.</li>
+        <li>$imasroot:  The web root of the imathas install (ie, http://yoursite.edu $imasroot)</li>
+        <li>$mathimgurl: An absolute path or full url to a Mimetex CGI installation, for math image fallback</li>
+        <li>$colorshift:  Whether icons should change colors as due date approaches.  I thought this was cute,
+            but others might find it annoying</li>
+        <li>$smallheaderlogo: Text or an HTML image tag for a small (120 x 80) logo to display at the top right of
+            course pages</li>
+        <li>$allownongrouplibs:  Whether non-admins should be allowed to create non-group libraries.
+            On a single-school install, set to true; for larger installs that plan to
+            use the Groups features, set to false</li>
+        <li>$allowcourseimport:  Whether anyone should be able to import/export questions and libraries from the
+            course page.  Intended for easy sharing between systems, but the course page
+            is cleaner if turned off.</li>
+        <li>$allowmacroinstall:  Whether admins should be able to install macro files.  Macros files hold a large
+            security risk, and should only be installed from trusted sources.  For a single-admin system, it is
+            recommended that you leave this as false, and change it when you need to install a macro</li>
+        <li>$sessionpath:  change the session file path different than the default.
+            This is usually not necessary unless your site is on a server farm, or
+            you're on a shared server and want more security of session data</li>
+        <li>$mathchaturl:  a URL to the live chat server.  Leave unchanged to use the local install's
+            server.  Comment out to disable the chat server.  You can also use a different install to
+            offload chat on a different server</li>
+        <li>$enablebasiclti:  Set to true to enable use of IMathAS as a BasicLTI producer.</li>
+        <li>$AWSkey,$AWSsecret,$AWSbucket:  To allow students and teachers to upload files through
+            the text editor, and to enable file upload questions, this specifies an Amazon S3
+            key, secret, and bucket to use for file storage.  Local storage is not yet implemented.</li>
+    </ul>
+    <li>Run the dbsetup.php script (access http://yoursite.edu $imasroot/dbsetup.php), or send it
+        to your system administrator and ask them to run it, if you don't have creation access
+        to the database server.  Alternatively, have your system administrator create a database and database user,
+        and use these names in the config.php file before running dbsetup.php.  This script sets up the necessary database user, database, and tables for IMathAS.</li>
+
+</ul>
+</p>
 </div>

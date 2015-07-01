@@ -455,7 +455,7 @@ class SiteController extends AppController
     }
     public function actionInstructorDocument()
     {
-        $this->includeCSS(['doc.css']);
+        $this->includeCSS(['docs.css']);
         return $this->renderWithData('instructorDocument');
     }
 

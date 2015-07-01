@@ -28,8 +28,7 @@ use app\components\AppConstant;
 //                    echo $this->render('_courseTutoring', ['tutors' => $tutors]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT) {
                     echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);
-                } elseif ($user->rights > AppConstant::STUDENT_RIGHT && $user->right >= AppConstant::TEACHER_RIGHT) {
-                    AppUtility::dump('hiieeeeeeeeee');
+                } elseif ($user->rights > AppConstant::STUDENT_RIGHT) {
                     echo $this->render('_courseTutoring', ['tutors' => $tutors]);
                 }
                 echo $this->render('_courseTaking', ['students' => $students, 'msgRecord' => $msgRecord]);

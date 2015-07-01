@@ -1,7 +1,8 @@
 <?php
 use app\components\AppUtility;
 echo $this->render('_toolbar',['course'=> $course]);
-require_once("../filter/filter.php")
+require_once("../filter/filter.php");
+use serhatozles\htmlawed\htmLawed;
 ?>
 
 <div id="wikiName">
@@ -48,14 +49,10 @@ if (count($countOfRevision)>1) {
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
-                <?php $text = $singleWikiRevision->revision;
-                echo strip_tags($text);
-//                $htmlawedconfig = array('elements'=>'*-script');
-//                $text = serhatozles\htmlawed\htmLawed::htmLawed(stripslashes($text), $htmlawedconfig);
-////                $text = serhatozles\htmlawed\htmLawed::htmLawed($text, array('tidy'=>'1'));
-//                //                $text = str_replace(array("\r","\n", "<p>", "</p>"),' ', $text);
-////                $text = preg_replace('/\s+/',' ', $text);
-//                 echo $text; ?>
+                <?php //$text = $singleWikiRevision->revision;  echo strip_tags($text);
+                $in = '<td>Hello Tudip</div>';
+                $out = \serhatozles\htmlawed\htmLawed::htmLawed($in);
+                echo strip_tags($out);?>
     </textarea>
     <?php }?>
     <?php }?>
