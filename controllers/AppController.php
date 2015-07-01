@@ -102,9 +102,9 @@ class AppController extends Controller
         for($i = 0; $i < $cnt; $i++){
             $fileURL = $assetUrl . $assetType . "/" . $fileArray[$i];
             if($assetType == AppConstant::ASSET_TYPE_CSS){
-                $this->getView()->registerCssFile($fileURL);
+                $this->getView()->registerCssFile($fileURL."?ver=".AppConstant::VERSION_NUMBER);
             }else{
-                $this->getView()->registerJsFile($fileURL);
+                $this->getView()->registerJsFile($fileURL."?ver=".AppConstant::VERSION_NUMBER);
             }
         }
     }
