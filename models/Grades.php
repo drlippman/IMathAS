@@ -13,6 +13,7 @@ use Yii;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasGrades;
+use yii\db\Query;
 
 class Grades extends BaseImasGrades
 {
@@ -25,6 +26,23 @@ class Grades extends BaseImasGrades
             $this->feedback = $singal['feedbackText'];
             $this->save();
         }
+    }
+
+    public static function GetOtherGrades($gradetypeselects, $limuser){
+        $query = new Query();
+        $query->select(['*'])
+            ->from('imas_grades');
+        foreach($gradetypeselects as $gradeSelect){
+            $query->orWhere(["gradetype" => $gradeSelect['gradetype']])
+                    ->andWhere(['IN', 'gradetypeid', $gradeSelect['gradetypeid']]);
+        }
+        if ($limuser > 0) {
+            $query->andWhere(["userid" => $limuser]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
     }
 }
 

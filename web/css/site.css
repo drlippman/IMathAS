@@ -464,6 +464,12 @@ a.msg-notification:visited{
     height: auto;
 }
 
-.login-register-link{
+.login-register-link {
     line-height: 10px;
+}
+
+.dropdown-auto{
+    width: auto;
+    height: auto;
+    padding: 0px;
 }

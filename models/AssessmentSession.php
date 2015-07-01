@@ -102,12 +102,30 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
-    public static function getByUserCourseAssessmentId($assessmentId,$courseId,$user){
+    public static function getByUserCourseAssessmentId($assessmentId,$courseId,$user)
+    {
         $query = new Query();
-        $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')->join('INNER JOIN','imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
+        $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
             ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId])->count();
-            $command = $query->createCommand();
+        $command = $query->createCommand();
         $items = $command->queryAll();
         return $items;
+    }
+
+    public static function findAssessmentsSession($courseId, $limuser){
+        $query = new Query();
+        $query	->select(['imas_assessment_sessions.id', 'imas_assessment_sessions.assessmentid', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask', 'imas_assessment_sessions.feedback', 'imas_assessment_sessions.userid', 'imas_assessments.timelimit'])
+            ->from('imas_assessments')
+            ->join(	'INNER JOIN',
+                'imas_assessment_sessions',
+                'imas_assessments.id = imas_assessment_sessions.assessmentid'
+            )
+            ->where(['imas_assessments.courseid' => $courseId]);
+        if($limuser > 0){
+            $query->andWhere(['imas_assessment_sessions.userid' => $limuser]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 

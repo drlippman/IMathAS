@@ -11,6 +11,7 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasExceptions;
+use yii\db\Query;
 
 class Exceptions extends BaseImasExceptions
 {
@@ -56,5 +57,20 @@ class Exceptions extends BaseImasExceptions
     {
         $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')")->queryOne();
         return $query;
+    }
+
+    public static function findExceptions($courseId){
+        $query = new Query();
+        $query	->select(['imas_exceptions.assessmentid', 'imas_exceptions.userid', 'imas_exceptions.enddate', 'imas_exceptions.islatepass'])
+            ->from('imas_exceptions')
+            ->join(	'INNER JOIN',
+                'imas_assessments',
+                'imas_exceptions.assessmentid = imas_assessments.id'
+            )
+            ->where(['imas_assessments.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
     }
 } 

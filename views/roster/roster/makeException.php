@@ -8,7 +8,6 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
-date_default_timezone_set("Asia/Calcutta");
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
 <form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
@@ -34,7 +33,7 @@ date_default_timezone_set("Asia/Calcutta");
             <?php
                 if($existingExceptions){
                 echo " <div><h4>Existing Exceptions</h4><p>Select exceptions to clear</p>"
-            ?>
+            ?><div><div class="alert alert-success">
                 <?php
                     foreach($existingExceptions as $entry){
                         echo "<ul><li>".$entry['Name']."<ul>";
@@ -48,9 +47,9 @@ date_default_timezone_set("Asia/Calcutta");
                             }
                         echo "</ul></li>";
                 ?>
-            <?php echo "</ul>"; } echo "<input type='submit'  class='btn btn-primary ' id='change-record' value='Record Changes'></div>";}
+            <?php echo "</ul>"; } echo "</div></div></div><input type='submit'  class='btn btn-primary record-submit' id='change-record' value='Record Changes'>";}
             else{
-                echo"<p>No exceptions currently exist for the selected students.</p></div>";
+                echo"<div class='alert alert-danger'><p>No exceptions currently exist for the selected students.</p></div>";
             }?>
         </div>
         <div>
@@ -61,6 +60,7 @@ date_default_timezone_set("Asia/Calcutta");
                   <?php
                      echo DatePicker::widget([
                           'name' => 'startDate',
+                          'options' => ['placeholder' => 'Select start date ...'],
                           'type' => DatePicker::TYPE_COMPONENT_APPEND,
                           'value' => date("m/d/Y"),
                           'pluginOptions' => [
@@ -73,7 +73,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php
                     echo TimePicker::widget([
                         'name' => 'startTime',
-                        'options' => ['placeholder' => 'Select operating time ...'],
+                        'options' => ['placeholder' => 'Select start time ...'],
                         'convertFormat' => true,
                         'value' => date('g:i A'),
                         'pluginOptions' => [
@@ -89,6 +89,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php
                     echo DatePicker::widget([
                          'name' => 'endDate',
+                         'options' => ['placeholder' => 'Select end date ...'],
                          'type' => DatePicker::TYPE_COMPONENT_APPEND,
                          'value' => date("m/d/Y",strtotime("+1 week")),
                          'pluginOptions' => [
@@ -101,7 +102,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php
                     echo TimePicker::widget([
                         'name' => 'endTime',
-                        'options' => ['placeholder' => 'Select operating time ...'],
+                        'options' => ['placeholder' => 'Select time ...'],
                         'convertFormat' => true,
                         'value' =>"10:00 AM",
                         'pluginOptions' => [
@@ -119,7 +120,7 @@ date_default_timezone_set("Asia/Calcutta");
                 <?php echo "<li><input type='checkbox' name='addexc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
                 <?php } ?>
             </ul>
-            <input type="submit" class="btn btn-primary" id="change-record" value="Record Changes">
+            <input type="submit" class="btn btn-primary record-submit" id="change-record" value="Record Changes">
             <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
         <br>

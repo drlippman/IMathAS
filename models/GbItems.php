@@ -13,6 +13,7 @@ use Yii;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasGbitems;
+use yii\db\Query;
 
 class GbItems extends BaseImasGbitems
 {
@@ -36,7 +37,29 @@ class GbItems extends BaseImasGbitems
         $this->save();
         return $this->id;
     }
+    public static function findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
 
+        $query = new Query();
+        $query->select(['*'])
+            ->from('imas_gbitems')
+            ->where(['courseid'=>$courseId]);
+        if (!$canviewall) {
+            $query->andWhere(['<','showdate', $now]);
+        }
+        if (!$canviewall) {
+            $query->andWhere(['>','cntingb', 0]);
+        }
+        if ($istutor) {
+            $query->andWhere(['<','tutoredit', 2]);
+        }
+        if ($catfilter>-1) {
+            $query->andWhere(['gbcategory' => $catfilter]);
+        }
+        $query->orderBy('showdate');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 
 }
 

@@ -16,8 +16,8 @@ class StudentController extends AppController
     {
         $this->guestUserHandler();
         $model = new StudentEnrollCourseForm();
-        if ($model->load(\Yii::$app->request->post())) {
-            $param = $this->getBodyParams();
+        if ($model->load($this->isPostMethod())) {
+            $param = $this->getRequestParams();
             $param = $param['StudentEnrollCourseForm'];
             $user = $this->getAuthenticatedUser();
 
@@ -49,6 +49,7 @@ class StudentController extends AppController
                 $this->setErrorFlash('Invalid combination of enrollment key and course id.');
             }
         }
-        return $this->renderWithData('studentEnrollCourse', ['model' => $model]);
+        $responseData = array('model' => $model);
+        return $this->renderWithData('studentEnrollCourse', $responseData);
     }
 }

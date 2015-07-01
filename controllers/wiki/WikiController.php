@@ -22,8 +22,8 @@ class WikiController extends AppController
         $course = Course::getById($courseId);
         $subject = $this->getBodyParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
-        $stugroupid = 0;
-        $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupid, $userId);
+        $stugroupId = 0;
+        $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
         $wikiTotalData = Wiki::getAllData($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
         $count = $wikiRevisionData ;
@@ -54,7 +54,7 @@ class WikiController extends AppController
         $wikiId = $this->getParamVal('wikiId');
         $wiki = Wiki::getById($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
-        $stugroupid = 0;
+        $stugroupId = 0;
         $wikiRevisionSortedByTime = '';
         $wikiRevision = WikiRevision::getByRevisionId($wikiId);
         foreach($wikiRevisionData as $singleWikiData){
@@ -79,7 +79,7 @@ class WikiController extends AppController
         $revisionid = $wikiRevisionData->id;
         if ($wikiRevisionData->revision!= null) { //FORM SUBMITTED, DATA PROCESSING
             $inconflict = false;
-            $stugroupid = 0;
+            $stugroupId = 0;
 
             //clean up wiki content
             require_once("../components/htmLawed.php");

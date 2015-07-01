@@ -943,74 +943,78 @@ class RosterController extends AppController
                     if (isset($params['addexc'])) {
                         $startException = strtotime($params['startDate'] . ' ' . $params['startTime']);
                         $endException = strtotime($params['endDate'] . ' ' . $params['endTime']);
-                        $waivereqscore = (isset($params['waivereqscore'])) ? AppConstant::NUMERIC_ONE : AppConstant::NUMERIC_ZERO;
-                        foreach ($studentArray as $student) {
-                            foreach ($params['addexc'] as $assessment) {
-                                $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
-                                if ($presentException) {
-                                    Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waivereqscore);
-                                } else {
-                                    $param = array('userid' => $student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
-                                    $exception = new Exceptions();
-                                    $exception->create($param);
-                                }
-                                if (isset($params['forceregen'])) {
-                                    $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
-                                    if ($query) {
-                                        if (strpos($query->questions, ';') === false) {
-                                            $questions = explode(",", $query->questions);
-                                        } else {
-                                            list($questions, $bestquestions) = explode(";", $query->questions);
-                                            $questions = explode(",", $query->questions);
-                                        }
-                                        $lastanswers = explode('~', $query->lastanswers);
-                                        $curscorelist = $query->scores;
-                                        $scores = array();
-                                        $attempts = array();
-                                        $seeds = array();
-                                        $reattempting = array();
-                                        for ($i = 0; $i < count($questions); $i++) {
-                                            $scores[$i] = AppConstant::NUMERIC_NEGATIVE_ONE;
-                                            $attempts[$i] = AppConstant::NUMERIC_ZERO;
-                                            $seeds[$i] = rand(1, 9999);
-                                            $newLastAns = array();
-                                            $laarr = explode('##', $lastanswers[$i]);
-                                            foreach ($laarr as $lael) {
-                                                if ($lael == "ReGen") {
-                                                    $newLastAns[] = "ReGen";
-                                                }
-                                            }
-                                            $newLastAns[] = "ReGen";
-                                            $lastanswers[$i] = implode('##', $newLastAns);
-                                        }
-                                        $scorelist = implode(',', $scores);
-                                        if (strpos($curscorelist, ';') !== false) {
-                                            $scorelist = $scorelist . ';' . $scorelist;
-                                        }
-                                        $attemptslist = implode(',', $attempts);
-                                        $seedslist = implode(',', $seeds);
-                                        $lastanswers = str_replace('~', '', $lastanswers);
-                                        $lastanswerslist = implode('~', $lastanswers);
-                                        $lastanswerslist = addslashes(stripslashes($lastanswerslist));
-                                        $reattemptinglist = implode(',', $reattempting);
-                                        $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' => $attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
-                                        AssessmentSession::modifyExistingSession($finalParams);
-                                    }
-                                } elseif (isset($params['forceclear'])) {
-                                    AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
-                                }
-                            }
-                        }
-                        if (isset($params['eatlatepass'])) {
-                            $n = intval($params['latepassn']);
+                        if($startException > $endException){
+                            $this->setErrorFlash("Available date(Available After) cannot be greater than end date(Available Until).");
+                        }else{
+                            $waivereqscore = (isset($params['waivereqscore'])) ? 1 : 0;
                             foreach ($studentArray as $student) {
-                                Student::reduceLatepasses($student['id'], $courseId, $n);
+                                foreach ($params['addexc'] as $assessment) {
+                                    $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
+                                    if ($presentException) {
+                                        Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waivereqscore);
+                                    } else {
+                                        $param = array('userid' => $student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
+                                        $exception = new Exceptions();
+                                        $exception->create($param);
+                                    }
+                                    if (isset($params['forceregen'])) {
+                                        $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
+                                        if ($query) {
+                                            if (strpos($query->questions, ';') === false) {
+                                                $questions = explode(",", $query->questions);
+                                            } else {
+                                                list($questions, $bestquestions) = explode(";", $query->questions);
+                                                $questions = explode(",", $query->questions);
+                                            }
+                                            $lastanswers = explode('~', $query->lastanswers);
+                                            $curscorelist = $query->scores;
+                                            $scores = array();
+                                            $attempts = array();
+                                            $seeds = array();
+                                            $reattempting = array();
+                                            for ($i = 0; $i < count($questions); $i++) {
+                                                $scores[$i] = -1;
+                                                $attempts[$i] = 0;
+                                                $seeds[$i] = rand(1, 9999);
+                                                $newLastAns = array();
+                                                $laarr = explode('##', $lastanswers[$i]);
+                                                foreach ($laarr as $lael) {
+                                                    if ($lael == "ReGen") {
+                                                        $newLastAns[] = "ReGen";
+                                                    }
+                                                }
+                                                $newLastAns[] = "ReGen";
+                                                $lastanswers[$i] = implode('##', $newLastAns);
+                                            }
+                                            $scorelist = implode(',', $scores);
+                                            if (strpos($curscorelist, ';') !== false) {
+                                                $scorelist = $scorelist . ';' . $scorelist;
+                                            }
+                                            $attemptslist = implode(',', $attempts);
+                                            $seedslist = implode(',', $seeds);
+                                            $lastanswers = str_replace('~', '', $lastanswers);
+                                            $lastanswerslist = implode('~', $lastanswers);
+                                            $lastanswerslist = addslashes(stripslashes($lastanswerslist));
+                                            $reattemptinglist = implode(',', $reattempting);
+                                            $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' => $attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
+                                            AssessmentSession::modifyExistingSession($finalParams);
+                                        }
+                                    } elseif (isset($params['forceclear'])) {
+                                        AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
+                                    }
+                                }
                             }
-                        }
-                        if (isset($params['sendmsg'])) {
-                            $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-                            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
-                            return $this->renderWithData('rosterMessage', $responseData);
+                            if (isset($params['eatlatepass'])) {
+                                $n = intval($params['latepassn']);
+                                foreach ($studentArray as $student) {
+                                    Student::reduceLatepasses($student['id'], $courseId, $n);
+                                }
+                            }
+                            if (isset($params['sendmsg'])) {
+                                $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
+                                $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                                return $this->renderWithData('rosterMessage', $responseData);
+                            }
                         }
                     }
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
@@ -1021,6 +1025,7 @@ class RosterController extends AppController
                 $sort_by = array_column($studentArray, 'LastName');
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
             }
+            $this->includeJS(['roster/makeException.js']);
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latepassMsg' => $latepassMsg);
             return $this->renderWithData('makeException', $responseData);
         } else {

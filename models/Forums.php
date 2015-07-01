@@ -9,7 +9,9 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasForums;
+use yii\db\Query;
 
 class Forums extends BaseImasForums {
 
@@ -23,9 +25,30 @@ class Forums extends BaseImasForums {
         return static::findOne(['id' => $id]);
     }
 
-
     public static function getByCourseIdOrdered($courseId,$sort,$orderBy)
     {
-        return Forums::find()->where(['courseid' => $courseId])->orderBy([$orderBy=>$sort])->all();
+        return Forums::find()->where(['courseid' => $courseId])->orderBy([$orderBy => $sort])->all();
+    }
+    public  static  function findDiscussionGradeInfo($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now){
+
+        $query = new Query();
+        $query->select(['id', 'name', 'gbcategory', 'startdate', 'enddate', 'replyby', 'postby', 'points', 'cntingb', 'avail'])
+            ->from('imas_forums')
+            ->where(['courseid'=>$courseId])
+            ->andWhere(['>', 'points', 0])
+            ->andWhere(['>', 'avail', 0]);
+        if (!$canviewall) {
+            $query->andWhere(['<','startdate', $now]);
+        }
+        if ($istutor) {
+            $query->andWhere(['<','tutoredit', 2]);
+        }
+        if ($catfilter>-1) {
+            $query->andWhere(['gbcategory' => $catfilter]);
+        }
+        $query->orderBy('enddate', 'postby', 'replyby', 'startdate');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 
