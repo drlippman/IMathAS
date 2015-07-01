@@ -12,7 +12,6 @@ namespace app\models;
 use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
 use yii\db\Query;
-use yii\web\User;
 
 class Student extends BaseImasStudents {
 
