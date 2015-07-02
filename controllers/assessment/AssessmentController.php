@@ -233,7 +233,7 @@ class AssessmentController extends AppController
                 }
             }
 
-            $query = Outcomes::getByCourseId($courseId);
+            $query = Outcomes::getByCourse($courseId);
             $pageOutcomes = array();
             if ($query) {
                 foreach($query as $singleData) {
@@ -242,7 +242,6 @@ class AssessmentController extends AppController
                 }
             }
             $pageOutcomes[0] = AppConstant::DEFAULT_OUTCOMES;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
             $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ZERO));
             if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
                 $query = $course['outcomes'];

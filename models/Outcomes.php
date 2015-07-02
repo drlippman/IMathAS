@@ -22,7 +22,7 @@ class Outcomes extends BaseImasOutcomes {
          return Outcomes::findAll(['courseid' => $courseId]);
     }
 
-    public static function getByCourseId($courseId){
+    public static function getByCourse($courseId){
         return Outcomes::find()->select('id,name')->where(['courseid' => $courseId])->all();
     }
 
