@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?php if ($data['hasImg'] == 1) { ?>
                                 <img class="circular-profile-image" id="img<?php echo $imgCount ?>"
                                 src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl ?>"
-                                onclick=changeProfileImage(this,<?php echo $data['userId'] ?>);/>
+                                onclick=changeProfileImage(this,<?php echo $data['userId'] ?>);>
                                 <?php } else { ?>
                                 <img class="circular-profile-image" id="img"
                                 src="<?php echo AppUtility::getAssetURL() ?>Uploads/dummy_profile.jpg"/>
@@ -107,3 +107,4 @@ $this->params['breadcrumbs'][] = $this->title;
   <div>
       <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $course->id . '&forumid=' . $forumid); ?>">Back to Thread List</a>
   </div>
+

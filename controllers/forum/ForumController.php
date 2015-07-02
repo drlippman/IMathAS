@@ -512,21 +512,26 @@ class ForumController extends AppController
        $this->guestUserHandler();
        $courseId = $this->getParamVal('courseid');
        $course = Course::getById($courseId);
+       $threadArray = array();
+       $Id = $this->getParamVal('id');
        $forumId = $this->getParamVal('forumid');
        $Id = $this->getParamVal('id');
        $threadId = $this->getParamVal('threadId');
        $threadData =ForumPosts::getbyidpost($Id);
-       $threadArray = array();
        foreach ($threadData as $data)
        {
+
                $tempArray = array
                (
 
                    'subject' => $data['subject'],
-
-               );
+                   'userName' => $data->user->FirstName.' ' .$data->user->LastName,
+                   'message' => $data['message'],
+                   'postDate' => date('F d, o g:i a', $data['postdate']),
+                );
                array_push($threadArray, $tempArray);
        }
+       $this->includeCSS(['forums.css']);
        $this->includeJS(['editor/tiny_mce.js' ,'editor/tiny_mce_src.js', 'general.js','forum/replypost.js']);
        $responseData = array('reply' => $threadArray,'course' => $course,'forumId' => $forumId,'threadId' => $threadId,'parentId' => $Id);
        return $this->renderWithData('replyPost', $responseData);

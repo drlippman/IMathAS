@@ -108,14 +108,21 @@ function markAllReadSuccess() {
 
 var flag = 0;
 function changeProfileImage(element, id) {
+
     if (flag == 0) {
+
         element.style.width = "200px";
         element.style.height = "175px";
-        flag = 1;
-    } else {
+        flag=1;
+
+    }else {
+
         element.style.width = "47px";
         element.style.height = "47px";
-        flag = 0;
+        flag =0;
     }
 
 }
+
+
+
