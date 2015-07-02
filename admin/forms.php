@@ -546,7 +546,7 @@ switch($_GET['action']) {
 			}
 			echo '</select><span id="templatepreview"></span>';
 			echo '<span id="termsbox" style="display:none;"><br/>';
-			echo 'This course has additional <a href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>';
+			echo 'This course has additional <a target="_blank" href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>';
 			echo '<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</span>';
 			echo '</span><br class="form" />';
 			echo '<script type="text/javascript"> function templatepreviewupdate(el) {';

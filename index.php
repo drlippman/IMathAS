@@ -342,7 +342,7 @@ require('./footer.php');
 
 
 function printCourses($data,$title,$type=null) {
-	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses;
+	global $shownewmsgnote, $shownewpostnote, $stuhashiddencourses,$imasroot;
 	if (count($data)==0 && $type=='tutor') {return;}
 	global $myrights,$showmessagesgadget,$showpostsgadget,$newmsgcnt,$newpostcnt;
 	echo '<div class="block"><h3>'.$title.'</h3></div>';
@@ -351,7 +351,14 @@ function printCourses($data,$title,$type=null) {
 		echo '<li>';
 		if ($type=='take') {
 			echo '<span class="delx" onclick="return hidefromcourselist(this,'.$data[$i]['id'].');" title="'._("Hide from course list").'">x</span>';
-		}
+		} /*else if ($type=='teach') {
+			echo '<div class="floatright clear dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="'.$imasroot.'/img/gears.png"/></a>';
+			echo '<ul class="dropdown-menu dropdown-menu-right">';
+			echo '<li><a>Do something one</a></li>';
+			echo '<li><a>Add/Remove Teachers</a></li>';
+			echo '<li><a>Something else</a></li>';
+			echo '</ul></div>';
+		}*/
 		echo '<a href="course/course.php?folder=0&cid='.$data[$i]['id'].'">';
 		echo $data[$i]['name'].'</a>';
 		if (isset($data[$i]['available']) && (($data[$i]['available']&1)==1)) {

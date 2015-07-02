@@ -892,7 +892,7 @@ writeHtmlSelect ("addto",$page_blockSelect['val'],$page_blockSelect['label'],$se
 		Enrollment key: <input type=text name=ekey id=ekey size=30></p>
 		
 		<p id="termsbox" style="display:none;">
-		This course has additional <a href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>
+		This course has additional <a target="_blank" href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>
 		<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</p>
 		
 		<input type=submit value="Select Course Items">

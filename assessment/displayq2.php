@@ -145,7 +145,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$la = $laarr[count($laarr)-1];
 	if ($la=="ReGen") {$la = '';}
 	if ($clearla) {$la = '';}
-	if (isset($requestclearla) && !isset($GLOBALS['questionscoreref'])) { $la = '';}
+	if (isset($requestclearla) && !isset($GLOBALS['questionscoreref'])) { $la = ''; $qcolors = array();}
 	
 	//$la = $GLOBALS['lastanswers'][$qnidx];
 	
@@ -507,7 +507,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 
 //inputs: Question number, Question id, rand seed, given answer
-function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
+function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($abstolerance);
 	srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;	
