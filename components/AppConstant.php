@@ -83,6 +83,9 @@ class AppConstant
     const NO_MESSAGE_FOUND = "No message found.";
     const NO_COURSE_FOUND = "Course not found.";
     const DELETED_SUCCESSFULLY = "Deleted successfully.";
+    /*
+     * Assessment Constant
+     */
     const WEEK_TIME = 604800;
     const SECONDS = 60;
     const DEFAULT_FEEDBACK = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";

@@ -39,7 +39,7 @@ class InstructorController extends AppController
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
-        if($type == 'assessment'){
+            if($type == 'assessment'){
                 return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
             }else if($type == 'inlinetext'){
                 return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
@@ -53,12 +53,11 @@ class InstructorController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
             }else if($type == 'calendar'){
 
-        }
-        else{
+            }
+            else{
                 $this->setErrorFlash("Item not selected");
             }
         }
-//        AppUtility::dump($this->getParamVal('add'));
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseData = $this->getRequestParams();

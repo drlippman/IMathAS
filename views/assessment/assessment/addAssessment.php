@@ -4,6 +4,7 @@ use yii\bootstrap\ActiveForm;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AppUtility;
+use app\components\AssessmentUtility;
 use app\components\AppConstant;
 $this->title = 'Add Assessment';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
@@ -31,17 +32,17 @@ Intro/Instructions:<BR>
 
 <span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
 		</span><br class="form"/>
 
 <div id="datediv" style="display:<?php echo ($assessmentData['avail']==AppConstant::NUMERIC_ONE)?"block":"none"; ?>">
 
     <span class=form>Available After:</span>
 		<span class=formright>
-			<input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/>
+			<input type=radio name="sdatetype" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/>
 			Always until end date<br/>
-			<input type=radio name="sdatetype" class="pull-left" value="sdate" <?php writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/>
+			<input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/>
 
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
@@ -73,9 +74,9 @@ Intro/Instructions:<BR>
 
     <span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($assessmentData['enddate'],"2000000000",0); ?>/>
+			<input type=radio name="edatetype" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($assessmentData['enddate'],"2000000000",0); ?>/>
 			 Always after start date<br/>
-			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php writeHtmlChecked($assessmentData['enddate'],"2000000000",1); ?>/>
+			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php AssessmentUtility::writeHtmlChecked($assessmentData['enddate'],"2000000000",1); ?>/>
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
@@ -106,8 +107,8 @@ Intro/Instructions:<BR>
 
     <span class="form">Keep open as review:</span>
 		<span class="formright">
-			<input type=radio name="doreview" value="0" <?php writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>> Never<br/>
-			<input type=radio name="doreview" value="2000000000" <?php writeHtmlChecked($assessmentData['reviewdate'],2000000000,AppConstant::NUMERIC_ZERO); ?>> Always after due date<br/>
+			<input type=radio name="doreview" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>> Never<br/>
+			<input type=radio name="doreview" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],2000000000,AppConstant::NUMERIC_ZERO); ?>> Always after due date<br/>
 			<input type=radio name="doreview" class="pull-left " value="rdate" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>>
             <?php
             echo '<label class="end pull-left"> Until</label>';
@@ -152,7 +153,7 @@ if (count($pageCopyFromSelect['val'])>AppConstant::NUMERIC_ZERO) {
     <span class=formright>
 
 <?php
-writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],AppConstant::NUMERIC_ZERO,"None - use settings below",AppConstant::NUMERIC_ZERO," onChange=\"chgcopyfrom()\"");
+AssessmentUtility::writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],AppConstant::NUMERIC_ZERO,"None - use settings below",AppConstant::NUMERIC_ZERO," onChange=\"chgcopyfrom()\"");
 ?>
 		</span><br class=form>
 <?php
@@ -183,12 +184,12 @@ writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['labe
     <span class=form>Display method: </span>
 			<span class=formright>
 				<select name="displaymethod">
-                    <option value="AllAtOnce" <?php writeHtmlSelected($assessmentData['displaymethod'],"AllAtOnce",AppConstant::NUMERIC_ZERO) ?>>Full test at once</option>
-                    <option value="OneByOne" <?php writeHtmlSelected($assessmentData['displaymethod'],"OneByOne",AppConstant::NUMERIC_ZERO) ?>>One question at a time</option>
-                    <option value="Seq" <?php writeHtmlSelected($assessmentData['displaymethod'],"Seq",AppConstant::NUMERIC_ZERO) ?>>Full test, submit one at time</option>
-                    <option value="SkipAround" <?php writeHtmlSelected($assessmentData['displaymethod'],"SkipAround",AppConstant::NUMERIC_ZERO) ?>>Skip Around</option>
-                    <option value="Embed" <?php writeHtmlSelected($assessmentData['displaymethod'],"Embed",AppConstant::NUMERIC_ZERO) ?>>Embedded</option>
-                    <option value="VideoCue" <?php writeHtmlSelected($assessmentData['displaymethod'],"VideoCue",AppConstant::NUMERIC_ZERO) ?>>Video Cued</option>
+                    <option value="AllAtOnce" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"AllAtOnce",AppConstant::NUMERIC_ZERO) ?>>Full test at once</option>
+                    <option value="OneByOne" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"OneByOne",AppConstant::NUMERIC_ZERO) ?>>One question at a time</option>
+                    <option value="Seq" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"Seq",AppConstant::NUMERIC_ZERO) ?>>Full test, submit one at time</option>
+                    <option value="SkipAround" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"SkipAround",AppConstant::NUMERIC_ZERO) ?>>Skip Around</option>
+                    <option value="Embed" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"Embed",AppConstant::NUMERIC_ZERO) ?>>Embedded</option>
+                    <option value="VideoCue" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"VideoCue",AppConstant::NUMERIC_ZERO) ?>>Video Cued</option>
                 </select>
 			</span><BR class=form>
 
@@ -199,7 +200,7 @@ writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['labe
 			<span class=formright>
 				<input type=text size=4 name=defattempts value="<?php echo $assessmentData['defattempts'];?>" >
 				<span id="showreattdiffver" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?>">
-	 			<input type=checkbox name="reattemptsdiffver" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_EIGHT,AppConstant::NUMERIC_EIGHT); ?>/> Reattempts different versions</span>
+	 			<input type=checkbox name="reattemptsdiffver" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_EIGHT,AppConstant::NUMERIC_EIGHT); ?>/> Reattempts different versions</span>
 	 		</span><BR class=form>
 
     <span class=form>Default penalty:</span>
@@ -260,74 +261,74 @@ writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['labe
     <span class="form">Use equation helper?</span>
 			<span class="formright">
 				<select name="eqnhelper">
-                    <option value="0" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ZERO) ?>>No</option>
+                    <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                     <?php
                     //start phasing these out; don't show as option if not used.
                     if ($assessmentData['eqnhelper']==AppConstant::NUMERIC_ONE || $assessmentData['eqnhelper']==AppConstant::NUMERIC_TWO) {
                         ?>
-                        <option value="1" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ONE) ?>>Yes, simple form (no logs or trig)</option>
-                        <option value="2" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_TWO) ?>>Yes, advanced form</option>
+                        <option value="1" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ONE) ?>>Yes, simple form (no logs or trig)</option>
+                        <option value="2" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_TWO) ?>>Yes, advanced form</option>
                     <?php
                     }
                     ?>
-                    <option value="3" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_THREE) ?>>MathQuill, simple form</option>
-                    <option value="4" <?php writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_FOUR) ?>>MathQuill, advanced form</option>
+                    <option value="3" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_THREE) ?>>MathQuill, simple form</option>
+                    <option value="4" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_FOUR) ?>>MathQuill, advanced form</option>
                 </select>
 			</span><br class="form" />
     <span class=form>Show hints and video/text buttons when available?</span>
 			<span class=formright>
-				<input type="checkbox" name="showhints" <?php writeHtmlChecked($assessmentData['showhints'],AppConstant::NUMERIC_ONE); ?>>
+				<input type="checkbox" name="showhints" <?php AssessmentUtility::writeHtmlChecked($assessmentData['showhints'],AppConstant::NUMERIC_ONE); ?>>
 			</span><br class=form>
 
     <span class=form>Show "ask question" links?</span>
 			<span class=formright>
-				<input type="checkbox" name="msgtoinstr" <?php writeHtmlChecked($assessmentData['msgtoinstr'],AppConstant::NUMERIC_ONE); ?>/> Show "Message instructor about this question" links<br/>
-				<input type="checkbox" name="doposttoforum" <?php writeHtmlChecked($assessmentData['posttoforum'],AppConstant::NUMERIC_ZERO,true); ?>/> Show "Post this question to forum" links, to forum <?php writeHtmlSelect("posttoforum",$pageForumSelect['val'],$pageForumSelect['label'],$assessmentData['posttoforum']); ?>
+				<input type="checkbox" name="msgtoinstr" <?php AssessmentUtility::writeHtmlChecked($assessmentData['msgtoinstr'],AppConstant::NUMERIC_ONE); ?>/> Show "Message instructor about this question" links<br/>
+				<input type="checkbox" name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($assessmentData['posttoforum'],AppConstant::NUMERIC_ZERO,true); ?>/> Show "Post this question to forum" links, to forum <?php AssessmentUtility::writeHtmlSelect("posttoforum",$pageForumSelect['val'],$pageForumSelect['label'],$assessmentData['posttoforum']); ?>
 			</span><br class=form>
 
     <span class=form>Show answer entry tips?</span>
 			<span class=formright>
 				<select name="showtips">
-                    <option value="0" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ZERO) ?>>No</option>
-                    <option value="1" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ONE) ?>>Yes, after question</option>
-                    <option value="2" <?php writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_TWO) ?>>Yes, under answerbox</option>
+                    <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ZERO) ?>>No</option>
+                    <option value="1" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ONE) ?>>Yes, after question</option>
+                    <option value="2" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_TWO) ?>>Yes, under answerbox</option>
                 </select>
 			</span><br class=form>
 
     <span class=form>Allow use of LatePasses?: </span>
 			<span class=formright>
 				<?php
-                writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN);
+                AssessmentUtility::writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN);
                 ?>
-                <label><input type="checkbox" name="latepassafterdue" <?php writeHtmlChecked($line['allowlate']>AppConstant::NUMERIC_TEN,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
+                <label><input type="checkbox" name="latepassafterdue" <?php AssessmentUtility::writeHtmlChecked($line['allowlate']>AppConstant::NUMERIC_TEN,true); ?>> Allow LatePasses after due date, within 1 LatePass period</label>
 			</span><BR class=form>
 
     <span class=form>Make hard to print?</span>
 			<span class=formright>
-				<input type="radio" value="0" name="noprint" <?php writeHtmlChecked($assessmentData['noprint'],AppConstant::NUMERIC_ZERO); ?>/> No <input type="radio" value="1" name="noprint" <?php writeHtmlChecked($line['noprint'],AppConstant::NUMERIC_ONE); ?>/> Yes
+				<input type="radio" value="0" name="noprint" <?php AssessmentUtility::writeHtmlChecked($assessmentData['noprint'],AppConstant::NUMERIC_ZERO); ?>/> No <input type="radio" value="1" name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'],AppConstant::NUMERIC_ONE); ?>/> Yes
 			</span><br class=form>
 
 
     <span class=form>Shuffle item order: </span>
-			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE); ?>>
+			<span class=formright><input type="checkbox" name="shuffle" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE); ?>>
 			</span><BR class=form>
     <span class=form>Gradebook Category:</span>
 			<span class=formright>
 
 <?php
-writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCategorySelect['label'],$gradebookCategory,"Default",AppConstant::NUMERIC_ZERO);
+AssessmentUtility::writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCategorySelect['label'],$gradebookCategory,"Default",AppConstant::NUMERIC_ZERO);
 ?>
 			</span><br class=form>
     <span class=form>Count: </span>
 			<span <?php if ($testType=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
-				<input type=radio name="cntingb" value="1" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO); ?> /> Count in Gradebook<br/>
-				<input type=radio name="cntingb" value="0" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
-				<input type=radio name="cntingb" value="3" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
-				<input type=radio name="cntingb" value="2" <?php writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_ZERO); ?> /> Count as Extra Credit
+				<input type=radio name="cntingb" value="1" <?php AssessmentUtility::writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO); ?> /> Count in Gradebook<br/>
+				<input type=radio name="cntingb" value="0" <?php AssessmentUtility::writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="cntingb" value="3" <?php AssessmentUtility::writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
+				<input type=radio name="cntingb" value="2" <?php AssessmentUtility::writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_ZERO); ?> /> Count as Extra Credit
 			</span>
 			<span <?php if ($testType!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
-				<input type=radio name="pcntingb" value="0" <?php writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
-				<input type=radio name="pcntingb" value="3" <?php writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
+				<input type=radio name="pcntingb" value="0" <?php AssessmentUtility::writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total and hide from students<br/>
+				<input type=radio name="pcntingb" value="3" <?php AssessmentUtility::writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /> Don't count in grade total<br/>
 			</span><br class=form />
     <?php
     if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
@@ -335,7 +336,7 @@ writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCatego
         <span class="form">Tutor Access:</span>
         <span class="formright">
 <?php
-writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$assessmentData['tutoredit']);
+AssessmentUtility::writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$assessmentData['tutoredit']);
 ?>
 			</span><br class="form" />
     <?php
@@ -353,8 +354,8 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
     <span class=form>Minimum score to receive credit: </span>
 			<span class=formright>
 				<input type=text size=4 name=minscore value="<?php echo $assessmentData['minscore'];?>">
-				<input type="radio" name="minscoretype" value="0" <?php writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>> Points
-				<input type="radio" name="minscoretype" value="1" <?php writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ONE);?>> Percent
+				<input type="radio" name="minscoretype" value="0" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>> Points
+				<input type="radio" name="minscoretype" value="1" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ONE);?>> Percent
 			</span><BR class=form>
 
     <span class=form>Show based on another assessment: </span>
@@ -362,21 +363,21 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
 				<input type=text size=4 name=reqscore value="<?php echo $assessmentData['reqscore'];?>">
 		   		points is obtained on
                 <?php
-                writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null);
+                AssessmentUtility::writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null);
                 ?>
 			</span><br class=form>
     <span class="form">Default Feedback Text:</span>
 			<span class="formright">
-				Use? <input type="checkbox" name="usedeffb" <?php writeHtmlChecked($useDefFeedback,true); ?>><br/>
+				Use? <input type="checkbox" name="usedeffb" <?php AssessmentUtility::writeHtmlChecked($useDefFeedback,true); ?>><br/>
 				Text: <input type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$defFeedback);?>" />
 			</span><br class="form" />
     <span class=form>All items same random seed: </span>
 			<span class=formright>
-				<input type="checkbox" name="sameseed" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_TWO); ?>>
+				<input type="checkbox" name="sameseed" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_TWO); ?>>
 			</span><BR class=form>
     <span class=form>All students same version of questions: </span>
 			<span class=formright>
-				<input type="checkbox" name="samever" <?php writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_FOUR,AppConstant::NUMERIC_FOUR); ?>>
+				<input type="checkbox" name="samever" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_FOUR,AppConstant::NUMERIC_FOUR); ?>>
 			</span><BR class=form>
 
     <span class=form>Penalty for questions done while in exception/LatePass: </span>
@@ -386,10 +387,10 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
 
     <span class=form>Group assessment: </span>
 			<span class=formright>
-				<input type="radio" name="isgroup" value="0" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> />Not a group assessment<br/>
-				<input type="radio" name="isgroup" value="1" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ONE); ?> />Students can add members with login passwords<br/>
-				<input type="radio" name="isgroup" value="2" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_TWO); ?> />Students can add members without passwords<br/>
-				<input type="radio" name="isgroup" value="3" <?php writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_THREE); ?> />Students cannot add members, and can't start the assessment until you add them to a group
+				<input type="radio" name="isgroup" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> />Not a group assessment<br/>
+				<input type="radio" name="isgroup" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ONE); ?> />Students can add members with login passwords<br/>
+				<input type="radio" name="isgroup" value="2" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_TWO); ?> />Students can add members without passwords<br/>
+				<input type="radio" name="isgroup" value="3" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_THREE); ?> />Students cannot add members, and can't start the assessment until you add them to a group
 			</span><br class="form" />
     <span class=form>Max group members (if group assessment): </span>
 			<span class=formright>
@@ -404,7 +405,7 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
                     }
                 }?></span>
 			<span class="formright">
-				<?php writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
+				<?php AssessmentUtility::writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
 			</span><br class="form" />
     <span class="form">Default Outcome:</span>
 			<span class="formright"><select name="defoutcome">
@@ -412,7 +413,7 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
                     $inGroup = false;
                     $isSelected = false;
                     foreach ($pageOutcomesList as $outcome) {
-                        if ($outcome[1]==AppConstant::NUMERIC_ZERO) {//is group
+                        if ($outcome[1]==AppConstant::NUMERIC_ONE) {//is group
                             if ($inGroup) { echo '</optgroup>';}
                             echo '<optgroup label="'.htmlentities($outcome[0]).'">';
                             $inGroup = true;
@@ -428,14 +429,14 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
 			</span><br class="form" />
     <span class=form>Show question categories:</span>
 			<span class=formright>
-				<input name="showqcat" type="radio" value="0" <?php writeHtmlChecked($showQuestionCategory,"0"); ?>>No <br />
-				<input name="showqcat" type="radio" value="1" <?php writeHtmlChecked($showQuestionCategory,"1"); ?>>In Points Possible bar <br />
-				<input name="showqcat" type="radio" value="2" <?php writeHtmlChecked($showQuestionCategory,"2"); ?>>In navigation bar (Skip-Around only)
+				<input name="showqcat" type="radio" value="0" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"0"); ?>>No <br />
+				<input name="showqcat" type="radio" value="1" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"1"); ?>>In Points Possible bar <br />
+				<input name="showqcat" type="radio" value="2" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"2"); ?>>In navigation bar (Skip-Around only)
 			</span><br class="form" />
 
     <span class=form>Display for tutorial-style questions: </span>
 			<span class=formright>
-				<input type="checkbox" name="istutorial" <?php writeHtmlChecked($assessmentData['istutorial'],AppConstant::NUMERIC_ONE); ?>>
+				<input type="checkbox" name="istutorial" <?php AssessmentUtility::writeHtmlChecked($assessmentData['istutorial'],AppConstant::NUMERIC_ONE); ?>>
 			</span><BR class=form>
 
 </fieldset>
@@ -443,147 +444,4 @@ writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$a
 </fieldset>
 <div class=submit><input class=""  type=submit name="" value="<?php echo $saveTitle;?>"></div>
 <?php
-
-function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
-    echo "<select name=\"$name\" id=\"$name\" ";
-    echo (isset($actions)) ? $actions : "" ;
-    echo ">\n";
-    if (isset($defaultLabel) && isset($defaultVal)) {
-        echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
-    }
-    for ($i=0;$i<count($valList);$i++) {
-        if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
-            echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
-        } else {
-            echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
-        }
-    }
-    echo "</select>\n";
-}
-
-function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$defaultLabel=null) {
-    echo "<div class=\"multisel\"><select name=\"{$name}[]\" id=\"$name\">";
-    if (isset($defaultLabel)) {
-        echo " <option value=\"null\" selected=\"selected\">$defaultLabel</option>\n";
-    }
-    if (is_array($valList[0])) {//has a group structure
-        $ingrp = false;
-        foreach ($valList as $oc) {
-            if ($oc[1]==1) {//is group
-                if ($ingrp) { echo '</optgroup>';}
-                echo '<optgroup label="'.htmlentities($oc[0]).'">';
-                $ingrp = true;
-            } else {
-                echo '<option value="'.$oc[0].'">'.$labelList[$oc[0]].'</option>';
-            }
-        }
-        if ($ingrp) { echo '</optgroup>';}
-    } else {
-        $val = array();
-        for ($i=0;$i<count($valList);$i++) {
-            $val[$valList[$i]] = $labelList[$i];
-            echo "	<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
-        }
-    }
-    echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
-    if (count($selectedVals)>0) {
-        foreach ($selectedVals as $v) {
-            echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';
-            echo '<input type="hidden" name="'.$name.'[]" value="'.$v.'"/>'.(is_array($valList[0])?$labelList[$v]:$val[$v]);
-            echo '</div>';
-        }
-    }
-    echo '</div>';
-}
-
-//writeHtmlChecked is used for checking the appropriate radio box on html forms
-function writeHtmlChecked ($var,$test,$notEqual=null) {
-    if ((isset($notEqual)) && ($notEqual==1)) {
-        if ($var!=$test) {
-            echo "checked ";
-        }
-    } else {
-        if ($var==$test) {
-            echo "checked ";
-        }
-    }
-}
-
-//writeHtmlChecked is used for checking the appropriate radio box on html forms
-function getHtmlChecked ($var,$test,$notEqual=null) {
-    if ((isset($notEqual)) && ($notEqual==1)) {
-        if ($var!=$test) {
-            return "checked ";
-        }
-    } else {
-        if ($var==$test) {
-            return "checked ";
-        }
-    }
-}
-
-//writeHtmlSelected is used for selecting the appropriate entry in a select item
-function writeHtmlSelected ($var,$test,$notEqual=null) {
-    if ((isset($notEqual)) && ($notEqual==1)) {
-        if ($var!=$test) {
-            echo 'selected="selected"';
-        }
-    } else {
-        if ($var==$test) {
-            echo 'selected="selected"';
-        }
-    }
-}
-
-//writeHtmlSelected is used for selecting the appropriate entry in a select item
-function getHtmlSelected ($var,$test,$notEqual=null) {
-    if ((isset($notEqual)) && ($notEqual==1)) {
-        if ($var!=$test) {
-            return 'selected="selected"';
-        }
-    } else {
-        if ($var==$test) {
-            return 'selected="selected"';
-        }
-    }
-}
 ?>
-    <script>
-        function chgfb() {
-            if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
-                document.getElementById("showanspracspan").className = "show";
-                document.getElementById("showansspan").className = "hidden";
-                document.getElementById("showreattdiffver").className = "hidden";
-            } else {
-                document.getElementById("showanspracspan").className = "hidden";
-                document.getElementById("showansspan").className = "show";
-                document.getElementById("showreattdiffver").className = "show";
-            }
-            if (document.getElementById("deffeedback").value=="Practice") {
-                document.getElementById("stdcntingb").className = "hidden";
-                document.getElementById("praccntingb").className = "formright";
-            } else {
-                document.getElementById("stdcntingb").className = "formright";
-                document.getElementById("praccntingb").className = "hidden";
-            }
-        }
-        function chgcopyfrom() {
-            if (document.getElementById('copyfrom').value==0) {
-                document.getElementById('customoptions').className="show";
-                document.getElementById('copyfromoptions').className="hidden";
-            } else {
-                document.getElementById('customoptions').className="hidden";
-                document.getElementById('copyfromoptions').className="show";
-            }
-        }
-        function apwshowhide(s) {
-            var el = document.getElementById("assmpassword");
-            if (el.type == "password") {
-                el.type = "text";
-                s.innerHTML = "Hide";
-            } else {
-                el.type = "password";
-                s.innerHTML = "Show";
-            }
-        }
-    </script>

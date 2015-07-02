@@ -161,7 +161,8 @@ echo $html;
                             <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                             <?php if ($assessment->enddate != 2000000000) { ?>
-                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
+                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment',
+                                        'assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                                 <!-- Use Late Pass here-->
                                 <?php if($students->latepass != 0) {
                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){

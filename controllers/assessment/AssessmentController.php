@@ -242,23 +242,15 @@ class AssessmentController extends AppController
                 }
             }
             $pageOutcomes[0] = AppConstant::DEFAULT_OUTCOMES;
-
-            $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO));
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+            $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ZERO));
             if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
                 $query = $course['outcomes'];
                 $outcomeArray = unserialize($query);
-                function flattenarr($outcomesData) {
-                    global $pageOutcomesList;
-                    foreach ($outcomesData as $singleData) {
-                        if (is_array($singleData)) { //outcome group
-                            $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
-                            flattenarr($singleData['outcomes']);
-                        } else {
-                            $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
-                        }
-                    }
+                $result = $this->flatArray($outcomeArray);
+                foreach($result as $singlePage){
+                        array_push($pageOutcomesList,$singlePage);
                 }
-                flattenarr($outcomeArray);
             }
             $query = StuGroupSet::getByCourseId($courseId);
             $pageGroupSets = array();
@@ -299,7 +291,7 @@ class AssessmentController extends AppController
             }
 
         }
-        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js"]);
+        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js","assessment/addAssessment.js"]);
         return $this->renderWithData('addAssessment',['course' => $course,'assessmentData' => $assessmentData,
         'saveTitle'=>$saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
         'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType,'skipPenalty' => $skipPenalty,
@@ -309,5 +301,18 @@ class AssessmentController extends AppController
         'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
         'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets,'pageOutcomesList' => $pageOutcomesList,
         'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory]);
+    }
+
+    public function flatArray($outcomesData) {
+        global $pageOutcomesList;
+        foreach ($outcomesData as $singleData) {
+            if (is_array($singleData)) { //outcome group
+                $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                $this->flatArray($singleData['outcomes']);
+            } else {
+                $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+            }
+        }
+        return $pageOutcomesList;
     }
 }
