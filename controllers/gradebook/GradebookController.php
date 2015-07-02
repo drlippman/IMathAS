@@ -1864,9 +1864,13 @@ class GradebookController extends AppController
             $gradebook[1] = $gradebook[$ln];
         }
 
+//        for($i=2;$i<=4;$i++){
+//        $j=0;
+//        AppUtility::dump($gradebook[$i][1][$j][0]);
+//        }
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse,'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate);
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'showPics' => $showpics);
         return $this->successResponse($responseData);
     }
 
