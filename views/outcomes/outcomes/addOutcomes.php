@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div><h3>Course Outcomes</h3></div>
 <div class="cpmid">
 <a href="#">View Outcomes Map</a> |
-<a href="#">View Outcomes Report</a>
+<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-report?cid='.$courseId)?>">View Outcomes Report</a>
 </div>
 <div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups.
 <input type="button" class="btn btn-primary" id="Save-changes"  value="Save Changes">
@@ -20,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <button  onclick=addOutcomeGrp() class="btn btn-primary ">Add Outcome Group</button>
 <button  onclick=addOutcome() class="btn btn-primary ">Add Outcome</button>
 <style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>
-
 
 
 <script>
@@ -126,5 +125,5 @@ $this->params['breadcrumbs'][] = $this->title;
                 $("#qviewtree").append(html);
             });
         }
-    }post
+    }
 </script>

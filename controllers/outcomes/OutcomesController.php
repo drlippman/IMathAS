@@ -4,6 +4,7 @@ namespace app\controllers\outcomes;
 use app\components\AppConstant;
 use app\models\Course;
 use app\models\Outcomes;
+use app\models\Student;
 use app\models\User;
 use app\components\AppUtility;
 use app\controllers\AppController;
@@ -78,6 +79,30 @@ class OutcomesController extends AppController
             array_push($outcomeDataArray,$tempArray);
         }
         $responseData = array('courseOutcome' => $courseOutcomeArray,'outcomeData' => $outcomeDataArray);
+        return $this->successResponse($responseData);
+    }
+
+    public function actionOutcomeReport()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParamVal('cid');
+        return $this->render('outcomeReport',['courseId' => $courseId]);
+    }
+
+    public function actionGetOutcomeReportAjax()
+    {
+        $courseId = $this->getRequestParams('courseId');
+        $studentOutcomeReport = Student::getByCourse($courseId);
+        $studentOutcomeReportArray = array();
+        foreach($studentOutcomeReport as $studentData)
+        {
+            $tempArray = array(
+
+                'userName' => $studentData->user->FirstName.' '.$studentData->user->LastName,
+            );
+            array_push($studentOutcomeReportArray,$tempArray);
+        }
+        $responseData = array('studentOutcomeReportArray' => $studentOutcomeReportArray);
         return $this->successResponse($responseData);
     }
 

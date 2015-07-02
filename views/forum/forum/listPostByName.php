@@ -99,4 +99,4 @@ if($status == AppConstant::NUMERIC_ONE){?>
     <input type="hidden" id="isData" value="0">
 
 <?php }?>
-<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumid);?>">Back to Thread List</a></div>
+<div><a href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid='. $course->id.'&forumid='.$forumId);?>">Back to Thread List</a></div>

@@ -192,4 +192,8 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
+    public static function getByCourse($cId)
+    {
+        return static::find()->where(['courseid' => $cId])->all();
+    }
 } 

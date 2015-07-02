@@ -97,7 +97,7 @@ $currentLevel = 0;
                 <?php if ($data['hasImg'] == 1){ ?>
                 <img class="circular-profile-image" id="img<?php echo $imgCount ?>"
                      src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl ?>"
-                     onclick=changeProfileImage(this,<?php echo $data['id'] ?>);/> </span>
+                     onclick=changeProfileImage(this,<?php echo $data['id'] ?>);> </span>
             <?php
             } else {
                 ?>
@@ -110,7 +110,7 @@ $currentLevel = 0;
                               ?>
 
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/move-thread?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Move</a>&nbsp;
-                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumiddata'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>&nbsp;
+                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>&nbsp;
                               <a href="#" name="remove" data-var="<?php echo $data['id'] ?>"
                                  class="mark-remove">Remove</a> <?php
                           } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) {
