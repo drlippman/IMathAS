@@ -311,7 +311,9 @@ function initeditor(edmode,edids,css) {
 	} else if (edmode=="textareas") {
 		edsetup.editor_selector = edids;
 	}
-	    
+	for (var i in tinyMCE.editors) {
+		tinyMCE.editors[i].remove();
+	}
 	tinyMCE.init(edsetup);	
 }
 
