@@ -37,12 +37,15 @@ class InstructorController extends AppController
     public function actionIndex()
     {
         $courseId = $this->getParamVal('cid');
+        $inlineTextId = InlineText::getByCourse($courseId);
+//        AppUtility::dump($inlineTextId->id);
+       
         $type = $this->getParamVal('type');
         if($type){
             if($type == 'assessment'){
                 return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
             }else if($type == 'inlinetext'){
-                return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?cid='.$courseId));
             }else if($type == 'linkedtext'){
                 return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
             }else if($type == 'forum'){

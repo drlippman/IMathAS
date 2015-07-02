@@ -147,6 +147,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class=submit><button type=submit name="submitbtn" class="btn btn-primary" value="Submit"><?php echo 'Save Changes' ?></button></div>
 </form>
 
+
+
+<!--Functions-->
 <?php
 function writeHtmlChecked ($var,$test,$notEqual=null) {
     if ((isset($notEqual)) && ($notEqual==1)) {

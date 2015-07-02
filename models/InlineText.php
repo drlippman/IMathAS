@@ -22,4 +22,9 @@ class InlineText extends BaseImasInlinetext
     {
         return InlineText::findOne(['id' => $id]);
     }
+
+    public static function getByCourse($courseId)
+    {
+        return InlineText::findOne(['courseid' => $courseId]);
+    }
 } 

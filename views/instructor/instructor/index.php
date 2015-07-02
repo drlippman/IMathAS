@@ -110,7 +110,7 @@ echo $html;
                             </b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                             <?php if ($assessment->enddate != 2000000000) { ?>
-                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                                 <!-- Use Late Pass here-->
                                 <?php if($students->latepass != 0) {
                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
@@ -127,7 +127,7 @@ echo $html;
                             <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                             <?php if ($assessment->enddate != 2000000000) { ?>
-                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                                 <!-- Use Late Pass here-->
                                 <?php if($students->latepass != 0) {
                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
@@ -145,7 +145,7 @@ echo $html;
                         <?php if($assessment->password == '') {?>
                             <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                             <?php if ($assessment->enddate != 2000000000) { ?>
-                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
+                                <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                                 <!-- Use Late Pass here-->
                                 <?php if($students->latepass != 0) {?>
                                     <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
@@ -192,20 +192,21 @@ echo $html;
                         </b>
                         <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                         <?php if ($assessment->reviewdate == 2000000000) { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
+
+                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?><?php echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                             <BR>This assessment is in review mode - no scores will be saved.
                         <?php } else { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
+                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?><?php echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                             <BR>This assessment is in review mode - no scores will be saved.
                         <?php } ?>
                     <?php } else {?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                         <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
                         <?php if ($assessment->reviewdate == 2000000000) { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
+                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?><?php echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                             <BR>This assessment is in review mode - no scores will be saved.
                         <?php } else { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?>
+                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?><?php echo ' Questions | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| Delete | Copy | Grades' ?>
                             <BR>This assessment is in review mode - no scores will be saved.
                         <?php } ?>
                     <?php } ?>
