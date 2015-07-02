@@ -1,13 +1,15 @@
-$(document).ready(function () {
+$(document).ready(function ()
+{
 
-    var isData = $('#isData').val();
-    if (isData == 0) {
+    var isData =  $('#isData').val();
+    if(isData == 0){
         var msg = 'Does not contains any record';
         CommonPopUp(msg);
     }
     hidebody();
     $('#collapse').hide();
-    $('#button').click(function () {
+    $('#butn').click(function()
+    {
         ExpandOne();
     });
 
@@ -26,7 +28,7 @@ $(document).ready(function () {
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadid;
-                    jQuerySubmit('mark-as-remove-ajax', {threadId: threadId}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId}, 'markAsRemoveSuccess');
                     return true;
                 }
             },
@@ -37,92 +39,100 @@ $(document).ready(function () {
     });
 });
 
-function hidebody() {
+function hidebody()
+{
     var count = $('#count').val();
 
-    for (var i = 0; i < count; i++) {
+    for(var i=0; i< count; i++){
 
-        var node = document.getElementById('item' + i);
+        var node = document.getElementById('item'+i);
         node.className = 'hidden';
     }
 
 }
-function collapseAll() {
+function collapseall()
+{
     var count = $('#count').val();
-    for (var i = 0; i < count; i++) {
+    for(var i=0; i< count; i++)
+    {
         var node = document.getElementById('item' + i);
-        var buti = document.getElementById('button' + i);
-        node.className = 'block-items';
+        var buti = document.getElementById('butn' + i);
+        node.className = 'blockitems';
         buti.value = '-';
     }
     document.getElementById("expand").value = 'Collapse All';
-    document.getElementById("expand").onclick = expandAll;
+    document.getElementById("expand").onclick = expandall;
 }
 
 
-function expandAll() {
+function expandall()
+{
     var count = $('#count').val();
-    for (var i = 0; i < count; i++) {
+    for(var i=0; i< count; i++)
+    {
         var node = document.getElementById('item' + i);
-        var buti = document.getElementById('button' + i);
+        var buti = document.getElementById('butn' + i);
         node.className = 'hidden';
         buti.value = '+';
     }
     document.getElementById("expand").value = 'Expand All';
-    document.getElementById("expand").onclick = collapseAll;
+    document.getElementById("expand").onclick = collapseall;
 }
 
 
-function toggleshow(inum) {
+function toggleshow(inum)
+{
     var node = document.getElementById('item' + inum);
-    var buti = document.getElementById('button' + inum);
-    if (node.className == 'block-items') {
+    var buti = document.getElementById('butn' + inum);
+    if (node.className == 'blockitems')
+    {
         node.className = 'hidden';
         buti.value = '+';
     }
-    else {
-        node.className = 'block-items';
+    else
+    {
+        node.className = 'blockitems';
         buti.value = '-';
     }
 }
 
 
-function showall() {
+function showall()
+{
     var count = $('#count').val();
-    for (var i = 0; i < count; i++) {
+    for(var i=0; i< count; i++){
 
-        $('.block-items').show(i);
+        $('.blockitems').show(i);
 
     }
 
 }
 
-function markAll() {
-    jQuerySubmit('mark-all-read-ajax', { }, 'markAllReadSuccess');
+function markall()
+{
+    jQuerySubmit('mark-all-read-ajax',{ },'markAllReadSuccess');
 }
 
-function markAllReadSuccess() {
+function markAllReadSuccess()
+{
 
     window.location.reload();
 }
 
-var flag = 0;
-function changeProfileImage(element, id) {
-
-    if (flag == 0) {
-
+var  flag =0;
+function changeProfileImage(element,id)
+{
+    if(flag == 0 )
+    {
         element.style.width = "200px";
         element.style.height = "175px";
-        flag=1;
-
-    }else {
-
+        flag =1;
+    }else
+    {
         element.style.width = "47px";
         element.style.height = "47px";
-        flag =0;
+        flag=0;
     }
 
 }
-
-
 
