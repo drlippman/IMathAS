@@ -734,7 +734,6 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-//        $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
         $returnData = array('course' => $course, 'inlineText' => $inlineText);
         return $this->render('modifyInlineText', $returnData);
     }
