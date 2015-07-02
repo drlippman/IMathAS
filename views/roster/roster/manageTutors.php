@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<input type="hidden" class="courseId" value="<?php echo $courseid ?>">
+<input type="hidden" class="courseId" value="<?php echo $courseId ?>">
 <?php $sectionArray = $section?>
 
 <p><div id="user-div"></div></p>
@@ -21,8 +21,8 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <thead>
         <th>Tutor Name</th>
         <th>Limit to Section</th>
-        <th>Remove?  Check <a id="checkAll" class="check-all" href="#">All</a> /
-            <a id="checkNone" class="uncheck-all" href="#">None</a></th>
+        <th>Remove?  Check <a id="check-all" class="check-all" href="#">All</a> /
+            <a id="check-none" class="uncheck-all" href="#">None</a></th>
     </thead>
     <tbody class="tutor-table-body">
         <div>
@@ -58,8 +58,8 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
 <p><b>Add new tutors.</b> Provide a list of usernames below, separated by commas, to add as tutors.</p>
 <br>
-    <textarea name = "newtutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
+    <textarea name = "newTutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
-<a class = "btn btn-primary" id = "update-bttn">Update</a>
+<a class = "btn btn-primary" id = "update-button">Update</a>
 <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
 

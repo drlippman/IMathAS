@@ -44,6 +44,7 @@ class GradebookController extends AppController
             $course = Course::getById($courseId);
             $this->includeJS(['gradebook/gradebook.js']);
             $responseData = array('course' => $course, 'user' => $user);
+            $this->includeJS(['general.js']);
             return $this->renderWithData('gradebook', $responseData);
 
     }
@@ -1864,13 +1865,15 @@ class GradebookController extends AppController
             $gradebook[1] = $gradebook[$ln];
         }
 
-//        for($i=2;$i<=4;$i++){
-//        $j=0;
-//        AppUtility::dump($gradebook[$i][1][$j][0]);
+//        for($i=2;$i<count($gradebook);$i++){
+//            for($j=1;$j<count($gradebook[0][1]);$j++){
+//                if($gradebook[0][1][$j][6]==0)
+//                AppUtility::dump($gradebook[0][1]);
+//            }
 //        }
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse,'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'showPics' => $showpics);
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, );
         return $this->successResponse($responseData);
     }
 

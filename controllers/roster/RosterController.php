@@ -427,7 +427,7 @@ class RosterController extends AppController
         }
         $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
         $this->includeJS(['general.js?ver=012115', 'roster/managetutors.js?ver=012115', 'jquery.session.js?ver=012115', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('course' => $course, 'courseid' => $courseId, 'tutors' => $tutorInfo, 'section' => $sectionArray);
+        $responseData = array('course' => $course, 'courseId' => $courseId, 'tutors' => $tutorInfo, 'section' => $sectionArray);
         return $this->renderWithData('manageTutors', $responseData);
     }
 
@@ -439,7 +439,7 @@ class RosterController extends AppController
         $params = $this->getRequestParams();
         $params['username'] = trim($params['username']);
         $users = explode(',', $params['username']);
-        $courseId = $params['courseid'];
+        $courseId = $params['courseId'];
         $sortBy = 'section';
         $order = AppConstant::ASCENDING;
         $userIdArray = array();
@@ -481,9 +481,9 @@ class RosterController extends AppController
                 Tutor::updateSection($tutors['tutorId'], $courseId, $tutors['tutorSection']);
             }
         }
-        $params['checkedtutor'] = isset($params['checkedtutor']) ? $params['checkedtutor'] : '';
-        if ($params['checkedtutor']) {
-            foreach ($params['checkedtutor'] as $tutor) {
+        $params['checkedTutor'] = isset($params['checkedTutor']) ? $params['checkedTutor'] : '';
+        if ($params['checkedTutor']) {
+            foreach ($params['checkedTutor'] as $tutor) {
                 Tutor::deleteTutorByUserId($tutor);
             }
         }
@@ -954,7 +954,7 @@ class RosterController extends AppController
                             array_push($studentArray, $student->attributes);
                         }
                         $exceptionArray = $this->createExceptionList($studentArray, $assessments);
-                        $latepassMsg = $this->findLatepassMsg($studentArray, $courseId);
+                        $latePassMsg = $this->findLatepassMsg($studentArray, $courseId);
                     } else {
                         return $this->redirect('student-roster?cid=' . $courseId);
                     }
@@ -969,24 +969,24 @@ class RosterController extends AppController
                             Exceptions::deleteExceptionById($clearEntry);
                         }
                     }
-                    if (isset($params['addexc'])) {
+                    if (isset($params['addExc'])) {
                         $startException = strtotime($params['startDate'] . ' ' . $params['startTime']);
                         $endException = strtotime($params['endDate'] . ' ' . $params['endTime']);
                         if($startException > $endException){
                             $this->setErrorFlash("Available date(Available After) cannot be greater than end date(Available Until).");
                         }else{
-                            $waivereqscore = (isset($params['waivereqscore'])) ? AppConstant::NUMERIC_ONE : AppConstant::NUMERIC_ZERO;
+                            $waiveReqScore = (isset($params['waiveReqScore'])) ? AppConstant::NUMERIC_ONE : AppConstant::NUMERIC_ZERO;
                             foreach ($studentArray as $student) {
-                                foreach ($params['addexc'] as $assessment) {
+                                foreach ($params['addExc'] as $assessment) {
                                     $presentException = Exceptions::getByAssessmentIdAndUserId($student['id'], $assessment);
                                     if ($presentException) {
-                                        Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waivereqscore);
+                                        Exceptions::modifyExistingException($student['id'], $assessment, $startException, $endException, $waiveReqScore);
                                     } else {
-                                        $param = array('userid' => $student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waivereqscore);
+                                        $param = array('userid' => $student['id'], 'assessmentid' => $assessment, 'startdate' => $startException, 'enddate' => $endException, 'waivereqscore' => $waiveReqScore);
                                         $exception = new Exceptions();
                                         $exception->create($param);
                                     }
-                                    if (isset($params['forceregen'])) {
+                                    if (isset($params['forceReGen'])) {
                                         $query = AssessmentSession::getAssessmentSession($student['id'], $assessment);
                                         if ($query) {
                                             if (strpos($query->questions, ';') === false) {
@@ -995,8 +995,8 @@ class RosterController extends AppController
                                                 list($questions, $bestquestions) = explode(";", $query->questions);
                                                 $questions = explode(",", $query->questions);
                                             }
-                                            $lastanswers = explode('~', $query->lastanswers);
-                                            $curscorelist = $query->scores;
+                                            $lastAnswers = explode('~', $query->lastanswers);
+                                            $curScoreList = $query->scores;
                                             $scores = array();
                                             $attempts = array();
                                             $seeds = array();
@@ -1006,40 +1006,40 @@ class RosterController extends AppController
                                                 $attempts[$i] = AppConstant::NUMERIC_ZERO;
                                                 $seeds[$i] = rand(1, 9999);
                                                 $newLastAns = array();
-                                                $laarr = explode('##', $lastanswers[$i]);
-                                                foreach ($laarr as $lael) {
-                                                    if ($lael == "ReGen") {
+                                                $lastArr = explode('##', $lastAnswers[$i]);
+                                                foreach ($lastArr as $lastElement) {
+                                                    if ($lastElement == "ReGen") {
                                                         $newLastAns[] = "ReGen";
                                                     }
                                                 }
                                                 $newLastAns[] = "ReGen";
-                                                $lastanswers[$i] = implode('##', $newLastAns);
+                                                $lastAnswers[$i] = implode('##', $newLastAns);
                                             }
-                                            $scorelist = implode(',', $scores);
-                                            if (strpos($curscorelist, ';') !== false) {
-                                                $scorelist = $scorelist . ';' . $scorelist;
+                                            $scoreList = implode(',', $scores);
+                                            if (strpos($curScoreList, ';') !== false) {
+                                                $scoreList = $scoreList . ';' . $scoreList;
                                             }
-                                            $attemptslist = implode(',', $attempts);
-                                            $seedslist = implode(',', $seeds);
-                                            $lastanswers = str_replace('~', '', $lastanswers);
-                                            $lastanswerslist = implode('~', $lastanswers);
-                                            $lastanswerslist = addslashes(stripslashes($lastanswerslist));
-                                            $reattemptinglist = implode(',', $reattempting);
-                                            $finalParams = Array('id' => $query->id, 'scores' => $scorelist, 'attempts' => $attemptslist, 'seeds' => $seedslist, 'lastanswers' => $lastanswerslist, 'reattempting' => $reattemptinglist);
+                                            $attemptsList = implode(',', $attempts);
+                                            $seedsList = implode(',', $seeds);
+                                            $lastAnswers = str_replace('~', '', $lastAnswers);
+                                            $lastAnswersList = implode('~', $lastAnswers);
+                                            $lastAnswersList = addslashes(stripslashes($lastAnswersList));
+                                            $reattemptingList = implode(',', $reattempting);
+                                            $finalParams = Array('id' => $query->id, 'scores' => $scoreList, 'attempts' => $attemptsList, 'seeds' => $seedsList, 'lastanswers' => $lastAnswersList, 'reattempting' => $reattemptingList);
                                             AssessmentSession::modifyExistingSession($finalParams);
                                         }
-                                    } elseif (isset($params['forceclear'])) {
+                                    } elseif (isset($params['forceClear'])) {
                                         AssessmentSession::removeByUserIdAndAssessmentId($student['id'], $assessment);
                                     }
                                 }
                             }
-                            if (isset($params['eatlatepass'])) {
-                                $n = intval($params['latepassn']);
+                            if (isset($params['eatLatePass'])) {
+                                $n = intval($params['latePassN']);
                                 foreach ($studentArray as $student) {
                                     Student::reduceLatepasses($student['id'], $courseId, $n);
                                 }
                             }
-                            if (isset($params['sendmsg'])) {
+                            if (isset($params['sendMsg'])) {
                                 $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                                 $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
                                 return $this->renderWithData('rosterMessage', $responseData);
@@ -1047,7 +1047,7 @@ class RosterController extends AppController
                         }
                     }
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
-                    $latepassMsg = $this->findLatepassMsg($studentArray, $courseId);
+                    $latePassMsg = $this->findLatepassMsg($studentArray, $courseId);
                 }
                 $sort_by = array_column($exceptionArray, 'Name');
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $exceptionArray);
@@ -1055,7 +1055,7 @@ class RosterController extends AppController
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
             }
             $this->includeJS(['roster/makeException.js']);
-            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latepassMsg' => $latepassMsg);
+            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg);
             return $this->renderWithData('makeException', $responseData);
         } else {
             $this->setErrorFlash(AppConstant::NO_USER_FOUND);
@@ -1071,7 +1071,7 @@ class RosterController extends AppController
             foreach ($assessments as $singleAssessment) {
                 $query = Exceptions::getByAssessmentIdAndUserId($student['id'], $singleAssessment['id']);
                 if ($query) {
-                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a', $query->startdate) . ' - ' . date('m/d/y g:i a', $query->enddate), 'waivereqscore' => $query->waivereqscore);
+                    $tempArray = array('assessmentName' => $singleAssessment->name, 'exceptionId' => $query->id, 'exceptionDate' => date('m/d/y g:i a', $query->startdate) . ' - ' . date('m/d/y g:i a', $query->enddate), 'waiveReqScore' => $query->waivereqscore);
                     array_push($exceptionList, $tempArray);
                 }
             }
@@ -1091,24 +1091,24 @@ class RosterController extends AppController
             array_push($studentRecord, Student::getByCourseId($courseId, $student['id']));
 
         }
-        $latepassMin = $studentRecord[0]->latepass;
-        $latepassMax = $studentRecord[0]->latepass;
+        $latePassMin = $studentRecord[0]->latepass;
+        $latePassMax = $studentRecord[0]->latepass;
         foreach ($studentRecord as $record) {
-            if ($record->latepass < $latepassMin) {
-                $latepassMin = $record->latepass;
+            if ($record->latepass < $latePassMin) {
+                $latePassMin = $record->latepass;
             }
-            if ($record->latepass > $latepassMax) {
-                $latepassMax = $record->latepass;
+            if ($record->latepass > $latePassMax) {
+                $latePassMax = $record->latepass;
             }
         }
         if (count($studentRecord) < AppConstant::NUMERIC_TWO) {
-            $latepassMsg = "This student has $latepassMin latepasses.";
-        } elseif ($latepassMin == $latepassMax) {
-            $latepassMsg = "These students all have $latepassMin latepasses.";
+            $latePassMsg = "This student has $latePassMin latepasses.";
+        } elseif ($latePassMin == $latePassMax) {
+            $latePassMsg = "These students all have $latePassMin latepasses.";
         } else {
-            $latepassMsg = "These students have $latepassMin-$latepassMax latepasses.";
+            $latePassMsg = "These students have $latePassMin-$latePassMax latepasses.";
         }
-        return $latepassMsg;
+        return $latePassMsg;
     }
 
     public function actionSaveCsvFileAjax()

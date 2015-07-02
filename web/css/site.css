@@ -473,3 +473,8 @@ a.msg-notification:visited{
     height: auto;
     padding: 0px;
 }
+
+.big-image{
+    width: 100px;
+    height: 100px;
+}

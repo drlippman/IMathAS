@@ -10,24 +10,21 @@ class EnrollStudentsForm extends model{
     public $section;
 
 
-private $_user = false;
+    private $_user = false;
 
 /**
 * @return array the validation rules.
 */
-public function rules()
-{
-return   [[['section'],'string'] ,
-];
+    public function rules()
+    {
+        return   [[['section'],'string']];
 
-}
+    }
 
-public function attributeLabels()
-{
-return [ 'section' => 'Assign to Section (optional) :'
-
-];
-}
+    public function attributeLabels()
+    {
+        return [ 'section' => 'Assign to Section (optional) :'];
+    }
 
 
 }

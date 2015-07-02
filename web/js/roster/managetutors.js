@@ -18,11 +18,11 @@ $(document).ready(function () {
 });
 function markCheck()
 {
-    $('#checkNone').click(function()
+    $('#check-none').click(function()
     {
         $('.list input[type = "checkbox"]').prop('checked', false);
     });
-    $('#checkAll').click(function()
+    $('#check-all').click(function()
     {
         $('.list input[type = "checkbox"]').prop('checked', true);
     });
@@ -30,9 +30,9 @@ function markCheck()
 
 function updateInfo()
 {
-    $("#update-bttn").click(function(){
+    $("#update-button").click(function(){
         var cid = $(".courseId").val();
-        var usernames = $("#tutor-text").val();
+        var userNames = $("#tutor-text").val();
         var markArray = [];
         $('.tutor-table-body input[name = "tutor-check"]:checked').each(function() {
             markArray.push($(this).val());
@@ -45,7 +45,7 @@ function updateInfo()
              sectionArray.push(tempArray);
 
          });
-        var data =  {courseid:cid,username:usernames,checkedtutor: markArray,sectionArray:sectionArray};
+        var data =  {courseId:cid,username:userNames,checkedTutor: markArray,sectionArray:sectionArray};
         jQuerySubmit('mark-update-ajax', data, 'markUpdateSuccess');
     });
 }

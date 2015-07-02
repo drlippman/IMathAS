@@ -8,6 +8,12 @@ $(document).ready(function () {
 var gradebookData;
 var data;
 var hidePast;
+var showPics = 0;
+function chgtoggle(){
+    showPics = $('#toggle4').val();
+    $('.gradebook-table').remove();
+    displayGradebook();
+}
 
 function showGradebookSuccess(response){
 console.log(response);
@@ -266,10 +272,10 @@ function displayGradebook() {
             html += "<sup>*</sup>";
         }
         html += "</div></td>";
-        if(data.showPics == 1 && gradebookData[i][4][2] == 1){
+        if(showPics == 1 && gradebookData[i][4][2] == 1){
             html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
-        } else if (data.showPics == 2 && gradebookData[i][4][2] == 1){
-            html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
+        } else if (showPics == 2 && gradebookData[i][4][2] == 1){
+            html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image big-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
         } else {
             html += "<td>"+insideDiv+"<div class='trld'>&nbsp;</div></td>";
         }
@@ -375,53 +381,55 @@ function displayGradebook() {
                 if(collapseGbCat[gradebookData[0][1][j][1]] == 2){
                     continue;
                 }
-                //if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-                //if(gradebookData[0][1][j][6]==0 && gradebookData[i][1][j][4]!='average' && ((gradebookData[i][1][j][3]!=undefined && gradebookData[i][1][j][3] > 9) || (!gradebookData[i][1][j][3] && gradebookData[0][1][j][3]==1))){
-                //    html += "<td class='c isact'>"+insideDiv;
+               // if online, not average, and either score exists and active, or score doesn't exist and assess is current,
+               // if(gradebookData[0][1][j][6]==0 && gradebookData[i][1][j][4]!='average' && ((gradebookData[i][1][j][3]!=undefined && gradebookData[i][1][j][3] > 9) || (!gradebookData[i][1][j][3] && gradebookData[0][1][j][3]==1))){
+               //     html += "<td class='c isact'>"+insideDiv;
                 //} else {
                     html += "<td class='c'>"+insideDiv;
                 //}
                 //if(gradebookData[i][1][j][5] && (gradebookData[i][1][j][5]&(1<<data.availShow)) && !hidePast){
                 //    html += "<span style='font-style:italic'>";
                 //}
+
                 if(gradebookData[0][1][j][6]==0){//online
-                    //if (gradebookData[i][1][j][0] != null) {
-                    //    if (data.isTutor && gradebookData[i][1][j][4] == 'average') {
-                    //
-                    //    } else if (gradebookData[i][1][j][4]=='average') {
-                    //        html += "<a href='#'onmouseover=\"tipshow(this,'5-number summary:"+gradebookData[0][1][j][9]+"')\" onmouseout=\"tipout()\">";
-                    //    } else {
-                    //        html += "<a href ='#'>"
-                    //    }
-                    //    if (gradebookData[i][1][j][3] > 9) {
-                    //        gradebookData[i][1][j][3] -= 10;
-                    //    }
-                    //    html += gradebookData[i][1][j][0];
-                    //    if (gradebookData[i][1][j][3] == 1) {
-                    //        html += " (NC)";
-                    //    } else if (gradebookData[i][1][j][3] == 2) {
-                    //        html += " (IP)";
-                    //    } else if (gradebookData[i][1][j][3] == 3) {
-                    //        html += " (OT)";
-                    //    } else if (gradebookData[i][1][j][3] == 4) {
-                    //        html += " (PT)";
-                    //    }
-                    //    if (data.isTutor && gradebookData[i][1][j][4] == 'average') {
-                    //    } else {
-                    //        html += "</a>";
-                    //    }
-                    //    if (gradebookData[i][1][j][1] == 1) {
-                    //        html += "<sup>*</sup>";
-                    //    }
-                    //}else { //no score
-                    //    if (gradebookData[i][0][0]=='Averages') {
-                    //        html += "-";
-                    //    } else if (data.isTeacher) {
-                    //        html += "<a href = '#'>-</a>";
-                    //    } else {
+                    //if (gradebookData[i][1][j][0]) {
+                    if (gradebookData[i][1][j]) {
+                        if (data.isTutor && gradebookData[i][1][j][4] == 'average') {
+
+                        } else if (gradebookData[i][1][j][4]=='average') {
+                            html += "<a href='#'onmouseover=\"tipshow(this,'5-number summary:"+gradebookData[0][1][j][9]+"')\" onmouseout=\"tipout()\">";
+                        } else {
+                            html += "<a href ='#'>"
+                        }
+                        if (gradebookData[i][1][j][3] > 9) {
+                            gradebookData[i][1][j][3] -= 10;
+                        }
+                        html += gradebookData[i][1][j][0];
+                        if (gradebookData[i][1][j][3] == 1) {
+                            html += " (NC)";
+                        } else if (gradebookData[i][1][j][3] == 2) {
+                            html += " (IP)";
+                        } else if (gradebookData[i][1][j][3] == 3) {
+                            html += " (OT)";
+                        } else if (gradebookData[i][1][j][3] == 4) {
+                            html += " (PT)";
+                        }
+                        if (data.isTutor && gradebookData[i][1][j][4] == 'average') {
+                        } else {
+                            html += "</a>";
+                        }
+                        if (gradebookData[i][1][j][1] == 1) {
+                            html += "<sup>*</sup>";
+                        }
+                    }else { //no score
+                        if (gradebookData[i][0][0]=='Averages') {
                             html += "-";
-                    //    }
-                    //}
+                        } else if (data.isTeacher) {
+                            html += "<a href = '#'>-</a>";
+                        } else {
+                            html += "-";
+                        }
+                    }
                     //if (gradebookData[i][1][j][6] != undefined || gradebookData[i][1][j][6] != null) {
                     //    if (gradebookData[i][1][j][6] > 1) {
                     //        if (gradebookData[i][1][j][6]>2) {
@@ -448,7 +456,7 @@ function displayGradebook() {
                         }
                     }
 
-                    if (gradebookData[i][1][j][0] != null) {
+                    if (gradebookData[i][1][j][0]) {
                         html += gradebookData[i][1][j][0];
                         if (gradebookData[i][1][j][3]==1) {
                             html += " (NC)";
@@ -608,3 +616,5 @@ function highlightrow(el) {
 function unhighlightrow(el) {
     el.className = el.getAttribute("lastclass");
 }
+
+

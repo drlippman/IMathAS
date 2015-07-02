@@ -17,14 +17,13 @@ class EnrollFromOtherCourseForm extends model{
      */
     public function rules()
     {
-        return [        ];
+        return [    ];
 
     }
 
     public function attributeLabels()
     {
         return ['rights'=>'Select a course to choose students from:',
-
         ];
     }
     public static function findById(){

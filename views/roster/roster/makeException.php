@@ -40,7 +40,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                             natsort($entry['assessments']);
                             foreach($entry['assessments'] as $singleAssessment){
                                 echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".')';
-                                    if ($singleAssessment['waivereqscore']==1) {
+                                    if ($singleAssessment['waiveReqScore']==1) {
                                         echo ' <i>('._('waives prereq').')</i>';
                                     }
                                 echo "</li>";
@@ -56,7 +56,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             <h4>Make New Exception</h4>
             <span class="form select-text-margin">Available After:</span>
 
-              <div class="col-lg-3 pull-left" id="datepicker-id1" >
+              <div class="col-lg-3 pull-left" id="datePicker-id1" >
                   <?php
                      echo DatePicker::widget([
                           'name' => 'startDate',
@@ -85,7 +85,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             </div>
             <br class="form">
             <span class="form select-text-margin">Available Until:</span>
-            <div class="col-lg-3 pull-left" id="datepicker-id2" >
+            <div class="col-lg-3 pull-left" id="datePicker-id2" >
                 <?php
                     echo DatePicker::widget([
                          'name' => 'endDate',
@@ -117,7 +117,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             <p>Set Exception for assessments:</p>
             <ul>
                 <?php foreach ($assessments as $assessment) { ?>
-                <?php echo "<li><input type='checkbox' name='addexc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
+                <?php echo "<li><input type='checkbox' name='addExc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
                 <?php } ?>
             </ul>
             <input type="submit" class="btn btn-primary record-submit" id="change-record" value="Record Changes">
@@ -125,11 +125,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         </div>
         <br>
         <div>
-            <p><input type="checkbox" name="forceregen"> Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.</p>
-            <p><input type="checkbox" name="forceclear"> Clear student's attempts?  Students will <b>not</b>  keep any scores earned, and must rework all problems.</p>
-            <p><input type="checkbox" name="eatlatepass"> Deduct <input type="input" name="latepassn" size="1" value="1">  LatePass(es) from each student.<?php echo $latepassMsg?></p>
-            <p><input type="checkbox" name="waivereqscore"> Waive "show based on an another assessment" requirements, if applicable.</p>
-            <p><input type="checkbox" name="sendmsg"> Send message to these students?</p>
+            <p><input type="checkbox" name="forceReGen"> Force student to work on new versions of all questions? Students will keep any scores earned, but must work new versions of questions to improve score.</p>
+            <p><input type="checkbox" name="forceClear"> Clear student's attempts?  Students will <b>not</b>  keep any scores earned, and must rework all problems.</p>
+            <p><input type="checkbox" name="eatLatePass"> Deduct <input type="input" name="latePassN" size="1" value="1">  LatePass(es) from each student.<?php echo $latePassMsg?></p>
+            <p><input type="checkbox" name="waiveReqScore"> Waive "show based on an another assessment" requirements, if applicable.</p>
+            <p><input type="checkbox" name="sendMsg"> Send message to these students?</p>
         </div>
         <div>
             <span><p><h4>Students Selected:</h4></span><ul>

@@ -27,7 +27,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <div><br>
         <h4>Select students to enroll: </h4>
         Check: <a id = "checkAll" class = "check-all" href = "#">All</a> /
-        <a id = "checkNone" class = "uncheck-all" href = "#">None</a>
+        <a id = "checkNone" class = "un-check-all" href = "#">None</a>
         <br><br>
     <div id = "list">
         <?php
@@ -35,9 +35,9 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
             echo "<tr><td>";
             if($value['isCheck'] == 1)
-                echo  "<input type='checkbox' name = 'studdent[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'>";
+                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'>";
             else
-                echo  "<input type='checkbox' name = 'studdent[".$value['id']."]' value = '{$value['id']}' class = 'master'>";
+                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master'>";
             echo "</td>"." " ."<td>{$value['lastName']}".", " ."{$value['firstName']}</td></tr><br>";
         }
         ?>
