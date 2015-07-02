@@ -78,9 +78,9 @@
 		}
 			exit;	
 	}
-	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist,enddate,avail FROM imas_forums WHERE id='$forumid'";
+	$query = "SELECT name,postby,settings,groupsetid,sortby,taglist,enddate,avail,postinstr,replyinstr FROM imas_forums WHERE id='$forumid'";
 	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	list($forumname, $postby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail) = mysql_fetch_row($result);
+	list($forumname, $postby, $forumsettings, $groupsetid, $sortby, $taglist, $enddate, $avail, $postinstr,$replyinstr) = mysql_fetch_row($result);
 	
 	if (isset($studentid) && ($avail==0 || ($avail==1 && time()>$enddate))) {
 		require("../header.php");
@@ -255,7 +255,29 @@
 	
 	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Forum Topics</div>\n";
 	echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.$forumname.'</h2></div>';
-
+	
+	if ($postinstr != '' || $replyinstr != '') {
+		echo '<a href="#" onclick="$(\'#postreplyinstr\').show();$(this).remove();return false;">';
+		 if ($postinstr != '' && $replyinstr != '') {
+		 	 echo _('View Post and Reply Instructions');
+		 } else if ($postinstr != '') {
+		 	 echo _('View Post Instructions');
+		 } else if ($replyinstr != '') {
+		 	 echo _('View Reply Instructions');
+		 } 
+		echo '</a>';
+		echo '<div id="postreplyinstr" style="display:none;">';
+		if ($postinstr != '') {
+			echo '<h4>'._('Posting Instructions').'</h4>';
+			echo $postinstr;
+		}
+		if ($replyinstr != '') {
+			echo '<h4>'._('Reply Instructions').'</h4>';
+			echo $replyinstr;
+		}
+		echo '</div><br/>';
+	}
+	
 	$query = "SELECT threadid,COUNT(id) AS postcount,MAX(postdate) AS maxdate FROM imas_forum_posts ";
 	$query .= "WHERE forumid='$forumid' ";
 	if ($dofilter) {

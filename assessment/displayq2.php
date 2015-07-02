@@ -145,7 +145,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$la = $laarr[count($laarr)-1];
 	if ($la=="ReGen") {$la = '';}
 	if ($clearla) {$la = '';}
-
+	if (isset($requestclearla) && !isset($GLOBALS['questionscoreref'])) { $la = '';}
+	
 	//$la = $GLOBALS['lastanswers'][$qnidx];
 	
 	if (isset($choices) && !isset($questions)) {
@@ -5636,7 +5637,7 @@ function checkanswerformat($tocheck,$ansformats) {
 			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction 
 				$tmpa = explode("/",$tocheck);
 				if (in_array("mixednumber",$ansformats)) {
-					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || $tmpa[0]>=$tmpa[1]) {
+					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || abs($tmpa[0])>=abs($tmpa[1])) {
 						return false;
 					}
 				} else if (in_array("mixednumberorimproper",$ansformats)) {

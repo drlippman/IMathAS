@@ -825,7 +825,7 @@ function doonsubmit(form,type2,skipconfirm) {
 	
 	for (var qn in intcalctoproc) { //i=0; i<intcalctoproc.length; i++) {
 		qn = parseInt(qn);
-		
+		if (document.getElementById("tc"+qn)==null) {continue;}
 		fullstr = document.getElementById("tc"+qn).value;
 		fullstr = fullstr.replace(/\s+/g,'');
 		fullstr = normalizemathunicode(fullstr);
@@ -884,7 +884,7 @@ function doonsubmit(form,type2,skipconfirm) {
 	}
 	for (var qn in calctoproc) { //i=0; i<calctoproc.length; i++) {
 		qn = parseInt(qn);
-		
+		if (document.getElementById("tc"+qn)==null) {continue;}
 		str = document.getElementById("tc"+qn).value;
 		str = normalizemathunicode(str);
 		if (calcformat[qn].indexOf('list')!=-1) {
@@ -924,25 +924,30 @@ function doonsubmit(form,type2,skipconfirm) {
 	for (var qn in matcalctoproc) {//i=0; i<matcalctoproc.length; i++) {
 		qn = parseInt(qn);
 		if (matsize[qn]!= null) {
+			if (document.getElementById("qn"+qn+"-0")==null) {continue;}
 			msize = matsize[qn].split(",");
 			str = matrixcalc("qn"+qn,null,msize[0],msize[1]);
 		} else {
+			if (document.getElementById("tc"+qn)==null) {continue;}
 			str = matrixcalc("tc"+qn,null);
 		}
 		document.getElementById("qn" +  qn).value = str;
 	}
 	for (var qn in ntupletoproc) {//i=0; i<ntupletoproc.length; i++) {
 		qn = parseInt(qn);
+		if (document.getElementById("tc"+qn)==null) {continue;}
 		str = ntuplecalc("tc"+qn,null,'');
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in complextoproc) { //i=0; i<complextoproc.length; i++) {
 		qn = parseInt(qn);
+		if (document.getElementById("tc"+qn)==null) {continue;}
 		str = complexcalc("tc"+qn,null,'');
 		document.getElementById("qn" + qn).value = str;
 	}
 	for (var qn in functoproc) { //fcnt=0; fcnt<functoproc.length; fcnt++) {
 		qn = parseInt(qn);
+		if (document.getElementById("tc"+qn)==null) {continue;}
 		str = document.getElementById("tc"+qn).value;
 		str = str.replace(/,/g,"");
 		str = normalizemathunicode(str);

@@ -143,6 +143,25 @@ switch($_GET['action']) {
 	case "addcourse":
 		if ($myrights < 40) { echo "You don't have the authority for this action"; break;}
 		
+		if (isset($CFG['CPS']['templateoncreate']) && isset($_POST['usetemplate']) && $_POST['usetemplate']>0) {
+			$coursetocheck = intval($_POST['usetemplate']);
+			$query = "SELECT termsurl FROM imas_courses WHERE id='$coursetocheck'";
+			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			$terms = mysql_fetch_row($result);
+			if ($terms[0]!='') {
+				if (!isset($_POST['termsagree'])) {
+					require("../header.php");
+					echo '<p>You must agree to the terms of use to copy this course.</p>';
+					require("../footer.php");
+					exit;
+				} else {
+					$now = time();
+					$userid = intval($userid);
+					$query = "INSERT INTO imas_log (time,log) VALUES ($now,'User $userid agreed to terms of use on course $coursetocheck')";
+					mysql_query($query) or die("Query failed : " . mysql_error());
+				}
+			}
+		}
 		if (isset($CFG['CPS']['theme']) && $CFG['CPS']['theme'][1]==0) {
 			$theme = addslashes($CFG['CPS']['theme'][0]);
 		} else {

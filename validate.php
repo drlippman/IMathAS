@@ -238,6 +238,11 @@
 			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
 			 $sessiondata['useed'] = checkeditorok(); 
 			 $enc = base64_encode(serialize($sessiondata));
+		 } else if ($_POST['access']==6) { //katex experimental
+		 	 $sessiondata['mathdisp'] = 6; 
+			 $sessiondata['graphdisp'] = $_POST['graphdisp'];
+			 $sessiondata['useed'] = checkeditorok(); 
+			 $enc = base64_encode(serialize($sessiondata));
 		 } else if (!empty($_POST['isok'])) {
 			 $sessiondata['mathdisp'] = 1;  
 			 $sessiondata['graphdisp'] = 1;

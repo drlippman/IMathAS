@@ -83,6 +83,27 @@ if (!isset($sessiondata['mathdisp'])) {
 	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
 	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); }</script>'; 
 	echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
+} else if ($sessiondata['mathdisp']==6) {
+	//Katex experimental
+	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";</script>';
+	echo "<script src=\"$imasroot/javascript/ASCIIMathTeXImg_min.js?ver=092314\" type=\"text/javascript\"></script>\n";
+	
+	echo '<script type="text/x-mathjax-config">
+		if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}, skipStartupTypeset: true});
+		} else {
+			MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}, skipStartupTypeset: true});
+		}
+		</script>';
+		// webFont: "STIX-Web", 
+	//echo '<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=AM_HTMLorMML"></script>';
+	//echo '<script>window.MathJax || document.write(\'<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"><\/script>\')</script>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/mathjax/MathJax.js?config=AM_HTMLorMML"></script>';
+	echo '<script src="'.$imasroot.'/katex/katex.min.js"></script>';
+	echo '<link rel="stylesheet" href="'.$imasroot.'/katex/katex.min.css"/>';
+	echo '<script type="text/javascript" src="'.$imasroot.'/katex/auto-render.js"></script>';
+	echo '<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = true; var MathJaxCompatible = true; function rendermathnode(node) {renderMathInElement(node);}</script>'; 
+	//echo '<style type="text/css">span.AM { font-size: 105%;}</style>';
 } else if ($sessiondata['mathdisp']==2 && isset($useeditor) && $sessiondata['useed']==1) {
 	//these scripts are used by the editor to make image-based math work in the editor
 	echo '<script type="text/javascript">var AMTcgiloc = "'.$mathimgurl.'";';

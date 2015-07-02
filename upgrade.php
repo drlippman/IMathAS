@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 98;
+$latest = 100;
 
 
 @set_time_limit(0);
@@ -1561,6 +1561,25 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 		}
 		if ($last<98) {
 			$query = "ALTER TABLE `imas_users` ADD `theme` VARCHAR( 32 ) NOT NULL DEFAULT '';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<99) {
+			$query = "ALTER TABLE `imas_courses` ADD `termsurl` VARCHAR( 254 ) NOT NULL DEFAULT '';";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<100) {
+			$query = "ALTER TABLE `imas_forums` ADD `postinstr` TEXT NOT NULL";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+			 $query = "ALTER TABLE `imas_forums` ADD `replyinstr` TEXT NOT NULL";
 			$res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

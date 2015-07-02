@@ -11,7 +11,7 @@ require("../includes/htmlutil.php");
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$useeditor = "description";
+$useeditor = "description,postinstr,replyinstr";
 
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
@@ -132,7 +132,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			$_POST['description'] = addslashes(htmLawed(stripslashes($_POST['description']),$htmlawedconfig));
 		}
-				
+		if (!isset($_POST['postinstr']) || trim($_POST['postinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['postinstr'])) {
+			$_POST['postinstr'] = '';
+		} else {
+			$_POST['postinstr'] = addslashes(htmLawed(stripslashes($_POST['postinstr']),$htmlawedconfig));
+		}
+		if (!isset($_POST['replyinstr']) || trim($_POST['replyinstr'])=='' || preg_match('/^\s*<p>(\s|&nbsp;)*<\/p>\s*$/',$_POST['replyinstr'])) {
+			$_POST['replyinstr'] = '';
+		} else {
+			$_POST['replyinstr'] = addslashes(htmLawed(stripslashes($_POST['replyinstr']),$htmlawedconfig));
+		}
 		if (isset($_GET['id'])) {  //already have id; update
 			$query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -142,7 +151,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
 				mysql_query($query) or die("Query failed : " . mysql_error());
 			}
-			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
+			$query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',postinstr='{$_POST['postinstr']}',replyinstr='{$_POST['replyinstr']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			$query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,";
 			$query .= "gbcategory='{$_POST['gbcat']}',avail='{$_POST['avail']}',sortby='{$_POST['sortby']}',forumtype='{$_POST['forumtype']}',taglist='$taglist',rubric=$rubric,outcomes='$outcomes' ";
 			$query .= "WHERE id='{$_GET['id']}';";
@@ -150,8 +159,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$newforumid = $_GET['id'];
 			
 		} else { //add new
-			$query = "INSERT INTO imas_forums (courseid,name,description,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
-			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
+			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes) VALUES ";
+			$query .= "('$cid','{$_POST['name']}','{$_POST['description']}','{$_POST['postinstr']}','{$_POST['replyinstr']}',$startdate,$enddate,$fsets,'{$_POST['defdisplay']}',$replyby,$postby,'{$_POST['groupsetid']}','{$_POST['points']}','{$_POST['cntingb']}',$tutoredit,'{$_POST['gbcat']}','{$_POST['avail']}','{$_POST['sortby']}','$caltag','{$_POST['forumtype']}','$taglist',$rubric,'$outcomes');";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			
 			$newforumid = mysql_insert_id();
@@ -249,6 +258,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$line['forumtype'] = 0;
 			$line['taglist'] = '';
 			$line['rubric'] = 0;
+			$line['postinstr'] = '';
+			$line['replyinstr'] = '';
 			$gradeoutcomes = array();
 			$startdate = time();
 			$enddate = time() + 7*24*60*60;
@@ -418,8 +429,27 @@ if ($overwriteBody==1) {
 		<div class=editor>
 		<textarea cols=60 rows=20 id=description name=description style="width: 100%">
 		<?php echo htmlentities($line['description']);?></textarea>
-		</div>
+		</div><br/>
 		
+		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
+			echo '<div><script type="text/javascript"> function showpostreply(el) { $("#postreplyinstr").show(); $(el).remove();}</script>';
+			echo '<a href="#" onclick="showpostreply(this);return false">'._('Add Posting / Reply Instructions').'</a>';
+			echo '<div id="postreplyinstr" style="display:none;">';
+		}?>
+		Posting Instructions: <em>Displays on Add New Thread</em><br/>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="postinstr" name="postinstr" style="width: 100%">
+		<?php echo htmlentities($line['postinstr']);?></textarea>
+		</div><br/>
+		Reply Instructions: <em>Displays on Add Reply</em><br/>
+		<div class=editor>
+		<textarea cols=60 rows=10 id="replyinstr" name="replyinstr" style="width: 100%">
+		<?php echo htmlentities($line['replyinstr']);?></textarea>
+		</div>
+		<?php if ($line['postinstr']=='' && $line['replyinstr']=='') {
+			echo '</div></div>';
+		}?>
+		<br class="form"/>
 		<span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>

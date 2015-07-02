@@ -118,13 +118,13 @@
 	
 	echo '<div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>';
 	if ($calledfrom=='lu') {
-		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\">\n";
+		echo "<form method=post action=\"listusers.php?cid=$cid&massexception=1\" id=\"qform\">\n";
 	} else if ($calledfrom=='gb') {
 		echo "<form method=post action=\"gradebook.php?cid=$cid&massexception=1";
 		if (isset($_GET['uid'])) {
 			echo "&uid={$_GET['uid']}";
 		}
-		echo "\">\n";
+		echo "\" id=\"qform\">\n";
 	}
 	
 	if (isset($_POST['tolist'])) {
@@ -177,7 +177,9 @@
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		echo "<h4>Existing Exceptions</h4>";
-		echo "Select exceptions to clear";
+		echo "Select exceptions to clear. ";
+		echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'clears[]\',false)">None</a>. ';
+	
 		echo '<ul>';
 		if ($isall) {
 			$lasta = 0;
@@ -271,8 +273,10 @@
 	echo "<a href=\"#\" onClick=\"displayDatePicker('edate', this); return false\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></A>\n";
 	echo "at <input type=text size=10 name=etime value=\"$etime\"></span><BR class=form>\n";
 	
-	echo "Set Exception for assessments:";
-	echo "<ul>";
+	echo "Set Exception for assessments: ";
+	echo 'Check: <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'addexc[]\',false)">None</a>. ';
+	
+	echo '<ul class="nomark">';
 	$query = "SELECT id,name FROM imas_assessments WHERE courseid='$cid'";
 	$query .= ' ORDER BY name';
 	$result = mysql_query($query) or die("Query failed :$query " . mysql_error());
