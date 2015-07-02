@@ -11,9 +11,13 @@ use kartik\time\TimePicker;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
 $this->title = 'Add Rubric';
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Add Grade', 'url' => ['/gradebook/gradebook/add-grades?cid='.$course->id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <fieldset xmlns="http://www.w3.org/1999/html">
-    <legend>Add Offline Grades</legend>
+    <legend>Add Rubric</legend>
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
         'action' => 'add-rubric',
@@ -46,7 +50,7 @@ $this->title = 'Add Rubric';
                         <td><input type="text" size="4" name="feedback[<?php echo $i ?>]"/></td></tr>
                 <?php }}?>
                 <?php if($edit == 1){ for ($i=0;$i<5; $i++) {
-                    AppUtility::dump($rubricItems);
+//                    AppUtility::dump($rubricItems);
                     ?>
                     <tr><td><input type="text" size="40" value="<?php echo $rubricItems[0][$i] ?>" name="rubitem[<?php echo $i ?>]" /></td>
                         <td><input type="text" size="40" value="<?php echo $rubricItems[1][$i] ?>" name="rubnote[<?php echo $i ?>]" /></td>

@@ -3,6 +3,7 @@
 namespace app\controllers\gradebook;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\Assessments;
 use app\models\AssessmentSession;
@@ -27,12 +28,14 @@ use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
 use Yii;
+use yii\web\UploadedFile;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use yii\rbac\Item;
 
 class GradebookController extends AppController
 {
+    public $a;
     public function actionGradebook()
     {
         $this->guestUserHandler();
@@ -1909,10 +1912,11 @@ class GradebookController extends AppController
         }
         if($this->isPost()){
             $params = $_POST;
-//            AppUtility::dump($params['rubric']);
+//            AppUtility::dump($params);
             $gbItems = new GbItems();
             $gbItemsId = $gbItems->createGbItemsByCourseId($courseId,$params);
-//            AppUtility::dump();
+
+            if($params['AddGradesForm']['UploadGrades'] == AppConstant::NUMERIC_ZERO){
             if($params['grade_text'] || $params['feedback_text']){
 
                 $gradeTextArray = array();
@@ -1935,8 +1939,15 @@ class GradebookController extends AppController
                 }
 
             }
+            }else{
+                $model = new AddGradesForm();
+                $this->redirect('upload-grades?gbItems='.$gbItemsId);
+//                $responseData = array('model' => $model,'gbItemsId' => $gbItemsId);
+//                return $this->renderWithData('uploadGrades', $responseData);
+            }
             $responseData = array('course' => $course, 'user' => $currentUser);
             return $this->renderWithData('gradebook', $responseData);
+//            $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
         }
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ,'gradebook/addgrades.js','roster/managelatepasses.js']);
@@ -1948,10 +1959,13 @@ class GradebookController extends AppController
     {
         $model = new AddRubricForm();
         $currentUser = $this->getAuthenticatedUser();
-        $rubricId = $this->getParamVal('rubricId');
+//        $rubricId = $this->getParamVal('rubricId');
+        $rubricId = 55;
+//        $courseId = $this->getParamVal('cid');
+//        $course = Course::getById($courseId);
         $edit = false;
         $rubicData = Rubrics::getByUserIdAndRubricId($currentUser['id'],$rubricId);
-
+//AppUtility::dump(unserialize($rubicData['rubric']));
         if($rubicData){
         $rubricItems = unserialize($rubicData['rubric']);
             $edit = true;
@@ -2006,8 +2020,8 @@ class GradebookController extends AppController
         foreach($studentInformation as $singleStudentInformation){
 //            AppUtility::dump($singleStudentInformation->user->grades->score);
             $tempArray = array(
-                'id' => $singleStudentInformation->id,
-                'value' => $singleStudentInformation->user->id,
+                'value' => $singleStudentInformation->id,
+                'userId' => $singleStudentInformation->user->id,
                 'section' => $singleStudentInformation->section,
                 'label' =>ucfirst($singleStudentInformation->user->FirstName).''.ucfirst($singleStudentInformation->user->LastName),
 
@@ -2021,4 +2035,177 @@ class GradebookController extends AppController
         $responseData = $studentDetails;
         return $this->successResponse($responseData);
     }
+    public function actionUploadGrades(){
+        $model = new AddGradesForm();
+        $gbItemsId = $this->getRequestParams();
+        $nowTime = time();
+        if ($model->load($this->getPostData())) {
+            $params = $this->getRequestParams();
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if ($model->file) {
+                $filename = AppConstant::UPLOAD_DIRECTORY .$nowTime. '.csv';
+                $model->file->saveAs($filename);
+            }
+            $studentRecords = $this->ImportStudentCsv($filename,$params);
+            $gradeTextArray = array();
+//            AppUtility::dump();
+            foreach($studentRecords as $key=> $single) {
+                if(count($studentRecords)-1 > $key) {
+                    if($params['AddGradesForm']['userIdentifiedBy'] == AppConstant::NUMERIC_ONE){
+                        $user = User::findByUsername($single[0]);
+                        $userId = $user['id'];
+                    }else{
+                    $user = User::findByUsername($single[0]);
+                    $userId = $user['id'];
+                    }
+//                AppUtility::dump($single);
+                    $tempArray = array(
+                        'studentId' => $userId,
+                        'gradeText' => $single[1],
+                        'feedbackText' => $single[2],
+                        'fromUploadFile' => '1'
+                    );
+//                    array_push($gradeTextArray, $tempArray);
+                    $grades = new Grades();
+
+                    $grades->createGradesByUserId($tempArray, $params['gb-items-id']);
+                }
+            }
+//            }AppUtility::dump($gradeTextArray);
+//AppUtility::dump($gradeTextArray);
+
+
+//            foreach($studentRecords as $single){
+////                AppUtility::dump($studentRecords);
+//
+//                $tempArray(
+//
+//                );
+
+//            }
+
+        }
+        $responseData = array('model' => $model,'gbItemsId' => $gbItemsId['gbItems']);
+        return $this->renderWithData('uploadGrades', $responseData);
+    }
+
+    public function ImportStudentCsv($fileName,$params)
+        {
+            $this->guestUserHandler();
+//        $course = Course::getById($courseId);
+            $allUserArray = array();
+//        $existingUser = array();
+//        if ($course) {
+            $handle = fopen($fileName, 'r');
+//            if ($params['ImportStudentForm']['headerRow'] == AppConstant::NUMERIC_ONE) {
+//                $data = fgetcsv($handle, 2096);
+//            }
+            while (($data = fgetcsv($handle, 2096)) !== false) {
+//
+//                $StudentDataArray = $this->parsecsv($data, $params);AppUtility::dump($StudentDataArray);
+//                for ($i = 0; $i < count($data); $i++) {
+//                    $StudentDataArray[$i] = trim($StudentDataArray[$i]);
+//                }
+//                if (trim($StudentDataArray[0]) == '' || trim($StudentDataArray[0]) == '_') {
+//                    continue;
+//                }
+//                $userData = User::getByName($StudentDataArray[0]);
+//                if ($userData) {
+//                    array_push($existingUser, $userData);
+//                }
+//                if (($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_ZERO || $params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_ONE) && strlen($StudentDataArray[0]) < 4) {
+//                    $password = password_hash($StudentDataArray[0], PASSWORD_DEFAULT);
+//                } else {
+//                    if ($params['ImportStudentForm']['setPassword'] == 0) {
+//                        $password = password_hash(substr($StudentDataArray[0], 0, 4), PASSWORD_DEFAULT);
+//                    } else if ($params['ImportStudentForm']['setPassword'] == 1) {
+//                        $password = password_hash(substr($StudentDataArray[0], -4), PASSWORD_DEFAULT);
+//
+//                    } else if ($params['ImportStudentForm']['setPassword'] == 2) {
+//                        $password = password_hash($params['defpw'], PASSWORD_DEFAULT);
+//
+//                    } else if ($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_THREE) {
+//                        if (trim($StudentDataArray[6]) == '') {
+//                            echo "Password for {$StudentDataArray[0]} is blank; skipping import<br/>";
+//                            continue;
+//                        }
+//                        $password = password_hash($StudentDataArray[6], PASSWORD_DEFAULT);
+//                    }
+//                }
+//                array_push($StudentDataArray, $password);
+                array_push($allUserArray, $data);
+
+
+//
+        }return  $allUserArray;
+//        return false;
+  }
+
+
+    public function parsecsv($data, $params)
+    {
+        $this->guestUserHandler();
+        $firstnamePosition = $params['ImportStudentForm']['firstName'] - AppConstant::NUMERIC_ONE;
+        $firstname = $data[$firstnamePosition];
+        if ($params['ImportStudentForm']['nameFirstColumn'] != AppConstant::NUMERIC_ZERO) {
+            $firstnameColumn = explode(' ', $firstname);
+            if ($params['ImportStudentForm']['nameFirstColumn'] < AppConstant::NUMERIC_THREE) {
+                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn'] - AppConstant::NUMERIC_ONE];
+            } else {
+                $firstname = $firstnameColumn[count($firstnameColumn) - AppConstant::NUMERIC_ONE];
+            }
+        }
+        $lastnamePosition = $params['ImportStudentForm']['lastName'] - AppConstant::NUMERIC_ONE;
+        $lastname = $data[$lastnamePosition];
+        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
+            $lastnameColumn = explode(' ', $lastname);
+        }
+        if ($params['ImportStudentForm']['nameLastColumn'] != AppConstant::NUMERIC_ZERO) {
+            if ($params['ImportStudentForm']['nameLastColumn'] < AppConstant::NUMERIC_THREE) {
+                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn'] - AppConstant::NUMERIC_ONE];
+            } else {
+                $lastname = $lastnameColumn[count($lastnameColumn) - AppConstant::NUMERIC_ONE];
+            }
+        }
+        $firstname = preg_replace('/\W/', '', $firstname);
+        $lastname = preg_replace('/\W/', '', $lastname);
+        $firstname = ucfirst(strtolower($firstname));
+        $lastname = ucfirst(strtolower($lastname));
+        if ($params['ImportStudentForm']['userName'] == AppConstant::NUMERIC_ZERO) {
+            $username = strtolower($firstname . '_' . $lastname);
+        } else {
+            $username = $data[$params['unloc'] - AppConstant::NUMERIC_ONE];
+            $username = preg_replace('/\W/', '', $username);
+        }
+        if ($params['ImportStudentForm']['emailAddress'] > AppConstant::NUMERIC_ZERO) {
+            $email = $data[$params['ImportStudentForm']['emailAddress'] - AppConstant::NUMERIC_ONE];
+            if ($email == '') {
+                $email = 'none@none.com';
+            }
+        } else {
+            $email = 'none@none.com';
+        }
+        if ($params['ImportStudentForm']['codeNumber'] == AppConstant::NUMERIC_ONE) {
+            $code = $data[$params['code'] - AppConstant::NUMERIC_ONE];
+        } else {
+            $code = AppConstant::NUMERIC_ZERO;
+        }
+        if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_ONE) {
+            $section = $params['secval'];
+        } else if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_TWO) {
+            $section = $data[$params['seccol'] - AppConstant::NUMERIC_ONE];
+        } else {
+            $section = AppConstant::NUMERIC_ZERO;
+        }
+        if ($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_THREE) {
+            $password = $data[$params['pwcol'] - AppConstant::NUMERIC_ONE];
+        } else {
+            $password = AppConstant::NUMERIC_ZERO;
+        }
+
+        return array($username, $firstname, $lastname, $email, $code, $section, $password);
+    }
+
+
 }
+

@@ -11,6 +11,9 @@ use kartik\time\TimePicker;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
 $this->title = 'Add Offline Grades';
+//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <fieldset xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
         <legend>Add Offline Grades</legend>
@@ -50,11 +53,13 @@ $this->title = 'Add Offline Grades';
             <?php } ?>
         </select>
     </div>
-    <div class="select-text-margin"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric') ?>" >Add new rubric</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric') ?>"  >Edit rubrics</a><div>
+    <div class="select-text-margin"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric') ?>" >Add new rubric</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid='.$course->id) ?>"  >Edit rubrics</a><div>
 
         <br><div class="col-lg-offset-3 ">  <?= $form->field($model, 'UploadGrades')-> checkbox(); ?>
-          <a class="btn btn-primary col-lg-offset-2"  href="#">Submit</a>
-        </div>
+                <?= Html::submitButton('Save', ['class' => 'btn btn-primary col-lg-offset-3']) ?>
+<!--          <a class="btn btn-primary col-lg-offset-2"  href="--><?php //echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-grades') ?><!--">Submit</a>-->
+<!--                --><?//= Html::submitButton('Save', ['class' => 'btn btn-primary col-lg-offset-2']) ?>
+            </div>
 
         <div class="col-lg-offset-3 ">
             <?= $form->field($model, 'AssessmentSnapshot')-> checkbox(['class' => 'assessment_snapshot']) ?>
@@ -124,8 +129,8 @@ $this->title = 'Add Offline Grades';
                 <tr>
                     <td><?php echo $singleStudentInformation['Name']?></td>
                     <td><?php echo $singleStudentInformation['Section']?></td>
-                    <td><input type="text" name="grade_text<?php echo $singleStudentInformation['StudentId'] ?>"  class="latepass-text-id" size="4"/></td>
-                    <td><textarea type="text" name="feedback_text<?php echo $singleStudentInformation['StudentId'] ?>" class="feedback-text-id"></textarea> </td>
+                    <td><input type="text" name="grade_text[<?php echo $singleStudentInformation['StudentId'] ?>]"  class="latepass-text-id" size="4"/></td>
+                    <td><textarea type="text" name="feedback_text[<?php echo $singleStudentInformation['StudentId']?>]" class="feedback-text-id"></textarea> </td>
                 </tr>
             <?php }?>
             <tbody>

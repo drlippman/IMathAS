@@ -41,6 +41,7 @@ $currentLevel = 0;
         </div>
     </div>
     <div class="midwrapper">
+
         <?php if ($threadId > $prevNextValueArray['minThread']) { ?>
             <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?forumid=' . $forumId . '&courseid=' . $course->id . '&threadid=' . $threadId . '&prev=1'); ?>">Prev</a>&nbsp;
         <?php } else { ?>
@@ -64,6 +65,7 @@ $currentLevel = 0;
         <button onclick="collapseall()" class="btn btn-primary expand">Collapse All</button>
         <button onclick="showall()" class="btn btn-primary expand">Show All</button>
         <button onclick="hideall()" class="btn btn-primary expand">Hide All</button>
+
         <br><br>
 
 

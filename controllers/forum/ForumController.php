@@ -385,15 +385,15 @@ class ForumController extends AppController
         $courseId=$this->getParamVal('courseid');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
+        $forumId = $this->getParamVal('forumid');
         $prev = $this->getParamVal('prev');
         $next = $this->getParamVal('next');
         if($next || $prev ){
-            $prevNextValueArray = Thread::getNextThreadId($threadId,$next,$prev);
+            $prevNextValueArray = Thread::getNextThreadId($threadId,$next,$prev,$forumId);
         $threadId = $prevNextValueArray['threadId'];
         }
         $isNew = ForumView::getById( $threadId, $currentUser);
         $tagValue = $isNew[0]['tagged'];
-        $forumId = $this->getParamVal('forumid');
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
         if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $FullThread[0]['posttype']== AppConstant::NUMERIC_THREE ){

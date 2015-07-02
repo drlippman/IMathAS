@@ -19,7 +19,8 @@ class Grades extends BaseImasGrades
 {
     public function createGradesByUserId($singal,$gbItemsId)
     {
-        if($singal['gradeText'] || $singal['feedbackText']){
+//        AppUtility::dump($gbItemsId);
+        if($singal['gradeText'] || $singal['feedbackText'] || $singal['fromUploadFile'] == AppConstant::NUMERIC_ONE){
             $this->gradetypeid = $gbItemsId;
             $this->userid = $singal['studentId'];
             $this->score = $singal['gradeText'];

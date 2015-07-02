@@ -23,21 +23,23 @@ class Thread extends BaseImasForumThreads
         return Thread::findOne(['id' => $id]);
     }
 
-    public static function getNextThreadId($currentId,$next=null,$prev=null)
+    public static function getNextThreadId($currentId,$next=null,$prev=null,$forumId)
     {
+//        AppUtility::dump($currentId);
         if($next == AppConstant::NUMERIC_TWO){
-            $thread = Thread::find()->where(['>', 'id', $currentId])->one();
+            $thread = Thread::find()->where(['>', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
         }elseif($prev == AppConstant::NUMERIC_ONE){
-            $thread = Thread::find()->where(['<', 'id', $currentId])->one();
+            $thread = Thread::find()->where(['<', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
         }
-        $minThreadId = Thread::find()->min('id');
-        $maxThreadId = Thread::find()->max('id');
+        $minThreadId = Thread::find()->where(['forumid' => $forumId])->min('id');
+        $maxThreadId = Thread::find()->where(['forumid' => $forumId])->max('id');
         $prevNextValueArray = array();
         $prevNextValueArray = array(
         'threadId' =>$thread->id,
         'maxThread' =>$maxThreadId,
             'minThread' =>$minThreadId,
     );
+//        AppUtility::dump($prevNextValueArray);
         return $prevNextValueArray;
     }
 } 
