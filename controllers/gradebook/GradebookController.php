@@ -2149,70 +2149,177 @@ class GradebookController extends AppController
   }
 
 
-    public function parsecsv($data, $params)
+//    public function parsecsv($data, $params)
+//    {
+//        $this->guestUserHandler();
+//        $firstnamePosition = $params['ImportStudentForm']['firstName'] - AppConstant::NUMERIC_ONE;
+//        $firstname = $data[$firstnamePosition];
+//        if ($params['ImportStudentForm']['nameFirstColumn'] != AppConstant::NUMERIC_ZERO) {
+//            $firstnameColumn = explode(' ', $firstname);
+//            if ($params['ImportStudentForm']['nameFirstColumn'] < AppConstant::NUMERIC_THREE) {
+//                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn'] - AppConstant::NUMERIC_ONE];
+//            } else {
+//                $firstname = $firstnameColumn[count($firstnameColumn) - AppConstant::NUMERIC_ONE];
+//            }
+//        }
+//        $lastnamePosition = $params['ImportStudentForm']['lastName'] - AppConstant::NUMERIC_ONE;
+//        $lastname = $data[$lastnamePosition];
+//        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
+//            $lastnameColumn = explode(' ', $lastname);
+//        }
+//        if ($params['ImportStudentForm']['nameLastColumn'] != AppConstant::NUMERIC_ZERO) {
+//            if ($params['ImportStudentForm']['nameLastColumn'] < AppConstant::NUMERIC_THREE) {
+//                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn'] - AppConstant::NUMERIC_ONE];
+//            } else {
+//                $lastname = $lastnameColumn[count($lastnameColumn) - AppConstant::NUMERIC_ONE];
+//            }
+//        }
+//        $firstname = preg_replace('/\W/', '', $firstname);
+//        $lastname = preg_replace('/\W/', '', $lastname);
+//        $firstname = ucfirst(strtolower($firstname));
+//        $lastname = ucfirst(strtolower($lastname));
+//        if ($params['ImportStudentForm']['userName'] == AppConstant::NUMERIC_ZERO) {
+//            $username = strtolower($firstname . '_' . $lastname);
+//        } else {
+//            $username = $data[$params['unloc'] - AppConstant::NUMERIC_ONE];
+//            $username = preg_replace('/\W/', '', $username);
+//        }
+//        if ($params['ImportStudentForm']['emailAddress'] > AppConstant::NUMERIC_ZERO) {
+//            $email = $data[$params['ImportStudentForm']['emailAddress'] - AppConstant::NUMERIC_ONE];
+//            if ($email == '') {
+//                $email = 'none@none.com';
+//            }
+//        } else {
+//            $email = 'none@none.com';
+//        }
+//        if ($params['ImportStudentForm']['codeNumber'] == AppConstant::NUMERIC_ONE) {
+//            $code = $data[$params['code'] - AppConstant::NUMERIC_ONE];
+//        } else {
+//            $code = AppConstant::NUMERIC_ZERO;
+//        }
+//        if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_ONE) {
+//            $section = $params['secval'];
+//        } else if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_TWO) {
+//            $section = $data[$params['seccol'] - AppConstant::NUMERIC_ONE];
+//        } else {
+//            $section = AppConstant::NUMERIC_ZERO;
+//        }
+//        if ($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_THREE) {
+//            $password = $data[$params['pwcol'] - AppConstant::NUMERIC_ONE];
+//        } else {
+//            $password = AppConstant::NUMERIC_ZERO;
+//        }
+//
+//        return array($username, $firstname, $lastname, $email, $code, $section, $password);
+//    }
+
+
+    public function actionManageOfflineGrades()
     {
+
         $this->guestUserHandler();
-        $firstnamePosition = $params['ImportStudentForm']['firstName'] - AppConstant::NUMERIC_ONE;
-        $firstname = $data[$firstnamePosition];
-        if ($params['ImportStudentForm']['nameFirstColumn'] != AppConstant::NUMERIC_ZERO) {
-            $firstnameColumn = explode(' ', $firstname);
-            if ($params['ImportStudentForm']['nameFirstColumn'] < AppConstant::NUMERIC_THREE) {
-                $firstname = $firstnameColumn[$params['ImportStudentForm']['nameFirstColumn'] - AppConstant::NUMERIC_ONE];
-            } else {
-                $firstname = $firstnameColumn[count($firstnameColumn) - AppConstant::NUMERIC_ONE];
-            }
-        }
-        $lastnamePosition = $params['ImportStudentForm']['lastName'] - AppConstant::NUMERIC_ONE;
-        $lastname = $data[$lastnamePosition];
-        if ($params['ImportStudentForm']['lastName'] != $params['ImportStudentForm']['firstName'] && $params['ImportStudentForm']['nameLastColumn'] != 0) {
-            $lastnameColumn = explode(' ', $lastname);
-        }
-        if ($params['ImportStudentForm']['nameLastColumn'] != AppConstant::NUMERIC_ZERO) {
-            if ($params['ImportStudentForm']['nameLastColumn'] < AppConstant::NUMERIC_THREE) {
-                $lastname = $lastnameColumn[$params['ImportStudentForm']['nameLastColumn'] - AppConstant::NUMERIC_ONE];
-            } else {
-                $lastname = $lastnameColumn[count($lastnameColumn) - AppConstant::NUMERIC_ONE];
-            }
-        }
-        $firstname = preg_replace('/\W/', '', $firstname);
-        $lastname = preg_replace('/\W/', '', $lastname);
-        $firstname = ucfirst(strtolower($firstname));
-        $lastname = ucfirst(strtolower($lastname));
-        if ($params['ImportStudentForm']['userName'] == AppConstant::NUMERIC_ZERO) {
-            $username = strtolower($firstname . '_' . $lastname);
-        } else {
-            $username = $data[$params['unloc'] - AppConstant::NUMERIC_ONE];
-            $username = preg_replace('/\W/', '', $username);
-        }
-        if ($params['ImportStudentForm']['emailAddress'] > AppConstant::NUMERIC_ZERO) {
-            $email = $data[$params['ImportStudentForm']['emailAddress'] - AppConstant::NUMERIC_ONE];
-            if ($email == '') {
-                $email = 'none@none.com';
-            }
-        } else {
-            $email = 'none@none.com';
-        }
-        if ($params['ImportStudentForm']['codeNumber'] == AppConstant::NUMERIC_ONE) {
-            $code = $data[$params['code'] - AppConstant::NUMERIC_ONE];
-        } else {
-            $code = AppConstant::NUMERIC_ZERO;
-        }
-        if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_ONE) {
-            $section = $params['secval'];
-        } else if ($params['ImportStudentForm']['sectionValue'] == AppConstant::NUMERIC_TWO) {
-            $section = $data[$params['seccol'] - AppConstant::NUMERIC_ONE];
-        } else {
-            $section = AppConstant::NUMERIC_ZERO;
-        }
-        if ($params['ImportStudentForm']['setPassword'] == AppConstant::NUMERIC_THREE) {
-            $password = $data[$params['pwcol'] - AppConstant::NUMERIC_ONE];
-        } else {
-            $password = AppConstant::NUMERIC_ZERO;
-        }
+        $model = new AddGradesForm();
+        $currentUser = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
 
-        return array($username, $firstname, $lastname, $email, $code, $section, $password);
+        $gradeNames = GbItems::getbyCourseId($courseId);
+//        AppUtility::dump($gradeNames);
+//        AppUtility::dump($rubricsData);
+//        $assessmentData = Assessments::getByCourseId($courseId);
+//        AppUtility::dump($assessmentData);
+
+        if($this->isPost()){
+            $params = $_POST;
+//            AppUtility::dump($params );
+
+
+                $tempArray = array();
+            foreach($params['grade-name-check'] as $gradeId){
+                if($params['Show-after-check'] == 1){
+                    if($params['Show-after']){
+                    $showdate = 0;
+                    if($params['Show-after'] == 2)
+                    {
+                        $showdate = strtotime(date('F d, o g:i a'));
+                    }
+                  $temp = 1;
+                    GbItems::updateGrade($gradeId,$showdate,$temp);
+                    }
+                    }
+                if($params['count-check'] == 1) {
+                    $countValue = $params['count'];
+                    if($countValue){
+                    $temp =2;
+                    GbItems::updateGrade($gradeId,$countValue,$temp);
+                    }
+                }
+                if($params['grade-name-check'] == 1) {
+                    $tutoredit = $params['tutor-access-value'];
+                    $temp =3;
+                    GbItems::updateGrade($gradeId,$tutoredit,$temp);
+                }
+
+//                AppUtility::dump($tempArray);
+
+
+
+            }
+
+
+//            $gbItems = new GbItems();
+//            $gbItemsId = $gbItems->createGbItemsByCourseId($courseId,$params);
+//
+//            if($params['AddGradesForm']['UploadGrades'] == AppConstant::NUMERIC_ZERO){
+//                if($params['grade_text'] || $params['feedback_text']){
+//
+//                    $gradeTextArray = array();
+//                    foreach($params['grade_text'] as $index => $grade)
+//                    {
+//                        foreach($params['feedback_text'] as $key => $feedback) {
+//                            if($index == $key){
+//                                $tempArray = array(
+//                                    'studentId' => $index,
+//                                    'gradeText' => $grade,
+//                                    'feedbackText' => $feedback,
+//                                );
+//                                array_push($gradeTextArray, $tempArray);
+//                            }
+//                        }
+//                    }
+//                    foreach($gradeTextArray as $single){
+//                        $grades = new Grades();
+//                        $grades->createGradesByUserId($single,$gbItemsId);
+//                    }
+//
+//                }
+//            }else{
+//                $model = new AddGradesForm();
+//                $this->redirect('upload-grades?gbItems='.$gbItemsId);
+////                $responseData = array('model' => $model,'gbItemsId' => $gbItemsId);
+////                return $this->renderWithData('uploadGrades', $responseData);
+//            }
+//            $responseData = array('course' => $course, 'user' => $currentUser);
+//            return $this->renderWithData('gradebook', $responseData);
+//            $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
+        }
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','gradebook/manageofflinegrades.js']);
+        $responseData = array('model' => $model,'gradeNames' => $gradeNames,'course' => $course);
+        return $this->renderWithData('manageOfflineGrades', $responseData);
+
+
     }
+    public function actionGradeDeleteAjax()
+    {
+        $params = $this->getRequestParams();
+//        AppUtility::dump($params);
+            foreach($params['checkedMsg'] as $gradeId){
+                GbItems::deleteById($gradeId);
 
-
+            }
+        return $this->successResponse();
+//        AppUtility::dump(count());
+    }
 }
 

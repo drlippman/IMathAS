@@ -60,6 +60,42 @@ class GbItems extends BaseImasGbitems
         $data = $command->queryAll();
         return $data;
     }
+    public static function getbyCourseId($courseId)
+    {
+        $gradeNames = GbItems::find()->where(['courseid' => $courseId])->all();
+        return $gradeNames;
+    }
+    public static function deleteById($gradeId)
+    {
+        $grade = GbItems::findOne($gradeId);
+        $grade->delete();
+    }
+    public static function updateGrade($gradeId,$AssignValue,$temp)
+    {
+        $grade = GbItems::find()->where(['id' => $gradeId])->all();
+        if($grade){
+            foreach($grade as $d ){
+//                AppUtility::dump($d['showdate']);
+           if($temp == 1){
+               $d->showdate = $AssignValue;
+           }else if($temp == 2){
+               $d->cntingb = $AssignValue;
+           }else if($temp == 3){
+               $d->tutoredit = $AssignValue;
+           }
+
+                $d->save();
+            }
+        }
+//        AppUtility::dump($grade);
+//        $this->showdate = $showdate;
+//        $this->gbcategory = $params['AddGradesForm']['GradeBookCategory'];
+//        $this ->rubric = $params['rubric'];
+//        $this->cntingb = $count;
+//        $this->tutoredit = $params['AddGradesForm']['TutorAccess'];
+//        $this->save();
+//        return $this->id;
+    }
 
 }
 
