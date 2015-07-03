@@ -187,16 +187,16 @@ class RosterController extends AppController
             $param = $param['StudentEnrollmentForm'];
             $uid = User::findByUsername($param['usernameToEnroll']);
             if (!$uid) {
-                $this->setErrorFlash('Student not found please enter correct username.');
+                $this->setErrorFlash(AppConstant::STUDENT_ERROR_MESSAGE);
             } else {
 
                 $teacher = Teacher::getTeacherByUserId($uid->id);
                 if ($teacher) {
-                    $this->setErrorFlash('Teachers can\'t be enrolled as students - use Student View, or create a separate student account.');
+                    $this->setErrorFlash(AppConstant::TEACHER_CANNOT_CHANGE_AS_SRUDENT);
                 } else {
                     $stdrecord = Student::getByUserIdentity($uid->id, $courseId);
                     if ($stdrecord) {
-                        $this->setErrorFlash('This username is already enrolled in the class');
+                        $this->setErrorFlash(AppConstant::USERNAME_ENROLLED);
                     } else {
                         $student = new Student();
                         $student->createNewStudent($uid->id, $courseId, $param);
@@ -395,7 +395,7 @@ class RosterController extends AppController
                 $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
 
             } else {
-                $this->setErrorFlash('Username already exists');
+                $this->setErrorFlash(AppConstant::USER_EXISTS);
             }
         }
         $responseData = array('course' => $course, 'model' => $model);
@@ -530,7 +530,7 @@ class RosterController extends AppController
                     $this->redirect(array('show-import-student', 'courseId' => $courseId, 'existingUsers' => $existUserRecords, 'newUsers' => $newUserRecords));
                 }
             } else {
-                $this->setErrorFlash('Add atleast one records in file.');
+                $this->setErrorFlash(AppConstant::ADD_AT_LEAST_ONE_RECORD);
                 $responseData = array('model' => $model, 'course' => $course);
                 return $this->render('importStudent', $responseData);
             }
@@ -712,7 +712,7 @@ class RosterController extends AppController
             }
         }
         if(count($uniqueStudentsForNewStudent) == 0){
-            $this->setErrorFlash('Entered record(s) already exist in file.');
+            $this->setErrorFlash(AppConstant::RECORD_EXISTS);
         }
 
 //        AppUtility::dump($uniqueStudentsForNewStudent);
@@ -973,7 +973,7 @@ class RosterController extends AppController
                         $startException = strtotime($params['startDate'] . ' ' . $params['startTime']);
                         $endException = strtotime($params['endDate'] . ' ' . $params['endTime']);
                         if($startException > $endException){
-                            $this->setErrorFlash("Available date(Available After) cannot be greater than end date(Available Until).");
+                            $this->setErrorFlash(AppConstant::GREATER_THEN_END_DATE);
                         }else{
                             $waiveReqScore = (isset($params['waiveReqScore'])) ? AppConstant::NUMERIC_ONE : AppConstant::NUMERIC_ZERO;
                             foreach ($studentArray as $student) {
@@ -1104,9 +1104,9 @@ class RosterController extends AppController
         if (count($studentRecord) < AppConstant::NUMERIC_TWO) {
             $latePassMsg = "This student has $latePassMin latepasses.";
         } elseif ($latePassMin == $latePassMax) {
-            $latePassMsg = "These students all have $latePassMin latepasses.";
+            $latePassMsg = sprintf(AppConstant::MIN_LATEPASS,$latePassMin);
         } else {
-            $latePassMsg = "These students have $latePassMin-$latePassMax latepasses.";
+            $latePassMsg = sprintf(AppConstant::MIN_MAX_LATEPASS,$latePassMin,$latePassMax);
         }
         return $latePassMsg;
     }
@@ -1122,10 +1122,10 @@ class RosterController extends AppController
                 $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
                 $student->assignSectionAndCode($newEntry, $id);
             }
-            $this->setSuccessFlash('Imported student successfully.');
+            $this->setSuccessFlash(AppConstant::IMPORTED_SUCCESSFULLY);
 
         } else {
-            $this->setSuccessFlash('All the student from file already exits.');
+            $this->setSuccessFlash(AppConstant::STUDENT_EXISTS);
         }
         return $this->successResponse();
     }
@@ -1299,7 +1299,7 @@ class RosterController extends AppController
             }
             User::saveUserRecord($params, $user);
             Student::updateSectionAndCodeValue($params['section'], $userId, $params['code'], $courseId, $params);
-            $this->setSuccessFlash('Student information updated successfully.');
+            $this->setSuccessFlash(AppConstant::UPDATE_STUDENT_SUCCESSFULLY);
             return $this->redirect('student-roster?cid=' . $courseId);
         }
         $this->includeCSS(['dashboard.css']);

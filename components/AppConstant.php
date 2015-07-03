@@ -98,4 +98,17 @@ class AppConstant
     const TUTOR_READ_SCORES = "View Scores";
     const TUTOR_READ_WRITE_SCORES = "View and Edit Scores";
     const New_Item = "Create Item";
+    const ALWAYS_TIME = 2000000000;
+    const STUDENT_ERROR_MESSAGE = "Student not found please enter correct username.";
+    const TEACHER_CANNOT_CHANGE_AS_SRUDENT = "Teachers can\'t be enrolled as students - use Student View, or create a separate student account.";
+    const UPDATE_STUDENT_SUCCESSFULLY="Student information updated successfully.";
+    const USER_EXISTS ="Username already exists";
+    const ADD_AT_LEAST_ONE_RECORD = "Add atleast one records in file.";
+    const RECORD_EXISTS = "Entered record(s) already exist in file.";
+    const GREATER_THEN_END_DATE="Available date(Available After) cannot be greater than end date(Available Until).";
+    const IMPORTED_SUCCESSFULLY="Imported student successfully.";
+    const STUDENT_EXISTS="All the student from file already exits.";
+    const USERNAME_ENROLLED="This username is already enrolled in the class";
+    const MIN_LATEPASS = "These students all have %u latepasses.";
+    const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
 }

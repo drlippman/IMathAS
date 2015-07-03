@@ -157,6 +157,9 @@ class InstructorController extends AppController
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $wiki;
+
+//                                $a = AppUtility::getFormattedDate($wiki['enddate'],'m/d/y');
+//                                AppUtility::dump($a);
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'InlineText':
@@ -276,6 +279,7 @@ class InstructorController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
         $student = Student::getByCId($courseId);
+//        AppUtility::dump($user);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
