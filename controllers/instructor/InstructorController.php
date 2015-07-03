@@ -64,8 +64,8 @@ class InstructorController extends AppController
         $courseData = $this->getRequestParams();
         $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
         if (!($teacherId)) {
-            echo AppConstant::UNAUTHORIZED_ACCESS;
-            exit;
+            $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
+            return $this->goBack();
         }
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);

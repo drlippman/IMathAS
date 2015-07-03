@@ -276,7 +276,7 @@ class SiteController extends AppController
                 $user->remoteaccess = null;
                 $user->save();
                 $this->setSuccessFlash('Your password is changed successfully.');
-                $this->redirect('login');
+                return $this->redirect("login");
 
             }
         }else{
@@ -360,7 +360,7 @@ class SiteController extends AppController
                 $user->save();
 
                 $this->setSuccessFlash('Your password has been changed.');
-                return $this->redirect(AppUtility::getURLFromHome('site','login'));
+                return $this->redirect('dashboard');
             } else {
                 $this->setErrorFlash('Old password did not match.');
                 return $this->redirect('change-password');
@@ -394,7 +394,7 @@ class SiteController extends AppController
             }
             User::saveUserRecord($params,$user);
             $this->setSuccessFlash('Changes updated successfully.');
-            $this->redirect('dashboard');
+            return $this->redirect('dashboard');
         }
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);

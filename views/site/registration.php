@@ -41,7 +41,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <?php ActiveForm::end(); ?>
-    <?php Yii::$app->session->getFlash('error'); ?>
 </div><!-- registration -->
 
 <div class="col-lg-12">

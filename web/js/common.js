@@ -4,6 +4,8 @@ $(document).ready(function(){
 
 //    $('.dataTables_filter input').get(0).type = 'text';
     $('.dataTables_filter').prop('type', 'text');
+
+    $("#flash-message").animate({opacity:0.5}, 5000).fadeOut();
 });
 
 function jQuerySubmit(url, data, successCallBack) {
@@ -112,3 +114,4 @@ function initEditor()
 
     });
 }
+
