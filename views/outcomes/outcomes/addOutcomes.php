@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
     });
     var cnt=0;
     function addOutcomeGrp(){
-        var html = '<li class="blockli" id="newgrp"><span class=icon style="background-color:#66f">G</span>';
+        var html = '<li class="blockli" id="newgrp'+cnt+'"><span class=icon style="background-color:#66f">G</span>';
         html += '<input class="outcomeGrp" type="text" size="60" id="newgrp'+cnt+'" > ';
         html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
         cnt++;
     }
     function addOutcome() {
-        var html = '<li id="newocnt"><span class=icon style="background-color:#0f0">O</span>';
+        var html = '<li id="new'+cnt+'"><span class=icon style="background-color:#0f0">O</span>';
         html += '<input class="outcome" type="text" size="60" id="new'+cnt+'">';
         html += '<a href="#" onclick=removeOutcome(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
@@ -126,4 +126,5 @@ $this->params['breadcrumbs'][] = $this->title;
             });
         }
     }
+
 </script>

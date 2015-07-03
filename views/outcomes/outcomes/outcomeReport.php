@@ -13,6 +13,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <option value='2' selected="selected">Past Due and Attempted scores</option></select>
 </div>
 <input type="hidden" id="course-id" value="<?php echo $courseId?>">
+<div class="outcomeReport-div"></div>
+
 <script>
     $(document).ready(function ()
     {
@@ -24,17 +26,40 @@ $this->params['breadcrumbs'][] = $this->title;
     function outcomeReportResponse(response)
     {
         response = JSON.parse(response);
-        console.log(response);
+
+
         var html="";
+
         if(response.status == 0)
         {
-
             var studentData = response.data.studentOutcomeReportArray;
-            $.each(studentData, function(index,data))
+            var html = "<table id='outcomeReport-table display-outcomeReport-table' class='outcomeReport-table display-outcomeReport-table table table-bordered table-striped table-hover data-table'><thead>";
+            for(i=0;i<studentData.header.length; i++)
             {
 
-
+                html += "<th>"+studentData.header[i]+"</th>";
             }
+            html += "</thead><tbody class='outcomeReport-table-body'>";
+            $.each(studentData.data, function(index,outcomeData)
+            {
+                html += '<tr>';
+                html += "<td><a href='#'>" + outcomeData.userName + "</a></td>";
+                html += '</tr>';
+
+            });
+            html += "<tr><td><a href='#'>Average</a></td></tr>";
+            html+= '</tbody></table>';
+            $('.outcomeReport-div').append(html);
+//           $(".outcomeReport-table").append(html);
+            $('#display-outcomeReport-table').DataTable({"bPaginate": false});
+
         }
+
+
     }
+
+    function createTableHeader() {
+
+    }
+
 </script>

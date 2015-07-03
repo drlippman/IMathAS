@@ -86,6 +86,8 @@ class OutcomesController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
         return $this->render('outcomeReport',['courseId' => $courseId]);
     }
 
@@ -93,15 +95,28 @@ class OutcomesController extends AppController
     {
         $courseId = $this->getRequestParams('courseId');
         $studentOutcomeReport = Student::getByCourse($courseId);
+        $outcomeData = Outcomes::getByCourseId($courseId);
         $studentOutcomeReportArray = array();
+        $headerArray =array();
+        $headerArray = ['Name'];
+
+       for($i=1;$i<=count($outcomeData);$i++)
+       {
+           $headerArray[$i]=$outcomeData[$i-1]['name'];
+
+       }
+        $studentOutcomeReportArray = array('header'=>$headerArray);
+        $tempArray = array();
         foreach($studentOutcomeReport as $studentData)
         {
-            $tempArray = array(
+            $temp = array(
 
                 'userName' => $studentData->user->FirstName.' '.$studentData->user->LastName,
             );
-            array_push($studentOutcomeReportArray,$tempArray);
+            array_push($tempArray,$temp);
         }
+        $studentOutcomeReportArray['data'] = ($tempArray);
+        $studentOutcomeReportArray['Average'] = ('hi');
         $responseData = array('studentOutcomeReportArray' => $studentOutcomeReportArray);
         return $this->successResponse($responseData);
     }
