@@ -1,0 +1,145 @@
+*********************************************************
+**   Internet Mathematics Assessment System (IMathAS)  ** 
+**   (c) David Lippman, 2006-2014		       **
+*********************************************************
+
+See readme.html for installation information.
+
+IMathAS was written by David Lippman with partial support from the
+WA State E-Learning Council, the Transition Math Project, and Pierce College.
+Additional work has been supported by xyzTextbooks, Carnegie Foundation,
+and Lumen Learning.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as published 
+by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License (at http://www.gnu.org/copyleft/gpl.html) 
+for more details.
+
+Questions written using the IMathAS language and macro libraries are 
+NOT derivative works of this software, and therefore are not required 
+to be be licensed under the GPL.  If you wish to distribute question 
+libraries or macro libraries using a license other than public-domain, 
+specify the license in the library description.  Libraries distributed 
+without a license statement will be assumed to be public-domain.  
+
+It is my interpretation of the GPL (in the spirit of free software) that 
+installers should not charge end-users (students) for access to IMathAS 
+beyond reasonable hosting costs.   
+
+IMathAS makes use of:
+ASCIIMathML and ASCIIsvg 
+(c) Peter Jipsen http://www.chapman.edu/~jipsen
+GPL License
+
+TinyMCE
+(c) 2003-2008 Moxiecode Systems AB
+LGPL License
+
+AsciiMath and AsciiSvg Plugins for TinyMCE
+(c) David Lippman
+Based on code by David Lippman and Peter Jipsen
+LGPL License
+
+MathJax
+(c) The MathJax Consortium
+Apache License
+
+TinyMCE File manager
+Adapted from work by TadejK
+http://sourceforge.net/tracker/index.php?func=detail&aid=1698519&group_id=103281&atid=738747
+No copyright or license included in package
+
+CalendarPopup
+(c) 2005 Julian Robichaux -- http://www.nsftools.com
+"it's free"
+
+Form Validator
+(c) Martin Honnen
+Presumably public domain (no license specified)
+
+Table Sorter
+(c) www.dhtmlgoodies.com, November 2005
+Custom license, allows use (commercial/noncommercial), but
+no for-sale redistribution or repost.
+
+Color Picker
+(c) Mark Kahn
+No license specified.  Posted in web article at
+http://www.webreference.com/programming/javascript/mk/column3/index.html
+
+Crystal Icons
+LGPL license
+http://www.everaldo.com/crystal/
+
+htmLawed
+(c) Santosh Patnaik
+http://www.bioinformatics.org/phplabware/internal_utilities/htmLawed/
+GPL License
+
+Viewer.class used by plot3d library
+(c) David Lippman, based on code by Evgeny Demidov, presumed public domain
+Code available on request to drlippman@yahoo.com
+
+Documentation Guides
+(c) David Lippman.  Created with development grant support from the 
+WA State Distance Learning Council and the Transition Math Project
+
+S3 library 
+(c) 2007-2008, Donovan Schonknecht
+Attribution license - see includes/S3.php
+
+MD5 Javascript code
+(C) Paul Johnston 1999 - 2002.
+BSD license
+
+Nested tree drag-and-drop
+(c) 2007 CrazyDave http://www.clanccc.co.uk/moo/nested.html
+
+Mootools
+(c) 2006 Valerio Proietti
+MIT Style License
+
+excanvas
+(c) 2006 Google inc
+Apache License, Version 2.0
+
+tar class
+Copyright (C) 2002  Josh Barger
+LGPL
+
+greybox redux
+John Resig / 4mir Salihefendic (http://amix.dk)
+LGPL
+
+Paul's Simple Diff Algorithm v 0.1
+(C) Paul Butler 2007 <http://www.paulbutler.org/>
+May be used and distributed under the zlib/libpng license.
+
+AutoSuggest
+(C) 2005 Joe Kepley, The Sling & Rock Design Group, Inc.
+LGPL
+
+JSON Library (PEAR)
+(c) 2005 Michal Migurski
+BSD license
+
+OAuth Library
+(c) 2007 Andy Smith
+MIT License
+
+LTI Utilities
+(c) IMS Global, written by Dr Chuck
+Apache 2.0 license
+
+Thumbs-up icon remixed from work (c) Bersam at
+http://commons.wikimedia.org/wiki/File:Thumbs-up-icon.svg
+CC-BY
+
+
+
+

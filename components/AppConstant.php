@@ -97,4 +97,5 @@ class AppConstant
     const TUTOR_NO_ACCESS = "No access";
     const TUTOR_READ_SCORES = "View Scores";
     const TUTOR_READ_WRITE_SCORES = "View and Edit Scores";
+    const New_Item = "Create Item";
 }

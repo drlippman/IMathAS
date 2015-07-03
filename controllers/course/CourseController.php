@@ -733,8 +733,29 @@ class CourseController extends AppController
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
+        $params = $this->getRequestParams();
+        $inlineTextId = $params['id'];
+        $saveTitle = '';
+        if(isset($params['id']))
+        {
+            $pageTitle = 'Modify Inline Text';
+            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
+            $saveTitle = AppConstant::SAVE_BUTTON;
+        }
+        else{
+            $pageTitle = 'Add Inline Text';
+            $saveTitle = AppConstant::New_Item;
+        }
+        if($this->isPost()){
+            $params = $_POST;
+
+            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
+            $saveChanges = new InlineText();
+            $saveChanges->saveChanges($params);
+
+         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'inlineText' => $inlineText);
+        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'course' => $course, 'page_formActionTag' => $page_formActionTag);
         return $this->render('modifyInlineText', $returnData);
     }
 

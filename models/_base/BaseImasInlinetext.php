@@ -38,7 +38,7 @@ class BaseImasInlinetext extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'title', 'text', 'startdate', 'enddate', 'fileorder', 'outcomes'], 'required'],
+//            [['courseid', 'title', 'text', 'startdate', 'enddate', 'fileorder', 'outcomes'], 'required'],
             [['courseid', 'startdate', 'enddate', 'avail', 'oncal', 'isplaylist'], 'integer'],
             [['text', 'fileorder', 'outcomes'], 'string'],
             [['title', 'caltag'], 'string', 'max' => 254]
