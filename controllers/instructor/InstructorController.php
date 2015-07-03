@@ -40,23 +40,29 @@ class InstructorController extends AppController
 
         $type = $this->getParamVal('type');
         if($type){
-            if($type == 'assessment'){
-                return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
-            }else if($type == 'inlinetext'){
-                return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
-            }else if($type == 'linkedtext'){
-                return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
-            }else if($type == 'forum'){
-                return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
-            }else if($type == 'wiki'){
-                return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
-            }else if($type == 'block'){
-                return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
-            }else if($type == 'calendar'){
-
-            }
-            else{
-                $this->setErrorFlash("Item not selected");
+            switch ($type) {
+                case 'assessment':
+                     return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
+                     break;
+                case 'inlinetext':
+                     return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
+                    break;
+                case 'linkedtext':
+                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                    break;
+                case 'forum':
+                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                    break;
+                case 'wiki':
+                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                    break;
+                case 'block':
+                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                    break;
+                case 'calendar':
+                    break;
+                case '':
+                    break;
             }
         }
         $this->guestUserHandler();
@@ -351,6 +357,15 @@ class InstructorController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $assessments = Assessments::getByCourseId($courseId);
+        $calendarItems = CalItem::getByCourseId($courseId);
+        $CalendarLinkItems = Links::getByCourseId($courseId);
+        $calendarInlineTextItems = InlineText::getByCourseId($courseId);
+
+        /**
+         * Display assessment Modes:
+         *                         - Normal assessment
+         *                         - Review mode assessment
+         */
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -367,7 +382,56 @@ class InstructorController extends AppController
                 'courseId' => $assessment['courseid']
             );
         }
-        return $this->successResponse($assessmentArray);
+
+        /**
+         * Display managed events by admin.
+         */
+        $calendarArray = array();
+        foreach ($calendarItems as $calendarItem)
+        {
+            $calendarArray[] = array(
+                'courseId' => $calendarItem['courseid'],
+                'date' => AppUtility::getFormattedDate($calendarItem['date']),
+                'title' => $calendarItem['title'],
+                'tag' => $calendarItem['tag']
+            );
+        }
+        /**
+         * Display link text: tags.
+         */
+        $calendarLinkArray = array();
+        foreach ($CalendarLinkItems as $CalendarLinkItem)
+        {
+            $calendarLinkArray[] = array(
+                'courseId' => $CalendarLinkItem['courseid'],
+                'title' => $CalendarLinkItem['title'],
+                'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
+                'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
+                'startDateString' => $CalendarLinkItem['startdate'],
+                'endDateString' => $CalendarLinkItem['enddate'],
+                'linkedId' => $CalendarLinkItem['id'],
+                'calTag' => $CalendarLinkItem['caltag']
+            );
+        }
+
+        /**
+         * Display inline text: tags.
+         */
+        $calendarInlineTextArray = array();
+        foreach ($calendarInlineTextItems as $calendarInlineTextItem)
+        {
+            $calendarInlineTextArray[] = array(
+                'courseId' => $calendarInlineTextItem['courseid'],
+                'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
+                'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
+                'startDateString' => $calendarInlineTextItem['startdate'],
+                'endDateString' => $calendarInlineTextItem['enddate'],
+                'calTag' => $calendarInlineTextItem['caltag']
+            );
+        }
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
+        return $this->successResponse($responseData);
     }
 
     public function actionManageEvents()

@@ -247,8 +247,10 @@ class AssessmentController extends AppController
                 $query = $course['outcomes'];
                 $outcomeArray = unserialize($query);
                 $result = $this->flatArray($outcomeArray);
-                foreach($result as $singlePage){
+                if($result){
+                    foreach($result as $singlePage){
                         array_push($pageOutcomesList,$singlePage);
+                    }
                 }
             }
             $query = StuGroupSet::getByCourseId($courseId);
@@ -304,12 +306,14 @@ class AssessmentController extends AppController
 
     public function flatArray($outcomesData) {
         global $pageOutcomesList;
-        foreach ($outcomesData as $singleData) {
-            if (is_array($singleData)) { //outcome group
-                $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
-                $this->flatArray($singleData['outcomes']);
-            } else {
-                $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+        if($outcomesData){
+            foreach ($outcomesData as $singleData) {
+                if (is_array($singleData)) { //outcome group
+                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $this->flatArray($singleData['outcomes']);
+                } else {
+                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                }
             }
         }
         return $pageOutcomesList;

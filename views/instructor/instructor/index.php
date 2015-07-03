@@ -6,7 +6,7 @@ use app\components\AppConstant;
 $this->title = $course->name;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php AppUtility::includeCSS('fullcalendar.print.css');?>
+<link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <!--<div class="mainbody">-->
 
      <div>
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <p> If you want to build from scratch, use the "Add An Item" pulldown below to get started. </p>
 
-        <?php } ?>
+        <?php } ?></div>
         <div class="col-lg-3 pull-left padding-zero">
 <?php
 $parent = AppConstant::NUMERIC_ZERO;
@@ -789,7 +789,13 @@ echo $html;
 
                         <!-- Calender Here-->
                     <?php case 'Calendar': ?>
-                        <div class ='calendar'></div>
+                        <pre><a href="<?php echo AppUtility::getURLFromHome(
+                                'instructor','instructor/index?id='.$item['Calendar'].'&block='.$parent.'&cid='.$course->id.'&remove='.true); ?>">Delete</a> | <a href="
+            <?php echo AppUtility::getURLFromHome('instructor','instructor/manage-events?cid='.$course->id); ?>">Manage Events</a></pre>
+                        <div class ='calendar'>
+                            <div id="demo">
+                            </div>
+                        </div>
                         <?php break; ?>
                     <?php endswitch; ?>
             <?php }?>
@@ -1069,6 +1075,7 @@ echo $html;
                         <?php break; ?>
 
                         <!-- Calender Here-->
+
                         <!--                    --><?php //case 'Calendar': ?>
                         <!--                        <div class ='calendar'></div>-->
                         <!--                    --><?php //break; ?>
