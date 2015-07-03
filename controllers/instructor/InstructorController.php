@@ -197,7 +197,7 @@ class InstructorController extends AppController
                     if ($filter=='b') {
                         $sub[] = $itemId;
                     } else if ($filter=='t') {
-                        array_unshift($sub,$itemId);
+                        array_unshift($sub,intval($itemId));
                     }
                     $itemOrder = addslashes(serialize($items));
                     Course::setItemOrder($itemOrder, $courseId);
