@@ -1062,8 +1062,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
-			else if (isset($options['answer'])) {if (is_array($options['answer'][$qn])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 		
@@ -2728,12 +2728,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								}
 								
 							} else if (isset($abstolerance)) {
-								if (abs($anans-$givenans) < $abstolerance + (($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;} 	
+								if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;} 	
 							} else {
 								if ($anans==0) {
 									if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								} else {
-									if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+									if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								}
 							}
 						}
@@ -2839,8 +2839,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		}
 	} else if ($anstype == "multans") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
-			else if (isset($options['answer'])) {if (is_array($options['answer'][$qn])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
+		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
 		if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
@@ -3476,12 +3476,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}*/
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
-							if (abs($anans-$givenans) < $abstolerance+(($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
+							if (abs($anans-$givenans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
 						} else {
 							if ($anans==0) {
 								if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
 							} else {
-								if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+								if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
 							}
 						}
 					}
