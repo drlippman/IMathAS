@@ -37,4 +37,13 @@ class Items extends BaseImasItems
     {
         return Items::deleteAll(['id' => $id]);
     }
+
+    public function saveItems($courseId, $typeId, $itemType)
+    {
+        $this->courseid = $courseId;
+        $this->typeid = $typeId;
+        $this->itemtype = $itemType;
+        $this->save();
+        return $this->id;
+    }
 }

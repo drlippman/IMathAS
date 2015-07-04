@@ -57,14 +57,13 @@ function calendar() {
     var startDate = $('.start-date').val();
 
     $('.calendar').fullCalendar({
-        aspectRatio: 2.5,
+        height: 400,
         header: {
             left: 'prev,next today',
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
         editable: false,
-        fixedWeekCount: false,
         events: function (start, end, timezone, callback) {
             $.ajax({
                 url: 'get-assessment-data-ajax',
@@ -72,10 +71,8 @@ function calendar() {
                     cid: courseId
                 },
                 success: function (response) {
-                    response = JSON.parse(response);
-
-                    var assessmentData = response.data;
-                    console.log(assessmentData.$calendarInlineTextArray);
+                   var calendarResponse = JSON.parse(response);
+                    var assessmentData = calendarResponse.data;
                     var events = [];
                     $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';
@@ -271,7 +268,6 @@ function calendar() {
             }
         }
     });
-
 }
 
 

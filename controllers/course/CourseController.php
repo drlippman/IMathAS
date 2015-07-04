@@ -563,17 +563,11 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
-        $courseId = $params['cid'];
-        $assessments = Assessments::getByCourseId($courseId);
-        $calendarItems = CalItem::getByCourseId($courseId);
-        $CalendarLinkItems = Links::getByCourseId($courseId);
-        $calendarInlineTextItems = InlineText::getByCourseId($courseId);
-
-        /**
-         * Display assessment Modes:
-         *                         - Normal assessment
-         *                         - Review mode assessment
-         */
+        $cid = $params['cid'];
+        $assessments = Assessments::getByCourseId($cid);
+        $calendarItems = CalItem::getByCourseId($cid);
+        $CalendarLinkItems = Links::getByCourseId($cid);
+        $calendarInlineTextItems = InlineText::getByCourseId($cid);
         $assessmentArray = array();
         foreach ($assessments as $assessment)
         {
@@ -591,9 +585,6 @@ class CourseController extends AppController
             );
         }
 
-        /**
-         * Display managed events by admin.
-         */
         $calendarArray = array();
         foreach ($calendarItems as $calendarItem)
         {
@@ -604,9 +595,6 @@ class CourseController extends AppController
                 'tag' => $calendarItem['tag']
             );
         }
-        /**
-         * Display link text: tags.
-         */
         $calendarLinkArray = array();
         foreach ($CalendarLinkItems as $CalendarLinkItem)
         {
@@ -623,9 +611,6 @@ class CourseController extends AppController
             );
         }
 
-        /**
-         * Display inline text: tags.
-         */
         $calendarInlineTextArray = array();
         foreach ($calendarInlineTextItems as $calendarInlineTextItem)
         {
@@ -708,20 +693,21 @@ class CourseController extends AppController
                     array_push($msgList,$singleMessage);
             }
         }
+
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
         $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData);
         return $this->render('blockIsolate', $returnData);
     }
 
-//    Display calendar on click of menuBars
-    public function actionCalendar()
-    {
-        $this->guestUserHandler();
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        return $this->render('calendar');
-    }
+////    Display calendar on click of menuBars
+//    public function actionCalendar()
+//    {
+//        $this->guestUserHandler();
+//        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+//        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
+//        return $this->render('calendar');
+//    }
 
     /**
      * Modify inline text: Teacher
@@ -733,27 +719,66 @@ class CourseController extends AppController
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
+
         $params = $this->getRequestParams();
         $inlineTextId = $params['id'];
         $saveTitle = '';
         if(isset($params['id']))
         {
             $pageTitle = 'Modify Inline Text';
-            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
+            if($this->isPost()){
+                $params = $_POST;
+                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
+                $saveChanges = new InlineText();
+                $saveChanges->saveChanges($params);
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            }
+
             $saveTitle = AppConstant::SAVE_BUTTON;
+
         }
         else{
             $pageTitle = 'Add Inline Text';
+            if($this->isPost()){
+                $params = $_POST;
+
+                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
+                $saveChanges = new InlineText();
+                $lastInlineId = $saveChanges->saveChanges($params);
+
+                $saveItems = new Items();
+                $lastItemsId = $saveItems->saveItems($courseId,$lastInlineId,'InlineText');
+                $courseItemOrder = Course::getItemOrder($courseId);
+//                AppUtility::dump($courseItemOrder->itemorder);
+                $itemorder = $courseItemOrder->itemorder;
+//                foreach($courseItemOrder as $key => $itemOrder)
+//                {
+//                    $items = unserialize($itemOrder['itemorder']);
+//                    $blocktree = 0;
+//                    $sub =& $items;
+//                    AppUtility::dump($sub);
+//                    for ($i=1;$i<count($blocktree);$i++) {
+//                        $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+//                        array_unshift($sub,$lastItemsId);
+//                    }
+//                    $itemorder = addslashes(serialize($items));
+//                }
+                $items = unserialize($itemorder);
+                $blocktree = 0;
+                $sub =& $items;
+                for ($i=1;$i<count($blocktree);$i++) {
+                        $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                        array_unshift($sub,$lastItemsId);
+                    }
+                $itemorder = addslashes(serialize($items));
+                AppUtility::dump($itemorder);
+                $saveItemOrderIntoCourse = new Course();
+                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            }
             $saveTitle = AppConstant::New_Item;
         }
-        if($this->isPost()){
-            $params = $_POST;
-
-            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
-            $saveChanges = new InlineText();
-            $saveChanges->saveChanges($params);
-
-         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'course' => $course, 'page_formActionTag' => $page_formActionTag);
         return $this->render('modifyInlineText', $returnData);

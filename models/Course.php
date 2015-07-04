@@ -128,11 +128,16 @@ class Course extends BaseImasCourses {
         $student->save();
     }
 
-    public static function setItemOrder($itemList,$courseId)
+    public function setItemOrder($itemList, $courseId)
     {
         $course = Course::findOne(['id' => $courseId]);
         $course->itemorder = $itemList;
         $course->save();
+    }
+
+    public static function getItemOrder($courseId)
+    {
+        return Course::findOne(['id' => $courseId]);
     }
 
 
