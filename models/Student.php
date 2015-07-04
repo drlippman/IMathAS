@@ -196,4 +196,17 @@ class Student extends BaseImasStudents {
     {
         return static::find()->where(['courseid' => $cId])->all();
     }
+
+    public static function findCount($courseId)
+    {
+        $query = new Query();
+        $query->select(['count(id)'])
+                 ->from('imas_students')
+                ->where(['courseid' => $courseId])
+                ->andWhere(['NOT LIKE','section', 'NULL']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
 } 

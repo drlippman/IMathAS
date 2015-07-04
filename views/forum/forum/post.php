@@ -143,7 +143,7 @@ $currentLevel = 0;
                        onClick="toggleitem(<?php echo $index ?>)">
                         </span>
             <b><?php echo $data['subject'] ?></b><br/>Posted by: <a
-            <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $courseId . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>,<?php echo $data['postdate'] ?>
+            <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>,<?php echo $data['postdate'] ?>
 
             <?php
             if (strtotime($data['postdate']) >= $data['lastView']) {

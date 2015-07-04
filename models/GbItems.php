@@ -87,14 +87,29 @@ class GbItems extends BaseImasGbitems
                 $d->save();
             }
         }
-//        AppUtility::dump($grade);
-//        $this->showdate = $showdate;
-//        $this->gbcategory = $params['AddGradesForm']['GradeBookCategory'];
-//        $this ->rubric = $params['rubric'];
-//        $this->cntingb = $count;
-//        $this->tutoredit = $params['AddGradesForm']['TutorAccess'];
-//        $this->save();
-//        return $this->id;
+
+    }
+
+    public static  function findOfflineGradeItemForOutcomes($courseId,$istutor,$catfilter, $now)
+    {
+        $query = new Query();
+        $query->select(['*'])
+            ->from('imas_gbitems')
+            ->where(['courseid'=>$courseId])
+            ->andWhere(['<>','outcomes',''])
+            ->andWhere(['<','showdate',$now])
+            ->andWhere(['>','cntingb',0])
+            ->andWhere(['<','cntingb',3]);
+        if ($istutor) {
+            $query->andWhere(['<','tutoredit', 2]);
+        }
+        if ($catfilter>-1) {
+            $query->andWhere(['gbcategory' => $catfilter]);
+        }
+        $query->orderBy('showdate');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
 }

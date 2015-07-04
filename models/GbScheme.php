@@ -27,4 +27,14 @@ class GbScheme extends BaseImasGbscheme
         $this->save();
         return $this->id;
     }
+
+    public static  function getByCourseId($courseId)
+    {
+       $result = GbScheme::find()->select('useweights,orderby,defaultcat,usersort')->where(['courseid'=> $courseId])->all();
+        return $result;
+
+
+
+
+    }
 }

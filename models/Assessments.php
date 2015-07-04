@@ -53,4 +53,25 @@ class Assessments extends BaseImasAssessments
     {
         return Assessments::find()->select('id,name')->where(['courseid' => $courseId])->orderBy('name')->all();
     }
+
+    public static function outcomeData($courseId,$istutor,$catfilter)
+    {
+        $query = new Query();
+        $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'defoutcome'])
+            ->from('imas_assessments')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['>', 'avail', 0])
+            ->andWhere(['>', 'cntingb', 0])
+            ->andWhere(['<', 'cntingb', 3]);
+        if($istutor){
+            $query->andWhere(['<', 'tutoredit', 2]);
+        }
+        if($catfilter > -1){
+            $query->andWhere(['gbcategory' => $catfilter]);
+        }
+        $query->orderBy('enddate','name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 } 

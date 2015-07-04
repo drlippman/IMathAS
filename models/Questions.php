@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppUtility;
 use app\models\_base\BaseImasQuestions;
 
 class Questions extends BaseImasQuestions
@@ -22,4 +23,11 @@ class Questions extends BaseImasQuestions
     {
         return static::findAll(['id' => $id]);
     }
+
+   public static function findQuestionForOuctome($dataId)
+   {
+        $query = Questions::find()->select('points,id,category')->where(['assessmentid' =>$dataId])->all();
+       return $query;
+
+   }
 } 

@@ -1,31 +1,43 @@
 $(document).ready(function () {
     initEditor();
-    $("#addNewThread").one('click',function()
+    $("#addNewThread").click(function()
     {
-        document.getElementById("addNewThread").disabled = 'true';
+
 
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
             var subject = $(".subject").val();
-        var date = $( "#datepicker-id input" ).val();
-        var time = $("#w1").val();
-        var postType = "";
-        var selected = $("#post-type-radio-list input[type='radio']:checked");
-        if (selected.length > 0) {
-            postType = selected.val();
-        }
-        var alwaysReplies = "";
-        var selected = $("#always-replies-radio-list input[type='radio']:checked");
-        if (selected.length > 0) {
-            alwaysReplies = selected.val();
-        }
-            var body = $("#message").val();
-            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time };
-            jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
+            if(!subject.length > 0)
+            {
+                $('#flash-message').show();
+                $(".subject").css('border-color', 'red');
+                $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank");
+            }else
+            {
+                document.getElementById("addNewThread").disabled = 'true';
+                var date = $( "#datepicker-id input" ).val();
+                var time = $("#w1").val();
+                var postType = "";
+                var selected = $("#post-type-radio-list input[type='radio']:checked");
+                if (selected.length > 0) {
+                    postType = selected.val();
+                }
+                var alwaysReplies = "";
+                var selected = $("#always-replies-radio-list input[type='radio']:checked");
+                if (selected.length > 0) {
+                    alwaysReplies = selected.val();
+                }
+                var body = $("#message").val();
+                var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time };
+                jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
+            }
     });
-
-
+    $("input").keypress(function(){
+        $(".subject").css('border-color', '');
+        $('#flash-message').hide();
+    });
 });
+
 function newThreadSuccess(response)
 {
     var forumId = $("#forumId").val();

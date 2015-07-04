@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <br><br>
     <div>
         <div class="col-md-2"><b>Subject</b></div>
-        <div class="col-md-8"><input class="subject form-control" type="text"></div>
+        <div class="col-md-8"><input class="subject form-control" type="text" ></div>
     </div>
     <br><br><br>
     <div>
@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
  <?php }?>
     <div class="col-md-4  col-lg-offset-2">
-    <input type="submit" class="btn btn-primary" id="addNewThread" value="Post Thread">
+    <input type="button" class="btn btn-primary" id="addNewThread" value="Post Thread">
         </div>
     
 </div>

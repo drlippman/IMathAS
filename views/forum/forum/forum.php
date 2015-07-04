@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
     <?php if(!empty($forum)){?>
    <div id="display">
-    <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table">
+    <table id="forum-table display-forum" class="forum-table table table-bordered table-striped table-hover data-table">
         <thead>
         <tr>
             <th>Forum Name</th>
@@ -63,8 +63,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 </div>
 
-<div id="searchthread">
-    <table id="forumsearch-table displayforum" class="forumsearch-table table table-bordered table-striped table-hover data-table">
+<div id="search-thread">
+    <table id="forum-search-table display-forum" class="forum-search-table table table-bordered table-striped table-hover data-table">
         <thead>
 
         <th>Topic</th>
@@ -74,12 +74,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         </thead>
-        <tbody class="forumsearch-table-body">
+        <tbody class="forum-search-table-body">
         </tbody>
     </table>
 
 </div>
-<div id="searchpost"></div>
+<div id="search-post"></div>
 <div id="result">
     <h5><Strong>No result found for your search.</Strong></h5>
 </div>

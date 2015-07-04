@@ -235,10 +235,11 @@ function threadSuccess(response)
     $("a[name=view-tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
         var html = '<div><p>Thread Views : </p></div><p>';
-        html +=  '<span class="col-lg-11" >Name </span><span>LastView </span><br>';
+        html +=  '<span class="col-lg-11" >Name     LastView </span><br>';
         $.each(uniquesDataArray, function (index, uniqueEntry) {
+            console.log(uniqueEntry);
             if(threadsid == uniqueEntry.threadId){
-                html += '<span class="col-lg-12 pull-left " >'+ uniqueEntry.name +'</span><span class="">'+uniqueEntry.lastView+'</span><br>';
+                html += '<span class="col-lg-12 pull-left " >'+ uniqueEntry.name +''+uniqueEntry.lastView+'</span><br>';
             }
 
         });

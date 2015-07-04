@@ -2,8 +2,8 @@ $(document).ready(function ()
 {
     var courseId = $('.courseId').val();
     jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
-    $('#searchthread').hide();
-    $('#searchpost').hide();
+    $('#search-thread').hide();
+    $('#search-post').hide();
     $('#result').hide();
 
     $('#forum_search').click(function ()
@@ -23,17 +23,17 @@ $(document).ready(function ()
                 $('#flash-message').hide();
                 if(val == 'subject')
                 {
-                    $('#searchthread').show();
+                    $('#search-thread').show();
                     $('#display').hide();
-                    $('#searchpost').hide();
+                    $('#search-post').hide();
                     $('#result').hide();
                     jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
                 }
                 else
                 {
-                    $('#searchthread').hide();
+                    $('#search-thread').hide();
                     $('#display').hide();
-                    $('#searchpost').show();
+                    $('#search-post').show();
                     $('#result').hide();
                     jQuerySubmit('get-search-post-ajax',{search: search, courseid: courseId , value: val},'postSuccess');
 
@@ -65,11 +65,11 @@ function postSuccess(response)
 {
     var courseId = $('.courseId').val();
     response = JSON.parse(response);
-    console.log(response);
+
     if (response.status == 0)
     {
         var html =" ";
-        $('#searchpost').empty();
+        $('#search-post').empty();
         var postData = response.data.data;
         $.each(postData, function(index, Data)
         {
@@ -83,12 +83,12 @@ function postSuccess(response)
                 html += "<label id='message'>"+result+"</label>";
                 html += "<p><a href='post?courseid=" + courseId + "&threadid=" + Data.threadId +"&forumid="+ Data.forumiddata+"'</a>Show full thread</p>";
                 html += "</div>\n";
-                $('#searchpost').append(html);
+                $('#search-post').append(html);
         });
     }
     else
     {
-        $('#searchpost').hide();
+        $('#search-post').hide();
         $('#result').show();
     }
 }
@@ -97,7 +97,7 @@ function threadSuccess(response)
 {
     var courseId = $('.courseId').val();
     response = JSON.parse(response);
-    console.log(response);
+
     if (response.status == 0)
     {
         var searchdata = response.data;
@@ -109,14 +109,14 @@ function threadSuccess(response)
             html += "<td>" + search.views + "</td>";
             html += "<td>" + search.postdate + "</td>";
        });
-      $(".forumsearch-table-body tr").remove();
-      $(".forumsearch-table-body").append(html);
-      $('.forumsearch-table').DataTable();
+      $(".forum-search-table-body tr").remove();
+      $(".forum-search-table-body").append(html);
+      $('.forum-search-table').DataTable();
     }
     else
     {
         $('#result').show();
-        $('#searchthread').hide();
+        $('#search-thread').hide();
     }
 
 }

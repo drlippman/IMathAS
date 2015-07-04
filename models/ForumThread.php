@@ -39,5 +39,11 @@ class ForumThread extends BaseImasForumThreads
         }
     }
 
+    public static function findThreadCount($forumId)
+    {
+        $thread = ForumThread::findAll(['forumid' => $forumId]);
+        return $thread;
+    }
+
 
 }

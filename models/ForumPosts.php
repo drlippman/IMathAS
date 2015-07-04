@@ -7,6 +7,7 @@ use app\models\_base\BaseImasForumPosts;
 
 use app\models\forms\ForumForm;
 use Yii;
+use yii\db\Query;
 
 
 class ForumPosts extends BaseImasForumPosts
@@ -129,6 +130,19 @@ class ForumPosts extends BaseImasForumPosts
     {
         $parentThread = ForumPosts::findOne(['threadid' => $parent]);
         return $parentThread;
+    }
+
+    public static function findCount($threadId)
+    {
+
+        $query = new Query();
+        $query->select(['count(parent) as count'])
+            ->from('imas_forum_posts')
+            ->where(['parent' => $threadId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
     }
 
 }
