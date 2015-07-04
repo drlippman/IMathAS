@@ -7,6 +7,7 @@ use kartik\date\DatePicker;
 $this->title = 'Modify InlineText';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+$hidetitle = false;
 ?>
 
 
@@ -15,8 +16,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <span class=form>Title: </span>
 	<span class=formright>
         <!-- Title-->
-		<input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$inlineText['title']);?>"><br/>
-		<input type="checkbox" name="hidetitle" value="1" />Hide title and icon
+         <?php $title = 'Enter title here';
+            if($inlineText['title']){
+                $title = $inlineText['title'];
+         } ?>
+        <input type=text size=0 name=title value="<?php echo $title ;?>"><br/>
+
+		<input type="checkbox" name="hidetitle" value="1" <?php writeHtmlChecked($hidetitle,true) ?>/>Hide title and icon
 	</span>
         <!--    Text Editor-->
     <BR class=form>
@@ -24,7 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <?php echo "<span class='left col-md-11'><div class= 'editor'>
             <textarea id='inlineText' name='inlineText'  style='width: 100%;' rows='20' cols='200'>";
-                echo htmlentities($inlineText['text']);?>
+                $text = "<p>Enter text here</p>";
+                if($inlineText['text'])
+                {
+                    $text = $inlineText['text'];
+                }
+               echo htmlentities($text);?>
             </textarea>
     </div>
 

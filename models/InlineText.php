@@ -46,8 +46,24 @@ class InlineText extends BaseImasInlinetext
         return $this->id;
     }
 
-    public static function getLastId($lastId)
+    public function updateChanges($params, $inlineTextId)
     {
-
+        $updateIdArray = InlineText::find()->where(['id' => $inlineTextId])->all();
+        foreach($updateIdArray as $key => $updateId)
+        {
+        $updateId->title = isset($params['title']) ? $params['title'] : null;
+        $updateId->courseid = 1;
+        $updateId->text = isset($params['inlineText']) ? $params['inlineText'] : null;
+        $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
+//        $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
+        $updateId->startdate = 1435293000;
+//        $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
+        $updateId->enddate = 2000000000;
+        $updateId->oncal = isset($params['oncal']) ? $params['oncal'] : null;
+        $updateId->caltag ='!';
+        $updateId->isplaylist = 0;
+//        AppUtility::dump($this);
+        $updateId->save();
+        }
     }
 } 

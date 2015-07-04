@@ -128,7 +128,7 @@ class Course extends BaseImasCourses {
         $student->save();
     }
 
-    public function setItemOrder($itemList, $courseId)
+    public static function setItemOrder($itemList, $courseId)
     {
         $course = Course::findOne(['id' => $courseId]);
         $course->itemorder = $itemList;
@@ -139,7 +139,6 @@ class Course extends BaseImasCourses {
     {
         return Course::findOne(['id' => $courseId]);
     }
-
 
     public static function getOutcome($courseId){
         return Course::find()->select('outcomes')->where(['id' => $courseId])->all();

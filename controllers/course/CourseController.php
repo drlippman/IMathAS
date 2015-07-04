@@ -719,6 +719,7 @@ class CourseController extends AppController
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
+        $hidetitle = false;
 
         $params = $this->getRequestParams();
         $inlineTextId = $params['id'];
@@ -729,8 +730,12 @@ class CourseController extends AppController
             if($this->isPost()){
                 $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
+                if ($params['title']=='##hidden##') {
+                    $hidetitle = true;
+                    $params['title']='';
+                }
                 $saveChanges = new InlineText();
-                $saveChanges->saveChanges($params);
+                $saveChanges->updateChanges($params, $inlineTextId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
             }
 
@@ -741,37 +746,31 @@ class CourseController extends AppController
             $pageTitle = 'Add Inline Text';
             if($this->isPost()){
                 $params = $_POST;
-
+                AppUtility::dump($params);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
+                if ($params['title']=='##hidden##') {
+                    $hidetitle = true;
+                    $params['title']='';
+                }
                 $saveChanges = new InlineText();
                 $lastInlineId = $saveChanges->saveChanges($params);
 
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId,$lastInlineId,'InlineText');
                 $courseItemOrder = Course::getItemOrder($courseId);
-//                AppUtility::dump($courseItemOrder->itemorder);
                 $itemorder = $courseItemOrder->itemorder;
-//                foreach($courseItemOrder as $key => $itemOrder)
-//                {
-//                    $items = unserialize($itemOrder['itemorder']);
-//                    $blocktree = 0;
-//                    $sub =& $items;
-//                    AppUtility::dump($sub);
-//                    for ($i=1;$i<count($blocktree);$i++) {
-//                        $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-//                        array_unshift($sub,$lastItemsId);
-//                    }
-//                    $itemorder = addslashes(serialize($items));
-//                }
+
                 $items = unserialize($itemorder);
-                $blocktree = 0;
+
+                $blocktree = array(0);
                 $sub =& $items;
+
                 for ($i=1;$i<count($blocktree);$i++) {
                         $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-                        array_unshift($sub,$lastItemsId);
+
                     }
+                array_unshift($sub,intval($lastItemsId));
                 $itemorder = addslashes(serialize($items));
-                AppUtility::dump($itemorder);
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
 
@@ -780,7 +779,7 @@ class CourseController extends AppController
             $saveTitle = AppConstant::New_Item;
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'course' => $course, 'page_formActionTag' => $page_formActionTag);
+        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'hidetitle' => $hidetitle, 'page_formActionTag' => $page_formActionTag);
         return $this->render('modifyInlineText', $returnData);
     }
 

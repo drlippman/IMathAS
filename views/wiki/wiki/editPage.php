@@ -23,13 +23,17 @@ foreach($wikiRevisionData as $key => $singleData) {
         <div class= 'editor'>
             <textarea id='wikicontent' name='wikicontent' style='width: 100%;' rows='30' cols='60'>
 
-                <?php foreach($wikiRevisionData as $key => $singleRevision){
+                <?php
+                    if(!empty($wikiRevisionData)){
+                foreach($wikiRevisionData as $key => $singleRevision){
                     $wikicontent = $singleRevision->revision;
                     $wikiContent = str_replace(array("\r","\n"),' ', $wikicontent);
                     $wikiContent = preg_replace('/\s+/',' ', $wikicontent);
                     ?>
                     <?php echo $wikiContent;?>
-                <?php }?>
+                <?php
+                    }
+                }?>
 
             </textarea>
             <input type="hidden" name="time" value="<?php echo $singleRevision->time;?>" />
