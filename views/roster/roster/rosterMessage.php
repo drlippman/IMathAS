@@ -1,16 +1,22 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+use app\components\AppConstant;
 
 $this->title = 'Send Mass Message';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+if($gradebook == AppConstant::NUMERIC_ONE){
+    $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+}else{
+    $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+}
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <form name="myForm" action="roster-message" method="post" id="roster-form">
 <div class="student-roster-message">
     <input type="hidden" name="isMessage" value="1"/>
+    <input type="hidden" name="gradebook" value="<?php echo $gradebook ?>"/>
     <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
     <h2><b>Send Mass Message</b></h2>
@@ -52,7 +58,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </div>
     <div class=" col-lg-offset-2 col-md-10"><br>
         <input type="submit" class="btn btn-primary " id="message-button" value="Send Message" style="margin-left: 0px">
+        <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
+        <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
+        <?php }else {?>
         <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+        <?php } ?>
     </div>
     <div>
         <span><p class="col-md-3"><br>Unless limited, message will be sent to:</p></span>

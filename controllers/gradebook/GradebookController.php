@@ -2308,14 +2308,35 @@ class GradebookController extends AppController
         $responseData = array('model' => $model,'gradeNames' => $gradeNames,'course' => $course);
         return $this->renderWithData('manageOfflineGrades', $responseData);
 
-
     }
-    public function actionGradeDeleteAjax()
+
+//Controller method to assign lock on students.
+    public function actionMarkLockAjax()
     {
+        $this->layout = false;
         $params = $this->getRequestParams();
+        foreach ($params['checkedstudents'] as $students) {
+            Student::updateLocked($students, $params['courseid']);
+        }
+        return $this->successResponse();
+    }
+//Controller method to Unenroll students.
+    public function actionMarkUnenrollAjax()
+    {
+        $this->layout = false;
+        $params = $this->getRequestParams();
+        foreach ($params['checkedstudents'] as $students) {
+            Student::deleteStudent($students, $params['courseid']);
+        }
+        return $this->successResponse();
+    }
+
+ public function actionGradeDeleteAjax()
+{
+    $params = $this->getRequestParams();
 //        AppUtility::dump($params);
-            foreach($params['checkedMsg'] as $gradeId){
-                GbItems::deleteById($gradeId);
+    foreach($params['checkedMsg'] as $gradeId){
+        GbItems::deleteById($gradeId);
 
             }
         return $this->successResponse();

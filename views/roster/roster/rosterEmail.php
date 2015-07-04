@@ -1,15 +1,21 @@
 <?php
 use yii\helpers\Html;
+use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Send Mass E-mail';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='. $course->id]];
+if($gradebook == AppConstant::NUMERIC_ONE){
+    $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+}else{
+    $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+}
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <form name="myEmailForm" action="roster-email" method="post" id="roster-form">
 <div class="student-roster-email">
     <input type="hidden" name="isEmail" value="1"/>
+    <input type="hidden" name="gradebook" value="<?php echo $gradebook ?>"/>
     <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
     <input type="hidden" name="courseId" value='<?php echo $course->id ?>'/>
 
@@ -47,7 +53,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </span>
     <div class="col-lg-offset-2 col-md-10"><br>
         <input type="submit" class="btn btn-primary" id="email-button" value="Send Email">
-        <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+        <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
+        <?php }else {?>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+        <?php } ?>
     </div>
     <div>
         <span><p class="col-md-3">Unless limited, message will be sent to:</p></span>

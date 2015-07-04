@@ -724,7 +724,7 @@ class RosterController extends AppController
 
 //Controller method to assign lock on student.
     public function actionMarkLockAjax()
-    {
+    {AppUtility::dump("hiii");
         $this->layout = false;
         $params = $this->getRequestParams();
         foreach ($params['checkedstudents'] as $students) {
@@ -738,6 +738,7 @@ class RosterController extends AppController
         $this->guestUserHandler();
         if ($this->isPost()) {
             $selectedStudents = $this->getRequestParams();
+            $isGradebook = $selectedStudents['gradebook'];
             $emailSender = $this->getAuthenticatedUser();
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : AppConstant::NUMERIC_ZERO;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
@@ -753,10 +754,14 @@ class RosterController extends AppController
                         array_push($studentArray, $student->attributes);
                     }
                     $this->includeJS(['roster/rosterEmail.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', '', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-                    $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                    $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course,  'gradebook' => $isGradebook);
                     return $this->renderWithData('rosterEmail', $responseData);
                 } else {
-                    return $this->redirect('student-roster?cid=' . $courseId);
+                    if($isGradebook == AppConstant::NUMERIC_ONE){
+                        return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+                    } else {
+                        return $this->redirect('student-roster?cid=' . $courseId);
+                    }
                 }
             } else {
                 $students = array();
@@ -810,11 +815,20 @@ class RosterController extends AppController
                     }
                     $this->sendEmailToSelectedUser($subject, $message, $studentArray);
                 }
-                return $this->redirect('student-roster?cid=' . $courseId);
+                if($isGradebook == AppConstant::NUMERIC_ONE){
+                    return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+                } else {
+                    return $this->redirect('student-roster?cid=' . $courseId);
+                }
             }
         } else {
             $courseId = $this->getParamVal('cid');
-            return $this->redirect('student-roster?cid=' . $courseId);
+            $isGradebook = $this->getParamVal('gradebook');
+            if($isGradebook == AppConstant::NUMERIC_ONE){
+                return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+            } else {
+                return $this->redirect('student-roster?cid=' . $courseId);
+            }
         }
     }
 
@@ -841,6 +855,7 @@ class RosterController extends AppController
         if ($this->isPost()) {
             $this->guestUserHandler();
             $selectedStudents = $this->getRequestParams();
+            $isGradebook = $selectedStudents['gradebook'];
             $isActionForMessage = isset($selectedStudents['isMessage']) ? $selectedStudents['isMessage'] : AppConstant::NUMERIC_ZERO;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
             if (!$isActionForMessage) {
@@ -854,10 +869,14 @@ class RosterController extends AppController
                         array_push($studentArray, $student->attributes);
                     }
                     $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-                    $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                    $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'gradebook' => $isGradebook);
                     return $this->renderWithData('rosterMessage', $responseData);
                 } else {
-                    return $this->redirect('student-roster?cid=' . $courseId);
+                    if($isGradebook == AppConstant::NUMERIC_ONE){
+                        return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+                    } else {
+                        return $this->redirect('student-roster?cid=' . $courseId);
+                    }
                 }
             } else {
                 $students = array();
@@ -897,14 +916,12 @@ class RosterController extends AppController
                     foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
-                    return $this->redirect('student-roster?cid=' . $courseId);
                 } elseif ($selectedStudents['messageCopyToSend'] == 'selfAndStudents') {
                     foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
                     }
                     $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
                     $this->sendMassMessage($courseId, $user->id, $subject, $messageToTeacher, $save);
-                    return $this->redirect('student-roster?cid=' . $courseId);
                 } elseif ($selectedStudents['messageCopyToSend'] == 'teachersAndStudents') {
                     foreach ($filteredStudents as $singleStudent) {
                         $this->sendMassMessage($courseId, $singleStudent, $subject, $messageBody, $notSaved);
@@ -914,12 +931,21 @@ class RosterController extends AppController
                         $messageToTeacher = $messageBody . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br>$toList\n");
                         $this->sendMassMessage($courseId, $teacher['userid'], $subject, $messageToTeacher, $save);
                     }
+                }
+                if($isGradebook == AppConstant::NUMERIC_ONE){
+                    return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+                } else {
                     return $this->redirect('student-roster?cid=' . $courseId);
                 }
             }
         } else {
             $courseId = $this->getParamVal('cid');
-            return $this->redirect('student-roster?cid=' . $courseId);
+            $isGradebook = $this->getParamVal('gradebook');
+            if($isGradebook == AppConstant::NUMERIC_ONE){
+                return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$courseId));
+            } else {
+                return $this->redirect('student-roster?cid=' . $courseId);
+            }
         }
     }
 

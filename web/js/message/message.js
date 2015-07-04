@@ -13,12 +13,14 @@ $(document).ready(function () {
     markAsUnread();
     markAsDelete();
     limitToTagShow();
+    filterByCourse();
 });
 
 var messageData;
 var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
+var courseInfo = [];
 function createTableHeader() {
     var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
     html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
@@ -78,6 +80,7 @@ function showMessage(messageData, status) {
 function showMessageSuccess(response) {
     response = JSON.parse(response);
     messageData = response.data;
+    calculateCourseList();
     if(response.status == 0)
     {
         var filterArrayForUser = [];
@@ -114,8 +117,8 @@ function getCourseSuccess(response) {
     var result = JSON.parse(response);
     var course = result.data;
     if (result.status == 0) {
-        courseDisplay(course);
-        filterByCourse();
+        //courseDisplay(course);
+        //filterByCourse();
     }
 }
 
@@ -386,3 +389,16 @@ function picshow(size) {
 
 }
 
+function calculateCourseList(){
+    var name= [];
+    var courseTest= [];
+    $.each(messageData, function (index, msg) {
+        if(!inArray(msg.name,name)){
+            var obj = {courseName:msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1), courseId:msg.courseid}
+            name.push(msg.name);
+            courseInfo.push(obj);
+        }
+    });
+    courseDisplay(courseInfo);
+    //filterByCourse();
+}

@@ -14,7 +14,7 @@ function markAsUnread() {
 function markAsUnreadSuccess(response) {
     var result = JSON.parse(response);
     if (result.status == 0) {
-        var cid = $(".course-id").val();
+        var cid = $(".send-msg").val();
         window.location = "index?cid=" + cid;
     }
 }
@@ -56,12 +56,12 @@ function markAsDelete() {
 function markAsDeleteSuccess(response) {
     var result = JSON.parse(response);
     if (result.status == 0) {
-        var cid = $(".course-id").val();
+        var cid = $(".send-msg").val();
         window.location = "index?cid=" + cid;
     }
 }
 
-function showtrimmedcontent(el) {alert(el);
+function showtrimmedcontent(el) {
     if (el.innerHTML.match(/Show/)) {
         document.getElementById("trimmed").style.display="block";
         el.innerHTML = "[Hide trimmed content]";

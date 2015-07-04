@@ -114,4 +114,21 @@ function initEditor()
 
     });
 }
+//function to find unique element in array
+Array.prototype.unique = function()
+{
+    var tmp = {}, out = [];
+    for(var i = 0, n = this.length; i < n; ++i)
+    {
+        if(!tmp[this[i]]) { tmp[this[i]] = true; out.push(this[i]); }
+    }
+    return out;
+}
+function inArray(needle, haystack) {
+    var length = haystack.length;
+    for(var i = 0; i < length; i++) {
+        if(haystack[i] == needle) return true;
+    }
+    return false;
+}
 

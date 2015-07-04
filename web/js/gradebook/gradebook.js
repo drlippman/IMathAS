@@ -1,9 +1,13 @@
 $(document).ready(function () {
     var courseId = $(".course-info").val();
     var userId = $(".user-info").val();
+    studentMessage();
+    copyStudentEmail();
     var allMessage = {courseId: courseId, userId:userId};
     jQuerySubmit('display-gradebook-ajax', allMessage, 'showGradebookSuccess');
     selectCheckBox();
+    studentLock();
+
 });
 var gradebookData;
 var data;
@@ -259,7 +263,7 @@ function displayGradebook() {
         }
         html += "<td class='locked' scope='row'><div class='trld'>";
         if(gradebookData[i][0][0] != "Averages" && data.isTeacher){
-            html += "<input type=\"checkbox\" name='checked[]' value='"+gradebookData[i][4][0]+"/>&nbsp;";
+            html += "<input type=\"checkbox\" name='checked' value='"+gradebookData[i][4][0]+"'/>&nbsp;";
         }
         html += "<a href='#'>";
         if(gradebookData[i][4][1] > 0) {
@@ -617,4 +621,145 @@ function unhighlightrow(el) {
     el.className = el.getAttribute("lastclass");
 }
 
+function studentLock() {
+    $('#lock-btn').click(function (e) {
+        var course_id = $("#course-id").val();
+        var markArray = [];
+        var dataArray = [];
+        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+            markArray.push($(this).val());
+            dataArray.push($(this).parent().text());
+        });
 
+        if (markArray.length != 0) {
+            var html = '<div><p>Are you SURE you want to lock the selected students out of the course?</p></div><p>';
+            $.each(dataArray, function (index, studentData) {
+                html += studentData + '<br>';
+            });
+            var cancelUrl = $(this).attr('href');
+            e.preventDefault();
+            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Yes, Lock Out Student": function () {
+                        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        $(this).dialog("close");
+                        var data = {checkedstudents: markArray, courseid: course_id};
+                        jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
+                        return true;
+                    },
+                    "Cancel": function () {
+
+                        $(this).dialog('destroy').remove();
+                        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
+        }
+        else {
+            var msg = "Select atleast one student.";
+            CommonPopUp(msg);
+        }
+    });
+}
+function markLockSuccess(response){
+    location.reload();
+}
+
+function studentUnenroll() {
+        var course_id = $("#course-id").val();
+        var markArray = [];
+        var dataArray = [];
+        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+            markArray.push($(this).val());
+            dataArray.push($(this).parent().text());
+        });
+        if (markArray.length != 0) {
+
+            var html = '<div><p><b style = "color: red">Warning!</b>:&nbsp;This will delete ALL course data about these students. This action cannot be undone. ' +
+                'If you have a student who isn\'t attending but may return, use the Lock Out of course option instead of unenrolling them.</p><p>Are you SURE' +
+                ' you want to unenroll the selected students?</p></p></div>';
+            $.each(dataArray, function (index, studentData) {
+                html += studentData + '<br>';
+            });
+            var cancelUrl = $(this).attr('href');
+            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                width: '730', resizable: false,
+                closeText: "hide",
+                buttons: {
+                    "Unenroll": function () {
+                        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        $(this).dialog("close");
+                        var data = {checkedstudents: markArray, courseid: course_id};
+                        jQuerySubmit('mark-unenroll-ajax', data, 'markUnenrollSuccess');
+                        return true;
+                    },
+                    "Lock Students Out Instead": function () {
+                        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        $(this).dialog("close");
+                        var data = {checkedstudents: markArray, courseid: course_id};
+                        jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
+                        return true;
+                    },
+                    "Cancel": function () {
+
+                        $(this).dialog('destroy').remove();
+                        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+                            $(this).prop('checked', false);
+                        });
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                }
+            });
+        }
+        else {
+            var msg = "Select atleast one student.";
+            CommonPopUp(msg);
+        }
+}
+function markUnenrollSuccess(response) {
+    location.reload();
+}
+function createStudentList(appendId, e){
+    var markArray = [];
+    $('.gradebook-table input[name = "checked"]:checked').each(function () {
+        markArray.push($(this).val());
+    });
+    if (markArray.length != 0) {
+        appendId.value = markArray;
+    } else {
+        var msg = "Select atleast one student.";
+        CommonPopUp(msg);
+        e.preventDefault();
+    }
+}
+function studentMessage() {
+    $('#roster-message').click(function (e) {
+        var appendId =  document.getElementById("message-id");
+        createStudentList(appendId, e);
+    });
+}
+function copyStudentEmail() {
+    $('#roster-email').click(function (e) {
+        var appendId =  document.getElementById("student-id");
+        createStudentList(appendId, e);
+    });
+}

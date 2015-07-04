@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
 <?php } ?>
+<input type="hidden" class="msg-id" value="<?php echo $messages['id'] ?>">
 <div id="headerviewmsg">
     <h2>Message</h2>
 </div>
