@@ -112,5 +112,30 @@ class AssessmentUtility extends Component
                 return 'selected="selected"';
             }
         }
-    }}
+    }
+
+    public static function createItemOrder($key,$countCourseDetails,$parent,$blockList) {
+        global $toolset;
+        if (($toolset&4)==4) {
+            return '';
+        }
+        $key = $key+1;
+        $html = "<select class=\"mvsel\" id=\"$parent-$key\" onchange=\"moveitem($key,$parent)\">\n";
+        for ($i = 1; $i <= $countCourseDetails; $i++) {
+            $html .= "<option value=\"$i\" ";
+            if ($i==$key) { $html .= "SELECTED";}
+            $html .= ">$i</option>\n";
+        }
+        for ($i=0; $i<count($blockList); $i++) {
+            if ($key!=$blockList[$i]) {
+                $html .= "<option value=\"B-{$blockList[$i]}\">" . sprintf(_('Into %s'),$blockList[$i]) . "</option>\n";
+            }
+        }
+        if ($parent!='0') {
+            $html .= '<option value="O-' . $parent . '">' . _('Out of Block') . '</option>';
+        }
+        $html .= "</select>\n";
+        echo $html;
+    }
+}
 

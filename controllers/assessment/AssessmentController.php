@@ -148,7 +148,7 @@ class AssessmentController extends AppController
         $courseId =$this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
-        if($assessmentId) {
+        if($courseId) {
             $assessmentData = Assessments::getByAssessmentId($assessmentId);
             if (isset($params['id'])) {
                 $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId,$user);
@@ -181,7 +181,60 @@ class AssessmentController extends AppController
                 }
                 $saveTitle = AppConstant::SAVE_BUTTON;
             }else{//page load in add mode set default values
+                $assessmentData['name'] = "Enter assessment name";
+                $assessmentData['summary'] = "Enter summary here (shows on course page)";
+                $assessmentData['intro'] = "<p>Enter intro/instructions</p>";
+                $startDate = time()+AppConstant::SECONDS*AppConstant::SECONDS;
+                $endDate = time() + AppConstant::WEEK_TIME;
+                $assessmentData['startdate'] = $startDate;
+                $assessmentData['enddate'] = $endDate;
+                $assessmentData['avail'] = AppConstant::NUMERIC_ONE;
+                $assessmentData['reviewdate'] = AppConstant::NUMERIC_ZERO;
+                $timeLimit = AppConstant::NUMERIC_ZERO;
+                $assessmentData['displaymethod']= "SkipAround";
+                $assessmentData['defpoints'] = AppConstant::NUMERIC_TEN;
+                $assessmentData['defattempts'] = AppConstant::NUMERIC_ONE;
+                $assessmentData['password'] = '';
+                $testType = "AsGo";
+                $showAnswer = "A";
+                $assessmentData['defpenalty'] = AppConstant::NUMERIC_TEN;
+                $assessmentData['shuffle'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['minscore'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['isgroup'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['showhints']= AppConstant::NUMERIC_ONE;
+                $assessmentData['reqscore'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['reqscoreaid'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['groupsetid'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['noprint'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['groupmax'] = AppConstant::NUMERIC_SIX;
+                $assessmentData['allowlate'] = AppConstant::NUMERIC_ONE;
+                $assessmentData['exceptionpenalty'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['tutoredit'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['eqnhelper'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['ltisecret'] = '';
+                $assessmentData['caltag'] = '?';
+                $assessmentData['calrtag'] = 'R';
+                $assessmentData['showtips'] = AppConstant::NUMERIC_TWO;
+                $useDefFeedback = false;
+                $defFeedback = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
+                $gradebookCategory = AppConstant::NUMERIC_ZERO;
+                $pointCountInGb = AppConstant::NUMERIC_ONE;
+                $pointCountInGb = AppConstant::NUMERIC_THREE;
+                $showQuestionCategory = AppConstant::NUMERIC_ZERO;
+                $assessmentData['posttoforum'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['msgtoinstr'] = AppConstant::NUMERIC_ZERO;
+                $assessmentData['defoutcome'] = AppConstant::NUMERIC_ZERO;
+                $assessmentSessionData = false;
+
+                $saveTitle = AppConstant::CREATE_BUTTON;
             }
+            if ($assessmentData['minscore']>AppConstant::NUMERIC_THOUSAND) {
+                $assessmentData['minscore'] -= AppConstant::NUMERIC_THOUSAND;
+                $minScoreType = AppConstant::NUMERIC_ONE; //pct;
+            } else {
+                $minScoreType = AppConstant::NUMERIC_ZERO; //points;
+            }
+
             $now = time();
             if ($assessmentData['minscore']>AppConstant::NUMERIC_THOUSAND) {
                 $assessmentData['minscore'] -= AppConstant::NUMERIC_THOUSAND;
@@ -192,14 +245,14 @@ class AssessmentController extends AppController
             if ($assessmentData['reviewdate'] > AppConstant::NUMERIC_ZERO) {
                 if ($assessmentData['reviewdate']=='2000000000') {
                     $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
-                    $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
+                    $reviewTime = $now; //tzdate("g:i a",$assessmentData['enddate']+7*24*60*60);
                 } else {
                     $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['reviewdate']);
                     $reviewTime = AppUtility::tzdate("g:i a",$assessmentData['reviewdate']);
                 }
             } else {
                 $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
-                $reviewTime = $now; //tzdate("g:i a",$line['enddate']+7*24*60*60);
+                $reviewTime = $now; //tzdate("g:i a",$assessmentData['enddate']+7*24*60*60);
             }
 
             if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO}==='L') {

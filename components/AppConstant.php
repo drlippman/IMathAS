@@ -90,6 +90,7 @@ class AppConstant
     const SECONDS = 60;
     const DEFAULT_FEEDBACK = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
     const SAVE_BUTTON = "Save Changes";
+    const CREATE_BUTTON = "Create Assessment";
     const DEFAULT_OUTCOMES = 'No default outcome selected';
     const GROUP_SET ='Create new set of groups';
     const NONE = "None";

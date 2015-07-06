@@ -37,7 +37,6 @@ class InstructorController extends AppController
     public function actionIndex()
     {
         $courseId = $this->getParamVal('cid');
-
         $type = $this->getParamVal('type');
         if($type){
             switch ($type) {
@@ -78,7 +77,7 @@ class InstructorController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $message = Message::getByCourseIdAndUserId($courseId, $user->id);
-        $isreadArray = array(0, 4, 8, 12);
+        $isreadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
         $msgList = array();
         if($message){
             foreach($message as $singleMessage){
@@ -91,16 +90,14 @@ class InstructorController extends AppController
         /**
          * Display Items
          */
-        if ($course && !isset($courseData['tb']) && !isset($courseData['remove'])) {
-            $itemOrders = unserialize($course->itemorder);
-            if ($itemOrders) {
+        if ($course && count($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
+
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
-                    if (is_array($itemOrder)) {
+                    if (is_array($itemOrder) && count($blockItems = $itemOrder['items'])) {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
                         $tempItemList = array();
-                        if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
                                 $tempItem = array();
                                 $item = Items::getById($blockItem);
@@ -132,7 +129,6 @@ class InstructorController extends AppController
                                 }
                                 array_push($tempItemList, $tempItem);
                             }
-                        }
                         $tempAray['itemList'] = $tempItemList;
                         array_push($responseData, $tempAray);
                     } else {
@@ -175,7 +171,7 @@ class InstructorController extends AppController
                         }
                     }
                 }
-            }
+
 
         }else{
             if (isset($courseData['tb'])) {
@@ -224,8 +220,6 @@ class InstructorController extends AppController
                 $itemOrder = addslashes(serialize($items));
                 Course::setItemOrder($itemOrder,$courseId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
-            }else{
-                $this->setErrorFlash(AppConstant::WRONG_OPTION);
             }
         }
         /*
@@ -285,7 +279,6 @@ class InstructorController extends AppController
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->renderWithData('index', $returnData);
     }
-
     /**
      * Display assessment details
      */
@@ -299,9 +292,7 @@ class InstructorController extends AppController
         $questionRecords = Questions::getByAssessmentId($id);
         $questionSet = QuestionSet::getByQuesSetId($id);
         $course = Course::getById($courseId);
-
         $this->saveAssessmentSession($assessment, $id);
-
         $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css']);
         $this->includeJS(['timer.js']);
         $returnData = array('cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time());
@@ -311,7 +302,6 @@ class InstructorController extends AppController
     public function saveAssessmentSession($assessment, $id)
     {
         list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
-
         $bestscorelist = $scorelist . ';' . $scorelist . ';' . $scorelist;
         $scorelist = $scorelist . ';' . $scorelist;
         $bestattemptslist = $attemptslist;

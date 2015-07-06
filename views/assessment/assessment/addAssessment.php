@@ -443,5 +443,3 @@ AssessmentUtility::writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTuto
 </div>
 </fieldset>
 <div class=submit><input class=""  type=submit name="" value="<?php echo $saveTitle;?>"></div>
-<?php
-?>

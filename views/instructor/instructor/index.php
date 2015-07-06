@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+use app\components\AssessmentUtility;
 use app\components\AppConstant;
 
 $this->title = $course->name;
@@ -73,28 +74,7 @@ echo $html;
     $assessment = $blockList = array();
 
     foreach($courseDetail as $key => $item){
-        global $toolset;
-        if (($toolset&4)==4) {
-            return '';
-        }
-        $key = $key+1;
-        $html = "<select class=\"mvsel\" id=\"$parent-$key\" onchange=\"moveitem($key,$parent)\">\n";
-        for ($i = 1; $i <= $countCourseDetails; $i++) {
-            $html .= "<option value=\"$i\" ";
-            if ($i==$key) { $html .= "SELECTED";}
-            $html .= ">$i</option>\n";
-        }
-        for ($i=0; $i<count($blockList); $i++) {
-            if ($key!=$blockList[$i]) {
-                $html .= "<option value=\"B-{$blockList[$i]}\">" . sprintf(_('Into %s'),$blockList[$i]) . "</option>\n";
-            }
-        }
-        if ($parent!='0') {
-            $html .= '<option value="O-' . $parent . '">' . _('Out of Block') . '</option>';
-        }
-        $html .= "</select>\n";
-        echo $html;
-
+      echo AssessmentUtility::createItemOrder($key,$countCourseDetails,$parent,$blockList);
     switch(key($item)):
     case 'Assessment': ?>
         <?php $assessment = $item[key($item)];
@@ -186,7 +166,7 @@ echo $html;
 
          <?php break; ?>
 
-        <!-- ///////////////////////////// Forum here /////////////////////// -->
+        <!-- ///////////////////////////// Forum here /////////////////////// -->,
     <?php case 'Forum': ?>
         <?php $forum = $item[key($item)]; ?>
         <?php if ($forum->avail != AppConstant::NUMERIC_ZERO && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>

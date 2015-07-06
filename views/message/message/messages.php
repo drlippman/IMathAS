@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
-if($isNewMessage == 1){
+if($isNewMessage == AppConstant::NUMERIC_ONE){
     $this->title = 'New Messages';
 }else{
     $this->title = 'Messages';
