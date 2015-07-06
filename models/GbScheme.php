@@ -14,6 +14,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasGbscheme;
+use yii\db\Query;
 
 class GbScheme extends BaseImasGbscheme
 {
@@ -30,11 +31,7 @@ class GbScheme extends BaseImasGbscheme
 
     public static  function getByCourseId($courseId)
     {
-       $result = GbScheme::find()->select('useweights,orderby,defaultcat,usersort')->where(['courseid'=> $courseId])->all();
+       $result = GbScheme::findOne(['courseid'=> $courseId]);
         return $result;
-
-
-
-
     }
 }

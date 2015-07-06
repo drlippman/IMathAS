@@ -22,43 +22,64 @@ $this->params['breadcrumbs'][] = $this->title;
         jQuerySubmit('get-outcome-report-ajax',{courseId:courseId},'outcomeReportResponse');
     });
 
-
+     var type = 1;
     function outcomeReportResponse(response)
     {
         response = JSON.parse(response);
 
 
         var html="";
-
+         console.log(response);
         if(response.status == 0)
         {
-            var studentData = response.data.studentOutcomeReportArray;
-            var html = "<table id='outcomeReport-table display-outcomeReport-table' class='outcomeReport-table display-outcomeReport-table table table-bordered table-striped table-hover data-table'><thead>";
-            for(i=0;i<studentData.header.length; i++)
-            {
+            var headerData = response.data.outcomeInfo;
+            var finalData = response.data.finalData;
+            var report = response.data.report;
+            var outc = response.data.outCome;
 
-                html += "<th>"+studentData.header[i]+"</th>";
-            }
-            html += "</thead><tbody class='outcomeReport-table-body'>";
-            $.each(studentData.data, function(index,outcomeData)
+             html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
+            var arr = '"S"';
+            $.each(outc, function(index,data)
             {
-                html += '<tr>';
-                html += "<td><a href='#'>" + outcomeData.userName + "</a></td>";
+                 html +='<th>'+headerData[data]+'<br/><a class="small" href="#">[Details]</a></th>';
+                arr += ',"N"';
+            });
+            html += '</tr>';
+
+
+            for(var i=0;i<finalData.length;i++)
+            {
+                html +='<tr class="'+(i%2==0?'even':'odd')+'">';
+                html +='<td><a href="#"></a></td>';
+                $.each(outc, function(index,data)
+                {
+
+                    if((finalData[i][3][type]) && (finalData[i][3][type][data]))
+                    {
+                        html += '<td>'+ round(100*finalData[i][3][type][data],1) +'%</td>';
+                    }
+                    else
+                    {
+                        html += '<td>-</td>';
+                    }
+
+                })
                 html += '</tr>';
 
-            });
-            html += "<tr><td><a href='#'>Average</a></td></tr>";
-            html+= '</tbody></table>';
+            }
+            html +='</tbody></table>';
+            html += initSortTable('myTable',Array(sarr),true,false);
             $('.outcomeReport-div').append(html);
-//           $(".outcomeReport-table").append(html);
-            $('#display-outcomeReport-table').DataTable({"bPaginate": false});
+            html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
+
+
+
 
         }
+ }
 
-
-    }
-
-    function createTableHeader() {
+    function createTableHeader()
+    {
 
     }
 

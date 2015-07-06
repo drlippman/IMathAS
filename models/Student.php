@@ -173,7 +173,7 @@ class Student extends BaseImasStudents {
         if($hidelocked){
             $query->andWhere(['imas_students.locked' => 0]);
         }
-        if(isset($timefilter)){AppUtility::dump("hello");
+        if(isset($timefilter)){
             $tf = time() - 60*60*$timefilter;
             $query->andWhere(['>', 'imas_users.lastaccess' ,$tf]);
         }
@@ -208,5 +208,53 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
 
+    }
+
+
+    public static function findStudentByCourseIdForOutcomes($courseId,$limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
+    {
+
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.SID', 'imas_users.FirstName', 'imas_users.LastName', 'imas_users.SID', 'imas_users.email', 'imas_students.section', 'imas_students.code', 'imas_students.locked', 'imas_students.timelimitmult', 'imas_students.lastaccess', 'imas_users.hasuserimg', 'imas_students.gbcomment'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId]);
+
+        if($limuser > 0)
+        {
+            $query->andWhere(['imas_users.id' => $limuser]);
+        }
+        if ($secfilter !=-1)
+        {
+            $query->andWhere(['imas_students.section' => $secfilter]);
+        }
+
+        if ($hidelocked) {
+            $query->andWhere(['imas_students.locked' => 0]);
+        }
+        if(isset($timefilter))
+        {
+            $tf = time() - 60*60*$timefilter;
+            $query->andWhere(['>', 'imas_users.lastaccess' ,$tf]);
+        }
+        if (isset($lnfilter) && $lnfilter!='') {
+            $query->andWhere(['LIKE', 'imas_users.LastName', $lnfilter.'%']) ;
+        }
+        if ($isdiag)
+        {
+            $query->orderBy('imas_users.email,imas_users.LastName,imas_users.FirstName');
+        }else if($hassection && $usersort==0)
+        {
+            $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName' );
+        }else
+        {
+            $query->orderBy('imas_users.LastName,imas_users.FirstName');
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 

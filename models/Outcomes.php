@@ -6,6 +6,7 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasOutcomes;
+use yii\db\Query;
 
 class Outcomes extends BaseImasOutcomes {
 
@@ -19,7 +20,14 @@ class Outcomes extends BaseImasOutcomes {
     }
     public static function getByCourseId($courseId)
     {
-         return Outcomes::findAll(['courseid' => $courseId]);
+//         return Outcomes::findAll(['courseid' => $courseId]);
+        $query = new Query();
+        $query -> select(['id','name'])
+               ->from('imas_outcomes')
+                ->where(['courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
     public static function getByCourse($courseId){

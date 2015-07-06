@@ -114,7 +114,25 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
     public static function findAssessmentsSession($courseId, $limuser){
         $query = new Query();
-        $query	->select(['imas_assessment_sessions.id', 'imas_assessment_sessions.assessmentid', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask', 'imas_assessment_sessions.feedback', 'imas_assessment_sessions.userid', 'imas_assessments.timelimit'])
+        $query	->select(['imas_assessment_sessions.id','imas_assessment_sessions.assessmentid', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask', 'imas_assessment_sessions.feedback', 'imas_assessment_sessions.userid', 'imas_assessments.timelimit'])
+            ->from('imas_assessments')
+            ->join(	'INNER JOIN',
+                'imas_assessment_sessions',
+                'imas_assessments.id = imas_assessment_sessions.assessmentid'
+            )
+            ->where(['imas_assessments.courseid' => $courseId]);
+        if($limuser > 0){
+            $query->andWhere(['imas_assessment_sessions.userid' => $limuser]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function findAssessmentForOutcomes($courseId, $limuser)
+    {
+        $query = new Query();
+        $query	->select(['imas_assessment_sessions.id','imas_assessment_sessions.assessmentid','imas_assessment_sessions.questions', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask', 'imas_assessment_sessions.feedback', 'imas_assessment_sessions.userid', 'imas_assessments.timelimit'])
             ->from('imas_assessments')
             ->join(	'INNER JOIN',
                 'imas_assessment_sessions',

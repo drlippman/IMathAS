@@ -71,6 +71,5 @@ class Exceptions extends BaseImasExceptions
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
 } 

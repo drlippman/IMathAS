@@ -45,5 +45,19 @@ class Grades extends BaseImasGrades
         return $data;
 
     }
+    public static function outcomeGrades($sel,$limuser)
+    {
+        $query = new Query();
+        $query->select(['*'])
+            ->from('imas_grades')
+            ->where([$sel]);
+        if ($limuser > 0)
+        {
+            $query->andWhere(["userid" => $limuser]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }
 

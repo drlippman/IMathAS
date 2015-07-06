@@ -160,5 +160,13 @@ class Course extends BaseImasCourses {
 
     }
 
+    public static function getByCourseIdOutcomes($courseId)
+    {
+
+        return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
+
+
+    }
+
 }
 
