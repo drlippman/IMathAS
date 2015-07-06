@@ -131,4 +131,19 @@ function inArray(needle, haystack) {
     }
     return false;
 }
+function isKeyPresent(array,index){
+var count = 0;
+    if(array != undefined){
+        $.each(array,function(key,element){
+           if(key == index){
+               count++;
+           }
+        });
+        if(count != 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
+}

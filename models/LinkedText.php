@@ -31,7 +31,7 @@ class LinkedText extends BaseImasLinkedtext
         if ($catfilter>-1) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }*/
-        $query->orderBy('enddate', 'startdate');
+        $query->orderBy('enddate, startdate');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

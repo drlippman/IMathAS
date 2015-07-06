@@ -961,9 +961,11 @@ class RosterController extends AppController
 //Controller method to make exception
     public function actionMakeException()
     {
+        $isGradebook = null;
         $this->guestUserHandler();
         if ($this->getRequestParams()) {
             $data = $this->getRequestParams();
+            $isGradebook = $data['gradebook'];
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
             $assessments = Assessments::getByCourseId($courseId);
@@ -1067,7 +1069,7 @@ class RosterController extends AppController
                             }
                             if (isset($params['sendMsg'])) {
                                 $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
-                                $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course);
+                                $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'gradebook' => $isGradebook);
                                 return $this->renderWithData('rosterMessage', $responseData);
                             }
                         }
@@ -1081,7 +1083,7 @@ class RosterController extends AppController
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
             }
             $this->includeJS(['roster/makeException.js']);
-            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg);
+            $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg, 'gradebook' =>  $isGradebook);
             return $this->renderWithData('makeException', $responseData);
         } else {
             $this->setErrorFlash(AppConstant::NO_USER_FOUND);
@@ -1161,6 +1163,7 @@ class RosterController extends AppController
         if ($this->isPost()) {
             $this->guestUserHandler();
             $selectedStudents = $this->getRequestParams();
+            $isGradebook = $selectedStudents['gradebook'];
             $selectedStudentId = explode(',', $selectedStudents['student-data']);
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
             $course = Course::getById($courseId);
@@ -1176,7 +1179,7 @@ class RosterController extends AppController
                 array_push($studentData, $sendto);
             }
             $studentList = implode($studentData);
-            $responseData = array('studentData' => $studentList, 'course' => $course);
+            $responseData = array('studentData' => $studentList, 'course' => $course, 'gradebook' => $isGradebook);
             $this->includeJS(['general.js']);
             return $this->renderWithData('copyStudentEmail', $responseData);
         } else {

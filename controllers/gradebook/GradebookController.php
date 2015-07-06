@@ -1893,7 +1893,7 @@ class GradebookController extends AppController
 //        for($i=2;$i<count($gradebook);$i++){
 //            for($j=1;$j<count($gradebook[0][1]);$j++){
 //                if($gradebook[0][1][$j][6]==0)
-//                AppUtility::dump($gradebook[0][1]);
+//                AppUtility::dump($gradebook);
 //            }
 //        }
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,

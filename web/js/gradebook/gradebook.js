@@ -2,12 +2,13 @@ $(document).ready(function () {
     var courseId = $(".course-info").val();
     var userId = $(".user-info").val();
     studentMessage();
-    copyStudentEmail();
+    studentEmail();
     var allMessage = {courseId: courseId, userId:userId};
     jQuerySubmit('display-gradebook-ajax', allMessage, 'showGradebookSuccess');
     selectCheckBox();
     studentLock();
-
+    studentCopyEmail();
+    teacherMakeException();
 });
 var gradebookData;
 var data;
@@ -20,7 +21,7 @@ function chgtoggle(){
 }
 
 function showGradebookSuccess(response){
-console.log(response);
+//console.log(response);
     var result = JSON.parse(response);
     //console.log(result.data)
     gradebookData = result.data.gradebook;
@@ -29,7 +30,6 @@ console.log(response);
         data.availShow = 1;
         hidePast = true;
     }
-
     displayGradebook();
 }
 function selectCheckBox() {
@@ -99,49 +99,49 @@ function displayGradebook() {
         }
     }
 
-    //if(data.totOnLeft != undefined && data.totOnLeft != null && !hidePast){
-    //    //total totals
-    //    if(data.catFilter < 0) {
-    //        if(gradebookData[0][3][0] != undefined || gradebookData[0][3][0] != null){
-    //            html += "<th><div><span class='cattothdr'>Total<br/>"+gradebookData[0][3][data.availShow]+"&nbsp;pts</span></div></th>";
-    //            html += "<th><div>%</div></th>";
-    //            n += 2;
-    //        } else {
-    //            html += "<th><div><span class='cattothdr'>Weighted Total %</span></div></th>";
-    //            n++;
-    //        }
-    //    }
-    //    if(gradebookData[0][2].length > 1 || data.catFilter != -1){ //want to show cat headers?
-    //        for(i=0;i<gradebookData[0][2].length;i++){ // category headers
-    //            if((data.availShow<2 || data.availShow==3) && gradebookData[0][2][i][2]>1){
-    //                continue;
-    //            } else if(data.availShow==2 && gradebookData[0][2][i][2]==3){
-    //                continue;
-    //            }
-    //            html += "<th class='cat'"+gradebookData[0][2][i][1]+"><div><span class='cattothdr'>";
-    //            if(data.availShow<3){//using points based
-    //                html += gradebookData[0][2][i][0]+"<br/>";
-    //                if(gradebookData[0][3][0] != null || gradebookData[0][3][0] != undefined){
-    //                    html += gradebookData[0][2][i][3+data.availShow]+"&nbsp;pts";
-    //                } else {
-    //                    html += gradebookData[0][2][i][11]+"%";
-    //                }
-    //            } else if (data.availShow == 3){//past and attempted
-    //                html += gradebookData[0][2][i][0];
-    //                if(gradebookData[0][2][i][11] != null || gradebookData[0][2][i][11] != undefined){
-    //                    html += "<br>"+gradebookData[0][2][i][11]+"%";
-    //                }
-    //            }
-    //            if(collapseGbCat[gradebookData[0][2][i][1]]==0){
-    //                html += "<br/><a class='small' href='#'>[Collapse]</a>";
-    //            } else{
-    //                html += "<br/><a class='small' href='#'>[Expand]</a>";
-    //            }
-    //            html += "</span></div></th>";
-    //            n++;
-    //        }
-    //    }
-    //}
+    if(data.totOnLeft != undefined && data.totOnLeft != null && hidePast != undefined){
+        //total totals
+        if(data.catFilter < 0) {
+            if(gradebookData[0][3][0] != undefined || gradebookData[0][3][0] != null){
+                html += "<th><div><span class='cattothdr'>Total<br/>"+gradebookData[0][3][data.availShow]+"&nbsp;pts</span></div></th>";
+                html += "<th><div>%</div></th>";
+                n += 2;
+            } else {
+                html += "<th><div><span class='cattothdr'>Weighted Total %</span></div></th>";
+                n++;
+            }
+        }
+        if(gradebookData[0][2].length > 1 || data.catFilter != -1){ //want to show cat headers?
+            for(i=0;i<gradebookData[0][2].length;i++){ // category headers
+                if((data.availShow<2 || data.availShow==3) && gradebookData[0][2][i][2]>1){
+                    continue;
+                } else if(data.availShow==2 && gradebookData[0][2][i][2]==3){
+                    continue;
+                }
+                html += "<th class='cat'"+gradebookData[0][2][i][1]+"><div><span class='cattothdr'>";
+                if(data.availShow<3){//using points based
+                    html += gradebookData[0][2][i][0]+"<br/>";
+                    if(gradebookData[0][3][0] != null || gradebookData[0][3][0] != undefined){
+                        html += gradebookData[0][2][i][3+data.availShow]+"&nbsp;pts";
+                    } else {
+                        html += gradebookData[0][2][i][11]+"%";
+                    }
+                } else if (data.availShow == 3){//past and attempted
+                    html += gradebookData[0][2][i][0];
+                    if(gradebookData[0][2][i][11] != null || gradebookData[0][2][i][11] != undefined){
+                        html += "<br>"+gradebookData[0][2][i][11]+"%";
+                    }
+                }
+                if(collapseGbCat[gradebookData[0][2][i][1]]==0){
+                    html += "<br/><a class='small' href='#'>[Collapse]</a>";
+                } else{
+                    html += "<br/><a class='small' href='#'>[Expand]</a>";
+                }
+                html += "</span></div></th>";
+                n++;
+            }
+        }
+    }
     if(data.catFilter>-2){
         for (i=0;i<gradebookData[0][1].length;i++){//assessment headers
             if(!data.isTeacher && !data.isTutor && gradebookData[0][1][i][4]==0){//skip if hidden
@@ -285,11 +285,20 @@ function displayGradebook() {
         }
         for (j=(gradebookData[0][0][1] == 'ID'?1:2);j<gradebookData[0][0].length;j++){
             if(gradebookData[i][0][j]){
-                html += "<td class='c'>"+insideDiv+gradebookData[i][0][j]+endDiv+"</td>";
+                if(j == 2){
+                    html += "<td class='c section-class' id='"+gradebookData[i][4][0]+"'>"+insideDiv+gradebookData[i][0][j]+endDiv+"</td>";
+                }else{
+                    html += "<td class='c'>"+insideDiv+gradebookData[i][0][j]+endDiv+"</td>";
+                }
             }else{
-                html += "<td></td>";
+                if(j == 2){
+                    html += "<td section-class></td>";
+                }else{
+                    html += "<td></td>";
+                }
             }
         }
+
         if(data.totOnLeft && !hidePast){
             //total totals
             if(data.catFilter < 0) {
@@ -385,22 +394,27 @@ function displayGradebook() {
                 if(collapseGbCat[gradebookData[0][1][j][1]] == 2){
                     continue;
                 }
-               // if online, not average, and either score exists and active, or score doesn't exist and assess is current,
-               // if(gradebookData[0][1][j][6]==0 && gradebookData[i][1][j][4]!='average' && ((gradebookData[i][1][j][3]!=undefined && gradebookData[i][1][j][3] > 9) || (!gradebookData[i][1][j][3] && gradebookData[0][1][j][3]==1))){
-               //     html += "<td class='c isact'>"+insideDiv;
-                //} else {
-                    html += "<td class='c'>"+insideDiv;
-                //}
-                //if(gradebookData[i][1][j][5] && (gradebookData[i][1][j][5]&(1<<data.availShow)) && !hidePast){
-                //    html += "<span style='font-style:italic'>";
-                //}
+                if(isKeyPresent(gradebookData[i][1][j],4)== true){
+                    if(gradebookData[0][1][j][6]==0 && gradebookData[i][1][j][4]!='average' && ((gradebookData[i][1][j][3]!=undefined && gradebookData[i][1][j][3] > 9) || (!gradebookData[i][1][j][3] && gradebookData[0][1][j][3]==1))){
+                        html += "<td class='c isact'>"+insideDiv;
+                    }
+                    else{
+                        html += "<td class='c isact'>"+insideDiv;
+                    }
+                } else{
+                    html += "<td class='c isact'>"+insideDiv;
+                }
 
+                if(isKeyPresent(gradebookData[i][1][j],5)== true) {
+                    if (gradebookData[i][1][j][5] && (gradebookData[i][1][j][5] & (1 << data.availShow)) && hidePast != undefined) {
+                        html += "<span style='font-style:italic'>";
+                    }
+                }
                 if(gradebookData[0][1][j][6]==0){//online
-                    //if (gradebookData[i][1][j][0]) {
-                    if (gradebookData[i][1][j]) {
+                    if(isKeyPresent(gradebookData[i][1][j],0)){
                         if (data.isTutor && gradebookData[i][1][j][4] == 'average') {
 
-                        } else if (gradebookData[i][1][j][4]=='average') {
+                        }else if (gradebookData[i][1][j][4]=='average') {
                             html += "<a href='#'onmouseover=\"tipshow(this,'5-number summary:"+gradebookData[0][1][j][9]+"')\" onmouseout=\"tipout()\">";
                         } else {
                             html += "<a href ='#'>"
@@ -425,7 +439,7 @@ function displayGradebook() {
                         if (gradebookData[i][1][j][1] == 1) {
                             html += "<sup>*</sup>";
                         }
-                    }else { //no score
+                    } else { //no score
                         if (gradebookData[i][0][0]=='Averages') {
                             html += "-";
                         } else if (data.isTeacher) {
@@ -434,17 +448,19 @@ function displayGradebook() {
                             html += "-";
                         }
                     }
-                    //if (gradebookData[i][1][j][6] != undefined || gradebookData[i][1][j][6] != null) {
-                    //    if (gradebookData[i][1][j][6] > 1) {
-                    //        if (gradebookData[i][1][j][6]>2) {
-                    //            html += "<sup>LP("+(gradebookData[i][1][j][6]-1)+")</sup>";
-                    //        } else {
-                    //            html += "<sup>LP</sup>";
-                    //        }
-                    //    } else {
-                    //        html += "<sup>e</sup>";
-                    //    }
-                    //}
+                    if(isKeyPresent(gradebookData[i][1][j],6)){
+                        if (gradebookData[i][1][j][6] != undefined || gradebookData[i][1][j][6] != null) {
+                            if (gradebookData[i][1][j][6] > 1) {
+                                if (gradebookData[i][1][j][6]>2) {
+                                    html += "<sup>LP("+(gradebookData[i][1][j][6]-1)+")</sup>";
+                                } else {
+                                    html += "<sup>LP</sup>";
+                                }
+                            } else {
+                                html += "<sup>e</sup>";
+                            }
+                        }
+                    }
                 } else if (gradebookData[0][1][j][6]==1) { //offline
                     if (data.isTeacher) {
                         if (gradebookData[i][0][0] == 'Averages') {
@@ -757,9 +773,33 @@ function studentMessage() {
         createStudentList(appendId, e);
     });
 }
-function copyStudentEmail() {
+function studentEmail() {
     $('#roster-email').click(function (e) {
         var appendId =  document.getElementById("student-id");
         createStudentList(appendId, e);
+    });
+}
+function studentCopyEmail() {
+    $('#roster-copy-emails').click(function (e) {
+        var appendId =  document.getElementById("email-id");
+        createStudentList(appendId, e);
+    });
+}
+function teacherMakeException() {
+    $('#gradebook-makeExc').click(function (e) {
+        var markArray = [];
+        var sectionName;
+        $('.gradebook-table input[name = "checked"]:checked').each(function () {
+            markArray.push($(this).val());
+            sectionName = document.getElementById($(this).val()).textContent;
+        });
+        if (markArray.length != 0) {
+            document.getElementById("exception-id").value = markArray;
+            document.getElementById("section-name").value = sectionName;
+        } else {
+            var msg = "Select atleast one student.";
+            CommonPopUp(msg);
+            e.preventDefault();
+        }
     });
 }

@@ -2,17 +2,29 @@
 use app\components\AppUtility;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
+use app\components\AppConstant;
 
 $this->title = 'Manage Exception';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'List Students', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+if($gradebook == AppConstant::NUMERIC_ONE){
+    $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+}else{
+    $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+}
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 <div id="headermassexception" class="pagetitle"><h2>Manage Exceptions</h2></div>
+<?php if($gradebook == AppConstant::NUMERIC_ONE){?>
+    <form action="make-exception?cid=<?php echo $course->id ?>&gradebook=1" method="post" id="roster-form">
+<?php }else {?>
 <form action="make-exception?cid=<?php echo $course->id ?>" method="post" id="roster-form">
+<?php } ?>
+
+
     <div class="student-roster-exception">
         <input type="hidden" name="isException" value="1"/>
+        <input type="hidden" name="gradebook" value="<?php echo $gradebook ?>"/>
         <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
         <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
         <input type="hidden" name="section" value='<?php echo $section ?>'/>
@@ -121,7 +133,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                 <?php } ?>
             </ul>
             <input type="submit" class="btn btn-primary record-submit" id="change-record" value="Record Changes">
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
+            <?php }else {?>
+                <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <?php } ?>
         </div>
         <br>
         <div>

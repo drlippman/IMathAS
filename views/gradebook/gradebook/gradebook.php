@@ -31,8 +31,8 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
         <span> <input type="submit" class="btn btn-primary" id="roster-email" value="E-mail"></span>
     </form>
-    <form action="#" method="post" id="roster-form">
-<!--        <input type="hidden" id="email-id" name="student-data" value=""/>-->
+    <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/copy-student-email?cid='.$course->id.'&gradebook=1' ) ?>" method="post" id="roster-form">
+        <input type="hidden" id="email-id" name="student-data" value=""/>
         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
         <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy E-mails"></span>
     </form>
@@ -43,10 +43,10 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </form>
     <span> <a class="btn btn-primary" id="unenroll-btn" onclick="studentUnenroll()">Unenroll</a></span>
     <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
-    <form action="#" name="teacherMakeException" id="make-student" method="post">
-<!--        <input type="hidden" id="exception-id" name="student-data" value=""/>-->
-<!--        <input type="hidden" id="section-name" name="section-data" value=""/>-->
-        <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
+    <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/make-exception?cid='.$course->id.'&gradebook=1' ) ?>" name="teacherMakeException" id="make-student" method="post">
+        <input type="hidden" id="exception-id" name="student-data" value=""/>
+        <input type="hidden" id="section-name" name="section-data" value=""/>
+        <span> <input type="submit" class="btn btn-primary" id="gradebook-makeExc" value="Make Exception"></span>
     </form>
 </div><br/>
 

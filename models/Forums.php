@@ -52,7 +52,7 @@ class Forums extends BaseImasForums {
         if ($catfilter>-1) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
-        $query->orderBy('enddate', 'postby', 'replyby', 'startdate');
+        $query->orderBy('enddate, postby, replyby, startdate');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -69,7 +69,7 @@ class Forums extends BaseImasForums {
         if ($catfilter>-1) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
-        $query->orderBy('enddate', 'postby', 'replyby', 'startdate');
+        $query->orderBy('enddate, postby, replyby, startdate');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

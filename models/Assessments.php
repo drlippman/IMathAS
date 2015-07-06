@@ -43,7 +43,7 @@ class Assessments extends BaseImasAssessments
         if($catfilter > -1){
             $query->andWhere(['gbcategory' => $catfilter]);
         }
-        $query->orderBy('enddate','name');
+        $query->orderBy('enddate, name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -69,7 +69,7 @@ class Assessments extends BaseImasAssessments
         if($catfilter > -1){
             $query->andWhere(['gbcategory' => $catfilter]);
         }
-        $query->orderBy('enddate','name');
+        $query->orderBy('enddate, name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

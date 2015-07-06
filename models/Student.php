@@ -181,11 +181,11 @@ class Student extends BaseImasStudents {
             $query->andWhere(['LIKE', 'imas_users.LastName', $lnfilter.'%']) ;
         }
         if ($isdiag) {
-            $query->orderBy('imas_users.email', 'imas_users.LastName', 'imas_users.FirstName');
+            $query->orderBy('imas_users.email, imas_users.LastName, imas_users.FirstName');
         } else if ($hassection && $usersort==0) {
-            $query->orderBy('imas_students.section', 'imas_users.LastName', 'imas_users.FirstName');
+            $query->orderBy('imas_students.section, imas_users.LastName, imas_users.FirstName');
         } else {
-            $query->orderBy('imas_users.LastName', 'imas_users.FirstName');
+            $query->orderBy('imas_users.LastName, imas_users.FirstName');
         }
 
         $command = $query->createCommand();
