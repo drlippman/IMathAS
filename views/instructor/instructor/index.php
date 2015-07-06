@@ -98,158 +98,93 @@ echo $html;
     switch(key($item)):
     case 'Assessment': ?>
         <?php $assessment = $item[key($item)];
-        if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
+        if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
             ?>
             <div class="item">
                 <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
                 <div class="title">
-                    <?php if($assessment->timelimit > AppConstant::NUMERIC_ZERO) { //timelimit
-                        if($assessment->password == '') {?> <!--Set password-->
+                    <b>
+                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php  echo $assessment->name ?></a>
+                    </b>
+                    <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+
+                    <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){?>
+                        <BR>Hidden
+                    <?php }else { ?>
+                        <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                    <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
+
+                        <?php }else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO){?>
+                                 <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+<!--                        --><?php //}else if($assessment->startdate == 0){ ?>
+<!--                            <br>Due --><?php //echo AppUtility::formatDate($assessment->enddate); ?>
+<!--                        --><?php //}else if($assessment->enddate == AppConstant::ALWAYS_TIME){ ?>
+                       <?php }else{ ?>
+                                <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                        <?php } }?>
+            <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>
+            <a> Questions  </a>| <a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0')?>"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+        <?php }else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime) {
+                    ?>
+                    <div class="item">
+                        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+                        <div class="title">
                             <b>
                                 <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php  echo $assessment->name ?></a>
                             </b>
                             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                                <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){?>
-                                    <BR>Hidden <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>  <a>Questions</a> | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| <a>Delete </a>|<a> Copy </a>| <a>Grades</a>
-                                <?php }else { ?>
-                                    <?php if ($assessment->enddate != AppConstant::ALWAYS_TIME) { ?>
-                                        <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?> <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php }else {?>
-                                        <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php } }?>
-                                <!-- Use Late Pass here-->
-                                <?php if($students->latepass != AppConstant::NUMERIC_ZERO) {
-                                    if($students->latepass != AppConstant::NUMERIC_ZERO && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
-                                        ?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
-                                    <?php } ?>
-                                <?php } else {?>
-                                    <!--                                --><?php //echo "<p>You have no late passes remaining.</p>";?>
-                                <?php }?>
-                        <?php } else {?>
-                            <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
-                            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-
-                                <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){?>
-                                    <BR>Hidden <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>  <a>Questions</a> | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| <a>Delete </a>|<a> Copy </a>| <a>Grades</a>
-                                <?php }else {?>
-                                    <?php if ($assessment->enddate != AppConstant::ALWAYS_TIME) {  ?>
-                                        <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?> <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php }else { ?>
-                                        <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php } }?>
-                                <!-- Use Late Pass here-->
-                                <?php if($students->latepass != AppConstant::NUMERIC_ZERO) {
-                                    if($students->latepass != AppConstant::NUMERIC_ZERO && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
-                                        ?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
-                                    <?php } ?>
-                                <?php } else {?>
-                                    <!--                                    --><?php //echo "<p>You have no late passes remaining.</p>";?>
-                                <?php }?>
-
-                        <?php } ?>
-                    <?php } else { ?>
-                        <?php if($assessment->password == '') {?>
-                            <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
-
-                                <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){?>
-                                    <BR>Hidden <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>  <a>Questions</a> | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| <a>Delete </a>|<a> Copy </a>| <a>Grades</a>
-                                <?php }else { ?>
-                                    <?php if ($assessment->enddate != AppConstant::ALWAYS_TIME) { ?>
-                                        <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?> <?php
-                                        if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php }else { ?>
-                                        <?php  if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                    <?php } }?>
-                                <!-- Use Late Pass here-->
-                                <?php if($students->latepass != AppConstant::NUMERIC_ZERO) {?>
-                                    <?php if($students->latepass != AppConstant::NUMERIC_ZERO && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
-                                    <?php } ?>
-                                <?php } else {?>
-                                    <!--                            --><?php //echo "<p>You have no late passes remaining.</p>";?>
-                                <?php }?>
-
-                        <?php } else {?>
-                            <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
-                            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-
 
                             <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){?>
-                                <BR>Hidden <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>  <a>Questions</a> | <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>| <a>Delete </a>|<a> Copy </a>| <a>Grades</a>
-                            <?php }else {?>
-                                <?php if ($assessment->enddate != AppConstant::ALWAYS_TIME) { ?>
-                                    <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?> <?php if($assessment->allowlate != 0) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                                <?php }else { ?>
-                                        <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+                                <BR>Hidden
+                            <?php }else { ?>
+                                <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                                    <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
+                                <?php }else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO){?>
+                                    <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+                                <?php }else{ ?>
+                                    <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
                                 <?php } }?>
-                                <!-- Use Late Pass here-->
-                                <?php if($students->latepass != AppConstant::NUMERIC_ZERO) {
-                                    if($students->latepass != AppConstant::NUMERIC_ZERO && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
-                                        ?>
-                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
-                                        <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
-                                    <?php } ?>
-                                <?php } else {?>
-                                    <!--                                --><?php //echo "<p>You have no late passes remaining.</p>";?>
-                                <?php }?>
+                            <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>
+                            <a> Questions  </a>| <a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0')?>"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+                            <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) {?>
+                            <br>This assessment is in review mode - no scores will be saved
+                            <?php }
 
-                        <?php } ?>
-                    <?php }?>
+
+
+                            }else if ( $assessment->startdate == 0 || $assessment->enddate == AppConstant::ALWAYS_TIME ) {
+                            ?>
+                            <div class="item">
+                                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+                                <div class="title">
+                                    <b>
+                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php  echo $assessment->name ?></a>
+                                    </b>
+                                    <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
+
+                                    <?php if($assessment['avail'] == AppConstant::NUMERIC_ZERO){
+                                        if ( $assessment->startdate == 0){ ?>
+                                        <BR>Hidden
+                                    <?php }else { ?>
+                                        <?php if ($assessment->reviewdate >= AppConstant::NUMERIC_ZERO) { ?>
+                                            <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?>.
+<!--                                        --><?php //}else if (){?>
+<!--                                            <br>Available --><?php //echo AppUtility::formatDate($assessment->startdate); ?><!--, until --><?php //echo AppUtility::formatDate($assessment->enddate); ?>
+                                        <?php }else{ ?>
+                                            <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                                        <?php } } } ?>
+                                    <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?>
+                                    <a> Questions  </a>| <a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0')?>"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+                                    <?php  } ?>
+
                 </div>
                 <div class="itemsum">
                     <p><?php echo $assessment->summary ?></p>
                 </div>
             </div>
-        <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != AppConstant::NUMERIC_ZERO) && ($assessment->reviewdate > $currentTime)) {?>
-            <div class="item">
-                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
-                <div class="title">
-                    <?php if($assessment->password == '') {?>
-                        <b>
-                            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="assessment-link"><?php echo $assessment->name ?></a>
-                        </b>
-                        <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                        <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?>
-
-                                    <?php if($assessment->allowlate != AppConstant::NUMERIC_ZERO) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
 
 
-
-
-                            <BR>This assessment is in review mode - no scores will be saved.
-                        <?php } else { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?><?php if($assessment->allowlate != 0) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                            <BR>This assessment is in review mode - no scores will be saved.
-                        <?php } ?>
-                    <?php } else {?>
-                        <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
-                        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                        <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review.'; ?><?php if($assessment->allowlate != 0) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                            <BR>This assessment is in review mode - no scores will be saved.
-                        <?php } else { ?>
-                            <BR><?php echo 'Past Due Date of ' . AppUtility::formatDate($assessment->enddate) . '. Showing as Review until ' . AppUtility::formatDate($assessment->reviewdate) . '.'; ?><?php if($assessment->allowlate != 0) { echo 'LP';} ?> <a> Questions  </a>| <a href="'. AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$assessment->id.'&cid='.$course->id.'&block=0').'"> Settings  </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-                            <BR>This assessment is in review mode - no scores will be saved.
-                        <?php } ?>
-                    <?php } ?>
-                </div>
-                <div class="itemsum">
-                    <p><?php echo $assessment->summary ?></p>
-                </div>
-            </div>
-        <?php } ?>
-        <?php break; ?>
+         <?php break; ?>
 
         <!-- ///////////////////////////// Forum here /////////////////////// -->
     <?php case 'Forum': ?>

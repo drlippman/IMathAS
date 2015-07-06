@@ -316,6 +316,8 @@ class ForumController extends AppController
                 {
                     $moveThreadId = $params['thread-name'];
                     ForumPosts::updatePostMoveThread($thread_Id,$moveThreadId);
+                    Thread::deleteThreadById($thread_Id);
+
                 }
                 else
                 {

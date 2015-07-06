@@ -42,4 +42,9 @@ class Thread extends BaseImasForumThreads
 //        AppUtility::dump($prevNextValueArray);
         return $prevNextValueArray;
     }
+    public static function deleteThreadById($id)
+    {
+        $thread = Thread::findOne(['id' => $id]);
+        $thread->delete();
+    }
 } 
