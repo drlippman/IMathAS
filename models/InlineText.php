@@ -34,14 +34,18 @@ class InlineText extends BaseImasInlinetext
         $this->courseid = 1;
         $this->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $this->avail = isset($params['avail']) ? $params['avail'] : null;
-//        $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-        $this->startdate = 1435293000;
-//        $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
-        $this->enddate = 2000000000;
+
+        if($params['avail'] == 1)
+        {
+            AppUtility::dump('hii');
+//            $this->startdate = 1435293000;
+            $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
+            $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
+//            $this->enddate = 2000000000;
+        }
         $this->oncal = isset($params['oncal']) ? $params['oncal'] : null;
         $this->caltag ='!';
         $this->isplaylist = 0;
-//        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }
@@ -51,18 +55,27 @@ class InlineText extends BaseImasInlinetext
         $updateIdArray = InlineText::find()->where(['id' => $inlineTextId])->all();
         foreach($updateIdArray as $key => $updateId)
         {
+            if($params['hidetitle'] == '##hidden##')
+            {
+                $updateId->title = '';
+            }
         $updateId->title = isset($params['title']) ? $params['title'] : null;
         $updateId->courseid = 1;
         $updateId->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
-//        $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-        $updateId->startdate = 1435293000;
-//        $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
+            if($params['avail'] == 1)
+            {
+//                AppUtility::dump('hii');
+//                $this->startdate = 1435293000;
+////        $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
+//                $this->enddate = 2000000000;
+                $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
+                $this->enddate = isset($params['edatetype']) ? $params['edatetype'] : null;
+            }
         $updateId->enddate = 2000000000;
         $updateId->oncal = isset($params['oncal']) ? $params['oncal'] : null;
         $updateId->caltag ='!';
         $updateId->isplaylist = 0;
-//        AppUtility::dump($this);
         $updateId->save();
         }
     }

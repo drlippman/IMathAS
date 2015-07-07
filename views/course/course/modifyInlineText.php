@@ -42,6 +42,7 @@ $hidetitle = false;
     <!--File Attachment -->
 	<span class=form>Attached Files:</span>
 	<span class=wideformright>
+
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		    New file<sup>*</sup>: <input type="file" name="userfile" /> <br/>
 		    Description: <input type="text" name="newfiledescr"/><br/>

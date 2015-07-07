@@ -12,6 +12,7 @@ use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\forms\CourseSettingForm;
+use app\models\InstrFiles;
 use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
@@ -700,14 +701,14 @@ class CourseController extends AppController
         return $this->render('blockIsolate', $returnData);
     }
 
-////    Display calendar on click of menuBars
-//    public function actionCalendar()
-//    {
-//        $this->guestUserHandler();
-//        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
-//        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-//        return $this->render('calendar');
-//    }
+//    Display calendar on click of menuBars
+    public function actionCalendar()
+    {
+        $this->guestUserHandler();
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
+        return $this->render('calendar');
+    }
 
     /**
      * Modify inline text: Teacher
@@ -719,16 +720,17 @@ class CourseController extends AppController
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
-        $hidetitle = false;
 
         $params = $this->getRequestParams();
         $inlineTextId = $params['id'];
         $saveTitle = '';
         if(isset($params['id']))
         {
+            $hidetitle = false;
             $pageTitle = 'Modify Inline Text';
             if($this->isPost()){
                 $params = $_POST;
+//                AppUtility::dump($params);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
                 if ($params['title']=='##hidden##') {
                     $hidetitle = true;
@@ -738,20 +740,13 @@ class CourseController extends AppController
                 $saveChanges->updateChanges($params, $inlineTextId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
             }
-
             $saveTitle = AppConstant::SAVE_BUTTON;
-
         }
-        else{
+        else {
             $pageTitle = 'Add Inline Text';
             if($this->isPost()){
                 $params = $_POST;
-                AppUtility::dump($params);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
-                if ($params['title']=='##hidden##') {
-                    $hidetitle = true;
-                    $params['title']='';
-                }
                 $saveChanges = new InlineText();
                 $lastInlineId = $saveChanges->saveChanges($params);
 
@@ -779,8 +774,16 @@ class CourseController extends AppController
             $saveTitle = AppConstant::New_Item;
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'hidetitle' => $hidetitle, 'page_formActionTag' => $page_formActionTag);
+        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'hidetitle' => $hidetitle);
         return $this->render('modifyInlineText', $returnData);
+    }
+
+    public function actionGradeDeleteAjax()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $cid = $params['courseId'];
+//        $itemTable = Items::
     }
 
 }

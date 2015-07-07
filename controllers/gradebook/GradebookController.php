@@ -2221,14 +2221,9 @@ class GradebookController extends AppController
 //        AppUtility::dump($params);
         foreach ($params['checkedMsg'] as $gradeId) {
             GbItems::deleteById($gradeId);
-
-
-            foreach ($params['checkedMsg'] as $gradeId) {
-                GbItems::deleteById($gradeId);
-
-            }
-            return $this->successResponse();
         }
+            return $this->successResponse();
+
     }
 }
 

@@ -275,7 +275,7 @@ class InstructorController extends AppController
         $student = Student::getByCId($courseId);
 //        AppUtility::dump($user);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js']);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js', 'instructor.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->renderWithData('index', $returnData);
     }
