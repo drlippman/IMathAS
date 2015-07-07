@@ -147,3 +147,26 @@ var count = 0;
     }
 
 }
+function alertPopUp(message, e){
+    var html = '<div><p>'+message+'</p></div>';
+    var cancelUrl = $(this).attr('href');
+    e.preventDefault();
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "Confirm": function () {
+                $(this).dialog("close");
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+}

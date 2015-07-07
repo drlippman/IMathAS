@@ -5,7 +5,7 @@ use kartik\time\TimePicker;
 use app\components\AppConstant;
 
 $this->title = 'Manage Exception';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = ['label' => ucfirst($course->name), 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 if($gradebook == AppConstant::NUMERIC_ONE){
     $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
 }else{

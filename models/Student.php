@@ -257,4 +257,26 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function findStudentsCompleteInfo($courseId){
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.SID', 'imas_users.FirstName', 'imas_users.LastName', 'imas_users.SID', 'imas_users.email', 'imas_students.section', 'imas_students.code', 'imas_students.locked', 'imas_students.timelimitmult', 'imas_students.lastaccess', 'imas_users.hasuserimg', 'imas_students.gbcomment', 'imas_students.gbinstrcomment'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId])
+            ->orderBy('imas_users.LastName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public  static  function updateGbComments($key,$values, $courseId){
+        $query = Student::findOne(['userid' => $key, 'courseid' => $courseId]);
+        if($query){
+            $query->gbcomment = trim($values);
+            $query->save();
+        }
+    }
 } 

@@ -27,6 +27,7 @@ use app\models\Questions;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\Tutor;
+use app\models\User;
 use Yii;
 use yii\web\UploadedFile;
 use app\controllers\AppController;
@@ -2197,8 +2198,8 @@ class GradebookController extends AppController
     {
         $this->layout = false;
         $params = $this->getRequestParams();
-        foreach ($params['checkedstudents'] as $students) {
-            Student::updateLocked($students, $params['courseid']);
+        foreach ($params['checkedStudents'] as $students) {
+            Student::updateLocked($students, $params['courseId']);
         }
         return $this->successResponse();
     }
@@ -2209,8 +2210,8 @@ class GradebookController extends AppController
         $this->layout = false;
         $params = $this->getRequestParams();
 
-        foreach ($params['checkedstudents'] as $students) {
-            Student::deleteStudent($students, $params['courseid']);
+        foreach ($params['checkedStudents'] as $students) {
+            Student::deleteStudent($students, $params['courseId']);
         }
         return $this->successResponse();
     }
@@ -2224,6 +2225,23 @@ class GradebookController extends AppController
         }
             return $this->successResponse();
 
+    }
+//Controller method for gradebook comment
+    public function actionGbComments()
+    {
+        $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $course = Course::getById($this->getParamVal('cid'));
+        if(isset($params['isComment'])){
+            foreach($params as $key => $values){
+                Student::updateGbComments($key, $values, $course['id']);
+            }
+            return $this->redirect('gradebook?cid='.$course['id']);
+        }
+        $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
+        $this->includeJS(['gradebook/gbComments.js','gradebook/addgrades.js']);
+        $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo);
+        return $this->renderWithData('gbComments', $responseData);
     }
 }
 

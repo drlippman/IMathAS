@@ -280,7 +280,12 @@ function displayGradebook() {
             html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
         } else if (showPics == 2 && gradebookData[i][4][2] == 1){
             html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image big-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
-        } else {
+        }else if(showPics == 1 && gradebookData[i][4][2] == 0) {
+            html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image' src='../../Uploads/dummy_profile.jpg'></div></td>";
+        }else if(showPics == 2 && gradebookData[i][4][2] == 0) {
+            html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image big-image' src='../../Uploads/dummy_profile.jpg'></div></td>";
+        }
+        else {
             html += "<td>"+insideDiv+"<div class='trld'>&nbsp;</div></td>";
         }
         for (j=(gradebookData[0][0][1] == 'ID'?1:2);j<gradebookData[0][0].length;j++){
@@ -664,7 +669,7 @@ function studentLock() {
                             $(this).prop('checked', false);
                         });
                         $(this).dialog("close");
-                        var data = {checkedstudents: markArray, courseid: course_id};
+                        var data = {checkedStudents: markArray, courseId: course_id};
                         jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
                         return true;
                     },
@@ -719,7 +724,7 @@ function studentUnenroll() {
                             $(this).prop('checked', false);
                         });
                         $(this).dialog("close");
-                        var data = {checkedstudents: markArray, courseid: course_id};
+                        var data = {checkedStudents: markArray, courseId: course_id};
                         jQuerySubmit('mark-unenroll-ajax', data, 'markUnenrollSuccess');
                         return true;
                     },
@@ -728,7 +733,7 @@ function studentUnenroll() {
                             $(this).prop('checked', false);
                         });
                         $(this).dialog("close");
-                        var data = {checkedstudents: markArray, courseid: course_id};
+                        var data = {checkedStudents: markArray, courseId: course_id};
                         jQuerySubmit('mark-lock-ajax', data, 'markLockSuccess');
                         return true;
                     },
@@ -754,6 +759,7 @@ function studentUnenroll() {
 function markUnenrollSuccess(response) {
     location.reload();
 }
+
 function createStudentList(appendId, e){
     var markArray = [];
     $('.gradebook-table input[name = "checked"]:checked').each(function () {
@@ -767,24 +773,28 @@ function createStudentList(appendId, e){
         e.preventDefault();
     }
 }
+
 function studentMessage() {
     $('#roster-message').click(function (e) {
         var appendId =  document.getElementById("message-id");
         createStudentList(appendId, e);
     });
 }
+
 function studentEmail() {
     $('#roster-email').click(function (e) {
         var appendId =  document.getElementById("student-id");
         createStudentList(appendId, e);
     });
 }
+
 function studentCopyEmail() {
     $('#roster-copy-emails').click(function (e) {
         var appendId =  document.getElementById("email-id");
         createStudentList(appendId, e);
     });
 }
+
 function teacherMakeException() {
     $('#gradebook-makeExc').click(function (e) {
         var markArray = [];
