@@ -46,4 +46,10 @@ class Items extends BaseImasItems
         $this->save();
         return $this->id;
     }
+
+    public static function getByTypeId($id)
+    {
+        return Items::findOne(['typeid' => $id]);
+    }
+
 }

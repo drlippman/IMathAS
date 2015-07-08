@@ -20,7 +20,6 @@ $model->navigationLink = $selectionList['toolset'];
 $model->courseAsTemplate = $selectionList['isTemplate'];
 
 $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
-
 ?>
 
 <div class="site-login">
@@ -35,7 +34,6 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                 'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
             ],
         ]); ?>
-
         <div class="form-label-alignment">
 
             <?= $form->field($model, 'courseName')->textInput(); ?>
@@ -64,7 +62,6 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                         'class' => 'time'
                     ]
                 ]);
-
                 echo '</div>';?>
             </div>
 
@@ -77,6 +74,7 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
             <?= $form->field($model, 'latePasses')->textInput(); ?>
             <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
     </fieldset>
+
     <div class="form-group">
         <div class="col-lg-offset-3 course-btn">
             <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>

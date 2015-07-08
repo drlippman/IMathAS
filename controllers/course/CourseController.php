@@ -374,6 +374,7 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
 
         $this->includeCSS(['dashboard.css']);
+        $this->includeJS(['course/transferCourse.js']);
         $returnData = array('users' => $users, 'course' => $course);
         return $this->renderWithData('transferCourse', $returnData);
     }
@@ -778,12 +779,40 @@ class CourseController extends AppController
         return $this->render('modifyInlineText', $returnData);
     }
 
-    public function actionGradeDeleteAjax()
+    public function actionDeleteInlineText()
     {
         $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $cid = $params['courseId'];
-//        $itemTable = Items::
+        $courseId = $this->getParamVal('courseId');
+        $inlineId = $this->getParamVal('id');
+//        $b = $this->getParamVal('b');
+//        if($b){
+        $course = Course::getById($courseId);
+        $inlineText = InlineText::getById($inlineId);
+        $itemTypeid = Items::getByTypeId($inlineId);
+        $itemId = $itemTypeid->id;
+
+        $deleteItemId = Items::deletedItems($itemId);
+        $deleteInlineTextId = InlineText::deleteInlineTextId($inlineId);
+        $items = array();
+        $itemOrder = Course::getItemOrder($courseId);
+        $items = unserialize($itemOrder['itemorder']);
+
+        $blocktree = array(0);
+        $sub =& $items;
+
+        for ($i=1;$i<count($blocktree);$i++) {
+            $sub =& $sub[$blocktree[$i]-1]['items'];
+
+        }
+        $key = array_search($itemId, $sub);
+        array_splice($sub, $key, 1);
+
+        $itemorder = addslashes(serialize($items));
+
+        $saveItemOrderIntoCourse = new Course();
+        $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+        $returnData = array('inline' => $inlineText, 'course' => $course);
+        return $this->render('deleteInlineText', $returnData);
     }
 
 }

@@ -12,9 +12,9 @@ $this->title = 'About';
 <div class="col-lg-12">
     <h1><?= Html::encode($this->title) ?></h1>
 </div>
-<div class="col-lg-8 text-justify">
+<div class="col-lg-8 text-just"<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"ify">
 
-    <p><?= Yii::t('yii', 'OpenMath is a web based mathematics assessment and course management platform.') ?></p>
+    <p><?= AppUtility::t('OpenMath is a web based mathematics assessment and course management platform.') ?></p>
     <table>
         <tbody>
         <tr>

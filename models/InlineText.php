@@ -79,4 +79,9 @@ class InlineText extends BaseImasInlinetext
         $updateId->save();
         }
     }
+
+    public static function deleteInlineTextId($id)
+    {
+        return InlineText::deleteAll(['id' => $id]);
+    }
 } 

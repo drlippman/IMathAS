@@ -2508,6 +2508,10 @@ class AppUtility extends Component
 // eof
     }
 
+    public static function t($key){
+        echo  Yii::t('yii', $key);
+    }
+
     public static function hl_tidy($t, $w, $p) {
 // Tidy/compact HTM
         if (strpos(' pre,script,textarea', "$p,")) {

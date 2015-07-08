@@ -600,34 +600,35 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
     <!-- ////////////////// Inline text here //////////////////-->
 <?php case 'InlineText': ?>
-    <?php $inline = $item[key($item)]; ?>
+    <?php $inline = $item[key($item)];
+  ?>
+
+    <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
     <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
         <div class="item">
+            <?php $InlineId = $inline->id;?>
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') {
-            $endDate = AppUtility::formatDate($inline->enddate); ?>
-        <img alt="text item" class="floatleft"
-             src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+        <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
             <div class="title">
                 <b><?php echo $inline->title ?></b> <br>
             </div>
-            <div class="itemsum"><p>
+            <div class="itemsum">
                     <?php } ?>
-                    <?php if ($inline->avail == 2) {
-                        echo "Showing Always";
-                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                    } else {
-                        if ($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000) {
-                            echo "Showing until: Always";
-                            echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                        } else {
-                            echo "Showing until: " . $endDate;
-                            echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                        }
+                    <?php if($inline->avail == 2) { ?>
+                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                    <?php }
+                    else {
+                        if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
+                        {
+                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                       <?php }
+                        else{
+                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                        <?php }
                     }
                     ?>
-
-
                 <p><?php echo $inline->text ?></p>
             </div>
             <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -638,21 +639,18 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 </ul>
             <?php } ?>
         </div>
-    <?php } elseif ($inline->avail == 0) { ?>
+    <?php } elseif($inline->avail == 0) { ?>
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') {
-            $endDate = AppUtility::formatDate($inline->enddate); ?>
-        <img alt="text item" class="floatleft faded"
-             src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+        <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
             <div class="title">
                 <b><?php echo $inline->title ?></b> <br>
             </div>
             <div class="itemsum"><p>
-                    <?php }
-                    echo 'Hidden';
-                    echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                    ?>
+                    <?php  }
+                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
 
                 <p><?php echo $inline->text ?></p>
             </div>
@@ -665,7 +663,22 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <?php } ?>
         </div>
         <div class="clear"></div>
-    <?php } ?>
+    <?php } else{ ?>
+        <div class="item">
+            <?php if ($inline->title != '##hidden##') {
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+            <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <div class="title">
+                <b><?php echo $inline->title ?></b> <br>
+            </div>
+            <div class="itemsum"><p>
+                    <?php }
+                    $startDate = AppUtility::formatDate($inline->startdate);
+                    $endDate = AppUtility::formatDate($inline->enddate);
+                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+            </div>
+        </div>
+    <?php }?>
     <?php break; ?>
 
     <!-- Calender Here-->
@@ -950,34 +963,32 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
                         <!-- ////////////////// Inline text here //////////////////-->
                     <?php case 'InlineText': ?>
-                        <?php $inline = $item[key($item)]; ?>
+                        <?php $inline = $item[key($item)];?>
+                        <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
                         <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') {
-                                $endDate = AppUtility::formatDate($inline->enddate); ?>
-                            <img alt="text item" class="floatleft"
-                                 src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                $endDate = AppUtility::formatDate($inline->enddate);?>
+                            <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                 <div class="title">
                                     <b><?php echo $inline->title ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
                                         <?php } ?>
-                                        <?php if ($inline->avail == 2) {
-                                            echo "Showing Always";
-                                            echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                        } else {
-                                            if ($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000) {
-                                                echo "Showing until: Always";
-                                                echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                            } else {
-                                                echo "Showing until: " . $endDate;
-                                                echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php if($inline->avail == 2) {
+                                            echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        }
+                                        else {
+                                            if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
+                                            {
+                                                echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                            }
+                                            else{
+                                                echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
                                             }
                                         }
                                         ?>
-
-
                                     <p><?php echo $inline->text ?></p>
                                 </div>
                                 <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -988,20 +999,18 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     </ul>
                                 <?php } ?>
                             </div>
-                        <?php } elseif ($inline->avail == 0) { ?>
+                        <?php } elseif($inline->avail == 0) { ?>
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') {
-                                $endDate = AppUtility::formatDate($inline->enddate); ?>
-                            <img alt="text item" class="floatleft faded"
-                                 src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                $endDate = AppUtility::formatDate($inline->enddate);?>
+                            <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                 <div class="title">
                                     <b><?php echo $inline->title ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
-                                        <?php }
-                                        echo 'Hidden';
-                                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php  }
+                                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
                                         ?>
 
                                     <p><?php echo $inline->text ?></p>
@@ -1015,7 +1024,22 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <?php } ?>
                             </div>
                             <div class="clear"></div>
-                        <?php } ?>
+                        <?php } else{ ?>
+                            <div class="item">
+                                <?php if ($inline->title != '##hidden##') {
+                                $endDate = AppUtility::formatDate($inline->enddate);?>
+                                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                <div class="title">
+                                    <b><?php echo $inline->title ?></b> <br>
+                                </div>
+                                <div class="itemsum"><p>
+                                        <?php }
+                                        $startDate = AppUtility::formatDate($inline->startdate);
+                                        $endDate = AppUtility::formatDate($inline->enddate);
+                                        echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+                                </div>
+                            </div>
+                        <?php }?>
                         <?php break; ?>
 
                         <!-- Calender Here-->

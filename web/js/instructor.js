@@ -1,5 +1,8 @@
-$("#mark-as-delete").click(function (e) {
-        var id = $('#inlineText-selected-id').val();
+$(document).ready(function(){
+
+});
+
+    $("#mark-as-delete").click(function (e) {
 
         var html = '<div><p>Are you SURE you want to delete this text item?</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
@@ -12,10 +15,11 @@ $("#mark-as-delete").click(function (e) {
                     return false;
                 },
                 "Confirm": function () {
-                     $(this).dialog("close");
+                    $(this).dialog("close");
 
-                    var readMsg = {id: id};
-                    jQuerySubmit('inline-delete-ajax', readMsg,'inlineDeleteSuccess');
+                    var readMsg = {id:id};
+
+                    jQuerySubmit('inline-delete-ajax',readMsg,'inlineDeleteSuccess');
                     return true;
                 }
             },
@@ -23,7 +27,7 @@ $("#mark-as-delete").click(function (e) {
                 $(this).remove();
             }
         });
-});
+    });
 
 function inlineDeleteSuccess(response)
 {

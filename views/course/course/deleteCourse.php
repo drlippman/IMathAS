@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
 $this->title = 'Delete Course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -18,8 +19,8 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
 
     <?php
-    echo'Are you sure you want to delete the course:'.$course->id;
-    \app\components\AppUtility::dump($course->id);
+        echo'Are you sure you want to delete the course:'.$course->id;
+        AppUtility::dump($course->id);
     ?>
 
     <div class="form-group">

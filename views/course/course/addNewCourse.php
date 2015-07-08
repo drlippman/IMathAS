@@ -8,7 +8,6 @@ $this->title = 'New Course';
 $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
     <div class="site-login">
         <fieldset>
             <legend>Course Settings</legend>
@@ -21,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
                 ],
             ]); ?>
-
             <div class="form-label-alignment">
 
                 <?= $form->field($model, 'courseName')->textInput(); ?>
@@ -50,7 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class' => 'time'
                         ]
                     ]);
-
                     echo '</div>';?>
                 </div>
 
@@ -65,6 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
         </fieldset>
     </div>
+
     <div class="form-group">
         <div class="col-lg-11 col-lg-offset-2 display_field">
             <?= Html::submitButton('Submit', ['id' => 'newCourse-btn', 'class' => 'btn btn-primary', 'name' => 'Submit']) ?>

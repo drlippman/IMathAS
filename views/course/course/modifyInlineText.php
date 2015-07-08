@@ -168,8 +168,6 @@ $hidetitle = false;
     <div class=submit><button type=submit name="submitbtn" class="btn btn-primary" value="Submit"><?php echo $saveTitle ?></button></div>
 </form>
 
-
-
 <!--Functions-->
 <?php
 function writeHtmlChecked ($var,$test,$notEqual=null) {

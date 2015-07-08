@@ -1,21 +1,18 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
-//AppUtility::dump($courseDetail);?>
+?>
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-
 echo $this->render('_toolbar',['course'=> $course]);
 ?>
+
 <div class=" col-lg-3 needed">
     <?php echo $this->render('_leftSide',['course'=> $course, 'messageList' => $messageList]);?>
 </div>
 
 <div class="col-lg-9 container">
-    <div class="">
-
-    </div>
 <?php if(count($courseDetail)){
     foreach($courseDetail as $key => $item){
     switch(key($item)):
