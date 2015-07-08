@@ -75,8 +75,8 @@ class BaseImasAssessments extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'startdate', 'enddate', 'reviewdate', 'timelimit', 'defpoints', 'defattempts', 'shuffle', 'gbcategory', 'cntingb', 'minscore', 'showcat', 'showhints', 'showtips', 'isgroup', 'groupsetid', 'reqscoreaid', 'reqscore', 'noprint', 'avail', 'groupmax', 'allowlate', 'eqnhelper', 'exceptionpenalty', 'posttoforum', 'msgtoinstr', 'istutorial', 'defoutcome', 'tutoredit'], 'integer'],
-            [['name', 'summary', 'intro', 'displaymethod', 'deffeedback', 'itemorder', 'password', 'ltisecret', 'endmsg', 'viddata', 'ancestors'], 'required'],
+//            [['courseid', 'startdate', 'enddate', 'reviewdate', 'timelimit', 'defpoints', 'defattempts', 'shuffle', 'gbcategory', 'cntingb', 'minscore', 'showcat', 'showhints', 'showtips', 'isgroup', 'groupsetid', 'reqscoreaid', 'reqscore', 'noprint', 'avail', 'groupmax', 'allowlate', 'eqnhelper', 'exceptionpenalty', 'posttoforum', 'msgtoinstr', 'istutorial', 'defoutcome', 'tutoredit'], 'integer'],
+//            [['name', 'summary', 'intro', 'displaymethod', 'deffeedback', 'itemorder', 'password', 'ltisecret', 'endmsg', 'viddata', 'ancestors'], 'required'],
             [['summary', 'intro', 'itemorder', 'endmsg', 'viddata', 'ancestors'], 'string'],
             [['name', 'caltag', 'calrtag'], 'string', 'max' => 254],
             [['displaymethod', 'deffeedback'], 'string', 'max' => 20],

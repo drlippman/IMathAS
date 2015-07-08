@@ -110,7 +110,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     echo 'LP';
 } ?>
 <a> Questions </a>| <a
-    href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
+    href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
     Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
 <?php  }else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
 ?>
@@ -470,6 +470,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         Always
                     <?php } else { ?>
                         <?php echo $endDateOfLink ?>
+
                     <?php }
                 } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
                     <br> Showing until:<?php echo $endDateOfLink; ?>
@@ -688,8 +689,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     <pre><a href="<?php echo AppUtility::getURLFromHome(
             'instructor', 'instructor/index?id=' . $item['Calendar'] . '&block=' . $parent . '&cid=' . $course->id . '&remove=' . true); ?>">Delete</a> | <a
             href="
-            <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage
-            Events</a></pre>
+            <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
     <div class='calendar'>
         <div id="demo">
         </div>

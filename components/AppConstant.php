@@ -113,4 +113,8 @@ class AppConstant
     const MIN_LATEPASS = "These students all have %u latepasses.";
     const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
     const FORUMTYPE = 1;
+    const ASSESSMENT_ALREADY_STARTED = "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
+    const DEFAULT_ASSESSMENT_INTRO = "Enter intro/instructions";
+    const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
+    const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
 }

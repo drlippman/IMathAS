@@ -23,4 +23,11 @@ class StuGroupSet extends BaseImasStugroupset {
         return $query;
     }
 
+    public function createGroupSet($courseId,$name){
+        $this->courseid = $courseId;
+        $this->name = $name;
+        $this->save();
+        return $this->id;
+    }
+
 }
