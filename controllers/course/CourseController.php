@@ -815,4 +815,12 @@ class CourseController extends AppController
         return $this->render('deleteInlineText', $returnData);
     }
 
+    public function actionCopyItem()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParamVal('courseId');
+        $inlineId = $this->getParamVal('id');
+
+    }
+
 }

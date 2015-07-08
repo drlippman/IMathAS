@@ -7,7 +7,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/in
 $this->params['breadcrumbs'][] = $this->title;
 ?>
     <title>Transfer Course Owner</title>
-    <?php AppUtility::includeCSS('dashboard.css');?>
+    <link rel="stylesheet" type="text/css" href="<?php echo AppUtility::getHomeURL() ?>css/dashboard.css"/>
     <!-- DataTables CSS -->
 
 <div class=mainbody>
@@ -33,3 +33,23 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" id="userId" value="<?php echo $course->ownerid ?>">
 </div>
 
+<script>
+$( document ).ready(function() {
+    $(".transfer").click(function () {
+        var transferTo = $("#seluid option:selected").val();
+        var courseId = $("#courseId").val();
+        var ownerId = $("#userId").val();
+
+        var transferData = {newOwner: transferTo,cid: courseId,oldOwner: ownerId};
+        jQuerySubmit('update-owner', transferData, 'updateSuccess');
+
+    });
+});
+
+function updateSuccess(response) {
+    var data = JSON.parse(response);
+    if (data.status) {
+        $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');
+    }
+}
+</script>

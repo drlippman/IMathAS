@@ -1,5 +1,4 @@
-<?php
-use yii\helpers\Html;
+<?ph
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
@@ -620,15 +619,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <div class="itemsum">
                     <?php } ?>
                     <?php if($inline->avail == 2) { ?>
-                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                     <?php }
                     else {
                         if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
                         {
-                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                        <?php }
                         else{
-                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                         <?php }
                     }
                     ?>
@@ -653,7 +652,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             </div>
             <div class="itemsum"><p>
                     <?php  }
-                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="#"> Copy </a>
+                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
 
                 <p><?php echo $inline->text ?></p>
             </div>
@@ -678,7 +677,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <?php }
                     $startDate = AppUtility::formatDate($inline->startdate);
                     $endDate = AppUtility::formatDate($inline->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href=""> Copy </a>';?>
             </div>
         </div>
     <?php }?>
