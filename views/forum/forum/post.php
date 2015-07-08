@@ -161,8 +161,13 @@ $currentLevel = 0;
                                      src="<?php echo AppUtility::getAssetURL() ?>img/likedgray.png" title=""
                                      onclick="saveLikes(this,true,<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)">
                 <?php } ?>
+                <?php if($data['likeCnt'] == 0){
+                    $data['likeCnt'] = '';
+                }else{
+                    $data['likeCnt'] = $data['likeCnt'];
+                }?>
                 <span class="pointer" id="likeCnt<?php echo $data['id'] ?>"
-                      onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
+                onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
             <?php } ?>
         </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>

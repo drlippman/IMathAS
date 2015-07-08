@@ -26,11 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function ()
     {
         var courseId = $('#course-id').val();
+
         jQuerySubmit('get-outcome-data-ajax',{courseId:courseId},'outcomeDataResponse');
     });
     var cnt=0;
+    var isArray;
+    var outcome;
+    var html = "";
     function addOutcomeGrp(){
-        var html = '<li class="blockli" id="newgrp'+cnt+'"><span class=icon style="background-color:#66f">G</span>';
+        var html = '<li class="blockli" id="newgrp"><span class=icon style="background-color:#66f">G</span>';
         html += '<input class="outcomeGrp" type="text" size="60" id="newgrp'+cnt+'" > ';
         html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
@@ -38,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
         cnt++;
     }
     function addOutcome() {
-        var html = '<li id="new'+cnt+'"><span class=icon style="background-color:#0f0">O</span>';
+        var html = '<li id="new"><span class=icon style="background-color:#0f0">O</span>';
         html += '<input class="outcome" type="text" size="60" id="new'+cnt+'">';
         html += '<a href="#" onclick=removeOutcome(this);return false> Delete</a></li>';
         $("#qviewtree").append(html);
@@ -68,6 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var outcomeGrpArray= [];
         var els = $(".outcome");
         var groupLen = $(".outcomeGrp");
+
         var courseId = $('#course-id').val();
         $('#Save-changes').parent().append('<span id="submitnotice" style="color:red;">Saving Changes...</span>');
         for (var i=0; i<els.length; i++)
@@ -80,11 +85,12 @@ $this->params['breadcrumbs'][] = $this->title;
             var outcomeGrp = $('#newgrp' + j).val();
             outcomeGrpArray.push(outcomeGrp);
         }
-        if(outcomeArray.length > 0)
+
+        if(outcomeArray)
         {
             jQuerySubmit('get-outcome-ajax',{outcomeArray:outcomeArray,courseId:courseId},'outcomeResponse');
         }
-        if(outcomeGrpArray.length > 0)
+        if(outcomeGrpArray)
         {
             jQuerySubmit('get-outcome-grp-ajax',{outcomeGrpArray:outcomeGrpArray,courseId:courseId},'outcomeGrpResponse');
         }
@@ -102,29 +108,50 @@ $this->params['breadcrumbs'][] = $this->title;
     function outcomeDataResponse(response)
     {
         response = JSON.parse(response);
-        var html="";
+
         if(response.status == 0)
         {
             var outcomeGrp = response.data.courseOutcome;
-            var outcome = response.data.outcomeData;
-            $.each(outcomeGrp, function(index,group)
-            {
-                html += '<li class="blockli" id="newgrp">';
-                html +='<span class=icon style="background-color:#66f">G</span>';
-                html += '<input class="outcomeGrp" type="text" size="60" id="newgrp" value="'+group+'" > ';
-                html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
-            });
-            $("#qviewtree").append(html);
+            outcome = response.data.outcomeData;
+            isArray = response.data.isArray;
+            html = printOutcomes(outcomeGrp);
 
-            $.each(outcome, function(index,group)
-            {
-                html = '<li id="newocnt">';
-                html +='<span class=icon style="background-color:#0f0">O</span>';
-                html += '<input class="outcome" type="text" size="60" id="new" value="'+group.name+'">';
-                html += '<a href="#" onclick=removeOutcome(this);return false> Delete</a></li>';
-                $("#qviewtree").append(html);
-            });
+            $("#qviewtree").append(html);
+        }
+        else
+        {
+
         }
     }
+function printOutcomes(outcomeGrp){
 
+    $.each(outcomeGrp, function(index,group)
+    {
+        if(isArray[index] == 1)
+        {
+            html += '<li class="blockli" id="newgrp'+cnt+'">';
+            html +='<span class=icon style="background-color:#66f">G</span>';
+            html += '<input class="outcomeGrp" type="text" size="60" id="g'+cnt+'" value="'+group['name']+'" > ';
+            html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
+            cnt++;
+            if(group['outcomes'].length >0)
+            {
+                html +='<ul class="qview">';
+//                html +='<li>'+outcome[group]+'</li>'
+                printOutcomes(group['outcomes']);
+                html+= '</ul>';
+            }
+            html+= '</li>';
+        }
+        else
+        {alert(group);
+            html += '<li id="'+group+'">';
+            html +='<span class=icon style="background-color:#0f0">O</span>';
+            html += '<input class="outcome" type="text" size="60" id="new" value="'+outcome[group]+'">';
+            html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
+        }
+
+    });
+    return html;
+}
 </script>

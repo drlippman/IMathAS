@@ -29,50 +29,72 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         var html="";
-         console.log(response);
+//         console.log(response);
         if(response.status == 0)
         {
             var headerData = response.data.outcomeInfo;
             var finalData = response.data.finalData;
             var report = response.data.report;
             var outc = response.data.outCome;
-
-             html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
-            var arr = '"S"';
-            $.each(outc, function(index,data)
+            if(headerData && outc)
             {
-                 html +='<th>'+headerData[data]+'<br/><a class="small" href="#">[Details]</a></th>';
-                arr += ',"N"';
-            });
-            html += '</tr>';
-
-
-            for(var i=0;i<finalData.length;i++)
-            {
-                html +='<tr class="'+(i%2==0?'even':'odd')+'">';
-                html +='<td><a href="#"></a></td>';
+                 html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
+                var arr = '"S"';
                 $.each(outc, function(index,data)
                 {
+                     html +='<th>'+headerData[data]+'<br/><a class="small" href="#">[Details]</a></th>';
+                    arr += ',"N"';
+                });
+                html += '</tr><tbody>';
 
-                    if((finalData[i][3][type]) && (finalData[i][3][type][data]))
-                    {
-                        html += '<td>'+ round(100*finalData[i][3][type][data],1) +'%</td>';
-                    }
-                    else
-                    {
-                        html += '<td>-</td>';
-                    }
 
-                })
-                html += '</tr>';
+                for(var i=1;i<finalData.length;i++)
+                {
+                    html +='<tr class="'+(i%2==0?'even':'odd')+'">';
+                    html +='<td><a href="#">'+finalData[i][0][0]+'</a></td>';
+                    $.each(outc, function(index,data)
+                    {
+                        if(isKeyPresent(finalData[i][3],type))
+                        {
+                                if((finalData[i][3][type]) && (finalData[i][3][type][data]))
+                                {
+                                    html += '<td align="center">'+Math.round(100*finalData[i][3][type][data],1)+'%</td>';
+                                }
+                                else
+                                {
+                                    html += '<td align="center">-</td>';
+                                }
+                        }
+                        else
+                        {
+                            html += '<td align="center">-</td>';
+                        }
+
+                    });
+                    html += '</tr>';
+                }
+                html +='</tbody></table>';
+//                html += initSortTable('myTable',Array(sarr),true,false);
+                $('.outcomeReport-div').append(html);
+                html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
+            }
+            else
+            {
+                html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
+                html += '</tr><tbody>';
+                for(var i=1;i<finalData.length;i++)
+                {
+                    html +='<tr class="'+(i%2==0?'even':'odd')+'">';
+                    html +='<td><a href="#">'+finalData[i][0][0]+'</a></td>';
+                }
+                html +='</tbody></table>';
+                html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
+                $('.outcomeReport-div').append(html);
 
             }
-            html +='</tbody></table>';
-            html += initSortTable('myTable',Array(sarr),true,false);
-            $('.outcomeReport-div').append(html);
-            html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
-
-
+        }
+        else
+        {
 
 
         }

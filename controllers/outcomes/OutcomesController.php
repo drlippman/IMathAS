@@ -28,7 +28,6 @@ class OutcomesController extends AppController
         $courseId = $this->getParamVal('cid');
         $this->includeCSS(['outcomes.css']);
         return $this->render('addOutcomes',['courseId' => $courseId]);
-
     }
 
     public function actionGetOutcomeAjax()
@@ -37,12 +36,19 @@ class OutcomesController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $outcomeArray = $params['outcomeArray'];
-        foreach($outcomeArray as $outcome)
+        if($outcomeArray)
         {
-            $saveOutcome = new Outcomes();
-            $saveOutcome->SaveOutcomes($courseId,$outcome);
+            foreach($outcomeArray as $outcome)
+                {
+                    $saveOutcome = new Outcomes();
+                    $saveOutcome->SaveOutcomes($courseId,$outcome);
+                }
+                return $this->successResponse();
         }
-        return $this->successResponse();
+        else
+        {
+            return $this->terminateResponse("");
+        }
     }
     public function actionGetOutcomeGrpAjax()
     {
@@ -50,45 +56,63 @@ class OutcomesController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $outcomeGrpArray = $params['outcomeGrpArray'];
-        foreach($outcomeGrpArray as $outcomeGrp)
+        $courseOutcomeData = Course::getById($courseId);
+        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
+        if($outcomeGrpArray)
         {
-            $serializedOutcomeGrp = serialize($outcomeGrp);
+                foreach($outcomeGrpArray as $outcomeGrp)
+                {
+                    array_push($courseOutcome ,['outcomes'=> array(), 'name' => $outcomeGrp]);
+
+                }
+            $serializedOutcomeGrp = serialize($courseOutcome);
             $saveOutcome = new Course();
             $saveOutcome->SaveOutcomes($courseId,$serializedOutcomeGrp);
-        }
-        return $this->successResponse();
-    }
+            return $this->successResponse();
+        }else
+        {
 
+            return $this->terminateResponse("");
+        }
+    }
     public function actionGetOutcomeDataAjax()
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
-        $courseOutcomeArray = array();
         $courseOutcomeData = Course::getById($courseId);
         $courseOutcome = unserialize($courseOutcomeData['outcomes']);
-        foreach ($courseOutcome as $outcome)
+//        AppUtility::dump($courseOutcome);
+        $isArray = array();
+        foreach($courseOutcome as $key => $data)
         {
-            if(is_array($outcome))
+
+            if(is_array($data))
             {
 
-                $tempArray = array(
-                    'outcomes' => $outcome['name'],
-                );
-                array_push($courseOutcomeArray,$tempArray['outcomes']);
-             }
-        }
-        $outcomeData = Outcomes::getByCourseId($courseId);
-        $outcomeDataArray = array();
-        foreach($outcomeData as $data){
-            $tempArray = array(
+                $isArray[$key] = 1;
+            }
+            else
+            {
+                $isArray[$key] = 0;
+            }
 
-                'name' =>$data['name'],
-            );
-            array_push($outcomeDataArray,$tempArray);
         }
-        $responseData = array('courseOutcome' => $courseOutcomeArray,'outcomeData' => $outcomeDataArray);
-        return $this->successResponse($responseData);
+        if($courseOutcome)
+        {
+               $outcomeData = Outcomes::getByCourseId($courseId);
+            $outcomeInfo = array();
+                foreach($outcomeData as $data)
+                {
+                    $outcomeInfo[$data['id']] = $data['name'];
+                }
+                $responseData = array('courseOutcome' => $courseOutcome ,'outcomeData' => $outcomeInfo,'isArray' =>$isArray);
+                return $this->successResponse($responseData);
+        }
+        else
+        {
+        return $this->terminateResponse("");
+        }
     }
 
     public function actionOutcomeReport()
@@ -633,7 +657,7 @@ class OutcomesController extends AppController
                  if (!isset($ptsposs[$qoutcome[$questions[$j]]])) {
                      $ptsposs[$qoutcome[$questions[$j]]] = 0;
                  }
-                 $pts[$qoutcome[$questions[$j]]] += getpts($scores[$j]);
+                 $pts[$qoutcome[$questions[$j]]] += $this->getpts($scores[$j]);
                  $ptsposs[$qoutcome[$questions[$j]]] += $qposs[$questions[$j]];
              }
 
@@ -1003,4 +1027,5 @@ class OutcomesController extends AppController
 
 
     }
+
 }
