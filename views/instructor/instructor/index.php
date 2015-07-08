@@ -1,4 +1,4 @@
-<?ph
+<?php
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
