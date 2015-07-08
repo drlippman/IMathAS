@@ -16,11 +16,12 @@ class Outcomes extends BaseImasOutcomes {
             $this->name =$outcome;
             $this->courseid = $courseId;
             $this->save();
+            return $this->id;
 
     }
     public static function getByCourseId($courseId)
     {
-//         return Outcomes::findAll(['courseid' => $courseId]);
+
         $query = new Query();
         $query -> select(['id','name'])
                ->from('imas_outcomes')

@@ -36,13 +36,24 @@ class OutcomesController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $outcomeArray = $params['outcomeArray'];
+        AppUtility::dump($outcomeArray);
+        $courseOutcomeData = Course::getById($courseId);
+        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
+        $outcomeId = array();
         if($outcomeArray)
         {
-            foreach($outcomeArray as $outcome)
+                foreach($outcomeArray as $outcome)
                 {
-                    $saveOutcome = new Outcomes();
-                    $saveOutcome->SaveOutcomes($courseId,$outcome);
+                    if($outcome)
+                    {
+                        $saveOutcome = new Outcomes();
+                        $Id= $saveOutcome->SaveOutcomes($courseId,$outcome);
+                        array_push($courseOutcome,$Id);
+                    }
                 }
+            $serializedOutcomeGrp = serialize($courseOutcome);
+            $saveOutcome = new Course();
+            $saveOutcome->SaveOutcomes($courseId,$serializedOutcomeGrp);
                 return $this->successResponse();
         }
         else
@@ -62,8 +73,10 @@ class OutcomesController extends AppController
         {
                 foreach($outcomeGrpArray as $outcomeGrp)
                 {
-                    array_push($courseOutcome ,['outcomes'=> array(), 'name' => $outcomeGrp]);
-
+                    if($outcomeGrp)
+                    {
+                        array_push($courseOutcome ,['outcomes'=> array(), 'name' => $outcomeGrp]);
+                    }
                 }
             $serializedOutcomeGrp = serialize($courseOutcome);
             $saveOutcome = new Course();
@@ -80,39 +93,17 @@ class OutcomesController extends AppController
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
+        $outcomeData = Outcomes::getByCourseId($courseId);
         $courseOutcomeData = Course::getById($courseId);
         $courseOutcome = unserialize($courseOutcomeData['outcomes']);
-//        AppUtility::dump($courseOutcome);
-        $isArray = array();
-        foreach($courseOutcome as $key => $data)
-        {
-
-            if(is_array($data))
-            {
-
-                $isArray[$key] = 1;
-            }
-            else
-            {
-                $isArray[$key] = 0;
-            }
-
-        }
-        if($courseOutcome)
-        {
-               $outcomeData = Outcomes::getByCourseId($courseId);
-            $outcomeInfo = array();
+        $outcomeInfo = array();
                 foreach($outcomeData as $data)
                 {
                     $outcomeInfo[$data['id']] = $data['name'];
+
                 }
-                $responseData = array('courseOutcome' => $courseOutcome ,'outcomeData' => $outcomeInfo,'isArray' =>$isArray);
+                $responseData = array('courseOutcome' => $courseOutcome ,'outcomeData' => $outcomeInfo);
                 return $this->successResponse($responseData);
-        }
-        else
-        {
-        return $this->terminateResponse("");
-        }
     }
 
     public function actionOutcomeReport()
