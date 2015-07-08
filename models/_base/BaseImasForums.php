@@ -54,7 +54,7 @@ class BaseImasForums extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'courseid', 'startdate', 'enddate', 'taglist', 'outcomes'], 'required'],
+//            [['name', 'description', 'courseid', 'startdate', 'enddate', 'taglist', 'outcomes'], 'required'],
             [['description', 'taglist', 'outcomes'], 'string'],
             [['courseid', 'startdate', 'enddate', 'settings', 'sortby', 'defdisplay', 'replyby', 'postby', 'grpaid', 'groupsetid', 'points', 'cntingb', 'gbcategory', 'tutoredit', 'rubric', 'avail', 'forumtype'], 'integer'],
             [['name', 'caltag'], 'string', 'max' => 254]

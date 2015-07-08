@@ -7,9 +7,12 @@ use app\controllers\AppController;
 use app\models\forms\ThreadForm;
 use app\models\ForumLike;
 use app\models\ForumPosts;
+use app\models\ForumSubscriptions;
 use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Forums;
+use app\models\Items;
+use app\models\StuGroupSet;
 use app\models\Thread;
 use app\models\User;
 use app\components\AppUtility;
@@ -322,6 +325,7 @@ class ForumController extends AppController
                 else
                 {
                     $forum_Id = $params['forum-name'];
+                    Thread::moveAndUpdateThread($forum_Id,$thread_Id);
                     ForumPosts::updateMoveThread($forum_Id, $thread_Id);
                 }
 
@@ -462,7 +466,6 @@ class ForumController extends AppController
             $this->postData[$postData['id']] = $tempArray;
 
         }
-
        ForumPosts::saveViews($threadId);
         $viewsData = new ForumView();
         $viewsData->updateData($threadId,$currentUser);
@@ -481,7 +484,6 @@ class ForumController extends AppController
         $this->children = AppUtility::removeEmptyAttributes($this->children);
         foreach ($childArray as $superKey => $child) {
             array_push($this->totalPosts, $this->postData[$child]);
-
             unset($this->children[$arrayKey][$superKey]);
             if (isset($this->children[$child])) {
                 return $this->createChild($this->children[$child], $child);
@@ -489,10 +491,10 @@ class ForumController extends AppController
                 continue;
             }
         }
+
         if (count($this->children)) {
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
-
     }
     //controller ajax method for fetch select as remove thread from Thread page and remove from database.
     public function actionMarkAsRemoveAjax()
@@ -841,8 +843,6 @@ class ForumController extends AppController
                 $like->DeleteLike($params,$userId);
             }
         }
-
-
         return $this->successResponse();
     }
 
@@ -871,6 +871,28 @@ class ForumController extends AppController
         $viewsData = new ForumView();
         $viewsData->updateDataForPostByName($userId);
         return $this->successResponse();
+
+    }
+    public function actionAddForum()
+    {
+        $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
+        $courseId = $params['cid'];
+        $groupNames = StuGroupSet::getByCourseId($courseId);
+        if($this->isPost())
+        {
+          $params = $this->getRequestParams();
+          $newForum = new Forums();
+        $forumId =  $newForum->addNewForum($params);
+            $itemType = 'Forum';
+            $itemId = new Items();
+        $itemId -> saveItems($courseId, $forumId, $itemType);
+            $subscreiptionEntry = new ForumSubscriptions();
+            $subscreiptionEntry->AddNewEntry($forumId,$user['id']);
+        }
+        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $responseData = array('courseId' => $courseId,'groupNames' => $groupNames);
+            return $this->renderWithData('addForum',$responseData);
 
     }
 

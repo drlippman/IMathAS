@@ -71,10 +71,13 @@ AppUtility::includeJS('general.js'); ?>
     <div class="forumgrp" id="block<?php echo $index - AppConstant::NUMERIC_ONE ?>">
 
         <?php } ?>
-        <div class=block><span class="leftbtns"><img class="pointer" id="butb<?php echo $index ?>"
+        <div class=block><span class="leftbtns">
+          <?php  if($message['replied'] != 0){ ?>
+                <img class="pointer" id="butb<?php echo $index ?>"
                                                      src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"
-                                                     onClick="toggleshow(<?php echo $index ?>)"/> </span>
-                <span class=right>
+                                                     onClick="toggleshow(<?php echo $index ?>)"/>
+               <?php } ?></span>
+            <span class=right>
 
                  <?php if ($user['id'] != $message['senderId']) { ?>
                      <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'] . '&cid=' . $course->id); ?>">

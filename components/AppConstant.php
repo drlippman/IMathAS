@@ -112,4 +112,5 @@ class AppConstant
     const USERNAME_ENROLLED="This username is already enrolled in the class";
     const MIN_LATEPASS = "These students all have %u latepasses.";
     const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
+    const FORUMTYPE = 1;
 }

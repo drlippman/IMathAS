@@ -45,6 +45,16 @@ class Thread extends BaseImasForumThreads
     public static function deleteThreadById($id)
     {
         $thread = Thread::findOne(['id' => $id]);
-        $thread->delete();
+        if($thread){
+            $thread->delete();
+        }
+
     }
+    public static function moveAndUpdateThread($forumId,$threadId)
+    {
+        $ForumPost = Thread::findOne(['id' => $threadId]);
+        $ForumPost->forumid = $forumId;
+        $ForumPost->save();
+    }
+
 } 

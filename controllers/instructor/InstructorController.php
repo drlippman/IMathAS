@@ -6,6 +6,9 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\CalItem;
 use app\models\Course;
+use app\models\ForumPosts;
+use app\models\ForumSubscriptions;
+use app\models\ForumView;
 use app\models\Message;
 use app\models\AssessmentSession;
 use app\models\Blocks;
@@ -22,6 +25,7 @@ use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
 use app\models\InlineText;
+use app\models\Thread;
 use app\models\Wiki;
 use app\models\User;
 use app\models\forms\ManageEventForm;
@@ -50,7 +54,7 @@ class InstructorController extends AppController
                      return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
                     break;
                 case 'forum':
-                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                     return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
                     break;
                 case 'wiki':
                      return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
@@ -271,7 +275,7 @@ class InstructorController extends AppController
         }
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js', 'instructor.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js', 'instructor.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->renderWithData('index', $returnData);
     }
@@ -492,6 +496,26 @@ class InstructorController extends AppController
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('manageEvent',$returnData);
+    }
+
+    public function actionDeleteItemsAjax()
+    {
+        $params = $this->getBodyParams();
+
+        if($params['itemType'] == AppConstant::FORUMTYPE) {
+            $forum = new Forums();
+            $forum->deleteForum($params);
+            $itemId = new Items();
+            $itemId->daleteItem($params['id']);
+            $subscreiptionEntry = new ForumSubscriptions();
+            $subscreiptionEntry->deleteEntry($params);
+            $post = new ForumPosts();
+            $post->deleteForumPost($params);
+            $view = new ForumView();
+            $view->daleteView($params['id']);
+            $thread = new Thread();
+            $thread->deleteThreadById($params['id']);
+        }
     }
 }
 

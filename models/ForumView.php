@@ -52,7 +52,7 @@ class ForumView extends BaseImasForumViews
         $postdate = strtotime(date('F d, o g:i a'));
         $this->lastview = $postdate;
         $this->userid = $userId;
-        $this->tagged = 0;
+        $this->tagged = AppConstant::NUMERIC_ZERO;
         $this->save();
     }
     public static  function removeThread($threadId)
@@ -158,6 +158,11 @@ class ForumView extends BaseImasForumViews
          }
 
     }
+
+    public function daleteView($forumId)
+    {
+        Yii::$app->db->createCommand("DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$forumId')")->queryAll();
+     }
 
 
 }

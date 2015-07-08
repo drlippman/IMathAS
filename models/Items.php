@@ -10,6 +10,7 @@ namespace app\models;
 
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasItems;
 
 class Items extends BaseImasItems
@@ -50,6 +51,14 @@ class Items extends BaseImasItems
     public static function getByTypeId($id)
     {
         return Items::findOne(['typeid' => $id]);
+    }
+
+    public function daleteItem($id)
+    {
+        $entry = Items::findOne(['typeid' => $id,'itemtype'=>'Forum']);
+        if($entry){
+            $entry->delete();
+        }
     }
 
 }

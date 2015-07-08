@@ -16,10 +16,13 @@ class ForumPosts extends BaseImasForumPosts
     public static function updatePostMoveThread($threadId,$moveThreadId)
     {
 
-        $ForumPost = ForumPosts::findOne(['id' => $threadId]);
-        $ForumPost->threadid = $moveThreadId;
-        $ForumPost->parent = $moveThreadId;
-        $ForumPost->save();
+
+        $ForumPosts = ForumPosts::findAll(['threadid' => $threadId]);
+        foreach($ForumPosts as $ForumPost) {
+            $ForumPost->threadid = $moveThreadId;
+            $ForumPost->parent = $moveThreadId;
+            $ForumPost->save();
+        }
     }
     public static function getbyid($threadId)
     {
@@ -43,7 +46,7 @@ class ForumPosts extends BaseImasForumPosts
     }
     public static function removeThread($threadId,$checkPostOrThread)
     {
-        if($checkPostOrThread == 1) {
+        if($checkPostOrThread == AppConstant::NUMERIC_ONE) {
             $threads = ForumPosts::findAll(['threadid' => $threadId]);
         }else{
             $threads = ForumPosts::findAll(['id' => $threadId]);
@@ -79,7 +82,7 @@ class ForumPosts extends BaseImasForumPosts
     public function createThread($params,$userId,$postType,$alwaysReplies,$date)
     {
         $maxid = $this->find()->max('id');
-        $maxid = $maxid + 1;
+        $maxid = $maxid + AppConstant::NUMERIC_ONE;
         $this->id = $maxid;
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
         $this->threadid = isset($maxid) ? $maxid : null;
@@ -93,9 +96,9 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->message = isset($params['body']) ? $params['body'] : null;
         $this->posttype = $postType;
-        if($alwaysReplies == 1){
-        $this->replyby = 2000000000;
-        }elseif($alwaysReplies == AppConstant::NUMERIC_ZERO) {
+        if($alwaysReplies == AppConstant::NUMERIC_ONE){
+        $this->replyby = AppConstant::ALWAYS_TIME;
+        }elseif($alwaysReplies == AppConstant::NUMERIC_TWO) {
             $this->replyby = AppConstant::NUMERIC_ZERO;
         }elseif($alwaysReplies == AppConstant::NUMERIC_THREE){
             $this->replyby = $date;
@@ -120,10 +123,10 @@ class ForumPosts extends BaseImasForumPosts
             $view->save();
         }
     }
-    public static function getbyThreadIdAndUserID($threadId,$CurrentUserId)
+    public static function getbyThreadIdAndUserID($threadId,$currentUserId)
     {
 
-        $ForumPost = ForumPosts::findAll(['threadid' => $threadId,'userid' => $CurrentUserId]);
+        $ForumPost = ForumPosts::findAll(['threadid' => $threadId,'userid' => $currentUserId]);
         return $ForumPost;
     }
     public  static function getbyParentId($parent)
@@ -134,7 +137,6 @@ class ForumPosts extends BaseImasForumPosts
 
     public static function findCount($threadId)
     {
-
         $query = new Query();
         $query->select(['count(parent) as count'])
             ->from('imas_forum_posts')
@@ -142,7 +144,13 @@ class ForumPosts extends BaseImasForumPosts
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
+    }
+    public function deleteForumPost($params)
+    {
+        $entry = ForumPosts::findOne(['forumid' => $params['id']]);
+        if($entry){
+            $entry->delete();
+        }
     }
 
 }

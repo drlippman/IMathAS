@@ -228,19 +228,20 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <div class="title">
                 <b><?php echo $forum->name ?></b> <br>
             </div>
-            <div class="itemsum"><p>
+            <div class="itemsum">
                     <?php } ?>
 
-                    <?php if($forum->avail == 2) {
-                        echo "Showing Always"; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
-                    }
+                    <?php if($forum->avail == 2) { ?>
+             <?php echo "Showing Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                  <?php  }
                     else {
                         if($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000)
                         {
-                            echo "Showing until: Always"; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
-                        }
+                            echo "Showing until: Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                     <?php   }
                         else{
-                            echo "Showing until: " .$endDate; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
+                            echo "Showing until: " .$endDate;?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                     <?php
                         }
                     }
                     $duedates = "";
@@ -266,7 +267,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             </div>
             <div class="itemsum"><p>
                     <?php
-                    echo 'Hidden'; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                    echo 'Hidden'; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                    <?php
                     } ?>
 
                 <p><?php echo $forum->description ?></p>
@@ -284,7 +286,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <?php }
                     $startDate = AppUtility::formatDate($forum->startdate);
                     $endDate = AppUtility::formatDate($forum->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+                    echo "Showing " .$startDate. " until " .$endDate; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+
             </div>
 
         </div>
