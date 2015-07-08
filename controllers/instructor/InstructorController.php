@@ -91,10 +91,10 @@ class InstructorController extends AppController
          * Display Items
          */
         if ($course && count($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
-
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
-                    if (is_array($itemOrder) && count($blockItems = $itemOrder['items'])) {
+                    if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
+                    {
                         $tempAray['Block'] = $itemOrder;
                         $blockItems = $itemOrder['items'];
                         $tempItemList = array();
@@ -153,9 +153,6 @@ class InstructorController extends AppController
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $wiki;
-
-//                                $a = AppUtility::getFormattedDate($wiki['enddate'],'m/d/y');
-//                                AppUtility::dump($a);
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'InlineText':
