@@ -117,4 +117,6 @@ class AppConstant
     const DEFAULT_ASSESSMENT_INTRO = "Enter intro/instructions";
     const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
     const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
+    const MODIFY_ASSESSMENT ="Modify Assessment";
+    const ADD_ASSESSMENT ="Add Assessment";
 }

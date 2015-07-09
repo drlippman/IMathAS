@@ -6,13 +6,14 @@ use kartik\date\DatePicker;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
-$this->title = 'Add Assessment';
+$this->title = $title;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 
-<?php echo $page_isTakenMsg;?>
+<h2><?php echo $pageTitle ?></h2>
+<?php echo $page_isTakenMsg ?>
 
 <form method=post action="add-assessment?cid=<?php echo $course->id ?>">
     <p></p>

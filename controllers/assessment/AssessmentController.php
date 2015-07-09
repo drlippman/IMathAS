@@ -9,7 +9,6 @@ use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
 use app\models\Exceptions;
-
 use app\models\Forums;
 use app\models\GbCats;
 use app\models\Items;
@@ -348,10 +347,11 @@ class AssessmentController extends AppController
                     $itemList = addslashes(serialize($items));
                     Course::setItemOrder($itemList,$courseId);
                     return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
-                    exit;
                 }
             }else {
                 if (isset($params['id'])) {//page load in modify mode
+                    $title = AppConstant::MODIFY_ASSESSMENT;
+                    $pageTitle =  AppConstant::MODIFY_ASSESSMENT;
                     $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId);
                     list($testType,$showAnswer) = explode('-',$assessmentData['deffeedback']);
                     $startDate = $assessmentData['startdate'];
@@ -382,6 +382,8 @@ class AssessmentController extends AppController
                     }
                     $saveTitle = AppConstant::SAVE_BUTTON;
                 }else {//page load in add mode set default values
+                    $title = AppConstant::ADD_ASSESSMENT;
+                    $pageTitle =  AppConstant::ADD_ASSESSMENT;
                     $assessmentData['name'] = AppConstant::DEFAULT_ASSESSMENT_NAME;
                     $assessmentData['summary'] = AppConstant::DEFAULT_ASSESSMENT_SUMMARY;
                     $assessmentData['intro'] = AppConstant::DEFAULT_ASSESSMENT_INTRO;
@@ -568,7 +570,7 @@ class AssessmentController extends AppController
         'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets,'pageOutcomesList' => $pageOutcomesList,
         'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory,'sDate' => $sDate,
         'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
-        'startDate' => $startDate, 'endDate' => $endDate]);
+        'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle]);
     }
 
     public function flatArray($outcomesData) {
