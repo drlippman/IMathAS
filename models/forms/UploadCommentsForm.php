@@ -14,7 +14,8 @@ class UploadCommentsForm extends Model{
     {
         return [
             [['lastName'],'required','message' => 'Last name field cannot be blank'],
-            [['commentsColumn'],'required','message' => 'Enter Comment column.'],
+            [['commentsColumn'],'required', 'message' => 'Enter Comment column.'],
+            [['commentsColumn'],'number', 'message' => 'comments are in columns must be integer value.'],
             ['file', 'required', 'message' => 'Upload CSV file'],
             ['file', 'safe'],
             [['file'], 'file', 'extensions' => 'csv'],

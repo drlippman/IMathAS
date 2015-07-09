@@ -16,12 +16,23 @@ if($commentType == "instr") {
     $this->params['breadcrumbs'][] = ['label' => 'Gradebook Comments', 'url' => ['/gradebook/gradebook/gb-comments?cid=' . $course->id]];
 }
 $this->params['breadcrumbs'][] = $this->title;
+if($userCol == AppConstant::NUMERIC_NEGATIVE_ONE){
+    echo "<p class='alert alert-danger'>Enter column to identify user.<br/>";
+}
+if ($successes>0) {
+    echo "<p class='alert alert-success'>Comments uploaded.  $successes records.</p> ";
+}
+if (count($failures)>0) {
+    echo "<p class='alert alert-danger'>Comment upload failure on: <br/>";
+    echo implode('<br/>',$failures);
+    echo '</p>';
+}
 if($commentType == "instr") {
     echo "<h2>Upload Instructor Notes</h2>";
 } else {
     echo "<h2>Upload Students Comments</h2>";
 } ?>
-<div class="roster-import-student-csv">
+<div>
     <fieldset>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
@@ -34,14 +45,17 @@ if($commentType == "instr") {
         ]); ?>
         <?php echo $form->field($model, 'file')->fileInput();?>
         <?php echo $form->field($model, 'fileHeaderRow')->radioList([AppConstant::NUMERIC_ZERO => 'No header',AppConstant::NUMERIC_ONE => 'Has 1 row header',AppConstant::NUMERIC_TWO => 'Has 2 row header']);?>
-
         <?php echo $form->field($model, 'commentsColumn')->textInput();?>
-            <span class="pull-left col-lg-3"><b>User is identified by</b></span>
-            <span class="formright col-lg-2">
-            <input type="radio" name="useridtype" value="0" checked="1">Username (login name) in column
-            <input type="text" size="4" name="usernamecol"><br>
-            <input type="radio" name="useridtype" value="1">Lastname, Firstname in column
-            <input type="text" size="4" name="fullnamecol"></span>
+<div >
+    <span class="pull-left"><b>User is identified by</b></span>
+            <span class="user-identity ">
+                <input type="radio" name="userIdType" value="0" checked="1"><b>Username (login name) in column</b>
+                <input type="text" size="4" name="userNameCol"><br>
+                <input type="radio" name="userIdType" value="1"><b>Lastname, Firstname in column</b>
+                <input type="text" size="4" name="fullNameCol">
+            </span>
+</div>
+
     </fieldset>
     <div class="form-group">
         <div class="col-lg-offset-3 roster-submit"><br class="form">

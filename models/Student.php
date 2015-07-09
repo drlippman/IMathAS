@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
 use yii\db\Query;
@@ -272,8 +273,8 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
-    public  static  function updateGbComments($key,$values, $courseId, $commentType){
-        $query = Student::findOne(['userid' => $key, 'courseid' => $courseId]);
+    public  static  function updateGbComments($userId,$values, $courseId, $commentType){
+        $query = Student::findOne(['userid' => $userId, 'courseid' => $courseId]);
         if($query){
             if($commentType == 'instr'){
                 $query->gbinstrcomment = trim($values);
@@ -282,5 +283,29 @@ class Student extends BaseImasStudents {
             }
             $query->save();
         }
+    }
+    public static function  findStudentToUpdateComment($courseId, $useridtype, $data){
+        $query = new Query();
+        $query	->select(['imas_users.id'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId]);
+        if($useridtype == AppConstant::NUMERIC_ZERO){
+            $query->andWhere(['imas_users.SID' => $data]);
+        } else if($useridtype == AppConstant::NUMERIC_ONE){
+            list($last,$first) = explode(',',$data);
+            $first = str_replace(' ','',$first);
+            $last = str_replace(' ','',$last);
+            $query->andWhere(['imas_users.FirstName' => $first]);
+            $query->andWhere(['imas_users.LastName' => $last]);
+        } else {
+            $query->andWhere(['0']);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 

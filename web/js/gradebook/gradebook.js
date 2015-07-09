@@ -489,9 +489,9 @@ function displayGradebook() {
                             html += " (NC)";
                         }
                     }
-                    //else {
-                    //    html += "-";
-                    //}
+                    else {
+                        html += "-";
+                    }
                     }else {
                         html += "-";
                     }
