@@ -272,10 +272,14 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
-    public  static  function updateGbComments($key,$values, $courseId){
+    public  static  function updateGbComments($key,$values, $courseId, $commentType){
         $query = Student::findOne(['userid' => $key, 'courseid' => $courseId]);
         if($query){
-            $query->gbcomment = trim($values);
+            if($commentType == 'instr'){
+                $query->gbinstrcomment = trim($values);
+            }else{
+                $query->gbcomment = trim($values);
+            }
             $query->save();
         }
     }

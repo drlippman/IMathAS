@@ -51,8 +51,8 @@ function displayGradebook() {
     html += "<thead><tr>";
     var sortArray = [];
     for(i=0;i<gradebookData[0][0].length;i++){   //biographical headers
-        if(i == 1){
-            html += "<th><div>&nbsp;</div></th>";
+        if(i == 1 && showPics !=0){
+            html += "<th><div>Picture</div></th>";
             sortArray.push('false');
         }
         if(i == 1 && gradebookData[0][0][1]!='ID'){
@@ -276,6 +276,7 @@ function displayGradebook() {
             html += "<sup>*</sup>";
         }
         html += "</div></td>";
+        if(showPics !=0){
         if(showPics == 1 && gradebookData[i][4][2] == 1){
             html += "<td>"+insideDiv+"<div class='trld'><img class='images circular-image' src='../../Uploads/" +gradebookData[i][4][0]+".jpg'></div></td>";
         } else if (showPics == 2 && gradebookData[i][4][2] == 1){
@@ -287,6 +288,7 @@ function displayGradebook() {
         }
         else {
             html += "<td>"+insideDiv+"<div class='trld'>&nbsp;</div></td>";
+        }
         }
         for (j=(gradebookData[0][0][1] == 'ID'?1:2);j<gradebookData[0][0].length;j++){
             if(gradebookData[i][0][j]){
@@ -480,20 +482,26 @@ function displayGradebook() {
                             html += "<a href='#'>";
                         }
                     }
-
+                    if(isKeyPresent(gradebookData[i][1][j],0)){
                     if (gradebookData[i][1][j][0]) {
                         html += gradebookData[i][1][j][0];
                         if (gradebookData[i][1][j][3]==1) {
                             html += " (NC)";
                         }
-                    } else {
+                    }
+                    //else {
+                    //    html += "-";
+                    //}
+                    }else {
                         html += "-";
                     }
                     if (data.isTeacher || (data.isTutor && gradebookData[0][1][j][8]==1)) {
                         html += "</a>";
                     }
-                    if (gradebookData[i][1][j][1] == 1) {
-                        html += "<sup>*</sup>";
+                    if(isKeyPresent(gradebookData[i][1][j],1)) {
+                        if (gradebookData[i][1][j][1] == 1) {
+                            html += "<sup>*</sup>";
+                        }
                     }
                 } else if (gradebookData[0][1][j][6] == 2) { //discuss
                     if (gradebookData[i][1][j][0] != undefined || gradebookData[i][1][j][0] != null) {

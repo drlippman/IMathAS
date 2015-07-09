@@ -13,6 +13,7 @@ use app\models\Exceptions;
 use app\models\forms\AddGradesForm;
 use app\models\forms\AddRubricForm;
 use app\models\forms\ManageTutorsForm;
+use app\models\forms\UploadCommentsForm;
 use app\models\Forums;
 use app\models\GbCats;
 use app\models\GbItems;
@@ -2232,17 +2233,83 @@ class GradebookController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $commentType = $this->getParamVal('comtype');
         $course = Course::getById($this->getParamVal('cid'));
         if(isset($params['isComment'])){
             foreach($params as $key => $values){
-                Student::updateGbComments($key, $values, $course['id']);
+                Student::updateGbComments($key, $values, $course['id'], $commentType);
             }
             return $this->redirect('gradebook?cid='.$course['id']);
         }
         $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
         $this->includeJS(['gradebook/gbComments.js','gradebook/addgrades.js']);
-        $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo);
+        $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo, 'commentType' => $commentType);
         return $this->renderWithData('gbComments', $responseData);
     }
+    public function actionUploadComments()
+    {
+        $this->guestUserHandler();
+        $course = Course::getById($this->getParamVal('cid'));
+        $commentType = $this->getParamVal('comtype');
+        $model = new UploadCommentsForm();
+        $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
+        if($this->isPost()){
+            AppUtility::dump($this->getRequestParams());
+        }
+//        $model = new AddGradesForm();
+//        $gbItemsId = $this->getRequestParams();
+//        $nowTime = time();
+//        if ($model->load($this->getPostData())) {
+//            $params = $this->getRequestParams();
+//            $model->file = UploadedFile::getInstance($model, 'file');
+//            if ($model->file) {
+//                $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
+//                $model->file->saveAs($filename);
+//            }
+//            $studentRecords = $this->ImportStudentCsv($filename, $params);
+//            $gradeTextArray = array();
+////            AppUtility::dump();
+//            foreach ($studentRecords as $key => $single) {
+//                if (count($studentRecords) - 1 > $key) {
+//                    if ($params['AddGradesForm']['userIdentifiedBy'] == AppConstant::NUMERIC_ONE) {
+//                        $user = User::findByUsername($single[0]);
+//                        $userId = $user['id'];
+//                    } else {
+//                        $user = User::findByUsername($single[0]);
+//                        $userId = $user['id'];
+//                    }
+////                AppUtility::dump($single);
+//                    $tempArray = array(
+//                        'studentId' => $userId,
+//                        'gradeText' => $single[1],
+//                        'feedbackText' => $single[2],
+//                        'fromUploadFile' => '1'
+//                    );
+////                    array_push($gradeTextArray, $tempArray);
+//                    $grades = new Grades();
+//
+//                    $grades->createGradesByUserId($tempArray, $params['gb-items-id']);
+//                }
+//            }
+////            }AppUtility::dump($gradeTextArray);
+////AppUtility::dump($gradeTextArray);
+//
+//
+////            foreach($studentRecords as $single){
+//////                AppUtility::dump($studentRecords);
+////
+////                $tempArray(
+////
+////                );
+//
+////            }
+//
+//        }
+        $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model);
+        return $this->renderWithData('uploadComments',$responseData);
+    }
+
 }
+
+
 
