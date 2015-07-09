@@ -1,0 +1,75 @@
+html,
+body {
+    height: 100%;
+    font-family: 'Open Sans', sans-serif;
+    margin: 0px;
+    padding: 0px;
+}
+.master-items-container{
+    margin: 0 5%;
+    position: relative;
+    bottom: 225px;
+    background-color: #ffffff;
+    min-height: 650px;
+}
+.master-container{
+    background-color: #FAFAFA;
+}
+.navbar-inverse {
+    background-color: #104e8c;
+}
+.navbar-brand{
+    color: #ffffff;
+    font-size: 30px;
+}
+.container-upper-blue{
+    background-color: #1460aa;
+}
+.container-lower-white{
+    background-color: #fafafa;
+    margin: 0px;
+    padding: 0px;
+;
+}
+.graphic-math-img{
+    width: 336px;
+    height:320px;
+    background-image: url("../img/background_graphic.png");
+    float: left;
+}
+.breadcrumb{
+    background-color: transparent;
+    color: #ffffff;
+}
+.index-header a, .index-header{
+    color: #ffffff;
+}
+.index-header .left-side .small-link{
+    font-size: 10px;
+}
+.index-header .left-side .big-title{
+    font-size: 25px;
+}
+.right-float{
+    float: right;
+}
+.index-header .right-side .right-item{
+
+}
+.index-header .right-side .item-icon{
+    float: left;
+    height: 34px;
+    width: 34px;
+    background-image: url("../img/two_gears.png");
+    /*background-color: #ffffff;*/
+}
+
+.left-float{
+    float: left;
+}
+.brand-name-footer
+{
+    font-size: 22px;
+    color: #d3d3d3;
+    margin-top: -10px;
+}

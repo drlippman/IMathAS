@@ -23,6 +23,7 @@ class AppAsset extends AssetBundle
         'css/jquery-ui.min.css',
         'css/jquery-ui.structure.min.css',
         'css/site.css',
+        'css/font-awesome.min.css'
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD

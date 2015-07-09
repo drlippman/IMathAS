@@ -9,12 +9,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <!--<div class="mainbody">-->
 
+<!--<div class="item-detail-header">-->
+<!--    --><?php //echo $this->render("header/_index",['item_name'=>'Course Setting', 'link_title'=>'Home', 'link_url' => '/', 'page_title' => $this->title]); ?>
+<!--</div>-->
+
 <div>
     <?php
     $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     $now = $currentTime;
-
-    echo $this->render('_toolbarTeacher', ['course' => $course]); ?>
+    ?>
 </div>
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="home-path"
@@ -104,7 +107,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
         <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
     <?php } else { ?>
         <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-    <?php }
+    <?php
+    }
 } ?>
 <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
     echo 'LP';
@@ -112,7 +116,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
     Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-<?php  }else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
+<?php
+}else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
 ?>
 <div class="item">
 <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
@@ -134,7 +139,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
         <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
     <?php } else { ?>
         <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-    <?php }
+    <?php
+    }
 } ?>
 <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
     echo 'LP';
@@ -144,7 +150,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
 <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) { ?>
     <br>This assessment is in review mode - no scores will be saved
-<?php }
+<?php
+}
 }else if ($assessment->startdate >= 0 || $assessment->enddate == AppConstant::ALWAYS_TIME) {
 ?>
 <div class="item">
@@ -171,9 +178,11 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <!--                                                                                    <br>Available --><?php //echo AppUtility::formatDate($assessment->startdate); ?><!--, until --><?php //echo AppUtility::formatDate($assessment->enddate); ?>
                 <?php } else { ?>
                     <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-                <?php }
+                <?php
+                }
             }
-        }    else if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime) { ?>
+        } else if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime) {
+            ?>
             <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
                 <BR>Hidden
             <?php } else { ?>
@@ -181,18 +190,20 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
 
                 <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                    <?php if($assessment->startdate == AppConstant::NUMERIC_ZERO){ ?>
+                    <?php if ($assessment->startdate == AppConstant::NUMERIC_ZERO) { ?>
                         <br>Available Always until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-                    <?php }else{ ?>
-                        <br>Available <?php echo AppUtility::formatDate($assessment->startdate);  ?>, <?php echo AppUtility::formatDate($assessment->enddate);  ?>
+                    <?php } else { ?>
+                        <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, <?php echo AppUtility::formatDate($assessment->enddate); ?>
                     <?php } ?>
                 <?php } else { ?>
                     <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
 
 
 
-                <?php }
-            }   } ?>
+                <?php
+                }
+            }
+        } ?>
 
 
         <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
@@ -206,7 +217,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <br> This assessment is in review mode - no scores will be saved
         <?php } ?>
 
-        <?php }   ?>
+        <?php } ?>
     </div>
     <div class="itemsum">
         <p><?php echo $assessment->summary ?></p>
@@ -217,84 +228,99 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 <!-- ///////////////////////////// Forum here /////////////////////// -->,
 <?php case 'Forum': ?>
     <?php $forum = $item[key($item)];
-    if ($forum->avail == 2 || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == 1) {?>
+    if ($forum->avail == 2 || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == 1) {
+        ?>
 
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($forum->name != '##hidden##') {
             $endDate = AppUtility::formatDate($forum->enddate);?>
             <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
             <div class="title">
                 <b><?php echo $forum->name ?></b> <br>
             </div>
             <div class="itemsum">
-                    <?php } ?>
+                <?php } ?>
 
-                    <?php if($forum->avail == 2) { ?>
-             <?php echo "Showing Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
-                  <?php  }
-                    else {
-                        if($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000)
-                        {
-                            echo "Showing until: Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
-                     <?php   }
-                        else{
-                            echo "Showing until: " .$endDate;?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
-                     <?php
-                        }
+                <?php if ($forum->avail == 2) { ?>
+                    <?php echo "Showing Always"; ?> <a href="#"> Modify </a> | <a href="#"
+                                                                                  onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE ?>)">
+                        Delete </a> | <a href="#"> Copy </a><br>
+                <?php
+                } else {
+                    if ($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000) {
+                        echo "Showing until: Always"; ?> <a href="#"> Modify </a> | <a href="#"
+                                                                                       onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE ?>)">
+                            Delete </a> | <a href="#"> Copy </a><br>
+                    <?php
+                    } else {
+                        echo "Showing until: " . $endDate;?> <a href="#"> Modify </a> | <a href="#"
+                                                                                           onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE ?>)">
+                            Delete </a> | <a href="#"> Copy </a><br>
+                    <?php
                     }
-                    $duedates = "";
-                    if ($forum->postby > $currentTime && $forum->postby != 2000000000) {
-                        echo('New Threads due '), AppUtility::formatdate($forum->postby).".";
-                    }
-                    if ($forum->replyby > $currentTime && $forum->replyby != 2000000000) {
-                        echo(' Replies due '), AppUtility::formatdate($forum->replyby).".";
-                    }
-                    ?>
+                }
+                $duedates = "";
+                if ($forum->postby > $currentTime && $forum->postby != 2000000000) {
+                    echo('New Threads due '), AppUtility::formatdate($forum->postby) . ".";
+                }
+                if ($forum->replyby > $currentTime && $forum->replyby != 2000000000) {
+                    echo(' Replies due '), AppUtility::formatdate($forum->replyby) . ".";
+                }
+                ?>
                 <p><?php echo $forum->description ?></p>
             </div>
         </div>
 
-    <?php } elseif($forum->avail == 0) { ?>
+    <?php } elseif ($forum->avail == 0) { ?>
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($forum->name != '##hidden##') {
             $endDate = AppUtility::formatDate($forum->enddate);?>
             <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
             <div class="title">
                 <b><?php echo $forum->name ?></b> <br>
             </div>
             <div class="itemsum"><p>
                     <?php
-                    echo 'Hidden'; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                    echo 'Hidden'; ?> <a href="#"> Modify </a> | <a href="#"
+                                                                    onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE ?>)">
+                        Delete </a> | <a href="#"> Copy </a><br>
                     <?php
                     } ?>
 
                 <p><?php echo $forum->description ?></p>
             </div>
         </div>
-    <?php } else{ ?>
+    <?php } else { ?>
         <div class="item">
             <?php if ($forum->name != '##hidden##') {
             $endDate = AppUtility::formatDate($forum->enddate);?>
             <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
             <div class="title">
                 <b><?php echo $forum->name ?></b> <br>
             </div>
             <div class="itemsum"><p>
-                    <?php }
+                    <?php
+                    }
                     $startDate = AppUtility::formatDate($forum->startdate);
                     $endDate = AppUtility::formatDate($forum->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                    echo "Showing " . $startDate . " until " . $endDate; ?> <a href="#"> Modify </a> | <a href="#"
+                                                                                                          onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE ?>)">
+                        Delete </a> | <a href="#"> Copy </a><br>
 
             </div>
 
         </div>
-    <?php }?>
+    <?php } ?>
     <?php break; ?>
 
     <!-- ////////////////// Wiki here //////////////////-->
-<?php case 'Wiki': ?>
+<?php
+case 'Wiki': ?>
     <?php $wikis = $item[key($item)]; ?>
     <?php $endDateOfWiki = AppUtility::formatDate($wikis['enddate'], 'm/d/y');
     ?>
@@ -328,7 +354,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <br><span> Showing until:</span>
                 <?php if ($wikis['enddate'] < AppConstant::ALWAYS_TIME) {
                     echo $endDateOfWiki;
-                } else { ?>
+                } else {
+                    ?>
                     Always
                 <?php } ?>
                 <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a><br>
@@ -367,7 +394,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     <?php break; ?>
 
     <!-- ////////////////// Linked text here //////////////////-->
-<?php case 'LinkedText': ?>
+<?php
+case 'LinkedText': ?>
     <?php $link = $item[key($item)]; ?>
     <!--                                --><?php //if ($link->avail != 0 && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
     <!--Link type : http-->
@@ -381,7 +409,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
             <div class="title">
                 <?php if ($link->target == 1) { ?>
-                    <b><a href="<?php echo $text ?>"target="_blank"><?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
+                    <b><a href="<?php echo $text ?>" target="_blank"><?php echo $link->title ?>&nbsp;<img
+                                src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
                 <?php } else { ?>
                     <b><a href="<?php echo $text ?>"><?php echo $link->title; ?></a></b>
                 <?php } ?>
@@ -399,8 +428,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                             until Always
                         <? } else { ?>
                             until <?php echo $endDateOfLink ?>,
-                        <?php }
-                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <?php
+                        }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) {
+                        ?>
                         <br>Showing Always until <?php echo $endDateOfLink ?>
                     <?php } ?>
                 <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
@@ -409,8 +440,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         Always
                     <?php } else { ?>
                         <?php echo $endDateOfLink ?>
-                    <?php }
-                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <?php
+                    }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) {
+                    ?>
                     <br> Showing until:<?php echo $endDateOfLink; ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
@@ -460,8 +493,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                             until Always
                         <? } else { ?>
                             until <?php echo $endDateOfLink ?>,
-                        <?php }
-                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <?php
+                        }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) {
+                        ?>
                         <br>Showing Always until <?php echo $endDateOfLink ?>
                     <?php } ?>
                 <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
@@ -470,8 +505,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         Always
                     <?php } else { ?>
                         <?php echo $endDateOfLink ?>
-                    <?php }
-                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <?php
+                    }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) {
+                    ?>
                     <br> Showing until:<?php echo $endDateOfLink; ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
@@ -518,8 +555,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                             until Always
                         <? } else { ?>
                             until <?php echo $endDateOfLink ?>,
-                        <?php }
-                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <?php
+                        }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) {
+                        ?>
                         <br>Showing Always until <?php echo $endDateOfLink ?>
                     <?php } ?>
                 <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
@@ -528,8 +567,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         Always
                     <?php } else { ?>
                         <?php echo $endDateOfLink ?>
-                    <?php }
-                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <?php
+                    }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) {
+                    ?>
                     <br> Showing until:<?php echo $endDateOfLink; ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
@@ -571,8 +612,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                             until Always
                         <? } else { ?>
                             until <?php echo $endDateOfLink ?>,
-                        <?php }
-                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <?php
+                        }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) {
+                        ?>
                         <br>Showing Always until <?php echo $endDateOfLink ?>
                     <?php } ?>
                 <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
@@ -581,8 +624,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         Always
                     <?php } else { ?>
                         <?php echo $endDateOfLink ?>
-                    <?php }
-                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <?php
+                    }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) {
+                    ?>
                     <br> Showing until:<?php echo $endDateOfLink; ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
@@ -601,14 +646,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     <?php break; ?>
 
     <!-- ////////////////// Inline text here //////////////////-->
-<?php case 'InlineText': ?>
+<?php
+case 'InlineText': ?>
     <?php $inline = $item[key($item)];
-  ?>
+    ?>
 
-    <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
+    <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id ?>">
     <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
         <div class="item">
-            <?php $InlineId = $inline->id;?>
+            <?php $InlineId = $inline->id; ?>
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') {
             $endDate = AppUtility::formatDate($inline->enddate);?>
@@ -617,20 +663,38 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <b><?php echo $inline->title ?></b> <br>
             </div>
             <div class="itemsum">
-                    <?php } ?>
-                    <?php if($inline->avail == 2) { ?>
-                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
-                    <?php }
-                    else {
-                        if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
-                        {
-                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
-                       <?php }
-                        else{
-                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
-                        <?php }
+                <?php } ?>
+                <?php if ($inline->avail == 2) { ?>
+                    <?php echo "Showing Always";
+                    echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> |
+                    <a id="mark-as-deleted"
+                       href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                        Delete </a> | <a
+                        href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                        Copy </a>
+                <?php
+                } else {
+                    if ($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000) {
+                        echo "Showing until: Always";
+                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> |
+                        <a id="mark-as-deleted"
+                           href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                            Delete </a> | <a
+                            href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                            Copy </a>
+                    <?php
+                    } else {
+                        echo "Showing until: " . $endDate;
+                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> |
+                        <a id="mark-as-deleted"
+                           href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                            Delete </a> | <a
+                            href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                            Copy </a>
+                    <?php
                     }
-                    ?>
+                }
+                ?>
                 <p><?php echo $inline->text ?></p>
             </div>
             <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -641,7 +705,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 </ul>
             <?php } ?>
         </div>
-    <?php } elseif($inline->avail == 0) { ?>
+    <?php } elseif ($inline->avail == 0) { ?>
         <div class="item">
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') {
@@ -651,8 +715,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <b><?php echo $inline->title ?></b> <br>
             </div>
             <div class="itemsum"><p>
-                    <?php  }
-                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
+                    <?php
+                    }
+                    echo 'Hidden';
+                    echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?>
+                    | <a id="mark-as-deleted"
+                         href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                        Delete </a> | <a
+                        href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id . '&courseId=' . $course->id) ?>">
+                        Copy </a>
 
                 <p><?php echo $inline->text ?></p>
             </div>
@@ -665,26 +736,30 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <?php } ?>
         </div>
         <div class="clear"></div>
-    <?php } else{ ?>
+    <?php } else { ?>
         <div class="item">
             <?php if ($inline->title != '##hidden##') {
             $endDate = AppUtility::formatDate($inline->enddate);?>
             <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+
             <div class="title">
                 <b><?php echo $inline->title ?></b> <br>
             </div>
             <div class="itemsum"><p>
-                    <?php }
+                    <?php
+                    }
                     $startDate = AppUtility::formatDate($inline->startdate);
                     $endDate = AppUtility::formatDate($inline->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href=""> Copy </a>';?>
+                    echo "Showing " . $startDate . " until " . $endDate;
+                    echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href=""> Copy </a>';?>
             </div>
         </div>
-    <?php }?>
+    <?php } ?>
     <?php break; ?>
 
     <!-- Calender Here-->
-<?php case 'Calendar': ?>
+<?php
+case 'Calendar': ?>
     <pre><a href="<?php echo AppUtility::getURLFromHome(
             'instructor', 'instructor/index?id=' . $item['Calendar'] . '&block=' . $parent . '&cid=' . $course->id . '&remove=' . true); ?>">Delete</a> | <a
             href="
@@ -697,7 +772,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     <?php break; ?>
 
     <!--  Block here-->
-<?php case 'Block': ?>
+<?php
+case 'Block': ?>
     <?php $block = $item[key($item)]; ?>
     <?php if ($block['avail'] != 0 && $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
         <div class=block>
@@ -732,7 +808,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
                 <?php switch (key($item)):
                     /*Assessment here*/
-                    case 'Assessment': ?>
+                    case 'Assessment':
+                        ?>
                         <div class="inactivewrapper "
                              onmouseout="this.className='inactivewrapper'">
                             <?php $assessment = $item[key($item)]; ?>
@@ -806,7 +883,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- Forum here-->
-                    <?php case 'Forum': ?>
+                    <?php
+                    case 'Forum': ?>
                         <?php $forum = $item[key($item)]; ?>
                         <?php if ($forum->avail != AppConstant::ZERO_VALUE && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                             <?php if ($forum->avail == AppConstant::NUMERIC_ONE && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
@@ -839,7 +917,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- ////////////////// Wiki here //////////////////-->
-                    <?php case 'Wiki': ?>
+                    <?php
+                    case 'Wiki': ?>
                         <?php $wikis = $item[key($item)]; ?>
                         <?php if ($wikis->avail != AppConstant::NUMERIC_ZERO && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                             <?php if ($wikis->avail == AppConstant::NUMERIC_ONE && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
@@ -878,7 +957,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- ////////////////// Linked text here //////////////////-->
-                    <?php case 'LinkedText': ?>
+                    <?php
+                    case 'LinkedText': ?>
                         <?php $link = $item[key($item)]; ?>
                         <?php if ($link->avail != AppConstant::NUMERIC_ZERO && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
                             <!--Link type : http-->
@@ -964,33 +1044,36 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- ////////////////// Inline text here //////////////////-->
-                    <?php case 'InlineText': ?>
-                        <?php $inline = $item[key($item)];?>
-                        <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
+                    <?php
+                    case 'InlineText': ?>
+                        <?php $inline = $item[key($item)]; ?>
+                        <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id ?>">
                         <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') {
                                 $endDate = AppUtility::formatDate($inline->enddate);?>
-                            <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                            <img alt="text item" class="floatleft"
+                                 src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                 <div class="title">
                                     <b><?php echo $inline->title ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
                                         <?php } ?>
-                                        <?php if($inline->avail == 2) {
-                                            echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                        }
-                                        else {
-                                            if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
-                                            {
-                                                echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                            }
-                                            else{
-                                                echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php if ($inline->avail == 2) {
+                                            echo "Showing Always";
+                                            echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        } else {
+                                            if ($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000) {
+                                                echo "Showing until: Always";
+                                                echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                            } else {
+                                                echo "Showing until: " . $endDate;
+                                                echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
                                             }
                                         }
                                         ?>
+
                                     <p><?php echo $inline->text ?></p>
                                 </div>
                                 <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -1001,18 +1084,21 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     </ul>
                                 <?php } ?>
                             </div>
-                        <?php } elseif($inline->avail == 0) { ?>
+                        <?php } elseif ($inline->avail == 0) { ?>
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($inline->title != '##hidden##') {
                                 $endDate = AppUtility::formatDate($inline->enddate);?>
-                            <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                            <img alt="text item" class="floatleft faded"
+                                 src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
                                 <div class="title">
                                     <b><?php echo $inline->title ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
-                                        <?php  }
-                                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php
+                                        }
+                                        echo 'Hidden';
+                                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
                                         ?>
 
                                     <p><?php echo $inline->text ?></p>
@@ -1026,26 +1112,31 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <?php } ?>
                             </div>
                             <div class="clear"></div>
-                        <?php } else{ ?>
+                        <?php } else { ?>
                             <div class="item">
                                 <?php if ($inline->title != '##hidden##') {
                                 $endDate = AppUtility::formatDate($inline->enddate);?>
-                                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                <img alt="text item" class="floatleft faded"
+                                     src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+
                                 <div class="title">
                                     <b><?php echo $inline->title ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
-                                        <?php }
+                                        <?php
+                                        }
                                         $startDate = AppUtility::formatDate($inline->startdate);
                                         $endDate = AppUtility::formatDate($inline->enddate);
-                                        echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+                                        echo "Showing " . $startDate . " until " . $endDate;
+                                        echo '<a href="' . AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id . '&courseId=' . $course->id) . '"> Modify  </a> | <a id="mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';?>
                                 </div>
                             </div>
-                        <?php }?>
+                        <?php } ?>
                         <?php break; ?>
 
                         <!-- Calender Here-->
-                    <?php case 'Calendar': ?>
+                    <?php
+                    case 'Calendar': ?>
                         <pre><a href="<?php echo AppUtility::getURLFromHome(
                                 'instructor', 'instructor/index?id=' . $item['Calendar'] . '&block=' . $parent . '&cid=' . $course->id . '&remove=' . true); ?>">Delete</a> | <a
                                 href="
@@ -1090,7 +1181,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
                 <?php switch (key($item)):
                     /*Assessment here*/
-                    case 'Assessment': ?>
+                    case 'Assessment':
+                        ?>
                         <div class="inactivewrapper "
                              onmouseout="this.className='inactivewrapper'">
                             <?php $assessment = $item[key($item)]; ?>
@@ -1166,84 +1258,97 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
                         <!-- Forum here-->
 
-                    <?php case 'Forum': ?>
+                    <?php
+                    case 'Forum': ?>
                         <?php $forum = $item[key($item)];
-                        if ($forum->avail == 2 || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == 1) {?>
+                        if ($forum->avail == 2 || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == 1) {
+                            ?>
 
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($forum->name != '##hidden##') {
                                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                <img alt="text item" class="floatleft"
+                                     src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
                                 <div class="title">
                                     <b><?php echo $forum->name ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
                                         <?php } ?>
 
-                                        <?php if($forum->avail == 2) {
-                                            echo "Showing Always"; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
-                                        }
-                                        else {
-                                            if($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000)
-                                            {
-                                                echo "Showing until: Always"; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
-                                            }
-                                            else{
-                                                echo "Showing until: " .$endDate; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
+                                        <?php if ($forum->avail == 2) {
+                                            echo "Showing Always";
+                                            echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
+                                        } else {
+                                            if ($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000) {
+                                                echo "Showing until: Always";
+                                                echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
+                                            } else {
+                                                echo "Showing until: " . $endDate;
+                                                echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a><br>';
                                             }
                                         }
                                         $duedates = "";
                                         if ($forum->postby > $currentTime && $forum->postby != 2000000000) {
-                                            echo('New Threads due '), AppUtility::formatdate($forum->postby).".";
+                                            echo('New Threads due '), AppUtility::formatdate($forum->postby) . ".";
                                         }
                                         if ($forum->replyby > $currentTime && $forum->replyby != 2000000000) {
-                                            echo(' Replies due '), AppUtility::formatdate($forum->replyby).".";
+                                            echo(' Replies due '), AppUtility::formatdate($forum->replyby) . ".";
                                         }
                                         ?>
+
                                     <p><?php echo $forum->description ?></p>
                                 </div>
                             </div>
 
-                        <?php } elseif($forum->avail == 0) { ?>
+                        <?php } elseif ($forum->avail == 0) { ?>
                             <div class="item">
                                 <!--Hide title and icon-->
                                 <?php if ($forum->name != '##hidden##') {
                                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                <img alt="text item" class="floatleft faded"
+                                     src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
                                 <div class="title">
                                     <b><?php echo $forum->name ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
                                         <?php
-                                        echo 'Hidden'; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
+                                        echo 'Hidden';
+                                        echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';
                                         } ?>
 
                                     <p><?php echo $forum->description ?></p>
                                 </div>
                             </div>
-                        <?php } else{ ?>
+                        <?php } else { ?>
                             <div class="item">
                                 <?php if ($forum->name != '##hidden##') {
                                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                <img alt="text item" class="floatleft faded"
+                                     src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+
                                 <div class="title">
                                     <b><?php echo $forum->name ?></b> <br>
                                 </div>
                                 <div class="itemsum"><p>
-                                        <?php }
+                                        <?php
+                                        }
                                         $startDate = AppUtility::formatDate($forum->startdate);
                                         $endDate = AppUtility::formatDate($forum->enddate);
-                                        echo "Showing " .$startDate. " until " .$endDate; echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';?>
+                                        echo "Showing " . $startDate . " until " . $endDate;
+                                        echo '<a href="#"> Modify  </a> | <a href="#"> Delete </a> | <a href="#"> Copy </a>';?>
                                 </div>
 
                             </div>
-                        <?php }?>
+                        <?php } ?>
                         <?php break; ?>
 
                         <!-- ////////////////// Wiki here //////////////////-->
 
-                    <?php case 'Wiki': ?>
+                    <?php
+                    case 'Wiki': ?>
                         <?php $wikis = $item[key($item)]; ?>
                         <?php if ($wikis->avail != AppConstant::NUMERIC_ZERO && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                             <?php if ($wikis->avail == AppConstant::NUMERIC_ONE && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
@@ -1285,7 +1390,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- ////////////////// Linked text here //////////////////-->
-                    <?php case 'LinkedText': ?>
+                    <?php
+                    case 'LinkedText': ?>
                         <?php $link = $item[key($item)]; ?>
                         <?php if ($link->avail != AppConstant::NUMERIC_ONE && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
                             <!--Link type : http-->
@@ -1372,7 +1478,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php break; ?>
 
                         <!-- ////////////////// Inline text here //////////////////-->
-                    <?php case 'InlineText': ?>
+                    <?php
+                    case 'InlineText': ?>
                         <?php $inline = $item[key($item)]; ?>
                         <?php if ($inline->avail != AppConstant::NUMERIC_ZERO && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
                             <div class="item">
@@ -1440,7 +1547,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 <?php endswitch;
 ?>
 
-<?php }?>
+<?php } ?>
 
 <?php } ?>
 </div>

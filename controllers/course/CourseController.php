@@ -731,7 +731,6 @@ class CourseController extends AppController
             $pageTitle = 'Modify Inline Text';
             if($this->isPost()){
                 $params = $_POST;
-//                AppUtility::dump($params);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
                 if ($params['title']=='##hidden##') {
                     $hidetitle = true;
@@ -747,6 +746,10 @@ class CourseController extends AppController
             $pageTitle = 'Add Inline Text';
             if($this->isPost()){
                 $params = $_POST;
+                $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+                $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+
+//                AppUtility::dump($d);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
                 $saveChanges = new InlineText();
                 $lastInlineId = $saveChanges->saveChanges($params);
@@ -820,6 +823,7 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
         $inlineId = $this->getParamVal('id');
+
 
     }
 

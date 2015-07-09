@@ -2508,8 +2508,20 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function t($key){
-        echo  Yii::t('yii', $key);
+    public static function get_meta_keys(){
+    $keys = array();
+        $keys[] = 'settings';
+
+    // key value json
+    }
+
+    public static function t($key, $echo = true){
+        $val = Yii::t('yii', $key);
+        if($echo){
+            echo $val;
+        } else{
+            return $val;
+        }
     }
 
     public static function hl_tidy($t, $w, $p) {
