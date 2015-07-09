@@ -1,6 +1,28 @@
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left"><a herf="#">Support</a><a id="about" href="#">About</a><a id="contact" href="#">Contact</a> <a id="policy" href="#">PrivacyPolicy</a></p>
-        <p class="pull-right brand-name-footer"><b>MyOpenMath</b></p>
+<div class="master-footer">
+<div class="row">
+    <div class="col-md-10">
+            <div class="col-md-2">
+                <a herf="#">Support</a>
+            </div>
+
+            <div class="col-md-2">
+                <a href="#">About</a>
+            </div>
+
+            <div class="col-md-2">
+                <a href="#">Contact</a>
+            </div>
+
+            <div class="col-md-2">
+                <a href="#">PrivacyPolicy</a>
+            </div>
     </div>
-</footer>
+    <div class="row">
+        <div class="col-md-2 footer-brand">
+
+                <b>MyOpenMath</b>
+
+        </div>
+    </div>
+</div>
+</div>

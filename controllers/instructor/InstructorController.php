@@ -519,12 +519,5 @@ class InstructorController extends AppController
             $thread->deleteThreadById($params['id']);
         }
     }
-
-    public function actionLayoutTesting()
-    {
-        $this->layout = "master";
-
-        return $this->render('layoutTesting');
-    }
 }
 

@@ -7,14 +7,14 @@
             <?php echo isset($page_title) ?  $page_title : ""; ?>
         </div>
     </div>
-    <div class="right-side right-float">
+    <div class="right-side right-float" style="background-color: #104e8c; height: 50px; width: 150px">
         <div class="right-items left-float" >
             <div class="item-icon">
                 <span>
 
                 </span>
             </div>
-            <div class="item-name left-float">
+            <div class="item-name left-float" style="margin-top: 15px; margin-left: 5px">
                 <?php echo isset($item_name) ?  $item_name : ""; ?>
             </div>
             <div class="clear-both"></div>

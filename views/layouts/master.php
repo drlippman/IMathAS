@@ -49,8 +49,6 @@ AppAsset::register($this);
 <?php $this->endBody() ?>
 <div class="clear-both"></div>
 </body>
-
 <?php echo $this->render( '_footer'); ?>
-
 </html>
 <?php $this->endPage() ?>
