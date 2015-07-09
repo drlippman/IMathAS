@@ -41,8 +41,6 @@ class InstructorController extends AppController
 
     public function actionIndex()
     {
-//        echo "fafasf";die;
-        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
