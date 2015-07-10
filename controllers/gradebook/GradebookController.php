@@ -2243,10 +2243,12 @@ class GradebookController extends AppController
             return $this->redirect('gradebook?cid='.$course['id']);
         }
         $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
-        $this->includeJS(['gradebook/gbComments.js','gradebook/addgrades.js']);
+        $this->includeJS(['gradebook/gbComments.js']);
         $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo, 'commentType' => $commentType);
         return $this->renderWithData('gbComments', $responseData);
     }
+
+//Controller method to upload gradebook comment
     public function actionUploadComments()
     {
         $this->guestUserHandler();
@@ -2263,14 +2265,14 @@ class GradebookController extends AppController
                 $model->file->saveAs($filename);
             }
             $failures = array();
-            $successes = 0;
-            if ($params['userIdType']==0) {
-                $usercol = $params['userNameCol']-1;
-            } else if ($params['userIdType']==1) {
-                $usercol = $params['fullNameCol']-1;
+            $successes = AppConstant::NUMERIC_ZERO;
+            if ($params['userIdType']== AppConstant::NUMERIC_ZERO) {
+                $usercol = $params['userNameCol'] - AppConstant::NUMERIC_ONE;
+            } else if ($params['userIdType'] == AppConstant::NUMERIC_ONE) {
+                $usercol = $params['fullNameCol']-AppConstant::NUMERIC_ONE;
             }
             if($usercol != AppConstant::NUMERIC_NEGATIVE_ONE){
-                $scorecol = $params['UploadCommentsForm']['commentsColumn']-1;
+                $scorecol = $params['UploadCommentsForm']['commentsColumn'] - AppConstant::NUMERIC_ONE;
                 $handle = fopen($filename, 'r');
                 if ($params['UploadCommentsForm']['fileHeaderRow'] == AppConstant::NUMERIC_ONE) {
                     $data = fgetcsv($handle,4096,',');
@@ -2294,6 +2296,15 @@ class GradebookController extends AppController
         $this->includeCSS(['site.css']);
         $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
         return $this->renderWithData('uploadComments',$responseData);
+    }
+
+//Controller method for gradebook settings
+    public  function actionGbSettings(){
+        $this->guestUserHandler();
+        $course = Course::getById($this->getParamVal('cid'));
+        $this->includeJS(['gradebook/gbSettings.js']);
+        $responseData = array('course' => $course);
+        return $this->renderWithData('gbSettings', $responseData);
     }
 
 }

@@ -410,7 +410,10 @@ class SiteController extends AppController
     }
     public function actionHelperGuide()
     {
-        return $this->renderWithData('help');
+        $params = $this->getRequestParams();
+        $section = $params['section'];
+        $responseData = (['section' => $section]);
+        return $this->renderWithData('help', $responseData);
     }
 
     public function actionDocumentation()

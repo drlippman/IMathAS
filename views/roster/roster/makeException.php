@@ -45,11 +45,10 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             <?php
                 if($existingExceptions){
                 echo " <div><h4>Existing Exceptions</h4><p>Select exceptions to clear</p>"
-            ?><div><div class="alert alert-success">
+            ?><div class='exception-list'><pre>
                 <?php
                     foreach($existingExceptions as $entry){
-                        echo "<ul><li>".$entry['Name']."<ul>";
-                            natsort($entry['assessments']);
+                        echo "<ul><li><b>".$entry['Name']."</b><ul>";
                             foreach($entry['assessments'] as $singleAssessment){
                                 echo "<li><input type='checkbox' name='clears[]' value='{$singleAssessment['exceptionId']}'>".' '."{$singleAssessment['assessmentName']}".' ('."{$singleAssessment['exceptionDate']}".')';
                                     if ($singleAssessment['waiveReqScore']==1) {
@@ -59,7 +58,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                             }
                         echo "</ul></li>";
                 ?>
-            <?php echo "</ul>"; } echo "</div></div></div><input type='submit'  class='btn btn-primary record-submit' id='change-record' value='Record Changes'>";}
+            <?php echo "</ul>"; } echo "</pre></div></div><input type='submit'  class='btn btn-primary record-submit clear-exception' id='change-record' value='Record Changes'>";}
             else{
                 echo"<div class='alert alert-danger'><p>No exceptions currently exist for the selected students.</p></div>";
             }?>
@@ -127,12 +126,12 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             </span>
             <br class="form">
             <p>Set Exception for assessments:</p>
-            <ul>
+            <ul  class='assessment-list'>
                 <?php foreach ($assessments as $assessment) { ?>
                 <?php echo "<li><input type='checkbox' name='addExc[]' value='{$assessment->id}'>".' '. ucfirst($assessment->name)."</li>";?>
                 <?php } ?>
             </ul>
-            <input type="submit" class="btn btn-primary record-submit" id="change-record" value="Record Changes">
+            <input type="submit" class="btn btn-primary record-submit create-exception" id="change-record" value="Record Changes">
             <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
                 <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
             <?php }else {?>

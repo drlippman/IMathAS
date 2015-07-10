@@ -31,7 +31,7 @@ switch(key($item)):
 case 'Assessment': ?>
     <?php $assessment = $item[key($item)];
 
-    if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
+    if ($assessment->enddate > $currentTime && $assessment->startdate <= $currentTime) {
         ?>
         <div class="item">
             <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>

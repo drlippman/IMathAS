@@ -49,17 +49,17 @@ if($commentType == "instr") {
 <div >
     <span class="pull-left"><b>User is identified by</b></span>
             <span class="user-identity ">
-                <input type="radio" name="userIdType" value="0" checked="1"><b>Username (login name) in column</b>
-                <input type="text" size="4" name="userNameCol"><br>
-                <input type="radio" name="userIdType" value="1"><b>Lastname, Firstname in column</b>
-                <input type="text" size="4" name="fullNameCol">
+                <div class="col-lg-7" style="padding-left: 0px"><input type="radio" name="userIdType" value="0" checked="1">&nbsp;<b>Username (login name) in column</b></div>
+                <div class="col-lg-2"><input class="form-control" type="text" size="4" name="userNameCol"><br></div>
+                <div class="col-lg-7" style="padding-left: 0px"><input type="radio" name="userIdType" value="1">&nbsp;<b>Lastname, Firstname in column</b></div>
+                <div class="col-lg-2"><input class="form-control" type="text" size="4" name="fullNameCol"></div>
             </span>
 </div>
 
     </fieldset>
     <div class="form-group">
-        <div class="col-lg-offset-3 roster-submit"><br class="form">
-            <?php echo Html::submitButton('Submit', ['class' => 'btn btn-primary', 'id' => 'submit', 'name' => 'Submit']) ?>
+        <div class="col-lg-offset-3"><br class="form">
+            <?php echo Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
             <?php if ($commentType == "instr"){ ?>
                 <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id.'&comtype=instr')  ?>">Back</a>
             <?php } else {?>

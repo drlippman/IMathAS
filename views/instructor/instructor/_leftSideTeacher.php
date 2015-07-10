@@ -16,7 +16,8 @@ use app\components\AppUtility;
 
 <p>Tools</p>
 <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"> Roster</a><br>
-<a href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>">Gradebook</a><br>
+<!--<a href="--><?php //echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?><!--">Gradebook</a><br>-->
+<a href="#">Gradebook</a><br>
 <a href="#">Groups</a><br>
 <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id); ?>">Outcomes</a><br>
 <a href="#">Calendar</a><br>

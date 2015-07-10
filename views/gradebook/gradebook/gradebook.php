@@ -8,10 +8,12 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 <h2>Gradebook</h2>
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
 <input type="hidden" class="user-info" name="user-info" value="<?php echo $user->id; ?>"/>
+<input type="hidden" id="gradebook-id" name="gradebook-data" value=""/>
 <div class="cpmid">
     Offline Grades: <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id); ?>">Add</a>, <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/manage-offline-grades?cid='.$course->id); ?>">Manage</a> |
                 <select id="exportsel" onchange="chgexport()"><option value="0">Export to...</option></select> |
-    <a href="#">GB Settings</a> | <a href="#">Averages</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id."&stu=0"); ?>">Comments</a> | <input type="button" id="lockbtn" class="btn-primary"onclick="lockcol()" value="Lock headers"> |
+                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-settings?cid='.$course->id); ?>">GB Settings</a> | <a href="#">Averages</a> |
+                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid='.$course->id."&stu=0"); ?>">Comments</a> | <input type="button" id="lockbtn" class="btn-primary"onclick="lockcol()" value="Lock headers"> |
     Color:      <select id="colorsel" onchange="updateColors(this)"><option value="0">None</option></select> | <a href="#" onclick="chgnewflag(); return false;">NewFlag</a><br><br>
     Category:   <select id="filtersel" onchange="chgfilter()"><option value="-1">All</option><option value="0">Default</option><option value="-2" selected="1">Category Totals</option></select> |
     Not Counted:<select id="toggle2" onchange="chgtoggle()"><option value="0">Show all</option><option value="1">Show stu view</option><option value="2" selected="selected">Hide all</option></select> |

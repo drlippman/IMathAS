@@ -25,6 +25,7 @@ function showGradebookSuccess(response){
     var result = JSON.parse(response);
     //console.log(result.data)
     gradebookData = result.data.gradebook;
+    document.getElementById("gradebook-id").value = gradebookData;
     data = result.data;
     if(data.availShow == 4){
         data.availShow = 1;
@@ -821,3 +822,5 @@ function teacherMakeException() {
         }
     });
 }
+
+

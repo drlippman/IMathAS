@@ -24,7 +24,7 @@ if($commentType == "instr"){
 <form id="mainform" method="post" action="#">
     <span class="form">Add/Replace to all</span>
     <span class="formright">
-        <textarea cols="50" rows="3" id="feedback_txt" class="form-control"></textarea><br>
+        <textarea cols="50" rows="3" id="comment_txt" class="form-control"></textarea><br>
         <input type="hidden" id="isComment" name="isComment" value="1"/>
         <input type="hidden" id="courseId" value="<?php echo $course->id ?>"/>
         <input type="button"  value="Append" class="btn btn-primary" onclick="appendPrependReplaceText(1)" />
@@ -35,7 +35,7 @@ if($commentType == "instr"){
         <br class="form">
         <span class="form"><?php echo ucfirst($student['LastName']." ".ucfirst($student['FirstName']));?></span>
         <span class="formright">
-        <textarea class="form-control feedback-text-id" cols="50" rows="3" name="<?php echo $student['id'];?>"><?php if($commentType == "instr"){echo trim($student['gbinstrcomment']);}else{ echo trim($student['gbcomment']);}?></textarea>
+        <textarea class="form-control comment-text-id" cols="50" rows="3" name="<?php echo $student['id'];?>"><?php if($commentType == "instr"){echo trim($student['gbinstrcomment']);}else{ echo trim($student['gbcomment']);}?></textarea>
         </span>
     <?php
     }

@@ -11,7 +11,7 @@ class Assessments extends BaseImasAssessments
 {
     public static function getByCourseId($courseId)
     {
-        return Assessments::findAll(['courseid' => $courseId]);
+        return Assessments::find()->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 
     public static function getByAssessmentId($id)

@@ -549,7 +549,7 @@ class RosterController extends AppController
         $existingUser = array();
         if ($course) {
             $handle = fopen($fileName, 'r');
-            if ($params['ImportStudentForm']['headerRow'] == AppConstant::NUMERIC_ONE) {
+                if ($params['ImportStudentForm']['headerRow'] == AppConstant::NUMERIC_ONE) {
                 $data = fgetcsv($handle, 2096);
             }
             while (($data = fgetcsv($handle, 2096)) !== false) {
@@ -1077,6 +1077,7 @@ class RosterController extends AppController
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
                     $latePassMsg = $this->findLatepassMsg($studentArray, $courseId);
                 }
+
                 $sort_by = array_column($exceptionArray, 'Name');
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $exceptionArray);
                 $sort_by = array_column($studentArray, 'LastName');
@@ -1084,7 +1085,11 @@ class RosterController extends AppController
             }
             $this->includeJS(['roster/makeException.js']);
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg, 'gradebook' =>  $isGradebook);
-            return $this->renderWithData('makeException', $responseData);
+            if(count($studentArray) > AppConstant::NUMERIC_ZERO){
+                return $this->renderWithData('makeException', $responseData);
+            } else {
+                $this->redirect(AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id));
+            }
         } else {
             $this->setErrorFlash(AppConstant::NO_USER_FOUND);
         }
@@ -1103,6 +1108,8 @@ class RosterController extends AppController
                     array_push($exceptionList, $tempArray);
                 }
             }
+            $sort_by = array_column($exceptionList, 'assessmentName');
+            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $exceptionList);
             if ($exceptionList) {
                 $assessmentList = array('Name' => ucfirst($student['LastName']) . ', ' . ucfirst($student['FirstName']), 'assessments' => $exceptionList);
                 array_push($exceptionArray, $assessmentList);
