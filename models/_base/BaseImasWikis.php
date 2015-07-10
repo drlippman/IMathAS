@@ -37,7 +37,7 @@ class BaseImasWikis extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'description', 'courseid', 'startdate', 'editbydate', 'enddate'], 'required'],
+//            [['name', 'description', 'courseid', 'startdate', 'editbydate', 'enddate'], 'required'],
             [['description'], 'string'],
             [['courseid', 'startdate', 'editbydate', 'enddate', 'settings', 'groupsetid', 'avail'], 'integer'],
             [['name'], 'string', 'max' => 254]

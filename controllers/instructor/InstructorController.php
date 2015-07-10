@@ -58,7 +58,7 @@ class InstructorController extends AppController
                      return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
                     break;
                 case 'wiki':
-                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                     return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
                     break;
                 case 'block':
                      return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));

@@ -308,7 +308,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
 
-                <br><span>Hidden</span> <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a>
+                <br><span>Hidden</span>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a>
             </div>
             <div class="itemsum">
                 <p>
@@ -351,7 +352,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
-                <br><span>Showing Always</span> <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a><br>
+                <br><span>Showing Always</span>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -367,7 +369,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
     <?php break; ?>
 
     <!-- ////////////////// Linked text here //////////////////-->
-<?php case 'LinkedText': ?>
+<?php
+case 'LinkedText': ?>
     <?php $link = $item[key($item)]; ?>
     <!--                                --><?php //if ($link->avail != 0 && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
     <!--Link type : http-->
@@ -381,7 +384,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
             <div class="title">
                 <?php if ($link->target == 1) { ?>
-                    <b><a href="<?php echo $text ?>"target="_blank"><?php echo $link->title ?>&nbsp;<img src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
+                    <b><a href="<?php echo $text ?>" target="_blank"><?php echo $link->title ?>&nbsp;<img
+                                src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
                 <?php } else { ?>
                     <b><a href="<?php echo $text ?>"><?php echo $link->title; ?></a></b>
                 <?php } ?>

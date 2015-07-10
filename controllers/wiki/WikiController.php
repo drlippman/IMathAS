@@ -5,6 +5,7 @@ use app\components\AppUtility;
 use app\components\WikiUtility;
 use app\controllers\AppController;
 use app\models\Course;
+use app\models\Items;
 use app\models\Wiki;
 use app\models\WikiRevision;
 
@@ -99,5 +100,67 @@ class WikiController extends AppController
                 $wikicontent = '**wver'.$wikiver.'**'.$wikicontent;
            }
         }
+    }
+
+    public function actionAddWiki()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParamVal('courseId');
+        $wikiId = $this->getParamVal('id');
+        $course = Course::getById($courseId);
+        $wiki = Wiki::getById($wikiId);
+
+        $params = $this->getRequestParams();
+        $wikiid = $params['id'];
+        $saveTitle = '';
+        if(isset($params['id']))
+        {
+            $hidetitle = false;
+            $pageTitle = 'Modify Wiki';
+            if($this->isPost()){
+                $params = $_POST;
+                $page_formActionTag = AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wiki->id.'&courseId=' .$course->id);
+
+                $saveChanges = new Wiki();
+                $saveChanges->updateChange($params, $wikiid);
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            }
+            $saveTitle = AppConstant::SAVE_BUTTON;
+        }
+        else {
+            $pageTitle = 'Add Wiki';
+            if($this->isPost()){
+                $params = $_POST;
+                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
+                $saveChanges = new Wiki();
+                $lastWikiId = $saveChanges->createItem($params);
+//                AppUtility::dump($lastWikiId);
+                $saveItems = new Items();
+                $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
+                $courseItemOrder = Course::getItemOrder($courseId);
+                $itemorder = $courseItemOrder->itemorder;
+
+                $items = unserialize($itemorder);
+
+                $blocktree = array(0);
+                $sub =& $items;
+
+                for ($i=1;$i<count($blocktree);$i++) {
+                    $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+
+                }
+                array_unshift($sub,intval($lastItemsId));
+                $itemorder = addslashes(serialize($items));
+                $saveItemOrderIntoCourse = new Course();
+                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            }
+            $saveTitle = AppConstant::New_Item;
+        }
+
+        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki);
+        return $this->render('addWiki', $returnData);
     }
 }
