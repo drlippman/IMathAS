@@ -92,6 +92,7 @@ class AppConstant
     const SAVE_BUTTON = "Save Changes";
     const CREATE_BUTTON = "Create Assessment";
     const DEFAULT_OUTCOMES = 'No default outcome selected';
+    const DEFAULT_OUTCOMES_FOR_FORUM='Select an outcome...';
     const GROUP_SET ='Create new set of groups';
     const NONE = "None";
     const UNLIMITED = "Unlimited";
@@ -112,11 +113,20 @@ class AppConstant
     const USERNAME_ENROLLED="This username is already enrolled in the class";
     const MIN_LATEPASS = "These students all have %u latepasses.";
     const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
-    const FORUMTYPE = 1;
+
     const ASSESSMENT_ALREADY_STARTED = "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
     const DEFAULT_ASSESSMENT_INTRO = "Enter intro/instructions";
     const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
     const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
+
     const MODIFY_ASSESSMENT ="Modify Assessment";
     const ADD_ASSESSMENT ="Add Assessment";
+
+    const FORUMTYPE = '1';
+    const WIKI = 'WIKI';
+    const LINK ='LINK';
+    const ASSESSEMENT ='ASSESSMENT';
+    const INLINE_TEXT = 'INLINE';
+    const CALENDAR = 'CALENDAR';
+    const BLOCK = 'BLOCK';
 }

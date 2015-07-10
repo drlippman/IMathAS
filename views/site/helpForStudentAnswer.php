@@ -11,14 +11,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <img class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/typing.jpg" alt="Computer screens"/>
 
     <div class="content">
-        <h4>Answer Types</h4>
+        <h4><?php AppUtility::t('Answer Types');?></h4>
         <p class="ind">
-            Each question requests a specific type of answer.  Usually a question will display a hint
+            <?php AppUtility::t('Each question requests a specific type of answer.  Usually a question will display a hint
             at the end of the question as to what type of answer is expected.  In addition to
             multiple choice questions and other standard types, this system also features several mathematical
-            answer types.  Read on for suggestions on entering answers for these types.</p>
+            answer types.  Read on for suggestions on entering answers for these types.')?></p>
 
-        <h4>Numerical Answers</h4>
+        <h4><?php AppUtility::t('Numerical Answers');?></h4>
         <p class="ind">
             Some question ask for numerical answers.  Acceptable answers include whole numbers, integers (negative numbers), and decimal values.
         </p>

@@ -41,8 +41,9 @@ class InstructorController extends AppController
 
     public function actionIndex()
     {
+
 //        $this->layout = "master";
-        $courseId = $this->getParamVal('cid');
+         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
             switch ($type) {
@@ -53,7 +54,7 @@ class InstructorController extends AppController
                      return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
                     break;
                 case 'linkedtext':
-                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                     return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-link?cid='.$courseId));
                     break;
                 case 'forum':
                      return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
@@ -504,7 +505,7 @@ class InstructorController extends AppController
     {
         $params = $this->getBodyParams();
 
-        if($params['itemType'] == AppConstant::FORUMTYPE) {
+        if($params['itemType'] === AppConstant::FORUMTYPE) {
             $forum = new Forums();
             $forum->deleteForum($params);
             $itemId = new Items();
@@ -518,6 +519,7 @@ class InstructorController extends AppController
             $thread = new Thread();
             $thread->deleteThreadById($params['id']);
         }
+        return $this->successResponse();
     }
 }
 
