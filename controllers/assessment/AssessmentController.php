@@ -323,7 +323,6 @@ class AssessmentController extends AppController
                     } else {
                         return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='. $courseId));
                     }
-                    exit;
                 } else { //add new
                     if (!isset($params['copyendmsg'])) {
                         $endMsg = '';

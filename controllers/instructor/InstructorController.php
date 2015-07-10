@@ -41,9 +41,7 @@ class InstructorController extends AppController
 
     public function actionIndex()
     {
-
-//        $this->layout = "master";
-         $courseId = $this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
             switch ($type) {
@@ -97,7 +95,7 @@ class InstructorController extends AppController
         /**
          * Display Items
          */
-        if ($course && count($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
+        if ($course && ($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
                 foreach ($itemOrders as $key => $itemOrder) {
                     $tempAray = array();
                     if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
@@ -148,7 +146,6 @@ class InstructorController extends AppController
                                 array_push($calendarCount, $assessment);
                                 break;
                             case 'Calendar':
-
                                 $tempAray[$item->itemtype] = $itemOrder;
                                 array_push($responseData, $tempAray);
                                 break;
@@ -175,8 +172,6 @@ class InstructorController extends AppController
                         }
                     }
                 }
-
-
         }else{
             if (isset($courseData['tb'])) {
                 $filter = $courseData['tb'];
@@ -194,8 +189,8 @@ class InstructorController extends AppController
             $items = unserialize($course['itemorder']);
                     $blockTree = explode('-',$block);
                     $sub =& $items;
-                    for ($i=1;$i<count($blockTree);$i++) {
-                        $sub =& $sub[$blockTree[$i]-1]['items'];
+                    for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
                     }
                     if ($filter=='b') {
                         $sub[] = $itemId;
@@ -216,11 +211,11 @@ class InstructorController extends AppController
                 $items = unserialize($course['itemorder']);
                 $blockTree = explode('-',$block);
                 $sub =& $items;
-                for ($i=1;$i<count($blockTree);$i++) {
-                    $sub =& $sub[$blockTree[$i]-1]['items'];
+                for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                    $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
                 }
                 $key = array_search($itemId,$sub);
-                array_splice($sub,$key,1);
+                array_splice($sub,$key,AppConstant::NUMERIC_ONE);
                 $itemOrder = addslashes(serialize($items));
                 Course::setItemOrder($itemOrder,$courseId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
@@ -237,39 +232,43 @@ class InstructorController extends AppController
             $items = unserialize($output['itemorder']);
             $blockTree = explode('-',$block);
             $sub =& $items;
-            for ($i=1;$i<count($blockTree)-1;$i++) {
-                $sub =& $sub[$blockTree[$i]-1]['items'];
+            for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree)-AppConstant::NUMERIC_ONE;$i++) {
+                $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
             }
-            if (count($blockTree)>1) {
-               $curBlock =& $sub[$blockTree[$i]-1]['items'];
-               $blockLoc = $blockTree[$i]-1;
+            if (count($blockTree)>AppConstant::NUMERIC_ONE) {
+               $curBlock =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+               $blockLoc = $blockTree[$i]-AppConstant::NUMERIC_ONE;
             } else {
                 $curBlock =& $sub;
             }
-            $blockLoc = $blockTree[count($blockTree)-1]-1;
+            $blockLoc = $blockTree[count($blockTree)-AppConstant::NUMERIC_ONE]-AppConstant::NUMERIC_ONE;
             if (strpos($toPosition ,'-')!==false) {
                if ($toPosition [0]=='O') {
-                  $itemToMove = $curBlock[$fromPosition -1];
-                  array_splice($curBlock,$fromPosition -1,1);
+                  $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
+                  array_splice($curBlock,$fromPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE);
                   if (is_array($itemToMove)) {
-                     array_splice($sub,$blockLoc+1,0,array($itemToMove));
+                     array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($itemToMove));
                   } else {
-                      array_splice($sub,$blockLoc+1,0,$itemToMove);
+                      array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
                   }
                 } else {
-                    $itemToMove = $curBlock[$fromPosition -1];
-                    array_splice($curBlock,$fromPosition -1,1);
-                    $toPosition  = substr($toPosition ,2);
-                    if ($fromPosition <$toPosition ) {$adj=1;} else {$adj=0;}
-                    array_push($curBlock[$toPosition -1-$adj]['items'],$itemToMove);
+                    $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
+                    array_splice($curBlock,$fromPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE);
+                    $toPosition  = substr($toPosition ,AppConstant::NUMERIC_ONE);
+                    if ($fromPosition <$toPosition ) {
+                        $adj=AppConstant::NUMERIC_ONE;
+                    } else {
+                        $adj=AppConstant::NUMERIC_ZERO;
+                    }
+                    array_push($curBlock[$toPosition -AppConstant::NUMERIC_ONE-$adj]['items'],$itemToMove);
                 }
             } else {
-                $itemToMove = $curBlock[$fromPosition -1];
-                array_splice($curBlock,$fromPosition -1,1);
+                $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
+                array_splice($curBlock,$fromPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE);
                 if (is_array($itemToMove)) {
-                   array_splice($curBlock,$toPosition -1,0,array($itemToMove));
+                   array_splice($curBlock,$toPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($itemToMove));
                 } else {
-                    array_splice($curBlock,$toPosition -1,0,$itemToMove);
+                    array_splice($curBlock,$toPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
                 }
             }
             $itemList = addslashes(serialize($items));
@@ -344,7 +343,6 @@ class InstructorController extends AppController
         $returnData = array('course' => $course, 'links' => $link);
         return $this->renderWithData('showLinkedText', $returnData);
     }
-
     /**
      * To handle event on calendar.
      */
@@ -357,11 +355,10 @@ class InstructorController extends AppController
         $calendarItems = CalItem::getByCourseId($courseId);
         $CalendarLinkItems = Links::getByCourseId($courseId);
         $calendarInlineTextItems = InlineText::getByCourseId($courseId);
-
         /**
          * Display assessment Modes:
-         *                         - Normal assessment
-         *                         - Review mode assessment
+         * - Normal assessment
+         * - Review mode assessment
          */
         $assessmentArray = array();
         foreach ($assessments as $assessment)
@@ -379,7 +376,6 @@ class InstructorController extends AppController
                 'courseId' => $assessment['courseid']
             );
         }
-
         /**
          * Display managed events by admin.
          */
@@ -411,7 +407,6 @@ class InstructorController extends AppController
                 'calTag' => $CalendarLinkItem['caltag']
             );
         }
-
         /**
          * Display inline text: tags.
          */
@@ -430,13 +425,13 @@ class InstructorController extends AppController
         $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
         return $this->successResponse($responseData);
     }
-
+/*
+ * Manage Calendar Event
+ */
     public function actionManageEvents()
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
-
-
         $eventData = $this->getRequestParams();
         $courseId = $eventData['cid'];
         $teacherId = Teacher::getByUserId($user->id, $courseId);
@@ -450,44 +445,41 @@ class InstructorController extends AppController
             $from = 'indexPage';
         }
         if ($this->isPost()) {
-            //delete any marked for deletion
-            if (isset($eventData['delete']) && count($eventData['delete'])>0) {
+            /*
+             * Delete Event
+             */
+            if (isset($eventData['delete']) && count($eventData['delete'])>AppConstant::NUMERIC_ZERO) {
                 foreach ($eventData['delete'] as $id=>$val) {
                     if($val == AppConstant::NUMERIC_ONE){
                         CalItem::deleteByCourseId($id,$courseId);
                     }
                 }
             }
-
-            if (isset($eventData['tag']) && count($eventData['tag'])>0) {
+            if (isset($eventData['tag']) && count($eventData['tag'])>AppConstant::NUMERIC_ZERO) {
                 foreach ($eventData['tag'] as $id=>$tag) {
                     $date = $eventData['EventDate'.$id];
                     $title = $eventData['eventDetails'][$id];
-                    preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-                    $date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+                    $date = AppUtility::dateMatch($date);
                     CalItem::setEvent($date,$tag,$title,$id);
                 }
             }
-
-            //add new
+            /*
+             * Add new Events
+             */
             if (trim($eventData['ManageEventForm']['newEventDetails'])!='' || $eventData['ManageEventForm']['newTag'] != '!') {
                 $date = $eventData['startDate'];
                 $tag = $eventData['ManageEventForm']['newTag'];
                 $title = $eventData['ManageEventForm']['newEventDetails'];
-                preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-                $newdate = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+                $newDate = AppUtility::dateMatch($date);
                 $items = new CalItem();
-                $items->createEvent($newdate,$tag,$title,$courseId);
+                $items->createEvent($newDate,$tag,$title,$courseId);
             }
-
             if ($eventData['Submit']=='Save') {
                 if ($from=='indexPage') {
                     return $this->redirect('index?cid='. $courseId);
                 } else {
-
-//                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/showcalendar.php?cid=$cid");
+                    return $this->redirect(AppUtility::getURLFromHome('course','course/calendar?cid='. $courseId));
                 }
-                exit;
             }else{
                 return $this->redirect('manage-events?cid='. $courseId);
             }
@@ -503,15 +495,14 @@ class InstructorController extends AppController
 
     public function actionDeleteItemsAjax()
     {
-        $params = $this->getBodyParams();
-
-        if($params['itemType'] === AppConstant::FORUMTYPE) {
+        $params = $this->getRequestParams();
+        if($params['itemType'] == AppConstant::FORUMTYPE) {
             $forum = new Forums();
             $forum->deleteForum($params);
             $itemId = new Items();
             $itemId->daleteItem($params['id']);
-            $subscreiptionEntry = new ForumSubscriptions();
-            $subscreiptionEntry->deleteEntry($params);
+            $subscriptionEntry = new ForumSubscriptions();
+            $subscriptionEntry->deleteEntry($params);
             $post = new ForumPosts();
             $post->deleteForumPost($params);
             $view = new ForumView();
