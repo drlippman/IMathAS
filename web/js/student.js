@@ -121,7 +121,6 @@ function calendar() {
                      */
                     $.each(assessmentData.calendarArray, function (index, calendarItem) {
                         var eventColor = '#00FFCC';
-//                        console.log(calendarItem);
                         if(calendarItem != 0)
                         {
                             events.push({
@@ -131,9 +130,7 @@ function calendar() {
                                 message: 'Managed Events',
                                 color: eventColor,
                                 calItem: true
-
                             });
-
                         }
                     });
                     /**

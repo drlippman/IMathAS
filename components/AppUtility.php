@@ -2625,16 +2625,9 @@ class AppUtility extends Component
 // eof
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    public static function dateMatch($date){
+        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
+        $date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+        return $date;
+    }
 }

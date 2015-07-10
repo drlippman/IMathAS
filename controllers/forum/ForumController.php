@@ -12,6 +12,8 @@ use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Forums;
 use app\models\Items;
+use app\models\Outcomes;
+use app\models\Rubrics;
 use app\models\StuGroupSet;
 use app\models\Thread;
 use app\models\User;
@@ -878,22 +880,107 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $modifyForumId = $params['modifyFid'];
         $groupNames = StuGroupSet::getByCourseId($courseId);
+        $rubricsData = Rubrics::getByUserId($user['id']);
+        $query = Outcomes::getByCourse($courseId);
+        $key = AppConstant::NUMERIC_ONE;
+        $pageOutcomes = array();
+        if ($query) {
+            foreach($query as $singleData) {
+                $pageOutcomes[$singleData['id']] = $singleData['name'];
+                $key++;
+            }
+        }
+        $pageOutcomes[0] = AppConstant::DEFAULT_OUTCOMES_FOR_FORUM;
+        $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ZERO));
+        if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
+            $query = $course['outcomes'];
+            $outcomeArray = unserialize($query);
+            $result = $this->flatArray($outcomeArray);
+            if($result){
+                foreach($result as $singlePage){
+                    array_push($pageOutcomesList,$singlePage);
+                }
+            }
+        }
+        $saveTitle = 'Create Forum';
         if($this->isPost())
         {
-          $params = $this->getRequestParams();
-          $newForum = new Forums();
-        $forumId =  $newForum->addNewForum($params);
-            $itemType = 'Forum';
-            $itemId = new Items();
-        $itemId -> saveItems($courseId, $forumId, $itemType);
-            $subscreiptionEntry = new ForumSubscriptions();
-            $subscreiptionEntry->AddNewEntry($forumId,$user['id']);
+
+            $params = $this->getRequestParams();
+            if(isset($modifyForumId)){
+                $updateForum = new Forums();
+                $updateForum->UpdateForum($params, $modifyForumId);
+            }else{
+//                AppUtility::dump($params);
+                $newForum = new Forums();
+                $forumId =  $newForum->addNewForum($params);
+                $itemType = 'Forum';
+                $itemId = new Items();
+                $lastItemId =   $itemId -> saveItems($courseId, $forumId, $itemType);
+                $subscreiptionEntry = new ForumSubscriptions();
+                $subscreiptionEntry->AddNewEntry($forumId,$user['id']);
+
+
+                $courseItemOrder = Course::getItemOrder($courseId);
+                $itemorder = $courseItemOrder->itemorder;
+
+                $items = unserialize($itemorder);
+
+                $blocktree = array(0);
+                $sub =& $items;
+
+                for ($i=1;$i<count($blocktree);$i++) {
+                    $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+
+                }
+                array_unshift($sub,intval($lastItemId));
+                $itemorder = addslashes(serialize($items));
+                $saveItemOrderIntoCourse = new Course();
+                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+
+            }
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
-        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $responseData = array('courseId' => $courseId,'groupNames' => $groupNames);
+        if(isset($modifyForumId)){
+            $pageTitle = 'Modify Forum';
+            $saveTitle = AppConstant::SAVE_BUTTON;
+            $forumData = Forums::getById($modifyForumId);
+//            AppUtility::dump($forum);
+            $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+            $responseData = array('course' => $course,'groupNames' => $groupNames,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle,'forumData' => $forumData,'modifyForumId' => $modifyForumId,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,
+                'pageOutcomes' => $pageOutcomes);
             return $this->renderWithData('addForum',$responseData);
+        }else{
+            $pageTitle = 'Add Forum';
+            $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+            $responseData = array('course' => $course,'groupNames' => $groupNames,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,
+                'pageOutcomes' => $pageOutcomes);
+            return $this->renderWithData('addForum',$responseData);
+        }
 
     }
+    public function flatArray($outcomesData) {
+        global $pageOutcomesList;
+        if($outcomesData){
+            foreach ($outcomesData as $singleData) {
+                if (is_array($singleData)) { //outcome group
+                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $this->flatArray($singleData['outcomes']);
+                } else {
+                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                }
+            }
+        }
+        return $pageOutcomesList;
+    }
+
+    public function actionAddLink()
+    {
+        return $this->render('addLink');
+    }
+
 
 }

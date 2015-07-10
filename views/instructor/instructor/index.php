@@ -9,10 +9,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <!--<div class="mainbody">-->
 
-<!--<div class="item-detail-header">-->
-<!--    --><?php //echo $this->render("header/_index",['item_name'=>'Course Setting', 'link_title'=>'Home', 'link_url' => '/', 'page_title' => $this->title]); ?>
-<!--</div>-->
-
 <div>
     <?php
     $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -334,7 +330,8 @@ case 'Wiki': ?>
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
 
-                <br><span>Hidden</span> <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a>
+                <br><span>Hidden</span>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a>
             </div>
             <div class="itemsum">
                 <p>
@@ -358,7 +355,7 @@ case 'Wiki': ?>
                     ?>
                     Always
                 <?php } ?>
-                <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a><br>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -378,7 +375,8 @@ case 'Wiki': ?>
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
-                <br><span>Showing Always</span> <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a><br>
+                <br><span>Showing Always</span>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>

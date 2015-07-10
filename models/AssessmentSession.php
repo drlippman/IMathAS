@@ -102,7 +102,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
-    public static function getByUserCourseAssessmentId($assessmentId,$courseId,$user)
+    public static function getByUserCourseAssessmentId($assessmentId,$courseId)
     {
         $query = new Query();
         $query->select(['imas_assessment_sessions.id,count(*)'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
@@ -145,5 +145,11 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+
+    public static function setGroupId($assessmentId){
+        $assessment = AssessmentSession::findOne(['assessmentid' => $assessmentId]);
+        $assessment->agroupid = 0;
+        $assessment->save();
     }
 } 

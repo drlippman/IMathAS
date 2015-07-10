@@ -78,7 +78,13 @@ class Forums extends BaseImasForums {
     }
     public function addNewForum($params)
     {
+        $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
+        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+        $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
+        $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
+
+
         $this->name = trim($params['title']);
         if(empty($params['forum-description']))
         {
@@ -89,19 +95,28 @@ class Forums extends BaseImasForums {
         $this->settings = $settingValue;
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-
+            $this->startdate = $startDate;
+            $this->enddate = $endDate;
         }else
         {
             $this->startdate = AppConstant::NUMERIC_ZERO;
             $this->enddate = AppConstant::ALWAYS_TIME;
         }
-//        $this->sortby = $params['sort-thread'];
+        $this->sortby = $params['sort-thread'];
         $this->defdisplay = $params['default-display'];
-        if($params['reply-to-posts'] > AppConstant::NUMERIC_ZERO && $params['reply-to-posts'] < AppConstant::ALWAYS_TIME){
+         if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
 
+            $this->postby = $replayPostDate;
+        }else{
+            $this->postby = $params['reply-to-posts'];
         }
-        $this->replyby = $params['reply-to-posts'];
-        $this->postby = $params['new-thread'];
+        if($params['new-thread'] == AppConstant::NUMERIC_ONE){
+
+            $this->replyby = $newThreadDate;
+        }else{
+            $this->replyby = $params['new-thread'];
+        }
+
         $this->groupsetid = $params['group-forum'];
         $this->cntingb = $params['count-in-gradebook'];
         $this->avail = $params['avail'];
@@ -112,17 +127,86 @@ class Forums extends BaseImasForums {
             $tagList = trim($params['taglist']);
         }
             $this->taglist = $tagList;
-//        AppUtility::dump($this);
+        $this->gbcategory = $params['gradebook-category'];
+        $this->points = $params['points'];
+        $this->tutoredit = $params['tutor-access'];
+        $this->rubric = $params['rubric'];
+        $this->outcomes = $params['associate-outcomes'];
         $this->save();
         return $this->id;
     }
     public function deleteForum($params)
     {
+
         $forum = Forums::findOne(['id' => $params['id']]);
         if($forum){
             $forum->delete();
         }
 
+    }
+    public function updateForum($params,$forumId)
+    {
+
+        $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
+        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+        $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
+        $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
+        $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
+
+        $updateForumData = Forums::findOne(['id' => $forumId]);
+//AppUtility::dump($updateForumData);
+        $updateForumData->name = trim($params['title']);
+
+        if(empty($params['forum-description']))
+        {
+            $params['forum-description'] = ' ';
+        }
+        $updateForumData->description = $params['forum-description'];
+        $updateForumData->courseid = $params['cid'];
+        $updateForumData->settings = $settingValue;
+
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
+        {
+            $updateForumData->startdate = $startDate;
+            $updateForumData->enddate = $endDate;
+        }else
+        {
+            $updateForumData->startdate = AppConstant::NUMERIC_ZERO;
+            $updateForumData->enddate = AppConstant::ALWAYS_TIME;
+        }
+        $updateForumData->sortby = $params['sort-thread'];
+        $updateForumData->defdisplay = $params['default-display'];
+//        AppUtility::dump($updateForumData);
+        if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
+
+            $updateForumData->postby = $replayPostDate;
+        }else{
+            $updateForumData->postby = $params['reply-to-posts'];
+        }
+
+        if($params['new-thread'] == AppConstant::NUMERIC_ONE){
+
+            $updateForumData->replyby = $newThreadDate;
+        }else{
+            $updateForumData->replyby = $params['new-thread'];
+        }
+
+        $updateForumData->groupsetid = $params['group-forum'];
+        $updateForumData->cntingb = $params['count-in-gradebook'];
+        $updateForumData->avail = $params['avail'];
+        $updateForumData->forumtype = $params['forum-type'];
+        $updateForumData->caltag = $params['calendar-icon-text1'].'--'.$params['calendar-icon-text2'];
+        $tagList = '';
+        if($params['categorize-posts'] == AppConstant::NUMERIC_ONE){
+            $tagList = trim($params['taglist']);
+        }
+        $updateForumData->taglist = $tagList;
+        $updateForumData->gbcategory = $params['gradebook-category'];
+        $updateForumData->points = $params['points'];
+        $updateForumData->tutoredit = $params['tutor-access'];
+        $updateForumData->rubric = $params['rubric'];
+        $updateForumData->outcomes = $params['associate-outcomes'];
+        $updateForumData->save();
     }
 
 } 

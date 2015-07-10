@@ -6,20 +6,19 @@ use kartik\date\DatePicker;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
-$this->title = 'Add Assessment';
+$this->title = $title;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
 
+<h2><?php echo $pageTitle ?></h2>
 <?php echo $page_isTakenMsg ?>
 
-<form method=post action="<?php echo $page_formActionTag ?>">
-
+<form method=post action="add-assessment?cid=<?php echo $course->id ?>">
     <p></p>
 <span class=form>Assessment Name:</span>
 <span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>"></span><BR class=form>
-
 Summary:<BR>
 <div >
     <?php echo "<div class='left col-md-11'><div class= 'editor'>
@@ -48,9 +47,9 @@ Intro/Instructions:<BR>
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
-                'name' => 'EventDate',
+                'name' => 'sdate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y",$assessmentData['startdate']),
+                'value' => $sDate,
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -62,8 +61,8 @@ Intro/Instructions:<BR>
 		     echo '<div class="pull-left col-lg-6">';
 
                 echo TimePicker::widget([
-                'name' => 'end_time',
-                'value' => time(),
+                'name' => 'stime',
+                'value' => $sTime,
                 'pluginOptions' => [
                 'showSeconds' => false,
                 'class' => 'time'
@@ -75,15 +74,15 @@ Intro/Instructions:<BR>
 
     <span class=form>Available Until:</span>
 		<span class=formright>
-			<input type=radio name="edatetype" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($assessmentData['enddate'],"2000000000",0); ?>/>
+			<input type=radio name="edatetype" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/>
 			 Always after start date<br/>
-			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php AssessmentUtility::writeHtmlChecked($assessmentData['enddate'],"2000000000",1); ?>/>
+			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/>
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
-                'name' => 'EventDate',
+                'name' => 'edate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y",$assessmentData['enddate']),
+                'value' => $eDate,
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -95,8 +94,8 @@ Intro/Instructions:<BR>
             echo '<div class="pull-left col-lg-6">';
 
             echo TimePicker::widget([
-                'name' => 'end_time',
-                'value' => time(),
+                'name' => 'etime',
+                'value' => $eTime,
                 'pluginOptions' => [
                     'showSeconds' => false,
                     'class' => 'time'
@@ -115,9 +114,9 @@ Intro/Instructions:<BR>
             echo '<label class="end pull-left"> Until</label>';
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
-                'name' => 'EventDate',
+                'name' => 'rdate',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y",$assessmentData['enddate']),
+                'value' => $reviewDate,
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,
@@ -128,8 +127,8 @@ Intro/Instructions:<BR>
             echo '<label class="end pull-left"> at </label>';
             echo '<div class=" col-lg-6">';
             echo TimePicker::widget([
-                'name' => 'end_time',
-                'value' => time(),
+                'name' => 'rtime',
+                'value' => $reviewTime,
                 'pluginOptions' => [
                     'showSeconds' => false,
                     'class' => 'time'
@@ -138,7 +137,7 @@ Intro/Instructions:<BR>
             echo '</div>';?>
 
 		</span><BR class=form>
-<!--</div>-->
+</div>
 
 <span class=form></span>
 		<span class=formright>

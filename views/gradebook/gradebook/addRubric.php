@@ -11,9 +11,9 @@ use kartik\time\TimePicker;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
 $this->title = 'Add Rubric';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Add Grade', 'url' => ['/gradebook/gradebook/add-grades?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+//$this->params['breadcrumbs'][] = ['label' => 'Add Grade', 'url' => ['/gradebook/gradebook/add-grades?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <fieldset xmlns="http://www.w3.org/1999/html">

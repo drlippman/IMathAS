@@ -488,3 +488,11 @@ a.msg-notification:visited{
     width: 100px;
     height: 100px;
 }
+.user-identity{
+    display: block;
+    width: 500px;
+    float: left;
+    margin-bottom: 10px;
+    text-align: left;
+    margin-left: 14%;
+}

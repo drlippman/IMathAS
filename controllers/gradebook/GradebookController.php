@@ -13,6 +13,7 @@ use app\models\Exceptions;
 use app\models\forms\AddGradesForm;
 use app\models\forms\AddRubricForm;
 use app\models\forms\ManageTutorsForm;
+use app\models\forms\UploadCommentsForm;
 use app\models\Forums;
 use app\models\GbCats;
 use app\models\GbItems;
@@ -2227,22 +2228,75 @@ class GradebookController extends AppController
             return $this->successResponse();
 
     }
+
 //Controller method for gradebook comment
     public function actionGbComments()
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $commentType = $this->getParamVal('comtype');
         $course = Course::getById($this->getParamVal('cid'));
         if(isset($params['isComment'])){
             foreach($params as $key => $values){
-                Student::updateGbComments($key, $values, $course['id']);
+                Student::updateGbComments($key, $values, $course['id'], $commentType);
             }
             return $this->redirect('gradebook?cid='.$course['id']);
         }
         $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
         $this->includeJS(['gradebook/gbComments.js','gradebook/addgrades.js']);
-        $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo);
+        $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo, 'commentType' => $commentType);
         return $this->renderWithData('gbComments', $responseData);
     }
+    public function actionUploadComments()
+    {
+        $this->guestUserHandler();
+        $course = Course::getById($this->getParamVal('cid'));
+        $nowTime = time();
+        $commentType = $this->getParamVal('comtype');
+        $model = new UploadCommentsForm();
+        $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
+        if($this->isPost()){
+            $params = $this->getRequestParams();
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if ($model->file) {
+                $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
+                $model->file->saveAs($filename);
+            }
+            $failures = array();
+            $successes = 0;
+            if ($params['userIdType']==0) {
+                $usercol = $params['userNameCol']-1;
+            } else if ($params['userIdType']==1) {
+                $usercol = $params['fullNameCol']-1;
+            }
+            if($usercol != AppConstant::NUMERIC_NEGATIVE_ONE){
+                $scorecol = $params['UploadCommentsForm']['commentsColumn']-1;
+                $handle = fopen($filename, 'r');
+                if ($params['UploadCommentsForm']['fileHeaderRow'] == AppConstant::NUMERIC_ONE) {
+                    $data = fgetcsv($handle,4096,',');
+                } else if ($params['UploadCommentsForm']['fileHeaderRow'] == AppConstant::NUMERIC_TWO) {
+                    $data = fgetcsv($handle,4096,',');
+                    $data = fgetcsv($handle,4096,',');
+                }
+                while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
+                    $query = Student::findStudentToUpdateComment($course->id, $params['userIdType'], $data[$usercol]);
+                    if($query){
+                        foreach($query as $result){
+                            Student::updateGbComments($result['id'], $data[$scorecol], $course->id, $commentType);
+                            $successes++;
+                        }
+                    } else {
+                        $failures[] = $data[$usercol];
+                    }
+                }
+            }
+        }
+        $this->includeCSS(['site.css']);
+        $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
+        return $this->renderWithData('uploadComments',$responseData);
+    }
+
 }
+
+
 

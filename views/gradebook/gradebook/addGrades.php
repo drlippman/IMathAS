@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php } ?>
         </select>
     </div>
-    <div class="select-text-margin"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric') ?>" >Add new rubric</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid='.$course->id) ?>"  >Edit rubrics</a><div>
+    <div class="select-text-margin"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$course->id) ?>" >Add new rubric</a> | <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid='.$course->id) ?>"  >Edit rubrics</a><div>
 
         <br><div class="col-lg-offset-3 ">  <?= $form->field($model, 'UploadGrades')-> checkbox(); ?>
                 <?= Html::submitButton('Save', ['class' => 'btn btn-primary col-lg-offset-3']) ?>

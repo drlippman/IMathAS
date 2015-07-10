@@ -24,6 +24,7 @@
             });
         }
 
-        function deleteForumSuccess(response) {
-              location.reload();
+        function deleteForumSuccess(response)
+        {
+              window.location.reload();
         }

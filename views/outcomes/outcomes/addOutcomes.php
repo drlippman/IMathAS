@@ -72,7 +72,6 @@ $this->params['breadcrumbs'][] = $this->title;
         var outcomeGrpArray= [];
         var els = $(".outcome");
         var groupLen = $(".outcomeGrp");
-
         var courseId = $('#course-id').val();
         $('#Save-changes').parent().append('<span id="submitnotice" style="color:red;">Saving Changes...</span>');
         for (var i=0; i<els.length; i++)
@@ -85,12 +84,11 @@ $this->params['breadcrumbs'][] = $this->title;
             var outcomeGrp = $('#newgrp' + j).val();
             outcomeGrpArray.push(outcomeGrp);
         }
-
-        if(outcomeArray)
+        if(outcomeArray.length > 0)
         {
             jQuerySubmit('get-outcome-ajax',{outcomeArray:outcomeArray,courseId:courseId},'outcomeResponse');
         }
-        if(outcomeGrpArray)
+        if(outcomeGrpArray.length > 0)
         {
             jQuerySubmit('get-outcome-grp-ajax',{outcomeGrpArray:outcomeGrpArray,courseId:courseId},'outcomeGrpResponse');
         }
@@ -115,8 +113,7 @@ $this->params['breadcrumbs'][] = $this->title;
             outcome = response.data.outcomeData;
             isArray = response.data.isArray;
             html = printOutcomes(outcomeGrp);
-
-            $("#qviewtree").append(html);
+           $("#qviewtree").append(html);
         }
         else
         {
@@ -125,10 +122,11 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 function printOutcomes(outcomeGrp){
 
-    $.each(outcomeGrp, function(index,group)
+    $.each(outcomeGrp, function(key,group)
     {
-        if(isArray[index] == 1)
+        if(group.length == undefined)
         {
+
             html += '<li class="blockli" id="newgrp'+cnt+'">';
             html +='<span class=icon style="background-color:#66f">G</span>';
             html += '<input class="outcomeGrp" type="text" size="60" id="g'+cnt+'" value="'+group['name']+'" > ';
@@ -137,14 +135,14 @@ function printOutcomes(outcomeGrp){
             if(group['outcomes'].length >0)
             {
                 html +='<ul class="qview">';
-//                html +='<li>'+outcome[group]+'</li>'
                 printOutcomes(group['outcomes']);
                 html+= '</ul>';
             }
             html+= '</li>';
         }
         else
-        {alert(group);
+        {
+
             html += '<li id="'+group+'">';
             html +='<span class=icon style="background-color:#0f0">O</span>';
             html += '<input class="outcome" type="text" size="60" id="new" value="'+outcome[group]+'">';
