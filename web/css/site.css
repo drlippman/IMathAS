@@ -108,7 +108,6 @@ a.desc:after {
 
 .navbar-brand{
     font-size: 30px;
-    color: #ffffff!important;
 }
 
 .navbar-inverse .navbar-nav > li > a{
@@ -375,11 +374,11 @@ a:focus {
     outline: none;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-    background-color: #3071a9 !important; border-color: #285e8e !important;
+    background-color: #3071a9; border-color: #285e8e;
 }
 
 .btn-primary {
-    color: #fff !important; background-color: #428bca !important; border-color: #357ebd !important;
+    color: #fff; background-color: #428bca; border-color: #357ebd;
 
 }
 .breadcrumb > li + li:before {

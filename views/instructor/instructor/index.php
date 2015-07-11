@@ -11,6 +11,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("header/_index",['item_name'=>'Course Setting', 'link_title'=>'Home', 'link_url' => '/', 'page_title' => $this->title]); ?>
 </div>
 
-<div class="itemp-detail-content">
-
+<div class="item-detail-content">
+    <?php echo $this->render("_toolbarTeacher");?>
 </div>

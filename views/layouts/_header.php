@@ -11,6 +11,12 @@ NavBar::begin([
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
 ]);
+echo '<div class="dropdown dropdown-class">
+        <img src="../../img/class.png">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">My Classes
+        <span class="caret"></span></button>
+
+      </div>';
 echo Nav::widget([
     'options' => ['class' => 'navbar-nav navbar-right'],
     'items' => [
@@ -28,4 +34,5 @@ echo Nav::widget([
 ]);
 NavBar::end();
 ?>
+
 </div>
