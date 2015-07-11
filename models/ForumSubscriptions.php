@@ -16,9 +16,9 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
         $this->userid = $userId;
         $this->save();
     }
-    public function deleteEntry($params)
+    public static function deleteSubscriptionsEntry($itemId)
     {
-        $entry = ForumSubscriptions::findOne(['forumid' => $params['id']]);
+        $entry = ForumSubscriptions::findOne(['forumid' => $itemId]);
         if($entry){
             $entry->delete();
         }

@@ -152,4 +152,13 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $assessment->agroupid = 0;
         $assessment->save();
     }
+
+    public static function deleteByAssessmentId($assessmentId){
+        $assessmentData = AssessmentSession::findAll(['assessmentid' => $assessmentId]);
+        if($assessmentData){
+            foreach ($assessmentData as $singleAssessment){
+                $singleAssessment->delete();
+            }
+        }
+    }
 } 

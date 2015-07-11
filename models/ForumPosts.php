@@ -145,11 +145,20 @@ class ForumPosts extends BaseImasForumPosts
         $data = $command->queryAll();
         return $data;
     }
-    public function deleteForumPost($params)
+    public static function deleteForumPost($itemId)
     {
-        $entry = ForumPosts::findOne(['forumid' => $params['id']]);
+        $entry = ForumPosts::findOne(['forumid' => $itemId]);
         if($entry){
             $entry->delete();
+        }
+    }
+
+    public static function getForumPostByFile($itemId)
+    {
+        $entry = ForumPosts::findOne(['forumid' => $itemId,'files' => '']);
+        if($entry){
+            $postId = $entry['id'];
+            return $postId;
         }
     }
 

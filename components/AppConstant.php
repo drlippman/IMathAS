@@ -113,20 +113,17 @@ class AppConstant
     const USERNAME_ENROLLED="This username is already enrolled in the class";
     const MIN_LATEPASS = "These students all have %u latepasses.";
     const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
-
     const ASSESSMENT_ALREADY_STARTED = "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
     const DEFAULT_ASSESSMENT_INTRO = "Enter intro/instructions";
     const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
     const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
-
     const MODIFY_ASSESSMENT ="Modify Assessment";
     const ADD_ASSESSMENT ="Add Assessment";
-
-    const FORUMTYPE = '1';
-    const WIKI = 'WIKI';
-    const LINK ='LINK';
-    const ASSESSEMENT ='ASSESSMENT';
-    const INLINE_TEXT = 'INLINE';
-    const CALENDAR = 'CALENDAR';
-    const BLOCK = 'BLOCK';
+    const FORUM = 'Forum';
+    const WIKI = 'Wiki';
+    const LINK ='Link';
+    const ASSESSMENT ='Assessment';
+    const INLINE_TEXT = 'Inline';
+    const CALENDAR = 'Calendar';
+    const BLOCK = 'Block';
 }

@@ -159,9 +159,12 @@ class ForumView extends BaseImasForumViews
 
     }
 
-    public function daleteView($forumId)
+    public static function deleteByForumIdThreadId($threadId)
     {
-        Yii::$app->db->createCommand("DELETE FROM imas_forum_views WHERE threadid IN (SELECT id FROM imas_forum_threads WHERE forumid='$forumId')")->queryAll();
+        $viewEntry = ForumView::findOne(['threadid' => $threadId]);
+        if($viewEntry){
+            $viewEntry->delete();
+        }
      }
 
 

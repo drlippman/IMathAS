@@ -5,6 +5,7 @@ namespace app\components;
 
 use app\models\Exceptions;
 use app\models\Questions;
+use app\models\Course;
 use Yii;
 use yii\base\Component;
 
@@ -2629,5 +2630,20 @@ class AppUtility extends Component
         preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
         $date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
         return $date;
+    }
+
+    public static function itemOrder($courseId,$block,$itemId){
+        $course = Course::getById($courseId);
+        $itemOrder = $course['itemorder'];
+        $items = unserialize($itemOrder);
+        $blockTree = explode('-',$block);
+        $sub =& $items;
+        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+        }
+        $key = array_search($itemId,$sub);
+        array_splice($sub,$key,AppConstant::NUMERIC_ONE);
+        $itemList = addslashes(serialize($items));
+        Course::setItemOrder($itemList,$courseId);
     }
 }

@@ -84,7 +84,6 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 ?>
 <div class="item">
 <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
-
 <div class="title">
 <b>
     <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
@@ -108,11 +107,12 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 } ?>
 <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
     echo 'LP';
-} ?>
+}
+?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-    Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
-<?php  }else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
+    Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+<?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
 ?>
 <div class="item">
 <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
@@ -141,7 +141,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 } ?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-    Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+    Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
 <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) { ?>
     <br>This assessment is in review mode - no scores will be saved
 <?php }
@@ -200,7 +200,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
         } ?>
         <a> Questions </a>| <a
             href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-            Settings </a>|<a> Delete </a> |<a> Copy </a>| <a>Grades</a>
+            Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
         <?php if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime && $assessment['avail'] != AppConstant::NUMERIC_ZERO && $assessment->reviewdate != AppConstant::NUMERIC_ZERO) { ?>
 
             <br> This assessment is in review mode - no scores will be saved
@@ -231,15 +231,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <?php } ?>
 
                     <?php if($forum->avail == 2) { ?>
-             <?php echo "Showing Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+             <?php echo "Showing Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
                   <?php  }
                     else {
                         if($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000)
                         {
-                            echo "Showing until: Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                            echo "Showing until: Always"; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
                      <?php   }
                         else{
-                            echo "Showing until: " .$endDate;?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                            echo "Showing until: " .$endDate;?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
                      <?php
                         }
                     }
@@ -266,7 +266,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             </div>
             <div class="itemsum"><p>
                     <?php
-                    echo 'Hidden'; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                    echo 'Hidden'; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
                     <?php
                     } ?>
 
@@ -285,7 +285,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <?php }
                     $startDate = AppUtility::formatDate($forum->startdate);
                     $endDate = AppUtility::formatDate($forum->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem(<?php echo $forum->id; ?>,<?php echo AppConstant::FORUMTYPE?>)"> Delete </a> | <a href="#"> Copy </a><br>
+                    echo "Showing " .$startDate. " until " .$endDate; ?> <a href="#"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
 
             </div>
 
@@ -690,8 +690,7 @@ case 'LinkedText': ?>
 
     <!-- Calender Here-->
 <?php case 'Calendar': ?>
-    <pre><a href="<?php echo AppUtility::getURLFromHome(
-            'instructor', 'instructor/index?id=' . $item['Calendar'] . '&block=' . $parent . '&cid=' . $course->id . '&remove=' . true); ?>">Delete</a> | <a
+    <pre><a onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
             href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
     <div class='calendar'>
@@ -1050,8 +1049,7 @@ case 'LinkedText': ?>
 
                         <!-- Calender Here-->
                     <?php case 'Calendar': ?>
-                        <pre><a href="<?php echo AppUtility::getURLFromHome(
-                                'instructor', 'instructor/index?id=' . $item['Calendar'] . '&block=' . $parent . '&cid=' . $course->id . '&remove=' . true); ?>">Delete</a> | <a
+                        <pre><a onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
                                 href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage
                                 Events</a></pre>

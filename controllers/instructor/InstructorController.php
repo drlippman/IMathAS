@@ -8,6 +8,7 @@ use app\models\CalItem;
 use app\models\Course;
 use app\models\ForumPosts;
 use app\models\ForumSubscriptions;
+use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Message;
 use app\models\AssessmentSession;
@@ -201,25 +202,6 @@ class InstructorController extends AppController
                     Course::setItemOrder($itemOrder, $courseId);
                     return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
             }
-            /*
-             *Delete calendar
-             */
-            elseif(isset($courseData['remove'])){
-                $block = $courseData['block'];
-                $itemId = $courseData['id'];
-                Items::deletedItems($itemId);
-                $items = unserialize($course['itemorder']);
-                $blockTree = explode('-',$block);
-                $sub =& $items;
-                for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-                    $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
-                }
-                $key = array_search($itemId,$sub);
-                array_splice($sub,$key,AppConstant::NUMERIC_ONE);
-                $itemOrder = addslashes(serialize($items));
-                Course::setItemOrder($itemOrder,$courseId);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
-            }
         }
         /*
          *Ordering Items
@@ -277,7 +259,7 @@ class InstructorController extends AppController
         }
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js', 'instructor.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->renderWithData('index', $returnData);
     }
@@ -496,19 +478,31 @@ class InstructorController extends AppController
     public function actionDeleteItemsAjax()
     {
         $params = $this->getRequestParams();
-        if($params['itemType'] == AppConstant::FORUMTYPE) {
-            $forum = new Forums();
-            $forum->deleteForum($params);
-            $itemId = new Items();
-            $itemId->daleteItem($params['id']);
-            $subscriptionEntry = new ForumSubscriptions();
-            $subscriptionEntry->deleteEntry($params);
-            $post = new ForumPosts();
-            $post->deleteForumPost($params);
-            $view = new ForumView();
-            $view->daleteView($params['id']);
-            $thread = new Thread();
-            $thread->deleteThreadById($params['id']);
+        $courseId = $params['courseId'];
+        $block = $params['block'];
+        $itemType = $params['itemType'];
+        $itemId = $params['id'];
+        if($itemType == AppConstant::FORUM) {
+            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+            Forums::deleteForum($itemId);
+            ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+            $postId = ForumPosts::getForumPostByFile($itemId);
+            $threadIdArray = ForumThread::findThreadCount($itemId);
+            foreach($threadIdArray as $singleThread){
+                ForumView::deleteByForumIdThreadId($singleThread['id']);
+            }
+            ForumPosts::deleteForumPost($itemId);
+            Thread::deleteThreadByForumId($itemId);
+        }elseif($itemType == AppConstant::ASSESSMENT){
+            AssessmentSession::deleteByAssessmentId($itemId);
+            Questions::deleteByAssessmentId($itemId);
+            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+            Assessments::deleteAssessmentById($itemId);
+            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+        }elseif($itemType == AppConstant::CALENDAR){
+            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
         }
         return $this->successResponse();
     }

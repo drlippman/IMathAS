@@ -53,12 +53,12 @@ class Items extends BaseImasItems
         return Items::findOne(['typeid' => $id]);
     }
 
-    public function daleteItem($id)
-    {
-        $entry = Items::findOne(['typeid' => $id,'itemtype'=>'Forum']);
-        if($entry){
-            $entry->delete();
+    public static function deleteByTypeIdName($typeId,$itemType){
+        $itemData = Items::findOne(['typeid' => $typeId, 'itemtype' => $itemType]);
+        $itemId = $itemData['id'];
+        if($itemData){
+            $itemData->delete();
         }
+        return $itemId;
     }
-
 }

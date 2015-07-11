@@ -135,14 +135,12 @@ class Forums extends BaseImasForums {
         $this->save();
         return $this->id;
     }
-    public function deleteForum($params)
+    public static function deleteForum($itemId)
     {
-
-        $forum = Forums::findOne(['id' => $params['id']]);
+        $forum = Forums::findOne(['id' => $itemId]);
         if($forum){
             $forum->delete();
         }
-
     }
     public function updateForum($params,$forumId)
     {

@@ -173,4 +173,11 @@ class Assessments extends BaseImasAssessments
 
         $assessment->save();
     }
+
+    public static function deleteAssessmentById($assessmentId){
+        $assessmentData = Assessments::findOne(['id',$assessmentId]);
+        if($assessmentData){
+            $assessmentData->delete();
+        }
+    }
 } 

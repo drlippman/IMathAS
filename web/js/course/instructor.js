@@ -1,4 +1,6 @@
-// Item Ordering on assessment page
+/*
+ * Item Ordering on assessment page
+ */
 var homePath = $('.home-path').val();
 function moveitem(from,blk) {
     var to = document.getElementById(blk+'-'+from).value;
@@ -19,3 +21,31 @@ function additem(blk,tb) {
         window.location = toOpen;
 }
 
+function deleteItem(id,type,block,courseId) {
+    var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "confirm": function () {
+
+                jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId},'responseSuccess');
+
+                $(this).dialog('destroy').remove();
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+}
+function responseSuccess(response)
+{
+    window.location = homePath;
+}

@@ -40,4 +40,13 @@ class Questions extends BaseImasQuestions
         $assessment->showans = 0;
         $assessment->save();
     }
+
+    public static function deleteByAssessmentId($assessmentId){
+        $questionData = Questions::findAll(['assessmentid' => $assessmentId]);
+        if($questionData){
+            foreach ($questionData as $singleQuestion){
+                $singleQuestion->delete();
+            }
+        }
+    }
 } 
