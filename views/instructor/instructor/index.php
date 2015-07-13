@@ -111,7 +111,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 ?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-    Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+    Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
 <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
 ?>
 <div class="item">
@@ -141,7 +141,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 } ?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-    Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+    Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
 <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) { ?>
     <br>This assessment is in review mode - no scores will be saved
 <?php }
@@ -200,7 +200,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
         } ?>
         <a> Questions </a>| <a
             href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-            Settings </a>|<a onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+            Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
         <?php if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime && $assessment['avail'] != AppConstant::NUMERIC_ZERO && $assessment->reviewdate != AppConstant::NUMERIC_ZERO) { ?>
 
             <br> This assessment is in review mode - no scores will be saved
@@ -309,7 +309,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php echo $wikis->name ?></a></b>
 
                 <br><span>Hidden</span>
-                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#">Delete</a> | <a>Copy</a>
             </div>
             <div class="itemsum">
                 <p>
@@ -332,7 +332,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 } else { ?>
                     Always
                 <?php } ?>
-                <a href="#">Modify</a> | <a>Delete</a> | <a>Copy</a><br>
+                <a href="#">Modify</a> | <a href="#">Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -353,7 +353,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
                 <br><span>Showing Always</span>
-                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a>Delete</a> | <a>Copy</a><br>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#">Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -419,7 +419,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
 
             </div>
             <div class="itemsum">
@@ -481,7 +481,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -539,7 +539,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -592,7 +592,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -690,7 +690,7 @@ case 'LinkedText': ?>
 
     <!-- Calender Here-->
 <?php case 'Calendar': ?>
-    <pre><a onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
+    <pre><a href="#" onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
             href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
     <div class='calendar'>
@@ -1049,7 +1049,7 @@ case 'LinkedText': ?>
 
                         <!-- Calender Here-->
                     <?php case 'Calendar': ?>
-                        <pre><a onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
+                        <pre><a href="#" onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
                                 href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage
                                 Events</a></pre>

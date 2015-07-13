@@ -165,7 +165,6 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             var courses = courseData.data.courses;
             var users = courseData.data.users;
-            alert(JSON.stringify(courses));
             createCourseTable(courses);
             createUsersTable(users);
         }
@@ -202,7 +201,7 @@ $this->params['breadcrumbs'][] = $this->title;
     function createCourseTable(courses)
     {
         var html = "";
-        $.each(courses, function(index, course){alert(course);
+        $.each(courses, function(index, course){
             html += "<tr> <td><a href='<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=')?>"+course.courseid+"'>"+capitalizeFirstLetter(course.name)+"</a></td>";
             html += "<td>"+course.courseid+"</td>";
             html += "<td>"+capitalizeFirstLetter(course.FirstName)+" "+capitalizeFirstLetter(course.LastName)+"</td>";

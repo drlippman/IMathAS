@@ -36,9 +36,7 @@ use app\controllers\AppController;
 
 class InstructorController extends AppController
 {
-
     public $enableCsrfValidation = false;
-
 
     public function actionIndex()
     {
@@ -194,7 +192,7 @@ class InstructorController extends AppController
                         $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
                     }
                     if ($filter=='b') {
-                        $sub[] = $itemId;
+                        $sub[] = intval($itemId);
                     } else if ($filter=='t') {
                         array_unshift($sub,intval($itemId));
                     }
@@ -285,31 +283,31 @@ class InstructorController extends AppController
 
     public function saveAssessmentSession($assessment, $id)
     {
-        list($qlist, $seedlist, $reviewseedlist, $scorelist, $attemptslist, $lalist) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
-        $bestscorelist = $scorelist . ';' . $scorelist . ';' . $scorelist;
-        $scorelist = $scorelist . ';' . $scorelist;
-        $bestattemptslist = $attemptslist;
-        $bestseedslist = $seedlist;
-        $bestlalist = $lalist;
-        $starttime = time();
-        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
-        $ltisourcedid = '';
-        $param['questions'] = $qlist;
-        $param['seeds'] = $seedlist;
+        list($qList, $seedList, $reviewSeedList, $scoreList, $attemptsList, $laList) = AppUtility::generateAssessmentData($assessment->itemorder, $assessment->shuffle, $assessment->id);
+        $bestscorelist = $scoreList . ';' . $scoreList . ';' . $scoreList;
+        $scoreList = $scoreList . ';' . $scoreList;
+        $bestAttemptsList = $attemptsList;
+        $bestSeedsList = $seedList;
+        $bestLaList = $laList;
+        $startTime = time();
+        $defFeedbackText = addslashes($assessment->deffeedbacktext);
+        $ltiSourcedId = '';
+        $param['questions'] = $qList;
+        $param['seeds'] = $seedList;
         $param['userid'] = $id;
         $param['assessmentid'] = $id;
-        $param['attempts'] = $attemptslist;
-        $param['lastanswers'] = $lalist;
-        $param['reviewscores'] = $scorelist;
-        $param['reviewseeds'] = $reviewseedlist;
+        $param['attempts'] = $attemptsList;
+        $param['lastanswers'] = $laList;
+        $param['reviewscores'] = $scoreList;
+        $param['reviewseeds'] = $reviewSeedList;
         $param['bestscores'] = $bestscorelist;
-        $param['scores'] = $scorelist;
-        $param['bestattempts'] = $bestattemptslist;
-        $param['bestseeds'] = $bestseedslist;
-        $param['bestlastanswers'] = $bestlalist;
-        $param['starttime'] = $starttime;
-        $param['feedback'] = $deffeedbacktext;
-        $param['lti_sourcedid'] = $ltisourcedid;
+        $param['scores'] = $scoreList;
+        $param['bestattempts'] = $bestAttemptsList;
+        $param['bestseeds'] = $bestSeedsList;
+        $param['bestlastanswers'] = $bestLaList;
+        $param['starttime'] = $startTime;
+        $param['feedback'] = $defFeedbackText;
+        $param['lti_sourcedid'] = $ltiSourcedId;
 
         $assessmentSession = new AssessmentSession();
         $assessmentSession->attributes = $param;
@@ -335,7 +333,7 @@ class InstructorController extends AppController
         $courseId = $params['cid'];
         $assessments = Assessments::getByCourseId($courseId);
         $calendarItems = CalItem::getByCourseId($courseId);
-        $CalendarLinkItems = Links::getByCourseId($courseId);
+        $calendarLinkItems = Links::getByCourseId($courseId);
         $calendarInlineTextItems = InlineText::getByCourseId($courseId);
         /**
          * Display assessment Modes:
@@ -375,18 +373,18 @@ class InstructorController extends AppController
          * Display link text: tags.
          */
         $calendarLinkArray = array();
-        foreach ($CalendarLinkItems as $CalendarLinkItem)
+        foreach ($calendarLinkItems as $calendarLinkItem)
         {
             $calendarLinkArray[] = array(
-                'courseId' => $CalendarLinkItem['courseid'],
-                'title' => $CalendarLinkItem['title'],
-                'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
-                'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'courseId' => $calendarLinkItem['courseid'],
+                'title' => $calendarLinkItem['title'],
+                'startDate' => AppUtility::getFormattedDate($calendarLinkItem['startdate']),
+                'endDate' => AppUtility::getFormattedDate($calendarLinkItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
-                'startDateString' => $CalendarLinkItem['startdate'],
-                'endDateString' => $CalendarLinkItem['enddate'],
-                'linkedId' => $CalendarLinkItem['id'],
-                'calTag' => $CalendarLinkItem['caltag']
+                'startDateString' => $calendarLinkItem['startdate'],
+                'endDateString' => $calendarLinkItem['enddate'],
+                'linkedId' => $calendarLinkItem['id'],
+                'calTag' => $calendarLinkItem['caltag']
             );
         }
         /**
@@ -426,7 +424,7 @@ class InstructorController extends AppController
         } else {
             $from = 'indexPage';
         }
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             /*
              * Delete Event
              */
@@ -507,4 +505,3 @@ class InstructorController extends AppController
         return $this->successResponse();
     }
 }
-

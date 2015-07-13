@@ -51,19 +51,19 @@ class AssessmentController extends AppController
     public function actionLatePass()
     {
         $this->guestUserHandler();
-        $assessmentId = Yii::$app->request->get('id');
-        $courseId = Yii::$app->request->get('cid');
-        $studentId = Yii::$app->user->identity->id;
+        $assessmentId = $this->getParamVal('id');
+        $courseId = $this->getParamVal('cid');
+        $studentId = $this->getAuthenticatedUser();
         $exceptionAssessment = Exceptions::getByAssessmentId($assessmentId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $student = Student::getByCourseId($courseId, $studentId);
-        $startdate = $assessment->startdate;
-        $enddate = $assessment->enddate;
+        $startDate = $assessment->startdate;
+        $endDate = $assessment->enddate;
         $wave = AppConstant::NUMERIC_ZERO;
         $param['assessmentid'] = $assessmentId;
         $param['userid'] = $studentId;
-        $param['startdate'] = $startdate;
-        $param['enddate'] = $enddate;
+        $param['startdate'] = $startDate;
+        $param['enddate'] = $endDate;
         $param['waivereqscore'] = $wave;
         $latepass = $student->latepass;
         $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
@@ -84,7 +84,7 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
-        if ($this->isPostMethod()){
+        if ($this->isPost()){
             $params = $this->getRequestParams();
             $password = $params['SetPassword']['password'];
             if($password == $assessment->password){
@@ -339,7 +339,7 @@ class AssessmentController extends AppController
                         $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                     }
                     if ($filter=='b') {
-                        $sub[] = $itemId;
+                        $sub[] = intval($itemId);
                     } else if ($filter=='t') {
                         array_unshift($sub,intval($itemId));
                     }
@@ -397,8 +397,8 @@ class AssessmentController extends AppController
                     $assessmentData['defpoints'] = AppConstant::NUMERIC_TEN;
                     $assessmentData['defattempts'] = AppConstant::NUMERIC_ONE;
                     $assessmentData['password'] = '';
-                    $testType = "AsGo";
-                    $showAnswer = "A";
+                    $testType = AppConstant::TEST_TYPE;
+                    $showAnswer = AppConstant::SHOW_ANSWER;
                     $assessmentData['defpenalty'] = AppConstant::NUMERIC_TEN;
                     $assessmentData['shuffle'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['minscore'] = AppConstant::NUMERIC_ZERO;
@@ -414,8 +414,8 @@ class AssessmentController extends AppController
                     $assessmentData['tutoredit'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['eqnhelper'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['ltisecret'] = '';
-                    $assessmentData['caltag'] = '?';
-                    $assessmentData['calrtag'] = 'R';
+                    $assessmentData['caltag'] = AppConstant::CALTAG;
+                    $assessmentData['calrtag'] = AppConstant::CALRTAG;
                     $assessmentData['showtips'] = AppConstant::NUMERIC_TWO;
                     $useDefFeedback = false;
                     $defFeedback = AppConstant::DEFAULT_FEEDBACK;
@@ -438,11 +438,11 @@ class AssessmentController extends AppController
                     $courseDefTime = $course['deftime']%AppConstant::NUMERIC_THOUSAND;
                     $hour = floor($courseDefTime/AppConstant::SECONDS)%AppConstant::NUMERIC_TWELVE;
                     $minutes = $courseDefTime%AppConstant::SECONDS;
-                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?'am':'pm';
+                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?AppConstant::AM:AppConstant::PM;
                     $defTime = (($hour==AppConstant::NUMERIC_ZERO)?AppConstant::NUMERIC_TWELVE:$hour).':'.(($minutes<AppConstant::NUMERIC_TEN)?'0':'').$minutes.' '.$am;
                     $hour = floor($courseDefTime/AppConstant::SECONDS)%AppConstant::NUMERIC_TWELVE;
                     $minutes = $courseDefTime%AppConstant::SECONDS;
-                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?'am':'pm';
+                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?AppConstant::AM:AppConstant::PM;
                     $defStartTime = (($hour==AppConstant::NUMERIC_ZERO)?AppConstant::NUMERIC_TWELVE:$hour).':'.(($minutes<AppConstant::NUMERIC_TEN)?'0':'').$minutes.' '.$am;
                 if ($startDate!=AppConstant::NUMERIC_ZERO) {
                     $sDate = AppUtility::tzdate("m/d/Y",$startDate);
@@ -459,7 +459,7 @@ class AssessmentController extends AppController
                     $eTime = $defTime; //tzdate("g:i a",time()+7*24*60*60);
                 }
                 if ($assessmentData['reviewdate'] > AppConstant::NUMERIC_ZERO) {
-                    if ($assessmentData['reviewdate']=='2000000000') {
+                    if ($assessmentData['reviewdate']==AppConstant::ALWAYS_TIME) {
                         $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
                         $reviewTime = $defTime; //tzdate("g:i a",$assessmentData['enddate']+7*24*60*60);
                     } else {

@@ -17,7 +17,6 @@ function jQuerySubmit(url, data, successCallBack) {
 }
 
 function jQuerySubmitAjax(url, type, data, successCallBack, errorCallBack) {
-    alert(url);
     $.ajax({
         url: url,
         type:type,

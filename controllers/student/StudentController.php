@@ -2,6 +2,7 @@
 
 namespace app\controllers\student;
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\controllers\AppController;
 use app\models\Course;
@@ -20,33 +21,29 @@ class StudentController extends AppController
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollCourseForm'];
             $user = $this->getAuthenticatedUser();
-
             $course = Course::getByIdAndEnrollmentKey($param['courseId'], $param['enrollmentKey']);
             if ($course) {
                 $teacher = Teacher::getByUserId($user->id, $param['courseId']);
                 $tutor = Tutor::getByUserId($user->id, $param['courseId']);
                 $alreadyEnroll = Student::getByCourseId($param['courseId'], $user->id);
-
                 if (!$teacher && !$tutor && !$alreadyEnroll) {
                     $param['userid'] = $user->id;
                     $param['courseid'] = $param['courseId'];
                     $param = AppUtility::removeEmptyAttributes($param);
-
                     $student = new Student();
                     $student->create($param);
-
-                    $this->setSuccessFlash('You have been enrolled in course ' . $course->name . ' successfully');
+                    $this->setSuccessFlash(AppConstant::ENROLL_SUCCESS . $course->name . ' successfully');
                 } else {
-                    $errorMessage = 'You are already enrolled in the course.';
+                    $errorMessage = AppConstant::ALREADY_ENROLLED;
                     if ($teacher) {
-                        $errorMessage = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
+                        $errorMessage = AppConstant::TEACHER_CANNOT_ENROLL_AS_STUDENT;
                     } elseif ($tutor) {
-                        $errorMessage = 'You are a tutor for this course, and can not enroll as a student.';
+                        $errorMessage = AppConstant::TUTOR_CANNOT_ENROLL_AS_STUDENT;
                     }
                     $this->setErrorFlash($errorMessage);
                 }
             } else {
-                $this->setErrorFlash('Invalid combination of enrollment key and course id.');
+                $this->setErrorFlash(AppConstant::INVALID_COMBINATION);
             }
         }
         $responseData = array('model' => $model);

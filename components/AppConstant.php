@@ -4,7 +4,6 @@ namespace app\components;
 
 class AppConstant
 {
-
     const VERSION_NUMBER = 3;
     const REMEMBER_ME_TIME = 2592000; //Time in second
     const ZERO_VALUE = '0';
@@ -119,6 +118,12 @@ class AppConstant
     const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
     const MODIFY_ASSESSMENT ="Modify Assessment";
     const ADD_ASSESSMENT ="Add Assessment";
+    const TEST_TYPE = "AsGo";
+    const SHOW_ANSWER = "A";
+    const CALTAG = '?';
+    const CALRTAG = 'R';
+    const AM = 'am';
+    const PM = 'pm';
     const FORUM = 'Forum';
     const WIKI = 'Wiki';
     const LINK ='Link';
@@ -126,4 +131,11 @@ class AppConstant
     const INLINE_TEXT = 'Inline';
     const CALENDAR = 'Calendar';
     const BLOCK = 'Block';
+    const MESSAGE_SUCCESS = 'Message sent successfully.';
+    const FIRST_NAME = 'FirstName';
+    const ENROLL_SUCCESS = 'You have been enrolled in course ';
+    const ALREADY_ENROLLED = 'You are already enrolled in the course.';
+    const TEACHER_CANNOT_ENROLL_AS_STUDENT = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
+    const TUTOR_CANNOT_ENROLL_AS_STUDENT = 'You are a tutor for this course, and can not enroll as a student.';
+    const INVALID_COMBINATION = 'Invalid combination of enrollment key and course id.';
 }

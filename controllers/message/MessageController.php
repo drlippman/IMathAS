@@ -19,11 +19,8 @@ class MessageController extends AppController
     public $messageData = array();
     public $totalMessages = array();
     public $children = array();
-
     public $enableCsrfValidation = false;
-
-    /**
-     *
+    /*
      * @return string
      */
     public function actionIndex()
@@ -34,7 +31,7 @@ class MessageController extends AppController
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
-            $sortBy = 'FirstName';
+            $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
@@ -66,7 +63,7 @@ class MessageController extends AppController
             foreach($students as $student){
                 array_push($users,$student);
             }
-            $userId  = $this->getUserId();
+            $userId = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
             $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId , 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);
@@ -84,7 +81,7 @@ class MessageController extends AppController
                 $message = new Message();
                 $message->create($params, $userId);
             }
-            $this->setSuccessFlash('Message sent successfully.');
+            $this->setSuccessFlash(AppConstant::MESSAGE_SUCCESS);
             return $this->successResponse();
         }
     }
@@ -96,9 +93,9 @@ class MessageController extends AppController
             $params = $this->getRequestParams();
             $ShowRedFlagRow = $params['ShowRedFlagRow'];
             $showNewMsg = $params['showNewMsg'];
-            $isreadArray = array(0, 4, 8, 12);
+            $isreadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
             $messages = array();
-            if($showNewMsg == 1){
+            if($showNewMsg == AppConstant::NUMERIC_ONE){
                 $query = Message::getUsersToDisplay($userId);
                 if($query){
                     foreach($query as $message){
@@ -112,7 +109,7 @@ class MessageController extends AppController
             }
             if ($messages) {
                 $dateArray = array();
-                if ($ShowRedFlagRow == 1) {
+                if ($ShowRedFlagRow == AppConstant::NUMERIC_ONE) {
                     foreach ($messages as $message) {
                         if ($message['isread'] == AppConstant::NUMERIC_EIGHT || $message['isread'] == AppConstant::NUMERIC_NINE || $message['isread'] == AppConstant::NUMERIC_TWELVE || $message['isread'] == AppConstant::NUMERIC_THIRTEEN) {
                             $dateArray[] = $message;
@@ -146,7 +143,7 @@ class MessageController extends AppController
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
-            $sortBy = 'FirstName';
+            $sortBy = AppConstant::FIRST_NAME;
             $order = AppConstant::ASCENDING;
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
@@ -190,8 +187,10 @@ class MessageController extends AppController
         $teacherArray = array();
         if ($teachers) {
             foreach ($teachers as $teacher) {
-                $tempArray = array('courseId' => $teacher->course->id,
-                    'courseName' => $teacher->course->name);
+                $tempArray = array(
+                    'courseId' => $teacher->course->id,
+                    'courseName' => $teacher->course->name
+                );
                 array_push($teacherArray, $tempArray);
             }
             return $this->successResponse($teacherArray);
@@ -399,7 +398,6 @@ class MessageController extends AppController
         $this->children = AppUtility::removeEmptyAttributes($this->children);
         foreach ($childArray as $superKey => $child) {
             array_push($this->totalMessages, $this->messageData[$child]);
-
             unset($this->children[$arrayKey][$superKey]);
             if (isset($this->children[$child])) {
                 return $this->createChild($this->children[$child], $child);
