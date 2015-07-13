@@ -158,7 +158,6 @@ class Forums extends BaseImasForums {
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
 
         $updateForumData = Forums::findOne(['id' => $forumId]);
-//AppUtility::dump($updateForumData);
         $updateForumData->name = trim($params['title']);
 
         if(empty($params['forum-description']))
@@ -186,7 +185,6 @@ class Forums extends BaseImasForums {
         }
         $updateForumData->sortby = $params['sort-thread'];
         $updateForumData->defdisplay = $params['default-display'];
-//        AppUtility::dump($updateForumData);
         if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
 
             $updateForumData->postby = $replayPostDate;

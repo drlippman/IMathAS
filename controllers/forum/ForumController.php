@@ -919,7 +919,6 @@ class ForumController extends AppController
         $saveTitle = 'Create Forum';
         if($this->isPost())
         {
-
             $params = $this->getRequestParams();
             if(isset($modifyForumId)){
                 $updateForum = new Forums();

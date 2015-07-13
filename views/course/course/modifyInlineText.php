@@ -8,6 +8,7 @@ $this->title = 'Modify InlineText';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 $hidetitle = false;
+include_once('../components/filehandler.php');
 ?>
 
 
@@ -43,6 +44,11 @@ $hidetitle = false;
 	<span class=form>Attached Files:</span>
 	<span class=wideformright>
 
+        <a href="<?php echo getcoursefileurl($arr['link']); ?>" target="_blank">
+            View</a>
+		<input type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
+		Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
+
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		    New file<sup>*</sup>: <input type="file" name="userfile" /> <br/>
 		    Description: <input type="text" name="newfiledescr"/><br/>
@@ -77,7 +83,7 @@ $hidetitle = false;
                         <?php
                         echo '<div class = "pull-left col-lg-4 time-input">';
                         echo DatePicker::widget([
-                            'name' => 'EventDate',
+                            'name' => 'StartDate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
                             'value' => date("m/d/Y"),
                             'removeButton' => false,
@@ -91,7 +97,7 @@ $hidetitle = false;
                         echo '<div class="pull-left col-lg-6">';
 
                         echo TimePicker::widget([
-                            'name' => 'end_time',
+                            'name' => 'start_end_time',
                             'value' => time(),
                             'pluginOptions' => [
                                 'showSeconds' => false,
@@ -109,7 +115,7 @@ $hidetitle = false;
                         <?php
                         echo '<div class = "pull-left col-lg-4 time-input">';
                         echo DatePicker::widget([
-                            'name' => 'EventDate',
+                            'name' => 'EndDate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
                             'value' => date("m/d/Y"),
                             'removeButton' => false,
@@ -123,7 +129,7 @@ $hidetitle = false;
                         echo '<div class="pull-left col-lg-6">';
 
                         echo TimePicker::widget([
-                            'name' => 'end_time',
+                            'name' => 'end_end_time',
                             'value' => time(),
                             'pluginOptions' => [
                                 'showSeconds' => false,
@@ -151,13 +157,26 @@ $hidetitle = false;
                     <?php
                     echo '<div class = "pull-left col-lg-4 time-input">';
                     echo DatePicker::widget([
-                        'name' => 'EventDate',
+                        'name' => 'Calendar',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'value' => date("m/d/Y"),
                         'removeButton' => false,
                         'pluginOptions' => [
                             'autoclose' => true,
                             'format' => 'mm/dd/yyyy' ]
+                    ]);
+                    echo '</div>';?>
+                    <?php
+                    echo '<label class="end pull-left col-lg-1"> at </label>';
+                    echo '<div class="pull-left col-lg-6">';
+
+                    echo TimePicker::widget([
+                        'name' => 'calendar_end_time',
+                        'value' => time(),
+                        'pluginOptions' => [
+                            'showSeconds' => false,
+                            'class' => 'time'
+                        ]
                     ]);
                     echo '</div>';?>
                     <br/><br>

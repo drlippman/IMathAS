@@ -9,7 +9,6 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = $this->title;
 $hidetitle = false;
 ?>
-
     <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
         <span class=form>Name: </span>
     <span class=formright>
@@ -34,9 +33,9 @@ $hidetitle = false;
 
         <span class=form>Show:</span>
 		<span class=formright>
-			<input type=radio name="avail" value="0" <?php writeHtmlChecked($line['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
-			<input type=radio name="avail" value="1" <?php writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
-			<input type=radio name="avail" value="2" <?php writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
+			<input type=radio name="avail" value="0" <?php writeHtmlChecked($wiki['avail'],0);?> onclick="document.getElementById('datediv').style.display='none';"/>Hide<br/>
+			<input type=radio name="avail" value="1" <?php writeHtmlChecked($wiki['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
+			<input type=radio name="avail" value="2" <?php writeHtmlChecked($wiki['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/>Show Always<br/>
 		</span><br class="form"/>
 
         <div id="datediv" style="display:<?php echo ($wiki['avail']==1)?"block":"none"; ?>">
@@ -105,24 +104,25 @@ $hidetitle = false;
 		</span><BR class=form>
         </div>
         <span class=form>Group wiki?</span><span class=formright>
-<?php
-if ($started) {
-    writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
-    echo '<input type="hidden" name="groupsetid" value="'.$line['groupsetid'].'" />';
-} else {
-    writeHtmlSelect("groupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0);
-}
-?>
+                    <span class=formright>
+                      <select name="group-wiki" class="form-control">
+                          <option value="0" selected>Not group wiki</option>
+                          <?php foreach ($groupNames as $groupName) { ?>
+                              <option value="<?php echo $groupName['id']; ?>" selected>Use group
+                                  set:<?php echo $groupName['name']; ?></option>
+                          <?php } ?>
+                      </select>
+        </span>
 		</span><br class="form"/>
 
         <span class=form>Students can edit:</span>
 		<span class=formright>
-			<input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
-			<input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before:
+			<input type=radio name="rdatetype" value="0" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
+			<input type=radio name="rdatetype" value="2000000000" <?php if ($revisedate==0) { echo "checked=1";}?>/>Never<br/>
+			<input type=radio name="rdatetype" class="pull-left" value="2" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before:
 
             <?php
-            echo '<div class = "pull-left col-lg-4 time-input">';
+            echo '<div class = "col-lg-4 time-input">';
             echo DatePicker::widget([
                 'name' => 'Calendar',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -134,11 +134,11 @@ if ($started) {
             ]);
             echo '</div>';?>
             <?php
-            echo '<label class="end pull-left col-lg-1"> at </label>';
-            echo '<div class="pull-left col-lg-6">';
+            echo '<label class="end col-lg-7"> at </label>';
+            echo '<div class="col-lg-6">';
 
             echo TimePicker::widget([
-                'name' => 'calendar_    end_time',
+                'name' => 'calendar_end_time',
                 'value' => time(),
                 'pluginOptions' => [
                     'showSeconds' => false,

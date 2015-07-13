@@ -12,12 +12,11 @@ class InstrFiles extends BaseImasInstrFiles
     {
         return InstrFiles::findAll(['itemid' => $itemId]);
     }
-    public function saveFile($params)
+    public function saveFile($params, $inlineText)
     {
         $this->description = isset($params['newfiledescr']) ? $params['newfiledescr'] : null;
         $this->filename = isset($params['filename']) ? $params['filename'] : null;
-        $this->itemid = isset($params['itemid']) ? $params['itemid'] : null;
-        AppUtility::dump($this);
+        $this->itemid = BaseImasInstrFiles::findOne(['itemid' => $inlineText]);
         $this->save();
         return $this->id;
     }

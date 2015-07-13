@@ -6,6 +6,7 @@ use app\components\WikiUtility;
 use app\controllers\AppController;
 use app\models\Course;
 use app\models\Items;
+use app\models\StuGroupSet;
 use app\models\Wiki;
 use app\models\WikiRevision;
 
@@ -109,8 +110,9 @@ class WikiController extends AppController
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $wiki = Wiki::getById($wikiId);
-
+        $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
+//        $courseParamsId = $params['courseId'];
         $wikiid = $params['id'];
         $saveTitle = '';
         if(isset($params['id']))
@@ -130,11 +132,12 @@ class WikiController extends AppController
         else {
             $pageTitle = 'Add Wiki';
             if($this->isPost()){
+//                AppUtility::dump($courseId);
                 $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
                 $saveChanges = new Wiki();
-                $lastWikiId = $saveChanges->createItem($params);
-//                AppUtility::dump($lastWikiId);
+                $lastWikiId = $saveChanges->createItem($params,$courseId);
+
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
                 $courseItemOrder = Course::getItemOrder($courseId);
@@ -146,8 +149,7 @@ class WikiController extends AppController
                 $sub =& $items;
 
                 for ($i=1;$i<count($blocktree);$i++) {
-                    $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-
+                    $sub =& $sub[$blocktree[$i]-1]['items'];
                 }
                 array_unshift($sub,intval($lastItemsId));
                 $itemorder = addslashes(serialize($items));
@@ -160,7 +162,7 @@ class WikiController extends AppController
         }
 
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames);
         return $this->render('addWiki', $returnData);
     }
 }

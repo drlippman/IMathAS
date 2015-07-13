@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasWikis;
 
@@ -30,11 +31,14 @@ class Wiki extends BaseImasWikis
         return $query;
     }
 
-    public function createItem($params)
+    public function createItem($params, $courseId)
     {
-//        AppUtility::dump($params);
+        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
+
         $this->name = isset($params['name']) ? $params['name'] : null;
-        $this->courseid = 1;
+        $this->courseid = $courseId;
         if(empty($params['description']))
         {
             $params['description'] = ' ';
@@ -42,21 +46,38 @@ class Wiki extends BaseImasWikis
         $this->description = isset($params['description']) ? $params['description'] : null;
         $this->avail = isset($params['avail']) ? $params['avail'] : null;
 
-        if($params['avail'] == 1)
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-//            $this->startdate = 1435293000;
-            $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-            $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
-//            $this->enddate = 2000000000;
+            if($params['available-after'] == 0){
+                $startDate = 0;
+            }
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
+            }
+            $this->startdate = $startDate;
+            $this->enddate = $endDate;
+        }else
+        {
+            $this->startdate = AppConstant::NUMERIC_ZERO;
+            $this->enddate = AppConstant::ALWAYS_TIME;
         }
         $this->settings = 0;
-        $this->editbydate = 2000000000;
+
+        if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
+            $tag = $params['rdatetype'];
+        }
+        $this->editbydate = $tag;
+        $this->groupsetid = $params['group-wiki'];
         $this->save();
         return $this->id;
     }
 
     public function updateChange($params, $wiki)
     {
+        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
+
         $updateIdArray = Wiki::find()->where(['id' => $wiki])->all();
         foreach($updateIdArray as $key => $updateId)
         {
@@ -65,15 +86,28 @@ class Wiki extends BaseImasWikis
             $updateId->description = isset($params['description']) ? $params['description'] : null;
             $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
 
-            if($params['avail'] == 1)
+            if($params['avail'] == AppConstant::NUMERIC_ONE)
             {
-//            $this->startdate = 1435293000;
-                $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-                $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
-//            $this->enddate = 2000000000;
+                if($params['available-after'] == 0){
+                    $startDate = 0;
+                }
+                if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                    $endDate = AppConstant::ALWAYS_TIME;
+                }
+                $updateId->startdate = $startDate;
+                $updateId->enddate = $endDate;
+            }else
+            {
+                $updateId->startdate = AppConstant::NUMERIC_ZERO;
+                $updateId->enddate = AppConstant::ALWAYS_TIME;
             }
             $updateId->settings = 0;
-            $updateId->editbydate = 2000000000;
+
+            if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
+                $tag = $params['rdatetype'];
+            }
+            $updateId->editbydate = $tag;
+            $updateId->groupsetid = $params['group-wiki'];
             $updateId->save();
         }
     }

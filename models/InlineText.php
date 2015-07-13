@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasInlinetext;
 
@@ -30,21 +31,57 @@ class InlineText extends BaseImasInlinetext
     }
     public function saveChanges($params)
     {
+
+        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
+        if($params['hidetitle'] == 1)
+        {
+            $params['title'] = '';
+        }
         $this->title = isset($params['title']) ? $params['title'] : null;
         $this->courseid = 1;
         $this->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $this->avail = isset($params['avail']) ? $params['avail'] : null;
 
-        if($params['avail'] == 1)
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            AppUtility::dump('hii');
-//            $this->startdate = 1435293000;
-            $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-            $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
-//            $this->enddate = 2000000000;
+            if($params['available-after'] == 0){
+                $startDate = 0;
+            }
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
+            }
+
+            $this->startdate = $startDate;
+            $this->enddate = $endDate;
+        }else
+        {
+            $this->startdate = AppConstant::NUMERIC_ZERO;
+            $this->enddate = AppConstant::ALWAYS_TIME;
         }
+
         $this->oncal = isset($params['oncal']) ? $params['oncal'] : null;
-        $this->caltag ='!';
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
+        {
+            if($params['oncal'] == 0)
+            {
+                $params['caltag'] = '!';
+            }elseif($params['oncal'] == 1){
+                $this['caltag'] = $params['caltag'];
+
+            }elseif($params['oncal'] == 2)
+            {
+                $this['caltag'] = $params['caltag'];
+            }
+        }
+        if($params['altoncal'] == 1){
+            $this->caltag  = $params['altcaltag'];
+        }
+        else{
+            $this->caltag = '!';
+        }
+
         $this->isplaylist = 0;
         $this->save();
         return $this->id;
@@ -52,29 +89,45 @@ class InlineText extends BaseImasInlinetext
 
     public function updateChanges($params, $inlineTextId)
     {
+        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
+
         $updateIdArray = InlineText::find()->where(['id' => $inlineTextId])->all();
         foreach($updateIdArray as $key => $updateId)
         {
-            if($params['hidetitle'] == '##hidden##')
+            if($params['hidetitle'] == 1)
             {
-                $updateId->title = '';
+                $params['title'] = '';
             }
         $updateId->title = isset($params['title']) ? $params['title'] : null;
         $updateId->courseid = 1;
         $updateId->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
-            if($params['avail'] == 1)
+
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
             {
-//                AppUtility::dump('hii');
-//                $this->startdate = 1435293000;
-////        $this->enddate = isset($params['EventDate']) ? $params['EventDate'] : null;
-//                $this->enddate = 2000000000;
-                $this->startdate = isset($params['sdatetype']) ? $params['sdatetype'] : null;
-                $this->enddate = isset($params['edatetype']) ? $params['edatetype'] : null;
+                if($params['available-after'] == 0){
+                    $startDate = 0;
+                }
+                if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                    $endDate = AppConstant::ALWAYS_TIME;
+                }
+                $this->startdate = $startDate;
+                $this->enddate = $endDate;
+            }else
+            {
+                $this->startdate = AppConstant::NUMERIC_ZERO;
+                $this->enddate = AppConstant::ALWAYS_TIME;
             }
-        $updateId->enddate = 2000000000;
+
         $updateId->oncal = isset($params['oncal']) ? $params['oncal'] : null;
-        $updateId->caltag ='!';
+            if($params['altoncal'] == 1){
+                $updateId->caltag  = $params['altcaltag'];
+            }
+            else{
+                $updateId->caltag = '!';
+            }
         $updateId->isplaylist = 0;
         $updateId->save();
         }

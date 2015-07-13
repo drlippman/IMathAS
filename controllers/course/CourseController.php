@@ -101,38 +101,38 @@ class CourseController extends AppController
                                 $assessment->startdate = $exception->startdate;
                                 $assessment->enddate = $exception->enddate;
                             }
-                                $tempAray[$item->itemtype] = $assessment;
-                                array_push($responseData, $tempAray);
-                                array_push($calendarCount, $assessment);
+                            $tempAray[$item->itemtype] = $assessment;
+                            array_push($responseData, $tempAray);
+                            array_push($calendarCount, $assessment);
                             break;
                         case 'Calendar':
                             $tempAray[$item->itemtype] = $itemOrder;
                             array_push($responseData, $tempAray);
                             break;
                         case 'Forum':
-                                $form = Forums::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $form;
-                                array_push($responseData, $tempAray);
+                            $form = Forums::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $form;
+                            array_push($responseData, $tempAray);
 
                             break;
                         case 'Wiki':
-                                $wiki = Wiki::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $wiki;
-                                array_push($responseData, $tempAray);
+                            $wiki = Wiki::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $wiki;
+                            array_push($responseData, $tempAray);
                             break;
                         case 'InlineText':
-                                $inlineText = InlineText::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $inlineText;
-                                array_push($responseData, $tempAray);
+                            $inlineText = InlineText::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $inlineText;
+                            array_push($responseData, $tempAray);
                             break;
                         case 'LinkedText':
-                                $linkedText = Links::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $linkedText;
-                                array_push($responseData, $tempAray);
-                              break;
-                        }
+                            $linkedText = Links::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $linkedText;
+                            array_push($responseData, $tempAray);
+                            break;
                     }
                 }
+            }
         }
 
         $course = Course::getById($courseId);
@@ -152,6 +152,7 @@ class CourseController extends AppController
         $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
     }
+
 
     /**
      * Display assessment details
@@ -732,10 +733,7 @@ class CourseController extends AppController
             if($this->isPost()){
                 $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
-                if ($params['title']=='##hidden##') {
-                    $hidetitle = true;
-                    $params['title']='';
-                }
+
                 $saveChanges = new InlineText();
                 $saveChanges->updateChanges($params, $inlineTextId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
@@ -751,6 +749,8 @@ class CourseController extends AppController
 
 //                AppUtility::dump($d);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
+
+
                 $saveChanges = new InlineText();
                 $lastInlineId = $saveChanges->saveChanges($params);
 
@@ -760,6 +760,33 @@ class CourseController extends AppController
                 $itemorder = $courseItemOrder->itemorder;
 
                 $items = unserialize($itemorder);
+                if ($_FILES['userfile']['name']!='') {
+
+                    $uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+
+                    $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+                    $filename = $userfilename;
+
+                    $extension = strtolower(strrchr($userfilename,"."));
+                    $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                    if (in_array($extension,$badextensions)) {
+                        echo "<p>File type is not allowed</p>";
+                    } else {
+                        include_once('../components/filehandler.php');
+                        if (($filename = storeuploadedcoursefile('userfile',$courseId.'/'.$filename))!==false) {
+                            if (trim($params['newfiledescr'])=='') {
+                                $params['newfiledescr'] = $filename;
+                            }
+                            $file = new InstrFiles();
+                            $fileId = $file->saveFile($params, $lastInlineId);
+                            AppUtility::dump($fileId);
+
+                        } else {
+
+                            echo "<p>Error uploading file!</p>\n";
+                        }
+                    }
+                }
 
                 $blocktree = array(0);
                 $sub =& $items;

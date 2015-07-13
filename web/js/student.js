@@ -152,6 +152,7 @@ function calendar() {
 
                             });
                         }
+
                     });
                     /**
                      * Display Inline text on calendar

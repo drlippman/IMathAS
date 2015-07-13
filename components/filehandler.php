@@ -143,8 +143,8 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 			return false;
 		}
 	} else {
-		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/Uploads/files/';
 			$keydir = dirname($key); 
 			$dir = $base.dirname($key);
 			$fn = basename($key);
@@ -669,22 +669,14 @@ function copyqimage($key,$dest) {
 
 function getuserfileurl($key) {
 	global $urlmode,$imasroot;
-	if ($GLOBALS['filehandertype'] == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/$key";
-	} else {
-		return "$imasroot/filestore/$key";
-	}
+		return "localhost/openmath/web/Uploads/$key";
 }
 function getcoursefileurl($key) {
-	global $urlmode,$imasroot;
-	if ($GLOBALS['filehandertypecfiles'] == 's3') {
-		return $urlmode."s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/$key";
-	} else {
-		return "$imasroot/openmath/web/Uploads/$key";
+		return "localhost/openmath/web/Uploads/$key";
 	}
-}
 function mkdir_recursive($pathname, $mode=0777)
 {
+    \app\components\AppUtility::dump('hj');
     is_dir(dirname($pathname)) || mkdir_recursive(dirname($pathname), $mode);
     return is_dir($pathname) || @mkdir($pathname, $mode);
 }
