@@ -308,4 +308,19 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
+    Public static function findStudentsToList($courseId)
+    {
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId])
+            ->orderBy('imas_users.LastName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 } 

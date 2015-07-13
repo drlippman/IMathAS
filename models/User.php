@@ -9,6 +9,7 @@ use app\models\_base\BaseUsers;
 use app\components\AppConstant;
 use yii\db\ActiveRecord;
 use Yii;
+use yii\db\Query;
 
 class User extends BaseImasUsers implements \yii\web\IdentityInterface
 {
@@ -211,8 +212,19 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $message = "Username {$StudentDataArray} already existed in system";
         return $message;
     }
-    Public static function getByCourseId($courseId)
+    Public static function findTeachersToList($courseId)
     {
-        return static::find()->where(['id'=>$courseId])->all();
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_teachers',
+                'imas_users.id = imas_teachers.userid'
+            )
+            ->where(['imas_teachers.courseid' => $courseId])
+            ->orderBy('imas_users.LastName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 }

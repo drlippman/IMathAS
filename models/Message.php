@@ -235,7 +235,8 @@ class Message extends BaseImasMsgs
             ->distinct()
             ->from('imas_users')
             ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_users.id = imas_msgs.msgto')
-            ->where(['imas_msgs.msgfrom' => $userId]);
+            ->where(['imas_msgs.msgfrom' => $userId])
+            ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

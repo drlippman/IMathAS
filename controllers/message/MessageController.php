@@ -6,7 +6,9 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\Course;
 use app\models\Message;
+use app\models\Student;
 use app\models\Teacher;
+use app\models\Tutor;
 use app\models\User;
 use Yii;
 use app\controllers\AppController;
@@ -50,18 +52,24 @@ class MessageController extends AppController
         $userRights = $this->getAuthenticatedUser();
         $newTo = $this->getParamVal('new');
         $courseId = $this->getParamVal('cid');
-        $UserId = $this->getParamVal('userid');
-        $userName = User::getById($UserId);
+        $userId = $this->getParamVal('userid');
+        $userName = User::getById($userId );
         if ($this->getAuthenticatedUser()) {
             $course = Course::getById($courseId);
             $teacher = Teacher::getTeachersById($courseId);
-            $sortBy = 'FirstName';
-            $order = AppConstant::ASCENDING;
-            $users = User::findAllUsers($sortBy, $order);
-            $userId = $this->getUserId();
+            $users = User::findTeachersToList($courseId);
+            $tutors = Tutor::findTutorsToList($courseId);
+            foreach($tutors as $tutor){
+                array_push($users,$tutor);
+            }
+            $students = Student::findStudentsToList($courseId);
+            foreach($students as $student){
+                array_push($users,$student);
+            }
+            $userId  = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
-            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId, 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);
+            $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId , 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);
             return $this->renderWithData('sendMessage', $responseData);
         }
     }

@@ -50,9 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <span class="col-md-4">
             <select name="seluid" class="dropdown form-control" id="seluid">
             <option value="0">Select a recipient</option>
-            <?php foreach ($teachers as $teacher) { ?>
-            <option value="<?php echo $teacher->user->id ?>">
-                <?php echo ucfirst($teacher->user->FirstName) . " " . ucfirst($teacher->user->LastName); ?>
+            <?php foreach ($users as $user) { ?>
+            <option value="<?php echo $user['id'] ?>">
+                <?php echo ucfirst($user['LastName']).", ".ucfirst($user['FirstName']); ?>
             </option><?php } ?>
         </select>
         <?php }?>

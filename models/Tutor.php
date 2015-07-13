@@ -11,6 +11,7 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasTutors;
+use yii\db\Query;
 
 class Tutor extends BaseImasTutors
 {
@@ -47,5 +48,23 @@ class Tutor extends BaseImasTutors
     public static function getByUser($userId)
     {
         return static::findAll(['userid' => $userId]);
+    }
+    Public static function findTutorsToList($courseId)
+    {
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
+            ->from('imas_tutors')
+            ->join(	'INNER JOIN',
+                'imas_users',
+                'imas_users.id = imas_tutors.userid'
+            )
+////            if (!$isteacher && $studentinfo['section']!=null) {
+////                $query .= "AND (imas_tutors.section='".addslashes($studentinfo['section'])."' OR imas_tutors.section='') ";
+////            }
+            ->where(['imas_tutors.courseid' => $courseId])
+            ->orderBy('imas_users.LastName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 } 
