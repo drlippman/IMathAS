@@ -40,11 +40,21 @@ use app\controllers\AppController;
 
 class InstructorController extends AppController
 {
+
+public $oa = array();
+    public $cn = 1;
+    public $key = 0;
+
     public $enableCsrfValidation = false;
 
     public function actionIndex()
     {
+
+
+//        echo "fafasf";die;
 //        $this->layout = "master";
+
+
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
@@ -191,6 +201,7 @@ class InstructorController extends AppController
             $itemCalender = new Items();
             $itemId = $itemCalender->create($courseId,$calender);
             $items = unserialize($course['itemorder']);
+
                     $blockTree = explode('-',$block);
                     $sub =& $items;
                     for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
@@ -538,4 +549,12 @@ class InstructorController extends AppController
         }
         return $this->successResponse();
     }
+
 }
+
+
+
+
+
+
+

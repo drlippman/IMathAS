@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <div class="col-md-1"><b>Subject</b></div>
         <div class="col-md-8"><input id="sub" class="text-box subject" type="text"
-                                     value="Re:<?php echo $reply[0]['subject'] ?>">
+                                     value="Re: <?php echo $reply[0]['subject'] ?>">
         </div>
     </div>
     <br><br><br>

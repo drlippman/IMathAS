@@ -4,6 +4,8 @@ namespace app\models\forms;
 use app\components\AppUtility;
 use yii\base\Model;
 use Yii;
+use yii\db\Query;
+
 class ForumForm extends Model
 {
     public $search;
@@ -28,8 +30,15 @@ class ForumForm extends Model
     }
     public static  function byAllSubject($search ){
 
-        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where subject LIKE '$search%' order by postdate desc")->queryAll();
-        return $subject;
+        $query = new Query();
+        $query->select(['*'])
+            ->from('imas_forum_posts ')
+            ->Where(['LIKE','subject', $search]);
+        $query->orderBy(['postdate'=> SORT_DESC]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
 
     }
 
