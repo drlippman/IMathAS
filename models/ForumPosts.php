@@ -37,7 +37,7 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static  function modifyThread($threadId,$message,$subject)
+    public static  function modifyPost($threadId,$message,$subject,$replyBy)
     {
         $threadPost = ForumPosts::findOne(['id' => $threadId]);
         $threadPost->subject = $subject;

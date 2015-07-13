@@ -95,6 +95,12 @@ class Forums extends BaseImasForums {
         $this->settings = $settingValue;
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
+            if($params['available-after'] == 0){
+                $startDate = 0;
+            }
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
+            }
             $this->startdate = $startDate;
             $this->enddate = $endDate;
         }else
@@ -165,6 +171,12 @@ class Forums extends BaseImasForums {
 
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
+            if($params['available-after'] == 0){
+                $startDate = 0;
+            }
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
+            }
             $updateForumData->startdate = $startDate;
             $updateForumData->enddate = $endDate;
         }else

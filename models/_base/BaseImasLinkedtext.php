@@ -39,7 +39,7 @@ class BaseImasLinkedtext extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['courseid', 'title', 'summary', 'text', 'startdate', 'enddate', 'outcomes'], 'required'],
+//            [['courseid', 'title', 'summary', 'text', 'startdate', 'enddate', 'outcomes'], 'required'],
             [['courseid', 'startdate', 'enddate', 'avail', 'oncal', 'target', 'points'], 'integer'],
             [['summary', 'text', 'outcomes'], 'string'],
             [['title', 'caltag'], 'string', 'max' => 254]
