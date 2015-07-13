@@ -22,4 +22,11 @@ class Links extends BaseImasLinkedtext
     {
         return Links::findOne(['id' => $id]);
     }
+
+    public static function deleteById($linkId){
+        $linkData = Links::findOne(['id' => $linkId]);
+        if($linkData){
+            $linkData->delete();
+        }
+    }
 } 

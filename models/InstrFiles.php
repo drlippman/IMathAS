@@ -21,4 +21,13 @@ class InstrFiles extends BaseImasInstrFiles
         $this->save();
         return $this->id;
     }
+
+    public static function deleteById($itemId){
+        $instrFileData = InstrFiles::findAll(['itemid' => $itemId]);
+        if($instrFileData){
+            foreach($instrFileData as $singleFile){
+                $singleFile->delete();
+            }
+        }
+    }
 } 

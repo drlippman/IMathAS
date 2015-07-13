@@ -10,6 +10,8 @@ use app\models\ForumPosts;
 use app\models\ForumSubscriptions;
 use app\models\ForumThread;
 use app\models\ForumView;
+use app\models\Grades;
+use app\models\InstrFiles;
 use app\models\Message;
 use app\models\AssessmentSession;
 use app\models\Blocks;
@@ -30,6 +32,8 @@ use app\models\Thread;
 use app\models\Wiki;
 use app\models\User;
 use app\models\forms\ManageEventForm;
+use app\models\WikiRevision;
+use app\models\WikiView;
 use Yii;
 use app\controllers\AppController;
 
@@ -480,27 +484,56 @@ class InstructorController extends AppController
         $block = $params['block'];
         $itemType = $params['itemType'];
         $itemId = $params['id'];
-        if($itemType == AppConstant::FORUM) {
-            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-            Forums::deleteForum($itemId);
-            ForumSubscriptions::deleteSubscriptionsEntry($itemId);
-            $postId = ForumPosts::getForumPostByFile($itemId);
-            $threadIdArray = ForumThread::findThreadCount($itemId);
-            foreach($threadIdArray as $singleThread){
-                ForumView::deleteByForumIdThreadId($singleThread['id']);
-            }
-            ForumPosts::deleteForumPost($itemId);
-            Thread::deleteThreadByForumId($itemId);
-        }elseif($itemType == AppConstant::ASSESSMENT){
-            AssessmentSession::deleteByAssessmentId($itemId);
-            Questions::deleteByAssessmentId($itemId);
-            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-            Assessments::deleteAssessmentById($itemId);
-            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-        }elseif($itemType == AppConstant::CALENDAR){
-            $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-            AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+        switch($itemType){
+            case AppConstant::FORUM:
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                Forums::deleteForum($itemId);
+                ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+                $postId = ForumPosts::getForumPostByFile($itemId);
+                $threadIdArray = ForumThread::findThreadCount($itemId);
+                foreach($threadIdArray as $singleThread){
+                    ForumView::deleteByForumIdThreadId($singleThread['id']);
+                }
+                ForumPosts::deleteForumPost($itemId);
+                Thread::deleteThreadByForumId($itemId);
+                break;
+            case AppConstant::ASSESSMENT:
+                AssessmentSession::deleteByAssessmentId($itemId);
+                Questions::deleteByAssessmentId($itemId);
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                Assessments::deleteAssessmentById($itemId);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                break;
+            case AppConstant::CALENDAR:
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                break;
+            case AppConstant::INLINE_TEXT:
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                InlineText::deleteInlineTextId($itemId);
+                InstrFiles::deleteById($itemId);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                break;
+            case AppConstant::WIKI:
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                Wiki::deleteById($itemId);
+                WikiRevision::deleteByWikiId($itemId);
+                WikiView::deleteByWikiId($itemId);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                break;
+            case AppConstant::LINK:
+                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                $linkData = Links::getById($itemId);
+                $points = $linkData['points'];
+                if($points > AppConstant::NUMERIC_ZERO){
+                    Grades::deleteByGradeTypeId($itemId);
+                }
+                Links::deleteById($itemId);
+                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
+                break;
+            case AppConstant::BLOCK:
+
         }
         return $this->successResponse();
     }

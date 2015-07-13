@@ -309,7 +309,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php echo $wikis->name ?></a></b>
 
                 <br><span>Hidden</span>
-                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#">Delete</a> | <a>Copy</a>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a>Copy</a>
             </div>
             <div class="itemsum">
                 <p>
@@ -332,7 +332,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 } else { ?>
                     Always
                 <?php } ?>
-                <a href="#">Modify</a> | <a href="#">Delete</a> | <a>Copy</a><br>
+                <a href="#">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -353,7 +353,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo $wikis->name ?></a></b>
                 <br><span>Showing Always</span>
-                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#">Delete</a> | <a>Copy</a><br>
+                <?php echo '<a href="' . AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id) . '"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a>Copy</a><br>
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
                 <?php } ?>
@@ -419,7 +419,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>
 
             </div>
             <div class="itemsum">
@@ -481,7 +481,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -539,7 +539,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -592,7 +592,7 @@ case 'LinkedText': ?>
                 <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
                     <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
                 <?php } ?>
-                <a> Modify </a>|<a href="#"> Delete </a> |<a> Copy </a>
+                <a> Modify </a>|<a href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>
 
 
             </div>
@@ -624,15 +624,15 @@ case 'LinkedText': ?>
             <div class="itemsum">
                     <?php } ?>
                     <?php if($inline->avail == 2) { ?>
-                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
+                       <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                     <?php }
                     else {
                         if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
                         {
-                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
+                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                        <?php }
                         else{
-                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
+                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
                         <?php }
                     }
                     ?>
@@ -657,7 +657,7 @@ case 'LinkedText': ?>
             </div>
             <div class="itemsum"><p>
                     <?php  }
-                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a id = "mark-as-deleted" href="<?php echo AppUtility::getURLFromHome('course', 'course/delete-inline-text?id=' . $inline->id.'&courseId=' .$course->id) ?>">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
+                    echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="<?php echo AppUtility::getURLFromHome('course', 'course/copy-item?id=' . $inline->id.'&courseId=' .$course->id) ?>"> Copy </a>
 
                 <p><?php echo $inline->text ?></p>
             </div>
@@ -682,7 +682,7 @@ case 'LinkedText': ?>
                     <?php }
                     $startDate = AppUtility::formatDate($inline->startdate);
                     $endDate = AppUtility::formatDate($inline->enddate);
-                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id="mark-as-read" href="#"> Delete </a> | <a href=""> Copy </a>';?>
+                    echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> ';?>| <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href=""> Copy </a>';?>
             </div>
         </div>
     <?php }?>
@@ -982,18 +982,18 @@ case 'LinkedText': ?>
                                 <div class="itemsum"><p>
                                         <?php } ?>
                                         <?php if($inline->avail == 2) {
-                                            echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                        }
+                                            echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> '?>| <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php }
                                         else {
                                             if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
                                             {
-                                                echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                            }
+                                                echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>';?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php }
                                             else{
-                                                echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                            }
-                                        }
-                                        ?>
+                                                echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> ';?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a>';
+                                        <?php   }
+                                        } ?>
+
                                     <p><?php echo $inline->text ?></p>
                                 </div>
                                 <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
@@ -1015,8 +1015,8 @@ case 'LinkedText': ?>
                                 </div>
                                 <div class="itemsum"><p>
                                         <?php  }
-                                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> | <a id = "mark-as-delete" href="#"> Delete </a> | <a href="#"> Copy </a>';
-                                        ?>
+                                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>';?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a>';
+
 
                                     <p><?php echo $inline->text ?></p>
                                 </div>
@@ -1057,13 +1057,13 @@ case 'LinkedText': ?>
                             <div id="demo">
                             </div>
                         </div>
-                        <?php break; ?>
-                    <?php endswitch; ?>
+                        <?php break;
+                     endswitch; ?>
             <?php } ?>
-        <?php } ?>
+        <?php }  ?>
         </div>
         <div class="clear"></div>
-    <?php } elseif ($block['avail'] == AppConstant::NUMERIC_TWO) { ?>
+    <?php }  elseif ($block['avail'] == AppConstant::NUMERIC_TWO) { ?>
         <!--Show Always-->
         <div class=block>
             <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>

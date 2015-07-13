@@ -59,5 +59,15 @@ class Grades extends BaseImasGrades
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function deleteByGradeTypeId($linkId){
+        $externalTool = 'exttool';
+        $linkData = Grades::findAll(['gradetypeid'=> $linkId,'gradetype' => $externalTool]);
+        if($linkData){
+            foreach($linkData as $singleData){
+                $singleData->delete();
+            }
+        }
+    }
 }
 

@@ -77,4 +77,11 @@ class Wiki extends BaseImasWikis
             $updateId->save();
         }
     }
+
+    public static function deleteById($itemId){
+        $wikiData = Wiki::findOne($itemId);
+        if($wikiData){
+            $wikiData->delete();
+        }
+    }
 } 

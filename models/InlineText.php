@@ -80,8 +80,11 @@ class InlineText extends BaseImasInlinetext
         }
     }
 
-    public static function deleteInlineTextId($id)
+    public static function deleteInlineTextId($itemId)
     {
-        return InlineText::deleteAll(['id' => $id]);
+        $inlineTextData = InlineText::findOne(['id' => $itemId]);
+        if($inlineTextData){
+            $inlineTextData->delete();
+        }
     }
 } 

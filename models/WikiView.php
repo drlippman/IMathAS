@@ -17,4 +17,13 @@ class WikiView extends BaseImasWikiViews
     {
         return WikiView::findAll(['wikiid' => $wikiId, 'userid' => $userId]);
     }
+
+    public static function deleteByWikiId($wikiId){
+        $wikiViewData = WikiRevision::findAll(['wikiid' => $wikiId]);
+        if($wikiViewData){
+            foreach($wikiViewData as $singleData){
+                $singleData->delete();
+            }
+        }
+    }
 } 
