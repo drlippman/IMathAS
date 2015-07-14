@@ -34,4 +34,29 @@ class GbScheme extends BaseImasGbscheme
        $result = GbScheme::findOne(['courseid'=> $courseId]);
         return $result;
     }
+
+    public static  function findByCourseId($courseId)
+    {
+        $query = new Query();
+        $query	->select(['useweights', 'orderby', 'defaultcat', 'defgbmode', 'usersort', 'stugbmode', 'colorize'])
+            ->from('imas_gbscheme')
+            ->where(['imas_gbscheme.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function updateGbScheme($useWeights, $orderBy, $userSort, $defaultCat, $defGbMode, $stuGbMode, $colorize, $courseId)
+    {
+        $query = GbScheme::findOne(['courseid' => $courseId]);
+        if($query){
+            $query->useweights = $useWeights;
+            $query->orderby = $orderBy;
+            $query->usersort = $userSort;
+            $query->defaultcat = $defaultCat;
+            $query->defgbmode = $defGbMode;
+            $query->stugbmode = $stuGbMode;
+            $query->colorize = $colorize;
+            $query->save();
+        }
+    }
 }

@@ -216,5 +216,15 @@ class Forums extends BaseImasForums {
         $updateForumData->outcomes = $params['associate-outcomes'];
         $updateForumData->save();
     }
+    public static function updateGbCat($catList){
+
+        foreach($catList as $category){
+            $query = Forums::findOne(['gbcategory' => $category]);
+            if($query){
+                $query->gbcategory = AppConstant::NUMERIC_ZERO;
+                $query->save();
+            }
+        }
+    }
 
 } 

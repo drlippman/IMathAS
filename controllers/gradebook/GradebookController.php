@@ -2302,8 +2302,109 @@ class GradebookController extends AppController
     public  function actionGbSettings(){
         $this->guestUserHandler();
         $course = Course::getById($this->getParamVal('cid'));
+        $params = $this->getRequestParams();
+
+        if($this->isPost()){
+            if (isset($params['deleteCatOnSubmit'])) {
+                foreach ($params['deleteCatOnSubmit'] as $i=>$catToDel) {
+                    $params['deleteCatOnSubmit'][$i] = intval($catToDel);
+                }
+                Assessments::updateGbCat($params['deleteCatOnSubmit']);
+                Forums::updateGbCat($params['deleteCatOnSubmit']);
+                GbItems::updateGbCat($params['deleteCatOnSubmit']);
+                GbCats::deleteGbCat($params['deleteCatOnSubmit']);
+            }
+            $useWeights = $params['useweights'];
+            $orderBy = $params['orderby'];
+            if (isset($params['grouporderby'])) {
+                $orderBy += 1;
+            }
+            $userSort = $params['usersort'];
+            //name,scale,scaletype,chop,drop,weight
+            $ids = array_keys($params['weight']);
+            foreach ($ids as $id) {
+                $name = $params['name'][$id];
+                $scale = $params['scale'][$id];
+                if (trim($scale) == '') {
+                    $scale = 0;
+                }
+                $scaleType = $params['st'][$id];
+                if (isset($params['chop'][$id])) {
+                    $chop = round($params['chopto'][$id] / 100, 2);
+                } else {
+                    $chop = 0;
+                }
+                if ($params['droptype'][$id] == 0) {
+                    $drop = 0;
+                } else if ($params['droptype'][$id] == 1){
+                    $drop = $params['dropl'][$id];
+                } else if ($params['droptype'][$id] == 2) {
+                    $drop = -1 * $params['droph'][$id];
+                }
+                $weight = $params['weight'][$id];
+                $calcType = intval($params['calctype'][$id]);
+                if (trim($weight) == '') {
+                    if ($useWeights == 0) {
+                        $weight = -1;
+                    } else {
+                        $weight = 0;
+                    }
+                }
+                $hide = intval($params['hide'][$id]);
+
+                if (substr($id, 0, 3) == 'new') {
+                    if (trim($name) != '') {
+                        GbCats::createGbCat($course['id'], $name, $scale, $scaleType, $chop, $weight, $hide, $calcType);
+                    }
+                } else if ($id == 0) {
+                    $defaultCat = "$scale,$scaleType,$chop,$drop,$weight,$hide,$calcType";
+                } else {
+                    GbCats::updateGbCat($id, $name, $scale, $scaleType, $chop, $drop, $weight, $hide, $calcType);
+                }
+            }
+            $defGbMode = $params['gbmode1'] + 10*$params['gbmode10'] + 100*($params['gbmode100']+$params['gbmode200']) + 1000*$params['gbmode1000'] + 1000*$params['gbmode1002'];
+            if (isset($params['gbmode4000'])) {$defGbMode += 4000;}
+            if (isset($params['gbmode400'])) {$defGbMode += 400;}
+            if (isset($params['gbmode40'])) {$defGbMode += 40;}
+            $stuGbMode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
+            GbScheme::updateGbScheme($useWeights, $orderBy, $userSort, $defaultCat, $defGbMode, $stuGbMode, $params['colorize'], $course['id']);
+            if (isset($params['submit'])) {
+                $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course['id'].'&refreshdef=true'));
+            }
+        }
+
+        $gbScheme = GbScheme::getByCourseId($course['id']);
+
+        $useWeights = $gbScheme['useweights'];
+        $defGbMode = $gbScheme['defgbmode'];
+        $colorize = $gbScheme['colorize'];
+        $totOnLeft = ((floor($defGbMode / 1000) % 10) & 1) ;    //0 right, 1 left
+        $avgOnTop = ((floor($defGbMode / 1000) % 10) & 2) ;          //0 bottom, 2 top
+        $lastLogin = (((floor($defGbMode / 1000) % 10) & 4) == 4) ;    //0 hide, 2 show last login column
+        $links = ((floor($defGbMode / 100) % 10) & 1);               //0: view/edit, 1 q breakdown
+        $hideLocked = ((floor($defGbMode / 100) % 10) & 2);          //0: show 2: hide locked
+        $includeDuDate = (((floor($defGbMode / 100) % 10) & 4) == 4); //0: hide due date, 4: show due date
+        $hideNc = (floor($defGbMode / 10) % 10) % 3;                 //0: show all, 1 stu visisble (cntingb not 0), 2 hide all (cntingb 1 or 2)
+        $includeLastChange = (((floor($defGbMode / 10) % 10) & 4) == 4);  //: hide last change, 4: show last change
+        $availShow = $defGbMode%10;                            //0: past, 1 past&cur, 2 all
+        $colorVal = array(0);
+        $colorLabel = array("No Color");
+        for ($j = 50; $j < 90; $j += ($j<70?10:5)) {
+            for ( $k = $j + ($j<70?10:5); $k < 100; $k += ($k<70?10:5)) {
+                $colorVal[] = "$j:$k";
+                $colorLabel[] = "red &le; $j%, green &ge; $k%";
+            }
+        }
+        $colorVal[] = "-1:-1";
+        $colorLabel[] = "Active";
+        $hideVal = array(1,0,2);
+        $hideLabel = array(_("Hidden"),_("Expanded"),_("Collapsed"));
+
+        $gbCategory = GbCats::findCategoryByCourseId($course['id']);
+
         $this->includeJS(['gradebook/gbSettings.js']);
-        $responseData = array('course' => $course);
+        $responseData = array('course' => $course, 'useWeights' => $useWeights, 'gbScheme' => $gbScheme, 'hideLabel' => $hideLabel, 'hideVal' =>$hideVal, 'gbCategory' => $gbCategory, 'links' => $links, 'availShow' => $availShow,'hideNc' => $hideNc, 'hideLocked' => $hideLocked,
+         'totOnLeft' => $totOnLeft, 'colorize' => $colorize, 'colorVal' => $colorVal, 'colorLabel' => $colorLabel, 'avgOnTop' => $avgOnTop, 'lastLogin' => $lastLogin, 'includeDuDate' => $includeDuDate, 'includeLastChange' => $includeLastChange);
         return $this->renderWithData('gbSettings', $responseData);
     }
 

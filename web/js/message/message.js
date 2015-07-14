@@ -6,7 +6,7 @@ $(document).ready(function () {
     var userId = $(".send-userId").val();
     var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
     jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
+    //jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
     markAsRead();
@@ -400,5 +400,4 @@ function calculateCourseList(){
         }
     });
     courseDisplay(courseInfo);
-    //filterByCourse();
 }

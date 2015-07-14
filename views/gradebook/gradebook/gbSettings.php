@@ -10,157 +10,213 @@ $this->params['breadcrumbs'][] = $this->title;
 <div id="headergbsettings" class="pagetitle">
     <h2>Grade Book Settings <img src="<?php echo AppUtility::getAssetURL()?>img/help.gif" alt="Help" onclick="window.open('<?php echo AppUtility::getURLFromHome('site', 'helper-guide?section=gbSettings'); ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"></h2>
 </div>
-<form id="theform" method=post action="gb-settings?cid=<?php echo $course->id;?>" onsubmit="prepforsubmit()">
+<form id="theform" method=post action="gb-settings?cid=<?php echo $course->id;?>" onsubmit="prepForSubmit()">
     <span class=form>Calculate total using:</span>
-	<span class=formright>
-<!--        hardcoded checked in radio list Insert logic for checked in radio list      -->
-		<input type=radio name=useweights value="0" id="usew0" checked onclick="swapweighthdr(0)"/><label for="usew0">points earned / possible</label><br/>
-		<input type=radio name=useweights value="1" id="usew1" onclick="swapweighthdr(1)"/><label for="usew1">category weights</label>
-	</span>
-    <br class=form />
-    <p><a href="#" onclick="toggleadv(this);return false">Edit view settings</a></p>
+    <span class=formright>
+		<input type=radio name=useweights value="0" id="usew0" <?php AppUtility::writeHtmlChecked($useWeights,0);?> onclick="swapWeightHdr(0)"/><label for="usew0">points earned / possible</label><br/>
+		<input type=radio name=useweights value="1" id="usew1" <?php AppUtility::writeHtmlChecked($useWeights,1);?> onclick="swapWeightHdr(1)"/><label for="usew1">category weights</label>
+	</span><br class=form />
+    <p><a href="#" onclick="toggleAdv(this);return false">Edit view settings</a></p>
 
     <fieldset id="viewfield"><legend>Default gradebook view:</legend>
 
         <span class="form">Gradebook display:</span>
 	<span class="formright">
-		Order: <select name="orderby" id="orderby">
-            <option value="0" selected="">by end date, old to new</option>
-            <option value="4">by end date, new to old</option>
-            <option value="6">by start date, old to new</option>
-            <option value="8">start date, new to old</option>
-            <option value="2">alphabetically</option>
-            <option value="10">by course page order, offline at end</option>
-            <option value="12">by course page order reversed, offline at start</option>
-        </select>
-		<br>
-		<input type="checkbox" name="grouporderby" value="1" id="grouporderby"><label for="grouporderby">Group by category first</label>
+        <?php
+        $orderVal = array(0,4,6,8,2,10,12);
+        $orderLabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
+        echo 'Order: ';
+        AppUtility::writeHtmlSelect("orderby", $orderVal, $orderLabel, $gbScheme['orderby']&~1);
+        ?>
+        <br/>
+		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php AppUtility::writeHtmlChecked($gbScheme['orderby']&1, 1);?>/><label for="grouporderby">Group by category first</label>
 	</span><br class="form">
+        <span class=form>Default user order:</span>
+	<span class=formright>
+		<?php
+        $orderVal = array(0,1);
+        $orderLabel = array('Order by section (if used), then Last name','Order by Last name');
+        AppUtility::writeHtmlSelect("usersort", $orderVal, $orderLabel, $gbScheme['usersort']);
+        ?>
+	</span><br class=form />
 
-        <span class="form">Default user order:</span>
-	<span class="formright">
-		<select name="usersort" id="usersort">
-            <option value="0" selected="">Order by section (if used), then Last name</option>
-            <option value="1">Order by Last name</option>
-        </select>
-	</span><br class="form">
+    <span class=form>Links show:</span>
+	<span class=formright>
+		<?php
+        $orderVal = array(0,1);
+        $orderLabel = array('Full Test','Question Breakdown');
+        AppUtility::writeHtmlSelect("gbmode100", $orderVal, $orderLabel, $links);
+        ?>
+	</span><br class=form />
 
-        <span class="form">Links show:</span>
-	<span class="formright">
-		<select name="gbmode100" id="gbmode100">
-            <option value="0" selected="">Full Test</option>
-            <option value="1">Question Breakdown</option>
-        </select>
-	</span><br class="form">
+    <span class=form>Default show by availability: </span>
+	<span class=formright>
+		<?php
+        $orderVal = array(0,3,4,1,2);
+        $orderLabel = array('Past Due Items','Past &amp; Attempted Items','Available Items Only','Past &amp; Available Items','All Items');
+        AppUtility::writeHtmlSelect("gbmode1", $orderVal, $orderLabel, $availShow);
+        ?>
+	</span><br class=form>
 
-        <span class="form">Default show by availability: </span>
-	<span class="formright">
-		<select name="gbmode1" id="gbmode1">
-            <option value="0">Past Due Items</option>
-            <option value="3">Past &amp; Attempted Items</option>
-            <option value="4">Available Items Only</option>
-            <option value="1" selected="">Past &amp; Available Items</option>
-            <option value="2">All Items</option>
-        </select>
-	</span><br class="form">
+    <span class=form>Not Counted (NC) items: </span>
+	<span class=formright>
+		<?php
+        $orderVal = array(0,1,2);
+        $orderLabel = array('Show NC items','Show NC items not hidden from students','Hide NC items');
+        AppUtility::writeHtmlSelect("gbmode10", $orderVal, $orderLabel, $hideNc);
+        ?>
+	</span><br class=form>
 
-        <span class="form">Not Counted (NC) items: </span>
-	<span class="formright">
-		<select name="gbmode10" id="gbmode10">
-            <option value="0">Show NC items</option>
-            <option value="1">Show NC items not hidden from students</option>
-            <option value="2" selected="">Hide NC items</option>
-        </select>
-	</span><br class="form">
+        <span class=form>Locked Students:</span>
+	<span class=formright>
+		<input type=radio name="gbmode200" value="0"  id="lockstu0" <?php AppUtility::writeHtmlChecked($hideLocked, 0);?>/><label for="lockstu0">Show</label>
+		<input type=radio name="gbmode200" value="2"  id="lockstu2" <?php AppUtility::writeHtmlChecked($hideLocked, 2);?>/><label for="lockstu2">Hide</label>
+	</span><br class=form />
 
-        <span class="form">Locked Students:</span>
-	<span class="formright">
-		<input type="radio" name="gbmode200" value="0" id="lockstu0" checked=""><label for="lockstu0">Show</label>
-		<input type="radio" name="gbmode200" value="2" id="lockstu2"><label for="lockstu2">Hide</label>
-	</span><br class="form">
+        <span class=form>Default Colorization:</span>
+	<span class=formright>
+	<?php AppUtility::writeHtmlSelect("colorize", $colorVal, $colorLabel, $colorize); ?>
+	</span><br class=form />
 
-        <span class="form">Default Colorization:</span>
-	<span class="formright">
-	<select name="colorize" id="colorize">
-        <option value="0" selected="">No Color</option>
-        <option value="50:60">red ≤ 50%, green ≥ 60%</option>
-        <option value="50:70">red ≤ 50%, green ≥ 70%</option>
-        <option value="50:75">red ≤ 50%, green ≥ 75%</option>
-        <option value="50:80">red ≤ 50%, green ≥ 80%</option>
-        <option value="50:85">red ≤ 50%, green ≥ 85%</option>
-        <option value="50:90">red ≤ 50%, green ≥ 90%</option>
-        <option value="50:95">red ≤ 50%, green ≥ 95%</option>
-        <option value="60:70">red ≤ 60%, green ≥ 70%</option>
-        <option value="60:75">red ≤ 60%, green ≥ 75%</option>
-        <option value="60:80">red ≤ 60%, green ≥ 80%</option>
-        <option value="60:85">red ≤ 60%, green ≥ 85%</option>
-        <option value="60:90">red ≤ 60%, green ≥ 90%</option>
-        <option value="60:95">red ≤ 60%, green ≥ 95%</option>
-        <option value="70:75">red ≤ 70%, green ≥ 75%</option>
-        <option value="70:80">red ≤ 70%, green ≥ 80%</option>
-        <option value="70:85">red ≤ 70%, green ≥ 85%</option>
-        <option value="70:90">red ≤ 70%, green ≥ 90%</option>
-        <option value="70:95">red ≤ 70%, green ≥ 95%</option>
-        <option value="75:80">red ≤ 75%, green ≥ 80%</option>
-        <option value="75:85">red ≤ 75%, green ≥ 85%</option>
-        <option value="75:90">red ≤ 75%, green ≥ 90%</option>
-        <option value="75:95">red ≤ 75%, green ≥ 95%</option>
-        <option value="80:85">red ≤ 80%, green ≥ 85%</option>
-        <option value="80:90">red ≤ 80%, green ≥ 90%</option>
-        <option value="80:95">red ≤ 80%, green ≥ 95%</option>
-        <option value="85:90">red ≤ 85%, green ≥ 90%</option>
-        <option value="85:95">red ≤ 85%, green ≥ 95%</option>
-        <option value="-1:-1">Active</option>
-    </select>
-	</span><br class="form">
+        </span><br class=form />
+        <span class=form>Totals columns show on:</span>
+	<span class=formright>
+		<input type=radio name="gbmode1000" value="0" id="totside0" <?php AppUtility::writeHtmlChecked($totOnLeft, 0);?>/><label for="totside0">Right</label>
+		<input type=radio name="gbmode1000" value="1" id="totside1" <?php AppUtility::writeHtmlChecked($totOnLeft, 1);?>/><label for="totside1">Left</label>
+	</span><br class=form />
 
-        <br class="form">
-        <span class="form">Totals columns show on:</span>
-	<span class="formright">
-		<input type="radio" name="gbmode1000" value="0" id="totside0" checked=""><label for="totside0">Right</label>
-		<input type="radio" name="gbmode1000" value="1" id="totside1"><label for="totside1">Left</label>
-	</span><br class="form">
+        <span class=form>Average row shows on:</span>
+	<span class=formright>
+		<input type=radio name="gbmode1002" value="0" id="avgloc0" <?php AppUtility::writeHtmlChecked($avgOnTop, 0);?>/><label for="avgloc0">Bottom</label>
+		<input type=radio name="gbmode1002" value="2" id="avgloc2" <?php AppUtility::writeHtmlChecked($avgOnTop, 2);?>/><label for="avgloc2">Top</label>
+	</span><br class=form />
 
-        <span class="form">Average row shows on:</span>
-	<span class="formright">
-		<input type="radio" name="gbmode1002" value="0" id="avgloc0" checked=""><label for="avgloc0">Bottom</label>
-		<input type="radio" name="gbmode1002" value="2" id="avgloc2"><label for="avgloc2">Top</label>
-	</span><br class="form">
-
-        <span class="form">Include details:</span>
-	<span class="formright">
-		<input type="checkbox" name="gbmode4000" value="4" id="llcol"><label for="llcol">Last Login column</label><br>
-		<input type="checkbox" name="gbmode400" value="4" id="duedate"><label for="duedate">Due Date in column headers, and column in single-student view</label><br>
-		<input type="checkbox" name="gbmode40" value="4" id="lastchg"><label for="lastchg">Last Change column in single-student view</label>
-	</span><br class="form">
+        <span class=form>Include details:</span>
+	<span class=formright>
+		<input type="checkbox" name="gbmode4000" value="4" id="llcol" <?php AppUtility::writeHtmlChecked($lastLogin,true);?>/><label for="llcol">Last Login column</label><br/>
+		<input type="checkbox" name="gbmode400" value="4" id="duedate" <?php AppUtility::writeHtmlChecked($includeDuDate,true);?>/><label for="duedate">Due Date in column headers, and column in single-student view</label><br/>
+		<input type="checkbox" name="gbmode40" value="4" id="lastchg" <?php AppUtility::writeHtmlChecked($includeLastChange,true);?>/><label for="lastchg">Last Change column in single-student view</label>
+	</span><br class=form />
 
         <span class="form">Totals to show students:</span>
-	<span class="formright">
-		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" checked=""><label for="totshow1">Past Due</label><br>
-		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" checked=""><label for="totshow2">Past Due and Attempted</label><br>
-		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" checked=""><label for="totshow4">Past Due and Available</label><br>
-		<input type="checkbox" name="stugbmode8" value="8" id="totshow8"><label for="totshow8">All (including future)</label><br>
-	</span><br class="form">
+	<span class=formright>
+		<input type="checkbox" name="stugbmode1" value="1" id="totshow1" <?php AppUtility::writeHtmlChecked(($gbScheme['stugbmode']) & 1, 1);?>/><label for="totshow1">Past Due</label><br/>
+		<input type="checkbox" name="stugbmode2" value="2" id="totshow2" <?php AppUtility::writeHtmlChecked(($gbScheme['stugbmode']) & 2, 2);?>/><label for="totshow2">Past Due and Attempted</label><br/>
+		<input type="checkbox" name="stugbmode4" value="4" id="totshow4" <?php AppUtility::writeHtmlChecked(($gbScheme['stugbmode']) & 4, 4);?>/><label for="totshow4">Past Due and Available</label><br/>
+		<input type="checkbox" name="stugbmode8" value="8" id="totshow8" <?php AppUtility::writeHtmlChecked(($gbScheme['stugbmode']) & 8, 8);?>/><label for="totshow8">All (including future)</label><br/>
+	</span><br class="form" />
     </fieldset>
 
-
     <fieldset><legend>Gradebook Categories</legend>
-        <table class="gb"><thead><tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th><th id="weighthdr">Fixed Category Point Total (optional)<br>Blank to use point sum</th><th>Remove</th></tr></thead><tbody id="cattbody"><tr class="grid" id="catrow0"><td>Default</td><td><select name="hide[0]" id="hide[0]">
-                        <option value="1">Hidden</option>
-                        <option value="0" selected="">Expanded</option>
-                        <option value="2">Collapsed</option>
-                    </select>
-                </td><td>Scale <input type="text" size="3" name="scale[0]" value=""> (<input type="radio" name="st[0]" value="0" checked="1">points <input type="radio" name="st[0]" value="1">percent)<br>to perfect score<br><input type="checkbox" name="chop[0]" value="1" checked="1"> no total over <input type="text" size="3" name="chopto[0]" value="100">%</td><td>Calc total: <select name="calctype[0]" id="calctype0"><option value="0" selected="selected">point total</option><option value="1">averaged percents</option></select><br><input type="radio" name="droptype[0]" value="0" onclick="calctypechange(0,0)" checked="1">Keep All<br><input type="radio" name="droptype[0]" value="1" onclick="calctypechange(0,1)">Drop lowest <input type="text" size="2" name="dropl[0]" value="0"> scores<br> <input type="radio" name="droptype[0]" value="2" onclick="calctypechange(0,1)">Keep highest <input type="text" size="2" name="droph[0]" value="0"> scores</td><td><input type="text" size="3" name="weight[0]" value=""></td><td></td></tr><tr class="grid" id="catrow1"><td><input type="text" name="name[1]" value="newCat"></td><td><select name="hide[1]" id="hide[1]">
-                        <option value="1">Hidden</option>
-                        <option value="0" selected="">Expanded</option>
-                        <option value="2">Collapsed</option>
-                    </select>
-                </td><td>Scale <input type="text" size="3" name="scale[1]" value=""> (<input type="radio" name="st[1]" value="0" checked="1">points <input type="radio" name="st[1]" value="1">percent)<br>to perfect score<br><input type="checkbox" name="chop[1]" value="1" checked="1"> no total over <input type="text" size="3" name="chopto[1]" value="100">%</td><td>Calc total: <select name="calctype[1]" id="calctype1"><option value="0" selected="selected">point total</option><option value="1">averaged percents</option></select><br><input type="radio" name="droptype[1]" value="0" onclick="calctypechange(1,0)" checked="1">Keep All<br><input type="radio" name="droptype[1]" value="1" onclick="calctypechange(1,1)">Drop lowest <input type="text" size="2" name="dropl[1]" value="0"> scores<br> <input type="radio" name="droptype[1]" value="2" onclick="calctypechange(1,1)">Keep highest <input type="text" size="2" name="droph[1]" value="0"> scores</td><td><input type="text" size="3" name="weight[1]" value=""></td><td><a href="#" onclick="removeexistcat(1);return false;">Remove</a></td></tr></tbody></table><p><input type="button" value="Add New Category" onclick="addcat()"></p></fieldset>
+    <?php
+        $r = explode(',', $gbScheme['defaultcat']);
+        $row['name'] = 'Default';
+        $row['scale'] = $r[0];
+        $row['scaletype'] = $r[1];
+        $row['chop'] = $r[2];
+        $row['dropn'] = $r[3];
+        $row['weight'] = $r[4];
+        $row['hidden'] = $r[5];
+        if (isset($r[6])) {
+            $row['calctype'] = $r[6];
+        } else {
+            $row['calctype'] = $row['dropn']==0?0:1;
+        }
+        echo "<table class='gb table table-bordered table-striped table-hover data-table'><thead>";
+        echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th><th id=weighthdr>";
+        if ($useWeights==0) {
+            echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
+        } else if ($useWeights==1) {
+            echo "Category Weight (%)";
+        }
+        echo '</th><th>Remove</th></tr></thead><tbody id="cattbody">';
+        disprow(0, $row, $hideLabel, $hideVal);
+        foreach($gbCategory as $category){
+        disprow($category['id'], $category, $hideLabel, $hideVal);
+        }
+        echo "</tbody></table>";
+        echo '<p><input type="button" class ="btn btn-primary" value="'.AppUtility::t('Add New Category', false).'" onclick="addCat()" /></p>';
+        echo '</fieldset>';
+        echo '<div class="submit"><input class ="btn btn-primary" type=submit name=submit value="'.AppUtility::t('Save Changes', false).'"/></div>';
+        echo "</form>";
+        echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
+        echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';
+        echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
+        echo '<p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible ';
+        echo 'scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>';
 
-    <div class="submit"><input type="submit" name="submit" value="Save Changes"></div>
+    function disprow($id,$row, $hideLabel, $hideVal) {
 
-    <p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br> When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br>When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>
-    <p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>
+        //name,scale,scaletype,chop,drop,weight
+        echo "<tr class=grid id=\"catrow$id\"><td>";
+        if ($id>0) {
+            echo "<input type=text name=\"name[$id]\" value=\"{$row['name']}\"/>";
+        } else {
+            echo $row['name'];
+        }
+        "</td>";
+        echo '<td>';
+        AppUtility::writeHtmlSelect("hide[$id]",$hideVal,$hideLabel,$row['hidden']);
+        echo '</td>';
+        echo "<td>Scale <input type=text size=3 name=\"scale[$id]\" value=\"";
+        if ($row['scale']>0) {
+            echo $row['scale'];
+        }
+        echo "\"/> (<input type=radio name=\"st[$id]\" value=0 ";
+        if ($row['scaletype']==0) {
+            echo "checked=1 ";
+        }
+        echo "/>points ";
+        echo "<input type=radio name=\"st[$id]\" value=1 ";
+        if ($row['scaletype']==1) {
+            echo "checked=1 ";
+        }
+        echo "/>percent)<br/>to perfect score<br/>";
+        echo "<input type=checkbox name=\"chop[$id]\" value=1 ";
+        if ($row['chop']>0) {
+            echo "checked=1 ";
+        }
+        echo "/> no total over <input type=text size=3 name=\"chopto[$id]\" value=\"";
+        if ($row['chop']>0) {
+            echo round($row['chop']*100);
+        } else {
+            echo "100";
+        }
+        echo "\"/>%</td>";
+        echo "<td>";
+        echo 'Calc total: <select name="calctype['.$id.']" id="calctype'.$id.'" ';
+        if ($row['dropn']!=0) { echo 'disabled="true"';}
+        echo '><option value="0" ';
+        if ($row['calctype']==0) {echo 'selected="selected"';}
+        echo '>point total</option><option value="1" ';
+        if ($row['calctype']==1) {echo 'selected="selected"';}
+        echo '>averaged percents</option></select><br/>';
 
+        echo "<input type=radio name=\"droptype[$id]\" value=0 onclick=\"calcTypeChange($id,0)\" ";
+        if ($row['dropn']==0) {
+            echo "checked=1 ";
+        }
+        echo "/>Keep All<br/><input type=radio name=\"droptype[$id]\" value=1 onclick=\"calcTypeChange($id,1)\" ";
+        if ($row['dropn']>0) {
+            echo "checked=1 ";
+        }
+        $absr4=abs($row['dropn']);
+        echo "/>Drop lowest <input type=text size=2 name=\"dropl[$id]\" value=\"$absr4\"/> scores<br/> <input type=radio name=\"droptype[$id]\" value=2 onclick=\"calcTypeChange($id,1)\" ";
+        if ($row['dropn']<0) {
+            echo "checked=1 ";
+        }
+        echo "/>Keep highest <input type=text size=2 name=\"droph[$id]\" value=\"$absr4\"/> scores</td>";
+        echo "<td><input type=text size=3 name=\"weight[$id]\" value=\"";
+        if ($row['weight']>-1) {
+            echo $row['weight'];
+        }
+        echo "\"/></td>";
+        if ($id!=0) {
+            echo "<td><a href=\"#\" id=\"remove-category\" onclick=\"removeExistCat($id);return false;\">Remove</a></td></tr>";
+        } else {
+            echo "<td></td></tr>";
+        }
+    }
 
-</form>
+    ?>
+

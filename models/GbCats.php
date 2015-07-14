@@ -20,8 +20,8 @@ class GbCats extends BaseImasGbcats
         $query = new Query();
         $query->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])
             ->from('imas_gbcats')
-            ->where(['courseid'=>$courseId])
-            ->orderBy('name');
+            ->where(['courseid'=>$courseId]);
+//            ->orderBy('name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -30,5 +30,41 @@ class GbCats extends BaseImasGbcats
     public static function getByCourseId($courseId)
     {
         return GbCats::find()->select('id,name')->where(['courseid' => $courseId])->all();
+    }
+
+    public  static function updateGbCat($id, $name, $scale, $scaleType, $chop, $drop, $weight, $hide, $calcType){
+        $query = GbCats::findOne(['id' => $id]);
+        if($query){
+            $query->name = $name;
+            $query->scale = $scale;
+            $query->scaletype = $scaleType;
+            $query->chop = $chop;
+            $query->dropn = $drop;
+            $query->weight = $weight;
+            $query->hidden = $hide;
+            $query->calctype = $calcType;
+            $query->save();
+        }
+    }
+    public static function deleteGbCat($catList){
+
+        foreach($catList as $category){
+            $query = GbCats::findOne(['id' => $category]);
+            if($query){
+                $query->delete();
+            }
+        }
+    }
+    public static function createGbCat($courseId, $name, $scale, $scaleType, $chop, $weight, $hide, $calcType){
+        $query = new GbCats();
+        $query->courseid = $courseId;
+        $query->scale = $scale;
+        $query->scaletype = $scaleType;
+        $query->chop = $chop;
+        $query->name = $name;
+        $query->weight = $weight;
+        $query->hidden = $hide;
+        $query->calctype = $calcType;
+        $query->save();
     }
 }

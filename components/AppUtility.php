@@ -2646,4 +2646,38 @@ class AppUtility extends Component
         $itemList = addslashes(serialize($items));
         Course::setItemOrder($itemList,$courseId);
     }
+
+    public static function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
+    //$name is the html name for the select list
+    //$valList is an array of strings for the html value tag
+    //$labelList is an array of strings that are displayed as the select list
+    //$selectVal is optional, if passed the item in $valList that matches will be output as selected
+
+    echo "<select name=\"$name\" ";
+    echo (isset($actions)) ? $actions : "" ;
+    echo ">\n";
+    if (isset($defaultLabel) && isset($defaultVal)) {
+        echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
+    }
+    for ($i=0;$i<count($valList);$i++) {
+        if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+            echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
+        } else {
+            echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+        }
+    }
+    echo "</select>\n";
+    }
+
+    public static function writeHtmlChecked ($var,$test,$notEqual=null) {
+        if ((isset($notEqual)) && ($notEqual==1)) {
+            if ($var!=$test) {
+                echo "checked ";
+            }
+        } else {
+            if ($var==$test) {
+                echo "checked ";
+            }
+        }
+    }
 }

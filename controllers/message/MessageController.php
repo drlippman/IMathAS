@@ -106,6 +106,7 @@ class MessageController extends AppController
                 }
             }else {
                 $messages = Message::getUsersToDisplay($userId);
+
             }
             if ($messages) {
                 $dateArray = array();

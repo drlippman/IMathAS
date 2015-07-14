@@ -2,6 +2,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasAssessments;
 use yii\db\Query;
@@ -178,6 +179,16 @@ class Assessments extends BaseImasAssessments
         $assessmentData = Assessments::findOne(['id',$assessmentId]);
         if($assessmentData){
             $assessmentData->delete();
+        }
+    }
+    public static function updateGbCat($catList){
+
+        foreach($catList as $category){
+            $query = Assessments::findOne(['gbcategory' => $category]);
+            if($query){
+                $query->gbcategory = AppConstant::NUMERIC_ZERO;
+                $query->save();
+            }
         }
     }
 } 

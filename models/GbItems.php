@@ -111,6 +111,16 @@ class GbItems extends BaseImasGbitems
         $data = $command->queryAll();
         return $data;
     }
+    public static function updateGbCat($catList){
+
+        foreach($catList as $category){
+            $query = GbItems::findOne(['gbcategory' => $category]);
+            if($query){
+                $query->gbcategory = AppConstant::NUMERIC_ZERO;
+                $query->save();
+            }
+        }
+    }
 
 }
 
