@@ -9,19 +9,9 @@
             <?php echo isset($page_title) ?  $page_title : ""; ?>
         </div>
     </div>
-<!--    <div class="right-side right-float right-side-button">-->
-<!--        <div class="right-items left-float" >-->
-<!--            <div class="item-icon">-->
-<!--                <span>-->
-<!---->
-<!--                </span>-->
-<!--            </div>-->
-<!--            <div class="item-name left-float" style="padding-top: 15px; padding-left: 5px">-->
-<!--                --><?php //echo isset($item_name) ?  $item_name : ""; ?>
-<!--            </div>-->
-<!--            <div class="clear-both"></div>-->
-<!--        </div>-->
-<!--    </div>-->
+            <div class="add-help left-float" style="">
+               <a href="#"> <i class="fa fa-question fa-align-center help-icon"></i> </a>
+            </div>
     <div class="clear-both"></div>
 </div>
 

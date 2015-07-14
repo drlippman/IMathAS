@@ -11,7 +11,7 @@ body {
     bottom: 225px;
 }
 .navbar-inverse {
-    background-color: #104e8c;
+    background-color: #2C368E;
     border: none;
 }
 .navbar-inverse .navbar-brand{
@@ -20,7 +20,7 @@ body {
     padding: 10% 4.7%;
 }
 .container-upper-blue{
-    background-color: #1460aa;
+    background-color: #3441AC;
     height: 320px;
 }
 .container-lower-white{
@@ -52,7 +52,7 @@ body {
 }
 .buttons-alignment
 {
-    background-color: #104e8c;
+    background-color: #2C368E;
     height: 50px;
     width: 150px
 }
@@ -91,8 +91,8 @@ body {
 }
 
 .dropdown-class > button{
-   background-color: #104E8C;
-   border-color: #104E8C;
+   background-color: #2C368E;
+   border-color: #2C368E;
 }
 .dropdown-class >img{
     width: 20px;
@@ -100,7 +100,7 @@ body {
 
 }
 .dropdown-class .btn-primary:hover,.btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-    background-color: #104E8C; border-color: #104E8C;
+    background-color: #2C368E; border-color: #2C368E;
 }
 
 .tab{
@@ -114,14 +114,14 @@ body {
 
 .right-items .left-float{
     height: 34px;
-    /*background-color:#104e8c;*/
+    /*background-color:#2C368E;*/
 }
 .footer-alignment
 {
     padding-right: 12%;
 }
 .right-side-button{
-    background-color: #104e8c;
+    background-color: #2C368E;
     height: 50px;
     width: 150px
 }
@@ -134,4 +134,20 @@ body {
 }
 .instructor-toolbar{
     padding: 3% 0;
+}
+.help-icon {
+    width: 20px;
+    height: 20px;
+    color: white;
+    background: #2C368E;
+    border-radius: 100%;
+    text-align: center;
+    padding: 20%;
+}
+
+.add-help{
+
+    padding-top: 25px;
+    padding-left: 5px
+
 }
