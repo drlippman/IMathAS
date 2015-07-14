@@ -6,30 +6,27 @@ body {
     padding: 0px;
 }
 .master-items-container{
-    margin: 0 5%;
+    padding: 0 5%;
     position: relative;
     bottom: 225px;
-    background-color: #ffffff;
-    min-height: 650px;
-}
-.master-container{
-    background-color: #FAFAFA;
 }
 .navbar-inverse {
     background-color: #104e8c;
+    border: none;
 }
-.navbar-brand{
+.navbar-inverse .navbar-brand{
     color: #ffffff;
     font-size: 30px;
+    padding: 10% 4.7%;
 }
 .container-upper-blue{
     background-color: #1460aa;
+    height: 320px;
 }
 .container-lower-white{
     background-color: #fafafa;
     margin: 0px;
     padding: 0px;
-;
 }
 .graphic-math-img{
     width: 336px;
@@ -53,23 +50,88 @@ body {
 .right-float{
     float: right;
 }
+.buttons-alignment
+{
+    background-color: #104e8c;
+    height: 50px;
+    width: 150px
+}
 .index-header .right-side .right-item{
 
 }
 .index-header .right-side .item-icon{
     float: left;
+    margin-top: 10px;
+    margin-left: 5px;
     height: 34px;
     width: 34px;
-    background-image: url("../img/two_gears.png");
-    /*background-color: #ffffff;*/
+    background: url("../img/two_gears.png");
 }
 
 .left-float{
     float: left;
 }
-.brand-name-footer
+.master-footer
 {
+    padding: 2% 5% 2% 3.8%;
+}
+.footer-brand
+{
+    padding-left: 20%;
     font-size: 22px;
-    color: #d3d3d3;
-    margin-top: -10px;
+    color: #808080;
+    position: relative;
+    top: -2px;
+}
+
+.dropdown-class{
+    float: left;
+    margin-top: 6px;
+    padding-left: 40px;
+}
+
+.dropdown-class > button{
+   background-color: #104E8C;
+   border-color: #104E8C;
+}
+.dropdown-class >img{
+    width: 20px;
+    height: 20px;
+
+}
+.dropdown-class .btn-primary:hover,.btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background-color: #104E8C; border-color: #104E8C;
+}
+
+.tab{
+    width: 25%;
+    padding: 1% 2%;
+    border: 1px solid #222;
+    text-align: center;
+    float: left;
+    background-color: #D3D3D3;
+}
+
+.right-items .left-float{
+    height: 34px;
+    /*background-color:#104e8c;*/
+}
+.footer-alignment
+{
+    padding-right: 12%;
+}
+.right-side-button{
+    background-color: #104e8c;
+    height: 50px;
+    width: 150px
+}
+.btn{
+    padding: 6px 6px;
+}
+
+.common-toolbar{
+    background-color: #d3d3d3;
+}
+.instructor-toolbar{
+    padding: 3% 0;
 }

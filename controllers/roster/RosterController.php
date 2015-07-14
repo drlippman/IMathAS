@@ -41,6 +41,7 @@ class RosterController extends AppController
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $students = Student::findByCid($courseId);

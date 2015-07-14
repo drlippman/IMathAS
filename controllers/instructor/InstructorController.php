@@ -41,6 +41,7 @@ class InstructorController extends AppController
 
     public function actionIndex()
     {
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
@@ -511,13 +512,6 @@ class InstructorController extends AppController
             $thread->deleteThreadById($params['id']);
         }
         return $this->successResponse();
-    }
-
-    public function actionLayoutTesting()
-    {
-        $this->layout = "master";
-
-        return $this->render('layoutTesting');
     }
 }
 

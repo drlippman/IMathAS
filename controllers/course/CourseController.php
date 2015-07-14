@@ -705,10 +705,14 @@ class CourseController extends AppController
 //    Display calendar on click of menuBars
     public function actionCalendar()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        return $this->render('calendar');
+        $responseData = array('course' => $course );
+        return $this->render('calendar', $responseData);
     }
 
     /**

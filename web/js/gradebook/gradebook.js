@@ -139,7 +139,7 @@ function displayGradebook() {
                 }
                 html += "</span></div></th>";
                 n++;
-            }
+            }o
         }
     }
     if(data.catFilter>-2){

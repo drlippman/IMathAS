@@ -1,6 +1,35 @@
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left"><a herf="#">Support</a><a id="about" href="#">About</a><a id="contact" href="#">Contact</a> <a id="policy" href="#">PrivacyPolicy</a></p>
-        <p class="pull-right brand-name-footer"><b>MyOpenMath</b></p>
+<<<<<<< Updated upstream
+=======
+<?php
+use app\components\AppUtility;
+?>
+
+>>>>>>> Stashed changes
+<div class="master-footer">
+<div class="row">
+    <div class="col-md-8">
+            <div class="col-md-1 footer-alignment">
+                <a href="#"><?php AppUtility::t('Support')?></a>
+            </div>
+
+            <div class="col-md-1 footer-alignment">
+                <a href="#"><?php AppUtility::t('About')?></a>
+            </div>
+
+            <div class="col-md-1 footer-alignment">
+                <a href="#"><?php AppUtility::t('Contact') ?></a>
+            </div>
+
+            <div class="col-md-1 footer-alignment">
+                <a href="#"><?php AppUtility::t('PrivacyPolicy')?></a>
+            </div>
     </div>
-</footer>
+    <div class="row">
+        <div class="col-md-4 footer-brand">
+
+                <b><?php AppUtility::t('MyOpenMath')?></b>
+
+        </div>
+    </div>
+</div>
+</div>
