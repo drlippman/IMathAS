@@ -208,7 +208,7 @@ function threadSuccess(response)
     }
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
-        var checkPostOrThread =1;
+        var checkPostOrThread = 1;
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -222,6 +222,7 @@ function threadSuccess(response)
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadsid;
+
                     jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
                     return true;
                 }

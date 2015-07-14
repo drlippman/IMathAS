@@ -5,10 +5,9 @@ $(document).ready(function () {
     }else{
         $('#flag-link').hide();
     }
-
+});
     $("a[name=remove]").on("click", function () {
         var threadid = $(this).attr("data-var");
-
         var checkPostOrThread = 0;
 
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
@@ -33,7 +32,7 @@ $(document).ready(function () {
             }
         });
     });
-});
+
 
 function toggleshow(bnum) {
     var node = document.getElementById('block' + bnum);

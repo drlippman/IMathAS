@@ -164,12 +164,12 @@ class ForumController extends AppController
         {
             if ($isValue == AppConstant::NUMERIC_ONE) {
                 foreach ($threads as $thread) {
-
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getbythreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
-                    $tagged = ForumView::forumViews($thread['threadid']);
+                    $tagged = ForumView::forumViews($thread['threadid'],$currentUser['id']);
+
                     if ($tagged[0]['tagged'] == AppConstant::NUMERIC_ONE) {
                         $temparray = array
                         (
@@ -200,7 +200,7 @@ class ForumController extends AppController
                     $uniquesData = ForumView::getbythreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
-                    $tagged = ForumView::forumViews($thread['threadid']);
+                    $tagged = ForumView::forumViews($thread['threadid'],$currentUser['id']);
                     if ($thread['postdate'] >=$lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id) {
                         $temparray = array
                         (
@@ -240,7 +240,7 @@ class ForumController extends AppController
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getbythreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser,$thread['threadid']);
-                    $tagged = ForumView::forumViews($thread['threadid']);
+                    $tagged = ForumView::forumViews($thread['threadid'],$currentUser['id']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $temparray = array
                     (
@@ -284,7 +284,6 @@ class ForumController extends AppController
         $this->includeJS(['forum/forum.js']);
         $responseData = array('threadArray' => $threadArray,'uniquesDataArray' => $FinalUniquesData,'isValue'=>  $isValue);
         return $this->successResponse($responseData);
-
     }
 
 /*
@@ -486,7 +485,7 @@ class ForumController extends AppController
         $myLikes = $Count->UserLikes($threadId,$currentUser);
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
-        $this->includeJS(['forum/post.js']);
+        $this->includeJS(["general.js","forum/post.js?ver=<?php echo time() ?>"]);
         $responseData = array('postdata' => $this->totalPosts,'course' => $course,'currentUser' => $currentUser,'forumId' => $forumId,'threadId'=>$threadId,'tagValue' => $tagValue,'prevNextValueArray' => $prevNextValueArray,'likeCount' =>$likeCount,'mylikes'=>$myLikes,'titleCountArray' =>$titleCountArray);
         return $this->render('post', $responseData);
     }

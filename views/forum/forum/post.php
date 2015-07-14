@@ -197,9 +197,9 @@ $currentLevel = 0;
     </div>
 </div>
 <?php
-AppUtility::includeJS('general.js');
-AppUtility::includeJS('forum/post.js'); ?>
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/general.js"></script>
-<script type="text/javascript"
-        src="<?php echo AppUtility::getHomeURL() ?>js/forum/post.js?ver=<?php echo time() ?>"></script>
+//AppUtility::includeJS('general.js');
+?>
+<!--<script type="text/javascript" src="--><?php //echo AppUtility::getHomeURL() ?><!--js/general.js"></script>-->
+<!--<script type="text/javascript"-->
+<!--        src="--><?php //echo AppUtility::getHomeURL() ?><!--js/forum/post.js?ver=--><?php //echo time() ?><!--"></script>-->
 
