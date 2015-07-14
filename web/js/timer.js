@@ -1,7 +1,6 @@
 var Timer;
 var TotalSeconds;
 
-
 function CreateTimer(TimerID, Time) {
     Timer = document.getElementById(TimerID);
     TotalSeconds = Time;

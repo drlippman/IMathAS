@@ -676,7 +676,6 @@ function getcoursefileurl($key) {
 	}
 function mkdir_recursive($pathname, $mode=0777)
 {
-    \app\components\AppUtility::dump('hj');
     is_dir(dirname($pathname)) || mkdir_recursive(dirname($pathname), $mode);
     return is_dir($pathname) || @mkdir($pathname, $mode);
 }

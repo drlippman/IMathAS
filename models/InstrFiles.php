@@ -14,9 +14,10 @@ class InstrFiles extends BaseImasInstrFiles
     }
     public function saveFile($params, $inlineText)
     {
+//        AppUtility::dump($params);
         $this->description = isset($params['newfiledescr']) ? $params['newfiledescr'] : null;
         $this->filename = isset($params['filename']) ? $params['filename'] : null;
-        $this->itemid = BaseImasInstrFiles::findOne(['itemid' => $inlineText]);
+        $this->itemid =  $inlineText;
         $this->save();
         return $this->id;
     }
