@@ -1,4 +1,4 @@
-<div class="header-wraper">
+<header class="header-wraper">
 <?php
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -35,4 +35,4 @@ echo Nav::widget([
 NavBar::end();
 ?>
 
-</div>
+</header>
