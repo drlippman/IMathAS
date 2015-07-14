@@ -12,5 +12,5 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <div class="item-detail-content">
-    <?php echo $this->render("_toolbarTeacher");?>
+    <?php echo $this->render("_toolbarTeacher", ['course' => $course]);?>
 </div>
