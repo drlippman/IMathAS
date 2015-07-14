@@ -1,10 +1,7 @@
-<<<<<<< Updated upstream
-=======
 <?php
 use app\components\AppUtility;
 ?>
 
->>>>>>> Stashed changes
 <div class="master-footer">
 <div class="row">
     <div class="col-md-8">
