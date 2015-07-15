@@ -1,0 +1,3139 @@
+<html>
+<head>
+<style type="text/css">
+table td {
+	padding: 1px 10px;
+}
+table thead td {
+	font-weight: bold;
+}
+ul li {
+	margin-top: .3em;
+}
+span.icon {
+	padding-left: 5px;
+	padding-right: 5px;
+	background-color: #ff0;
+	color:#00d;	
+	border: 1px solid #00f;
+	font-weight: bolder;
+}
+h1,h2,h3 {
+	margin-top: 1.5em;
+	margin-bottom: .5em;
+}
+h1 {
+	color: #00f;
+}
+h2,h3,h4 {
+	color: #00c;
+}
+div.h2 {
+	margin-left: 5px;
+}
+div.h3 {
+	margin-left: 10px;
+}
+div.h4 {
+	margin-left: 15px;
+}
+dd {
+	margin-bottom: .4em;
+}
+
+</style>
+</head>
+<body>
+<div class=h1>
+<h1>IMathAS Help Documentation</h1>
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#administration">Administration</a></li>
+	<ul>
+	<li><a href="#creatingcourses">Creating Courses</a></li>
+		<ul>
+	 	<li><a href="#coursecreationsettings">Course Creation Settings</a></li>
+		<li><a href="#addingteachers">Adding Teachers</a></li>
+		<li><a href="#transferingownership">Transfering Ownership</a></li>
+		<li><a href="#deletingcourse">Deleting</a></li>
+		</ul>
+	<li><a href="#questionsetmanagement">Question Set Management</a></li>
+		<ul>
+		<li><a href="#managequestionset">Manage Question Set</a></li>
+		<li><a href="#exportquestionset">Export Question Set</a></li>
+		<li><a href="#importquestionset">Import Question Set</a></li>
+		</ul>
+	<li><a href="#librarymanagement">Library Management</a>
+		<ul>
+		<li><a href="#managelibraries">Manage Libraries</a></li>
+		<li><a href="#exportlibraries">Export Libraries</a></li>
+		<li><a href="#importlibraries">Import Libraries</a></li>
+		</ul>
+		</li>
+	<li><a href="#installmacrofile">Install Macro File</a></li>
+	<li><a href="#deleteoldusers">Delete Old Users</a></li>
+	<li><a href="#importstudents">Import Students</a></li>
+	<li><a href="#managegroups">Manage Groups</a></li>
+	<li><a href="#diagnostics">Diagnostics</a></li>
+	<li><a href="#managingadministrators">Managing Administrators and Teachers</a></li>
+		<ul>
+		<li><a href="#addingadministrators">Adding Administrators and Teachers</a></li>
+		<li><a href="#rights">Rights</a></li>
+		<li><a href="#resettingadminpasswords">Resetting Admin Passwords</a></li>
+		<li><a href="#deletingadmin">Deleting</a></li>
+		</ul>
+	</ul>
+	
+<li><a href="#coursemanagement">Course Management</a></li>
+	<ul>
+	<li><a href="#coursepagelayout">Course Page Layout</a></li>
+	<li><a href="#addingitems">Adding Items</a></li>
+		<ul>
+		<li><a href="#blocks">Blocks</a></li>
+		<li><a href="#inlinetextitems">Inline Text Items</a></li>
+		<li><a href="#linkedtextitems">Linked Text Items</a></li>
+		<li><a href="#forumitems">Forum Items</a></li>
+		<li><a href="#assessments">Assessments</a></li>
+			<ul>
+			<li><a href="#assessmentsettings">Assessment Settings</a></li>
+			<li><a href="#addingquestionstoanassessment">Adding Questions to an Assessment</a></li>
+			<li><a href="#addingnewquestions">Adding New Questions</a></li>
+			<li><a href="#categorizequestions">Categorizing Questions</a></li>
+			<li><a href="#printcopies">Making Print Copies</a></li>
+			</ul>
+		</ul>
+	<li><a href="#quickview">Quick View</a></li>
+	<li><a href="#calendar">Calendar</a></li>
+	<li><a href="#questionsetmanagementcm">Question Set Management</a></li>
+		<ul>
+		<li><a href="#managequestionsetcm">Manage Question Set</a></li>
+		<li><a href="#exportquestionsetcm">Export Question Set</a></li>
+		<li><a href="#importquestionsetcm">Import Question Set</a></li>
+		</ul>
+	<li><a href="#librarymanagementcm">Library Management</a>
+		<ul>
+		<li><a href="#managelibrariescm">Manage Libraries</a></li>
+		<li><a href="#exportlibrariescm">Export Libraries</a></li>
+		<li><a href="#importlibrariescm">Import Libraries</a></li>
+		</ul>
+		</li>
+	<li><a href="#liststudents">List Students</a></li>
+		<ul>
+		<li><a href="#exceptions">Exceptions</a></li>
+		<li><a href="#resettingpasswords">Resetting Passwords / Changing Info</a></li>
+		<li><a href="#unenrolling">Unenrolling</a></li>
+		<li><a href="#importstudentscm">Import Students</a></li>
+		<li><a href="#sectioncodes">Assigning Section and/or Code Numbers</a></li>
+		<li><a href="#managelatepasses">Manage LatePasses</a></li>
+		<li><a href="#managetutors">Manage Tutors</a></li>
+		</ul>
+	<li><a href="#gradebook">Gradebook</a></li>
+		<ul>
+		<li><a href="#gradebooksettings">Gradebook Settings and Categories</a></li>
+		<li><a href="#offlinegrades">Offline Grades</a></li>
+		<li><a href="#gradebookdetail">Gradebook Detail</a></li>
+		</ul>
+	<li><a href="#stugroups">Student Groups</a></li>
+	<li><a href="#messages">Messages</a></li>
+	<li><a href="#copycourseitems">Copy Course Items</a></li>
+	<li><a href="#masschgdates">Change Dates</a></li>
+	<li><a href="#masschgassessments">Change Assessments</a></li>
+	<li><a href="#importexportitems">Import/Export Course Items</a></li>
+	<li><a href="#mashups">Mashups: Google Gadgets</a></li>
+	<li><a href="#lti">BasicLTI</a></li>
+	</ul>
+	
+<li><a href="#writingquestions">Writing Questions</a></li>
+	<ul>
+	<li><a href="#questionparts">Question Parts</a></li>
+	<li><a href="#basiccontrolsyntax">Basic Control Syntax</a></li>
+	<li><a href="#randomizers">Randomizers</a></li>
+	<li><a href="#graphtablemacros">Graph/Table Macros</a></li>
+	<li><a href="#formatmacros">Format Macros</a></li>
+	<li><a href="#stringmacros">String Macros</a></li>
+	<li><a href="#arraymacros">Array Macros</a></li>
+	<li><a href="#generalmacros">General Macros</a></li>
+	<li><a href="#mathmacros">Math Macros</a></li>
+	<li><a href="#conditionalmacros">Conditional Test Macros</a></li>
+	<li><a href="#feedbackmacros">Feedback Macros</a></li>
+	<li><a href="#usingothermacros">Using Other Macros</a></li>
+	<li><a href="#mathentry">Math Entry</li>
+	<li><a href="#writingcommon">Options Common to All Types</a></li>
+	<li><a href="#questiontypes">Question Types</a></li>
+		<ul>
+		<li><a href="#number">Number</a></li>
+		<li><a href="#calculated">Calculated</a></li>
+		<li><a href="#multiple-choice">Multiple-Choice</a></li>
+		<li><a href="#multiple-answer">Multiple-Answer</a></li>
+		<li><a href="#matching">Matching</a></li>
+		<li><a href="#function">Function</a></li>
+		<li><a href="#string">String</a></li>
+		<li><a href="#essay">Essay</a></li>
+		<li><a href="#draw">Drawing</a></li>
+		<li><a href="#ntuple">N-Tuple</a></li>
+		<li><a href="#calcntuple">Calculated N-Tuple</a></li>
+		<li><a href="#complex">Complex</a></li>
+		<li><a href="#calccomplex">Calculated Complex</a></li>
+		
+		<li><a href="#numericalmatrix">Numerical Matrix</a></li>
+		<li><a href="#calculatedmatrix">Calculated Matrix</a></li>
+		<li><a href="#interval">Interval</a></li>
+		<li><a href="#calcinterval">Calculated Interval</a></li>
+		<li><a href="#fileupload">File Upload</a></li>
+		<li><a href="#multipart">Multipart</a></li>
+		<li><a href="#conditional">Conditional</a></li>
+		</ul>
+	</ul>
+
+<li><a href="#usingimas">Using IMathAS</a></li>
+	<ul>
+	<li><a href="#registering">Registering</a></li>
+	<li><a href="#loggingin">Logging In</a></li>
+	<li><a href="#homepage">Home Page</a></li>
+		<ul>
+		<li><a href="#enrollinginacourse">Enrolling in a Course</a></li>
+		</ul>
+	<li><a href="#coursepage">Course Page</a></li>
+	<li><a href="#takingassessments">Taking Assessments</a></li>
+		<ul>
+		<li><a href="#enteringmath">Entering Math</a></li>
+	</ul>
+	
+</ul>
+
+</div>
+<div class=h1>
+<h1><a name="administration">Administration</a></h1>
+
+<p>From an administrator's home page, the Admin page can be reached by clicking
+the &quot;Go to Admin Page&quot; link near the end of the page.</p>
+
+<p>Not all the options described here may be available to you depending upon
+your rights setting</p>
+<div class=h2>
+<h2><a name="creatingcourses">Creating Courses</a></h2>
+
+Create a new course by clicking the &quot;Add New Course&quot; button.
+
+<div class=h3>
+<h3><a name="coursecreationsettings">Course Creation Settings</a></h3>
+
+<p>When you add a new course or click the &quot;Modify&quot; link next to a course name,
+enter the course name and an enrollment key.  If you are allowing students to self-enroll then the enrollment key should be
+given to students, and will be required for them to enroll in this course, along with the Course ID.  
+For new courses, the course ID will display when you return to the Admin page.</p>
+
+<p>Other option:
+<ul>
+<li><b>Enrollment Key</b>:  A entry password for students to self-enroll in the course. If you provide a semicolon-separated 
+  list of keys, students can enroll with any of them, and the key will get recorded as the student's section</li>
+<li><b>Available</b>:  Whether course is available to students, and whether it should display on the instructor's
+  home page</li>
+<li><b>Lock for Assessment</b>:  Shuts down access to the course except for the specified assessment.  Intended for
+  in-class testing situations.</li>
+<li><b>Theme</b>:  Change the look and feel of your course</li>
+<li><b>Icons:</b>  Whether to display icons next to different course items.</li>
+<li><b>Allow self un-enroll</b>:  Whether students should be able to unenroll themselves from your course (usually NO is 
+the best choice, so students can't accidentally delete their scores)</li>
+<li><b>Allow other instructors to copy</b>:  Whether other instructors should be allowed to copy
+course items without needing an enrollment key.  You can limit this ability to instructors in your
+own group.</li>
+<li><b>Message System</b>: allows you decide which features of the internal messaging system you
+want to enable.  This allows you restrict who, if anyone, the student can send messages to.</li>
+<li><b>Live Chat</b>: Enable a live chat room for this course</li>
+<li><b>Student Quick-Pick Top Bar</b>: What items, if any, to have in a bar at the top of the student's course page</li>
+<li><b>Instructor Quick-Pick Top Bar</b>:  What items, if any, to have in a bar at the top of the instructor's course page</li>
+<li><b>Instructor Course Management Links</b>:  Whether to have course management links at the bottom or along the
+  left side of the instructor's course page</li>
+<li><b>LTI access secret</b>:  A secret code to allow placement of your course into a BasicLTI consumer. <a href="#lti">More info</a></li>
+</ul>
+
+</div>
+<div class=h3>
+<h3><a name="addingteachers">Adding Teachers</a></h3>
+
+After creating a course, click the &quot;Add/Remove Teachers&quot; link after the course
+name.  Here you can add or remove users authorized as a teacher for this course.  Only Group and
+full Admins have rights to add/remove teachers.
+
+</div>
+<div class=h3>
+<h3><a name="transferingownership">Transfering Ownership</a></h3>
+Click the &quot;Transfer&quot; link after the course name to transfer the ownership
+of the course to another teacher/admin.  In general, course ownership is not
+highly important, but Limited Course Creators can only modify courses for which
+they have ownership.
+
+</div>
+<div class=h3>
+<h3><a name="deletingcourse">Deleting</a></h3>
+
+Clicking the &quot;Delete&quot; link after the course name will delete the course and
+all items contained within the course.  However, it will not delete any
+questions added to the Question Set from within the course; the Question Set
+is shared, and not linked to any course
+
+
+</div>
+</div>
+<div class=h2>
+<h2><a name="questionsetmanagement">Question Set Management</a></h2>
+
+<div class=h3>
+<h3><a name="managequestionset">Manage Question Set</a></h3>
+
+<p>Clicking the &quot;Manage Question Set&quot; link will allow you to search through the
+Question Set, modify questions, add questions, remove question, transfer ownership, or
+add a set of questions to a question library.  Only administrators or question owners 
+have the rights to remove a question.  Be aware that if you remove
+a question that is currently being used in an assessment (as shown in the &quot;Times
+Used&quot; column), it will mess up that assessment.
+</p>
+<p>
+The options available in the question set manager are:
+<ul>
+<li><b>Modify</b>: Change the source code of the question and make library assignments.  You will only see this option for
+   questions you own or when the owner has given permission for anyone to modify the question.</li>
+<li><b>View</b>:  View the source code of the question and make library assignements.  You will only see this option for question
+   you do not own.</li>
+<li><b>Template</b>:  Create a new question, using the code of an existing question as a starting point.  When you template a 
+   question, the original question is not changed.</li>
+<li><b>Delete</b>:  Delete the question completely from the questionset and all libraries.  You will only see this option for
+   questions you own or when the owner has given permission for anyone to modify the question.  You can delete many questions at once
+   by selecting questions with the checkboxes, then clicking the Delete button near the top of the page.</li>
+<li><b>Transfer</b>:  Transfer ownership of the question to another user.  You will only see this option for
+   questions you own.  You can transfer many questions at once
+   by selecting questions with the checkboxes, then clicking the Transfer button near the top of the page.</li>
+<li><b>Library Assignment</b>:  The Library Assignment button near the top of the page can be used with the checkboxes to add or change your
+   library assignments for the selected questions.  This will not affect other people's assignments</li>
+</ul>
+</p>
+<p>Note that the assignment of questions into libraries can be done by anyone, but only the person who made the assignment is able
+to remove the question from the assigned library</p>
+
+
+</div>
+<div class=h3>
+<h3><a name="exportquestionset">Export Question Set</a></h3>
+
+Use the &quot;Export Question Set&quot; feature to export a portion of the Question Set
+for backup or sharing.  Use the search feature with the checkboxes to select
+questions for inclusion in the export.  Clicking the &quot;Finalize&quot; button, you
+will be asked for a Library Description.  
+
+
+</div>
+<div class=h3>
+<h3><a name="importquestionset">Import Question Set</a></h3>
+<p>
+Use the &quot;Import Question Set&quot; feature to import a Question Set that you or
+someone else had exported from IMathAS.  Be sure to only import question sets from
+trusted sources.  After specifying an import file, you will be given a chance
+to select specific questions from the set to be imported.  
+</p>
+<p>
+Imported questions will have ownership assigned to the importer.  Select the
+userights you want to apply to all imported questions.  You also can import
+the questions directly into an existing or new question library</p>
+
+<p>If any questions (identified by a unique id) already exist in your system, you
+will be asked if you want to update the existing questions, or add as new questions.
+If you have modified questions previously imported, you may want to add as new. </p>
+
+</div>
+</div>
+<div class=h2>
+<h2><a name="librarymanagement">Library Management</a></h2>
+<div class=h3>
+<h3><a name="managelibraries">Manage Libraries</a></h3>
+<p>
+Use the library manager to remove, rename, change rights, change parent, or transfer
+ownership of question libraries.  Be aware that if a library is deleted, the
+questions in that library will become unassigned; they are not deleted.
+</p><p>
+Libraries have a tree structure, where each library has a parent library.  When you
+add or modify a library, you can change it's parent library.  If you change a library's
+parent, all children library move with a library.  You can only specify an empty
+library or existing parent library as a parent.
+</p>
+<p>
+Libraries have use rights.  Options are:
+<ul>
+<li><b>Private</b>:  Only the owner or an administrator can list questions in these libraries</li>
+<li><b>Closed to group, private to others</b>: Anyone in group can list and use questions, , but only 
+	the owner or an admin can add questions to the library.  Hidden to anyone outside the group.</li>
+<li><b>Open to group, private to others</b>: Anyone in group can list and use questions and add to the library.
+	Hidden to anyone outside the group.</li>
+<li><b>Closed to all</b>:  Everyone can list and use questions, but only the owner or an admin can add questions to the library</li>
+<li><b>Open to group, close to others</b>: Anyone in group can list and use questions and add to the library.  
+       Outside the group, users can only list and use questions; they cannot add questions to the library</li>
+<li><b>Open to all</b>:  Everyone can list and use questions and add to the library</li>
+</ul>
+With library rights, child rights take precedence over parent rights.  For example,
+if an open library is a child to a private library, the parent will not be hidden
+from other users.  However a private library as child to a private parent will be
+hidden from other users.
+</p>
+<p>Depending upon the system configuration, non-admins may be limited to creating libraries that are private
+to others outside their group.  If this is the case, a non-admin will need to contact an admin to create a library
+that is closed or open to all.</p>
+<p>
+Library assignments are done in question management.  Library assignments can be done
+by any user, but only the person who made the assignment can remove that assignment.
+</p>
+</div>
+<div class=h3>
+<h3><a name="exportlibraries">Export Libraries</a></h3>
+Use the &quot;Export Libraries&quot; feature to export an entire library or tree
+of libraries for backup or sharing.  Use the tree to select libraries to export. 
+Note that if a parent library is selected, it's children libraries are automatically 
+included in the export, and heirarchy will be maintained. If libraries from different 
+trees are selected, the topmost libraries in each branch selected will be exported 
+at the same level.
+</div>
+
+<div class=h3>
+<h3><a name="importlibraries">Import Libraries</a></h3>
+<p>Use the &quot;Import Libraries&quot; feature to import an entire library or tree
+of libraries.  After selecting a file, the tree of libraries in the import file
+will be shown, and you can deselect libraries you do not want to import.  Note that 
+if a parent library is not selected, NONE of the children libraries will be added, 
+regardless of whether they're checked or not.</p>
+
+<p>You will be asked if you want to update existing questions/libraries, or add as new.  If 
+a library or question (identified by a unique id) in the import already exists on your system,
+this will tell the importer whether to update the existing libraries/questions, or import
+the libraries/questions as a new copy (a new unique id is assigned).
+If you have modified questions previously imported, you may want to add as new. </p>
+
+<p>
+Imported libraries and questions will have ownership assigned to the importer.  Select the
+userights you want to apply to all imported questions and libraries.  You can select
+a parent in the library tree for all (top level) imported libraries</p>
+
+<p>
+If you load a file that does not have a library tree embedded in the file, you will
+be told to use the Import Question Set feature instead.  Even if a file has a library
+tree, you can use the Import Question Set feature to import specific questions from
+the file.
+</p>
+</div>
+
+</div>
+<div class=h2>
+<h2><a name="installmacrofile">Install Macro File</a></h2>
+<p>A Macro Library contains macros (functions) which can be used in questions.  These
+expand the capabilities of IMathAS.  If allowed, installation requires selecting the file name
+from your local computer and clicking "Submit".  Be aware that any existing
+macro library of the same name will be replaced.  A help file is automatically
+generated for newly installed macro libraries.</p>
+<p>
+<b>Warning!</b>: Macro libraries are pure PHP (programming code), and have a large
+security risk.  <b>Only install macro libraries from a trusted source</b>
+</p>
+
+</div>
+<div class=h2>
+<h2><a name="deleteoldusers">Delete Old Users</a></h2>
+
+Use the Delete Old Users option to delete users who have not accessed the system within
+some specified number of months.  You can delete just students, or all non-Admin users.
+
+</div>
+<div class=h2>
+<h2><a name="importstudents">Import Students from File</a></h2>
+
+Use the Import Students from File feature to register and enroll a set of students
+automatically from a CSV (commas separated values) file.  You can generate a CSV
+file using any spreadsheet program.
+
+<p>
+The form will guide you through specifying which columns of the CSV file contain
+First name, Last name, email address, and desired username.  Once setting these options,
+the first five rows of the file will be displayed so you can verify that the import
+settings are correct.  If you selected a class to enroll the imported students in,
+the students will be both registered and enrolled in that class upon submission.</p>
+
+</div>
+<div class=h2>
+<h2><a name="managegroups">Manage Groups</a></h2>
+<p>Groups allow instructors to be divided into groups (by school, for example).  Groups
+can create group-specific libraries, and Group Admins can be assigned to have Admin 
+rights over group users and libraries.  By default, users are added to a Default group.</p>
+
+<p>Click <b>Edit Groups</b> to add, modify, or delete groups.</p>
+
+</div>
+<div class=h2>
+<h2><a name="diagnostics">Diagnostics</a></h2>
+<p>Diagnostics allow you to create a special login page for larger-scale diagnostic assessment. 
+This provides a way for students to access and take the diagnostic without needing
+to register and enroll in a course.  Also, it delivers them the correct assessment based
+on a specified selection.</p>
+
+<p>If you are a group admin or full admin, click the "Add New Diagnostic" button to set up
+a new diagnostic.  Diagnostics are linked with assessments in a course, so you should first
+create a course and add your diagnostic assessments to that course.</p>
+
+<p>Over two pages, you will be asked for:
+<ul>
+ <li>Diagnostic name: the name of your diagnostic to display to students on the login page</li>
+ <li>Term designator: Can be changed each term for ongoing assessments to keep track of which term an assessment was taken in.  Also will create a unique
+   username for each term, so same student ID could take the assessment again in the different term.</li>
+ <li>Linked with course:  What course contains your diagnostic assessments.  You must be listed as a teacher for the course</li>
+ <li>Available:  Whether students can take the diagnostic</li>
+ <li>Public:  Whether the diagnostic should be listed on the main Diagnostics list page at $imasroot/diag.  If set to no,
+     students will have to be provided with the direct link to the diagnostic.</li>
+ <li>Allow Reentry:  Whether students should be forced to complete the diagnostic in one sitting, or whether you'll allow them
+     to reaccess the test at a later time.  If Yes, you can set a testing window that limits the number of minutes after first accessing
+     the diagnostic they can reenter the diagnostic.</li>
+ <li>Unique ID prompt:  How you want to word the prompt for a unique user id</li>
+ <li>ID entry format:  Lets you specify the format of the unique ID, so ensure valid IDs</li>
+ <li>Allow access IP addresses:  IP addressed for which the diagnostic can be taken without a password.  If you want to
+     allow access from anywhere, enter "*".  You can use "*" for a wildcard as well, e.g. 123.45.* to allow any IP beginning
+     with 123.45.</li>
+ <li>Passwords:  Passwords which will allow access to the diagnostic from other IP addresses.  Passwords are not case sensitive.</li>
+ <li>Super passwords:  These passwords will override the "allow reentry" time limit, if you specified one earlier.  These passwords would be intended 
+     for use by instructors or proctors, and generally would not be shared directly with students.</li>
+  <li>First level selector name:  Students will be asked to select two items from pull-down lists, with the values in the second
+     depending upon the values in the first.  The choice in the first list also dictates which assessment is delivered.  For
+     selector name, specify what this selection should be called, filling in the blank "Please enter your ______".  In many cases
+     the two selectors will be Course and Instructor, or Course and Section</li>
+ <li>First level selector options:  Add options for the first level selector</li>
+ <li>Second level selector name:  Secondary selection, with values depending upon the first-level selector choice.  Fill in the blank
+	"Enter your _________".  Second level selectors will be become the student's section identifier in the course, allowing you to
+	use the tutor system with diagnostics.</li>
+ <li>Deliver assessment:  For each first-level selector, specify which assessment should be delivered if the student
+     selects that option</li>
+ <li>Second level selector options:  For each first-level selector, specify the options for the second level selector.</li>
+</ul>
+<p>After submitting the second page, you will be provided with the direct access link to the diagnostic, which you can
+provide to students or use to create a link from another website</p>
+
+<p>In courses for which a diagnostic has been set up, the gradebook will display differently, showing the student unique ID, 
+the term, and the first and second selector values in addition to the students' names and scores</p>
+
+</div>
+<div class=h2>
+<h2><a name="managingadministrators">Managing Administrators and Teachers</a></h2>
+
+At the bottom of the admin page is a list of users.  Group Admins will see the teachers in their group.  For Full Admins, 
+teacher and higher level users are grouped by instructor Group, or are in the Default
+group if you haven't defined groups.  Student accounts can be listed by choosing the corresponding first letter of the last name.  To approve
+teachers who have filled out the "new instructor account request" form, choose Pending from the list.  Note that if you require email confirmation
+of students, they might also show up in the Pending list until they confirm their account.
+
+<div class=h3>
+<h3><a name="addingadministrators">Adding Administrators and Teachers</a></h3>
+
+You can add a new administrator, teacher, or student by clicking the &quot;Add New User&quot; 
+button.  You will be asked to provide a username, user's name, and email.  The 
+user's password defaults to 'password'.  If a user
+already has self-registered, and you want to promote them to administrator or teacher,
+find them in the user list and click the &quot;Change Rights&quot; link.
+
+</div>
+<div class=h3>
+<h3><a name="rights">Rights</a></h3>
+
+When adding a new administrator or changing rights, there are several rights levels, each
+higher level including the rights of the lower levels:
+<ol>
+<li><b>Guest</b>:  Can access all class materials, including taking tests (however, test is restarted next time the guest user
+       accesses the test).  Cannot enroll or unenroll in courses, or change
+       user info or password.  Cannot post in forums</li>
+<li><b>Student</b>: Can only access class materials - cannot edit anything</li>
+<li><b>Teacher</b>: Can edit course materials and create assessments, but only in courses
+	to which they have been assigned as a teacher</li>
+<li><b>Limited Course Creator</b>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
+       that they create.</li>
+<li><b>Diagnostic Creator</b>: Can add courses, and they are automatically assigned as the teacher.  Can delete courses
+       that they create.  Can create diagnostics.</li>
+<li><b>Group Admin</b>: Can add/delete teachers and set user rights, but only for users in their group.  Can modify/delete questions
+       and libraries created by members of the group regardless of ownership or use rights.  Can always create "open to all" libraries</li>
+<li><b>Full Administrator</b>: Can add/delete administrators and set user rights.  Can import macro files, if installation allows.
+       Can modify/delete questions and libraries regardless of ownership or use rights</li>
+</ol> 
+
+</div>
+<div class=h3>
+<h3><a name="resettingadminpasswords">Resetting Admin Passwords</a></h3>
+
+You can reset a user's password to 'password' by clicking the &quot;Reset Password&quot; link
+next to the user's name.
+
+</div>
+<div class=h3>
+<h3><a name="deletingadmin">Deleting</a></h3>
+
+You can delete an administrator by clicking the &quot;Delete&quot; button next to their name.
+Note that if they were teaching a course, this will unset them as a teacher, but
+does not delete the course itself.
+		
+	
+</div>
+</div>
+</div>
+<div class=h1>
+<h1><a name="coursemanagement">Course Management</a></h1>
+
+Accessing a course as a teacher shows the course in management (edit) mode.
+
+<div class=h2>
+<h2><a name="coursepagelayout">Course Page Layout</a></h2>
+
+The course page consists of a list of items.  There are six types of items:
+<ul>
+<li><b>Blocks</b>:  Groupings of items (Inline Text, Linked Text, Assessments)</li>  
+<li><b>Inline Text Items</b>:  Text that displays on the course page</li>
+<li><b>Linked Text Items</b>:  A summary displays on the course page.  A link is provided
+    that can display text, an uploaded file, or a weblink</li>
+<li><b>Forum Items</b>: Basic disussion forum</li>
+<li><b>Assessments</b>:  Tests or Practice questions</li>
+<li><b>Calendar</b>:  The course calendar, if you want to embed it on your course page</li>
+</ul>
+<p>Blocks have a colored header.  If a block is displayed collapsed, click the block
+name or the &quot;Expand&quot; button to view the block's contents.  If the block is 
+displayed as a folder (has a folder icon next to it), click the block name to view
+the block items.</p>
+
+<p>Text items are preceded with an information <span class=icon>!</span> icon, forums are preceded with a 
+<span class=icon>F</span> icon, and assessments are preceded with a <span class=icon>?</span> 
+icon.  The icons will be grey when the item is not available, and
+(depending upon install settings) may change color as a deadline approaches.  The color is
+green at two weeks, yellow at one week, and red on due date.</p>
+
+<p>The item order can be rearranged by using the number selector to the left of the
+item.  Items can also be moved into or out of blocks using this selector.</p>
+
+</div>
+<div class=h2>
+<h2><a name="addingitems">Adding Items</a></h2>
+
+Add an item by selecting the item type from the &quot;Add Item&quot; pulldown.  Using the
+&quot;Add Item&quot; pulldown inside a block will add the item to that block.
+
+<div class=h3>
+<h3><a name="blocks">Blocks</a></h3>
+
+For Blocks, you will asked to provide:
+<ul>
+<li><b>Title</b>:  The title of the block</li>
+<li><b>Available after</b>:  The first date for the item to display to students</li>
+<li><b>Available until</b>:  The last date for the item to display to students</li>
+<li><b>When available</b>: Whether you want to display the block Expanded, Collapsed, or as a folder when available</li>
+<li><b>When not available</b>:  Whether you want to hide the block from students when not available, or show
+   collapsed or as folder (depending on available setting).  Use the show collapsed/folder option if the block contains items that students still need to be
+   able to access.</li>
+<li><b>Colors</b>: Allows you to specify colors other than the defaults for blocks</li>
+<li>
+</ul>
+
+</div>
+<div class=h3>
+<h3><a name="inlinetextitems">Inline Text Items</a></h3>
+
+For Inline Text items, you will asked to provide:
+<ul>
+<li><b>Title</b>:  The title of the item</li>
+<li><b>Hide title</b>: If you want to hide the title and icon, and just display the text</li>
+<li><b>Text</b>:  The actual text (displays on course page)</li>
+<li><b>Files</b>:  You can attach one or more files to an inline text item.  For each file, provide a description
+of the file.  A list of the descriptions, with links to the files, will display at the bottom of your text item.</li>
+<li><b>Available after</b>:  The first date for the item to display to students</li>
+<li><b>Available until</b>:  The last date for the item to display to students</li>
+</ul>
+
+</div>
+<div class=h3>
+<h3><a name="linkedtextitems">Linked Text Items</a></h3>
+
+For Linked Text items, you will asked to provide:
+<ul>
+<li><b>Title</b>:  The title of the item</li>
+<li><b>Summary</b>:  A description of the link (displays on course page)</li>
+<li><b>Text</b>: Enter one of the following:</li>
+	<ul>
+	<li>Type text in box provided.  The text will display when link is clicked</li>
+	<li>Enter a weblink (like http://www.google.com).  The link will take students to this weblink</li>
+	<li>Attach a file.  The link will open the file.  Note: Do not change the text on subsequent modifications</li>
+	</ul>
+<li><b>Available after</b>:  The first date for the item to display to students</li>
+<li><b>Available until</b>:  The last date for the item to display to students</li>
+</ul>
+
+</div>
+<div class=h3>
+<h3><a name="forumitems">Forum Items</a></h3>
+
+For Forum items, you will asked to provide:
+<ul>
+<li><b>Name</b>:  The name of the forum</li>
+<li><b>Description</b>:  A description of the forum (displays on course page)</li>
+<li><b>Available after</b>:  The first date for the item to display to students</li>
+<li><b>Available until</b>:  The last date for the item to display to students</li>
+<li><b>Group linked</b>:  If you have a group assessment, you can link the forum to the groups of that assessment.  If you do this,
+   students viewing the forum will only see posts from their group members and instructors. Be aware that posts to group linked
+   forums often won't trigger the red "New Posts" flag on the home page.</li>
+<li><b>Allow anonymous posts</b>:  Whether you want to allow students to post anonymously</li>
+<li><b>Allow students to modify posts</b>:  Whether you want students to be able to modify their posts</li>
+<li><b>Email notify</b>:  Whether you want to receive an email whenever a new post is made on the forum</li>
+<li><b>Default display</b>:  Whether you want threads to display Expanded, Collapsed, or in Condensed format by default.  
+    Users can change the display once they view the thread</li>
+<li><b>Students can reply by</b>:  Optionally set date restrictions for students replying to posts.  Can be overridden in individual threads.</li>
+<li><b>Students can create new threads by</b>:  Optionally set date restrictions for students creating new threads</li>
+<li><b>Count in gradebook</b>:  Whether you want the forum to count in the gradebook for points.  You will be able to assign points for individual posts made.</li>
+<li><b>Gradebook category</b>:  Category for the gradebook, if assigning points to the forum.
+</ul>
+
+<p>When you as a teacher start a new thread, you are given the option to have it be:
+<ul>
+<li>A regular post</li>
+<li>Always display at the top of the list</li>
+<li>Displayed at top and locked (no replies can be made)</li>
+<li>Displayed at top and replies are hidden from students</li>
+
+</ul>
+You can use the middle two options to, for example, post discussion instructions.  You can use the last option to post a question in 
+class, and have students respond without seeing other students' replies.</p>
+
+<p>When viewing the forum thread list as an instructor, there is a "List Posts by Name" link which will list
+all posts in the forum, grouped by student name.  New threads are colored in black, replies in green</p>
+
+</div>
+<div class=h3>
+<h3><a name="assessments">Assessments</a></h3>
+
+<b>Warning:</b> Making changes to an assessment after students have already taken it
+can seriously mess up those students' assessment results.  It is NOT safe to change:  Default points per problem or Default penalty.
+
+
+<div class=h4>
+<h4><a name="assessmentsettings">Assessment Settings</a></h4>
+
+You need to set the assessment settings when you add an assessment.  You can
+change these settings by clicking the &quot;Modify Settings&quot; link next to the 
+assessment in the course page.
+<ul>
+<li><b>Name</b>:  The name of the assessment</li>
+<li><b>Summary</b>:  A description of the summary (shows on course page)</li>
+<li><b>Intro/Instructions</b>:  Displays at the top of the test (see below for details on making question-specific instructions)</li>
+<li><b>Available after</b>:  The first date for the item to be available to students</li>
+<li><b>Available until</b>:  The last date for the item to be available to students.  Students must complete the assessment by this date - they will
+    be kicked out if they are in the middle of an assessment when this time is reached.</li>
+<li><b>Available for review</b>:  If the checkbox is clicked, the assessment will convert to review mode after the due date
+    until this date.  Review mode defaults to Skip Around display, unlimited attempts, answers shown always.  Scores are not
+    saved in Review mode.</li>
+<li><b>Count</b>:  Whether the assessment score should be counted in the gradebook, not counted in the grade total, or counted as extra credit.</li>
+<li><b>Copy Options From</b>:  If you have other assessments in your course already, you can select to copy the assessment settings
+   from another assessment.</li>
+<li><b>Password</b>:  If specified, requires student to enter this password to access the assessment.  Leave blank to require no password.</li>
+<li><b>Time Limit</b>:  The time limit, in minutes, for the test (0 for none).  If the student exceeds the 
+   time limit, their test will be recorded, and you can decide whether or not
+   to accept it in the gradebook detail.  Partial minutes are possible using decimal values.  If you check the 
+   "Kick student out at timelimit" box, then the assessment will automatically finalize at the timelimit, and submission
+   attempts after the timelimit will be rejected.</li>
+<li><b>Display method</b>:</li>
+	<ul>
+	<li><b>Full test at once</b>:  All questions are displayed on one page</li>
+	<li><b>One question at a time</b>:  One question is shown at a time.  Students
+	    must complete the questions in the order presented</li>
+	<li><b>Full test, submit one at time</b>: Full test is displayed, but student submits
+	    answer to one question at a time.  Student can skip between questions.</li>
+	<li><b>Skip around</b>:  Students are provided with a navigation bar and can
+	    jump between questions and complete them in any order</li>
+	<li><b>Embedded</b>:  Similar to "Full test, submit one at time", but all questions are
+	    always active, and any one can be submitted at any time.  Questions can be embedded into the 
+	    Intro/Instructions using [QUESTION #] tags.</li>
+	</ul>
+<li><b>Default points per problem</b>:  How many points each problem should be worth by default.
+    This can be changed for individual problems.</li>
+<li><b>Default attempts per problem</b>:  How many attempts a student should have at each problem by default.
+    This can be changed for individual problems.  Enter 0 for unlimited attempts</li>
+<li><b>Reattempts different versions</b>:  Reattempting a problem will regenerate the question with new numbers.  By default,
+    reattempts of problems receive the same version of the problem.  This option does not make sense to use with Homework mode.</li>
+<li><b>Default penalty per missed attempt</b>:  What percentage of points possible a student should lose
+    for an incorrect attempt.  This can be changed for individual problems.  You can select a penalty for
+    each missed attempt, to start after a certain number of missed attempts, or specify a penalty for the last possible attempt only.</li>
+<li><b>Feedback method</b>:  What detail the students should see</li>
+	<ul>
+	<li><b>No scores shown</b>:  No scores, including the total, are shown to the student.  If reattempts are allowed, 
+	    the student is forced to retake all questions (even ones they got right the first time).  With this
+	    mode, access to grade detail in the gradebook controlled by the Show Answers setting.</li>
+	<li><b>Final score</b>:  Only final (total) score is shown at the end.  If reattempts are allowed, 
+	    the student is forced to retake all questions (even ones they got right the first time).  With this
+	    mode, access to grade detail in the gradebook controlled by the Show Answers setting.</li>
+	<li><b>Show score on each at end</b>:  At the end of the test, the student is shown their score on 
+	    each question.  If reattempts are allowed, they are then allowed to go back and reattempt
+	    problems.</li>
+	<li><b>Show as submitted</b>:  As each question is submitted, the score is shown, and students are 
+	    offered a chance to reattempt the problem (if allowed).  This method does not apply to the
+	    &quot;Full test at once&quot; display method.</li>
+	<li><b>Practice Test</b>:  Same as above, and the test can be regenerated (re-randomized) whenever the student wants.  
+	    Students are given an opportunity to try similar problems to
+	    the one presented after completing each question (when not in Full test at once mode).  Scores are cleared each time
+	    the test is regenerated, and scores are not shown by default in the gradebook.  Answers can be shown after some number
+	    of attempts.</li>
+	<li><b>Homework</b>:  Like "Show as submitted", but students are given an opportunity to attempt a similar
+	    question if they miss a question.  Doing so resets attempts for that question (reseting attempt penalty as well).
+	    Also, show answers (see below) can be set to show answers during the homework after a number of attempts.  This is
+	    best used in conjunction with the attempt penalty.</li>
+	</ul>
+<li><b>Show Answers</b>:  When (if ever) students should be able to see answers.</li>
+	<ul>
+	<li><b>Practice Tests and Homework</b>:  For practice tests and homework, you can set this to never, after 0,1,3,4,or 5 attempts are made,
+	    or after last attempt.  There is also an after last attempt option that will allow students to jump directly to the answer.</li>
+	<li><b>Other Tests</b>:  For other tests, you can set this to never, after the assessment due date, after the last last attempt (in Skip Around and Full 
+	    test submitted one at time modes only), or immediately.  
+	    Answers will be available in the gradebook review of a test.  <i>Note</i>:  Do not use the "Immediately" option if you
+	    are allowing multiple attempts per problem.  Doing so would allow a student to complete the test, view the answers, then
+	    reenter the test (since more attempts are allowed) and put in the correct answers.  Also be aware that if an assessment
+	    is set to allow review mode, that answers will be available to students in review mode.</li>
+	</ul>
+<li><b>Show hints when available</b>:  Whether or not to show hints if the question has them defined</li>
+<li><b>Allow use of LatePasses</b>:  If you have granted LatePasses to students, this will allow use of them on this assessment</li>
+<li><b>Make hard to print</b>:  Makes the assessment harder to print, for in-class tests</li>
+<li><b>Shuffle item order</b>:  Randomizes the order in which questions are presented</li>
+<li><b>Gradebook Category</b>:  If you have created gradebook categories, you can assign the assessment to one of those categories.</li>
+<li><b>Count</b>:  Whether to count the assessment in the gradebook</li>
+<li><b>Allow tutors to edit</b>:  Whether tutors should be able to change students' scores on this assessment</li>
+<li><b>Minimum Score for Credit</b>:  A minimum score which must be acheived to receive credit for the assessment.  Set to 0 to accept all scores.
+   If set and score is not met, gradebook will display "NC" (No Credit).</li>
+<li><b>Show based on another assessment</b>:  Use this to hide this assessment until a specific score is acheived on another
+  assessment.  Provide a point value and select an assessment to use this feature.  Set the assessment to "Don't Use" to not use
+  this feature</li>
+<li><b>All questions same random seed</b>: Usually not needed.  This is only need for a set of questions designed to work together using the same random values</li>
+<li><b>All students receive same version of questions</b>:  All students receive the same first version of questions.  If in practice test or homework mode, when 
+students request a similar problem, different students will receive different versions of the questions.</li>
+<li><b>Penalty for questions done while in exception/LatePass</b>:  A percent penalty to take on all questions submitted after the original assignment due date while under a due date exception.</li>
+<li><b>Is group assessment?</b>: Allows students to specify group members for the assignment.  All group members will receive the same score for the assignment</li>
+<li><b>Show question categories?</b>:  If you plan to categorize questions and would like the categories displayed while the student is taking the test, you can
+ select that option here</li>
+<li><b>LTI access secret</b>:  An access code to place this assessment in a BasicLTI-compliant consumer.  <a href="#lti">More info</a></li>
+</ul>
+
+<p><b>Qustion-specific instructions</b></p>
+<p>In the Intro/Instructions box, you can make question-specific instructions by putting a tag of the form [Q #] or [Q #-#] before the
+text specific to that question or range of questions.  Here is an example:</p>
+<div style="border: 1px solid #000;padding:8px;">
+<p>This is the general info<p>
+<p>[Q 1]</p>
+<p>This text will display before question 1</p>
+<p>[Q 3-4]</p>
+<p>This text will display before questions 3 and 4.  Since there was no tag for question 2, it will display
+  directly after question 1, with no associated intro text.  Likewise, if there was a question 5, it would 
+  display directly after question 4 with no associated intro text.</p>
+</div>
+
+
+</div>
+<div class=h4>
+<h4><a name="addingquestionstoanassessment">Adding Questions to an Assessment</a></h4>
+
+<p>You can add existing questions to an assessment by clicking the &quot;Select Library&quot; button 
+to choose libraries to search, then the &quot;Search&quot; button to
+list potential questions.  Leave the &quot;Search&quot; entry blank to list all questions in the libraries selected.  The checkboxes
+can be used to search in all libraries (not just the selected ones), list only questions you own, or exclude questions you've already
+added to your assessment.</p>
+From this list you can:
+<ul>
+<li>Use the checkboxes to select questions, then click the &quot;Add Selected (using defaults)&quot;
+button to add the questions.  Adding this way will use the assessment default settings for
+points, attempts allowed, and penalty per attempt.  You can change these later by 
+clicking the &quot;Change Settings&quot; link.</li>
+<li>Use the checkboxes to select questions, then click the &quot;Add&quot;
+button to add the questions.  Adding this way will allow you to override the default settings for
+points, attempts allowed, and penalty per attempt if you wish, and add a question multiple times.</li>
+<li>Click the &quot;Add&quot; link.  This will allow you to change the default
+question settings</li>
+<li>Click &quot;Use as template for New Question&quot; link.  This will create a new question based
+upon the existing question.  This allows you to avoid rewriting a question from 
+scratch if a similar question exists</li>
+<li>Click &quot;Preview&quot; to preview the question</li>
+</ul>
+
+<p>Alternatively, you can click the "Select from Assessments" button to choose questions from existing assessments.
+In this mode, select the assessments you wish to pull questions from and click "Use these assessments".  Then select 
+the questions you wish to use.</p>
+
+Once added to the assessment you can:
+<ul>
+<li><b>Reorder Questions</b>: When "Rearrange Questions" is selected, using the number selectors next
+    to each question will allow you to rearrange the order of the questions.  This is only useful if you
+    are not shuffling the question order</li>
+<li><b>Group Questions</b>:  When "Group Questions" is selected, using the number selectors next to each
+    question will allow you to group questions.  When questions are grouped, the testing engine will randomly
+    select one question from the group to display to the student</li>
+<li><b>Change Settings</b>:  Override the default settings for points, attempts allowed, and 
+    penalty per attempt, if desired</li>
+<li><b>Edit Source</b>:  Change the question code or wording</li>
+<li><b>Remove from assessment</b>:  Remove the question from the assessment.  This does not
+    delete the question from the Question Set.  You can also use the checkboxes and the "With selected, Remove"
+    button to remove multiple questions at once.</li>
+</ul>
+
+<p>If students have taken the assessment, you will not be allowed to make as many changes to the assessment, as it
+will mess up existing student attempts.  If you need to change the assessment a lot, you can clear all student attempts.
+Otherwise you can change individual question settings (be careful!) or edit the question if it's yours.  If there is a problem with
+the question, you modify it, and want to give students another chance on that question, you can clear all attempts on a single question
+by clicking the "Clear Attempts" link here</p>
+
+</div>
+<div class=h4>
+<h4><a name="addingnewquestions">Adding New Questions</a></h4>
+
+Click the &quot;Add New Question&quot; to write a new question from scratch, then add it to
+the assessment.  See the help section on <a href="#writingquestions">Writing Questions</a> for help on writing
+new questions
+
+</div>
+<div class=h4>
+<h4><a name="categorizequestions">Categorizing Questions</a></h4>
+
+<p>After adding questions to an assessment, click the &quot;Categorize Questions&quot; button to categorize the questions
+in the assessment.  Categorization allows you and students to see a score breakdown by question category.</p>
+
+<p>In the question categorization page, you will see each question listed, followed by a category pull-down.  By default, the
+list contains the names of all libraries containing the question.  If you'd like to define a category not in the lists, type in
+the new category name in the box provided and click the &quot;Add Category&quot; button.  The new category name will now appear
+in the pull-down lists next to each question, and can be selected to assign the question to that category.  When you are done, click
+the &quot;Record&quot; button.</p>
+
+</div>
+<div class=h4>
+<h4><a name="printcopies">Making Print Copies</a></h4>
+
+<p>After adding questions to an assessment, click the &quot;Create Print Version&quot; to layout your assessment for printing.</p>
+
+<p>On the first page, you will be asked what you would like to include in the test header.  You will also be asked to enter your
+print margins setup.  These can be found by choosing "Page Setup" from the "File" menu in your browser.  In the Page Setup you may 
+also wish to remove the default header and footer materials included in printouts by your browser.  </p>
+
+<p>On the next page, you will see alternating blue and green rectangles indicating the size of pages. Use the resizing buttons 
+next to each question to increase or decrease the space after each question until the questions fall nicely onto the pages. You 
+can use Print Preview in your browser to verify that the print layout looks correct. After you have completed the print layout, 
+you will be given the chance to specify additional print options.  Longer questions, such as those with graphs, may appear cut 
+off in the print layout page. Be sure to resize those questions to show the entire question.</p>
+
+<p>On the next page, select how many versions of the test you would like to generate, and whether you'd like to generate answer
+keys.  After hitting continue, you print version of the test will be displayed.  Choose Print in your browser to print your tests.</p>
+
+</p>
+
+</div>
+</div>
+</div>
+
+<div class=h2>
+<h2><a name="quickview">Quick View</a></h2>
+<p>Quick view is a condensed view of the course page.  You can use it to quickly look over 
+your entire course.  It is more useful for major editing</p>
+
+<p>It allows easy drag-and-drop
+reordering of course items.  Changes will not be recorded until the "Record Changes" button
+is pressed.</p>
+
+<p>You can also quickly rename items by clicking on their titles and changing the text.  
+Again, changes will not be recorded until the "Record Changes" button
+is pressed.</p>
+
+<p>When done in quick view, click the "Return to regular view" link to get back to the regular course page</p>
+</div>
+
+<div class=h2>
+<h2><a name="calendar">Calendar</a></h2>
+<p>The calendar can be accessed from the course navigation bars, or by embedding the calendar
+on your course page.  The calendar autopopulates with assessment item due dates, and discussion forum
+post-by and reply-by dates.  Text items have options to place them on the calendar.  The calendar
+displays with the current date on the top line; you can jump later in the future or look in the past
+using the "&lt; &lt;" and "&gt; &gt;" links above the calendar.</p>
+
+<p>You can add additional items to the Calendar using the "Manage Events" link on the calendar.  All items
+to be placed on the calendar need a date, a description, and a single letter or symbol tag that will show on
+the calendar</p>
+</div>
+
+<div class=h2>
+<h2><a name="questionsetmanagementcm">Question Set Management</a></h2>
+
+<div class=h3>
+<h3><a name="managequestionsetcm">Manage Question Set</a></h3>
+
+<p>Clicking the &quot;Manage Question Set&quot; link will allow you to search through the
+Question Set, modify questions, add questions, remove question, transfer ownership, or
+add a set of questions to a question library.  Only administrators or question owners 
+have the rights to remove a question.  Be aware that if you remove
+a question that is currently being used in an assessment (as shown in the &quot;Times
+Used&quot; column), it will mess up that assessment.
+</p>
+<p>
+The options available in the question set manager are:
+<ul>
+<li><b>Modify</b>: Change the source code of the question and make library assignments.  You will only see this option for
+   questions you own or when the owner has given permission for anyone to modify the question.</li>
+<li><b>View</b>:  View the source code of the question and make library assignements.  You will only see this option for question
+   you do not own.</li>
+<li><b>Template</b>:  Create a new question, using the code of an existing question as a starting point.  When you template a 
+   question, the original question is not changed.</li>
+<li><b>Delete</b>:  Delete the question completely from the questionset and all libraries.  You will only see this option for
+   questions you own or when the owner has given permission for anyone to modify the question.  You can delete many questions at once
+   by selecting questions with the checkboxes, then clicking the Delete button near the top of the page.</li>
+<li><b>Transfer</b>:  Transfer ownership of the question to another user.  You will only see this option for
+   questions you own.  You can transfer many questions at once
+   by selecting questions with the checkboxes, then clicking the Transfer button near the top of the page.</li>
+<li><b>Library Assignment</b>:  The Library Assignment button near the top of the page can be used with the checkboxes to add or change your
+   library assignments for the selected questions.  This will not affect other people's assignments</li>
+</ul>
+</p>
+<p>Note that the assignment of questions into libraries can be done by anyone, but only the person who made the assignment is able
+to remove the question from the assigned library</p>
+
+</div>
+<div class=h3>
+<h3><a name="exportquestionsetcm">Export Question Set</a></h3>
+
+Use the &quot;Export Question Set&quot; feature to export a portion of the Question Set
+for backup or sharing.  Use the search feature with the checkboxes to select
+questions for inclusion in the export.  Clicking the &quot;Finalize&quot; button, you
+will be asked for a Library Description.  
+
+
+</div>
+<div class=h3>
+<h3><a name="importquestionsetcm">Import Question Set</a></h3>
+<p>
+Use the &quot;Import Question Set&quot; feature to import a Question Set that you or
+someone else had exported from IMathAS.  Be sure to only import question sets from
+trusted sources.  After specifying an import file, you will be given a chance
+to select specific questions from the set to be imported.  
+</p>
+<p>
+Imported questions will have ownership assigned to the importer.  Select the
+userights you want to apply to all imported questions.  You can import
+the questions directly into an existing library, or into the Unassigned library
+for later assignment.</p>
+
+<p>If any questions (identified by a unique id) already exist in your system, you
+will be asked if you want to update the existing questions, or add as new questions.
+If you have modified questions previously imported, you may want to add as new. </p>
+
+</div>
+</div>
+<div class=h2>
+<h2><a name="librarymanagementcm">Library Management</a></h2>
+<div class=h3>
+<h3><a name="managelibrariescm">Manage Libraries</a></h3>
+<p>
+Use the library manager to remove, rename, change rights, change parent, or transfer
+ownership of question libraries.  Be aware that if a library is deleted, the
+questions in that library will become unassigned; they are not deleted.
+</p><p>
+Libraries have a tree structure, where each library has a parent library.  When you
+add or modify a library, you can change it's parent library.  If you change a library's
+parent, all children library move with a library.  You can only specify an empty
+library or existing parent library as a parent.
+<p>
+Libraries have use rights.  Options are:
+<ul>
+<li><b>Private</b>:  Only the owner or an administrator can list questions in these libraries</li>
+<li><b>Closed to group, private to others</b>: Anyone in group can list and use questions, , but only 
+	the owner or an admin can add questions to the library.  Hidden to anyone outside the group.</li>
+<li><b>Open to group, private to others</b>: Anyone in group can list and use questions and add to the library.
+	Hidden to anyone outside the group.</li>
+<li><b>Closed to all</b>:  Everyone can list and use questions, but only the owner or an admin can add questions to the library</li>
+<li><b>Open to group, close to others</b>: Anyone in group can list and use questions and add to the library.  
+       Outside the group, users can only list and use questions; they cannot add questions to the library</li>
+<li><b>Open to all</b>:  Everyone can list and use questions and add to the library</li>
+</ul>
+With library rights, child rights take precedence over parent rights.  For example,
+if an open library is a child to a private library, the parent will not be hidden
+from other users.  However a private library as child to a private parent will be
+hidden from other users.
+</p>
+<p>Depending upon the system configuration, non-admins may be limited to creating libraries that are private
+to others outside their group.  If this is the case, a non-admin will need to contact an admin to create a library
+that is closed or open to all.</p>
+<p>
+Library assignments are done in question management.  Library assignments can be done
+by any user, but only the person who made the assignment can remove that assignment.
+</p>
+</div>
+<div class=h3>
+<h3><a name="exportlibrariescm">Export Libraries</a></h3>
+Use the &quot;Export Libraries&quot; feature to export an entire library or tree
+of libraries for backup or sharing.  Use the tree to select libraries to export. 
+Note that if a parent library is selected, it's children libraries are automatically 
+included in the export, and heirarchy will be maintained. If libraries from different 
+trees are selected, the topmost libraries in each branch selected will be exported 
+at the same level.
+</div>
+
+<div class=h3>
+<h3><a name="importlibrariescm">Import Libraries</a></h3>
+<p>Use the &quot;Import Libraries&quot; feature to import an entire library or tree
+of libraries.  After selecting a file, the tree of libraries in the import file
+will be shown, and you can deselect libraries you do not want to import.  Note that 
+if a parent library is not selected, NONE of the children libraries will be added, 
+regardless of whether they're checked or not.</p>
+
+<p>You will be asked if you want to update existing questions/libraries, or add as new.  If 
+a library or question (identified by a unique id) in the import already exists on your system,
+this will tell the importer whether to update the existing libraries/questions, or import
+the libraries/questions as a new copy (a new unique id is assigned).
+If you have modified questions previously imported, you may want to add as new. 
+Note that only the original importer can update questions they imported.</p>
+
+<p>
+Imported libraries and questions will have ownership assigned to the importer.  Select the
+userights you want to apply to all imported questions and libraries.  You can select
+a parent in the library tree for all (top level) imported libraries</p>
+
+<p>
+If you load a file that does not have a library tree embedded in the file, you will
+be told to use the Import Question Set feature instead.  Even if a file has a library
+tree, you can use the Import Question Set feature to import specific questions from
+the file.
+</p>
+
+
+</div>
+
+</div>
+
+<div class=h2>
+<h2><a name="liststudents">List Students</a></h2>
+<p>
+Use the &quot;List Students&quot; link to list the students in your class.  On this page you can
+import (register and enroll) students from a file, enroll a student (already registered) 
+with a known username.  This is the easiest way to add a guest user to your class.  Note that the "Last Login" 
+date shows the last time the student logged into IMathAS, not necessarily the last time they accessed
+your course.
+</p>
+<p>The List Students page also gives you access to student email addresses, as well as a link to send out a mass email or message
+to all students</p>
+
+<div class=h3>
+<h3><a name="exceptions">Exceptions</a></h3>
+
+Click the &quot;Make Exception&quot; link to change the Start or End date of an assessment
+for a single student.  If you need to make exceptions for multiple students at once, or want to make
+exceptions for multiple assessments at once, use the "Make Exception" button in connection with the checkboxes
+in the Gradebook.
+
+</div>
+<div class=h3>
+<h3><a name="resettingpasswords">Resetting Passwords / Changing Info</a></h3>
+
+Use the &quot;Chg Info&quot; link to reset a student's password, 
+update their email address, username or full name, or change their section or code.  
+You can also lock the student out of the course on this page.  Doing so will
+display a message to the student that they need to see their instructor to
+regain access to the course.  On this page you can also set a time limit multiplier 
+for students needing extra time on timed assessments.  Setting the multiplier to 1.5 would
+give the student 1.5 times the usual timelimit for all assessments.
+
+</div>
+<div class=h3>
+<h3><a name="unenrolling">Unenrolling</a></h3>
+
+Use the &quot;Unenroll&quot; link to unenroll a student from the class, or the &quot;Unenroll All&quot; button
+to unenroll all students.  This can be useful to clear out a classroom at the end of
+a term.  Unenrolling all students will also delete all regular posts from the course's forums.
+
+</div>
+<div class=h3>
+<h3><a name="importstudentscm">Import Students from File</a></h3>
+
+Use the Import Students from File feature to register and enroll a set of students
+automatically from a CSV (commas separated values) file.  You can generate a CSV
+file using any spreadsheet program.
+
+<p>
+The form will guide you through specifying which columns of the CSV file contain
+First name, Last name, email address, and desired username.  Once setting these options,
+the first five rows of the file will be displayed so you can verify that the import
+settings are correct.  The students will be both registered and enrolled in the
+current class upon submission.</p>
+
+</div>
+<div class=h3>
+<h3><a name="sectioncodes">Assigning Section and/or Code Numbers</a></h3>
+
+<p>Click the "Assign section and/or code numbers" link to assign section or code 
+numbers to students.  These only serve for identification purposes, the the gradebook
+will be sorted first by section, then by name.  Section can be alphanumeric; code number
+must be numeric, up to 4 digits.</p>
+
+</div>
+<div class=h3>
+<h3><a name="managelatepasses">Manage LatePasses</a></h3>
+
+<p>Click the "Manage LatePasses" link to give students LatePasses.  Students can redeed
+a LatePass for an extension on an online assessment without your intervention, provided
+you have clicked the "Allow use of latepasses" option in that assessment.</p>
+
+<p>On this page you can also define the number of hours extension a LatePass will grant</p>
+
+</div>
+<div class=h3>
+<h3><a name="managetutors">Manage Tutors</a></h3>
+
+<p>Click the "Manage Tutors" link to manage tutors for your class.  Tutors can have an
+instructor account or student account. Tutors will be able to view students' scores
+and online assessments.  If given permission, tutors can edit or enter online or offline
+scores.</p>
+
+<p>Add tutors by listing their usernames in the box
+provided.  Remove tutors by clicking the "Remove" checkboxes next to tutors and clicking Update</p>
+
+<p>Once tutors are added, you can limit them to a single section of the course.  If selected,
+tutors will only be able to see scores for students in the section they're limited to.  This
+can be used in conjunction with the diagnostic system, since second-level selections become the 
+student's section identifier</p>
+
+</div>
+</div>
+<div class=h2>
+<h2><a name="gradebook">Gradebook</a></h2>
+
+<p>Click the &quot;Gradebook&quot; link to show the gradebook.  The gradebook shows each student's
+score on each assessment and any offline grades you've entered.  Click on a student's assessment score to show detail on their
+assessment attempt, or on a student's offline grade to change their grade.  Click the Settings link in the table header
+if you need to change an assessment's settings.  Click on an assessment's average score to view an breakdown showing
+the average score on each question.  Click on an offline grade's average score or the Settings link in the table header to change the settings for that item or modify all students' grades
+at once.</p>
+
+<p>By using checkboxes next to student's names, you can send messages or emails to multiple students, or make
+due date exceptions for multiple students at once</p>
+
+<div class=h3>
+<h3><a name="gradebooksettings">Gradebook Settings and Categories</a></h3>
+<p>Click the "Gradebook Settings" to change Gradebook settings and create or modify categories.  This allows
+you to create a grading scheme.</p>
+<p>Your overall settings are:
+<ul>
+<li>Calculate total using:  Select "points earned" to use a points earned out of points possible grading scheme.  Select "Category weights" to
+assign a percentage weight to each category in calculation of total grade.</li>
+<li>Gradebook display:  Select whether to order the gradebook by item dates (Available until dates for assessments, 
+Show After dates for offline grades) or if you want to group items by category</li>
+</ul></p>
+
+<p>The next section lets you define categories.  There is always the "Default" category, but it will not display if there are no items
+assigned to it.  To add a new category, click the "Add Category" link to add a new line to the table, then fill in the name and
+other info, then click "Update"</p>
+<p>For each category, you can specify:
+<ul>
+<li>Name:  The name of the category</li>
+<li>Scale (optional):  Scale the category total by specifying a point value or percent value to be scaled up to 100%.  
+For example, if the category point value was 80 points, and a student earned 50 points, their category total would be 50 points.
+If you specified a scale of 60 points, then the students grade would become 80*(50/60) = 66.7 points out of 80.  You can specify whether
+grades that would end up over 100% should be chopped to 100%.  You can specify no scale by leaving the Scale box blank.</li>
+<li>Drops (optional):  You can specify whether to drop the lowest N scores, or keep the highest N scores from the category.  Set the number to 0 to keep all scores.</li>
+<li>Weight/Fix Category Point Total:  If you are using a "Category Weights" grading scheme, enter the percent weights for each category 
+here.  If the category percents don't add to 100%, they are all scaled equally so they do add to 100%.  If you are using a "Points earned" grading scheme, you can
+fix the point value for the category here (optional).  For example, if the current category total is 50 points and a student earns 40 points, 
+if you specified a fixed point value of 100 points, the students score would become 80 points.  Leave this blank to use the actual
+category point total.</li>
+<li>Remove:  When you remove a category, any items currently assigned to that category will be assigned to the Default category</li>
+</ul>
+
+
+</div>
+<div class=h3>
+<h3><a name="offlinegrades">Offline Grades</a></h3>
+To add an offline grade, click the "Add Offline Grade" link on the gradebook page.  You can specify:
+<ul>
+<li>Name:  The name to give the grade item</li>
+<li>Points: The number of points possible on the item</li>
+<li>Show to students after:  The date after which to show the item to students</li>
+<li>Gradebook Category:  The gradebook category you wish to assign the item to</li>
+<li>Count:  Whether to count the score in the gradebook total, not count it, or count it as extra credit</li>
+<li>Allow tutors to edit:  Whether tutors should be able to edit scores for this item</li>
+</ul>
+<p>You can then enter grades for each student.  If you leave a grade blank, no grade will be recorded for that student. 
+You can edit these settings or edit all students' grades at a later time by clicking the "Average" in the gradebook for this item. 
+You can edit an individual student's grade by clicking on their score in the gradebook for this item.  You can leave feedback for
+students about their grade using the boxes provided.</p>
+
+<p>You can manage offline grades by clicking the "Offline Grades: Manage" link on the gradebook page.  This page
+allows you to delete, change the availability, or change the gradebook assignment of a set of
+offline grade items.</p>
+
+</div>
+<div class=h3>
+<h3><a name="gradebookdetail">Gradebook Detail</a></h3>
+
+<p>When you click on a student's score in the gradebook, you will see the specific
+assessment that they received and the last answer they provided, as well as their
+score on each question and the attempts used.  You can override the scores they
+received on this page.  You can also send a student a message about a question, quoting
+their version of the question in the message.  At the bottom of the page is a box to leave the student
+feedback about the assessment.</p>
+<p>If you wish to give a student another chance to take an assessment, click
+the "Clear Attempt" or "Clear Scores" link.  <b>Note</b>: This will clear their current scores,
+answers, and attempts used.  The "Clear Attempt" link will make it appear the student never started
+the assessment, and the student will receive a different version of the assessment when they access the assessment.
+The "Clear Scores" link will clear the student's scores and attempts to 0, but the student will receive the same
+version of the assessment when they access it.
+</p>
+<p>If you categorized the questions in the assessment, you will also see a category
+breakdown at the bottom of the details page</p>
+	
+</div>
+</div>
+<div class=h2>
+<h2><a name="stugroups">Student Groups</a></h2>
+<p>The Student Groups page allows you to manipulate student groups associated with assessments that you have designated as group
+assessments.  When you first access this page, you will be presented with a list of group assessments.  Select the assessment you
+want to modify groups for</p>
+
+<p>You will be presented with a list of groups (the group number is arbitrary) with the students in each group.  To separate a
+student from the group, click the "Break from Group" link.</p>
+
+<p>At the bottom of the page is a list of students not assigned to a group.  If you wish to assign students to groups, click the 
+checkboxes next to the students' names.  In the "add to group: " pulldown, select the group you want to add the students to, or select
+"New Group", and click Add</p>
+
+<p>When students are broken from the group, they retain the version of the assessment and progress the group had acheived before you
+broke them from the group.  If a student is added to a group, any work they've already done is lost and replaced with the group's
+version and progress.  Any changes to an assessment made by one group member affects all group members.</p>
+</div>
+<div class=h2>
+<h2><a name="messages">Messages</a></h2>
+<p>The message system allows you to send a message to students in the class.  This is an internal message system; it is not emailed
+unless the student has requested email notification.  </p>
+<p>Click Send New Message to send a new message to a student.  If you want to send a message to multiple students, use the "List Students" page.  
+Select a student from the pull-down list, and type your message.</p>
+<p>When viewing messages, you can either Reply to the message, or use the "Quote in Reply" option to quote the original message in your reply.</p>
+
+</div>
+<div class=h2>
+<h2><a name="copycourseitems">Copy Course Items</a></h2>
+<p>Course Item Copy allows you to copy items in your course or an entire course structure, or copy items from
+another instructor's course.  Note that item structure, items, and settings are exported, but not students, assessment
+attempts, or forum threads.</p>
+
+<p>On the first page, select a course to copy from.  If you select a course that is not one of your own courses, 
+you must enter the course Enrollment Key as verification that you have received permission to copy from the course.</p>
+
+<p>On the second page, select the items you wish to import.  If you export an item currently contained in a block and 
+do not export the block, the item will be exported as an item on the main course page.</p>
+
+<p>You can optionally append words to the end of the title of each item, or place the copied items into an existing block.</p>
+
+<p>You can optionally also specify to copy the course settings (the items you'd set under Modify on the Admin page), or copy
+   the gradebook scheme and gradebook categories.  Copying the gradebook scheme will overwrite the existing gradebook scheme in your
+   course.  Copying the gradebook scheme will also retain any category assignments for the assessments you're copying.</p>
+
+</div>
+<div class=h2>
+<h2><a name="masschgdates">Change Dates</a></h2>
+<p>The Change Dates page allows you to change the dates for all your course items on one page.  On this page you will see a list
+of your course items, with inputs for start date, end date, and review date (for assessments).  You can filter the list to only
+show one item type using the Filter selection at the top of the page, and you can change the sort order to sort by start date, end
+date, or name.</p>
+
+<p>If you change dates on any line and click the "Send down list" button on that line, the date change will be made to all items below
+that item in the list.  For example, if you add one day to an item and click "Send down list", one day will be added to all items
+lower in the list.  By default the system only allows Monday-Friday dates; you can switch to a 7-day week by unchecking the "Shift
+by weekdays only" checkbox</p>
+</div>
+<div class=h2>
+<h2><a name="masschgassessments">Change Assessments</a></h2>
+<p>The Change Assessments page allows you to change assessment settings for many assessments at the same time.  Begin by selecting
+all the assessments you want to change settings for using the checkboxes next to each assessment's name</p>
+
+<p>Select which options you want to change by clicking the checkbox in the "Change?" column, then adjust the setting in the "Option"
+column.  When you are done, click "Submit"</p>
+
+</div>
+<div class=h2>
+<h2><a name="importexportitems">Import/Export Course Items</a></h2>
+<p>Course Item import/export allows you to share a course setup with other instructors, or copy
+a class for yourself.  Note that item structure and questions are exported, but not students, assessment
+attempts, or forum threads.</p>
+
+<p>On Export, you provide a export description, and select the items you wish to export.
+If you export an item currently contained in a block and do not export the block, the item
+will be exported as an item on the main course page.</p>
+
+<p>On Import, first provide the import file.  If there are assessment questions that do not
+already exist on your system, they will be added to the system.  Select the library into which
+these questions should be imported.  If a question already exists, you can select whether to update
+the existing question with the import question (if it is newer), or create a new copy of the question in
+the designated library.  Select the items to import, and click "Import Items".</p>
+
+</div>
+<div class=h2>
+<h2><a name="mashups">Mashups: Google Gadget</a></h2>
+<p>IMathAS has experimental support for two mashups: BasicLTI as a producer, and Google Gadgets</p>
+
+<p>There is a Google Gadget which users can add to their iGoogle account available through
+a link on the Change User Info page, accessible from the users' home page.  The gadget
+will tell the user how many new messages and forum posts they have.</p>
+
+<p>There is also a link from the Google Gadget page to a webpage that will report new
+messages and posts without requiring you to log in.  This page is convenient on a mobile device.</p>
+</div>
+<div class=h2><h2><a name="lti">BasicLTI</a></h2>
+
+<p>IMathAS can be used as a BasicLTI producer using two instructor-initiated placement methods: course level, or
+assessment level.  A course level placement will provide access to an entire IMathAS course;  an assessment
+level placement will allow you to provide access to a single assessment via LTI.  You can set the LTI
+access secret through the Course Settings and Assessment Settings pages.  The URL and key to use are also provided on those
+pages.  Follow the instructions in your LTI consumer to make the placement using the URL, key and secret.</p>
+
+<p>Your LTI keys will take the form cid_###_# or aid_###_#.  The last number determines how authentication is handled.
+If that last digit is 0, then when the student accesses the LTI placement, the first time they will be asked to sign into their
+IMathAS account or create one, and that account will be linked with the account at the host LMS.  From then on, when the same 
+student accesses any LTI placement, they will not need to sign in again.  They will be able to sign in directly to IMathAS as well.</p>
+
+<p>If the last digit of your LTI key is 1, then a student account will automatically be created the first time a student 
+accesses the LTI placement, and that account will be linked with the host LMS account.  The student will not be provided an IMathAS
+username or password, so they will only be able to access IMathAS resources through the LMS LTI placements.</p>
+
+<p>IMathAS can also be an LTI consumer.  In any text item, enter [LTI: url=theurl, key=thekey, secret=thesecret] to place a tool</p>
+</div>
+</div>
+<div class=h1>
+<h1><a name="writingquestions">Writing Questions</a></h1>
+
+The IMathAS question format is based on PHP.
+
+<div class=h2>
+<h2><a name="questionparts">Question Parts</a></h2>
+
+A question is formed in several parts:
+<ul>
+<li><b>Description</b>:  A description of the question.  This is not shown to students</li>
+<li><b>Use Rights</b>:  The rights you wish to grant other people (you always have full rights).  Options are:</li>
+	<ul>
+	<li><b>Private</b>:  Only you can use the question</li>
+	<li><b>Use, no modification</b>:  Anyone can use the problem, but only you can modify the problem.  Anyone can add 
+	    library assignments, but cannot remove assignments.</li>
+	<li><b>Use, allow modification</b>:  Anyone can use or modify the problem.</li>
+	</ul>
+<li><b>Libraries</b>:  The question libraries you wish to include this question in</li>
+<li><b>Question type</b>:  The type of question.</li>
+<li><b>Common control</b>:  General definitions needed for both display and scoring</li>
+<li><b>Question control</b>:  Definitions only needed for question display</li>
+<li><b>Question text</b>:  The actual question display.  This section should be HTML based, but
+    can include variables defined in the common or question control.  For convenience, a blank line
+    is automatically interpreted to be a paragraph break.  Use of &lt; and &gt; signs are usually 
+    handled ok, but use of the HTML &amp;lt; and &amp;gt; are recommended in their place.</li>
+<li><b>Answer</b>:  Code defining the answer</li>
+</ul>
+
+<p>Note:  All control code can be placed in the "Common Control" box; the Question Control and Answer sections do not have to be used.</p>
+
+</div>
+<div class=h2>
+<h2><a name="basiccontrolsyntax">Basic Control Syntax</a></h2>
+<p>
+Lines of the common control, question control, and answer sections usually take the form of variable
+definition.  In IMathAS, variables are identified with a dollarsign ($) prefix.  For example,
+$a is the variable a.  Most lines will take one of these forms:
+<ul>
+<li>$var = number.  Example:  $a = 3</li>
+<li>$var = calculation.  Example:  $a = 3*$b*$c</li>
+<li>$var = function.  Example:  $a = showplot(&quot;sin(x)&quot;)</li>
+<li>$var = randomizer.  Example:  $a = rand(-5,5)</li>
+</ul>
+In some cases you want to define several variables at once.  There are two ways to
+do this:
+<ul>
+<li>$var1,$var2 = arrayfunction.  Example: $a,$b = diffrands(-5,5,2)</li>
+<li>$ar = arrayfunction.  Example: $ar = diffrands(-5,5,2)</li>
+</ul>
+In the first example, variables $a and $b each take on a value.  In the second example,
+the variable $ar is an array; the elements can be accessed as $ar[0] and $ar[1] (note
+that arrays are zero-indexed).  If you use this approach, enclose the variable reference in
+parenthesis in calculations, like $new = ($ar[0])^2, and in curly brackets inside strings, 
+like $string = "there were {$ar[0]} people".
+</p><p>
+You can also literally define an array using the &quot;array&quot; function.  
+Examples:  $ar = array(2,3,4,5), or $ar = array(&quot;red&quot;,&quot;green&quot;,&quot;blue&quot;)
+</p><p>
+Note that numbers are not in quotes, and strings are in quotes.  When you use
+the double-quote mark (&quot;) to define a string, you can interpolate variables into
+the string.  Example:
+<pre>
+$a = 3
+$b = 5
+$str = &quot;What is $a/$b&quot;
+</pre>
+In this example, $str now contains &quot;What is 3/5&quot;.
+</p>
+<p>If needed, you can concatenate (combine) two strings using the . operator.  Example:
+<pre>
+$a = &quot;string one &quot;
+$b = &quot;string two&quot;
+$both = $a . $b
+</pre>
+Here, $both now contains the string &quot;string one string two&quot;
+</p>
+<p>
+If you have a long command to type, you can put a &quot;&amp;&quot; at the end of a line to specify it continues on the next line.  Example:
+<pre>
+$questions = array("this is choice 1",&amp;
+"this is choice 2")
+</pre>
+If defining a string for display, you can put a &quot;&amp;&amp;&quot; at the end of a line to specify it continues on the next line and insert
+an HTML line break.  Example:
+<pre>
+$showanswer = "Do this first. &amp;&amp;
+Then do this."
+</pre>
+will be interpreted as:
+<pre>
+$showanswer = "Do this first. &lt;br/&gt;Then do this."
+</pre>
+</p>
+<div class=h4>
+<h4><a name="conditionals">Conditionals</a></h4>
+
+Any assignment line can be followed by one of two conditional:  &quot;where&quot; or &quot;if&quot;.  
+<p>
+&quot;where&quot; is used to repeat the previous assignment if the condition provided is not met.  The
+&quot;where&quot; condition is almost exclusively used with array randomizers.  Example: to select two
+different numbers that are not opposites:
+<pre>$a,$b = diffrands(-5,5,2) where ($a+$b!=0)</pre>
+<p>
+&quot;if&quot; is used to make an assignment conditional.  For example:
+<pre>
+$a = rand(0,1)
+$b = &quot;sin(x)&quot; if ($a==0)
+$b = &quot;cos(x)&quot; if ($a==1)
+</pre>
+</p>
+<p>
+Note the use of double equal signs (==) for testing equality.  A single equal sign (=) will
+make an assignment (change the value of $a in this example) and return &quot;true&quot;, which is probably not what you intended to do.  
+</p>
+<p>
+Comparison operators available for &quot;if&quot; and &quot;where&quot; statements:
+<ul>
+<li>==  Equal to</li>
+<li>!=  Not equal to</li>
+<li>&gt; Greater than</li>
+<li>&lt; Less than</li>
+<li>&gt;= Greater than or equal to</li>
+<li>&lt;= Less than or equal to</li>
+</ul>
+To do compound conditionals, use || for &quot;or&quot;, and &amp;&amp; for &quot;and&quot;.  For example:
+<pre>
+$a = nonzerorand(-9,9) where ($a!=1 &amp;&amp; $a!=-1)
+</pre>
+</p>
+<p>
+The &quot;if&quot; condition can also be used before or after a code block like this:
+<pre>
+$a = rand(0,1)
+if ($a==0) {
+   $b = 1
+   $c = 2
+}
+</pre>
+or 
+<pre>
+$a = rand(0,1)
+{
+   $b = 1
+   $c = 2
+} if ($a==0)
+</pre>
+When &quot;if&quot; is used before a block of code, it can optionally be followed
+with &quot;elseif&quot; and/or an &quot;else&quot; statement, like this:
+<pre>
+$a = rand(0,5)
+if ($a==0) {
+   $b = 1
+} elseif ($a==2) {
+   $b = 3
+} else {
+   $b = 2
+}
+</pre>
+</p>
+<p>
+&quot;where&quot; can also be applied to a block of code:
+<pre>
+{ 
+  $a = rand(-5,-1)
+  $b = rand(1,5)
+} where ($a+$b !==0)
+</pre>
+</p>
+</div>
+<div class=h4>
+<h4><a name="loops">Loops</a></h4>
+<p>There are several looping macros (such as calconarray) that can meet most needs.  For more general use
+there is a "for" loop:</p>
+
+<pre>for ($i=a..b) { action }</pre>
+<p>
+Here <i>a</i> and <i>b</i> represent whole numbers or variables.  Expressions are not allowed. 
+</p>
+<p>Examples:
+<pre>
+$f = 0
+for ($i=1..5) { $f = $f + $i }
+
+$a = rands(1,5,5)
+$b = rands(1,5,5)
+for ($i=0..4) {
+  $c[$i] = $a[$i]*$b[$i] 
+}
+</pre></p>
+
+<p>Conditions can be used <i>inside</i> a for loop, but not outside without explicit blocking
+<pre>for ($i=1..5) {$a = $a+$i if ($i>2) }     WORKS
+for ($i=1..5) {$a = $a+$i} if ($a>2)     DOES NOT WORK
+{for ($i=1..5) {$a = $a+$i} } if ($a>2)    WORKS
+</pre>
+</p>
+</div>
+</div>
+<div class=h2>
+<h2><a name="randomizers">Randomizers</a></h2>
+<p>Note on macros:  The descriptions below explain macros available and the arguments the
+functions should be called with.  Arguments in [square brackets] are optional arguments, and
+can be omitted.</p>
+
+Single result randomizers:
+<ul>
+<li><b>rand(min,max)</b>:  Returns an integer between min and max</li>
+<li><b>rrand(min,max,p)</b>:  Returns an number between min and max in steps of p.  Example: rrand(2,5,.1) might return 3.4. 
+       rrand(2,5,.01) might return 3.27.  rrand(2,8,2) might return 6</li>
+<li><b>nonzerorand(min,max)</b>:  Returns a nonzero integer between min and max</li>
+<li><b>nonzerorrand(min,max,p)</b>:  Returns a nonzero real number between min and max in steps of p</li>
+<li><b>randfrom(list or array)</b>: Return an element of the list/array.  Examples of lists: &quot;2,4,6,8&quot;, or &quot;red,green,blue&quot;</li>
+<li><b>randname(),randmalename(),randfemalename()</b>:  Returns a random first name</li>
+</ul>
+
+Array randomizers (return multiple results):
+<ul>
+<li><b>rands(min,max,n)</b>:  Returns n integers between min and max</li>
+<li><b>rrands(min,max,p,n)</b>:  Returns n real numbers between min and max in steps of p</li>
+<li><b>nonzerorands(min,max,n)</b>:  Returns n nonzero integers between min and max</li>
+<li><b>nonzerorrands(min,max,p,n)</b>:  Returns n nonzero real numbers between min and max in steps of p</li>
+<li><b>randsfrom(list/array,n)</b>: Return n elements of the list/array.</li>
+<li><b>jointrandfrom(list/array,list/array)</b>:  Returns one element from each list, where the location used in each list is the same</li>
+<li><b>diffrands(min,max,n)</b>:  Returns n different integers between min and max</li>
+<li><b>diffrrands(min,max,p,n)</b>:  Returns n different real numbers between min and max in steps of p</li>
+<li><b>diffrandsfrom(list/array,n)</b>: Return n different elements of the list/array.</li>
+<li><b>nonzerodiffrands(min,max,n)</b>:  Returns n different nonzero integers between min and max</li>
+<li><b>nonzerodiffrrands(min,max,p,n)</b>:  Returns n different nonzero real numbers between min and max in steps of p</li>
+<li><b>jointshuffle(list/array1,list/array2,[n1,n2])</b>:  Shuffles two lists/arrays in a way that retains
+    respective order.  In n1 is provided, n1 elements from each shuffled array will be returned (like
+    a joint version of diffrandsfrom).  If n2 is also provided, n1 elements of list/array1 and n2 
+    elements of list/array2 will be returned.</li>
+<li><b>singleshuffle(list/array,[n])</b>:  returns a shuffled version of a list/array.  If n is provided, 
+    it behaves identically to diffrandsfrom</li>
+<li><b>randnames(n),randmalenames(n),randfemalenames(n)</b>:  Returns n random first names</li>
+<li><b>randcity(),randcities(n)</b>:  Returns one or n random city names</li>
+<li><b>randstate(),randstates(n)</b>:  Returns one or n random US state names</li>
+</ul>
+
+</div>
+<div class=h2>
+<h2><a name="graphtablemacros">Graph/Table Macros</a></h2>
+The following macros create graphs or tables:
+<ul>
+<li><b>showarrays(string,array,[string,array]...,[format])</b>:  Creates a tabular display of the data in the array(s) as column(s), with the strings
+    as column headers.  format = "c", "r", or "l" to center, left-align, or right align data. Alternatively you can call this function with arguments
+    showarrays(array of column headers, array of data arrays, [format]).</li>
+<li><b>showdataarray(array,[columns])</b>:  Creates a tabular display of the data in the array with no headers.  Data is presented
+    in one column unless second argument is provided, in which case the data will be distributed over the specified number of columns.</li>
+<li><b>horizshowarrays(string,array,[string,array]...)</b>:  Creates a tabular display of the data in the array(s) as row(s), with the strings
+    as row labels.  Does not text wrap, so only use for small data sets.</li> 
+<li><b>showrecttable(data array of arrays,columnlabels,rowlabels,[format])</b>:  Creates a tabular display of a 2x2 data table, where $data[0] is the first row of the table.  
+    The rowlabels and columnlabels are arrays of labels. format = "c", "r", or "l" to center, left-align, or right align data.</li>
+<li><b>showplot(funcstrings,[xmin,xmax,ymin,ymax,labels,grid,width,height])</b></li>
+	<ul>
+	<li><b>funcstrings</b> is a single string or an array of strings each having at least the first of the following list:<BR>
+	"function,color,min,max,startmarker,endmarker,width,dash"</li>
+		<ul>
+		<li><b>Function</b>: a single function of x, like cos(x), or a parametric function of t, entered like [sin(t),cos(t)], or x=c for a vertical line, entered like x=1</li>
+		<li><b>color</b>: a color designator: black,red,orange,yellow,green,blue,purple</li>
+		<li><b>min,max</b>: the min and max values for the input variable for which you wish to see this graph.  You can also exclude
+		    point discontinuities; for example -5,5!0!2 for min,max would include all values from -5 to 5, excluding 0 and 2.</li>
+		<li><b>startmarker,endmarker</b>: can be "open" or "closed" (dots), or anything else for none</li>
+		<li><b>width</b>: a pixel width for the line</li>
+		<li><b>dash</b>: enter "dash" if you want a dashed line, otherwise the line is solid</li>
+		<li><b>Examples</b>: "cos(x),red" or "x^2,,-2,2,open,closed" or "[t^2,t/3],blue,0,5,,,2,dash" or "1/x,black,-5,5!0" or "x=1,red,,,,,,dash"</li>
+		</ul>
+	<li><b>xmin,xmax,ymin,ymax</b>: Graphing window.  Defaults to -5 to 5 for both</li>
+	<li><b>labels</b>: spacing of axes labels.  Defaults to 1. Set to "off" or 0 for none.  Use "xlbl:ylbl" for different spacing on each axis.</li>
+	<li><b>grid</b>: spacing of grid lines.  Defaults to 1.  Set to "off" or 0 for none.  Use "xgrid:ygrid" for different spacing on each axis.</li>
+	<li><b>width,height</b>:  The width and height (in pixels) of the graph.  Defaults to 200x200</li>
+	</ul>
+<li><b>addfractionaxislabels(plot,step)</b>:  Adds labels along the horizontal axis in steps of step to a plot created with showplot. 
+      Step is a fraction like "1/4", or a pi multiple, like "pi/4" or "2pi".  When using this, make sure to set the showplot x-axis label
+      spacing larger than the domain to prevent the default labels from showing.</li>
+<li><b>addlabel(plot,x,y,label,[color,loc,angle])</b>: Adds a label to a plot created with showplot. 
+	<ul>
+	<li><b>plot</b>: The plot created with showplot</li>
+	<li><b>x,y</b>: The coordinates for the label</li>
+	<li><b>label</b>:  The string label itself.  MathML cannot currently be displayed in labels</li>
+	<li><b>color</b>: Label color.  Defaults to black.</li>
+	<li><b>loc</b>:  By default, the label is centered at the x,y coordinates.  Use "left" to display the string to the left of the
+	point, "right" to the right, "below" for below the point, "above" for above the point.</li>
+	<li><b>angle</b>: Angle to rotate text.</li>
+	</ul>
+	</li>
+<li><b>addlabelabs(plot,x,y,label,[color,loc,angle])</b>: Adds a label to a plot created with showplot. Parameters are the same as with
+     addlabel, except x and y here are pixel values on the picture rather than values relative to the axes.</li>
+<li><b>addplotborder(plot,left,[bottom,right,top])</b>:  Changes the pixel width of border (default 5) around a plot.  Labels
+    will show within the border.  Typically used to add room for labels to show.</li>
+<li><b>adddrawcommand(plot,commands)</b>:  Inserts arbitrary asciisvg drawing commands into an existing
+    plot created with showplot or other drawing tools.</li>
+<li><b>showasciisvg(string,[width,height])</b>:  If you know the ASCIIsvg language, this will set up an svg with "string" as the script.
+    optionally you can specify the width and height (in pixels) for the svg.</li>
+<li><b>textonimage(img,text,left,top[text,left,top...])</b>:  Overlays text over an image.  Image can be a URL or the variable for an uploaded
+    image.  Specify the text string, and offset in pixels from the top left corner.  Can specify multiple strings to overlay.</li>
+<li><b>arraystodoteqns(xarray,yarray,[color])</b>:  Converts an array of x-values and y-values into a form that can be used in
+  showplot.</li>
+<li><b>connectthedots(xarray,yarray,[color,thickness,startmarker,endmarker])</b>: Converts an array of x-values and y-values into a form that
+  can be used in showplot to create a series of lines connecting the (x,y) pairs</li>
+<li><b>arraystodots(xarray,yarray)</b>: Converts an array of x-values and y-values into a form that can be used in the Drawing answer type</li>
+<li><b>gettwopointlinedata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing
+  question and pulls out the two-point line data.  Returns an array of lines, each of form array(x1,y1,x2,y2) giving the coordinates
+  of the two points used.</li>
+  <li><b>gettwopointdata(stuans, type, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing question 
+  and pulls out the two-point data for the given curve type.  Type should be one of 'line', 'parab', 'sqrt', 
+  'sin', 'cos', 'abs', 'vector', 'circle'.  Returns an array of curve data, each of form array(x1,y1,x2,y2) giving the coordinates of 
+  the two points used.  They are returned in the order clicked.  For example, with 'parab' type, the first point is the vertex and the 
+  second point is an arbitrary point.</li>
+<li><b>getdotsdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing
+  question and pulls out the closed dots data.  Returns an array of dots, each of form array(x1,y1) giving the coordinates
+  of the dot.</li>
+<li><b>getlinesdata(stuans, [xmin, xmax, ymin, ymax, drawing width, drawing height])</b>:  Takes a $stuanswers from a drawing
+  question and pulls out the lines data, which includes polygons.  Returns an array, with an element for each line/curve draw.  Each of those
+  elements will be an array of points on that line/curve.  Each of those points is array (x,y).</li>
+<li><b>getsnapwidthheight(xmin, xmax, ymin, ymax, drawing width, drawing height, snaptogrid)</b>:  Takes drawing grid info and a snaptogrid 
+  value or string, and returns an array(width,height) giving a closeby drawing width and height that will guarantee that the snaptogrid values
+  fall on exact drawing pixel locations.</li>
+</ul>
+</div>
+<div class=h2>
+<h2><a name="formatmacros">Format Macros</a></h2>
+
+The following macros help with formatting values for display:
+<ul>
+<li><b>makepretty(string or array of strings)</b>: Changes double add/subtract signs to a single sign.</li>
+<li><b>makeprettydisp(string or array of strings)</b>:  Does makepretty (see above) and backquotes the string for math display</li>
+<li><b>polymakepretty and polymakeprettydisp</b>:  Like makepretty, but for polynomials.  Cleans up 0*, 1*, ^1, and ^0 to make the polynomial look nicer.  
+   This function can do weird things for equations that are not simple polynomials, so test well</li>
+<li><b>makexpretty and makexprettydisp</b>:  (deprecated - use makexxpretty instead) Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, etc.  This function
+   will often cause weird things to happen, so test well</li>
+<li><b>makexxpretty and makexxprettydisp</b>:  Like makepretty, but the X-tra version - attempts to clean up things like 1*, 0*, x^1, x^0, etc.  Can occasionally cause strange output, so 
+   be sure to test.  Handles things better than the older makexpretty, but does not always produce 100% identical output.</li>
+<li><b>numtowords(number,[addth])</b>:  Creates a string containing number written out in words.  Add true as second parameter
+    to change five to fifth.</li>
+<li><b>numtoroman(number,[uppercase])</b>:  Converts a number 0.5-3999.5 to a roman numeral string.  Defaults to uppercase; set second parameter to false to
+    produce lowercase</li>
+<li><b>prettyint(number)</b>:  Adds commas in thousands spaces of integers.  Example: prettyint(1234) will return "1,234".  The result is a string, which
+   can only be used for display, not in calculations</li>
+<li><b>prettyreal(number,decimals,[comma])</b>:  Adds commas in thousands spaces of number, and rounds decimal to decimals places.  Example: prettyreal(1234.567,2) will return "1,234.57".  The result is a string, which
+   can only be used for display, not in calculations.  By default adds a comma as a thousands separator; set comma to "" to override.</li> 
+<li><b>prettysigfig(number,sigfigs,[comma,choptrailingzeros])</b>:  Rounds number to sigfigs significant figures.  By default it adds commas in thousands spaces; set comma to "" override.
+   Set choptrailingzeros to true to chop trailing zeros from the decimal part, even if significant.</li> 
+<li><b>makescinot(number,[decimals,format])</b>:  Converts number to scientific notation.  If provided, rounds mantissa to decimals places.  Can specify format: "*" "E" as alternative to default cross.</li>
+<li><b>prettytime(value,informat,outformat)</b>:  Creates a nice representation of a time.  Informat can be 'h', 'm', or 's' designating whether
+    value is hours, minutes, or seconds.  Outformat can be any combination of these to specify output.  For example, 'hm' will return "__ hours and __ minutes".  Outformat
+    can also be 'clock' which returns 3:42pm, or 'sclock' which returns 3:42:15pm</li>
+<li><b>dispreducedfraction(numerator,denominator,[doubleslash,variable in numerator])</b>:  Takes two numbers as numerator and denominator of a fraction, returning a display form of the fraction,
+    reduced to lowest terms.  Suitable for $showanswer.  Set doubleslash to true to produced "3//4" rather than "3/4".  Set variable in numerator to put a variable
+    in the numerator, such as pi.</li>
+<li><b>makereducedfraction(numerator,denominator,[doubleslash,variable in numerator])</b>:  Same as dispreducefraction, but not already in display form</li>
+<li><b>decimaltofraction(decimal,[format,maxden])</b>:  Converts a decimal to a fraction.  Can use format="mixednumber" to get a mixed number rather than improper fraction.  
+    Only works for denominators up to maxden (default 5000)</li>
+<li><b>htmldisp(string,[variables])</b>:  Uses HTML instead of the math typesetter to display simple exponents and subscripts, and to italicize variables</li>
+</ul>
+
+</div>
+
+<div class=h2>
+<h2><a name="stringmacros">String Macros</a></h2>
+These macros help with working with strings:
+<ul>
+<li><b>stringappend(value,string)</b>: Appends string to value.  If value is an array, string is appended to each element of the array</li>
+<li><b>stringprepend(value,string)</b>:  Same as stringappend, but prepends string to value</li>
+<li><b>today([string])</b>: Returns today's date, like "July 3, 2008".  Can change format using string (see http://us2.php.net/manual/en/function.date.php for formats)</li>
+<li><b>stringpos(needle,haystack)</b>: Finds the position of the string needle in the string haystack.  Returns -1 if needle is not found</li>
+<li><b>stringlen(string)</b>: returns the character count in the provided string</li>
+<li><b>stringclean(string,mode)</b>: mode 0: trims leading and trailing whitespace.  mode 1: removes all whitespace.  mode 2: removes all non-alphanumeric charactesr.</li>
+<li><b>substr(string,start,[length])</b>: grabs the part of the string from the start index with given length.  If length is not specified, it cuts from the start index to the end of the string.</li>
+<li><b>strtoupper(string)</b>: make all characters in the string upper case</li>
+<li><b>ucfirst(string)</b>: makes the first character in the string upper case</li>
+<li><b>strtolower(string)</b>: make all characters in the string lower case</li>
+<li><b>substr_count(haystack,needle)</b>: Find the number of occurances of needle in the string haystack</li>
+<li><b>str_replace(search,replace,string)</b>:  Replace all occurances of search in the string with replace.  Search and replace can be arrays.</li>
+</ul>
+
+</div>
+
+<div class=h2>
+<h2><a name="arraymacros">Array Macros</a></h2>
+These macros are for working with arrays:
+<ul>
+<li><b>listtoarray(list)</b>:  Converts a list, like "1,2,3,4" or "cat,dog,rabbit" to an array</li>
+<li><b>explode(symbol, string)</b>:  Converts a string to an array, breaking it apart on the given symbol.</li>
+<li><b>arraytolist(array)</b>:  Converts an array to a list</li>
+<li><b>calclisttoarray(list)</b>:  Converts a list of calculations, like "2^2,3^5,7/2" to an array, evaluating the calculations 
+    along the way.</li>
+<li><b>stringtoarray(string)</b>: Converts a text string to an array of characters</li>
+<li><b>fillarray(value,num,[start])</b>:  Creates an array with num entries, all of which are the same given value.  Array indexing
+    starts at 0 unless specified</li>
+<li><b>sortarray(list/array,[dir])</b>:  Sorts an array from lowest to highest value.  To sort in reverse order, give the option
+    second parameter as "rev"</li>
+<li><b>jointsort(array,array,[array,...])</b>:  Jointly reorders two or more arrays based on a lowest-to-highest sort of values in the first array</li>
+<li><b>consecutive(min,max,[step])</b>:  Creates an array of consecutive numbers, starting at min and ending at max, in increments of
+    step.  Step is optional; it defaults to 1.</li>
+<li><b>calconarray(array,calculation)</b>:  Returns an array, performing the given calculation on each element of the given array.  Use
+    "x" as the variable to represent each element of the array.  Example: $b = calconarray($a,"x^2") will create an array that is the
+    square each element of the array $a.</li>
+<li><b>multicalconarray(calculation,varslist,var1array,var2array,etc.)</b>  Returns an array, performing the given calculation on each set
+    of elements from the given arrays.  Allows multivariable calculations.  Example:  $z= multicalconarray("x*y^2","x,y",$xs,$ys)</li>
+<li><b>calconarrayif(array,calculation,ifcondition)</b>:  Like calconarray, but allows you to specify a condition for each element for whether to
+    do the calculation.  Example:  $b = calconarray($a,"x+.1","floor(x)==x") will add .1 to add whole numbers in the array, and leave the 
+    other elements unchanged.</li>
+<li><b>subarray(array,params)</b>:  Creates a new array as a subset of the specified array.  The params can take several forms:
+	<ul>
+	<li>subarray($a,2,4,6):  creates an array from $a[2], $a[4], and $a[6]</li>
+	<li>subarray($a,"1:3","6:8"):  create an array from $a[1] through $a[3], and $a[6] through $a[8]</li>
+	<li>subarray($a,$b):  creates an array from entries in $a with indexes specified in $b.  So if $b = array(2,4,6), this
+	    would return $a[2], $a[4], and $a[6]</li>
+	 </ul>
+	 </li>
+<li><b>joinarray(array,symbol)</b>:  Convert an array to a string, joining elements with the given symbol</li>
+<li><b>mergearrays(array,array)</b>:  Combines two arrays into one long array</li>
+<li><b>unionarrays(array,array)</b>:  Unions two arrays, preventing duplicates, into a new array</li>
+<li><b>intersectarrays(array,array)</b>:  Finds the intersection of two arrays</li>
+<li><b>diffarrays(array1,array2)</b>: Returns all elements in array1 that are not also in array2</li>
+<li><b>array_unique(array)</b>: Returns the array, stripping duplicate values</li>
+<li><b>count(array)</b>:  Counts the number of entries in the array</li>
+<li><b>sumarray(array)</b>: Adds the entries in an array</li>
+<li><b>in_array(needle,haystack)</b>:  Checks if value needle is in array haystack.  Returns true or false</li>
+<li><b>arrayfindindex(needle,haystack)</b>: Returns the index in the array haystack of the value needle.  If there are multiple matches, it only returns the first.</li>
+<li><b>arrayfindindices(needle,haystack)</b>: Returns an array of indices in the array haystack of the value needle.</li>
+<li><b>array_flip(array)</b>:  Reverses a one-to-one array, so indexes become values and values become indexes</li>
+
+</ul>
+</div>
+<div class=h2>
+<h2><a name="generalmacros">General Macros</a></h2>
+These macros are fairly general purpose:
+<ul>
+<li><b>ifthen(condition,trueval,falseval)</b>:  Takes a comparision condition, and returns the trueval if the condition is true and the falseval otherwise.</li>
+<li><b>formhoverover(label,tip)</b>:  Creates a hover-over definition or other tip</li>
+<li><b>formpopup(label,content,[width,height,style,scrollbars])</b>:  Creates a link or button leading to a popup window.  Content can
+  be a web address, or HTML content to put directly into the popup.  Style can be "link" or "button". Scrollbars defaults to false - set true for scrollbars.</li>
+<li><b>forminlinebutton(lable,content,[style,outputstyle])</b>:  Creates a link or button that when clicked will reveal hidden content.  
+  Content can be any valid HTML.  Style can be "link" or "button".  Outputstyle can be "inline" or "block".  Block will allow any HTML, but will
+  be displayed on a new line.  Use "inline" to have text stay on the same line.</li>
+<li><b>makenumberrequiretimes(array/list)</b>:  Takes an array or list of numbers and generates a string suitable for use as a $requiretimes.  Writes
+  the string so that every number in the array must show up in the student answer.  Automatically detects and adjusts for number overlaps
+  (like 2 appearing in 32).</li>
+<li><b>ABarray(start, num)</b>: Produces an array of strings of the form [AB#] which will get replaced with answerboxes if placed in the question text. 
+  start is the first value used, and num indicates the number of entries to create.
+  ABarray(5,2) will output array("[AB5]","[AB6]").  
+  This macro is often used in conjunction with the showarrays macro.</li>
+</ul>
+</div>
+<div class=h2>
+<h2><a name="mathmacros">Math Macros</a></h2>
+These macros are used for mathematical calculations:
+<ul>
+<li><b>sin(t), cos(t), tan(t), sec(t), csc(t), cot(t)</b>: The usual trig functions</li>
+<li><b>arcsin(v), arccos(v), arctan(v)</b>: The inverse trig functions</li>
+<li><b>abs(v)</b>: Absolute value</li>
+<li><b>gcd(a,b)</b>: Greatest common divisor of a and b</li>
+<li><b>lcm(a,b)</b>: Least common multiple of a and b</li>
+<li><b>sign(a,[option])</b>:  Returns the sign of a, as 1 or -1.  If option is set to true, returns a string "+" or "-" instead. If option
+  is set to "onlyneg", it returns the string "-" if a is negative, or "" otherwise.</li>
+<li><b>v!</b>: Factorial, like $a = $b!</li>
+<li><b>evalfunc(func,vars,val1,val2,..)</b>: Evaluates a function given the variables and values for each variable.
+  for example evalfunc("x^2*y","x,y",2,3) will evaluate x^2*y with x=2, y=3</li>
+<li>See also: calconarray and multicalconarray in the <a href="#arraymacros">Array Macros</a> section</li>
+</ul>
+</div>
+<div class=h2>
+<h2><a name="conditionalmacros">Conditional Test Macros</a></h2>
+These macros are used to test various conditions.  They typically return true or false, depending on whether the desired condition is met.
+<ul>
+<li><b>comparenumbers(a,b,[tol])</b>:  Compares numbers or numerical expressions a and b to see if there are equivalent to the specified
+  tolerance.  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
+<li><b>comparefunctions(a,b,[vars,tol,domain])</b>: Compares functions a and b to see if they are algebraically equivalent.  Set
+  vars to a list of variables (defaults to 'x').  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.
+  Set domain to "xmin,xmax" to specify a domain for comparison.</li>
+<li><b>is_numeric(str)</b>:  Checks if the string represents an integer or decimal number.</li>
+<li><b>scorestring($answer,$showanswer,words,$stuanswers,$thisq,[partn, highlight])</b>: This function checks
+  to see if the words in the list/array "words" appear in the student's answer. If they are, it redefines
+  $answer and $showanswer so the student's answer is marked correct. 
+  For multipart questions, include the part number as an
+  additional parameter.  Usage for single part questions (where $words is predefined earlier in the code):<br/>
+  $answer,$showanswer = scorestring($answer,"",$words,$stuanswers,$thisq)<Br/>
+  Usage for multipart questions (again where $words is predefined). This is example is for part 2: <br/>
+  $answer,$showanswer = scorestring($answer,$showanswer,$words,$stuanswers,$thisq,2)
+  </ul>
+</div>
+<div class=h2>
+<h2><a name="feedbackmacros">Feedback Macros</a></h2>
+These macros are used to select and format feedback messages to students.  They return a string which can be placed in the question text.
+<ul>
+<li><b>getfeedbacktxt(stuans, feedbacktxt, ans)</b>:  Gives feedback on multiple choice questions.  <br/>
+  stuans should be the student answer, obtained from
+   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart. <br/>
+   feedbacktxt is an array of feedback responses, corresponding     in array order to the $questions, so feedbacktxt[1] is the feedback 
+   if the student selections $questions[1] as their answer.  <br/>
+   ans is the correct    answer; you can usually pass $answer if it's been defined already.</li>
+<li><b>getfeedbacktxtessay(stuans, feedbacktxt)</b>:  Gives feedback on essay questions.  stuans should be the student answer, obtained from
+   $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  It is not actually evaluated or compared - it is only 
+   needed to see if the student has entered a response or not.  Once the student has entered any response, feedbacktxt will be returned.</li>  
+<li><b>getfeedbacktxtnumber(stuans, partialcredit, feedbacktxt, defaultfeedback, [tol])</b>:  Gives feedback on number questions.  <br/>
+  stuans should be the student answer, obtained from $stuanswers[$thisq] for single part questions, or using the getstuans macro for multipart.  For Calculated
+  type questions, be sure to use $stuanswersval.  <br/>
+  partialcredit is an array or list of form array(number, score, number, score, ... ) where the scores are in the range [0,1].  <br/>
+  feedbacktxt is an array of feedback messages, corresponding in array order to the order of the numbers in the partialcredit list.<br/>
+  defaultfeedback is the default incorrect response feedback <br/>
+  Set tol to specify the relative tolerance (defaults to .001), or prefix with | for an absolute tolerance.</li>
+
+</ul>
+</div>
+<div class=h2>
+<h2><a name="usingothermacros">Using Other Macros</a></h2>
+<p>If an IMathAS administrator has installed other Macro Libraries, you can load a macro library by entering the line 
+<pre>loadlibrary("list of library names")</pre> at the beginning of the Common Control section.</p>
+<p>Examples:  <pre>loadlibrary("stats")</pre> or  <pre>loadlibrary("stats,misc")</pre>
+
+<p>Click on the "Macro Library Help" link in the question editor to get a list of installed macro libraries and the macros
+available in each library</p>
+
+</div>
+<div class=h2>
+<h2><a name="mathentry">Math Entry</a></h2>
+IMathAS uses ASCIIMath for math entry.  For calculations, a limited subset is available:
+<table>
+<thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>* / + -</td><td>Multiply, divide, add, subtract</td></tr>
+<tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
+<tr><td>e, pi</td><td>The standard constants</td></tr>
+<tr><td>%</td><td>Modulus (remainder after division.  5%2 = 1)</td></tr>
+<tr><td>!</td><td>Factorial</td></tr>
+<tr><td>sqrt</td><td>Square root</td></tr>
+<tr><td>sin,cos,tan,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
+<tr><td>arcsin,arccos,arctan,arcsinh,arccosh</td><td>Inverse trig functions.</td></tr>
+<tr><td>sin^-1, cos^-1, tan^-1</td><td>Alternative entry for inverse trig functions.  Use like sin^-1(0.5)</td></tr>
+<tr><td>ln</td><td>Natural Logarithm base e</td></tr>
+<tr><td>log</td><td>Common Logarithm base 10</td></tr>
+<tr><td>abs</td><td>Absolute Value.  Note that while abs() is used for calculations, you may prefer to use | brackets for display</td></tr>
+<tr><td>round(n,d)</td><td>round number n to d decimal places</td></tr>
+<tr><td>floor,ceil</td><td>floor/ceiling: integer below/above given number</td></tr>
+</tbody>
+</table>
+
+<p>For display only, the full ASCIIMath language is available (which includes support
+for a limited subset of LaTeX). For more info, see the 
+<a href="http://www1.chapman.edu/~jipsen/mathml/asciimathsyntax.html">full ASCIIMath syntax</a>, or look at
+some <a href="http://www1.chapman.edu/~jipsen/mathml/asciimath.html">examples</a>.</p>
+
+</div>
+<div class=h2>
+<h2><a name="writingcommon">Common options to all types</a></h2>
+All question types can support these options:
+<h4>Hints</h4>
+<p>For a single question (not multipart), to use hints, in the common control (or question control) section define the array $hints where:
+<pre>$hints[attempt number] = "hint text"</pre></p>
+
+<p>For example:<pre>
+$hints[0] = "This will show on first display"
+$hints[1] = "This will show on second attempt (after 1 missed attempt)"
+$hints[2] = "This will show on third and subsequent attempts, since no later values have been defined"
+</pre>
+It is fine, or example, to not define $hints[0] if you want nothing to display initially.
+</p>
+<p>
+Then in the question text, place the location of the hint using the variable $hintloc.
+<p>
+
+<p>In multipart questions, you can follow the process above if you just want a single strand of hints for the entire problem.  If you want per-part hints, define the $hints array as:
+<pre>
+$hints[question part number][attempt number] = "hint text"
+</pre>
+Then in question text, place each hint using $hintloc[question part number]
+</p>
+
+<h4>Help references</h4>
+<p>To provide help of some sort for a question (typically, links to videos, book references, etc), define $helptext
+in the common control section.  Any text assigned to this variable will show above the answer box entry tips.  The
+display of this text is controlled by the same "show hints?" option that controls the display of hints described above.</p>
+
+
+<h4>Referencing Student Answers</h4>
+<p>To create multipart questions that are graded on consistency, or to create a set of lab-type problems that rely on student-provided data, you can reference
+students' previous answers in your question code.  You will only be able to reference the student answer to some question types</p>
+<ul>
+<li>$stuanswers[N] will refer to the student's answer on question N (not zero-indexed: N=1 is question 1)</li>
+<li>$stuanswers[N][P] will refer to the student's answer on question N, part P (if multipart)</li>
+<li>$stuanswers[$thisq][P] will refer to the student's answer on the current question, part P</li>
+<li>$stuanswers[$thisq-1] will refer to the student's answer on the previous question</li>
+<li>$stuanswersval[$thisq] or $stuanswersval[$thisq][P] will contain the numerical value of Calculated question types.</li>
+</ul>
+Notes (important!):
+</p>
+<p>
+1) If the student has not answered the question, then $stuanswers[N] == null.  If used in an equation, it will take on the value 0.  To prevent divide-by-zero errors and to prevent students from exploiting this, it is highly recommended that you do something like:
+<pre>
+$a = $stuanswers[$thisq][0]
+$a = rand(1,100) if ($a==null)
+</pre>
+Perhaps also include:
+$warning = "You MUST answer question 1 before this question" if ($a==null), then put $warning in the question text.
+</p>
+<p>
+2) If you use $stuanswers in your $answer, $showanswer will generally not be defined.  If you follow the advice in #1 above, then your 
+$showanswer will reflect the random number assigned to $a.  For this reason, it is highly recommended that you custom define the $showanswer.
+</p>
+<p>
+3) If using the $stuanswers array in a string or in the Question Text, you must enclose it with curly brackets:  
+Your answer was {$stuanswers[0][0]}.  If using it directly in a calculation, enclose it in parentheses just to be safe.
+</p>
+<p>
+4) $stuanswers[$thisq] is defined for question scoring, but may not be for question display.
+</p>
+<p>
+5) You can use the function getstuans($stuanswers,N,P) to retreive a student answer value.  This method bypasses some strange things that happen
+when there is a multipart question with only one part.
+</p>
+
+<h4>Reusing Code</h4>
+<p>You can import in the Common Control code from another question using
+<pre>includecodefrom(questionid)</pre>
+where questionid is the ID number of the question you want to import the code of.  In the
+source question, the variable $included will automatically be set to true when the question
+has been included, so it can be used to determine if the question has been
+imported into another question, or is running independently.
+</p>
+<p>For example, in the master/source question, you might use the code:
+<pre>
+if (!$included) {
+ $type = rand(0,4)
+}
+do stuff here
+</pre>
+In a question using this code, you could limit to a specific type using:
+<pre>
+$type = 0
+includecodefrom(1234)
+</pre>
+</p>
+<p>Question text can be also brought in from another question by using
+<pre>includeqtextfrom(questionid)</pre>
+somewhere in the Question Text portion of the question.
+</p>
+
+
+</div>
+<div class=h2>
+<h2><a name="questiontypes">Question Types</a></h2>
+
+The question types available are:
+
+<div class=h3>
+<h3><a name="number">Number</a></h3>
+
+The student is asked to enter a number (integer, decimal, or scientific notation).
+The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity), and
+-oo (Negative Infinity) as answers.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a number or calculation resulting in a number, like $answer = 5 (In Common Control)</dt>
+	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".  
+	Alternatively, you can provide an interval notation range of 
+	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set.  If $answerformat is set
+	for list answers, then this should provide a list of correct answers, like $answer = "1,2,3".</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Common Control)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$reqsigfigs = a number (In Common Control)</dt>
+	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer.  This will put also a message in the answer tips stating the
+	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
+	round your $answer if needed for the $showanswer.</dd>
+<dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
+	<dd>Specifies that a list of answers is expected.  If $answerformat="list", then duplicate values are ignored.  If $answerformat="exactlist",
+	then duplicate values are not ignored.  If $answerformat="orderedlist", the list must be in the same order and contain identical counts of values.</dd>
+<dt>$partialcredit = array(number,score,[number,score,...]) (In Common Control)</dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(number,score,number,score,...), where
+	number is the value to compare to the student answer, and score is a proportion between 0 and 1 to award as partial credit.  Note this
+	currently only works for single number answers; "or" and list answers are not supported.</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$displayformat = "alignright" (In Common Control)</dt>
+	<dd>Aligns the text in the answer box to the right side</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
+	or a rounded off answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calculated">Calculated</a></h3>
+
+A student is asked to enter a number or a calculation, like 2/3, 5^2, or sin(2).  Can also accept DNE, oo (Infinity), and
+-oo (Negative Infinity) as answers.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a number or calculation resulting in a number (In Common Control)</dt>
+	<dd>Defines the answer.  Define multiple acceptable answers in a string separated by or:  $answer = "3 or 5 or 7".
+	Alternatively, you can provide an interval notation range of 
+	acceptable answers, like $answer = "(2,5]".  Providing a range will override any tolerances set</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "sloppymixednumber", "mixednumberorimproper", "scinot", "fracordec", "nodecimal", "notrig", "allowmixed", "noval", "list", "exactlist", or "orderedlist" (In Common Control)</dt>
+	<dd>Specifies answer format options.  Some can be combined, like this: $answerformat="nodecimal,notrig".
+	<ul>
+	<li>fraction: requires the answer to be a single fraction (like 10/6, 1/3, or 5)</li>
+	<li>reducedfraction: a reduced fraction (like 5/3 or 5)</li>
+	<li>mixednumber: a reduced mixed number (like 2 1/2 or 2_1/2, or 2/3 or 5)</li>
+	<li>mixednumberorimproper: a reduced mixed number or improper fraction (like 2 1/2 or 5/2)</li>
+	<li>sloppymixednumber: a mixed number (will take 5/2, 2 1/2, even 1 3/2)</li>
+	<li>scinot: scientific notation (like 2.3*10^4)</li>
+	<li>fracordec: a single fraction or decimal value</li>
+	<li>nodecimal: an answer without decimals (also disallows 10^-2 and 3E-2).</li>
+	<li>notrig: an answer without trig functions (sin,cos,tan,sec,csc,cot)</li>
+	<li>allowmixed: will accept mixed numbers (like 2 1/2) as well as other expressions</li>
+	<li>noval: tells the answer preview to not compute a decimal equivalent</li>
+	<li>list:  a list of answers is expected - ignores duplicate values (1,1,2 is equivalent to 1,2)</li>
+	<li>exactlist: a list of answers is expected - does not ignore duplicates</li>
+	<li>orderedlist: a list of answers is expected - order is important, and duplicates are not ignored</li>
+	</ul>
+	</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Common Control)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Common Control)</dt>
+	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
+	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
+	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times. <br/> 
+	You can	use "#" in the symbol location to match any number (including decimal values); 3.2^5 would match twice.<br/>
+	You can use a regular expression by putting in the symbol location "regex:expression"</dd>
+<dt>$requiretimeslistpart = a list, in the same format as $requiretimes (In Common Control)</dt>
+	<dd>Similar to $requiretimes, but this check is applied to each element of the answer list when a list $answerformat is used, 
+	where $requiretimes would be applied to the entire list of answers.</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$hidepreview = true (In Common Control)</dt>
+	<dd>Hides the Preview button.  Could be useful in multipart questions, or if you're only asking for a simple
+	response, like a fraction</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to $answer.  Use this to give a detailed answer,
+	or a rounded off answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="multiple-choice">Multiple-Choice</a></h3>
+
+A student is asked to select the correct answer from those given.  The order
+of choices is automatically randomized.
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$questions (or $choices) = an array of choices (In Common Control)</dt>
+	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>
+<dt>$answer = the <i>index</i> into $questions that contains the correct answer (In Common Control)</dt>
+	<dd>Defines the answer.  Remember that arrays are zero-indexed, so if $questions = array("correct","wrong","wrong"),
+	then $answer=0.  Define multiple acceptable answer indices in a string separated by or:  $answer = "0 or 1". </dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$displayformat = "horiz", "select", "2column, "3column", or "inline" (In Common Control)</dt>
+	<dd>Will lay out the choices horizontally, as a select box, in multiple columns, or inline with text rather than using the default vertical layout</dd>
+<dt>$noshuffle = "all" or "last" (In Common Control)</dt>
+	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled).  If $noshuffle = "last", then the $questions
+	array will be randomized, except for the last element.  This is for options like "None of the above"</dd>
+<dt>$partialcredit = array(index,score,[index,score,...]) (In Common Control)</dt>
+	<dd>Allows you to specify partial credit for other answers.  The array should be given in the form array(index,score,index,score,...), where
+	index is the index in $questions, and score is a proportion between 0 and 1 to award as partial credit.  For example, if $answer = 0 
+	and $partialcredit = array(2,.3), then the student would get full credit for selecting the item corresponding with $questions[0], and 30% credit
+	for selecting the item corresponding with $questions[2].  All other answers would receive 0 credit.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="multiple-answer">Multiple-Answer</a></h3>
+
+A student is asked to select all the choices given that are correct.  The order
+of choices is automatically randomized.
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$questions (or $choices)= an array of questions (In Common Control)</dt>
+	<dd>Defines the choices.  If you use $choices, don't define $questions</dd>
+<dt>$answers = a list of the <i>indexes</i> into $questions that contain the correct answer (In Common Control)</dt>
+	<dd>Defines the answers.  Remember that arrays are zero-indexed, if $questions = array("correct","correct","wrong"),
+	then $answers="0,1"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$scoremethod = "answers" or "allornothing" (In Common Control)</dt>
+	<dd>By default, the total points possible are divided by the number of questions, and partial credit is lost for each
+	correct answer missed and each wrong answer selected.  If $scoremethod="answers" is set, then the total points
+	possible are divided by the number of answers (tougher grading scheme).  If $scoremethod="allornothing", then the
+	student will only get credit if every piece is correct (no partial credit).</dd>
+<dt>$displayformat = "horiz", "2column, "3column", or "inline" (In Common Control)</dt>
+	<dd>Will lay out the choices horizontally, in multiple columns, or inline with text rather than using the default vertical layout</dd>
+<dt>$noshuffle = "all" (In Common Control)</dt>
+	<dd>If $noshuffle="all", then the $questions array will not be randomized (shuffled)</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the choice list in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answers.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="matching">Matching</a></h3>
+
+A student is asked to match answers with questions
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$questions = an array of questions (In Common Control)</dt>
+	<dd>Defines the questions - these will be on the left with entry boxes</dd>
+<dt>$answers = an array of answers (In Common Control)</dt>
+	<dd>Defines the answers - these will be on the right and lettered</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$matchlist = a list of the <i>indexes</i> into $answers that contain the match to each question. (In Common Control)</dt>
+	<dd>Defines correct matches.  By default, it is assumed that each element of $questions is matched one-to-one with the 
+	    corresponding element of $answers (in other words, that $answers[0] is the answer to $questions[0]).<br/>  $matchlist allows
+	    you to define one-to-many matches.  Example:  if $questions=array("cat","dog","quartz") and 
+	    $answers=array("animal","mineral"), then $matchlist = "0,0,1"</dd> 
+<dt>$questiontitle = string (In Common Control)</dt>
+	<dd>Displays a title above the list of questions.  For example, if $questions was a list of
+	states, then $questiontitle="States" would be appropriate</dd>
+<dt>$answertitle = string (In Common Control)</dt>
+	<dd>Displays a title above the list of answers</dd>
+<dt>$noshuffle = "questions" or "answers"</dt>
+	<dd>Retains original order of questions or answers, and only shuffles the other.  By default, both lists are shuffled</dd>
+<dt>$displayformat = "select" or "2columnselect"</dt>
+	<dd>Only displays the $answers, with select boxes next to each containing the $questions.  This should only be used with
+	pure text $questions.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place matching questions and answers in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the list of correct matches.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="function">Function</a></h3>
+
+A student is asked to enter a function
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = string (In Common Control)</dt>
+	<dd>Defines the answer function, entered as a string.  For example, $answer="2sin(x)"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$variables = string (In Common Control)</dt>
+	<dd>A list of all variables in the function (including letters representing constants).  Defaults to "x"</dd>
+<dt>$domain = "inputmin,inputmax" (In Common Control)</dt>
+	<dd>Defines the domain on which to compare the given answer and correct answer functions.  The same domain
+	applies to all variables.  An option third list element "integers" can be given, which limits the domain to integer
+	values.  The domain defaults to real numbers from -10 to 10.  If using multiple variables, can extend domain to 
+	define domain for each variable separately.  Example: $variables = "x,y"; $domain = "0,5,20,25"</dd>	
+<dt>$requiretimes = a list, like "^,=3,cos,&lt;2" (In Common Control)</dt>
+	<dd>Adds format checking to the student's answer.  The list can include multiple checks, which come in pairs.  The
+	first is the symbol to look for.  The second describes what is acceptable.  For example, in the string shown above,
+	the symbol "^" would be required to show up exactly 3 times, and "cos" would be required to show up less than 2 times.  You can
+	use "#" in the symbol location to match any number (including decimal values); 3.2x+42y would match twice.</dd>
+<dt>$answerformat = "equation" or "toconst" (In Common Control)</dt>
+	<dd>By default, the student answer is expected to be an expression, and be equivalent (at points) to the specified answer.  This option changes
+	this behavior.<br/>
+	"equation": Specifies that the answer expected is an equation rather than an expression.  The given
+	answer should also be an equation.  Be sure to specify all variables in the equation in $variables.  This may fail
+	on equations that are near zero for most values of the input; this can often be overcome by changing the $domain<br/>
+	"toconst": Specifies that the answer provided by the student is allowed to differ from the specified answer by a constant
+	for all inputs.  Appropriate for comparing antiderivatives.  This may fail on expressions that evaluate to very large
+	values or raise numbers to very large powers.</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>	
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$hidepreview = true (In Common Control)</dt>
+	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to makeprettydisp($answer).  </dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>	
+
+</div>
+<div class=h3>
+<h3><a name="string">String</a></h3>
+
+A student is asked to enter a string (a word or list of letters).  
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string (In Common Control)</dt>
+	<dd>Defines the answer.  Multiple acceptable answers can be entered using "or".  Example: $answer = "dog or cat"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$strflags = string of flags, like "ignore_case=1,trim_whitespace=0" (In Common Control)</dt>
+	<dd>Determines how the string will be compared.  Set to 1 to turn on, 0 for off.  Flags are:
+		<ul>
+		<li>ignore_case: ignores capitol/lowercase differences</li>
+		<li>trim_whitespace: trims leading and ending whitespace (spaces)</li>
+		<li>compress_whitespace: compresses multiple spaces to one space and trims</li>
+		<li>remove_whitespace: removes all whitespace (spaces)</li>
+		<li>ignore_order: treats ABC and CBA as equivalent</li>
+		<li>ignore_commas: removes commas</li>
+		<li>partial_credit: awards partial credit based on Levenshtein distance between strings</li>
+		<li>allow_diff=n: gives full credit for answers with Levenshtein distance between strings &le; n </li>
+		<li>in_answer: gives credit if $answer is contained anywhere in the student answer</li>
+		<li>special_or: use <b>*or*</b> for separating answers rather than <b>or</b>.</li>
+		<li>ignore_symbol=sym: Unlike the other flags, this is not an on/off flag. Set this equal to a symbol to ignore that
+		    symbol in student answers.  This flag can be used multiple times with different symbols.</li>
+		</ul>
+		By default, compress_whitespace and ignore_case are On.  Only one of
+		partial_credit, allow_diff, or in_answer may be used at a time.</dd>
+<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
+<dt>$answerformat = "list" (In Common Control)</dt>
+	<dd>Specifies that a list of answers is expected.  Renders ignore_commas unnecessary.  Cannot be used with 
+	partial_credit flag.  Duplicates are not ignored.</dd>
+<dt>$displayformat = "usepreview" or "typeahead"(In Common Control)</dt>
+	<dd>"usepreview" adds a preview button for previewing mathematical answers.<br/>
+	"typeahead" will enable an auto-suggest list of options once the student has typed at least
+	two letters of the word.  Provide the auto-suggest list in the variable $questions.
+	</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="type: "</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the answer entry box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="essay">Essay</a></h3>
+
+A student is asked to enter a free-response answer.  <b>The essay type is not automatically graded</b>.  
+
+<p><b>Required Variables</b><BR>
+None - the essay type is not computer graded.
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerboxsize = "rows" or $answerboxsize = "rows,columns" (In Common Control)</dt>
+	<dd>Determines size of space provided for entry of an answer.  Defaults to 5 rows, 50 columns.</dd>
+<dt>$displayformat = "editor" (In Common Control)</dt>
+	<dd>Use the rich text editor for the essay answer box.</dd>
+<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the essay box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="draw">Drawing</a></h3>
+
+Drawing questions require the student to draw one or more lines/curves or dots.  
+Dots are graded right/wrong.  Lines/curves are graded based on the deviation of the 
+drawn line from the correct line.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string or array of strings describing the points or curves to be drawn (In Common Control)</dt>
+	<dd>Curves:  "f(x)" or "f(x),xmin,xmax", like "x^2+3" or "x,-3,2"<br/>
+	    Dots:  "x,y" for closed dots, "x,y,open" for open dots, like "2,3"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "line,lineseg,dot,opendot" or "polygon" or "twopoint" or "inequality" or "numberline" (In Common Control)</dt>
+	<dd>Limits the drawing tools available to students.  Defaults to "line,dot,opendot".  Define to limit the options.
+	    Example: $answerformat = "line", or $answerformat = "line,dot"<br/>
+	    $answerformat = "polygon" can be used for drawing a single polygon; give $answer as array of points in order joined with edges.<br/>
+	    $answerformat="inequality" will use a set of drawing tools for graphing linear inequalities in two variables.  Give $answers for non-vertical lines in form
+	       like "&gt;=3x+4", "&lt;5x+4", and "x&lt;=3" for vertical lines.<br/>
+	    $answerformat="inequality,parab" will use a set of drawing tools for graphing quadratic inequalities in two variables.  Give $answers in form
+	       like "&gt;=x^2-4", "&lt;x^2+1".  Use $answerformat="inequality,both" to turn on lines and parabolas.<br/>
+	    $answerformat="numberline" will use a set of drawing tools for graphing inequalities or points in one variable on a number line.  Give $answers as dots and
+	       line segments, or use the intervalstodraw function from the interval macro library to form the $answers array.<br/>
+	    $answerformat="twopoint" will use a different set of drawing tools for specific shapes that all use two
+	    control points to define the shape. 
+	      <ul>
+	        <li>$answerformat="twopoint" will use a default tool set of line, parabola, absolute value, circle, and dot tools</li>
+	        <li>You can limit or expand the tools by specifying them: e.g. $answerformat = "twopoint,line,parab".  Valid values are: line, parab,abs,circle,dot,sqrt,trig,vector,exp</li>
+	        <li>For lines, parabolas, absolute values, square roots, sines, cosines, exponentials and dots, give $answers in the normal way (as a function of x)</li>
+	        <li>For circles, use "circle,x,y,radius", like "circle,2,-1,3"</li>
+	        <li>For vertical lines use "x=number", like "x=3".</li>
+	        <li>For vectors, use "vector, x_start, y_start, x_end, y_end" for position vectors, or "vector, dx, dy" for displacement vectors</li>
+	      </ul>
+	     </dd>
+<dt>$grid = "xmin,xmax,ymin,ymax,xscl,yscl,imagewidth,imageheight" (In Common Control)</dt>
+	<dd>Defines the grid to be drawn on.  Defaults to "-5,5,-5,5,1,1,300,300".  You can set all or just some of the
+	    values.  For example, to just set the window, you could use "0,10,0,10"<br/>
+	    If using $answerformat="numberline", set ymin and ymax to 0.<br/>If desired, you can set separate label and grid
+	    spacing using "xmin,xmax,ymin,ymax,xlabel:xgrid,ylabel:ygrid,imagewidth,imageheight".  You can specify axis labels using
+	    "xmin,xmax,ymin,ymax,xlabel:xgrid:xaxislabel,ylabel:ygrid:yaxislabel,imagewidth,imageheight"</dd>
+<dt>$snaptogrid = spacing (In Common Control)</dt>
+	<dd>Turns on snapping, where points will jump to a grid.  $snaptogrid = 1 will jump to the nearest
+	integer. $snaptogrid = 0.5 will jump to the nearest .5.  $snaptogrid = "2:4" will jump to the nearest
+	2 in the x and 4 in the y.  Does not have to match the actual grid line spacing.  Be aware that due to pixelation, the snapping
+	may not land on exact values correctly.  This is usually corrected for automatically, but it sometimes fails if the correction would be 
+	too large.  In that case, use the getsnapwidthheight macro to compute an imagewidth and imageheight that will be pixel accurate.</dd>
+<dt>$background = equation or array of equations, using the showplot macro format (In Common Control)</dt>
+	<dd>Define a graph to display in the background, to be drawn on top of.  Example:  $background = "x^2,red"</dd>
+<dt>$partweights = array or list of weights (In Common Control)</dt>
+	<dd>Defines grading weight for each line or dot in $answers.  Example: $partweights = ".5,.25,.25".  Defaults
+	    to equal weights on each line or dot.</dd>
+<dt>$reltolerance = tolerance scaling factor</dt>
+	<dd>Scales the grading tolerance.  Defaults to 1.  Set $reltolerance = 2 to make the grading twice as tolerant;
+	    $reltolerance = 0.5 to make grading half as forgiving</dd>
+<dt>$abstolerance = grading cutoff</dt>
+	<dd>Sets all-or-nothing grading.  If score &lt; $abstolerance, the student receives 0 for the question (note: score is 
+	between 0 and 1).  Otherwise
+	the student will receive full credit.  Not set by default.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="ntuple">N-Tuple</a></h3>
+
+N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
+This can be used for coordinate points, vectors, or any other n-tuple of numbers.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string containing an n-tuple or list of n-tuples (In Common Control)</dt>
+	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1,2)",
+	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;".</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
+	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calcntuple">Calculated N-Tuple</a></h3>
+
+Calculated N-Tuple questions require the student to enter an n-tuple or list of n-tuples.
+This can be used for coordinate points, vectors, or any other n-tuple of numbers.
+Drawing question require the student to draw one or more lines/curves or dots.  This
+is identical the the N-tuple answer type, but allows students to enter mathematical expressions
+rather than just numbers, such as (5/3, 2/3).
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string containing an n-tuple or list of n-tuples (In Common Control)</dt>
+	<dd>Defines the answer n-tuple or list of n-tuples.  N-tuples can be any dimension,
+	but must be surrounded by any of: (), [], {}, &lt;&gt;.  Examples: $answer = "(1/3,2)",
+	$answer = "&lt;2,3,4&gt;,&lt;1,5,7&gt;". </dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$displayformat = "point", "pointlist", "vector", "vectorlist", "list" (In Common Control)</dt>
+	<dd>Changes the answer entry tips (does NOT change how the question is graded).  For points,
+	entry like (2,3) is specified.  For vectors, entry like &lt;2,3&gt; is specified.</dd>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires each component of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+
+<div class=h3>
+<h3><a name="complex">Complex</a></h3>
+
+Complex questions require the student to enter a complex number in a+bi form.  
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing a complex number or list of complex numbers (In Common Control)</dt>
+  <dd>Defines the answer.  Example: $answer="3+2i"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "list" (In Common Control)</dt>
+	<dd>Specifies that the answer will be a list of complex numbers.</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calccomplex">Calculated Complex</a></h3>
+
+Calculated Complex questions require the student to enter a complex number in a+bi form. 
+This is identical the the N-tuple answer type, but allows students to enter mathematical expressions
+rather than just numbers, such as 1/3+sqrt(2)i.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answers = a string containing a complex number or list of complex numbers (In Common Control)</dt>
+  <dd>Defines the answer.  Example: $answer="3+2i", $answer="2/3+1/3i".  The answer <i>must</i> be given in 
+  a + bi format (so 2+3isqrt(2) or 5/2+i/3 will not work)</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt><dt>$answerformat = "sloppycomplex", "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Use "sloppycomplex" to allow the student to enter complex numbers in forms other than a+bi (allows 2+3isqrt(2) for example).  Student answer
+	must still only contain one i.  <br/>
+	The other options requires the real and imaginary parts of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "list" specifies that the answer will be a list of complex numbers.</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input drawing tool in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+
+<div class=h3>
+<h3><a name="numericalmatrix">Numerical Matrix</a></h3>
+
+The student is asked to enter a matrix of numbers (integer, decimal, or scientific notation).
+The entries are compared to a given tolerance.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers (In Common Control)</dt>
+	<dd>Defines the answer.  Example: $answer = "[(1,2,3),(8/2,5,6)]" is a 2x3 matrix with first row: 1,2,3</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answersize = "rows,cols" (In Common Control)</dt>
+	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
+	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
+	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
+	used if $answersize is not supplied.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calculatedmatrix">Calculated Matrix</a></h3>
+
+The student is asked to enter a matrix of numbers or calculations, like 2/3 or 5^2.
+The entries are compared to a given tolerance.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = string descripting a matrix of numbers, or calculations leading to numbers (In Common Control)</dt>
+	<dd>Defines the answer.  Example: $answer = "[(1,2,3),(8/2,5,6)]" is a 2x3 matrix with first row: 1,2,3</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answersize = "rows,cols" (In Common Control)</dt>
+	<dd>Defines the size of the answer matrix.  If this is supplied, the student will be provided with a grid of
+	entry boxes in which to input the matrix.  If this is not supplied, they will be required to enter the matrix
+	using the ASCIIMath notation, like "[(1,2,3),(4,5,6)]"</dd>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", or "notrig" (In Common Control)</dt>
+	<dd>Requires the entries of the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="y="</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.  Will only be
+	used if $answersize is not supplied.</dd>
+<dt>$hidepreview = true (In Common Control)</dt>
+	<dd>Hides the Preview button.  Could be useful in multipart questions, but generally not recommended</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the question input box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to $answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+	
+</div>
+<div class=h3>
+<h3><a name="interval">Interval</a></h3>
+
+A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo)
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string with the answer in interval notation (In Common Control)</dt>
+	<dd>Defines the answer.  Join multiple intervals with U for union.  Example: $answer = "(-oo,4]U(3,oo)".  Use
+	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]"</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Common Control)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$answerformat = "normalcurve" (In Common Control)</dt>
+	<dd>Changes the question to use a "shade the area under the normal curve" widget. Define $answer using the interval that should be
+	shaded. Note that the shading tool only allows selection of z-values to 1 decimal place.</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="calcinterval">Calculated Interval</a></h3>
+
+A student is asked to enter an interval notation answer. Example: (2,5]U(7,oo).  Values can be entered as calculations
+rather than numbers, like [2/5,sqrt(8)].  Can use $answerformat="inequality" to require the student to use inequalities rather than 
+invertal notation.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$answer = a string with the answer in interval notation (In Common Control)</dt>
+	<dd>Defines the answer.  Join multiple intervals with U for union, and oo for infinity.  Example: $answer = "(-oo,4]U(9/2,oo)".  Use
+	DNE for empty set.   Multiple acceptable answers can be entered using "or".  Example: $answer = "(3,3) or [3,3]".</dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answerformat = "fraction", "reducedfraction", "mixednumber", "scinot", "fracordec", "nodecimal", "notrig", or "inequality" (In Common Control)</dt>
+	<dd>Requires the each value in the answer to be a single fraction (like 10/6), a reduced fraction (like 5/3), a reduced mixed number (like 2_1/2), scientific notation (like 2.3*10^4), a single fraction or decimal, an answer
+	without decimals (also disallows 10^-2 and 3E-2), or 
+	an answer without trig functions (sin,cos,tan,sec,csc,cot).  Multiple options can be specified like $answerformat="nodecimal,notrig".<br/>
+	$answerformat = "inequality" will require the student to enter an inequality rather than an interval.  The instructor answer must still be given in
+	interval notation (it will be reformatted to an inequality automatically for the Show Answer).  Use $variables="y" to change the variable of the inequality.
+	</dd>
+<dt>$reltolerance = a decimal value (In Common Control)</dt>
+	<dd>Defines the largest relative error that will be accepted.  If this is not set, a relative error of .001 (.1%) is
+	used by default.</dd>
+<dt>$abstolerance = a number (In Common Control)</dt>
+	<dd>Defines the largest absolute error that will be accepted.  This will override the use of $reltolerance</dd>
+<dt>$reqdecimals = a number (In Common Control)</dt>
+	<dd>Defines the decimal accuracy required (ie 2 for two decimal places).  This will put a message in the answer tips stating the
+	decimals required.  If neither $abstolerance or $reltolerance is set, this will set the tolerance, otherwise the provided tolerance
+	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
+<dt>$ansprompt = string (In Common Control)</dt>
+	<dd>A string that will be displayed in front of the input box.  Example: $ansprompt="`x in`"</dd>
+<dt>$answerboxsize = number (In Common Control)</dt>
+	<dd>Determines the number of characters space provided for entry of an answer.  Defaults to 20.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the entry box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).  Defaults to the text of the correct answer.  
+	Use this to substitute a detailed answer.</dd>
+<dt>$previewloc (In Question Text)</dt>
+	<dd>Where you want the preview button to be located.  Defaults to after the entry box if not placed in question text.</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+
+</div>
+<div class=h3>
+<h3><a name="fileupload">File Upload</a></h3>
+
+A student is asked to upload a file.  <b>The file upload type is not automatically graded</b>.  
+
+<p><b>Required Variables</b><BR>
+None - the file upload type is not computer graded.
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$scoremethod = "takeanything" (In Common Control)</dt>
+	<dd>Sets the problem to give full credit for any answer.</dd>
+<dt>$answerbox (In Question Text)</dt>
+	<dd>Using the variable $answerbox in the Question Text will place the file upload box in that location</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>The answer to show to students (if option if available).</dd>
+<dt>$hidetips = true (In Common Control)</dt>
+	<dd>Hides the question entry tips that display by default.
+This should only be used when a question type is being used in an unintentional way,
+or if the question type gives away critical info to the student.</dd>
+</dl>
+</p>
+</div>
+<div class=h3>
+<h3><a name="multipart">Multipart</a></h3>
+
+This type of question can contain multiple parts, where each part is one of the previous question types.
+
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$anstypes = an array or list of answer types (In Common Control)</dt>
+	<dd>Defines the answer type for each part.  Example: 
+	$anstypes = array("number","number","choices")<br/>
+	Refer to this list for the short names of each question type:
+	<ul>
+	<li>Number:  "number"</li>
+	<li>Calculated: "calculated"</li>
+	<li>Multiple Choice: "choices"</li>
+	<li>Multiple Answer: "multans"</li>
+	<li>Matching: "matching"</li>
+	<li>Function/expression: "numfunc"</li>
+	<li>Drawing: "draw"</li>
+	<li>N-tuple: "ntuple"</li>
+	<li>Calculated N-tuple: "calcntuple"</li>
+	<li>Matrix: "matrix"</li>
+	<li>Calculated Matrix: "calcmatrix"</li>
+	<li>Complex: "complex"</li>
+	<li>Calculated Complex: "calccomplex"</li>
+	<li>Interval: "interval"</li>
+	<li>Calculated Interval: "calcinterval"</li>
+	<li>Essay: "essay"</li>
+	<li>File Upload: "file"</li>
+	<li>String: "string"</li>
+	</ul>
+	</dd>
+<dt>Question part variables</dt>
+	<dd>For each question part, you will need to define the variables (like $answer, $questions, etc.) you would normally
+	need to define.  However, you will need to suffix the variable with a part designator.  For example, based on $anstypes 
+	above, the first answer is a number.  Instead of $answer = 5, enter $answer[0] = 5.  This designates that this answer belongs
+	to the first element of $anstypes.  Likewise, to set the variables for the "numfunc" type, you'd set $variables[5] = "x".</dd>
+<dt>$answerbox[partnum] (In Question Text)</dt>
+	<dd>The array $answerbox will contain the entry boxes for each answer type.  In the question text, you will need to position
+	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[1]".  Alternatively, you 
+	can use [AB#]: "Enter a number: [AB0].  Now a function: [AB1]" </dd>
+</dl>
+</p>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>$answeights = an array or list of weights for each question (In Common Control)</dt>
+	<dd>By default the points for a problem are divided evenly over the parts.  Use this option if you wish to weight parts
+	differently.  Example: $answeights = array(.2,.3,.5).  Best practice is to use percents, but if other values are used, they will
+	be converted to percents.</dd>
+<dt>$scoremethod = "singlescore" or "allornothing" (In Common Control)</dt>
+	<dd>Instead of recording individual scores for each question part, these will cause a single score to be
+	recorded for the question.  "singlescore" totals the individual part scores, while "allornothing"
+	will only give full credit or no credit.</dd>
+<dt>Question part options</dt>
+	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.</dd>
+<dt>$showanswer (In Common Control)</dt>
+	<dd>You can either define $showanswer for individual question parts (ie, $showanswer[1]="`x^2`"), or you can set one 
+	$showanswer, which will be the only answer shown for the problem (ie, $showanswer = "x=$answer[0], y=$answer[1]")</dd>
+<dt>$showanswerloc (In Question Text)</dt>
+	<dd>Optionally, you can use $showanswerloc to place a single $showanswer "Show Answer" button, 
+	or $showanswerloc[part] to place "Show Answer" buttons for each part.  Note that if you use this to place one
+	Show Answer button, you must place all of them, or else the remainder will not show.  Use $showanswerstyle = 'inline' to 
+	allow Show Answer to be placed inline with text rather than on its own line.</dd>
+</dl>
+</p>
+	
+</div>
+<div class=h3>
+<h3><a name="conditional">Conditional</a></h3>
+A variation on multipart questions, a conditional question can include multiple answer boxes, but assigns
+a single score.  The score is based on applying some comparison or conditional test to the student answers, referenced through
+the <a href="#writingcommon">$stuanswers</a> array.  This allows the question writer to essentially create their
+own question type.
+<p><b>Required Variables</b><BR>
+<dl>
+<dt>$anstypes = an array or list of answer types</dt>
+	<dd>Defines the answer type for each part.  Example: $anstypes = "number,number".  See the Multipart help above 
+	for the list of short names</dd>
+<dt>$answer = any of these:</dt>
+	<dd>
+	<ul>
+	<li><b>A boolean (true/false) expression</b>: Something that evaluates to true or false. <br/>
+	Example: $answer = ($a>3) <br/>
+	Example: $answer = comparefunctions($f,'x^2') &amp;&amp; ($a!=0)</li>
+	<li><b>A single numerical value</b> in the interval [0,1]: will award that percentage of the total possible points.</li>
+	<li><b>array('function',$a,$b)</b>:  Will compare the functions $a and $b and mark the question correct if they
+	   are equivalent.  Can set $variables, $reltolerance, $abstolerance, and $domain as needed, like with Function type
+	   questions</li>
+	<li><b>array('number',$a,$b)</b>:  Will compare the numbers or numerical expressions $a and $b and mark the question correct if they
+	   are equivalent.  Can set $reltolerance or $abstolerance as needed, like with Number/Calculated type
+	   questions</li>
+	<li><b>Multiple comparisons</b>: You can mix the two types above by creating an array of comparions.  All must be true
+	   for the question to be marked correct.  <br/>
+	   Example: $answer = array($a>3, array('function',$b,c), array('number',evalfunc($b,$a),5))</li>
+	</ul>   
+<dt>Question part variables</dt>
+	<dd>For each question part, you will need to define the variables (like $questions, etc.) you would normally
+	need to define, except you <b>should not</b> define an $answer.  However, you will need to suffix the variable with
+	a part designator.  For example, based on $anstypes 
+	above, the first answer is a number.  Instead of $displayformat = "select", enter $displayformat[0] = "select".  
+	This designates that this setting belongs
+	to the first element of $anstypes.  
+	</dd>
+<dt>$answerbox[partnum] (In Question Text)</dt>
+	<dd>The array $answerbox will contain the entry boxes for each answer type.  In the question text, you will need to position
+	these boxes within the question.  For example:  "Enter a number: $answerbox[0].  Now a function: $answerbox[5]"</dd>
+</dl>
+<p><b>Optional Variables</b><BR>
+<dl>
+<dt>Question part options</dt>
+	<dd>You can define any optional variable for each question part.  Like above, suffix the variable with the part designator.
+	Note that $variables, $domain, $reltolerance, and $abstolerance may be used for the comparison, and should not be set for 
+	individual parts.</dd>
+<dt>$showanswer</dt>
+	<dd>By default the $showanswer for conditional types is "Answers may vary".  Set $showanswer to override this.</dd>
+</dl>
+</p>		
+
+</div>
+</div>
+</div>
+<h1><a name="usingimas">Using IMathAS</a></h1>
+<div class=h2>
+<h2><a name="registering">Registering</a></h2>
+
+At the Login page, if you are not currently registered as a student, click the
+"Register as a New User" link.  You will be asked to provide:
+<ul>
+<li>A username.  Your school may require something specific, like your student ID number.</li>
+<li>A password.  You're asked to enter this twice. </li>
+<li>Your Firstname (Given name) and Lastname (Surname)</li>
+<li>Your email address</li>
+</ul>
+When you click "Sign Up", you will be taken back to the Login page so you can log in
+
+</div>
+<div class=h2>
+<h2><a name="loggingin">Logging In</a></h2>
+
+At the Login page, you will be asked to supply your login credidentials (username and password).  
+You will also be able to select Viewing/Accessibility options:
+<ul>
+<li>Most of the time, select Use defaults.  This will detect what your browser is capable of, and use the best option available.</li>
+<li>Force image-based display will force the use of images for math and graph display. This can be helpful if the default display is 
+    not working correctly for you, or if you want to be able to copy-and-paste math and graphs.</li>
+<li>MathJax display uses MathJax for math display, and detects the best settings for graphs.</li>
+<li>Use text-based display, for screen readers or older browsers.</li>
+</ul>
+<p><b>If you're not sure what to choose:</b> Pick "Use defaults"</p>
+<p>
+The options are set for your current session only, so you can set them differently depending on the support offered by the
+computer you're currently working at.
+</p>
+</div>
+<div class=h2>
+<h2><a name="homepage">Home Page</a></h2>
+
+The home page lists the classes you're currently taking, and also has options for
+enrolling in a course, changing your password, changing your user info, or logging
+out of the system.
+
+<div class=h3>
+<h3><a name="enrollinginacourse">Enrolling in a Course</a></h3>
+
+At your home page, you can sign up for a course by entering the course ID number and
+enrollment key in the box provided.  If you do not know these, ask your instructor.
+
+</div>
+</div>
+<div class=h2>
+<h2><a name="coursepage">Course Page</a></h2>
+
+The course page consists of a list of items.  There are five types of items:
+<ul>
+<li><b>Blocks</b>: Groupings of items</li>
+<li><b>Text Items</b>:  Text that displays on the course page</li>
+<li><b>Links</b>:  A summary displays on the course page.  A link is provided
+    that may display text, a file, or take you to a weblink</li>
+<li><b>Forums</b>:  Discussion forums</li>
+<li><b>Assessments</b>:  Tests or Practice questions</li>
+</ul>
+<p>Blocks have a colored header.  Some blocks may show collapsed.  Click the block
+name or the &quot;Expand&quot; button to view the block's contents.  Other blocks may display as
+folders (with a folder icon).  Click on the block name show the contents.</p>
+
+<p>Text items are preceded with an information <span class=icon>!</span> icon, forums are preceded with
+a <span class=icon>F</span> icon, and assessments are 
+preceded with a <span class=icon>?</span> icon.  Depending upon the setup, these may change color as a deadline approaches.  
+The color is green at two weeks before a due date, yellow at one week, and red on due date.</p>
+
+
+
+</div>
+<div class=h2>
+<h2><a name="takingassessments">Taking Assessments</a></h2>
+When you take an assessment, it will be displayed to you in one of three ways:
+<ul>
+<li><b>Full Test</b>:  You may see the entire test at once</li>
+<li><b>One at a time</b>:  You may have to answer one question before proceeding to the next</li>
+<li><b>Full test, submit one at a time</b>:  The full test is displayed, but only question is available for answer entry at a time</li>
+<li><b>Skip Around</b>:  You may see a green box on the left.  This will contain a list of questions.  You can
+    skip around between questions by clicking on these links, and answer the questions in any order.</li>
+</ul>
+
+There are several question types.  At the bottom of the question or under the answer box when you click on it, it will tell you
+what kind of answer is expected.  Here are the types:
+<ul>
+<li><b>Number</b>:  You will be asked to enter a number, like 3, 5.5, or -6</li>
+<li><b>Calculated</b>:  You will be asked to enter a number, or a calculation, like 2/3, 5^2, or sin(2).  You can
+    press the "Preview" button to ensure that the system is interpreting your answer the way you intended.</li>
+<li><b>Multiple-Choice</b>:  You will be given a set of choices, and asked to select the correct choice</li>
+<li><b>Multiple-Answer</b>:  You will be given a set of choices, and asked to select all the correct choices</li>
+<li><b>Matching</b>:  You will be given a list of items with input boxes in front of them.  In each box, enter the letter
+    of the item in the right-hand column that matches that item</li>
+<li><b>Function</b>:  You will be asked to enter a function, like "sin(x)" or "3x^2-5" or "x^2/5".  Make sure you use the
+    same variables in your answer than were specified in the question.  You can press the
+    "Preview" button to ensure the system is interpreting your answer the way you intended.  It will also check to 
+    make sure that it understands your answer, and will tell if you if the syntax is ok.</li>
+<li><b>String</b>: You will be asked to enter a word or list of letters</li>
+<li><b>Numerical Matrix</b>:  You will asked to enter a matrix of numbers.  In some case, a grid of input boxes will be provided
+    for you to enter the values.  If not, you will need to enter the matrix in ASCIIMath notation, like [(1,2,3),(4,5,6)]
+    for the 2x3 matrix with first row: 1,2,3</li>
+<li><b>Calculated Matrix</b>:  Like a numerical matrix, but each entry can be a calculation, like 2/3 or 5^2 or sin(2).</li>
+</ul>
+<div class=h3>
+<h3><a name="enteringmath">Entering Math</a></h3>
+For some types of questions, you need to enter a mathematical expression.  The system
+follows order of operations, so use grouping symbols as much as necessary.
+<p>Here is some help on how to enter expressions:</p>
+<table>
+<thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>* / + -</td><td>Multiply, divide, add, subtract</td></tr>
+<tr><td>^</td><td>Powers.  2^3 = 8.</td></tr>
+<tr><td>sqrt</td><td>Square root.  sqrt(4) = 2</td></tr>
+<tr><td>( )</td><td>Parentheses, for grouping.  (2+6)/2 = 4, while 2+6/2 = 5.</td></tr>
+<tr><td>e, pi</td><td>The standard constants</td></tr>
+<tr><td>abs</td><td>Absolute Value.  abs(-4) = 4</td></tr>
+<tr><td>sin,cos,tan,sec,csc,cot,sinh,cosh</td><td>Standard trig function.  Be sure to enter as sin(2), not sin 2</td></tr>
+<tr><td>arcsin,arccos,arctan,arcsinh,arccosh</td><td>Inverse trig functions.  Note arcsec, arccsc, and arccot are not defined</td></tr>
+<tr><td>sin^-1, cos^-1, tan^-1</td><td>Alternative entry for inverse trig functions.  Use like sin^-1(0.5)</td></tr>
+<tr><td>ln</td><td>Natural Logarithm base e</td></tr>
+<tr><td>log</td><td>Common Logarithm base 10</td></tr>
+<tr><td>!</td><td>Factorial</td></tr>
+<tr><td>oo</td><td>Infinity.  Those are two lowercase o's, like the middle of the word "look"</td></tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
+	
+			
+		
+	

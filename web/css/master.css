@@ -81,7 +81,7 @@ body {
     padding-right: 5%;
     height: 60px;
     background-color: #ffffff;
-    border-top: 1px solid #ddd;
+    /*border-top: 1px solid #ddd;*/
     padding-top: 20px;
 }
 .footer-brand
@@ -187,6 +187,9 @@ body {
     padding-left: 0%;
 }
 
-a{
+.grey-color-link{
     color: #6d6d6d;
+}
+.calendar-details{
+    padding-top: 47px;
 }

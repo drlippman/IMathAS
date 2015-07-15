@@ -21,8 +21,8 @@ echo Nav::widget([
     'options' => ['class' => 'navbar-nav navbar-right'],
     'items' => [
         Yii::$app->user->isGuest ?
-            ['label' => 'Home', 'url' => [$basePath.'login']]:
-            ['label' => 'Home', 'url' => [$basePath.'dashboard']],
+            ['label' => 'Notification', 'url' => [$basePath.'login']]:
+            ['label' => 'Notification', 'url' => [$basePath.'dashboard']],
         Yii::$app->user->isGuest ?
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?
