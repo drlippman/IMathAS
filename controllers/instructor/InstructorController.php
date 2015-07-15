@@ -4,6 +4,7 @@ namespace app\controllers\instructor;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\CopyItemsUtility;
 use app\models\CalItem;
 use app\models\Course;
 use app\models\ForumPosts;
@@ -22,6 +23,7 @@ use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
 use app\models\Items;
+use app\models\Outcomes;
 use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\SetPassword;
@@ -34,6 +36,7 @@ use app\models\User;
 use app\models\forms\ManageEventForm;
 use app\models\WikiRevision;
 use app\models\WikiView;
+use app\models\GbCats;
 use Yii;
 use app\controllers\AppController;
 
@@ -42,19 +45,12 @@ class InstructorController extends AppController
 {
 
 public $oa = array();
-    public $cn = 1;
-    public $key = 0;
-
+    public $cn = AppConstant::NUMERIC_ONE;
+    public $key = AppConstant::NUMERIC_ZERO;
     public $enableCsrfValidation = false;
 
     public function actionIndex()
     {
-
-
-//        echo "fafasf";die;
-//        $this->layout = "master";
-
-
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
@@ -196,25 +192,24 @@ public $oa = array();
              *Create calendar
              */
             if(isset($courseData['block']) && isset($courseData['cid']) && !isset($courseData['from']) && !isset($courseData['remove'])){
-            $block = $courseData['block'];
-            $calender = 'Calendar';
-            $itemCalender = new Items();
-            $itemId = $itemCalender->create($courseId,$calender);
-            $items = unserialize($course['itemorder']);
-
-                    $blockTree = explode('-',$block);
-                    $sub =& $items;
-                    for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
-                    }
-                    if ($filter=='b') {
-                        $sub[] = intval($itemId);
-                    } else if ($filter=='t') {
-                        array_unshift($sub,intval($itemId));
-                    }
-                    $itemOrder = addslashes(serialize($items));
-                    Course::setItemOrder($itemOrder, $courseId);
-                    return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
+                $block = $courseData['block'];
+                $calender = 'Calendar';
+                $itemCalender = new Items();
+                $itemId = $itemCalender->create($courseId,$calender);
+                $items = unserialize($course['itemorder']);
+                $blockTree = explode('-',$block);
+                $sub =& $items;
+                for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                    $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+                }
+                if ($filter=='b') {
+                    $sub[] = intval($itemId);
+                } else if ($filter=='t') {
+                    array_unshift($sub,intval($itemId));
+                }
+                $itemOrder = addslashes(serialize($items));
+                Course::setItemOrder($itemOrder, $courseId);
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
             }
         }
         /*
@@ -324,7 +319,6 @@ public $oa = array();
         $param['starttime'] = $startTime;
         $param['feedback'] = $defFeedbackText;
         $param['lti_sourcedid'] = $ltiSourcedId;
-
         $assessmentSession = new AssessmentSession();
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
@@ -518,7 +512,7 @@ public $oa = array();
                 AppUtility::itemOrder($courseId,$block,$itemDeletedId);
                 break;
             case AppConstant::CALENDAR:
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                $itemDeletedId = Items::deletedCalendar($itemId,$itemType);
                 AppUtility::itemOrder($courseId,$block,$itemDeletedId);
                 break;
             case AppConstant::INLINE_TEXT:
@@ -549,7 +543,90 @@ public $oa = array();
         }
         return $this->successResponse();
     }
+    public function actionCopyItemsAjax()
+    {
+        $params = $this->getRequestParams();
+        $courseId = $params['courseId'];
+        $block = $params['block'];
+        $itemType = $params['itemType'];
+        $tocopy = $params['copyid'];
+        if (isset($params['noappend'])) {
+            $params['append'] = "";
+        } else {
+            $params['append'] = " (Copy)";
+        }
+        $params['ctc'] = $courseId;
+        $gradebookCategory = array();
+        $gradeBookData =  GbCats::getByCourseId($courseId);
+        if ($gradeBookData){
+            foreach ($gradeBookData as $singleRecord){
+                $gradebookCategory[$singleRecord['id']] = $singleRecord['id'];
+            }
+        }
+        $outComes = array();
+        $outComesData = Outcomes::getByCourseId($courseId);
+        if ($outComesData){
+            foreach ($outComesData as $singleRecord){
+                $outComes[$singleRecord['id']] = $singleRecord['id'];
+            }
+        }
+        $courseData = Course::getById($courseId);
+        $blockCount = $courseData['blockcnt'];
+        $items = unserialize($courseData['itemorder']);
+        $notImportant = array();
+        $this->copysubone($items,'0',false,$notImportant);
+        CopyItemsUtility::copyrubrics();
 
+        $itemOrder = addslashes(serialize($items));
+        Course::setBlockCount($itemOrder,$blockCount,$courseId);
+        return $this->successResponse();
+    }
+
+    public function copysubone(&$items,$parent,$copyinside,&$addtoarr) {
+        global $blockcnt,$tocopy, $gbcats, $outcomes;
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
+                    $newblock = array();
+                    $newblock['name'] = $item['name'].stripslashes($_POST['append']);
+                    $newblock['id'] = $blockcnt;
+                    $blockcnt++;
+                    $newblock['startdate'] = $item['startdate'];
+                    $newblock['enddate'] = $item['enddate'];
+                    $newblock['avail'] = $item['avail'];
+                    $newblock['SH'] = $item['SH'];
+                    $newblock['colors'] = $item['colors'];
+                    $newblock['fixedheight'] = $item['fixedheight'];
+                    $newblock['grouplimit'] = $item['grouplimit'];
+                    $newblock['items'] = array();
+                    if (count($item['items'])>0) {
+                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items']);
+                    }
+                    if (!$copyinside) {
+                        array_splice($items,$k+1,0,array($newblock));
+                        return 0;
+                    } else {
+                        $addtoarr[] = $newblock;
+                    }
+                } else {
+                    if (count($item['items'])>0) {
+                        $nothin = array();
+                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),false,$nothin);
+                    }
+                }
+            } else {
+                if ($item==$tocopy || $copyinside) {
+                    $newitem = CopyItemsUtility::copyitem($item,$gbcats);
+                    if (!$copyinside) {
+                        array_splice($items,$k+1,0,$newitem);
+                        return 0;
+                    } else {
+                        $addtoarr[] = $newitem;
+                    }
+                }
+            }
+        }
+    }
 }
 
 

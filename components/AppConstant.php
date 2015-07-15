@@ -87,6 +87,7 @@ class AppConstant
      */
     const WEEK_TIME = 604800;
     const SECONDS = 60;
+    const MINUTES = 3600;
     const DEFAULT_FEEDBACK = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
     const SAVE_BUTTON = "Save Changes";
     const CREATE_BUTTON = "Create Assessment";
@@ -138,4 +139,6 @@ class AppConstant
     const TEACHER_CANNOT_ENROLL_AS_STUDENT = 'You are a teacher for this course, and can not enroll as a student.Use Student View to see the class from a student perspective, or create a dummy student account.';
     const TUTOR_CANNOT_ENROLL_AS_STUDENT = 'You are a tutor for this course, and can not enroll as a student.';
     const INVALID_COMBINATION = 'Invalid combination of enrollment key and course id.';
+    const INLINE_TEXT_MODIFY_TITLE = 'Modify Inline Text';
+    const INLINE_TEXT_ADD_TITLE = 'Add Inline Text';
 }

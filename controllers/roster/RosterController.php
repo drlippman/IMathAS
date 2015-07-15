@@ -37,7 +37,9 @@ use app\models\forms\ChangeUserInfoForm;
 
 class RosterController extends AppController
 {
-//Controller method to display student information on student roster page.
+/*
+ * Controller method to display student information on student roster page.
+ */
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
@@ -65,10 +67,11 @@ class RosterController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
-
     }
 
-//Controller method for redirect to Login Grid View page.
+/*
+ * Controller method for redirect to Login Grid View page.
+ */
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
@@ -80,7 +83,9 @@ class RosterController extends AppController
         return $this->render('loginGridView', $responseData);
     }
 
-//Controller ajax method to retrieve student data form Login grid table
+/*
+ * Controller ajax method to retrieve student data form Login grid table
+ */
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();

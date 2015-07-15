@@ -36,5 +36,27 @@ class Rubrics extends BaseImasRubrics
         $rubricsData = Rubrics::findone(['ownerid' => $currentUserId,'id' => $rubricId]);
         return $rubricsData;
     }
-}
 
+    public static function getByUserIdAndGroupId($userId,$groupid,$list)
+    {
+        $rubricsData = Rubrics::find()->where(['in','id',$list])->andwhere('ownerid = :ownerid',[':ownerid' => $userId])
+        ->orWhere( ['groupid = :groupid',':groupid' => $groupid])->all();
+        return $rubricsData;
+    }
+
+    public static function getByUserIdAndGroupIdAndList($userId,$groupid,$list)
+    {
+        $rubricsData = Rubrics::find()->where(['in','id',$list])->andWhere('ownerid != :ownerid',[':ownerid' => $userId])
+            ->orWhere( ['groupid != :groupid',':groupid' => $groupid])->all();
+        return $rubricsData;
+    }
+
+    public static function getById($id){
+        return $rubricData = Rubrics::findOne(['id' => $id]);
+    }
+
+    public static function getByUserIdAndGroupIdAndRubric($rubric,$userid,$groupid){
+        $rubricsData = Rubrics::find()->where(['rubric'=> $rubric])->andWhere('ownerid = :ownerid',[':ownerid' => $userid] or ['groupid = :groupid',':groupid' => $groupid])->all();
+        return $rubricsData;
+    }
+}

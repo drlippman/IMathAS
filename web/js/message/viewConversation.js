@@ -56,7 +56,7 @@ function hideall() {
         buti.value = "Show";
     }
 }
-function showtrimmedcontent(el,n) {alert(el);alert(n);
+function showtrimmedcontent(el,n) {
     if (el.innerHTML.match(/Show/)) {
         document.getElementById("trimmed"+n).style.display="block";
         el.innerHTML = "[Hide trimmed content]";

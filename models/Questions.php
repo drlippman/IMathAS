@@ -49,4 +49,11 @@ class Questions extends BaseImasQuestions
             }
         }
     }
+    public static function setRubric($id, $data){
+        $rubricData = Questions::findOne(['id' => $id]);
+        if ($rubricData){
+            $rubricData->rubric = $data;
+            $rubricData->save();
+        }
+    }
 } 

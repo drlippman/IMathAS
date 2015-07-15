@@ -54,7 +54,20 @@ class Items extends BaseImasItems
     }
 
     public static function deleteByTypeIdName($typeId,$itemType){
-        $itemData = Items::findOne(['typeid' => $typeId, 'itemtype' => $itemType]);
+        $itemData = Items::findAll(['typeid' => $typeId, 'itemtype' => $itemType]);
+        AppUtility::dump($itemData);
+        $itemId = $itemData['id'];
+        if($itemData){
+            foreach ($itemData as $singleData){
+                $singleData->delete();
+            }
+        }
+        return $itemId;
+    }
+
+    public static function deletedCalendar($id, $itemType)
+    {
+        $itemData =  Items::findOne(['id' => $id, 'itemtype' => $itemType]);
         $itemId = $itemData['id'];
         if($itemData){
             $itemData->delete();

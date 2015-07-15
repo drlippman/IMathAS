@@ -282,7 +282,9 @@ class AssessmentController extends AppController
                         $updategroupset = "groupsetid='{$params['groupsetid']}',";
                     }
                     if ($params['isgroup']>AppConstant::NUMERIC_ZERO && isset($params['groupsetid']) && $params['groupsetid']==AppConstant::NUMERIC_ZERO) {
-                        //create new groupset
+                        /*
+                         * create new groupset
+                         */
                         $stuGroupSet = new StuGroupSet();
                         $query = $stuGroupSet->createGroupSet($courseId,$params['name']);
                         $params['groupsetid'] = $query;
@@ -291,17 +293,19 @@ class AssessmentController extends AppController
                     $calTag = $params['caltagact'];
                     $calrTag = $params['caltagrev'];
                     $params['name'] = addslashes(htmlentities(stripslashes($params['name'])));
-//                    require_once("../includes/htmLawed.php");
-//                    $htmlawedconfig = array('elements'=>'*-script');
                     if ($params['summary']==AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
                         $params['summary'] = '';
                     } else {
-//                        $params['summary'] = addslashes(htmLawed(stripslashes($params['summary']),$htmlawedconfig));
+                        /*
+                         * HtmLawed in progress
+                         */
                     }
                     if ($params['intro']==AppConstant::DEFAULT_ASSESSMENT_INTRO) {
                         $params['intro'] = '';
                     } else {
-//                        $params['intro'] = addslashes(htmLawed(stripslashes($params['intro']),$htmlawedconfig));
+                        /*
+                         * HtmLawed in progress
+                         */
                     }
                 if (isset($params['id'])) {  //already have id; update
                     if ($isGroup==AppConstant::NUMERIC_ZERO) { //set agroupid=0 if switching from groups to non groups
@@ -449,26 +453,26 @@ class AssessmentController extends AppController
                     $sTime = AppUtility::tzdate("g:i a",$startDate);
                 } else {
                     $sDate = AppUtility::tzdate("m/d/Y",time());
-                    $sTime = $defStartTime; //$stime = tzdate("g:i a",time());
+                    $sTime = $defStartTime;
                 }
                 if ($endDate!=AppConstant::ALWAYS_TIME) {
                     $eDate = AppUtility::tzdate("m/d/Y",$endDate);
                     $eTime = AppUtility::tzdate("g:i a",$endDate);
                 } else {
                     $eDate = AppUtility::tzdate("m/d/Y",time()+AppConstant::WEEK_TIME);
-                    $eTime = $defTime; //tzdate("g:i a",time()+7*24*60*60);
+                    $eTime = $defTime;
                 }
                 if ($assessmentData['reviewdate'] > AppConstant::NUMERIC_ZERO) {
                     if ($assessmentData['reviewdate']==AppConstant::ALWAYS_TIME) {
                         $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
-                        $reviewTime = $defTime; //tzdate("g:i a",$assessmentData['enddate']+7*24*60*60);
+                        $reviewTime = $defTime;
                     } else {
                         $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['reviewdate']);
                         $reviewTime = AppUtility::tzdate("g:i a",$assessmentData['reviewdate']);
                     }
                 } else {
                     $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
-                    $reviewTime = $defTime; //tzdate("g:i a",$assessmentData['enddate']+7*24*60*60);
+                    $reviewTime = $defTime;
                 }
                     if (!isset($params['id'])) {
                         $sTime = $defStartTime;
@@ -576,7 +580,10 @@ class AssessmentController extends AppController
         global $pageOutcomesList;
         if($outcomesData){
             foreach ($outcomesData as $singleData) {
-                if (is_array($singleData)) { //outcome group
+                /*
+                 * outcome group
+                 */
+                if (is_array($singleData)) {
                     $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
                     $this->flatArray($singleData['outcomes']);
                 } else {

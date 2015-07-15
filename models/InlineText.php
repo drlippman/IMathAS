@@ -140,4 +140,12 @@ class InlineText extends BaseImasInlinetext
             $inlineTextData->delete();
         }
     }
+
+    public static function setFileOrder($newtypeid,$addedfilelist){
+        $inlineData = InlineText::findOne(['id' => $newtypeid]);
+        if($inlineData){
+            $inlineData->fileorder = $addedfilelist;
+            $inlineData->save();
+        }
+    }
 } 

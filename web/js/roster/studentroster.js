@@ -10,12 +10,18 @@ $(document).ready(function () {
     jQuerySubmit('student-roster-ajax', { course_id: course_id }, 'studentRosterSuccess');
 });
 
+var data;
 var studentData;
+var students;
+var isCode;
+var isSection;
+var isImageColumnPresent = 0;
 function studentRosterSuccess(response) {
     response = JSON.parse(response);
-    var isCode = response.data.isCode;
-    var isSection = response.data.isSection;
-    var isImageColumnPresent = response.data.isImageColumnPresent;
+    data = response.data;
+     isCode = response.data.isCode;
+     isSection = response.data.isSection;
+     //isImageColumnPresent = response.data.isImageColumnPresent;
     if (response.status == 0) {
         var students = response.data.query;
         showStudentInformation(students, isCode, isSection, isImageColumnPresent);
@@ -30,7 +36,7 @@ function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
     $.each(students, function (index, student) {
 
         html += "<tr> <td><input type='checkbox' name='student-information-check' value='" + student.id + "'></td>";
-        if (isImageColumnPresent == 1) {
+        if (isImageColumnPresent != 0) {
             imageURL = 'dummy_profile.jpg';
             if (student.hasuserimg != 0) {
                 imageURL = student.id + ".jpg";
@@ -92,6 +98,8 @@ function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
             html += "<td class = 'lock-class'><img src='../../img/lock.png'>&nbsp;<a href='#' onclick='lockUnlockStudent(true," + student.id + ")'>Unlock</a></td>";
          }
     });
+    $('.roster-info div').remove();
+    createHeader();
     $('#student-information-table').append(html);
     createDataTable('student-data-table');
     bindEvent();
@@ -323,10 +331,12 @@ function teacherMakeException() {
         }
     });
 }
-var picsize = 0;
 function rotatepics() {
-    picsize = (picsize + 1) % 3;
-    picshow(picsize);
+    isImageColumnPresent = (isImageColumnPresent + 1) % 3;
+    //$('#student-information-table').remove();
+    showStudentInformation(studentData, isCode, isSection, isImageColumnPresent);
+    picshow(isImageColumnPresent);
+
 }
 function picshow(size) {
     var course_id = $("#course-id").val();
@@ -401,4 +411,19 @@ $('.roster-make-exception').click(function(e) {
     f.action = cancelUrl;
     f.submit();
     });
+}
+
+function createHeader(){
+    var html = '<table class="student-data-table table table-bordered table-striped table-hover data-table" id="student-information" bPaginate="false" ><thead><tr><th></th>';
+     if (isImageColumnPresent != 0) {
+        html += '<th>Picture</th>';
+         }
+    if (isSection == true) {
+        html += '<th>Section</th>';
+    }
+    if (isCode == true) {
+    html += '<th>Code</th>';
+    }
+    html += '<th>Last</th><th>First</th><th>Email</th><th>UserName</th><th>Last Access</th><th>Grades</th><th>Due Dates</th><th>Change Info</th><th>Lock Out</th></tr></thead><tbody id="student-information-table"></tbody></table>';
+    $('.roster-info').append(html);
 }

@@ -122,5 +122,12 @@ class GbItems extends BaseImasGbitems
         }
     }
 
+    public static function setRubric($id, $data){
+        $rubricData = GbItems::findOne(['id' => $id]);
+        if ($rubricData){
+            $rubricData->rubric = $data;
+            $rubricData->save();
+        }
+    }
 }
 

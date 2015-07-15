@@ -47,6 +47,36 @@ function deleteItem(id,type,block,courseId) {
     });
 }
 function responseSuccess(response)
-{
+{console.log(response);
+    window.location = homePath;
+}
+
+function copyItem(id,type,block,courseId) {
+    var itemType = type;
+    var html = '<div><p>Are you sure? This will copy the '+ itemType+' .</p></div>';
+    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        closeText: "hide",
+        buttons: {
+            "Cancel": function () {
+                $(this).dialog('destroy').remove();
+                return false;
+            },
+            "confirm": function () {
+
+                jQuerySubmit('copy-items-ajax', {copyid: id, itemType: type, block: block, courseId: courseId},'copyResponseSuccess');
+
+                $(this).dialog('destroy').remove();
+                return true;
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+}
+function copyResponseSuccess(response)
+{console.log(response);
     window.location = homePath;
 }

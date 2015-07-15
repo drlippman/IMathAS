@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = 'Login Log';
+$this->title = 'Activity Log';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;

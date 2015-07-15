@@ -59,34 +59,36 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     </form>
 </div>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-<table class="student-data-table table table-bordered table-striped table-hover data-table" id="student-information" bPaginate="false" >
-    <thead>
-    <tr>
-        <th></th>
-        <?php if ($isImageColumnPresent == 1) {
-            ?><th></th>
-        <?php }
-            if ($isSection == true) {
-            ?>
-            <th>Section</th>
-        <?php
-        }
-        if ($isCode == true) {
-            ?>
-            <th>Code</th>
-        <?php } ?>
-        <th>Last</th>
-        <th>First</th>
-        <th>Email</th>
-        <th>UserName</th>
-        <th>Last Access</th>
-        <th>Grades</th>
-        <th>Due Dates</th>
-        <th>Change Info</th>
-        <th>Lock Out</th>
-    </tr>
-    </thead>
-    <tbody id="student-information-table">
-    </tbody>
-</table>
+<div class="roster-info">
+<!--<table class="student-data-table table table-bordered table-striped table-hover data-table" id="student-information" bPaginate="false" >-->
+<!--    <thead>-->
+<!--    <tr>-->
+<!--        <th></th>-->
+<!--        --><?php //if ($isImageColumnPresent == 1) {
+//            ?><!--<th></th>-->
+<!--        --><?php //}
+//            if ($isSection == true) {
+//            ?>
+<!--            <th>Section</th>-->
+<!--        --><?php
+//        }
+//        if ($isCode == true) {
+//            ?>
+<!--            <th>Code</th>-->
+<!--        --><?php //} ?>
+<!--        <th>Last</th>-->
+<!--        <th>First</th>-->
+<!--        <th>Email</th>-->
+<!--        <th>UserName</th>-->
+<!--        <th>Last Access</th>-->
+<!--        <th>Grades</th>-->
+<!--        <th>Due Dates</th>-->
+<!--        <th>Change Info</th>-->
+<!--        <th>Lock Out</th>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody id="student-information-table">-->
+<!--    </tbody>-->
+<!--</table>-->
+</div>
 

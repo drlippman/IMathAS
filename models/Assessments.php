@@ -77,7 +77,7 @@ class Assessments extends BaseImasAssessments
     }
     public function createAssessment($params,$startDate,$endDate,$reviewDate,$timeLimit,$shuffle,$defFeedback,$tutorEdit,$showHints,$endMsg,$defFeedbackText,$isTutorial){
         $this->courseid = isset($params['cid']) ? $params['cid'] : null;
-        $this->name = isset($params['name']) ? $params['name'] : null;
+        $this->name = isset($params['name']) ? trim($params['name']) : null;
         $this->summary = isset($params['summary']) ? $params['summary'] : null;
         $this->intro = isset($params['intro']) ? $params['intro'] : null;
         $this->startdate = $startDate;
@@ -126,7 +126,7 @@ class Assessments extends BaseImasAssessments
                                             $calrtag,$defFeedbackText,$isTutorial,$endMsg,
                                             $startDate,$endDate,$reviewDate){
         $assessment = Assessments::findOne(['id' => $params['id']]);
-        $assessment->name = $params['name'];
+        $assessment->name = trim($params['name']);
         $assessment->summary = $params['summary'];
         $assessment->intro = $params['intro'];
         $assessment->timelimit = $timeLimit;

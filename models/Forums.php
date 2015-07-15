@@ -227,4 +227,12 @@ class Forums extends BaseImasForums {
         }
     }
 
+    public static function setRubric($id, $data){
+        $rubricData = Forums::findOne(['id' => $id]);
+        if ($rubricData){
+            $rubricData->rubric = $data;
+            $rubricData->save();
+        }
+    }
+
 } 
