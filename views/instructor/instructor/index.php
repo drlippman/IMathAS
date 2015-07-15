@@ -16,3 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("_toolbarTeacher", ['course' => $course]);?>
 </div>
+
+<div class="tab-content">
+<br><br><br><br><br><br><br><br><br><br>
+</div>
