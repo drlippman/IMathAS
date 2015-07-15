@@ -24,7 +24,7 @@ body {
     height: 320px;
 }
 .container-lower-white{
-    background-color: #fafafa;
+    background-color: #ffffff;
     margin: 0px;
     padding: 0px;
 }
@@ -149,5 +149,14 @@ body {
 
     padding-top: 25px;
     padding-left: 5px
-
 }
+.item-detail-content{
+    background: #E0E0E0;
+    margin-top: 5%;
+}
+.master-tabs{
+    border: 1px solid #6D6D6D;
+}
+/*.page-content{*/
+    /*background: #fafafa;*/
+/*}*/
