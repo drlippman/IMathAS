@@ -209,7 +209,7 @@ function threadSuccess(response)
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
         var checkPostOrThread = 1;
-        var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
+        var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
