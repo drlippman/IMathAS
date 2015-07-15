@@ -27,7 +27,7 @@ echo Nav::widget([
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?
             ['label' => ''] :
-            ['label' => 'Logout (' . ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName) .')',
+            ['label' => (ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
                 'url' => ['/site/logout'],
                 'linkOptions' => ['data-method' => 'post']],
     ],

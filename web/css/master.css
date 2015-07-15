@@ -9,6 +9,7 @@ body {
     padding: 0 5%;
     position: relative;
     bottom: 225px;
+
 }
 .navbar-inverse {
     background-color: #2C368E;
@@ -17,7 +18,7 @@ body {
 .navbar-inverse .navbar-brand{
     color: #ffffff;
     font-size: 30px;
-    padding: 10% 4.7%;
+    /*padding: 10% 4.7%;*/
 }
 .container-upper-blue{
     background-color: #3441AC;
@@ -45,7 +46,7 @@ body {
     font-size: 10px;
 }
 .index-header .left-side .big-title{
-    font-size: 25px;
+    font-size: 30px;
 }
 .right-float{
     float: right;
@@ -73,15 +74,25 @@ body {
 }
 .master-footer
 {
-    padding: 2% 5% 2% 3.8%;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 5%;
+    padding-right: 5%;
+    height: 60px;
+    background-color: #ffffff;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
 }
 .footer-brand
 {
-    padding-left: 20%;
+    padding-right: 0;
     font-size: 22px;
     color: #808080;
     position: relative;
     top: -2px;
+    text-align: right;
+
 }
 
 .dropdown-class{
@@ -119,6 +130,7 @@ body {
 .footer-alignment
 {
     padding-right: 12%;
+    padding-left: 0%;
 }
 .right-side-button{
     background-color: #2C368E;
@@ -135,6 +147,7 @@ body {
 .instructor-toolbar{
     padding: 3% 0;
 }
+
 .help-icon {
     width: 20px;
     height: 20px;
@@ -147,7 +160,7 @@ body {
 
 .add-help{
 
-    padding-top: 25px;
+    padding-top: 30px;
     padding-left: 5px
 }
 .item-detail-content{
@@ -157,6 +170,20 @@ body {
 .master-tabs{
     border: 1px solid #6D6D6D;
 }
-/*.page-content{*/
-    /*background: #fafafa;*/
-/*}*/
+
+.container{
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 5%;
+    padding-right: 5%;
+
+}
+.row{
+   margin: 0%;
+    padding-left: 0%;
+}
+.row-alignment{
+    padding-left: 0%;
+}
+

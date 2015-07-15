@@ -8,7 +8,7 @@ $this->title = 'Roster';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
 <div class="item-detail-header">
     <?php echo $this->render("header/_index",['item_name' => 'help', 'link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>

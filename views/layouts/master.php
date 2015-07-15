@@ -19,13 +19,14 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
 </head>
 
 <body>
 <?php $this->beginBody() ?>
 <div class="header-content">
-    <?php echo $this->render( '_header'); ?>
+    <?php echo $this->render('_header'); ?>
 </div>
 <div class="clear-both"></div>
 <div class="master-wrap">
@@ -49,6 +50,6 @@ AppAsset::register($this);
 <?php $this->endBody() ?>
 <div class="clear-both"></div>
 </body>
-<?php echo $this->render( '_footer'); ?>
+<?php echo $this->render('_footer'); ?>
 </html>
 <?php $this->endPage() ?>

@@ -4,7 +4,7 @@ use app\components\AppUtility;
 
 <div class="master-footer">
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-8 row-alignment">
             <div class="col-md-1 footer-alignment">
                 <a href="#"><?php AppUtility::t('Support')?></a>
             </div>
