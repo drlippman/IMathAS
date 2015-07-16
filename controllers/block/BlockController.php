@@ -9,7 +9,9 @@
 namespace app\controllers\block;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\AssessmentUtility;
 use app\controllers\AppController;
 use app\models\Course;
 use app\models\Student;
@@ -67,7 +69,7 @@ class BlockController extends AppController
         }else
         { //modifying existing
             $blockTree = explode('-',$params['id']);
-            $existingid = array_pop($blocktree) - 1; //-1 adjust for 1-index
+            $existingid = array_pop($blocktree) - AppConstant::NUMERIC_ONE; //-1 adjust for 1-index
         }
         $sub =& $blockData;
         if (count($blockTree)>1) {
@@ -81,37 +83,56 @@ class BlockController extends AppController
         }
         if(isset($params['public']))
         {
-            $params['public'] = $params['public'];
+            $public = AppConstant::NUMERIC_ONE;
         }
         else{
-            $params['public'] = 0;
+            $public = AppConstant::NUMERIC_ZERO;
         }
-        if(isset($params['fixedheight']))
+        if(is_numeric($params['fixedheight']))
         {
-            $params['fixedheight'] = $params['fixedheight'];
+            $fixedHeight = $params['fixedheight'];
         }
         else{
-            $params['fixedheight'] = 0;
+            $fixedHeight  = AppConstant::NUMERIC_ZERO;
+        }
+        if ($params['avail']==AppConstant::NUMERIC_ONE)
+        {
+            if ($params['available-after']=='0') {
+                $startDate = AppConstant::NUMERIC_ZERO;
+            } else if ($params['available-after']=='1') {
+                $startDate = time()-AppConstant::NUMERIC_TWO;
+            } else {
+                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+            }
+            if ($params['available-until']=='2000000000') {
+                $endDate = 2000000000;
+            } else {
+                $endDate = AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
+            }
+        }else
+        {
+            $startDate = AppConstant::NUMERIC_ZERO;
+            $endDate = 2000000000;
         }
         $blockItems = array();
         $blockItems['name'] = htmlentities(stripslashes($params['title']));
-        $blockItems['id'] = $blockCnt;
-        $blockItems['startdate'] = $params['sdate'];
-        $blockItems['enddate'] = $params['edate'];
+        $blockItems['id'] = strval($blockCnt);
+        $blockItems['startdate'] =  $startDate;
+        $blockItems['enddate'] = $endDate;
         $blockItems['avail'] = $params['avail'];
         $blockItems['SH'] = $params['showhide'] . $params['availBeh'];
-        $blockItems['colors'] = 0;
-        $blockItems['public'] = $params['public'];
-        $blockItems['fixedheight'] = $params['fixedheight'];
+        $blockItems['colors'] = "";
+        $blockItems['public'] = $public ;
+        $blockItems['fixedheight'] = $fixedHeight;
         $blockItems['grouplimit'] = $groupLimit;
         $blockItems['items'] = array();
         if ($params['toTb']=='b') {
-            array_push($sub,$blockItems);
+            array_push($sub,($blockItems));
         } else if ($params['toTb']=='t') {
-            array_unshift($sub,$blockItems);
+            array_unshift($sub,($blockItems));
         }
         $blockCnt++;
-        $finalBlockItems = addslashes(serialize($blockData));AppUtility::dump($finalBlockItems);
+        $finalBlockItems =(serialize($blockData));
         Course::UpdateItemOrder($finalBlockItems,$blockCnt,$params['courseId']);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$params['courseId']));
     }

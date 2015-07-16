@@ -210,6 +210,8 @@ function threadSuccess(response)
 
         $('#data').hide();
         $('#noThread').show();
+        $('#limit-to-new-link').hide();
+        $('#markRead').hide();
     }
     if(isValue == 3)
     {

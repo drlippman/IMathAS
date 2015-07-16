@@ -15,8 +15,9 @@ $hidetitle = false;
 ?>
 
 
-<h3><b><?php echo $pageTitle; ?></b><img src="<?php echo AppUtility::getAssetURL() ?>img/help.gif" alt="Help"
-                                         onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
+<h3><b><?php echo $pageTitle; ?></b>
+<!--    <img src="--><?php //echo AppUtility::getAssetURL() ?><!--img/help.gif" alt="Help"-->
+<!--                                         onClick="window.open('--><?php //echo AppUtility::getHomeURL() ?><!--docs/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>-->
 </h3>
 <?php if (isset($modifyForumId)){ ?>
 <form enctype="multipart/form-data" method=post

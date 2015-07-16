@@ -496,3 +496,7 @@ a.msg-notification:visited{
     text-align: left;
     margin-left: 14%;
 }
+
+.non-bold{
+    font-weight: normal;
+}

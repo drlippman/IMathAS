@@ -645,7 +645,6 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
         public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent)
         {
-
                              $block = $item[key($item)]; ?>
 
                             <?php if ($block['avail'] == 1&& $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
@@ -663,12 +662,12 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                       <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
                                     </span>
                                     <?php } ?>
-                                    <div class=title>
-                                    <span class="right">
-                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-                                     </span>
-                                     <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
-                                    </div>
+                                  <div class=title>
+                                         <span class="right">
+                                         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
+                                         </span>
+                                         <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
+                                  </div>
                             </div>
                             <div class=blockitems id="block5<?php echo $block['id']?>">
                                 <?php if (count($item['itemList'])) { ?>

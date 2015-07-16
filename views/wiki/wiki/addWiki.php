@@ -116,37 +116,38 @@ $hidetitle = false;
 		</span><br class="form"/>
 
         <span class=form>Students can edit:</span>
-		<span class=formright>
-			<input type=radio name="rdatetype" value="0" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
+		 <span class="formright">
+             <input type=radio name="rdatetype" value="0" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/>Always<br/>
 			<input type=radio name="rdatetype" value="2000000000" <?php if ($revisedate==0) { echo "checked=1";}?>/>Never<br/>
-			<input type=radio name="rdatetype" class="pull-left" value="2" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/>Before:
+   			<input type=radio name="rdatetype" class="pull-left" value="2" <?php if ($revisedate<2000000000 && $revisedate>0){ echo "checked=1";}?>/>
 
-            <?php
-            echo '<div class = "col-lg-4 time-input">';
-            echo DatePicker::widget([
-                'name' => 'Calendar',
-                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y"),
-                'removeButton' => false,
-                'pluginOptions' => [
-                    'autoclose' => true,
-                    'format' => 'mm/dd/yyyy' ]
-            ]);
-            echo '</div>';?>
-            <?php
-            echo '<label class="end col-lg-7"> at </label>';
-            echo '<div class="col-lg-6">';
+             <?php
+             echo '<label class="end pull-left non-bold">Before:</label>';
+             echo '<div class = "pull-left col-lg-4 time-input">';
+             echo DatePicker::widget([
+                 'name' => 'Calendar',
+                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                 'value' => date("m/d/Y"),
+                 'removeButton' => false,
+                 'pluginOptions' => [
+                     'autoclose' => true,
+                     'format' => 'mm/dd/yyyy']
+             ]);
+             echo '</div>'; ?>
+             <?php
+             echo '<label class="end pull-left non-bold"> at </label>';
+             echo '<div class=" col-lg-6">';
+             echo TimePicker::widget([
+                 'name' => 'calendar_end_time',
+                 'value' => time(),
+                 'pluginOptions' => [
+                     'showSeconds' => false,
+                     'class' => 'time'
+                 ]
+             ]);
+             echo '</div>'; ?>
 
-            echo TimePicker::widget([
-                'name' => 'calendar_end_time',
-                'value' => time(),
-                'pluginOptions' => [
-                    'showSeconds' => false,
-                    'class' => 'time'
-                ]
-            ]);
-            echo '</div>';?>
-		</span><br class="form" />
+		</span><BR class=form>
 
         <div class=submit><input type=submit class="btn btn-primary" value="<?php echo $saveTitle;?>"></div>
     </form>
