@@ -62,7 +62,7 @@ public $oa = array();
                      return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
                     break;
                 case 'linkedtext':
-                     return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-link?cid='.$courseId));
+                     return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
                     break;
                 case 'forum':
                      return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));

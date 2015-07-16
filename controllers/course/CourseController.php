@@ -27,6 +27,10 @@ use app\models\InlineText;
 use app\models\Wiki;
 use app\models\User;
 use app\models\GbCats;
+use app\models\StuGroupSet;
+use app\models\Rubrics;
+use app\models\Outcomes;
+use app\models\ExternalTools;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\DeleteCourseForm;
@@ -761,5 +765,367 @@ class CourseController extends AppController
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'hidetitle' => $hideTitle);
         return $this->render('modifyInlineText', $returnData);
+    }
+
+    public function actionAddLink()
+    {
+        $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $modifyLinkId = $params['id'];
+        $groupNames = StuGroupSet::getByCourseId($courseId);
+        $rubricsData = Rubrics::getByUserId($user['id']);
+        $query = Outcomes::getByCourse($courseId);
+        $key = AppConstant::NUMERIC_ONE;
+        $pageOutcomes = array();
+        if ($query) {
+            foreach($query as $singleData) {
+                $pageOutcomes[$singleData['id']] = $singleData['name'];
+                $key++;
+            }
+        }
+        $pageOutcomesList = array();
+        if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
+            $query = $course['outcomes'];
+            $outcomeArray = unserialize($query);
+            $result = $this->flatArray($outcomeArray);
+            if($result){
+                foreach($result as $singlePage){
+                    array_push($pageOutcomesList,$singlePage);
+                }
+            }
+        }
+        $key = 0;
+        $gbcatsData = GbCats::getByCourseId($courseId);
+        foreach($gbcatsData as $group){
+            $gbcatsId[$key] = $group['id'];
+            $gbcatsLabel[$key] = $group['name'];
+            $key++;
+        }
+        $toolsData = ExternalTools::externalToolsData($courseId);
+        $toolvals = array();
+        $toolvals[0] = AppConstant::NUMERIC_ZERO;
+        $key = 1;
+        foreach($toolsData as $tool){
+            $toolvals[$key++] = $tool['id'];
+
+        }
+        $toollabels[0] = 'Select a tool...';
+        $key = 1;
+        foreach($toolsData as $tool){
+            $toollabels[$key++] = $tool['name'];
+
+        }
+        if ($params['id']) {
+//            $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
+            $linkData = LinkedText::getById($params['id']);
+//            AppUtility::dump($linkData);
+            $gbcat = 0;
+            $cntingb = 1;
+            $tutoredit = 0;
+            $gradesecret = uniqid();
+
+            if ($linkData['avail'] == 2 && $linkData['startdate'] > 0) {
+                $altoncal = 1;
+            } else {
+                $altoncal = 0;
+            }
+            if (substr($linkData['text'], 0, 4) == 'http') {
+                $type = 'web';
+                $webaddr = $linkData['text'];
+                $linkData['text'] = "<p>Enter text here</p>";
+            } else if (substr($linkData['text'], 0, 5) == 'file:') {
+                $type = 'file';
+                $filename = substr($linkData['text'], 5);
+                $line['text'] = "<p>Enter text here</p>";
+            } else if (substr($linkData['text'], 0, 8) == 'exttool:') {
+                $type = 'tool';
+                $points = $linkData['points'];
+                $toolparts = explode('~~', substr($linkData['text'], 8));
+
+                $selectedtool = $toolparts[0];
+                $toolcustom = $toolparts[1];
+                if (isset($toolparts[2])) {
+                    $toolcustomurl = $toolparts[2];
+                } else {
+                    $toolcustomurl = '';
+                }
+                if (isset($toolparts[3])) {
+                    $gbcat = $toolparts[3];
+                    $cntingb = $toolparts[4];
+                    $tutoredit = $toolparts[5];
+                    $gradesecret = $toolparts[6];
+                }
+                $line['text'] = "<p>Enter text here</p>";
+            } else {
+                $type = 'text';
+            }
+            if ($linkData['outcomes'] != '') {
+                $gradeoutcomes = explode(',', $linkData['outcomes']);
+
+            } else {
+                $gradeoutcomes = array();
+            }
+            if ($linkData['summary'] == '') {
+                $line['summary'] = "<p>Enter summary here (displays on course page)</p>";
+            }
+            $saveTitle = "Modify Link";
+            $saveButtonTitle = "Save Changes";
+            $gradesecret = uniqid();
+            $gradeoutcomes = array();
+            $checkboxesValues = array(
+                'title' => $linkData['title'],
+                'summary' =>  $linkData['summary'],
+                'text' =>  $linkData['text'],
+//            $line['text'] = "<p>Enter text here</p>";
+                'startdate' => $linkData['startdate'],
+                'enddate' => $linkData['enddate'],
+                'gbcat' => 0,
+                'cntingb' => 1,
+                'tutoredit' => 0,
+                'gradesecret' => uniqid(),
+                'webaddr' => $webaddr,
+                'filename' => $filename,
+                'altoncal' => $altoncal,
+                'altoncal' => 0,
+                'type' => $type,
+                'gradeoutcomes' => $gradeoutcomes,
+//            $selectedgbitem = 0,
+                'points' => $points,
+                'toolparts' => $toolparts,
+                'cntingb' => $cntingb,
+                'gbcat' => $gbcat,
+                'tutoredit' => $tutoredit,
+                'gradesecret' => $gradesecret,
+                'saveButtonTitle' => $saveButtonTitle,
+                'saveTitle' => $saveTitle,
+                'points' => $points,
+            );
+        } else {
+//            //set defaults
+            $checkboxesValues = array(
+                'saveButtonTitle' => "Create Link",
+                'saveTitle' => "Create Link",
+                'title' => "Enter title here",
+                'summary' => "Enter summary here (displays on course page)",
+                'text' => "Enter text here",
+                'points' => 0,
+
+            );
+//
+        }if($this->isPost()){
+        $outcomes = array();
+        $params = $this->getRequestParams();
+        $modifyLinkId = $params['id'];
+        if(isset($modifyLinkId)){
+//            AppUtility::dump($params);
+            $link = new LinkedText();
+            $link->updateLinkData($params);
+        }else{
+            foreach ($params['outcomes'] as $o) {
+                if (is_numeric($o) && $o>0) {
+                    $outcomes[] = intval($o);
+                }
+            }
+            $outcomes = implode(',',$outcomes);
+
+            $processingerror = false;
+//            if ($params['linktype']=='text') {
+//
+//            } else
+            if ($params['linktype']=='file') {
+//                require_once("../includes/filehandler.php");
+//AppUtility::dump($_FILES['userfile']['name']);\
+                if ($_FILES['userfile']['name']!='') {
+                    //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+                    //$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
+                    $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+                    $filename = $userfilename;
+                    $extension = strtolower(strrchr($userfilename,"."));
+                    $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+//                    AppUtility::dump($extension);
+                    if (in_array($extension,$badextensions)) {
+                        $overwriteBody = 1;
+                        $body = "<p>File type is not allowed</p>";
+                    } else {
+
+                        if ($_FILES['userfile']['error']==1 || $_FILES['userfile']['error']==2) {
+
+                            $errormsg = "File size too large";
+                            $params['text'] = "File upload error - $errormsg";
+                            $uploaderror = true;
+                        } else {
+
+                            if (($filename=$this->storeuploadedcoursefile('userfile',$courseId.'/'.$filename))===false) {
+//AppUtility::dump($filename);
+                                $errormsg = "Try again";
+                                $params['text'] = "File upload error - $errormsg";
+                                $uploaderror = true;
+                            } else {
+                                $params['text'] = "file:$filename";
+//                                AppUtility::dump($filename);
+                            }
+
+                        }
+                    }
+
+                } else if (!empty($_POST['curfile'])) {
+                    //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+                    ///if (!file_exists($uploaddir . $_POST['curfile'])) {
+                    if (!($this->doesfileexist('cfile',$_POST['curfile']))) {
+                        $processingerror = true;
+                    } else {
+                        $_POST['text'] = "file:".$_POST['curfile'];
+                    }
+                } else {
+                    $processingerror = true;
+                }
+            } else if ($params['linktype']=='web') {
+                $params['text'] = trim(strip_tags($params['web']));
+
+                if (substr($params['text'],0,4)!='http') {
+
+                    $processingerror = true;
+                }
+
+            } else if ($params['linktype']=='tool') {
+                if ($params['tool']==0) {
+                    $processingerror = true;
+                } else {
+                    //tool~~custom~~customurl~~gbcategory~~cntingb~~tutoredit~~gradesecret
+                    $params['text'] = 'exttool:'.$params['tool'].'~~'.$params['toolcustom'].'~~'.$params['toolcustomurl'];
+                    if ($params['usegbscore']==0 || $params['points']==0) {
+                        $points = 0;
+                    } else {
+                        $params['text'] .= '~~'.$params['gbcat'].'~~'.$params['cntingb'].'~~'.$params['tutoredit'].'~~'.$params['gradesecret'];
+                        $points = intval($params['points']);
+                    }
+                }
+            }
+
+
+            $s = new ExternalTools();
+            $s->updateExternalToolsData($params);
+            $linkText = new LinkedText();
+            $linkTextId = $linkText->AddLinkedText($params,$outcomes);
+            $itemType = AppConstant::LINK;
+            $itemId = new Items();
+            $lastItemId =   $itemId -> saveItems($courseId, $linkTextId, $itemType);
+            $courseItemOrder = Course::getItemOrder($courseId);
+            $itemOrder = $courseItemOrder->itemorder;
+            $items = unserialize($itemOrder);
+            $blocktree = array(0);
+            $sub =& $items;
+            for ($i=1;$i<count($blocktree);$i++) {
+                $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+            }
+            array_unshift($sub,intval($lastItemId));
+            $itemorder = addslashes(serialize($items));
+            $saveItemOrderIntoCourse = new Course();
+            $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+        }
+
+        $this->includeJS(["editor/tiny_mce.js","general.js"]);
+        return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+    }
+
+//        AppUtility::dump($tool);
+        $this->includeJS(["editor/tiny_mce.js","general.js"]);
+        $responseData = array('course' => $course,'groupNames' => $groupNames,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,'modifyLinkId' => $modifyLinkId,
+            'pageOutcomes' => $pageOutcomes,'toolvals' => $toolvals,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'toollabels' => $toollabels,'checkboxesValues' => $checkboxesValues);
+        return $this->renderWithData('addLink',$responseData);
+    }
+
+    function storeuploadedcoursefile($id,$key,$sec="public-read") {
+//AppUtility::dump('fun');
+        if ($this->filehandertypecfiles == 's3') {
+//            AppUtility::dump($this->filehandertypecfiles);
+            if ($sec=="public" || $sec=="public-read") {
+                $sec = "public-read";
+            } else {
+                $sec = "private";
+            }
+            if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+//                AppUtility::dump($_FILES[$id]);
+                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+                $t=0;
+                $fn = $key;
+                while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
+                    $key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
+                    $t++;
+                }
+                if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
+                    return $key;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+
+            if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
+                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/Uploads';
+//                AppUtility::dump($base);
+                $keydir = dirname($key);
+                $dir = $base.dirname($key);
+                $fn = basename($key);
+                if (!is_dir($dir)) {
+                    $this->mkdir_recursive($dir);
+                }
+                $t=0; $tfn = $fn;
+                while(file_exists($dir.'/'.$fn)){
+                    $fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
+                    $t++;
+                }
+                if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
+                    return $keydir.'/'.$fn;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
+    function mkdir_recursive($pathname, $mode=0777)
+    {
+        is_dir(dirname($pathname)) || $this->mkdir_recursive(dirname($pathname), $mode);
+        return is_dir($pathname) || @mkdir($pathname, $mode);
+    }
+    function doesfileexist($type,$key) {
+        if ($type=='cfile') {
+            if ($GLOBALS['filehandertypecfiles'] == 's3') {
+                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+                return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false);
+            } else {
+                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
+                return file_exists($base.$key);
+            }
+        } else {
+            if ($GLOBALS['filehandertype'] == 's3') {
+                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+                return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
+            } else {
+                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
+                return file_exists($base.$key);
+            }
+        }
+    }
+    public function flatArray($outcomesData)
+    {
+        global $pageOutcomesList;
+        if ($outcomesData) {
+            foreach ($outcomesData as $singleData) {
+                if (is_array($singleData)) { //outcome group
+                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $this->flatArray($singleData['outcomes']);
+                } else {
+                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                }
+            }
+        }
+        return $pageOutcomesList;
     }
 }

@@ -78,6 +78,7 @@ class Forums extends BaseImasForums {
     }
     public function addNewForum($params)
     {
+//        AppUtility::dump($params);
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
         $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
@@ -123,7 +124,7 @@ class Forums extends BaseImasForums {
             $this->replyby = $params['new-thread'];
         }
 
-        $this->groupsetid = $params['group-forum'];
+//        $this->groupsetid = $params['group-forum'];
         $this->cntingb = $params['count-in-gradebook'];
         $this->avail = $params['avail'];
         $this->forumtype = $params['forum-type'];
@@ -133,11 +134,12 @@ class Forums extends BaseImasForums {
             $tagList = trim($params['taglist']);
         }
             $this->taglist = $tagList;
-        $this->gbcategory = $params['gradebook-category'];
-        $this->points = $params['points'];
-        $this->tutoredit = $params['tutor-access'];
-        $this->rubric = $params['rubric'];
-        $this->outcomes = $params['associate-outcomes'];
+//        $this->gbcategory = $params['gradebook-category'];
+//        $this->points = $params['points'];
+//        $this->tutoredit = $params['tutor-access'];
+//        $this->rubric = $params['rubric'];
+//        $this->outcomes = $params['associate-outcomes'];
+//        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }

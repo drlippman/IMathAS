@@ -127,7 +127,7 @@ class AppConstant
     const PM = 'pm';
     const FORUM = 'Forum';
     const WIKI = 'Wiki';
-    const LINK ='Link';
+    const LINK ='LinkedText';
     const ASSESSMENT ='Assessment';
     const INLINE_TEXT = 'Inline';
     const CALENDAR = 'Calendar';
@@ -141,4 +141,8 @@ class AppConstant
     const INVALID_COMBINATION = 'Invalid combination of enrollment key and course id.';
     const INLINE_TEXT_MODIFY_TITLE = 'Modify Inline Text';
     const INLINE_TEXT_ADD_TITLE = 'Add Inline Text';
+    const CHOOSE_STUDENT = 'Select course from list to choose students';
+    const ADD_FORUM = 'Add Forum';
+    const CREATE_FORUM = 'Create Forum';
+    const SIXTEEN = 16;
 }

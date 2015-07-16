@@ -32,9 +32,9 @@ class ForumView extends BaseImasForumViews
         return $thread;
 
     }
-    public static function updateFlagValue($row)
+    public static function updateFlagValue($row,$userId)
     {
-        Yii::$app->db->createCommand("UPDATE imas_forum_views SET tagged=(tagged^1) WHERE threadid=".$row)->execute();
+        Yii::$app->db->createCommand("UPDATE imas_forum_views SET tagged=(tagged^1) WHERE threadid=$row AND userid = $userId")->execute();
 
     }
 

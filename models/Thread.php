@@ -12,6 +12,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
+use Yii;
 use app\models\_base\BaseImasInstrFiles;
 
 class Thread extends BaseImasForumThreads
@@ -55,6 +56,11 @@ class Thread extends BaseImasForumThreads
         $ForumPost = Thread::findOne(['id' => $threadId]);
         $ForumPost->forumid = $forumId;
         $ForumPost->save();
+    }
+    public static function getByForumId($forumId)
+    {
+        $threadData = Yii::$app->db->createCommand("SELECT * FROM imas_forum_threads WHERE forumid = $forumId AND stugroupid>0 LIMIT 1")->queryAll();
+        return $threadData;
     }
 
 } 

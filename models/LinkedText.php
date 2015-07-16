@@ -69,4 +69,43 @@ class LinkedText extends BaseImasLinkedtext
         $this->save();
         return $this->id;
     }
+    public static function getById($id)
+    {
+        $linkData = LinkedText::find()->where(['id' => $id])->one();
+        return $linkData;
+    }
+    public function updateLinkData($params)
+    {
+//        courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points
+        $updaateLink = LinkedText::findOne(['id' => $params['id']]);
+//        AppUtility::dump($updaateLink);
+        $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
+        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+        $updaateLink->courseid = $params['cid'];
+        $updaateLink->title = $params['name'];
+        $updaateLink->summary = $params['summary'];
+        $updaateLink->text = $params['text'];
+        $updaateLink->avail = $params['avail'];
+        $updaateLink->oncal = $params['place-on-calendar'];
+        $updaateLink->caltag = $params['tag'];
+        $updaateLink->target = $params['open-page-in'];
+//        $this->outcomes = $outcomes;
+        $updaateLink->points= $params['points'];
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
+        {
+            if($params['available-after'] == 0){
+                $startDate = 0;
+            }
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
+            }
+            $updaateLink->startdate = $startDate;
+            $updaateLink->enddate = $endDate;
+        }else
+        {
+            $updaateLink->startdate = AppConstant::NUMERIC_ZERO;
+            $updaateLink->enddate = AppConstant::ALWAYS_TIME;
+        }
+        $updaateLink->save();
+    }
 }
