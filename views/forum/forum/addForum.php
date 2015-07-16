@@ -55,16 +55,16 @@ $hidetitle = false;
             <span class=form>Show:</span>
 		<span class=formright>
 			<input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ZERO);?>
-                   onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='none';"/>Hide<br/>
+                   onclick="document.getElementById('datediv').style.display='none'; "/>Hide<br/>
 			<input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ONE);?>
-                   onclick="document.getElementById('datediv').style.display='block';document.getElementById('altcaldiv').style.display='none';"/>Show by Dates<br/>
+                   onclick="document.getElementById('datediv').style.display='block';"/>Show by Dates<br/>
 			<input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_TWO); ?>
-                   onclick="document.getElementById('datediv').style.display='none';document.getElementById('altcaldiv').style.display='block';"/>Show Always<br/>
+                   onclick="document.getElementById('datediv').style.display='none'; "/>Show Always<br/>
 		</span><br class="form"/>
 
             <!--Show by dates-->
             <div id="datediv" style="display:<?php echo ($forum['avail'] == 1) ? "block" : "none"; ?>">
-
+<?php $startTime = $eTime; ?>
                 <span class=form>Available After:</span>
 		        <span class=formright>
 			        <input type=radio name="available-after"
@@ -87,7 +87,6 @@ $hidetitle = false;
                     <?php
                     echo '<label class="end pull-left col-lg-1"> at </label>';
                     echo '<div class="pull-left col-lg-6">';
-
                     echo TimePicker::widget([
                         'name' => 'stime',
                         'value' => $eTime,

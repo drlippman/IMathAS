@@ -128,7 +128,7 @@ function threadSuccess(response)
 {
     response = JSON.parse(response);
     var fid = $('#forumid').val();
-    var courseId = $('#course-id').val();
+    var courseId = $('#courseid').val();
     if (response.status == 0) {
         var threads = response.data.threadArray;
         var uniquesDataArray = response.data.uniquesDataArray;
@@ -148,7 +148,6 @@ function threadSuccess(response)
                 });
                 count--;
                 if(thread.parent == 0){
-
                     html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
                     if (thread.tagged == 0 && thread.posttype == 0 ) {
                         html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
@@ -192,7 +191,7 @@ function threadSuccess(response)
                 }
             }
         });
-        $('.forum-table').DataTable().destroy();
+        //$('.forum-table').DataTable().destroy();
         $('.forum-table-body').empty();
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
