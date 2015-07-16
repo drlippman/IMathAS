@@ -162,6 +162,8 @@ body {
 
 .item-detail-content{
     padding-top: 30px;
+    /*box-shadow: 0 0 5px 5px #888;*/
+
 }
 .master-tabs{
     border-right: 1px solid #6d6d6d;
@@ -193,9 +195,15 @@ body {
     box-shadow: 0px -3px 13px -2px #6d6d6d;
 }
 .tab-content{
+    background-color: #ffffff;
     margin-right: 1px;
     padding: 15px;
     background: #ffffff;
+
+}
+.notification-alignment{
+    background-color: #008E71;
+    /*background: #ffffff;*/
     box-shadow: 0px 4px 13px -2px #6d6d6d;
 }
 .common-navbar #nav .active > a {
@@ -205,4 +213,32 @@ body {
 .fa-calendar{
     font-size: 1em;
     margin-right: 5px;
+}
+.calendar-alignment{
+    width: 76%;
+    position: relative;
+    padding: 15px;
+}
+.calendar-day-details{
+    width: 24%;
+    position: relative;
+    padding: 15px;
+}
+
+.left-side-content {
+padding-left: 1%;
+}
+
+.back-arrow{
+    padding-top: 0;
+}
+
+.back-text{
+    padding-top: 0;
+}
+
+.padding-alignment{
+    padding-right: 0;
+    padding-left: 0;
+
 }

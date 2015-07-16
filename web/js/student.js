@@ -65,6 +65,8 @@ function calendar() {
         },
         editable: false,
         events: function (start, end, timezone, callback) {
+            var html = '';
+            var moment = $('.calendar').fullCalendar('getDate');
             $.ajax({
                 url: 'get-assessment-data-ajax',
                 data: {
@@ -173,6 +175,12 @@ function calendar() {
                     callback(events);
                 }
             });
+//            if(moment == assessmentData.assessmentArray){
+//                html += moment;
+//                $('.calendar-day-details').append(html);
+//            }
+            alert(assessmentData);
+
         },
         /**
          * Onclick event
