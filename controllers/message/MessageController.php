@@ -59,12 +59,10 @@ class MessageController extends AppController
             foreach($tutors as $tutor){
                 array_push($users,$tutor);
             }
-            if($userRights['rights'] != 10){
                 $students = Student::findStudentsToList($courseId);
                 foreach($students as $student){
                     array_push($users,$student);
                 }
-            }
             $userId = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);

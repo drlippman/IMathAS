@@ -55,7 +55,6 @@ class Items extends BaseImasItems
 
     public static function deleteByTypeIdName($typeId,$itemType){
         $itemData = Items::findAll(['typeid' => $typeId, 'itemtype' => $itemType]);
-        AppUtility::dump($itemData);
         $itemId = $itemData['id'];
         if($itemData){
             foreach ($itemData as $singleData){

@@ -172,6 +172,7 @@ public $oa = array();
                             case 'InlineText':
                                 $inlineText = InlineText::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $inlineText;
+                                $tempAray['inline'] = $item;
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'LinkedText':

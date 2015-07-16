@@ -14,8 +14,7 @@ use app\components\AppUtility;
                 <li><a class="ahrefAlign" href="#">Forums</a></li>
                 <li><a class="ahrefAlign" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>">Roster</a></li>
                 <li><a class="ahrefAlign" href="#">Calendar</a></li>
-                <li><a class="ahrefAlign" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>">Gradebook</a></li>
-<!--                <li><a class="ahrefAlign" href="#">Gradebook</a></li>-->
+                <li><a class="ahrefAlign" href="#">Gradebook</a></li>
             </ul>
             <br class="clear"/>
         </div>

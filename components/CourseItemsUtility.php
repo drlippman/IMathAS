@@ -565,15 +565,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <div class="itemsum">
                     <?php } ?>
                     <?php if($inline->avail == 2) { ?>
-                        <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
+                        <?php echo "Showing Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
                     <?php }
                     else {
                         if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
                         {
-                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
+                            echo "Showing until: Always"; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
                         <?php }
                         else{
-                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
+                            echo "Showing until: " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
                         <?php }
                     }
                     ?>
@@ -598,7 +598,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 </div>
                 <div class="itemsum"><p>
                         <?php  }
-                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
+                        echo 'Hidden'; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a>'; ?> | <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">  Delete </a> | <a href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>
 
                     <p><?php echo $inline->text ?></p>
                 </div>
@@ -623,7 +623,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php }
                         $startDate = AppUtility::formatDate($inline->startdate);
                         $endDate = AppUtility::formatDate($inline->enddate);
-                        echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> ';?>| <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#" onclick="copyItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>';?>
+                        echo "Showing " .$startDate. " until " .$endDate; echo '<a href="' .AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id).'"> Modify  </a> ';?>| <a href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Copy </a>';?>
                 </div>
             </div>
         <?php }?>
