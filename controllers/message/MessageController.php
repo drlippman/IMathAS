@@ -59,9 +59,11 @@ class MessageController extends AppController
             foreach($tutors as $tutor){
                 array_push($users,$tutor);
             }
-            $students = Student::findStudentsToList($courseId);
-            foreach($students as $student){
-                array_push($users,$student);
+            if($userRights['rights'] != 10){
+                $students = Student::findStudentsToList($courseId);
+                foreach($students as $student){
+                    array_push($users,$student);
+                }
             }
             $userId = $this->getUserId();
             $this->includeCSS(["message.css"]);

@@ -267,7 +267,7 @@ function getUserSuccess(response) {
 function userDisplay(userData) {
     var html = "";
     $.each(userData, function (index, userData) {
-        html += "<option value = " + userData.id + ">"+ userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1) +" "+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1) + "</option>"
+        html += "<option value = " + userData.id + ">"+ userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1) +", "+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1) + "</option>"
     });
     $(".show-users").append(html);
 }
@@ -399,5 +399,6 @@ function calculateCourseList(){
             courseInfo.push(obj);
         }
     });
+    courseInfo.sort();
     courseDisplay(courseInfo);
 }
