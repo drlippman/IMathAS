@@ -251,5 +251,14 @@ class Message extends BaseImasMsgs
     {
         return Message::find()->where(['courseid' => $courseid, 'msgto' => $userId])->all();
     }
+    public static function isMessageHaveChild($messageId)
+    {
+        $message =  Message::find()->where(['parent' => $messageId])->all();
+        $hasChild = AppConstant::NUMERIC_ZERO;
+        if($message){
+            $hasChild = AppConstant::NUMERIC_ONE;
+        }
+        return $hasChild;
+    }
 }
 

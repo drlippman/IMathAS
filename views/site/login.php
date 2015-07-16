@@ -22,7 +22,7 @@ $this->title = 'About';
                 <img class="about-page" src="<?php echo AppUtility::getHomeURL() ?>img/screens.jpg" alt="Computer screens"/>
             </td>
             <td>
-                <p><?= Yii::t('yii', 'This system is designed for mathematics, providing delivery of homework, quizzes, tests, practice
+                <p><?= AppUtility::t( 'This system is designed for mathematics, providing delivery of homework, quizzes, tests, practice
                     tests,and diagnostics with rich mathematical content. Students can receive immediate feedback on
                     algorithmically generated questions with numerical or algebraic expression answers.') ?>
                 </p>
@@ -38,7 +38,7 @@ $this->title = 'About';
     </table>
     <p><?= Yii::t('yii', 'Also available:') ?>
     <ul>
-        <li><a href="#"><?= Yii::t('yii', 'Help for student with entering answers') ?></a></li>
+        <li><a href="#"><?= AppUtility::t('Help for student with entering answers') ?></a></li>
         <li><a href="#"><?= Yii::t('yii','Instructor Documentation') ?></a></li>
     </ul>
 </div>

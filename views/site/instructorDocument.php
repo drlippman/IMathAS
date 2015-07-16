@@ -2,22 +2,23 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = Yii::t('yii', 'Instructor documents');
+$this->title = AppUtility::t('yii', 'Instructor documents');
 $this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
 </div>
-<h2>Guides</h2>
-<h4>Use Guides</h4>
+<h2><?php AppUtility::t('Guides')?>></h2>
+<h4><?php AppUtility::t('Use Guides')?></h4>
 <ul>
-    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/GettingStarted.pdf" target="_blank">Getting Started in WAMAP</a> (PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
-        version is specific to the WAMAP installation of IMathAS, but applies to any installation.</li>
-    <li><a href="#getting-started">Getting Started in IMathAS</a>.  A walkthrough of creating
-        your first IMathAS course.</li>
-    <li><a href="#common-task">Common Tasks in IMathAS</a>.  A walkthrough of common instructor activities.</li>
-    <li><a href="#manage-question-library">Managing Libraries and Questions in IMathAS</a>.  A guide to the library and question
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/GettingStarted.pdf" target="_blank"><?php AppUtility::t('Getting Started in WAMAP
+    version is specific to the WAMAP installation of IMathAS, but applies to any installation.')?></a> <?php AppUtility::t('(PDF file).  A walkthrough of creating a course in WAMAP, with screenshots.  This
+        ')?></li>
+    <li><a href="#getting-started"><?php AppUtility::t('Getting Started in IMathAS')?></a>.  <?php AppUtility::t('A walkthrough of creating
+        your first IMathAS course.')?></li>
+    <li><a href="#common-task"><?php AppUtility::t('Common Tasks in IMathAS');?></a>.  <?php AppUtility::t('A walkthrough of common instructor activities.')?></li>
+    <li><a href="#manage-question-library"><?php AppUtility::t('Managing Libraries and Questions in IMathAS')?></a>.  A guide to the library and question
         set management tools</li>
     <li><a href="#administrator">Administration</a>.  A guide to administering IMathAS for Full and Group Admins.</li>
     <li><a href="#diagnostics">Diagnostics</a>.  A guide to setting up diagnostic assessment login pages.</li>

@@ -199,8 +199,8 @@ class RosterController extends AppController
                 if ($teacher) {
                     $this->setErrorFlash(AppConstant::TEACHER_CANNOT_CHANGE_AS_SRUDENT);
                 } else {
-                    $stdrecord = Student::getByUserIdentity($uid->id, $courseId);
-                    if ($stdrecord) {
+                    $studentRecord = Student::getByUserIdentity($uid->id, $courseId);
+                    if ($studentRecord) {
                         $this->setErrorFlash(AppConstant::USERNAME_ENROLLED);
                     } else {
                         $student = new Student();
@@ -233,7 +233,7 @@ class RosterController extends AppController
             }
         }
         if ($this->isPost()) {
-            $params = $_POST;
+            $params = $this->getRequestParams();
             if ($params['section']) {
                 foreach ($params['section'] as $key => $section) {
                     $code = trim($params['code'][$key]);
@@ -267,12 +267,12 @@ class RosterController extends AppController
                 );
                 array_push($studentArray, $tempArray);
                 if ($this->isPost()) {
-                    $paramas = $_POST;
-                    foreach ($paramas['code'] as $key => $latepass) {
-                        $latepasshours = $paramas['passhours'];
+                    $params = $this->getRequestParams();
+                    foreach ($params['code'] as $key => $latepass) {
+                        $latePassHours = $params['passhours'];
                         Student::updateLatepasses(trim($latepass), $key, $courseId);
                     }
-                    Course::updatePassHours($latepasshours, $courseId);
+                    Course::updatePassHours($latePassHours, $courseId);
                     $this->redirect('student-roster?cid=' . $courseId);
                 }
             }
@@ -308,7 +308,7 @@ class RosterController extends AppController
             if ($selectedCourseId) {
                 $this->redirect('enroll-students?cid=' . $courseId . '&courseData=' . $selectedCourseId);
             } else {
-                $this->setErrorFlash("Select course from list to choose students");
+                $this->setErrorFlash(AppConstant::CHOOSE_STUDENT);
             }
         }
         $responseData = array('course' => $course, 'data' => $courseDetails, 'model' => $model);
@@ -716,6 +716,7 @@ class RosterController extends AppController
                 array_push($duplicateStudentsForNewStudent, $singleStudent);
             }
         }
+//        AppUtility::dump($duplicateStudentsForNewStudent);
         if(count($uniqueStudentsForNewStudent) == 0){
             $this->setErrorFlash(AppConstant::RECORD_EXISTS);
         }
@@ -1155,12 +1156,17 @@ class RosterController extends AppController
     {
         $params = $this->getRequestParams();
         $studentData = $params['studentData'];
+        $courseId = $params['courseId'];
         if ($studentData) {
             foreach ($studentData as $newEntry) {
                 $user = new User();
                 $student = new Student();
                 $id = $user->createUserFromCsv($newEntry, AppConstant::STUDENT_RIGHT);
-                $student->assignSectionAndCode($newEntry, $id);
+                $sectionAndCodeValue = array(
+                    'section' => $newEntry['5'],
+                    'code' => $newEntry['4'],
+                );
+                $student->createNewStudent($id,$courseId,$sectionAndCodeValue);
             }
             $this->setSuccessFlash(AppConstant::IMPORTED_SUCCESSFULLY);
 

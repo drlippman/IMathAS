@@ -341,12 +341,12 @@ function rotatepics() {
 function picshow(size) {
     var course_id = $("#course-id").val();
     if (size == 0) {
-        els = document.getElementById("student-information").getElementsByTagName("img");
+        els = document.getElementsByClassName("images");
         for (var i = 0; i < els.length; i++) {
             els[i].style.display = "none";
         }
     } else {
-        els = document.getElementById("student-information").getElementsByTagName("img");
+        els = document.getElementsByClassName("images");
         for (var i = 0; i < els.length; i++) {
             els[i].style.display = "inline";
             if (size == 2) {

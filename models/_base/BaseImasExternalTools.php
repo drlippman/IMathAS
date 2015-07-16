@@ -36,7 +36,7 @@ class BaseImasExternalTools extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'url', 'ltikey', 'secret', 'custom', 'privacy', 'courseid', 'groupid'], 'required'],
+//            [['name', 'url', 'ltikey', 'secret', 'custom', 'privacy', 'courseid', 'groupid'], 'required'],
             [['privacy', 'courseid', 'groupid'], 'integer'],
             [['name', 'url', 'ltikey', 'secret', 'custom'], 'string', 'max' => 255]
         ];

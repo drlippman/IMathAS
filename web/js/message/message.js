@@ -45,10 +45,10 @@ function showMessage(messageData, status) {
             }
             html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> " + msg.title + "</a></td>";
             if (msg.replied == 1) {
-                html += "<th>Yes</th>";
+                html += "<th class='read-message'>Yes</th>";
             }
             else {
-                html += "<th>No</th>";
+                html += "<th class='unread-message'>No</th>";
             }
             var rowid = msg.id;
             if (msg.isread < 7) {

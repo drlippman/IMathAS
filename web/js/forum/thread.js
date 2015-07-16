@@ -192,6 +192,8 @@ function threadSuccess(response)
                 }
             }
         });
+        $('.forum-table').DataTable().destroy();
+        $('.forum-table-body').empty();
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
         if(newCount > 0)
@@ -275,6 +277,7 @@ function threadSuccess(response)
 var isValue;
 function changeImage(element,checkFlagValue, rowId) {
 
+    var userId = $("#user-id").val();
     if(checkFlagValue == false){
         element.src = element.bln ? '../../img/flagempty.gif' : '../../img/flagfilled.gif';
         element.bln = !element.bln;
@@ -283,12 +286,11 @@ function changeImage(element,checkFlagValue, rowId) {
         element.src = element.bln ? '../../img/flagfilled.gif' : '../../img/flagempty.gif';
         element.bln = !element.bln;
     }
-    var row = {rowId: rowId};
-    jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
+    var row = {rowId: rowId,userId:userId};
+    jQuerySubmit('change-image-ajax', row,{});
 
 }
-function changeImageSuccess(response) {
-}
+
 function markAsRemoveSuccess(response) {
     var forumid = $("#forumid").val();
     var courseid = $("#course-id").val();
@@ -301,7 +303,6 @@ function markAsRemoveSuccess(response) {
 function limitToTagShow() {
 
     $("#limit-to-tag-link").click(function () {
-        $(".forum-table-body").empty();
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();
@@ -312,7 +313,6 @@ function limitToTagShow() {
 
     });
     $("#show-all-link").click(function () {
-        $(".forum-table-body").empty();
         $("#limit-to-tag-link").show();
         $("#show-all-link").hide();
         $("#limit-to-new-link").show();
@@ -323,7 +323,6 @@ function limitToTagShow() {
 
     });
     $("#limit-to-new-link").click(function () {
-        $(".forum-table-body").empty();
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();

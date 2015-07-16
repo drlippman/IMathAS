@@ -370,7 +370,9 @@ class MessageController extends AppController
         $messages = Message::getByBaseId($msgId, $baseId);
         if ($messages) {
             foreach ($messages as $message) {
+//                AppUtility::dump($message);
                 $this->children[$message['parent']][] = $message['id'];
+                $hasChild = Message::isMessageHaveChild($message['id']);
                 $tempArray = array();
                 $titleLevel = AppUtility::calculateLevel($message['title']);
                 $fromUser = User::getById($message['msgfrom']);
@@ -387,6 +389,7 @@ class MessageController extends AppController
                 $tempArray['replied'] = $message['replied'];
                 $tempArray['parent'] = $message['parent'];
                 $tempArray['baseId'] = $message['baseid'];
+                $tempArray['hasChild'] = $hasChild;
                 $this->messageData[$message['id']] = $tempArray;
             }
             $this->includeJS(["message/viewConversation.js"]);

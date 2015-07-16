@@ -127,9 +127,8 @@ $this->params['breadcrumbs'][] = $this->title;
     });
     function saveStudentData() {
         var existingData = <?php echo json_encode($existingStudent ); ?>;
-//        var existingData = studentInformation['existingUsers'];
-        console.log(existingData);
         var NewStudentData =  <?php echo json_encode($uniqueStudents ); ?>;
+        var courseId = $("#course-id").val();
         if(existingData){
         var html = '<div><p>Existing students detail : </p></div><p>';
         html += '* Already existing in system' + '<br>';
@@ -149,8 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 "confirm": function () {
                     $('#searchText').val(null);
                     $(this).dialog('destroy').remove();
-                    console.log(NewStudentData);
-                    jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData}, 'saveCsvFileSuccess');
+                    jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData,courseId:courseId}, 'saveCsvFileSuccess');
                     return true;
                 },
                 "Cancel": function () {
@@ -163,7 +161,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         });
     }else {
-            jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData}, 'saveCsvFileSuccess');
+            jQuerySubmit('save-csv-file-ajax', {studentData: NewStudentData,courseId:courseId}, 'saveCsvFileSuccess');
         }
 
     }

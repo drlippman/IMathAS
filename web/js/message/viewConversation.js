@@ -25,8 +25,10 @@ function expandall() {
     for (var i = 0; i < messageCount; i++) {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
-        node.className = 'forumgrp';
-        butn.src = '../../img/collapse.gif';;
+        if(node) {
+            node.className = 'forumgrp';
+            butn.src = '../../img/collapse.gif';
+        }
     }
 }
 function collapseall() {
@@ -34,8 +36,10 @@ function collapseall() {
     for (var i = 0; i <= messageCount; i++) {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
+        if(node){
         node.className = 'hidden';
         butn.src = '../../img/expand.gif';
+        }
     }
 }
 function showall() {
