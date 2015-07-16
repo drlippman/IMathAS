@@ -14,10 +14,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]);?>
 </div>
 
-<div class ='calendar col-lg-9'>
-    <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
-    <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
-</div>
-<div class="col-lg-3 right-float calendar-details">
-    <?php echo 'Tudip';?>
+<div class="tab-content">
+    <br><br><br><br><br><br><br><br><br><br>
+    <div class ='calendar col-lg-9'>
+        <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+        <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+    </div>
+    <div class="col-lg-3 right-float calendar-details">
+        <?php echo 'Tudip';?>
+    </div>
 </div>
