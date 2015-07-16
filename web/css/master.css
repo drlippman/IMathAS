@@ -81,7 +81,6 @@ body {
     padding-right: 5%;
     height: 60px;
     background-color: #ffffff;
-    /*border-top: 1px solid #ddd;*/
     padding-top: 20px;
 }
 .footer-brand
@@ -122,10 +121,8 @@ body {
     float: left;
     background-color: #D3D3D3;
 }
-
 .right-items .left-float{
     height: 34px;
-    /*background-color:#2C368E;*/
 }
 .footer-alignment
 {
@@ -140,12 +137,8 @@ body {
 .btn{
     padding: 6px 6px;
 }
-
 .common-navbar{
     background: #ffffff;
-    border-right: 1px solid #6d6d6d;
-    border-top: 1px solid #6d6d6d;
-    /*margin-top: 15px;*/
 }
 .instructor-toolbar{
     padding: 3% 0;
@@ -171,7 +164,8 @@ body {
     padding-top: 30px;
 }
 .master-tabs{
-    border-left: 1px solid #6D6D6D;
+    border-right: 1px solid #6d6d6d;
+    border-bottom-color: #ffffff;
 }
 
 .container{
@@ -180,7 +174,6 @@ body {
     margin-right: 0;
     padding-left: 5%;
     padding-right: 5%;
-
 }
 .row{
    margin: 0%;
@@ -189,23 +182,31 @@ body {
 .row-alignment{
     padding-left: 0%;
 }
-
 .grey-color-link{
     color: #6d6d6d;
 }
 .calendar-details{
     padding-top: 47px;
 }
-.tab-content{
-    background: #ffffff;
-}
 .nav-tabs{
     background: #E0E0E0;
+    box-shadow: 0px -3px 13px -2px #6d6d6d;
 }
 .tab-content{
-    border: 1px solid #6D6D6D;
+    margin-right: 1px;
     padding: 15px;
 }
 .notification-alignment{
     background-color: #008E71;
+    background: #ffffff;
+    box-shadow: 0px 4px 13px -2px #6d6d6d;
+}
+.common-navbar #nav .active > a {
+    color: #ffffff;
+    background-color: #2C368E;
+}
+.fa-calendar{
+    position: absolute;
+    left: 30%;
+    top: 5px;
 }
