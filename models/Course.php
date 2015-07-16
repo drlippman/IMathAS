@@ -167,12 +167,28 @@ class Course extends BaseImasCourses {
 
 
     }
+
     public static function setBlockCount($itemOrder,$blockCount,$courseId)
     {
         $course = Course::findOne(['id' => $courseId]);
         $course->itemorder = $itemOrder;
         $course->blockcnt = $blockCount;
         $course->save();
+    }
+
+
+    public static function UpdateItemOrder($finalBlockItems,$blockCnt,$course)
+    {
+        $isRecord = Course::findOne(['id' =>$course]);
+        if($isRecord)
+        {
+
+            $isRecord->itemorder = $finalBlockItems;
+            $isRecord->blockcnt = $blockCnt;
+            $isRecord->save();
+
+
+        }
     }
 }
 

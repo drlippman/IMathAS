@@ -71,7 +71,7 @@ public $oa = array();
                      return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
                     break;
                 case 'block':
-                     return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='.$courseId));
+                     return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&block=0&tb=t'));
                     break;
                 case 'calendar':
                     break;

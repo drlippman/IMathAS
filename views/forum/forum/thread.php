@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <span>
             <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-new-thread?forumid=' .$forumid.'&cid='.$course->id); ?>"
                class="btn btn-primary btn-sm">Add New Thread</a></span> |
-        <span></span><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/list-post-by-name?forumid=' .$forumid.'&cid='.$course->id); ?>">List Posts by Name</a> </span>|
-        <span><a id="limit-to-new-link" href="#">Limit to New</a> | <a id="limit-to-tag-link" href="#">Limit to Flagged</a> <a id="show-all-link" href="#">Show All</a> </span>|
+        <span></span><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/list-post-by-name?forumid=' .$forumid.'&cid='.$course->id); ?>">List Posts by Name</a> </span>
+        <span><a id="limit-to-new-link" href="#"> | Limit to New</a> | <a id="limit-to-tag-link" href="#">Limit to Flagged</a> <a id="show-all-link" href="#">Show All</a> </span>|
         <span><?= Html::submitButton('Mark all Read', ['id' => 'markRead','class' => 'btn btn-primary btn-sm ', 'name' => 'markallread-button']) ?></span>
     </div>
     <input type="hidden" id="forumid" value="<?php echo $forumid ?>">

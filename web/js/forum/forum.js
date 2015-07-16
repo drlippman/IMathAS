@@ -27,7 +27,8 @@ $(document).ready(function ()
                     $('#display').hide();
                     $('#search-post').hide();
                     $('#result').hide();
-                    jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: val},'threadSuccess');
+                    var courseId = $('.courseId').val();
+                    jQuerySubmit('get-forum-name-ajax',{search: search, courseId: courseId , value: val},'threadSuccess');
                 }
                 else
                 {
@@ -98,16 +99,21 @@ function threadSuccess(response)
     var courseId = $('.courseId').val();
     response = JSON.parse(response);
 
+
     if (response.status == 0)
     {
         var searchdata = response.data;
         var html = "";
         $.each(searchdata, function(index, search)
         {
+            if(search.parent ==0){
+
+
             html += "<tr> <td><a href='post?courseid=" + courseId + "&threadid=" + search.threadId +"&forumid="+ search.forumIdData+"'>" +(search.subject) +"</a> "+ search.name+" </td> ";
             html += "<td>" + search.replyBy + "</td>";
             html += "<td>" + search.views + "</td>";
             html += "<td>" + search.postdate + "</td>";
+            }
        });
       $(".forum-search-table-body tr").remove();
       $(".forum-search-table-body").append(html);

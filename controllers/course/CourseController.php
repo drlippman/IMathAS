@@ -55,9 +55,11 @@ class CourseController extends AppController
         if ($course && count($itemOrders = unserialize($course->itemorder))) {
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
-                if (is_array($itemOrder) && count($blockItems = $itemOrder['items'])) {
+                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
+                {
                     $tempAray['Block'] = $itemOrder;
                     $tempItemList = array();
+                    $blockItems = $itemOrder['items'];
                     foreach ($blockItems as $blockKey => $blockItem) {
                         $tempItem = array();
                         $item = Items::getById($blockItem);

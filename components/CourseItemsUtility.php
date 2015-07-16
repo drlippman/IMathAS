@@ -12,7 +12,7 @@ use app\components\AppConstant;
 
 class CourseItemsUtility extends Component
 {
-
+public $cnt = 0;
     public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent)
     {
          $assessment = $item[key($item)];
@@ -643,43 +643,37 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             </div>
   <?php }
 
-        public static  function AddBlock($block)
-        {
-            ?>
-            <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
-            <span class=left>
-                <img alt="folder" src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
-            </span>
-            <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
-            <span class=left>
-                <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
-            </span>
-            <?php } else { ?>
-            <span class=left>
-                <img alt="expand/collapse" style="cursor:pointer;" id="img3"
-                     src="<?php echo AppUtility::getHomeURL() ?>img/expand.gif"/>
-                </span>
-             <?php } ?>
-
-   <?php }
-
         public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent)
         {
-                                $block = $item[key($item)]; ?>
-                    <?php if ($block['avail'] == 1&& $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
+
+                             $block = $item[key($item)]; ?>
+
+                            <?php if ($block['avail'] == 1&& $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
                             <div class=block>
-                                <?php $this->AddBlock($item,$block);?>
-                                <div class=title>
-                                <span class="right">
-                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-                                 </span>
-                                 <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
-                                </div>
+                                <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
+                                  <span class=left>
+                                  <img alt="folder"  src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                                  </span>
+                                  <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
+                                  <span class=left>
+                                  <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                                  </span>
+                                  <?php } else { ?>
+                                  <span class=left>
+                                      <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                                    </span>
+                                    <?php } ?>
+                                    <div class=title>
+                                    <span class="right">
+                                    <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
+                                     </span>
+                                     <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
+                                    </div>
                             </div>
-                            <div class=blockitems id="block5">
+                            <div class=blockitems id="block5<?php echo $block['id']?>">
                                 <?php if (count($item['itemList'])) { ?>
-                                    <?php foreach ($item['itemList'] as $itemlistKey => $item) {  ?>
-                                        <?php switch (key($item)):
+                                    <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
+                                    <?php switch (key($item)):
 
                                             /*Assessment here*/
                                             case 'Assessment': ?>
@@ -713,30 +707,42 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                             <?php case 'Calendar': ?>
                                                 <?php $this->AddCalendar($item,$parent,$course);?>
                                                 <?php break; ?>
-                                            <?php case '': ?>
+                                            <?php case '':?>
+                                                  <?php
 
-                                                <?php $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);?>
-
-                                                <?php break; ?>
+                                                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                                ?>
+                                                 <?php break; ?>
                                             <?php endswitch; ?>
                                     <?php } ?>
-                                <?php } ?>
+                                    <?php } ?>
+                             <?php $this->AddItemsDropDown();?>
                             </div>
                             <div class="clear"></div>
                         <?php }else if(($block['avail']) == AppConstant::NUMERIC_TWO){?>
                             <!--Show Always-->
                             <div class=block>
-                                <?php $this->AddBlock($item,$block);?>
-
+                                <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
+                                    <span class=left>
+                                                <img alt="folder"  src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                                                </span>
+                                <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
+                                    <span class=left>
+                                            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                                            </span>
+                                <?php } else { ?>
+                                    <span class=left>
+                                          <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)"  src="<?php echo AppUtility::getHomeURL() ?>img/expand.gif"/>
+                                            </span>
+                                <?php } ?>
                                 <div class=title>
-            <span class="right">
-                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-            </span>
+                                                <span class="right">
+                                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
+                                                 </span>
                                     <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
                                 </div>
                             </div>
-                            <div class=blockitems id="block5">
-                                <!--        --><?php //CourseItemsUtility::BlockItems($assessment,$course,$currentTime,$item,$parent,$block);?>
+                            <div class=blockitems id="block5<?php echo $block['id']?>">
                                 <?php if (count($item['itemList'])) { ?>
                                     <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
                                         <?php switch (key($item)):
@@ -774,15 +780,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                                 <?php $this->AddCalendar($item,$parent,$course);?>
                                                 <?php break; ?>
                                             <?php case '': ?>
-                                                <div class=block>
-                                                    <?php $this->AddBlock($block);?>
-                                                <div class=title>
-                                                <span class="right">
-                                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-                                                </span>
-                                                 <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
-                                                 </div>
-                                                </div>
+                                                <?php $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);?>
+                                                <?php print_r(count($this)); ?>
                                                 <?php break; ?>
                                             <?php endswitch; ?>
                                     <?php } ?>
@@ -793,6 +792,33 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <?php } ?> <!--Show always ends-->
 
      <?php }
+
+        public static function AddItemsDropDown()
+        {
+            ?>
+
+
+            <div class="padding-zero" style="width: 25%">
+                <?php  $parent = AppConstant::NUMERIC_ZERO;
+                $tb = 't';
+                $html = "<select class='form-control padding-zero' name=addtype id=\"addtype$parent-$tb\" onchange=\"additem('$parent','$tb')\" ";
+                if ($tb == 't') {
+                    $html .= 'style="margin-bottom:5px;"';
+                }
+                $html .= ">\n";
+                $html .= "<option value=\"\">" . _('Add An Item...') . "</option>\n";
+                $html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
+                $html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
+                $html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
+                $html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
+                $html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
+                $html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
+                $html .= "<option value=\"calendar\">" . _('Add Calendar') . "</option>\n";
+                $html .= "</select><BR>\n";
+                echo $html;
+                ?>
+            </div>
+        <?php }
 
   }?>
 

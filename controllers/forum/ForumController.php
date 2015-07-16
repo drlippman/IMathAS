@@ -53,8 +53,10 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $param = $this->getRequestParams();
+        $userId = $this->getAuthenticatedUser()->id;
         $search = $param['search'];
-        $query = ForumForm::byAllSubject($search);
+        $courseId = $param['courseId'];
+        $query = ForumForm::byAllSubject($search,$courseId,$userId);
             if ($query)
             {
                 $searchThread = array();
@@ -790,6 +792,8 @@ class ForumController extends AppController
         }
         else
         {
+            $this->includeCSS(['forums.css']);
+            $this->includeJS(['forum/listpostbyname.js']);
             $status = AppConstant::NUMERIC_ZERO;
             $responseData = array('status' => $status,'forumId' => $forumId,'course' => $course);
             return $this->renderWithData('listPostByName',$responseData);

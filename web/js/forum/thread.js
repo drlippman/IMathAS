@@ -194,6 +194,15 @@ function threadSuccess(response)
         });
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
+        if(newCount > 0)
+        {
+            $('#limit-to-new-link').show();
+            $('#markRead').show();
+        }
+        else{
+            $('#limit-to-new-link').hide();
+            $('#markRead').hide();
+        }
 
     }
     else if (response.status == -1) {
