@@ -16,65 +16,64 @@ public $cnt = 0;
     public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent)
     {
          $assessment = $item[key($item)];
-if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
-?>
-<div class="item">
-<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
-<div class="title">
-<b>
-    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-       class="confirmation-require assessment-link"
-       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
-</b>
-<input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
-       name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
+        if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
+        ?>
+        <div class="item">
+        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+        <div class="title">
+        <b>
+            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+               class="confirmation-require assessment-link"
+               id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+        </b>
+        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+               name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
 
-<?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-    <BR>Hidden
-<?php } else { ?>
-    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-        <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
+        <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+            <BR>Hidden
+        <?php } else { ?>
+            <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
 
-    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-        <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-    <?php } else { ?>
-        <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-    <?php }
-} ?>
-<?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
-    echo 'LP';
-}
-?>
-<a> Questions </a>| <a
-    href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-    Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
-<?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
-?>
-<div class="item">
-<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
-
-<div class="title">
-<b>
-    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-       class="confirmation-require assessment-link"
-       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
-</b>
-<input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
-       name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
-<?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-    <BR>Hidden
-<?php } else { ?>
-    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-        <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
-    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-        <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-    <?php } else { ?>
-        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-    <?php }
-} ?>
-<?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
-    echo 'LP';
-} ?>
+            <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+                <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+            <?php } else { ?>
+                <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+            <?php }
+        } ?>
+        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
+            echo 'LP';
+            }
+            ?>
+        <a> Questions </a>| <a
+            href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
+            Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+        <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
+        ?>
+        <div class="item">
+        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+        <div class="title">
+        <b>
+            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+               class="confirmation-require assessment-link"
+               id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+        </b>
+        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+               name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
+        <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+            <BR>Hidden
+        <?php } else { ?>
+            <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
+            <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+                <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+            <?php } else { ?>
+                <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+            <?php }
+        } ?>
+        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
+        echo 'LP';
+    } ?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
     Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
@@ -645,13 +644,16 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
         public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent)
         {
-                             $block = $item[key($item)]; ?>
-
-                            <?php if ($block['avail'] == 1&& $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
+                             $block = $item[key($item)];?>
+                                <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
+                                <input type="hidden" id="id" value="<?php echo $block['id']?>" >
+                             <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
+                             <?php $endDate = AppUtility::formatDate($block['enddate']);?>
+                            <?php if ($block['avail'] == 1){  ?>
                             <div class=block>
                                 <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                                   <span class=left>
-                                  <img alt="folder"  src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                                  <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
                                   </span>
                                   <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
                                   <span class=left>
@@ -662,12 +664,21 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                       <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
                                     </span>
                                     <?php } ?>
-                                  <div class=title>
-                                         <span class="right">
-                                         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-                                         </span>
-                                         <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
-                                  </div>
+                                <div class="title">
+                                <span class="pointer" onclick="#">
+                                <b>
+                                <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                </span>
+
+                                <span class="instrdates" style="font-family: "Times New Roman", Times, serif">
+                                    <?php if($block['SH'] == 'HC'){$title = 'Showing Collapsed';}
+                                    else if($block['SH'] == 'HO'){$title = 'Showing Expanded';}
+                                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as Folder';}?>
+                                <br><?php echo $title?> <?php echo $StartDate?> until <?php echo $endDate?></span>
+                                 <span class="instronly">
+                                <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                </span>
+                                </div>
                             </div>
                             <div class=blockitems id="block5<?php echo $block['id']?>">
                                 <?php if (count($item['itemList'])) { ?>
@@ -718,78 +729,160 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                              <?php $this->AddItemsDropDown();?>
                             </div>
                             <div class="clear"></div>
-                        <?php }else if(($block['avail']) == AppConstant::NUMERIC_TWO){?>
+                        <?php }elseif(($block['avail']) == AppConstant::NUMERIC_TWO){?>
                             <!--Show Always-->
+                        <div class=block>
+                <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
+                    <span class=left>
+                                  <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                                  </span>
+                <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
+                    <span class=left>
+                                  <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                                  </span>
+                <?php } else { ?>
+                    <span class=left>
+                                      <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                                    </span>
+                <?php } ?>
+                <div class="title">
+                                <span class="pointer" onclick="#">
+                                <b>
+                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                </span>
+
+                    <span class="instrdates" style="font-family: "Times New Roman", Times, serif">
+                    <?php if($block['SH'] == 'HC'){$title = 'Showing Collapsed';}
+                    else if($block['SH'] == 'HO'){$title = 'Showing Expanded';}
+                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as Folder';}?>
+                    <br><?php echo $title?> Always</span>
+                                 <span class="instronly">
+                                <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                </span>
+                </div>
+            </div>
+            <div class=blockitems id="block5<?php echo $block['id']?>">
+                <?php if (count($item['itemList'])) { ?>
+                    <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
+                        <?php switch (key($item)):
+
+                            /*Assessment here*/
+                            case 'Assessment': ?>
+                                <div class="inactivewrapper "
+                                     onmouseout="this.className='inactivewrapper'">
+                                    <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent); ?>
+                                </div>
+                                <?php break; ?>
+
+                                <!-- Forum here-->
+                            <?php case 'Forum': ?>
+                                <?php $this->AddForum($item,$course,$currentTime,$parent); ?>
+                                <?php break; ?>
+
+                                <!-- ////////////////// Wiki here //////////////////-->
+                            <?php case 'Wiki': ?>
+                                <?php $this->AddWiki($item,$course,$parent); ?>
+                                <?php break; ?>
+
+                                <!-- ////////////////// Linked text here //////////////////-->
+                            <?php case 'LinkedText': ?>
+                                <?php $this->AddLink($item,$currentTime,$parent,$course);?>
+                                <?php break; ?>
+
+                                <!-- ////////////////// Inline text here //////////////////-->
+                            <?php case 'InlineText': ?>
+                                <?php $this->AddInlineText($item,$currentTime,$course,$parent);?>
+                                <?php break; ?>
+
+                                <!-- Calender Here-->
+                            <?php case 'Calendar': ?>
+                                <?php $this->AddCalendar($item,$parent,$course);?>
+                                <?php break; ?>
+                            <?php case '':?>
+                                <?php
+
+                                $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                ?>
+                                <?php break; ?>
+                            <?php endswitch; ?>
+                    <?php } ?>
+                <?php } ?>
+                <?php $this->AddItemsDropDown();?>
+            </div>
+            <div class="clear"></div>
+            <?php }else {  ?>
+                             <input type="hidden" id="isHidden" value="1">
                             <div class=block>
                                 <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
-                                    <span class=left>
-                                                <img alt="folder"  src=".<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
-                                                </span>
+                                <span class=left>
+                                <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                                </span>
                                 <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
-                                    <span class=left>
-                                            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
-                                            </span>
-                                <?php } else { ?>
-                                    <span class=left>
-                                          <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)"  src="<?php echo AppUtility::getHomeURL() ?>img/expand.gif"/>
-                                            </span>
-                                <?php } ?>
-                                <div class=title>
-                                                <span class="right">
-                                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=') ?>">Isolate</a>
-                                                 </span>
-                                    <b><a href="#" onclick="return false;"><?php print_r($block['name']); ?></a></b>
+                                <span class=left>
+                                 <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                                 </span><?php } else { ?>
+                                 <span class=left>
+                                 <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                                 </span><?php } ?>
+                                <div class="title">
+                                    <span class="pointer" onclick="#">
+                                    <b>
+                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                    </span>
+                                    <span class="instrdates">
+                                    <br>Hidden</span><span class="instronly">
+                                    <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                    </span>
                                 </div>
                             </div>
-                            <div class=blockitems id="block5<?php echo $block['id']?>">
-                                <?php if (count($item['itemList'])) { ?>
-                                    <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
-                                        <?php switch (key($item)):
+                        <div class=blockitems id="block5<?php echo $block['id']?>">
+                            <?php if (count($item['itemList'])) { ?>
+                                <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
+                                    <?php switch (key($item)):
+                                        case 'Assessment': ?>
+                                            <div class="inactivewrapper "
+                                                 onmouseout="this.className='inactivewrapper'">
+                                                <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent); ?>
+                                            </div>
+                                            <?php break; ?>
+                                            <!-- Forum here-->
+                                        <?php case 'Forum': ?>
+                                            <?php $this->AddForum($item,$course,$currentTime,$parent); ?>
+                                            <?php break; ?>
 
-                                            /*Assessment here*/
-                                            case 'Assessment': ?>
-                                                <div class="inactivewrapper "
-                                                     onmouseout="this.className='inactivewrapper'">
-                                                    <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent); ?>
-                                                </div>
-                                                <?php break; ?>
+                                            <!-- ////////////////// Wiki here //////////////////-->
+                                        <?php case 'Wiki': ?>
+                                            <?php $this->AddWiki($item,$course,$parent); ?>
+                                            <?php break; ?>
 
-                                                <!-- Forum here-->
-                                            <?php case 'Forum': ?>
-                                                <?php $this->AddForum($item,$course,$currentTime,$parent); ?>
-                                                <?php break; ?>
+                                            <!-- ////////////////// Linked text here //////////////////-->
+                                        <?php case 'LinkedText': ?>
+                                            <?php $this->AddLink($item,$currentTime,$parent,$course);?>
+                                            <?php break; ?>
 
-                                                <!-- ////////////////// Wiki here //////////////////-->
-                                            <?php case 'Wiki': ?>
-                                                <?php $this->AddWiki($item,$course,$parent); ?>
-                                                <?php break; ?>
+                                            <!-- ////////////////// Inline text here //////////////////-->
+                                        <?php case 'InlineText': ?>
+                                            <?php $this->AddInlineText($item,$currentTime,$course,$parent);?>
+                                            <?php break; ?>
 
-                                                <!-- ////////////////// Linked text here //////////////////-->
-                                            <?php case 'LinkedText': ?>
-                                                <?php $this->AddLink($item,$currentTime,$parent,$course);?>
-                                                <?php break; ?>
+                                            <!-- Calender Here-->
+                                        <?php case 'Calendar': ?>
+                                            <?php $this->AddCalendar($item,$parent,$course);?>
+                                            <?php break; ?>
+                                        <?php case '':?>
+                                            <?php
 
-                                                <!-- ////////////////// Inline text here //////////////////-->
-                                            <?php case 'InlineText': ?>
-                                                <?php $this->AddInlineText($item,$currentTime,$course,$parent);?>
-                                                <?php break; ?>
-
-                                                <!-- Calender Here-->
-                                            <?php case 'Calendar': ?>
-                                                <?php $this->AddCalendar($item,$parent,$course);?>
-                                                <?php break; ?>
-                                            <?php case '': ?>
-                                                <?php $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);?>
-                                                <?php print_r(count($this)); ?>
-                                                <?php break; ?>
-                                            <?php endswitch; ?>
-                                    <?php } ?>
+                                            $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                            ?>
+                                            <?php break; ?>
+                                        <?php endswitch; ?>
                                 <?php } ?>
-                            </div>
-                            <div class="clear">
-                            </div>
-                        <?php } ?> <!--Show always ends-->
-
+                            <?php } ?>
+                            <?php $this->AddItemsDropDown();?>
+                        </div>
+                        <div class="clear">
+                        </div>
+      <?php } ?> <!--Show always ends-->
      <?php }
 
         public static function AddItemsDropDown()
