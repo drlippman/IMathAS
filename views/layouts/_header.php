@@ -13,7 +13,7 @@ NavBar::begin([
 ]);
 echo '<div class="dropdown dropdown-class">
         <img src="../../img/class.png">
-        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">My Classes
+        <button class="btn btn-primary dropdown-toggle" type="submit" data-toggle="dropdown">My Classes
         <span class="caret"></span></button>
       </div>';
 echo Nav::widget([
@@ -39,4 +39,8 @@ NavBar::end();
 </header>
 
 </div>
+<script>
 
+
+
+</script>

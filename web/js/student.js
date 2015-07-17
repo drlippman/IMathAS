@@ -57,7 +57,7 @@ function calendar() {
     var startDate = $('.start-date').val();
 
     $('.calendar').fullCalendar({
-        height: 400,
+        height: 420,
         header: {
             left: 'prev,next today',
             center: 'title',
