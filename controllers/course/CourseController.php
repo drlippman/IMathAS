@@ -378,7 +378,7 @@ class CourseController extends AppController
             if ($this->getAuthenticatedUser()->rights == AppConstant::GROUP_ADMIN_RIGHT) // 75 is instructor right
             {
                 /*
-                 * Group admin not started
+                 * Group admin rights not implemented
                  */
             } elseif ($this->getAuthenticatedUser()->rights > AppConstant::GROUP_ADMIN_RIGHT) {
                 $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);

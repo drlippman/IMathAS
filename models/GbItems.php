@@ -19,7 +19,6 @@ class GbItems extends BaseImasGbitems
 {
     public function createGbItemsByCourseId($courseId,$params)
     {
-//        AppUtility::dump($params['AddGradesForm']['TutorAccess']);
         $this->courseid = $courseId;
         $name = $params['AddGradesForm']['Name'];
         $this->name = isset($name) ? $name : null;
@@ -75,7 +74,6 @@ class GbItems extends BaseImasGbitems
         $grade = GbItems::find()->where(['id' => $gradeId])->all();
         if($grade){
             foreach($grade as $d ){
-//                AppUtility::dump($d['showdate']);
            if($temp == 1){
                $d->showdate = $AssignValue;
            }else if($temp == 2){
@@ -83,7 +81,6 @@ class GbItems extends BaseImasGbitems
            }else if($temp == 3){
                $d->tutoredit = $AssignValue;
            }
-
                 $d->save();
             }
         }
@@ -130,4 +127,3 @@ class GbItems extends BaseImasGbitems
         }
     }
 }
-

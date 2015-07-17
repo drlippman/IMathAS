@@ -26,7 +26,9 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
     }
     public static function getByForumIdUserId($forumId,$userId)
     {
-        $subscriptionsData = Yii::$app->db->createCommand("SELECT id FROM imas_forum_subscriptions WHERE forumid='{$_GET['id']}' AND userid='$userId'")->queryAll();
-        return $subscriptionsData;
+        $subscriptionsData = ForumSubscriptions::findAll(['forumid'=> $forumId, 'userid'=>$userId]);
+        if ($subscriptionsData){
+            return $subscriptionsData;
+        }
     }
 }

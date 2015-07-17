@@ -312,12 +312,12 @@ class SiteController extends AppController
             } elseif($tutors){
                 $user = $tutors;
             }
-            $isreadArray = array(0, 4, 8, 12);
+            $isreadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
             $msgCountArray = array();
             if($users){
                 foreach ($users as $singleUser) {
                     $messageList = Message::getByCourseIdAndUserId($singleUser->courseid, $user->id);
-                    $count = 0;
+                    $count = AppConstant::NUMERIC_ZERO;
                     if($messageList){
                         foreach($messageList as $message){
                             if(in_array($message->isread, $isreadArray))
@@ -367,7 +367,7 @@ class SiteController extends AppController
             }
         }
         $responseData = array('model' => $model,);
-        return $this->renderWithData('changePassword', ['model' => $model]);
+        return $this->renderWithData('changePassword', $responseData);
     }
 
     public function actionChangeUserInfo()
@@ -380,15 +380,14 @@ class SiteController extends AppController
         if ($model->load($this->getPostData()) && $model->checkPassword()) {
             $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
-
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file ) {
                 $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                $model->remove=0;
+                $model->remove= AppConstant::NUMERIC_ZERO;
                 if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
                 User::updateImgByUserId($userid);
             }
-            if($model->remove == 1){
+            if($model->remove == AppConstant::NUMERIC_ONE){
                 User::deleteImgByUserId($userid);
                 unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
             }

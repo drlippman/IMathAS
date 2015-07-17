@@ -968,7 +968,7 @@ class ForumController extends AppController
                 $blockTree = array(0);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
-                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
+                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
                 }
                 array_unshift($sub, intval($lastItemId));
                 $itemOrder = addslashes(serialize($items));
@@ -1006,14 +1006,14 @@ class ForumController extends AppController
                 $sTime = AppUtility::tzdate("g:i a", $startDate);
             } else {
                 $sDate = AppUtility::tzdate("m/d/Y", time());
-                $sTime = $defStartTime; //$stime = tzdate("g:i a",time());
+                $sTime = $defStartTime;
             }
             if ($endDate != AppConstant::ALWAYS_TIME) {
                 $eDate = AppUtility::tzdate("m/d/Y", $endDate);
                 $eTime = AppUtility::tzdate("g:i a", $endDate);
             } else {
                 $eDate = AppUtility::tzdate("m/d/Y", time() + AppConstant::WEEK_TIME);
-                $eTime = $defTime; //tzdate("g:i a",time()+7*24*60*60);
+                $eTime = $defTime;
             }
             $allNon = (($forumData['settings'] & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE);
             $allMod = (($forumData['settings'] & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO);
@@ -1025,7 +1025,7 @@ class ForumController extends AppController
             $postBy = $forumData['postby'];
             $defDisplay = $forumData['defdisplay'];
             $subscriptionsData = ForumSubscriptions::getByForumIdUserId($modifyForumId, $user['id']);
-            if (count($subscriptionsData) > 0) {
+            if (count($subscriptionsData) > AppConstant::NUMERIC_ZERO) {
                 $hasSubScrip = true;
             }
             list($postTag, $replyTag) = explode('--', $forumData['caltag']);

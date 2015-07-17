@@ -14,20 +14,12 @@ $(document).ready(function () {
                     $('#to').hide();
                     jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }else{
-    //            var msg="Subject field cannot be blank";
-    //            CommonPopUp(msg);
-    //            $('#subjecttext').show();
-    //            $('#to').hide();
                 changeColorSub();
                 $('#to').css('color','white');
 
 
             }
         }else{
-    //        var msg="Please select atleast one user";
-    //        CommonPopUp(msg);
-    //        $('#to').show();
-    //        $('#subjecttext').hide();
             changeColorTo();
             $('#subjecttext').css('color','white');
         }

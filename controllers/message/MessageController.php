@@ -21,7 +21,7 @@ class MessageController extends AppController
     public $children = array();
     public $enableCsrfValidation = false;
     /*
-     * @return string
+     * Initial load of message index page.
      */
     public function actionIndex()
     {
@@ -42,7 +42,9 @@ class MessageController extends AppController
             return $this->renderWithData('messages', $responseData);
         }
     }
-
+    /*
+     * Send new message initial load
+     */
     public function actionSendMessage()
     {
         $this->guestUserHandler();
@@ -70,7 +72,9 @@ class MessageController extends AppController
             return $this->renderWithData('sendMessage', $responseData);
         }
     }
-
+    /*
+     * Ajax call method for sending the message.
+     */
     public function actionConfirmMessage()
     {
         $this->guestUserHandler();
@@ -85,7 +89,9 @@ class MessageController extends AppController
             return $this->successResponse();
         }
     }
-
+    /*
+     * Ajax call method to display received message
+     */
     public function actionDisplayMessageAjax()
     {
         if (!$this->isGuestUser()) {
@@ -106,7 +112,6 @@ class MessageController extends AppController
                 }
             }else {
                 $messages = Message::getUsersToDisplay($userId);
-
             }
             if ($messages) {
                 $dateArray = array();
@@ -126,7 +131,6 @@ class MessageController extends AppController
                     $singleDate['senddate'] = date('F d, o g:i a', $singleDate['senddate']);
                     $titleLevel = AppUtility::calculateLevel($singleDate['title']);
                     $singleDate['title'] = $titleLevel['title'];
-
                     $newArray[] = $singleDate;
                 }
                 return $this->successResponse($newArray);
@@ -135,7 +139,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     *  Sent message page initial load
+     */
     public function actionSentMessage()
     {
         $this->guestUserHandler();
@@ -154,7 +160,9 @@ class MessageController extends AppController
             return $this->renderWithData('sentMessage', $responseData);
         }
     }
-
+    /*
+     * Ajax call method to display sent message
+     */
     public function actionDisplaySentMessageAjax()
     {
         if (!$this->isGuestUser()) {
@@ -178,7 +186,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * Ajax call method to get course list
+     */
     public function actionGetCourseAjax()
     {
         $this->guestUserHandler();
@@ -199,7 +209,9 @@ class MessageController extends AppController
             return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }
     }
-
+    /*
+     * Ajax call method to mark message as unread
+     */
     public function actionMarkAsUnreadAjax()
     {
         $this->guestUserHandler();
@@ -216,7 +228,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * Ajax call method to mark message as read
+     */
     public function actionMarkAsReadAjax()
     {
         $this->guestUserHandler();
@@ -233,7 +247,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * Ajax call method to get user list
+     */
     public function actionGetUserAjax()
     {
         $this->guestUserHandler();
@@ -245,7 +261,9 @@ class MessageController extends AppController
             return $this->terminateResponse(AppConstant::NO_USER_FOUND);
         }
     }
-
+    /*
+     * View message page initial load
+     */
     public function actionViewMessage()
     {
         $this->guestUserHandler();
@@ -264,7 +282,9 @@ class MessageController extends AppController
             return $this->renderWithData('viewMessage', $responseData);
         }
     }
-
+    /*
+     * Ajax call method to delete message from inbox
+     */
     public function actionMarkAsDeleteAjax()
     {
         $this->guestUserHandler();
@@ -277,7 +297,9 @@ class MessageController extends AppController
             return $this->successResponse();
         }
     }
-
+    /*
+     *  Ajax call method to remove  message form outbox
+     */
     public function actionMarkSentRemoveAjax()
     {
         $this->guestUserHandler();
@@ -294,7 +316,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * Reply message initial load
+     */
     public function actionReplyMessage()
     {
         $this->guestUserHandler();
@@ -311,7 +335,9 @@ class MessageController extends AppController
             return $this->renderWithData('replyMessage', $responseData);
         }
     }
-
+    /*
+     * Ajax call method to get course list on sent message page
+     */
     public function actionGetSentCourseAjax()
     {
         $this->guestUserHandler();
@@ -323,7 +349,9 @@ class MessageController extends AppController
             return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }
     }
-
+    /*
+     * Ajax call method to get users list on the sent message page
+     */
     public function actionGetSentUserAjax()
     {
         $this->guestUserHandler();
@@ -335,7 +363,9 @@ class MessageController extends AppController
             return $this->terminateResponse(AppConstant::NO_USER_FOUND);
         }
     }
-
+    /*
+     * Ajax call method to send reply message
+     */
     public function actionReplyMessageAjax()
     {
         $this->guestUserHandler();
@@ -351,7 +381,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * View conversation page initial load.
+     */
     public function actionViewConversation()
     {
         $this->guestUserHandler();
@@ -368,7 +400,6 @@ class MessageController extends AppController
         $messages = Message::getByBaseId($msgId, $baseId);
         if ($messages) {
             foreach ($messages as $message) {
-//                AppUtility::dump($message);
                 $this->children[$message['parent']][] = $message['id'];
                 $hasChild = Message::isMessageHaveChild($message['id']);
                 $tempArray = array();
@@ -396,7 +427,9 @@ class MessageController extends AppController
             return $this->renderWithData('viewConversation', $responseData);
         }
     }
-
+    /*
+     * Method to check child message and parent message
+     */
     public function createChild($childArray, $arrayKey = AppConstant::ZERO_VALUE)
     {
         $this->children = AppUtility::removeEmptyAttributes($this->children);
@@ -413,7 +446,9 @@ class MessageController extends AppController
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
     }
-
+    /*
+     * Ajax call method to unsent the message
+     */
     public function actionMarkSentUnsendAjax()
     {
         $this->guestUserHandler();
@@ -430,7 +465,9 @@ class MessageController extends AppController
             }
         }
     }
-
+    /*
+     * Ajax call method to mark flag as important
+     */
     public function actionChangeImageAjax()
     {
         $params = $this->getRequestParams();

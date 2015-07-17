@@ -148,4 +148,9 @@ class InlineText extends BaseImasInlinetext
             $inlineData->save();
         }
     }
+
+    public static function getByIdLimited($id)
+    {
+        return InlineText::find()->select('title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder')->where(['id' => $id]);
+    }
 } 

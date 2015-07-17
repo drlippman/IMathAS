@@ -50,7 +50,7 @@ class Items extends BaseImasItems
 
     public static function getByTypeId($id)
     {
-        return Items::findOne(['typeid' => $id]);
+        return Items::findOne(['id' => $id]);
     }
 
     public static function deleteByTypeIdName($typeId,$itemType){

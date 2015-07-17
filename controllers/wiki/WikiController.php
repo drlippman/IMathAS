@@ -112,15 +112,12 @@ class WikiController extends AppController
         $wiki = Wiki::getById($wikiId);
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
-//        $courseParamsId = $params['courseId'];
         $wikiid = $params['id'];
         $saveTitle = '';
         if(isset($params['id']))
         {
-            $hidetitle = false;
             $pageTitle = 'Modify Wiki';
             if($this->isPost()){
-                $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wiki->id.'&courseId=' .$course->id);
 
                 $saveChanges = new Wiki();
@@ -132,7 +129,6 @@ class WikiController extends AppController
         else {
             $pageTitle = 'Add Wiki';
             if($this->isPost()){
-//                AppUtility::dump($courseId);
                 $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
                 $saveChanges = new Wiki();

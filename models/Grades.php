@@ -19,7 +19,6 @@ class Grades extends BaseImasGrades
 {
     public function createGradesByUserId($singal,$gbItemsId)
     {
-//        AppUtility::dump($gbItemsId);
         if($singal['gradeText'] || $singal['feedbackText'] || $singal['fromUploadFile'] == AppConstant::NUMERIC_ONE){
             $this->gradetypeid = $gbItemsId;
             $this->userid = $singal['studentId'];
@@ -43,7 +42,6 @@ class Grades extends BaseImasGrades
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
     public static function outcomeGrades($sel,$limuser)
     {

@@ -575,7 +575,7 @@ public $oa = array();
         $blockCount = $courseData['blockcnt'];
         $items = unserialize($courseData['itemorder']);
         $notImportant = array();
-        $this->copysubone($items,'0',false,$notImportant,$tocopy,$blockCount,$gradebookCategory);
+        $this->copysubone($items,'0',false,$notImportant,$tocopy,$blockCount,$gradebookCategory,$params);
         CopyItemsUtility::copyrubrics();
 
         $itemOrder = addslashes(serialize($items));
@@ -583,12 +583,12 @@ public $oa = array();
         return $this->successResponse();
     }
 
-    public function copysubone(&$items,$parent,$copyinside,&$addtoarr,$tocopy,$blockCount,$gradebookCategory) {
+    public function copysubone(&$items,$parent,$copyinside,&$addtoarr,$tocopy,$blockCount,$gradebookCategory,$params) {
         foreach ($items as $k=>$item) {
             if (is_array($item)) {
                 if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
                     $newblock = array();
-                    $newblock['name'] = $item['name'].stripslashes($_POST['append']);
+                    $newblock['name'] = $item['name'].stripslashes($params['append']);
                     $newblock['id'] = $blockCount;
                     $blockCount++;
                     $newblock['startdate'] = $item['startdate'];
@@ -600,7 +600,7 @@ public $oa = array();
                     $newblock['grouplimit'] = $item['grouplimit'];
                     $newblock['items'] = array();
                     if (count($item['items'])>0) {
-                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items'],$tocopy,$blockCount,$gradebookCategory);
+                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items'],$tocopy,$blockCount,$gradebookCategory,$params);
                     }
                     if (!$copyinside) {
                         array_splice($items,$k+1,0,array($newblock));
@@ -611,12 +611,12 @@ public $oa = array();
                 } else {
                     if (count($item['items'])>0) {
                         $nothin = array();
-                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),false,$nothin,$tocopy,$blockCount,$gradebookCategory);
+                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),false,$nothin,$tocopy,$blockCount,$gradebookCategory,$params);
                     }
                 }
             } else {
                 if ($item==$tocopy || $copyinside) {
-                    $newitem = CopyItemsUtility::copyitem($item,$gradebookCategory);
+                    $newitem = CopyItemsUtility::copyitem($item,$gradebookCategory,$params);
                     if (!$copyinside) {
                         array_splice($items,$k+1,0,$newitem);
                         return 0;

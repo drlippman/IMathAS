@@ -30,10 +30,10 @@ class Wiki extends BaseImasWikis
         $query = Wiki::find(['name','startdate','enddate','editbydate','avail'])->where(['id' => $wikiId])->all();
         return $query;
     }
-
+    
     public function createItem($params, $courseId)
     {
-        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
+        $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
         $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
         $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
 
