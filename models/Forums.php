@@ -42,13 +42,13 @@ class Forums extends BaseImasForums {
         $query->select(['id', 'name', 'gbcategory', 'startdate', 'enddate', 'replyby', 'postby', 'points', 'cntingb', 'avail'])
             ->from('imas_forums')
             ->where(['courseid'=>$courseId])
-            ->andWhere(['>', 'points', 0])
-            ->andWhere(['>', 'avail', 0]);
+            ->andWhere(['>', 'points', AppConstant::NUMERIC_ZERO])
+            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if (!$canviewall) {
             $query->andWhere(['<','startdate', $now]);
         }
         if ($istutor) {
-            $query->andWhere(['<','tutoredit', 2]);
+            $query->andWhere(['<','tutoredit', AppConstant::NUMERIC_TWO]);
         }
         if ($catfilter> AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['gbcategory' => $catfilter]);
@@ -65,8 +65,8 @@ class Forums extends BaseImasForums {
         $query->select(['id', 'name', 'gbcategory', 'startdate', 'enddate', 'replyby', 'postby', 'points', 'cntingb', 'avail'])
             ->from('imas_forums')
             ->where(['courseid'=>$courseId])
-            ->andWhere(['>', 'points', 0])
-            ->andWhere(['>', 'avail', 0]);
+            ->andWhere(['>', 'points', AppConstant::NUMERIC_ZERO])
+            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if ($catfilter>AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
@@ -74,18 +74,14 @@ class Forums extends BaseImasForums {
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
     public function addNewForum($params)
     {
-//        AppUtility::dump($params);
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
         $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
         $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
-
-
         $this->name = trim($params['title']);
         if(empty($params['forum-description']))
         {
@@ -96,8 +92,8 @@ class Forums extends BaseImasForums {
         $this->settings = $settingValue;
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            if($params['available-after'] == 0){
-                $startDate = 0;
+            if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+                $startDate = AppConstant::NUMERIC_ZERO;
             }
             if($params['available-until'] == AppConstant::ALWAYS_TIME){
                 $endDate = AppConstant::ALWAYS_TIME;
@@ -172,8 +168,8 @@ class Forums extends BaseImasForums {
 
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            if($params['available-after'] == 0){
-                $startDate = 0;
+            if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+                $startDate = AppConstant::NUMERIC_ZERO;
             }
             if($params['available-until'] == AppConstant::ALWAYS_TIME){
                 $endDate = AppConstant::ALWAYS_TIME;

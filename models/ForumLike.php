@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumLikes;
 use yii\db\Query;
@@ -16,12 +17,10 @@ use yii\db\Query;
 class ForumLike extends BaseImasForumLikes
 {
 
-    public function InsertLike($params,$userId)
+    public function InsertLike($params, $userId)
     {
-
-       $isRecord = $this->find('threadid','userid','postid')->where(['threadid' => $params['threadid'],'userid' => $userId,'postid' => $params['id']])->all();
-        if(!$isRecord){
-
+        $isRecord = $this->find('threadid', 'userid', 'postid')->where(['threadid' => $params['threadid'], 'userid' => $userId, 'postid' => $params['id']])->all();
+        if (!$isRecord) {
             $this->userid = $userId;
             $this->threadid = $params['threadid'];
             $this->postid = $params['id'];
@@ -32,67 +31,51 @@ class ForumLike extends BaseImasForumLikes
 
     public function findCOunt($threadId)
     {
-        $likecount = new Query();
-        $likecount->select(['postid', 'type', 'COUNT(*) AS count'] )
-            ->from('imas_forum_likes')
-            ->where(['threadid'=>$threadId])
-            ->groupBy(['postid','type']);
-        $command = $likecount->createCommand();
+        $likeCount = new Query();
+        $likeCount->select(['postid', 'type', 'COUNT(*) AS count'])->from('imas_forum_likes')->where(['threadid' => $threadId])->groupBy(['postid', 'type']);
+        $command = $likeCount->createCommand();
         $data = $command->queryAll();
         return $data;
     }
 
-    public function UserLikes($threadId,$currentUser)
+    public function UserLikes($threadId, $currentUser)
     {
-
-        $mylikes = new Query();
-        $mylikes->select(['postid'])
-            ->from('imas_forum_likes')
-            ->where(['threadid'=>$threadId,'userid' => $currentUser['id']]);
-        $command = $mylikes->createCommand();
+        $myLikes = new Query();
+        $myLikes->select(['postid'])->from('imas_forum_likes')->where(['threadid' => $threadId, 'userid' => $currentUser['id']]);
+        $command = $myLikes->createCommand();
         $data = $command->queryAll();
         return $data;
-
     }
 
-    public function DeleteLike($params,$userId)
+    public function DeleteLike($params, $userId)
     {
-
-        $deleteLike = $this->find('threadid','userid','postid')->where(['threadid' => $params['threadid'],'userid' => $userId,'postid' => $params['id']])->all();
-
-        if($deleteLike){
-
-
-            foreach($deleteLike as $unlike)
-            {
+        $deleteLike = $this->find('threadid', 'userid', 'postid')->where(['threadid' => $params['threadid'], 'userid' => $userId, 'postid' => $params['id']])->all();
+        if ($deleteLike) {
+            foreach ($deleteLike as $unlike) {
                 $unlike->delete();
-
             }
         }
     }
 
-    public static function checkStatus($postid,$currentUser)
+    public static function checkStatus($postId, $currentUser)
     {
-        $isRecord = ForumLike::findAll(['userid' => $currentUser['id'],'postid' => $postid]);
-        if($isRecord){
-            return 1;
-        }
-        else
-        {
-            return 0;
-
+        $isRecord = ForumLike::findAll(['userid' => $currentUser['id'], 'postid' => $postId]);
+        if ($isRecord) {
+            return AppConstant::NUMERIC_ONE;
+        } else {
+            return AppConstant::NUMERIC_ZERO;
         }
     }
 
     public function checkCount($params)
     {
-        $count = ForumLike::findAll(['postid'  => $params['id'],'type' => $params['type']]);
+        $count = ForumLike::findAll(['postid' => $params['id'], 'type' => $params['type']]);
         return $count;
     }
 
-    public function CalculateCount($postid)
+    public function CalculateCount($postId)
     {
-        $count = ForumLike::findAll(['postid'  => $postid]);
+        $count = ForumLike::findAll(['postid' => $postId]);
         return $count;
     }
 } 

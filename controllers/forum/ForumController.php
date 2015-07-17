@@ -146,9 +146,10 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumid');
         $users = $this->getAuthenticatedUser();
         $this->setReferrer();
+        $qq = 0;
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
-        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course);
+        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'qq' => $qq);
         return $this->renderWithData('thread', $responseData);
     }
 
@@ -169,7 +170,7 @@ class ForumController extends AppController
             if ($isValue == AppConstant::NUMERIC_ONE) {
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
-                    $uniquesData = ForumView::getbythreadId($thread['threadid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
@@ -200,7 +201,7 @@ class ForumController extends AppController
             } else if ($isValue == AppConstant::NUMERIC_TWO || $isValue == AppConstant::NUMERIC_THREE) {
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
-                    $uniquesData = ForumView::getbythreadId($thread['threadid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
@@ -236,7 +237,7 @@ class ForumController extends AppController
             } else {
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
-                    $uniquesData = ForumView::getbythreadId($thread['threadid']);
+                    $uniquesData = ForumView::getByThreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
                     $count = ForumView::uniqueCount($thread['threadid']);
@@ -363,8 +364,17 @@ class ForumController extends AppController
                     'subject' => $data['subject'],
                     'message' => $data['message'],
                 );
+//                AppUtility::dump($data);
                 array_push($threadArray, $tempArray);
             }
+        }
+
+        if($this->isPost())
+        {
+            $params = $this->getRequestParams();
+            ForumPosts::modifyPost($params);
+            $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser);
+            return $this->renderWithData('modifyPost', $responseData);
         }
         $this->setReferrer();
         $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser);
@@ -374,18 +384,19 @@ class ForumController extends AppController
     /*
     * controller ajax method for fetch modified thread from Modify page and store in database.
     */
-    public function actionModifyPostAjax()
-    {
-        $params = $this->getRequestParams();
-        $threadId = $params['threadId'];
-        $message = trim($params['message']);
-        $subject = trim($params['subject']);
-        $replyBy = trim($params['replyBy']);
-        $postType = trim($params['postType']);
-        ForumPosts::modifyPost($threadId, $message, $subject, $postType, $replyBy);
-        $this->includeJS(['forum/modifypost.js']);
-        return $this->successResponse();
-    }
+//    public function actionModifyPostAjax()
+//    {
+//        $params = $this->getRequestParams();
+//        AppUtility::dump($params);
+//        $threadId = $params['threadId'];
+//        $message = trim($params['message']);
+//        $subject = trim($params['subject']);
+//        $replyBy = trim($params['replyBy']);
+//        $postType = trim($params['postType']);
+//        ForumPosts::modifyPost($threadId, $message, $subject, $postType, $replyBy);
+//        $this->includeJS(['forum/modifypost.js']);
+//        return $this->successResponse();
+//    }
 
     /*
     * Controller Action To Redirect To Post Page
@@ -409,7 +420,7 @@ class ForumController extends AppController
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
         if ($currentUser['rights'] == AppConstant::NUMERIC_TEN && $FullThread[0]['posttype'] == AppConstant::NUMERIC_THREE) {
-            $forumPostData = ForumPosts::getbyThreadIdAndUserID($threadId, $currentUser['id']);
+            $forumPostData = ForumPosts::getByThreadIdAndUserID($threadId, $currentUser['id']);
             $parentThread = ForumPosts::getbyParentId($forumPostData[0]['parent']);
             array_push($data, $parentThread);
             foreach ($forumPostData as $single) {
@@ -606,7 +617,8 @@ class ForumController extends AppController
             $userId = $params['userId'];
             ForumView::deleteByUserIdAndThreadId($threadId, $userId);
         } else {
-            ForumView::updateFlagValue($rowId, $params['userId']);
+            $updateView = new ForumView();
+            $updateView->updateFlagValue($rowId, $params['userId']);
         }
         return $this->successResponse();
     }
@@ -1042,16 +1054,12 @@ class ForumController extends AppController
                 'points' => $forumData['points'],
                 'gbCat' => $forumData['gbcategory']
             );
-            $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-            $responseData = array('course' => $course, 'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'forumData' => $forumData, 'modifyForumId' => $modifyForumId, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
-            'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue, 'gbcatsLabel' => $gbcatsLabel, '$gbcatsId' => $gbcatsId);
-            return $this->renderWithData('addForum', $responseData);
-        } else {
-            $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-            $responseData = array('course' => $course, 'groupNames' => $groupNames, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
-            'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue);
-            return $this->renderWithData('addForum', $responseData);
         }
+            $this->includeJS(["forum/addforum.js","editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+            $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
+            'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
+                'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);
+            return $this->renderWithData('addForum', $responseData);
     }
     public function flatArray($outcomesData)
     {

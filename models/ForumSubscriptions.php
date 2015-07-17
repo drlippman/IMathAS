@@ -23,7 +23,6 @@ class ForumSubscriptions extends BaseImasForumSubscriptions
         if($entry){
             $entry->delete();
         }
-
     }
     public static function getByForumIdUserId($forumId,$userId)
     {

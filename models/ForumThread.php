@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
 
@@ -22,7 +23,7 @@ class ForumThread extends BaseImasForumThreads
         $postdate = strtotime(date('F d, o g:i a'));
         $this->lastposttime = $postdate;
         $this->lastpostuser = $userId;
-        $this->views = 0;
+        $this->views = AppConstant::NUMERIC_ZERO;
         $this->save();
 
     }

@@ -1031,7 +1031,7 @@ class CourseController extends AppController
     }
 
 //        AppUtility::dump($tool);
-        $this->includeJS(["editor/tiny_mce.js","general.js"]);
+        $this->includeJS(["editor/tiny_mce.js","course/addlink.js","general.js"]);
         $responseData = array('course' => $course,'groupNames' => $groupNames,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,'modifyLinkId' => $modifyLinkId,
             'pageOutcomes' => $pageOutcomes,'toolvals' => $toolvals,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'toollabels' => $toollabels,'checkboxesValues' => $checkboxesValues);
         return $this->renderWithData('addLink',$responseData);

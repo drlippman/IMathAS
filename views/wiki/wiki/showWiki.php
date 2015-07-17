@@ -49,10 +49,8 @@ if (count($countOfRevision)>1) {
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
-                <?php //$text = $singleWikiRevision->revision;  echo strip_tags($text);
-                $in = '<td>Hello Tudip</div>';
-                $out = \serhatozles\htmlawed\htmLawed::htmLawed($in);
-                echo strip_tags($out);?>
+                <?php $text = $singleWikiRevision->revision;  echo strip_tags($text);
+                echo strip_tags($text);?>
     </textarea>
     <?php }?>
     <?php }?>

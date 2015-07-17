@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumPosts;
@@ -12,24 +13,22 @@ use yii\db\Query;
 
 class ForumPosts extends BaseImasForumPosts
 {
-
-    public static function updatePostMoveThread($threadId,$moveThreadId)
+    public static function updatePostMoveThread($threadId, $moveThreadId)
     {
-
-
         $ForumPosts = ForumPosts::findAll(['threadid' => $threadId]);
-        foreach($ForumPosts as $ForumPost) {
+        foreach ($ForumPosts as $ForumPost) {
             $ForumPost->threadid = $moveThreadId;
             $ForumPost->parent = $moveThreadId;
             $ForumPost->save();
         }
     }
+
     public static function getbyid($threadId)
     {
-
         $ForumPost = ForumPosts::findAll(['threadid' => $threadId]);
-     return $ForumPost;
+        return $ForumPost;
     }
+
     public static function getbyidpost($Id)
     {
 
@@ -37,29 +36,41 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static  function modifyPost($threadId,$message,$subject,$replyBy)
+    public static function modifyPost($params)
     {
-        $threadPost = ForumPosts::findOne(['id' => $threadId]);
-        $threadPost->subject = $subject;
-        $threadPost->message = $message;
+        $threadPost = ForumPosts::findOne(['id' => $params['threadId']]);
+        $threadPost->subject = $params['subject'];
+        $threadPost->message = $params['message'];
+
+        if($params['always-replies']) {
+            if ($params['always-replies'] != AppConstant::NUMERIC_THREE) {
+                $threadPost->replyby = $params['always-replies'];
+            } else {
+                $replyBy = AppUtility::parsedatetime($params['startDate'], $params['startTime']);
+                $threadPost->replyby = $replyBy;
+            }
+        }
+        if($params['post-type']){
+            $threadPost->posttype = $params['post-type'];
+        }
         $threadPost->save();
     }
-    public static function removeThread($threadId,$checkPostOrThread)
+
+    public static function removeThread($threadId, $checkPostOrThread)
     {
-        if($checkPostOrThread == AppConstant::NUMERIC_ONE) {
+        if ($checkPostOrThread == AppConstant::NUMERIC_ONE) {
             $threads = ForumPosts::findAll(['threadid' => $threadId]);
-        }else{
+        } else {
             $threads = ForumPosts::findAll(['id' => $threadId]);
         }
-            if($threads)
-        {
-            foreach($threads as $thread)
-            {
+        if ($threads) {
+            foreach ($threads as $thread) {
                 $thread->delete();
             }
         }
     }
-    public static function updateMoveThread($forumId,$threadId)
+
+    public static function updateMoveThread($forumId, $threadId)
     {
 
         $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
@@ -79,32 +90,32 @@ class ForumPosts extends BaseImasForumPosts
         $this->postdate = $postdate;
         $this->save();
     }
-    public function createThread($params,$userId,$postType,$alwaysReplies,$date)
+
+    public function createThread($params, $userId, $postType, $alwaysReplies, $date)
     {
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
         $this->id = $maxid;
         $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
         $this->threadid = isset($maxid) ? $maxid : null;
-        if(empty($params['subject']))
-        {
-                $params['subject'] = '(None)';
+        if (empty($params['subject'])) {
+            $params['subject'] = '(None)';
         }
         $this->subject = trim($params['subject']);
-        $this->userid = isset($userId) ?  $userId : null;
+        $this->userid = isset($userId) ? $userId : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;
         $this->message = isset($params['body']) ? $params['body'] : null;
         $this->posttype = $postType;
-        if($alwaysReplies == AppConstant::NUMERIC_ONE){
-        $this->replyby = AppConstant::ALWAYS_TIME;
-        }elseif($alwaysReplies == AppConstant::NUMERIC_TWO) {
+        if ($alwaysReplies == AppConstant::NUMERIC_ONE) {
+            $this->replyby = AppConstant::ALWAYS_TIME;
+        } elseif ($alwaysReplies == AppConstant::NUMERIC_TWO) {
             $this->replyby = AppConstant::NUMERIC_ZERO;
-        }elseif($alwaysReplies == AppConstant::NUMERIC_THREE){
+        } elseif ($alwaysReplies == AppConstant::NUMERIC_THREE) {
             $this->replyby = $date;
         }
         $this->save();
-        return($this->threadid);
+        return ($this->threadid);
 
     }
 
@@ -113,23 +124,24 @@ class ForumPosts extends BaseImasForumPosts
         $ForumPost = ForumPosts::findOne(['id' => $Id]);
         return $ForumPost;
     }
-    public static function saveViews($threadid){
 
-
+    public static function saveViews($threadid)
+    {
         $views = ForumPosts::find('views')->where(['threadid' => $threadid])->all();
-        foreach ($views as $view)
-        {
+        foreach ($views as $view) {
             $view->views++;
             $view->save();
         }
     }
-    public static function getbyThreadIdAndUserID($threadId,$currentUserId)
+
+    public static function getbyThreadIdAndUserID($threadId, $currentUserId)
     {
 
-        $ForumPost = ForumPosts::findAll(['threadid' => $threadId,'userid' => $currentUserId]);
+        $ForumPost = ForumPosts::findAll(['threadid' => $threadId, 'userid' => $currentUserId]);
         return $ForumPost;
     }
-    public  static function getbyParentId($parent)
+
+    public static function getbyParentId($parent)
     {
         $parentThread = ForumPosts::findOne(['threadid' => $parent]);
         return $parentThread;
@@ -145,21 +157,21 @@ class ForumPosts extends BaseImasForumPosts
         $data = $command->queryAll();
         return $data;
     }
+
     public static function deleteForumPost($itemId)
     {
         $entry = ForumPosts::findOne(['forumid' => $itemId]);
-        if($entry){
+        if ($entry) {
             $entry->delete();
         }
     }
 
     public static function getForumPostByFile($itemId)
     {
-        $entry = ForumPosts::findOne(['forumid' => $itemId,'files' => '']);
-        if($entry){
+        $entry = ForumPosts::findOne(['forumid' => $itemId, 'files' => '']);
+        if ($entry) {
             $postId = $entry['id'];
             return $postId;
         }
     }
-
 }

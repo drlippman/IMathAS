@@ -150,7 +150,7 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
                     html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
-                    if (thread.tagged == 0 && thread.posttype == 0 ) {
+                    if (thread.tagged != 1 && thread.posttype == 0 ) {
                         html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
                     }
                     else if(thread.posttype == 0 ){
@@ -165,19 +165,16 @@ function threadSuccess(response)
                     }else { html += " <td> - </td> "; }
                     if(count >= 0){
                     html += "<td>" + count + "</td>";}
-                    $.each(thread.countArray, function (index, count) {
-                        count.usercount--;
-                        if(count.usercount == -1){
-                            count.usercount = '';
+                    var uniqueView = thread.countArray;
+                    uniqueView--;
+                        if(uniqueView == -1){
+                            uniqueView = '';
                         }
                         if (thread.userright >= 20) {
-                            html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + count.usercount + ")" + "</a></td>";
+                            html += "<td><a href='#' name='view-tabs' data-var='" + thread.threadId + "' >" + thread.views + "(" + uniqueView + ")" + "</a></td>";
                         } else {
-                            html += "<td>" + thread.views + "(" + count.usercount + ")" + "</td>";
+                            html += "<td>" + thread.views + "(" + uniqueView + ")" + "</td>";
                         }
-                    });
-
-
                     if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
                     {
                            html += "<td>" + thread .postdate + "&nbsp;<span style='color: red'>New</span></td>";
@@ -310,6 +307,7 @@ function markAsRemoveSuccess(response) {
 function limitToTagShow() {
 
     $("#limit-to-tag-link").click(function () {
+        $('.forum-table').DataTable().destroy();
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();
@@ -320,6 +318,7 @@ function limitToTagShow() {
 
     });
     $("#show-all-link").click(function () {
+        $('.forum-table').DataTable().destroy();
         $("#limit-to-tag-link").show();
         $("#show-all-link").hide();
         isValue = 0;
@@ -330,6 +329,7 @@ function limitToTagShow() {
 
     });
     $("#limit-to-new-link").click(function () {
+        $('.forum-table').DataTable().destroy();
         $("#limit-to-tag-link").hide();
         $('#limit-to-new-link').hide();
         $("#show-all-link").show();
@@ -343,6 +343,7 @@ function limitToTagShow() {
     $('#markRead').click(function(){
         var isValue = 3;
         var forumid= $('#forumid').val();
+        $('.forum-table').DataTable().destroy();
         var thread = {forumid: forumid , isValue: isValue};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
     });
