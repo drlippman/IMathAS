@@ -1,7 +1,7 @@
 <div class="index-header">
     <div class="left-side left-float">
         <div class="small-link">
-            <a href="<?php echo isset($link_url) ?  $link_url : ""; ?>"><?php echo isset($link_title) ?  $link_title : ""; ?> </a>>>
+            <i class="fa fa-home icon-padding-right fa-2x"></i><a href="<?php echo isset($link_url) ?  $link_url : ""; ?>"><?php echo isset($link_title) ?  $link_title : ""; ?> </a>>>
         </div>
         <div class="big-title">
             <?php echo isset($page_title) ?  $page_title : ""; ?>

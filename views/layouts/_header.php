@@ -3,7 +3,6 @@
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 
-
 $basePath = '/site/';
 NavBar::begin([
     'brandLabel' => 'OpenMath',
