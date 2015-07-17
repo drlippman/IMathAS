@@ -13,7 +13,7 @@ $(document).ready(function () {
         var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
+            width: 'auto',resizable: false,
             closeText: "hide",
             buttons: {
                 "Cancel": function () {

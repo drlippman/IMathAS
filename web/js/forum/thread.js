@@ -50,6 +50,7 @@ $(document).ready(function ()
     });
 
  });
+var hideLink =0;
 function postSearchSuccess(response)
 {
     response = JSON.parse(response);
@@ -191,18 +192,23 @@ function threadSuccess(response)
                 }
             }
         });
-        //$('.forum-table').DataTable().destroy();
         $('.forum-table-body').empty();
         $(".forum-table-body").append(html);
         $('.forum-table').DataTable({"ordering": false});
-        if(newCount > 0)
+        if(isValue == 2)
         {
-            $('#limit-to-new-link').show();
-            $('#markRead').show();
-        }
-        else{
             $('#limit-to-new-link').hide();
-            $('#markRead').hide();
+
+        }else{
+            if(newCount > 0)
+            {
+                $('#limit-to-new-link').show();
+                $('#markRead').show();
+            }
+            else{
+                $('#limit-to-new-link').hide();
+                $('#markRead').hide();
+            }
         }
 
     }
@@ -316,10 +322,10 @@ function limitToTagShow() {
     $("#show-all-link").click(function () {
         $("#limit-to-tag-link").show();
         $("#show-all-link").hide();
-        $("#limit-to-new-link").show();
         isValue = 0;
+        hideLink = 0;
         var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , isValue: isValue};
+        var thread = {forumid: forumid , isValue: isValue,hideLink:hideLink};
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });

@@ -161,6 +161,7 @@ class ForumController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $isValue = $params['isValue'];
         $forumId = $params['forumid'];
+        $hideLink = $params['hideLink'];
         $threads = ThreadForm::thread($forumId);
         $threadArray = array();
         $uniquesDataArray = array();
@@ -273,11 +274,11 @@ class ForumController extends AppController
                     array_push($FinalUniquesData, $temparrayForUnique);
                 }
             }
-        } else {
+        } else
+        {
             return $this->terminateResponse('');
 
         }
-//        AppUtility::dump($threadArray);
         $this->includeJS(['forum/forum.js']);
         $responseData = array('threadArray' => $threadArray, 'uniquesDataArray' => $FinalUniquesData, 'isValue' => $isValue);
         return $this->successResponse($responseData);
@@ -516,10 +517,10 @@ class ForumController extends AppController
     public function actionReplyPost()
     {
         $this->guestUserHandler();
+        $isPost = $this->getParamVal('listbypost');
         $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
         $threadArray = array();
-        $Id = $this->getParamVal('id');
         $forumId = $this->getParamVal('forumid');
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
@@ -536,7 +537,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);
-        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id);
+        $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id,'isPost' => $isPost);
         return $this->renderWithData('replyPost', $responseData);
     }
 
@@ -545,10 +546,11 @@ class ForumController extends AppController
         $this->guestUserHandler();
         if ($this->isPost()) {
             $params = $this->getRequestParams();
+            $isPost = $params['isPost'];
             $user = $this->getAuthenticatedUser();
             $reply = new ForumPosts();
             $reply->createReply($params, $user);
-            return $this->successResponse();
+            return $this->successResponse($isPost);
         }
     }
 
@@ -867,6 +869,7 @@ class ForumController extends AppController
 
     public function actionAddForum()
     {
+        $this->guestUserHandler();
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
