@@ -3,7 +3,7 @@ use app\components\AppUtility;
 
 $this->title = 'Calendar';
 $this->params['breadcrumbs'][] = $this->title;
-
+$currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 ?>
 
 <div class="item-detail-header">
@@ -16,11 +16,15 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="tab-content col-lg-12">
         <div class="col-lg-12">
             <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                 <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                 <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
             </div>
-            <div class="calendar-day-details pull-left col-lg-3">
-                <?php echo 'Day details';?>
+            <div class="calendar-day-details-right-side pull-left col-lg-3">
+                <div class="day-detail-border" style="border-bottom: #d3d3d3 solid 1px; padding-top: 48px;">
+                    <?php echo "<b>Day Details:</b>"?>
+                </div>
+                <div class="calendar-day-details"></div>
             </div>
         </div>
     </div>

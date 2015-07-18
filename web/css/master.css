@@ -29,6 +29,11 @@ body {
     margin: 0px;
     padding: 0px;
 }
+.container-lower-white:after{
+    display: table;
+    content: "";
+    clear: both;
+}
 .graphic-math-img{
     width: 336px;
     height:320px;
@@ -220,10 +225,11 @@ body {
     position: relative;
     padding: 15px;
 }
-.calendar-day-details{
+.calendar-day-details-right-side{
     width: 24%;
     position: relative;
     padding: 15px;
+    /*border-style: solid;*/
 }
 .left-side-content {
 padding-left: 1%;
@@ -244,3 +250,13 @@ padding-left: 1%;
 .icon-padding-right{
   padding-right: 5px;
 }
+/*.day-details {*/
+    /*border-bottom: solid 2px #000000;*/
+    /*display: inline;*/
+    /*padding-bottom: 3px;*/
+/*}*/
+/*.calendar-day-details-right-side{*/
+    /*padding-top: 63px;*/
+    /*padding-left: 30px;*/
+/*}*/
+

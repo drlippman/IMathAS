@@ -7,7 +7,6 @@ $(document).ready(function(){
     var m = date.getMonth();
     var y = date.getFullYear();
     calendar();
-
     /**
      * Show Dialog Pop Up for Assessment time
      */
@@ -44,7 +43,7 @@ $(document).ready(function(){
 
 
 });
-
+var calendarEvents = [];
 /**
  *  Display Calender
  */
@@ -57,7 +56,8 @@ function calendar() {
     var startDate = $('.start-date').val();
 
     $('.calendar').fullCalendar({
-        height: 420,
+        height: "auto",
+        fixedWeekCount: false,
         header: {
             left: 'prev,next today',
             center: 'title',
@@ -172,15 +172,10 @@ function calendar() {
                             });
                         }
                     });
+                    calendarEvents.push(events);
                     callback(events);
                 }
             });
-//            if(moment == assessmentData.assessmentArray){
-//                html += moment;
-//                $('.calendar-day-details').append(html);
-//            }
-            alert(assessmentData);
-
         },
         /**
          * Onclick event
@@ -191,86 +186,106 @@ function calendar() {
              */
             if(event.reviewMode == true)
             {
-                $("#demo").empty();
+                $(".calendar-day-details").empty();
                 var dateH = "Showing as Review until <b>" +event.reviewDat+"</b>";
                 var reviewMode= "<p style='margin-left:21px!important;'>This assessment is in review mode - no scores will be saved</p>";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $("#demo").append("<div>"+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+"."+reviewMode+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350,
-                    buttons: {
-                        "Ok": function() {
-                            $(this).dialog('close');
-                            return false;
-                        }
-                    }
-                });
+                $(".calendar-day-details").append("<div>"+assessmentLogo+"<b> "+event.title+"</b><br>"+dateH+"."+reviewMode+"</div>");
+//                $("#demo").dialog({ modal: true, title: event.message, width:350,
+//                    buttons: {
+//                        "Ok": function() {
+//                            $(this).dialog('close');
+//                            return false;
+//                        }
+//                    }
+//                });
             }
             /**
              * If assessment is not in review mode
              */
             else if(event.reviewMode == false)
             {
-                $("#demo").empty();
+                $(".calendar-day-details").empty();
                 var title = "<a class='link'style='color: #0000ff' href='../../assessment/assessment/show-assessment?id="+event.assessmentId+"&cid="+event.courseId+" '>"+event.title+"</a>";
                 var dateH = "Due " +event.startDat+"";
                 var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
-                $("#demo").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350,
-                    buttons: {
-                        "Ok": function() {
-                            $(this).dialog('close');
-                            return false;
-                        }
-                    }
-                });
+                $(".calendar-day-details").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
+//                $("#demo").dialog({ modal: true, title: event.message, width:350,
+//                    buttons: {
+//                        "Ok": function() {
+//                            $(this).dialog('close');
+//                            return false;
+//                        }
+//                    }
+//                });
             }
             /**
              * Managed event by admin pop up.
              */
             else if(event.calItem == true)
             {
-                $("#demo").empty();
+                $(".calendar-day-details").empty();
                 var title = event.tagTitle;
                 var tag = event.title;
-                $("#demo").append("<div> "+tag+"<br>"+title+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350,
-                    buttons: {
-                        "Ok": function() {
-                            $(this).dialog('close');
-                            return false;
-                        }
-                    }
-                });
+                $(".calendar-day-details").append("<div> "+tag+"<br>"+title+"</div>");
+//                $("#demo").dialog({ modal: true, title: event.message, width:350,
+//                    buttons: {
+//                        "Ok": function() {
+//                            $(this).dialog('close');
+//                            return false;
+//                        }
+//                    }
+//                });
             }
             else if(event.calLinkItem == true)
             {
-                $("#demo").empty();
+                $(".calendar-day-details").empty();
                 var tag = event.title;
                 var title = "<a class='link'style='color: #0000ff' href='../../course/course/show-linked-text?cid="+event.courseId+"&id="+event.linkedId+" '>"+event.linkTitle+"</a>";
-                $("#demo").append("<div> "+tag+"<br>"+title+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350,
-                    buttons: {
-                        "Ok": function() {
-                            $(this).dialog('close');
-                            return false;
-                        }
-                    }
-                });
+                $(".calendar-day-details").append("<div> "+tag+"<br>"+title+"</div>");
+//                $("#demo").dialog({ modal: true, title: event.message, width:350,
+//                    buttons: {
+//                        "Ok": function() {
+//                            $(this).dialog('close');
+//                            return false;
+//                        }
+//                    }
+//                });
             }
             else if(event.calInlineTextItem == true)
             {
-                $("#demo").empty();
+                $(".calendar-day-details").empty();
                 var tag = event.title;
-                $("#demo").append("<div> "+tag+"</div>");
-                $("#demo").dialog({ modal: true, title: event.message, width:350,
-                    buttons: {
-                        "Ok": function() {
-                            $(this).dialog('close');
-                            return false;
-                        }
-                    }
-                });
+                $(".calendar-day-details").append("<div> "+tag+"</div>");
+//                $("#demo").dialog({ modal: true, title: event.message, width:350,
+//                    buttons: {
+//                        "Ok": function() {
+//                            $(this).dialog('close');
+//                            return false;
+//                        }
+//                    }
+//                });
             }
+
+
+        },
+        dayClick: function(date, jsEvent, view) {
+
+            var now = date.format();
+            $(".calendar-day-details").empty();
+            $.each(calendarEvents[0], function (index, selectedDate) {
+                if(selectedDate.start == now){
+                    var title = "<a class='link'style='color: #0000ff' href='../../assessment/assessment/show-assessment?id="+selectedDate.assessmentId+"&cid="+selectedDate.courseId+" '>"+selectedDate.title+"</a>";
+                    var dateH = "Due " +selectedDate.start+"";
+                    if(selectedDate.color == "blue"){
+                        var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/assess.png'/>";
+                    }else{
+                        var assessmentLogo = "<img alt='assess' class='floatleft' src='../../img/html.png'/>";
+                    }
+                    $(".calendar-day-details").append("<div> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
+                    console.log(selectedDate);
+                }
+            });
         }
     });
 }
@@ -290,3 +305,4 @@ function getAssessmentDataRequest(response) {
         });
     }
 }
+
