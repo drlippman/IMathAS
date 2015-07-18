@@ -199,7 +199,6 @@ body {
     background: #E0E0E0;
 }
 .tab-content{
-    padding: 15px;
     background: #ffffff;
     box-shadow: 0px 4px 13px -2px #6d6d6d;
 }
@@ -262,4 +261,7 @@ padding-left: 1%;
 .nav-tabs-non-shadow{
     box-shadow: 0px -3px 13px -2px #6d6d6d;
 }
-
+.calendar-container{
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
