@@ -140,6 +140,10 @@ class AppUtility extends Component
         return date($format, $dateStr);
     }
 
+    public static function getFormattedTime($dateStr, $format = 'h:i A'){
+        return date($format, $dateStr);
+    }
+
     public static function getFullName($first, $last){
         return trim(ucfirst($first).' '.ucfirst($last));
     }

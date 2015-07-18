@@ -223,13 +223,13 @@ body {
 .calendar-alignment{
     width: 76%;
     position: relative;
-    padding: 15px;
 }
 .calendar-day-details-right-side{
     width: 24%;
     position: relative;
     padding: 15px;
-    /*border-style: solid;*/
+    padding-right: 0;
+    padding-top: 47px;
 }
 .left-side-content {
 padding-left: 1%;
@@ -250,13 +250,14 @@ padding-left: 1%;
 .icon-padding-right{
   padding-right: 5px;
 }
-/*.day-details {*/
-    /*border-bottom: solid 2px #000000;*/
-    /*display: inline;*/
-    /*padding-bottom: 3px;*/
-/*}*/
-/*.calendar-day-details-right-side{*/
-    /*padding-top: 63px;*/
-    /*padding-left: 30px;*/
-/*}*/
 
+.fc-unthemed .fc-today {
+    background-color: #D4E1F1;
+}
+.day-detail-border{
+    border-bottom: #d3d3d3 solid 1px;
+}
+.single-event{
+    height: 90px;
+    padding-top: 10px;
+}

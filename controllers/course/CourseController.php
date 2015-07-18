@@ -566,6 +566,7 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $cid = $params['cid'];
+        $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $assessments = Assessments::getByCourseId($cid);
         $calendarItems = CalItem::getByCourseId($cid);
         $CalendarLinkItems = Links::getByCourseId($cid);
@@ -576,8 +577,9 @@ class CourseController extends AppController
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
-                'name' => $assessment['name'],
+                'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate'],
@@ -593,8 +595,9 @@ class CourseController extends AppController
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'title' => $calendarItem['title'],
-                'tag' => $calendarItem['tag']
+                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
+                'title' => ucfirst($calendarItem['title']),
+                'tag' => ucfirst($calendarItem['tag'])
             );
         }
         $calendarLinkArray = array();
@@ -602,14 +605,15 @@ class CourseController extends AppController
         {
             $calendarLinkArray[] = array(
                 'courseId' => $CalendarLinkItem['courseid'],
-                'title' => $CalendarLinkItem['title'],
+                'title' => ucfirst($CalendarLinkItem['title']),
                 'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($CalendarLinkItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $CalendarLinkItem['startdate'],
                 'endDateString' => $CalendarLinkItem['enddate'],
                 'linkedId' => $CalendarLinkItem['id'],
-                'calTag' => $CalendarLinkItem['caltag']
+                'calTag' => ucfirst($CalendarLinkItem['caltag'])
             );
         }
 
@@ -619,13 +623,14 @@ class CourseController extends AppController
             $calendarInlineTextArray[] = array(
                 'courseId' => $calendarInlineTextItem['courseid'],
                 'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($calendarInlineTextItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarInlineTextItem['startdate'],
                 'endDateString' => $calendarInlineTextItem['enddate'],
-                'calTag' => $calendarInlineTextItem['caltag']
+                'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
         return $this->successResponse($responseData);
     }
 
