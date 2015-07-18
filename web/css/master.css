@@ -195,12 +195,11 @@ body {
 .calendar-details{
     padding-top: 47px;
 }
-.nav-tabs{
+.teacher-tab{
     background: #E0E0E0;
-    box-shadow: 0px -3px 13px -2px #6d6d6d;
 }
 .tab-content{
-    padding: 15px;
+    /*padding: 15px;*/
     background: #ffffff;
     box-shadow: 0px 4px 13px -2px #6d6d6d;
 }
@@ -250,7 +249,6 @@ padding-left: 1%;
 .icon-padding-right{
   padding-right: 5px;
 }
-
 .fc-unthemed .fc-today {
     background-color: #D4E1F1;
 }
@@ -261,3 +259,7 @@ padding-left: 1%;
     height: 90px;
     padding-top: 10px;
 }
+.nav-tabs-non-shadow{
+    box-shadow: 0px -3px 13px -2px #6d6d6d;
+}
+

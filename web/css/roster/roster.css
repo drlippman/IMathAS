@@ -1,0 +1,32 @@
+.roster-menu-bar-nav{
+    background: #f8f8f8;
+}
+.roster-upper-content{
+    padding: 15px;
+}
+.page-title{
+    font-size: 36px;
+    color: #6d6d6d;
+}
+.nav-tabs.nav-justified > .dropdown .enroll-options{
+    background: #f8f8f8;
+    padding: 0;
+
+}
+.nav-tabs.nav-justified > .dropdown .enroll-options > li > a {
+    display: block;
+    padding: 8px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #428bca;
+    white-space: nowrap;
+    border-bottom: 1px solid #ccc;
+}
+.nav-tabs.nav-justified > .dropdown .enroll-options{
+    background: #f8f8f8;
+}
+
+/*.dropdown-roster-menu-bar-nav{*/
+/*background-color: #f8f8f8;*/
+/*}*/

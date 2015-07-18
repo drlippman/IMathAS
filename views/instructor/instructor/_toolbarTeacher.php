@@ -5,7 +5,7 @@ use app\components\AppUtility;
 ?>
 
     <div class="common-navbar">
-        <ul class="nav nav-tabs nav-justified" id="nav">
+        <ul class="nav nav-tabs teacher-tab nav-justified nav-tabs-non-shadow" id="nav">
             <?php if($section == 'course'){ ?>
             <li class="active master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>"><i class="fa fa-book icon-nav"></i><?php AppUtility::t('Course'); ?></a></li>
             <?php } else { ?>

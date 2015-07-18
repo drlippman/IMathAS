@@ -62,7 +62,7 @@ class RosterController extends AppController
                 }
             }
         }
-        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
         $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
