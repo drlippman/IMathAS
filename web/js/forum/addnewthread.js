@@ -2,8 +2,6 @@ $(document).ready(function () {
     initEditor();
     $("#addNewThread").click(function()
     {
-
-
         tinyMCE.triggerSave();
             var forumId = $("#forumId").val();
             var subject = $(".subject").val();
@@ -12,7 +10,8 @@ $(document).ready(function () {
                 $('#flash-message').show();
                 $(".subject").css('border-color', 'red');
                 $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank");
-            }else
+            }
+            else
             {
                 document.getElementById("addNewThread").disabled = 'true';
                 var date = $( "#datepicker-id input" ).val();
@@ -32,9 +31,21 @@ $(document).ready(function () {
                 jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
             }
     });
-    $("input").keypress(function(){
+    $("input").keypress(function(e){
+        var subject = $(".subject").val();
         $(".subject").css('border-color', '');
         $('#flash-message').hide();
+        if(subject.length > 60)
+        {
+            $('#flash-message').show();
+            $(".subject").css('border-color', 'red');
+            $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters!");
+            return false;
+        }else{
+            $(".subject").css('border-color', '');
+            $('#flash-message').hide();
+        }
+
     });
 });
 

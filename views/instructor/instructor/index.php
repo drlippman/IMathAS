@@ -72,6 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <br><br><br>
 <!-- ////////////////// Assessment here //////////////////-->
+    <?php $cnt=0;?>
 <?php $countCourseDetails = count($courseDetail);
 if ($countCourseDetails){
 $assessment = $blockList = array();
@@ -105,7 +106,7 @@ case 'LinkedText': ?>
 <!--  Block here-->
 <?php case  'Block': ?>
     <?php $displayBlock = new CourseItemsUtility();
-    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent);
+    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
     ?>
     <?php break; ?>
 <?php endswitch;

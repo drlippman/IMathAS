@@ -177,7 +177,7 @@ class Course extends BaseImasCourses {
     }
 
 
-    public static function UpdateItemOrder($finalBlockItems,$blockCnt,$course)
+    public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {
         $isRecord = Course::findOne(['id' =>$course]);
         if($isRecord)

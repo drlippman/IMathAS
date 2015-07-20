@@ -146,7 +146,7 @@ $currentLevel = 0;
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $data['userId'] . '&new=1') ?>"><?php echo $data['name'] ?></a>,<?php echo $data['postdate'] ?>
 
             <?php
-            if (strtotime($data['postdate']) >= $data['lastView']) {
+            if (strtotime($data['postdate']) >= $data['lastView'] && $data['id'] != $data['threadId']) {
                 ?>
                 <span style="color:red;">New</span>
             <?php } ?>

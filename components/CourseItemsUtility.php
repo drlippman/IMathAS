@@ -647,13 +647,14 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             </div>
   <?php }
 
-        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent)
+        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
         {
                              $block = $item[key($item)];?>
                                 <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
                                 <input type="hidden" id="id" value="<?php echo $block['id']?>" >
                              <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
                              <?php $endDate = AppUtility::formatDate($block['enddate']);?>
+                            <?php  $cnt++;?>
                             <?php if ($block['avail'] == 1){  ?>
                             <div class=block>
                                 <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
@@ -672,16 +673,23 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <div class="title">
                                 <span class="pointer" onclick="#">
                                 <b>
-                                <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                <a href="#" onclick="return false;"><?php echo $block['name']?></a>
+                                        <?php if($block['newflag'] == 1){?>
+                                <span class="red">New</span>a
+                                <?php }?>
+                                </b>
                                 </span>
 
                                 <span class="instrdates" style="font-family: "Times New Roman", Times, serif">
                                     <?php if($block['SH'] == 'HC'){$title = 'Showing Collapsed';}
                                     else if($block['SH'] == 'HO'){$title = 'Showing Expanded';}
-                                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as Folder';}?>
-                                <br><?php echo $title?> <?php echo $StartDate?> until <?php echo $endDate?></span>
+                                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as TreeReader';}
+                                    elseif($block['SH'] == 'SO'){$title = 'Showing Expanded';}elseif($block['SH'] == 'SC'){$title = 'Showing Collapsed';}
+                                    elseif($block['SH'] == 'SF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'ST'){$title = 'Showing as TreeReader';}?>
+                                    <?php if($block['startdate'] == AppConstant::NUMERIC_ZERO && $block['enddate'] == AppConstant::ALWAYS_TIME){$StartDate = 'ALways'; $endDate = 'ALways';}?>
+                                    <br><?php echo $title?>   <?php echo $StartDate?> until <?php echo $endDate?></span>
                                  <span class="instronly">
-                                <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                 <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
                                 </span>
                                 </div>
                             </div>
@@ -725,7 +733,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                             <?php case '':?>
                                                   <?php
 
-                                                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
                                                 ?>
                                                  <?php break; ?>
                                             <?php endswitch; ?>
@@ -753,16 +761,22 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <div class="title">
                                 <span class="pointer" onclick="#">
                                 <b>
-                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a>
+                                    <?php if($block['newflag'] == 1){?>
+                                        <span class="red">New</span>a
+                                    <?php }?>
+                                </b>
                                 </span>
 
                     <span class="instrdates" style="font-family: "Times New Roman", Times, serif">
                     <?php if($block['SH'] == 'HC'){$title = 'Showing Collapsed';}
                     else if($block['SH'] == 'HO'){$title = 'Showing Expanded';}
-                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as Folder';}?>
+                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as TreeReader';}
+                    elseif($block['SH'] == 'SO'){$title = 'Showing Expanded';}elseif($block['SH'] == 'SC'){$title = 'Showing Collapsed';}
+                    elseif($block['SH'] == 'SF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'ST'){$title = 'Showing as TreeReader';}?>
                     <br><?php echo $title?> Always</span>
                                  <span class="instronly">
-                                <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
                                 </span>
                 </div>
             </div>
@@ -806,7 +820,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                             <?php case '':?>
                                 <?php
 
-                                $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
                                 ?>
                                 <?php break; ?>
                             <?php endswitch; ?>
@@ -832,11 +846,15 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <div class="title">
                                     <span class="pointer" onclick="#">
                                     <b>
-                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a></b>
+                                    <a href="#" onclick="return false;"><?php echo $block['name']?></a>
+                                        <?php if($block['newflag'] == 1){?>
+                                            <span class="red">New</span>
+                                        <?php }?>
+                                    </b>
                                     </span>
                                     <span class="instrdates">
                                     <br>Hidden</span><span class="instronly">
-                                    <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="">NewFlag</a>
+                                    <a href="#">Isolate</a> | <a href="#">Modify</a> | <a href="#">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
                                     </span>
                                 </div>
                             </div>
@@ -877,7 +895,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                         <?php case '':?>
                                             <?php
 
-                                            $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent);
+                                            $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
                                             ?>
                                             <?php break; ?>
                                         <?php endswitch; ?>

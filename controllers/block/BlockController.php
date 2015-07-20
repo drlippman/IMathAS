@@ -133,8 +133,37 @@ class BlockController extends AppController
         }
         $blockCnt++;
         $finalBlockItems =(serialize($blockData));
-        Course::UpdateItemOrder($finalBlockItems,$blockCnt,$params['courseId']);
+        Course::UpdateItemOrder($finalBlockItems,$params['courseId'],$blockCnt);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$params['courseId']));
+    }
+
+    public function actionNewFlag()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParam('cid');
+        $course = Course::getById($courseId);
+        $blockData = unserialize($course['itemorder']);
+        $newFlag = $this->getParamVal('newflag');
+        if(isset($newFlag)){
+            $sub =& $blockData;
+        }
+        $blockTree = explode('-',$newFlag);
+        if (count($blockTree)>1) {
+            for ($i=1;$i<count($blockTree)-1;$i++) {
+                $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+            }
+        }
+        $sub =& $sub[$blockTree[$i]-1];
+        if (!isset($sub['newflag']) || $sub['newflag']==0) {
+            $sub['newflag']=1;
+        } else {
+
+            $sub['newflag']=0;
+        }
+        $finalBlockItems =(serialize($blockData));
+        Course::UpdateItemOrder($finalBlockItems,$courseId,$blockCnt=null);
+        $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
+
     }
 
 }
