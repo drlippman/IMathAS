@@ -14,8 +14,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
 <h2><?php echo $pageTitle ?></h2>
 <?php echo $page_isTakenMsg ?>
-
-<form method=post action="add-assessment?cid=<?php echo $course->id ?>">
+<form method=post action="add-assessment?cid=<?php echo $course->id ?>&id=<?php echo $assessmentData['id'];?>">
     <p></p>
 <span class=form>Assessment Name:</span>
 <span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>"></span><BR class=form>
@@ -405,7 +404,8 @@ AssessmentUtility::writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTuto
                     }
                 }?></span>
 			<span class="formright">
-				<?php AssessmentUtility::writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
+                <?php AssessmentUtility::writeHtmlSelect("groupsetid",$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],"Not group forum",0); ?>
+<!--				--><?php //AssessmentUtility::writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
 			</span><br class="form" />
     <span class="form">Default Outcome:</span>
 			<span class="formright"><select name="defoutcome">

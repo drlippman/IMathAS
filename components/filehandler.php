@@ -84,6 +84,7 @@ function relocatefileifneeded($file, $key, $sec="public") {
 }
 
 function storeuploadedfile($id,$key,$sec="private") {
+
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -101,6 +102,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 			return false;
 		}
 	} else {
+//        \app\components\AppUtility::dump('file');
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
 			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
 			$dir = $base.dirname($key);

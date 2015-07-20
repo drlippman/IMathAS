@@ -76,6 +76,7 @@ class Assessments extends BaseImasAssessments
         return $data;
     }
     public function createAssessment($params,$startDate,$endDate,$reviewDate,$timeLimit,$shuffle,$defFeedback,$tutorEdit,$showHints,$endMsg,$defFeedbackText,$isTutorial){
+//        $this->getErrors();
         $this->courseid = isset($params['cid']) ? $params['cid'] : null;
         $this->name = isset($params['name']) ? trim($params['name']) : null;
         $this->summary = isset($params['summary']) ? $params['summary'] : null;
@@ -171,7 +172,7 @@ class Assessments extends BaseImasAssessments
             $assessment->enddate = $endDate;
             $assessment->reviewdate = $reviewDate;
         }
-
+AppUtility::dump($assessment);
         $assessment->save();
     }
 

@@ -44,7 +44,7 @@ class AssessmentController extends AppController
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to);
+        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to,'user' => $user);
         return $this->render('ShowAssessment', $responseData);
     }
 
@@ -307,7 +307,9 @@ class AssessmentController extends AppController
                          * HtmLawed in progress
                          */
                     }
-                if (isset($params['id'])) {  //already have id; update
+//AppUtility::dump($params);
+                if ($params['id']) {  //already have id; update
+                    AppUtility::dump('update');
                     if ($isGroup==AppConstant::NUMERIC_ZERO) { //set agroupid=0 if switching from groups to non groups
                         $query = $assessmentData['isgroup'];
                         if ($query>AppConstant::NUMERIC_ZERO) {
@@ -328,6 +330,7 @@ class AssessmentController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='. $courseId));
                     }
                 } else { //add new
+//                    AppUtility::dump('add');
                     if (!isset($params['copyendmsg'])) {
                         $endMsg = '';
                     }
@@ -536,6 +539,7 @@ class AssessmentController extends AppController
                 }
                 $pageGroupSets['val'][0] = AppConstant::NUMERIC_ZERO;
                 $pageGroupSets['label'][0] = AppConstant::GROUP_SET;
+                    $key = 1;
                 foreach ($query as $singleData) {
                     $pageGroupSets['val'][$key] = $singleData['id'];
                     $pageGroupSets['label'][$key] = $singleData['name'];

@@ -44,7 +44,7 @@ class BaseImasForumPosts extends \yii\db\ActiveRecord
     {
         return [
 //            [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'subject', 'message', 'files', 'tag'], 'required'],
-            [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'isanon', 'replyby'], 'integer'],
+            [['forumid', 'threadid', 'userid', 'postdate', 'views', 'parent', 'posttype', 'isanon'], 'integer'],
             [['message', 'files'], 'string'],
             [['subject', 'tag'], 'string', 'max' => 254]
         ];

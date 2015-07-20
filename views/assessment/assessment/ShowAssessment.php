@@ -27,6 +27,7 @@ MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", ima
 $hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
 $min = floor((abs($assessment->timelimit)%3600)/60);
 ?>
+<input type="hidden" id="user-rights" value="<?php echo $user['rights'];?>">
 <input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
 <input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
 <input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
@@ -58,8 +59,9 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
         var startDateString = $('#startDateString').val();
         var reviewDateString = $('#reviewDateString').val();
         var noQuestion = $('#noQuestion').val();
+        var userRights = $('#user-rights').val();
         if(noQuestion == 1){
-            noQuestionPopup();
+            noQuestionPopup(userRights);
         }
         initEditor();
         if(timer != 0)
@@ -137,7 +139,7 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
 
     });
 
-    function noQuestionPopup(){
+    function noQuestionPopup(userRights){
         var courseId = $("#courseId").val();
         var msg = '<div><p>This assessment does not have any questions right now</div>';
 
@@ -150,7 +152,13 @@ $min = floor((abs($assessment->timelimit)%3600)/60);
             {
                 "Go Back": function ()
                 {
-                    window.location ="../../course/course/index?cid="+courseId;
+                    if(userRights == 10)
+                    {
+                        window.location ="../../course/course/index?cid="+courseId;
+                    }else{
+                        window.location ="../../instructor/instructor/index?cid="+courseId;
+                    }
+
                     $(this).dialog('destroy').remove();
 
                 }

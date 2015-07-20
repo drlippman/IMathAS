@@ -26,7 +26,9 @@ class AdminController extends AppController
         $this->includeJS(['adminindex.js','general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('index', ['users' => $users]);
     }
-
+/*
+ * This method to add new user
+ */
     public function actionAddNewUser()
     {
         $this->guestUserHandler();
@@ -68,7 +70,6 @@ class AdminController extends AppController
         return $this->renderWithData('adminDiagnostic',$responseData);
     }
 
-
     public function actionGetAllCourseUserAjax()
     {
         $sortBy = AppConstant::FIRST_NAME;
@@ -85,8 +86,8 @@ class AdminController extends AppController
 
     public function actionChangeRights()
     {
-        $id = $this->getParamVal('id');
         $this->guestUserHandler();
+        $id = $this->getParamVal('id');
         $model = new ChangeRightsForm();
         if ($model->load($this->getPostData())) {
             $params = $this->getRequestParams();

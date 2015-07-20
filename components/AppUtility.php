@@ -806,7 +806,7 @@ class AppUtility extends Component
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
             }
-       
+
             $useeqnhelper = $testsettings['eqnhelper'];
 
             $responseString .= '<div id="headershowtest" class="pagetitle">';
@@ -2193,7 +2193,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_tag($t) {
+    public static function hl_tag($t)
+    {
 // tag/attribute handler
         global $C;
         $t = $t[0];
@@ -2300,7 +2301,7 @@ class AppUtility extends Component
         $a = array();
         $nfr = 0;
         foreach ($aA as $k => $v) {
-            if (((isset($C['deny_attribute']['*']) ? isset($C['deny_attribute'][$k]) : !isset($C['deny_attribute'][$k])) && (isset($aN[$k][$e]) or ( isset($aNU[$k]) && !isset($aNU[$k][$e]))) && !isset($rl['n'][$k]) && !isset($rl['n']['*'])) or isset($rl[$k])) {
+            if (((isset($C['deny_attribute']['*']) ? isset($C['deny_attribute'][$k]) : !isset($C['deny_attribute'][$k])) && (isset($aN[$k][$e]) or (isset($aNU[$k]) && !isset($aNU[$k][$e]))) && !isset($rl['n'][$k]) && !isset($rl['n']['*'])) or isset($rl[$k])) {
                 if (isset($aNE[$k])) {
                     $v = $k;
                 } elseif (!empty($lcase) && (($e != 'button' or $e != 'input') or $k == 'type')) { // Rather loose but ?not cause issues
@@ -2365,7 +2366,7 @@ class AppUtility extends Component
         if ($depTr) {
             $c = array();
             foreach ($a as $k => $v) {
-                if ($k == 'style' or ! isset($aND[$k][$e])) {
+                if ($k == 'style' or !isset($aND[$k][$e])) {
                     continue;
                 }
                 if ($k == 'align') {
@@ -2402,7 +2403,7 @@ class AppUtility extends Component
                     unset($a['language']);
                     $a['type'] = 'text/' . strtolower($v);
                 } elseif ($k == 'name') {
-                    if ($C['no_deprecated_attr'] == 2 or ( $e != 'a' && $e != 'map')) {
+                    if ($C['no_deprecated_attr'] == 2 or ($e != 'a' && $e != 'map')) {
                         unset($a['name']);
                     }
                     if (!isset($a['id']) && preg_match('`[a-zA-Z][a-zA-Z\d.:_\-]*`', $v)) {
@@ -2435,7 +2436,7 @@ class AppUtility extends Component
         }
 // unique ID
         if ($C['unique_ids'] && isset($a['id'])) {
-            if (!preg_match('`^[A-Za-z][A-Za-z0-9_\-.:]*$`', ($id = $a['id'])) or ( isset($GLOBALS['hl_Ids'][$id]) && $C['unique_ids'] == 1)) {
+            if (!preg_match('`^[A-Za-z][A-Za-z0-9_\-.:]*$`', ($id = $a['id'])) or (isset($GLOBALS['hl_Ids'][$id]) && $C['unique_ids'] == 1)) {
                 unset($a['id']);
             } else {
                 while (isset($GLOBALS['hl_Ids'][$id])) {
@@ -2510,10 +2511,10 @@ class AppUtility extends Component
     }
 
     public static function get_meta_keys(){
-    $keys = array();
+        $keys = array();
         $keys[] = 'settings';
 
-    // key value json
+        // key value json
     }
 
     public static function t($key, $echo = true){
@@ -2648,25 +2649,25 @@ class AppUtility extends Component
     }
 
     public static function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
-    //$name is the html name for the select list
-    //$valList is an array of strings for the html value tag
-    //$labelList is an array of strings that are displayed as the select list
-    //$selectVal is optional, if passed the item in $valList that matches will be output as selected
+        //$name is the html name for the select list
+        //$valList is an array of strings for the html value tag
+        //$labelList is an array of strings that are displayed as the select list
+        //$selectVal is optional, if passed the item in $valList that matches will be output as selected
 
-    echo "<select name=\"$name\" ";
-    echo (isset($actions)) ? $actions : "" ;
-    echo ">\n";
-    if (isset($defaultLabel) && isset($defaultVal)) {
-        echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
-    }
-    for ($i=0;$i<count($valList);$i++) {
-        if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
-            echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
-        } else {
-            echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+        echo "<select name=\"$name\" ";
+        echo (isset($actions)) ? $actions : "" ;
+        echo ">\n";
+        if (isset($defaultLabel) && isset($defaultVal)) {
+            echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
         }
-    }
-    echo "</select>\n";
+        for ($i=0;$i<count($valList);$i++) {
+            if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+                echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
+            } else {
+                echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+            }
+        }
+        echo "</select>\n";
     }
 
     public static function writeHtmlChecked ($var,$test,$notEqual=null) {

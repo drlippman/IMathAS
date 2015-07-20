@@ -16,63 +16,67 @@ public $cnt = 0;
     public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent)
     {
          $assessment = $item[key($item)];
-        if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
-        ?>
-        <div class="item">
-        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
-        <div class="title">
-        <b>
-            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-               class="confirmation-require assessment-link"
-               id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
-        </b>
-        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
-               name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
 
-        <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-            <BR>Hidden
-        <?php } else { ?>
-            <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
+if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
+?>
+<div class="item">
+<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+<div class="title">
+<b>
+    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+       class="confirmation-require assessment-link"
+       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+</b>
+<input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+       name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
 
-            <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-            <?php } else { ?>
-                <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-            <?php }
-        } ?>
-        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
-            echo 'LP';
-            }
-            ?>
-        <a> Questions </a>| <a
-            href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
-            Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
-        <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
-        ?>
-        <div class="item">
-        <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
-        <div class="title">
-        <b>
-            <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-               class="confirmation-require assessment-link"
-               id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
-        </b>
-        <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
-               name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
-        <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-            <BR>Hidden
-        <?php } else { ?>
-            <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
-            <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-            <?php } else { ?>
-                <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-            <?php }
-        } ?>
-        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
-        echo 'LP';
+<?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+    <BR>Hidden
+<?php } else { ?>
+    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+        <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
+
+    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+        <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+    <?php } else { ?>
+        <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+    <?php }
+} ?>
+    <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+        <span title="Late Passes Allowed">LP</span>
+    <?php
+    } ?>
+
+<a> Questions </a>| <a
+    href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>">
+    Settings </a>|<a href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> |<a> Copy </a>| <a>Grades</a>
+<?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
+?>
+<div class="item">
+<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+
+<div class="title">
+<b>
+    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+       class="confirmation-require assessment-link"
+       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+</b>
+<input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+       name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
+<?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+    <BR>Hidden
+<?php } else { ?>
+    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+        <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
+    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+        <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+    <?php } else { ?>
+        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+    <?php }
+} ?>
+    <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+        <span title="Late Passes Allowed">LP</span>
+    <?php
     } ?>
 <a> Questions </a>| <a
     href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
@@ -130,8 +134,9 @@ public $cnt = 0;
             }   } ?>
 
 
-        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) {
-            echo 'LP';
+        <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+             <span title="Late Passes Allowed">LP</span>
+            <?php
         } ?>
         <a> Questions </a>| <a
             href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id=' . $assessment->id . '&cid=' . $course->id . '&block=0') ?>">
