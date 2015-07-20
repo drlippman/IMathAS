@@ -540,7 +540,36 @@ public $oa = array();
                 AppUtility::itemOrder($courseId,$block,$itemDeletedId);
                 break;
             case AppConstant::BLOCK:
+                $course = Course::getById($courseId);
+                $blockData = unserialize($course['itemorder']);
+                $blockTree = explode('-',$itemId);
+                $blockCnt=" ";
+                $blockId = array_pop($blockTree) - 1;
+                $sub =& $blockData;
+                if (count($blockTree)>1)
+                {
+                    for ($i=1;$i<count($blockTree);$i++)
+                    {
+                        $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                    }
+                }
+                if (is_array($sub[$blockId])) { //make sure it's really a block
+                    $blockItems = $sub[$blockId]['items'];
+                    $obId = $sub[$blockId]['id'];
 
+                    if (count($blockItems)>0)
+                    {
+                        $this->deleteRecursive($blockItems);
+                        array_splice($sub,$blockId,1);
+
+                    }else
+                    {
+
+                        array_splice($sub,$blockId,1);
+                    }
+                }
+                $itemList =(serialize($blockData));
+                Course::setBlockCount($itemList,$blockCnt=null,$courseId);
         }
         return $this->successResponse();
     }
@@ -625,6 +654,45 @@ public $oa = array();
                     }
                 }
             }
+        }
+    }
+    public function deleteRecursive($itemArray) { //delete items, recursing through blocks as needed
+        foreach($itemArray as $itemId) {
+            if (is_array($itemId)) {
+                $this->deleteRecursive($itemId['items']);
+            } else {
+                $ItemType =Items::getByTypeId($itemId);
+//                $this->deleteItemById($itemId);
+            $this->actionDeleteItemsAjax($ItemType['itemtype']);
+            }
+        }
+    }
+
+    public function deleteItemById($itemId)
+    {
+        $ItemType =Items::getByTypeId($itemId);
+        switch($ItemType['itemtype'])
+        {
+            case AppConstant::FORUM:
+
+                break;
+            case AppConstant::ASSESSMENT:
+
+                break;
+            case AppConstant::CALENDAR:
+
+                break;
+            case AppConstant::INLINE_TEXT:
+
+                break;
+            case AppConstant::WIKI:
+
+                break;
+            case AppConstant::LINK:
+
+                break;
+            case AppConstant::BLOCK:
+
         }
     }
 }

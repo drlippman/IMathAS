@@ -182,7 +182,6 @@ class Course extends BaseImasCourses {
         $isRecord = Course::findOne(['id' =>$course]);
         if($isRecord)
         {
-
             $isRecord->itemorder = $finalBlockItems;
             $isRecord->blockcnt = $blockCnt;
             $isRecord->save();

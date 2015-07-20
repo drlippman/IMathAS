@@ -23,8 +23,11 @@ class BlockController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
+        $course = Course::getById($courseId);
+        $blockData = unserialize($course['itemorder']);
         $toTb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
+        $modify = $this->getParamVal('modify');
         if(isset($toTb))
         {
             $toTb = $toTb;
@@ -32,8 +35,56 @@ class BlockController extends AppController
         else{
             $toTb = 'b';
         }
+        if(isset($modify))
+        {
+           $modifyId = $this->getParamVal('id');
+           $blockTree = explode('-',$modifyId);
+            $existingId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
+            $blockItems = $blockData;
+            if (count($blockTree)>1) {
+                for ($i=1;$i<count($blockTree);$i++) {
+                    $blockItems = $blockItems[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                }
+            }
+            $title = stripslashes($blockItems[$existingId]['name']);
+            $title = str_replace('"','&quot;',$title);
+            $startDate = $blockItems[$existingId]['startdate'];
+            $endDate = $blockItems[$existingId]['enddate'];
+            if (isset($blockItems[$existingId]['avail'])) { //backwards compat
+                $avail = $blockItems[$existingId]['avail'];
+            } else {
+                $avail = 1;
+            }
+            if (isset($blockItems[$existingId]['public'])) { //backwards compat
+                $public = $blockItems[$existingId]['public'];
+            } else {
+                $public = 0;
+            }
+            $showHide = $blockItems[$existingId]['SH'][0];
+            if (strlen($blockItems[$existingId]['SH'])==1) {
+                $availBeh = 'O';
+            } else {
+                $availBeh = $blockItems[$existingId]['SH'][1];
+            }
+            $fixedHeight = $blockItems[$existingId]['fixedheight'];
+            $groupLimit = $blockItems[$existingId]['grouplimit'];
+            $saveTitle = _("Save Changes");
+           $defaultBlockData = array
+           (
+                'title' =>  $title,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'availBeh' => $availBeh,
+                'showHide' => $showHide,
+                'avail' => $avail,
+                'public' => $public,
+                'fixedHeight' => $fixedHeight,
+                'groupLimit' => $groupLimit,
+               'saveTitle' =>'save Changes',
+           );
+        }
+        else{
         $groupLimit = array();
-
         $defaultBlockData = array(
         'title' => 'Enter Block name here',
         'startDate' => time() + 60*60,
@@ -42,10 +93,11 @@ class BlockController extends AppController
         'showHide' => 'H',
         'avail' => 1,
         'public' => 0,
-        'useDef' => 1,
         'fixedHeight' => 0,
         'groupLimit' => $groupLimit,
+         'saveTitle' =>'Create Block',
         );
+        }
         $page_sectionListVal = array("none");
         $page_sectionListLabel = array("No restriction");
         $sectionQuery = Student::findDistinctSection($courseId);
@@ -54,7 +106,7 @@ class BlockController extends AppController
             $page_sectionListVal[] = 's-'.$data->section;
             $page_sectionListLabel[] = 'Section '.$data->section;
         }
-        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block]);
+        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId]);
     }
 
     public function actionCreateBlock()
@@ -67,14 +119,14 @@ class BlockController extends AppController
         {
             $blockTree = explode('-',$params['block']);
         }else
-        { //modifying existing
+        {
             $blockTree = explode('-',$params['id']);
-            $existingid = array_pop($blocktree) - AppConstant::NUMERIC_ONE; //-1 adjust for 1-index
+            $existingId = array_pop($blockTree) - 1;
         }
         $sub =& $blockData;
         if (count($blockTree)>1) {
             for ($i=1;$i<count($blockTree);$i++) {
-                $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                $sub =& $sub[$blockTree[$i]-1]['items'];
             }
         }
         $groupLimit = array();
@@ -114,24 +166,42 @@ class BlockController extends AppController
             $startDate = AppConstant::NUMERIC_ZERO;
             $endDate = 2000000000;
         }
-        $blockItems = array();
-        $blockItems['name'] = htmlentities(stripslashes($params['title']));
-        $blockItems['id'] = strval($blockCnt);
-        $blockItems['startdate'] =  $startDate;
-        $blockItems['enddate'] = $endDate;
-        $blockItems['avail'] = $params['avail'];
-        $blockItems['SH'] = $params['showhide'] . $params['availBeh'];
-        $blockItems['colors'] = "";
-        $blockItems['public'] = $public ;
-        $blockItems['fixedheight'] = $fixedHeight;
-        $blockItems['grouplimit'] = $groupLimit;
-        $blockItems['items'] = array();
-        if ($params['toTb']=='b') {
-            array_push($sub,($blockItems));
-        } else if ($params['toTb']=='t') {
-            array_unshift($sub,($blockItems));
+
+        if(isset($existingId))
+        {
+
+            $sub[$existingId]['name'] = htmlentities(stripslashes($params['title']));
+            $sub[$existingId]['id'] = strval($blockCnt);
+            $sub[$existingId]['startdate'] =  $startDate;
+            $sub[$existingId]['enddate'] = $endDate;
+            $sub[$existingId]['avail'] = $params['avail'];
+            $sub[$existingId]['SH'] = $params['showhide'] . $params['availBeh'];
+            $sub[$existingId]['colors'] = "";
+            $sub[$existingId]['public'] = $public ;
+            $sub[$existingId]['fixedheight'] = $fixedHeight;
+            $sub[$existingId]['grouplimit'] = $groupLimit;
+
         }
-        $blockCnt++;
+        else{
+            $blockItems = array();
+            $blockItems['name'] = htmlentities(stripslashes($params['title']));
+            $blockItems['id'] = strval($blockCnt);
+            $blockItems['startdate'] =  $startDate;
+            $blockItems['enddate'] = $endDate;
+            $blockItems['avail'] = $params['avail'];
+            $blockItems['SH'] = $params['showhide'] . $params['availBeh'];
+            $blockItems['colors'] = "";
+            $blockItems['public'] = $public ;
+            $blockItems['fixedheight'] = $fixedHeight;
+            $blockItems['grouplimit'] = $groupLimit;
+            $blockItems['items'] = array();
+            if ($params['toTb']=='b') {
+                array_push($sub,($blockItems));
+            } else if ($params['toTb']=='t') {
+                array_unshift($sub,($blockItems));
+            }
+            $blockCnt++;
+        }
         $finalBlockItems =(serialize($blockData));
         Course::UpdateItemOrder($finalBlockItems,$params['courseId'],$blockCnt);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$params['courseId']));

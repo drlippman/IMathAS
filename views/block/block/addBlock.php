@@ -2,11 +2,12 @@
 use app\components\AssessmentUtility;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
+use app\components\AppUtility;
 $this->title = 'Add Block';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <h3><strong>ADD BLOCK</strong></h3>
-    <form method=post action="create-block?courseId=<?php echo $courseId; if(isset($block)){echo "&block=$block";} if(isset($toTb)){echo "&toTb=$toTb";}?>">
+    <form method=post action="create-block?courseId=<?php echo $courseId; if(isset($block)){echo "&block=$block";} if(isset($toTb)){echo "&toTb=$toTb";} if(isset($id)){echo "&id=$id";}?>">
         <span class=form>Title: </span>
         <span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$defaultBlockData['title']);?>" ></span>
         <BR class=form>
@@ -118,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
 	<input type=checkbox name=public value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['public'],'1') ?> />
 	</span><br class=form />
 
-    <div class=submit><input type=submit class="btn btn-primary" value="Create Block"></div>
+    <div class=submit><input type=submit class="btn btn-primary" value="<?php echo $defaultBlockData['saveTitle']?>"></div>
     </form>
     <p class="small"><sup>*</sup>If a parent block is set to be publicly accessible, this block will automatically be publicly accessible, regardless of your selection here.<br/>
         Items from publicly accessible blocks can viewed without logging in at <?php echo "" ?>/public.php?cid=<?php echo ""?>. </p>

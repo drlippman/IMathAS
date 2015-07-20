@@ -6,6 +6,7 @@ use app\components\AppConstant;
 use app\components\CourseItemsUtility;
 $this->title = ucfirst($course->name);
 $this->params['breadcrumbs'][] = $this->title;
+$cnt=0;
 ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
 <!--<div class="mainbody">-->
@@ -72,9 +73,11 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <br><br><br>
 <!-- ////////////////// Assessment here //////////////////-->
-    <?php $cnt=0;?>
+
+
 <?php $countCourseDetails = count($courseDetail);
 if ($countCourseDetails){
+
 $assessment = $blockList = array();
 foreach ($courseDetail as $key => $item){
 echo AssessmentUtility::createItemOrder($key, $countCourseDetails, $parent, $blockList);
@@ -105,6 +108,7 @@ case 'LinkedText': ?>
 <?php break; ?>
 <!--  Block here-->
 <?php case  'Block': ?>
+    <?php  $cnt++; ?>
     <?php $displayBlock = new CourseItemsUtility();
     $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
     ?>

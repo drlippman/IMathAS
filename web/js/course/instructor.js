@@ -23,6 +23,7 @@ function additem(blk,tb) {
 
 function deleteItem(id,type,block,courseId) {
     var itemType = type;
+
     var html = '<div><p>Are you sure? This will delete the '+ itemType+' .</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
