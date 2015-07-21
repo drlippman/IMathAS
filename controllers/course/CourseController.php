@@ -755,7 +755,7 @@ class CourseController extends AppController
                         $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                     }
                 array_unshift($sub,intval($lastItemsId));
-                $itemOrder = addslashes(serialize($items));
+                $itemOrder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
@@ -820,7 +820,6 @@ class CourseController extends AppController
         if ($params['id']) {
 //            $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
             $linkData = LinkedText::getById($params['id']);
-//            AppUtility::dump($linkData);
             $gbcat = 0;
             $cntingb = 1;
             $tutoredit = 0;
@@ -935,16 +934,12 @@ class CourseController extends AppController
 //
 //            } else
             if ($params['linktype']=='file') {
-//                require_once("../includes/filehandler.php");
-//AppUtility::dump($_FILES['userfile']['name']);\
-                if ($_FILES['userfile']['name']!='') {
-                    //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-                    //$uploadfile = $uploaddir . "$cid-" . basename($_FILES['userfile']['name']);
+         if ($_FILES['userfile']['name']!='') {
                     $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
                     $filename = $userfilename;
                     $extension = strtolower(strrchr($userfilename,"."));
                     $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
-//                    AppUtility::dump($extension);
+
                     if (in_array($extension,$badextensions)) {
                         $overwriteBody = 1;
                         $body = "<p>File type is not allowed</p>";
@@ -958,21 +953,19 @@ class CourseController extends AppController
                         } else {
 
                             if (($filename=$this->storeuploadedcoursefile('userfile',$courseId.'/'.$filename))===false) {
-//AppUtility::dump($filename);
+
                                 $errormsg = "Try again";
                                 $params['text'] = "File upload error - $errormsg";
                                 $uploaderror = true;
                             } else {
                                 $params['text'] = "file:$filename";
-//                                AppUtility::dump($filename);
+
                             }
 
                         }
                     }
 
                 } else if (!empty($_POST['curfile'])) {
-                    //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-                    ///if (!file_exists($uploaddir . $_POST['curfile'])) {
                     if (!($this->doesfileexist('cfile',$_POST['curfile']))) {
                         $processingerror = true;
                     } else {
@@ -993,7 +986,6 @@ class CourseController extends AppController
                 if ($params['tool']==0) {
                     $processingerror = true;
                 } else {
-                    //tool~~custom~~customurl~~gbcategory~~cntingb~~tutoredit~~gradesecret
                     $params['text'] = 'exttool:'.$params['tool'].'~~'.$params['toolcustom'].'~~'.$params['toolcustomurl'];
                     if ($params['usegbscore']==0 || $params['points']==0) {
                         $points = 0;
@@ -1003,8 +995,6 @@ class CourseController extends AppController
                     }
                 }
             }
-
-
             $s = new ExternalTools();
             $s->updateExternalToolsData($params);
             $linkText = new LinkedText();
@@ -1021,7 +1011,7 @@ class CourseController extends AppController
                 $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
             }
             array_unshift($sub,intval($lastItemId));
-            $itemorder = addslashes(serialize($items));
+            $itemorder = (serialize($items));
             $saveItemOrderIntoCourse = new Course();
             $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
         }
@@ -1029,8 +1019,6 @@ class CourseController extends AppController
         $this->includeJS(["editor/tiny_mce.js","general.js"]);
         return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
     }
-
-//        AppUtility::dump($tool);
         $this->includeJS(["editor/tiny_mce.js","course/addlink.js","general.js"]);
         $responseData = array('course' => $course,'groupNames' => $groupNames,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,'modifyLinkId' => $modifyLinkId,
             'pageOutcomes' => $pageOutcomes,'toolvals' => $toolvals,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'toollabels' => $toollabels,'checkboxesValues' => $checkboxesValues);
@@ -1038,16 +1026,14 @@ class CourseController extends AppController
     }
 
     function storeuploadedcoursefile($id,$key,$sec="public-read") {
-//AppUtility::dump('fun');
         if ($this->filehandertypecfiles == 's3') {
-//            AppUtility::dump($this->filehandertypecfiles);
+
             if ($sec=="public" || $sec=="public-read") {
                 $sec = "public-read";
             } else {
                 $sec = "private";
             }
             if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-//                AppUtility::dump($_FILES[$id]);
                 $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
                 $t=0;
                 $fn = $key;
@@ -1067,7 +1053,6 @@ class CourseController extends AppController
 
             if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
                 $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/Uploads';
-//                AppUtility::dump($base);
                 $keydir = dirname($key);
                 $dir = $base.dirname($key);
                 $fn = basename($key);

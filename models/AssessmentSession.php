@@ -52,7 +52,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $bestseedslist = $seedlist;
         $bestlalist = $lalist;
         $starttime = time();
-        $deffeedbacktext = addslashes($assessment->deffeedbacktext);
+        $deffeedbacktext = ($assessment->deffeedbacktext);
         $ltisourcedid = '';
         $param['questions'] = $qlist;
         $param['seeds'] = $seedlist;

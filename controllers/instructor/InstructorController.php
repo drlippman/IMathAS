@@ -208,7 +208,7 @@ public $oa = array();
                 } else if ($filter=='t') {
                     array_unshift($sub,intval($itemId));
                 }
-                $itemOrder = addslashes(serialize($items));
+                $itemOrder = serialize($items);
                 Course::setItemOrder($itemOrder, $courseId);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id.'&folder=0'));
             }
@@ -263,7 +263,7 @@ public $oa = array();
                     array_splice($curBlock,$toPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
                 }
             }
-            $itemList = addslashes(serialize($items));
+            $itemList = serialize($items);
             Course::setItemOrder($itemList,$courseId);
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
@@ -302,7 +302,7 @@ public $oa = array();
         $bestSeedsList = $seedList;
         $bestLaList = $laList;
         $startTime = time();
-        $defFeedbackText = addslashes($assessment->deffeedbacktext);
+        $defFeedbackText = ($assessment->deffeedbacktext);
         $ltiSourcedId = '';
         $param['questions'] = $qList;
         $param['seeds'] = $seedList;
@@ -550,10 +550,10 @@ public $oa = array();
                 {
                     for ($i=1;$i<count($blockTree);$i++)
                     {
-                        $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                        $sub =& $sub[$blockTree[$i]-1]['items'];
                     }
                 }
-                if (is_array($sub[$blockId])) { //make sure it's really a block
+                if (is_array($sub[$blockId])) {
                     $blockItems = $sub[$blockId]['items'];
                     $obId = $sub[$blockId]['id'];
 
@@ -564,8 +564,7 @@ public $oa = array();
 
                     }else
                     {
-
-                        array_splice($sub,$blockId,1);
+                            array_splice($sub,$blockId,1);
                     }
                 }
                 $itemList =(serialize($blockData));
@@ -573,6 +572,62 @@ public $oa = array();
         }
         return $this->successResponse();
     }
+
+    public function deleteRecursive($itemArray) {
+        foreach($itemArray as $itemId) {
+            if (is_array($itemId)) {
+                $this->deleteRecursive($itemId['items']);
+            } else {
+                $this->deleteItemById($itemId);
+            }
+        }
+    }
+
+    public function deleteItemById($itemId)
+    {
+        $ItemType =Items::getByTypeId($itemId);
+        switch($ItemType['itemtype'])
+        {
+            case AppConstant::FORUM:
+                Forums::deleteForum($itemId);
+                ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+                $postId = ForumPosts::getForumPostByFile($itemId);
+                $threadIdArray = ForumThread::findThreadCount($itemId);
+                foreach($threadIdArray as $singleThread){
+                    ForumView::deleteByForumIdThreadId($singleThread['id']);
+                }
+                ForumPosts::deleteForumPost($itemId);
+                Thread::deleteThreadByForumId($itemId);
+                break;
+            case AppConstant::ASSESSMENT:
+                AssessmentSession::deleteByAssessmentId($itemId);
+                Questions::deleteByAssessmentId($itemId);
+                Assessments::deleteAssessmentById($itemId);
+                break;
+            case AppConstant::CALENDAR:
+                 Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
+                break;
+            case AppConstant::INLINE_TEXT:
+                InlineText::deleteInlineTextId($itemId);
+                InstrFiles::deleteById($itemId);
+                break;
+            case AppConstant::WIKI:
+                Wiki::deleteById($itemId);
+                WikiRevision::deleteByWikiId($itemId);
+                WikiView::deleteByWikiId($itemId);
+                break;
+            case AppConstant::LINK:
+                $linkData = Links::getById($itemId);
+                $points = $linkData['points'];
+                if($points > AppConstant::NUMERIC_ZERO){
+                    Grades::deleteByGradeTypeId($itemId);
+                }
+                Links::deleteById($itemId);
+                break;
+        }
+        Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
+    }
+
     public function actionCopyItemsAjax()
     {
         $params = $this->getRequestParams();
@@ -607,7 +662,7 @@ public $oa = array();
         $this->copysubone($items,'0',false,$notImportant,$tocopy,$blockCount,$gradebookCategory,$params);
         CopyItemsUtility::copyrubrics();
 
-        $itemOrder = addslashes(serialize($items));
+        $itemOrder = serialize($items);
         Course::setBlockCount($itemOrder,$blockCount,$courseId);
         return $this->successResponse();
     }
@@ -656,45 +711,7 @@ public $oa = array();
             }
         }
     }
-    public function deleteRecursive($itemArray) { //delete items, recursing through blocks as needed
-        foreach($itemArray as $itemId) {
-            if (is_array($itemId)) {
-                $this->deleteRecursive($itemId['items']);
-            } else {
-                $ItemType =Items::getByTypeId($itemId);
-//                $this->deleteItemById($itemId);
-            $this->actionDeleteItemsAjax($ItemType['itemtype']);
-            }
-        }
-    }
 
-    public function deleteItemById($itemId)
-    {
-        $ItemType =Items::getByTypeId($itemId);
-        switch($ItemType['itemtype'])
-        {
-            case AppConstant::FORUM:
-
-                break;
-            case AppConstant::ASSESSMENT:
-
-                break;
-            case AppConstant::CALENDAR:
-
-                break;
-            case AppConstant::INLINE_TEXT:
-
-                break;
-            case AppConstant::WIKI:
-
-                break;
-            case AppConstant::LINK:
-
-                break;
-            case AppConstant::BLOCK:
-
-        }
-    }
 }
 
 

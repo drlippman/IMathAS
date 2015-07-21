@@ -81,6 +81,7 @@ if ($countCourseDetails){
 $assessment = $blockList = array();
 foreach ($courseDetail as $key => $item){
 echo AssessmentUtility::createItemOrder($key, $countCourseDetails, $parent, $blockList);
+    $cnt++;
 switch (key($item)):
 case 'Assessment': ?>
 <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent); ?>
@@ -108,7 +109,7 @@ case 'LinkedText': ?>
 <?php break; ?>
 <!--  Block here-->
 <?php case  'Block': ?>
-    <?php  $cnt++; ?>
+
     <?php $displayBlock = new CourseItemsUtility();
     $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
     ?>

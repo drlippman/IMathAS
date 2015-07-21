@@ -118,7 +118,9 @@ class AppConstant
     const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
     const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
     const MODIFY_ASSESSMENT ="Modify Assessment";
+    const MODIFY_BlOCK ="Modify Block";
     const ADD_ASSESSMENT ="Add Assessment";
+    const ADD_BLOCK ="Add Block";
     const TEST_TYPE = "AsGo";
     const SHOW_ANSWER = "A";
     const CALTAG = '?';
@@ -144,5 +146,6 @@ class AppConstant
     const CHOOSE_STUDENT = 'Select course from list to choose students';
     const ADD_FORUM = 'Add Forum';
     const CREATE_FORUM = 'Create Forum';
+    const CREATE_BLOCK = 'Create Block';
     const SIXTEEN = 16;
 }

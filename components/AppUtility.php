@@ -2644,7 +2644,7 @@ class AppUtility extends Component
         }
         $key = array_search($itemId,$sub);
         array_splice($sub,$key,AppConstant::NUMERIC_ONE);
-        $itemList = addslashes(serialize($items));
+        $itemList = serialize($items);
         Course::setItemOrder($itemList,$courseId);
     }
 

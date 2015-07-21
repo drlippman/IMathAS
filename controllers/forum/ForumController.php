@@ -971,7 +971,7 @@ class ForumController extends AppController
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
                 }
                 array_unshift($sub, intval($lastItemId));
-                $itemOrder = addslashes(serialize($items));
+                $itemOrder = serialize($items);
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
             }

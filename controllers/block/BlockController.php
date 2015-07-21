@@ -24,6 +24,7 @@ class BlockController extends AppController
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
+        $courseName = $course['name'];
         $blockData = unserialize($course['itemorder']);
         $toTb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
@@ -68,7 +69,6 @@ class BlockController extends AppController
             }
             $fixedHeight = $blockItems[$existingId]['fixedheight'];
             $groupLimit = $blockItems[$existingId]['grouplimit'];
-            $saveTitle = _("Save Changes");
            $defaultBlockData = array
            (
                 'title' =>  $title,
@@ -80,7 +80,8 @@ class BlockController extends AppController
                 'public' => $public,
                 'fixedHeight' => $fixedHeight,
                 'groupLimit' => $groupLimit,
-               'saveTitle' =>'save Changes',
+               'saveTitle' => AppConstant::SAVE_BUTTON,
+               'pageTitle' => AppConstant::MODIFY_BlOCK,
            );
         }
         else{
@@ -95,7 +96,9 @@ class BlockController extends AppController
         'public' => 0,
         'fixedHeight' => 0,
         'groupLimit' => $groupLimit,
-         'saveTitle' =>'Create Block',
+         'saveTitle' => AppConstant::CREATE_BLOCK,
+         'pageTitle' => AppConstant::ADD_BLOCK,
+
         );
         }
         $page_sectionListVal = array("none");
@@ -106,7 +109,7 @@ class BlockController extends AppController
             $page_sectionListVal[] = 's-'.$data->section;
             $page_sectionListLabel[] = 'Section '.$data->section;
         }
-        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId]);
+        return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName]);
     }
 
     public function actionCreateBlock()
@@ -234,6 +237,35 @@ class BlockController extends AppController
         Course::UpdateItemOrder($finalBlockItems,$courseId,$blockCnt=null);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
 
+    }
+    public function actionEditContent()
+    {
+        $this->guestUserHandler();
+        $previewShift = - AppConstant::NUMERIC_ONE;
+        $courseId = $this->getParam('cid');
+        $course = Course::getById($courseId);
+        $blockData = unserialize($course['itemorder']);
+
+        $folder = $this->getParamVal('Folder');
+        if ($folder!='0') {
+
+            $now = time() + $previewShift ;
+            $blockTree = explode('-',$folder);
+            $backtrack = array();
+
+            for ($i=1;$i<count($blockTree);$i++) {
+                $backtrack[] = array($blockData[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree,0,$i+1)));
+                if (!isset($teacherid) && !isset($tutorid) && $blockData[$blockTree[$i]-1]['avail']<2 && $blockData[$blockTree[$i]-1]['SH'][0]!='S' &&($now< $blockData[$blockTree[$i]-1]['startdate'] || $now>$blockData[$blockTree[$i]-1]['enddate'] || $blockData[$blockTree[$i]-1]['avail']=='0')) {
+                    $folder = 0;
+                    unset($backtrack);
+                    unset($blockTree);
+                    break;
+                }
+
+                $blockData = $blockData[$blockTree[$i]-1]['items'];
+            }
+        }
+        $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
     }
 
 }

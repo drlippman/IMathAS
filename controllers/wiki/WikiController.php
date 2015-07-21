@@ -89,7 +89,7 @@ class WikiController extends AppController
             $wikicontent = htmLawed(stripslashes($wikiData['body']),$htmlawedconfig);
             $wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
             $wikicontent = preg_replace('/\s+/',' ',$wikicontent);
-            $wikicontent = addslashes('**wver2**'.$wikicontent);
+            $wikicontent = ('**wver2**'.$wikicontent);
 
             if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
                 $wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6)-6);
@@ -148,7 +148,7 @@ class WikiController extends AppController
                     $sub =& $sub[$blocktree[$i]-1]['items'];
                 }
                 array_unshift($sub,intval($lastItemsId));
-                $itemorder = addslashes(serialize($items));
+                $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
 

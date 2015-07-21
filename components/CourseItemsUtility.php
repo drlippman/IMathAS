@@ -690,7 +690,11 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     <?php if($block['startdate'] == AppConstant::NUMERIC_ZERO && $block['enddate'] == AppConstant::ALWAYS_TIME){$StartDate = 'ALways'; $endDate = 'ALways';}?>
                                     <br><?php echo $title?>   <?php echo $StartDate?> until <?php echo $endDate?></span>
                                  <span class="instronly">
-                                 <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                     <?php if($block['SH'] == 'HT' ||$block['SH'] == 'ST'){?>
+                                 <a href="<?php echo AppUtility::getURLFromHome('block','block/edit-content?cid='.$course->id.'&Folder='.$parent.'-'.$cnt)?>">Edit Content</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                    <?php }else{?>
+                                    <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                <?php }?>
                                 </span>
                                 </div>
                             </div>
@@ -776,8 +780,12 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     elseif($block['SH'] == 'SO'){$title = 'Showing Expanded';}elseif($block['SH'] == 'SC'){$title = 'Showing Collapsed';}
                     elseif($block['SH'] == 'SF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'ST'){$title = 'Showing as TreeReader';}?>
                     <br><?php echo $title?> Always</span>
-                                 <span class="instronly">
-                                <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                    <span class="instronly">
+                                     <?php if($block['SH'] == 'HT' ||$block['SH'] == 'ST'){?>
+                                         <a href="<?php echo AppUtility::getURLFromHome('block','block/edit-content?cid='.$course->id.'&Folder='.$parent.'-'.$cnt)?>">Edit Content</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                     <?php }else{?>
+                                         <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                     <?php }?>
                                 </span>
                 </div>
             </div>
@@ -854,9 +862,14 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     </b>
                                     </span>
                                     <span class="instrdates">
-                                    <br>Hidden</span><span class="instronly">
-                                    <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
-                                    </span>
+                                    <br>Hidden</span>
+                                   <span class="instronly">
+                                     <?php if($block['SH'] == 'HT' ||$block['SH'] == 'ST'){?>
+                                         <a href="<?php echo AppUtility::getURLFromHome('block','block/edit-content?cid='.$course->id.'&Folder='.$parent.'-'.$cnt)?>">Edit Content</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                     <?php }else{?>
+                                         <a href="#">Isolate</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>">Modify</a> | <a href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a href="#">Copy</a> | <a href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>">NewFlag</a>
+                                     <?php }?>
+                                </span>
                                 </div>
                             </div>
                         <div class=blockitems id="block5<?php echo $block['id']?>">

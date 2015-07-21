@@ -4,9 +4,12 @@ use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AppUtility;
 $this->title = 'Add Block';
+$this->params['breadcrumbs'][] = ['label' => $courseName, 'url' => ['/instructor/instructor/index?cid='.$courseId]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<h3><strong>ADD BLOCK</strong></h3>
+<h3><strong><?php echo $defaultBlockData['pageTitle']?></strong>
+    <img src="<?php echo AppUtility::getAssetURL()?>img/help.gif" alt="Help" onclick="window.open('/IMathAS/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))">
+</h3>
     <form method=post action="create-block?courseId=<?php echo $courseId; if(isset($block)){echo "&block=$block";} if(isset($toTb)){echo "&toTb=$toTb";} if(isset($id)){echo "&id=$id";}?>">
         <span class=form>Title: </span>
         <span class=formright><input type=text size=60 name=title value="<?php echo str_replace('"','&quot;',$defaultBlockData['title']);?>" ></span>
