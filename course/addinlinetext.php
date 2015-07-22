@@ -489,7 +489,7 @@ function movefile(from) {
 			<input type=text size=10 name="cdate" value="<?php echo $sdate;?>"> 
 			<a href="#" onClick="displayDatePicker('cdate', this); return false">
 			<img src="../img/cal.gif" alt="Calendar"/></a> <br/>
-			With tag: <input name="altcaltag" type=text size=1 value="<?php echo $line['caltag'];?>"/>
+			With tag: <input name="altcaltag" type=text size=4 value="<?php echo $line['caltag'];?>"/>
 		</span><BR class=form>
 		</div>
 <?php

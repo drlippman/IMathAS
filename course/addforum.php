@@ -559,8 +559,8 @@ if ($overwriteBody==1) {
 		
 		<span class="form">Calendar icon:</span>
 		<span class="formright">
-			New Threads: <input name="caltagpost" type=text size=1 value="<?php echo $posttag;?>"/>, 
-			Replies: <input name="caltagreply" type=text size=1 value="<?php echo $replytag;?>"/>
+			New Threads: <input name="caltagpost" type=text size=4 value="<?php echo $posttag;?>"/>, 
+			Replies: <input name="caltagreply" type=text size=4 value="<?php echo $replytag;?>"/>
 		</span><br class="form" />
 		
 		
