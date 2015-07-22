@@ -75,27 +75,26 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryAll();
         return $data;
     }
-    public function createAssessment($params,$startDate,$endDate,$reviewDate,$timeLimit,$shuffle,$defFeedback,$tutorEdit,$showHints,$endMsg,$defFeedbackText,$isTutorial){
-//        $this->getErrors();
+    public function createAssessment($params){
         $this->courseid = isset($params['cid']) ? $params['cid'] : null;
         $this->name = isset($params['name']) ? trim($params['name']) : null;
         $this->summary = isset($params['summary']) ? $params['summary'] : null;
         $this->intro = isset($params['intro']) ? $params['intro'] : null;
-        $this->startdate = $startDate;
-        $this->enddate = $endDate;
-        $this->reviewdate = $reviewDate;
-        $this->timelimit = $timeLimit;
+        $this->startdate = $params['startdate'];
+        $this->enddate = $params['enddate'];
+        $this->reviewdate = $params['reviewdate'];
+        $this->timelimit = $params['timelimit'];
         $this->minscore = isset($params['minscore']) ? $params['minscore'] : null;
         $this->displaymethod = isset($params['displaymethod']) ? $params['displaymethod'] : null;
         $this->defpoints = isset($params['defpoints']) ? $params['defpoints'] : null;
         $this->defattempts = isset($params['defattempts']) ? $params['defattempts'] : null;
         $this->defpenalty = isset($params['defpenalty']) ? $params['defpenalty'] : null;
-        $this->deffeedback = $defFeedback;
-        $this->shuffle = $shuffle;
+        $this->deffeedback = $params['deffeedback'];
+        $this->shuffle = $params['shuffle'];
         $this->gbcategory = isset($params['gbcat']) ? $params['gbcat'] : null;
         $this->password = isset($params['assmpassword']) ? $params['assmpassword'] : null;
         $this->cntingb = isset($params['cntingb']) ? $params['cntingb'] : null;
-        $this->tutoredit = $tutorEdit;
+        $this->tutoredit = $params['tutoredit'];
         $this->showcat = isset($params['showqcat']) ? $params['showqcat'] : null;
         $this->eqnhelper = isset($params['eqnhelper']) ? $params['eqnhelper'] : null;
         $this->showtips = isset($params['showtips']) ? $params['showtips'] : null;
@@ -104,7 +103,7 @@ class Assessments extends BaseImasAssessments
         $this->isgroup = isset($params['isgroup']) ? $params['isgroup'] : null;
         $this->groupmax = isset($params['groupmax']) ? $params['groupmax'] : null;
         $this->groupsetid = isset($params['groupsetid']) ? $params['groupsetid'] : null;
-        $this->showhints = $showHints;
+        $this->showhints = $params['showhints'];
         $this->reqscore = isset($params['reqscore']) ? $params['reqscore'] : null;
         $this->reqscoreaid = isset($params['reqscoreaid']) ? $params['reqscoreaid'] : null;
         $this->noprint = isset($params['noprint']) ? $params['noprint'] : null;
@@ -112,11 +111,11 @@ class Assessments extends BaseImasAssessments
         $this->allowlate = isset($params['allowlate']) ? $params['allowlate'] : null;
         $this->exceptionpenalty = isset($params['exceptionpenalty']) ? $params['exceptionpenalty'] : null;
         $this->ltisecret = isset($params['ltisecret']) ? $params['ltisecret'] : null;
-        $this->endmsg = $endMsg;
-        $this->deffeedbacktext = $defFeedbackText;
+        $this->endmsg = $params['endmsg'];
+        $this->deffeedbacktext = $params['deffeedbacktext'];
         $this->msgtoinstr = isset($params['msgtoinstr']) ? $params['msgtoinstr'] : null;
         $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
-        $this->istutorial = $isTutorial;
+        $this->istutorial = $params['istutorial'];
         $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
         $this->save();
         return $this->id;
@@ -172,7 +171,6 @@ class Assessments extends BaseImasAssessments
             $assessment->enddate = $endDate;
             $assessment->reviewdate = $reviewDate;
         }
-AppUtility::dump($assessment);
         $assessment->save();
     }
 
@@ -192,4 +190,59 @@ AppUtility::dump($assessment);
             }
         }
     }
-} 
+
+    public function copyAssessment($params)
+    {
+        $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
+        $this->name = isset($params['name']) ? $params['name'] : null;
+        $this->summary = isset($params['summary']) ? $params['summary'] : null;
+        $this->intro = isset($params['intro']) ? $params['intro'] : null;
+        $this->startdate = isset($params['startdate']) ? $params['startdate'] : null;
+        $this->enddate = isset($params['enddate']) ? $params['enddate'] : null;
+        $this->reviewdate = isset($params['reviewdate']) ? $params['reviewdate'] : null;
+        $this->timelimit = isset($params['timelimit']) ? $params['timelimit'] : null;
+        $this->minscore = isset($params['minscore']) ? $params['minscore'] : null;
+        $this->displaymethod = isset($params['displaymethod']) ? $params['displaymethod'] : null;
+        $this->defpoints = isset($params['defpoints']) ? $params['defpoints'] : null;
+        $this->defattempts = isset($params['defattempts']) ? $params['defattempts'] : null;
+        $this->defpenalty = isset($params['defpenalty']) ? $params['defpenalty'] : null;
+        $this->deffeedback = isset($params['deffeedback']) ? $params['deffeedback'] : null;
+        $this->shuffle = isset($params['shuffle']) ? $params['shuffle'] : null;
+        $this->gbcategory = isset($params['gbcategory']) ? $params['gbcategory'] : null;
+        $this->password = isset($params['password']) ? $params['password'] : null;
+        $this->cntingb = isset($params['cntingb']) ? $params['cntingb'] : null;
+        $this->tutoredit = isset($params['tutoredit']) ? $params['tutoredit'] : null;
+        $this->showcat = isset($params['showcat']) ? $params['showcat'] : null;
+        $this->eqnhelper = isset($params['eqnhelper']) ? $params['eqnhelper'] : null;
+        $this->showtips = isset($params['showtips']) ? $params['showtips'] : null;
+        $this->caltag = isset($params['caltag']) ? $params['caltag'] : null;
+        $this->calrtag = isset($params['calrtag']) ? $params['calrtag'] : null;
+        $this->isgroup = isset($params['isgroup']) ? $params['isgroup'] : null;
+        $this->groupmax = isset($params['groupmax']) ? $params['groupmax'] : null;
+        $this->groupsetid = isset($params['groupsetid']) ? $params['groupsetid'] : null;
+        $this->showhints = isset($params['showhints']) ? $params['showhints'] : null;
+        $this->reqscore = isset($params['reqscore']) ? $params['reqscore'] : null;
+        $this->noprint = isset($params['noprint']) ? $params['noprint'] : null;
+        $this->avail = isset($params['avail']) ? $params['avail'] : null;
+        $this->allowlate = isset($params['allowlate']) ? $params['allowlate'] : null;
+        $this->exceptionpenalty = isset($params['exceptionpenalty']) ? $params['exceptionpenalty'] : null;
+        $this->ltisecret = isset($params['ltisecret']) ? $params['ltisecret'] : null;
+        $this->endmsg = isset($params['endmsg']) ? $params['endmsg'] : null;
+        $this->deffeedbacktext = isset($params['deffeedbacktext']) ? $params['deffeedbacktext'] : null;
+        $this->msgtoinstr = isset($params['msgtoinstr']) ? $params['msgtoinstr'] : null;
+        $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
+        $this->istutorial = isset($params['istutorial']) ? $params['istutorial'] : null;
+        $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
+        $this->itemorder = isset($params['itemorder']) ? $params['itemorder'] : null;
+        $this->ancestors = isset($params['ancestors']) ? $params['ancestors'] : null;
+        $this->viddata = isset($params['viddata']) ? $params['viddata'] : null;
+        $this->save();
+        return $this->id;
+    }
+    public static function setItemOrder($itemOrder,$id){
+        $assessmentData = Assessments::findOne(['id' => $id]);
+        if($assessmentData){
+            $assessmentData->itemorder = $itemOrder;
+        }
+    }
+}

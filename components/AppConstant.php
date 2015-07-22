@@ -148,4 +148,5 @@ class AppConstant
     const CREATE_FORUM = 'Create Forum';
     const CREATE_BLOCK = 'Create Block';
     const SIXTEEN = 16;
+    const COPY = " (Copy)";
 }

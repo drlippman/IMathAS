@@ -14,8 +14,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 ?>
 <h3><b><?php echo $checkboxesValues['saveTitle']; ?></b>
 </h3>
-
-<form method=post action="add-link?cid=<?php echo $course['id'];?>&id=<?php echo $modifyLinkId; ?>" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<form method=post action="add-link?cid=<?php echo $course['id'];?>" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
     <p></p>
     <span class=form>Title:</span>
     <span class=formright><input type=text size=30 name=name

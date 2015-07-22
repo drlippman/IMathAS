@@ -30,7 +30,7 @@ include_once('../components/filehandler.php');
     Text:<BR>
     <div>
         <?php echo "<span class='left col-md-11'><div class= 'editor'>
-            <textarea id='inlineText' name='inlineText'  style='width: 100%;' rows='20' cols='200'>";
+            <textarea id='inlineText' name='text'  style='width: 100%;' rows='20' cols='200'>";
                 $text = "<p>Enter text here</p>";
                 if($inlineText['text'])
                 {
@@ -83,7 +83,7 @@ include_once('../components/filehandler.php');
                         <?php
                         echo '<div class = "pull-left col-lg-4 time-input">';
                         echo DatePicker::widget([
-                            'name' => 'StartDate',
+                            'name' => 'startdate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
                             'value' => date("m/d/Y"),
                             'removeButton' => false,
@@ -115,7 +115,7 @@ include_once('../components/filehandler.php');
                         <?php
                         echo '<div class = "pull-left col-lg-4 time-input">';
                         echo DatePicker::widget([
-                            'name' => 'EndDate',
+                            'name' => 'enddate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
                             'value' => date("m/d/Y"),
                             'removeButton' => false,

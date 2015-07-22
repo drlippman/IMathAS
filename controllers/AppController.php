@@ -66,7 +66,7 @@ class AppController extends Controller
         return \Yii::$app->user->isGuest;
     }
 
-    function guestUserHandler($isAjaxCall = false){
+    function guestUserHandler($a= false, $isAjaxCall = false){
         if(self::isGuestUser())
         {
             if($isAjaxCall)
@@ -156,6 +156,11 @@ class AppController extends Controller
         if ($referrer) {
             Yii::$app->session->set('referrer', $referrer);
         }
+    }
+
+    function getUserRight(){
+        $user = $this->getAuthenticatedUser();
+        return $user->rights;
     }
 
 }

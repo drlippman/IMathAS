@@ -51,6 +51,7 @@ public $oa = array();
 
     public function actionIndex()
     {
+        $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
         $type = $this->getParamVal('type');
         if($type){
@@ -79,7 +80,6 @@ public $oa = array();
                     break;
             }
         }
-        $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseData = $this->getRequestParams();
         $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
@@ -120,7 +120,6 @@ public $oa = array();
                                     case 'Assessment':
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
-                                        array_push($calendarCount, $assessment);
                                         break;
                                     case 'Calendar':
                                         $tempItem[$item->itemtype] = $itemOrder;
@@ -152,8 +151,8 @@ public $oa = array();
                             case 'Assessment':
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempAray[$item->itemtype] = $assessment;
+                                $tempAray['assessment'] = $item;
                                 array_push($responseData, $tempAray);
-                                array_push($calendarCount, $assessment);
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = $itemOrder;
@@ -162,11 +161,13 @@ public $oa = array();
                             case 'Forum':
                                 $form = Forums::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $form;
+                                $tempAray['forum'] = $item;
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $wiki;
+                                $tempAray['wiki'] = $item;
                                 array_push($responseData, $tempAray);
                                 break;
                             case 'InlineText':
@@ -178,6 +179,7 @@ public $oa = array();
                             case 'LinkedText':
                                 $linkedText = Links::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $linkedText;
+                                $tempAray['link'] = $item;
                                 array_push($responseData, $tempAray);
                                 break;
                         }
@@ -483,7 +485,9 @@ public $oa = array();
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('manageEvent',$returnData);
     }
-
+    /*
+     * Ajax method to delete course items
+     */
     public function actionDeleteItemsAjax()
     {
         $params = $this->getRequestParams();
@@ -627,25 +631,27 @@ public $oa = array();
         }
         Items::deleteByTypeIdName($itemId,$ItemType['itemtype']);
     }
-
+    /*
+     * Ajax method to copy course items
+     */
     public function actionCopyItemsAjax()
     {
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $block = $params['block'];
         $itemType = $params['itemType'];
-        $tocopy = $params['copyid'];
+        $copyItemId = $params['copyid'];
         if (isset($params['noappend'])) {
             $params['append'] = "";
         } else {
-            $params['append'] = " (Copy)";
+            $params['append'] = AppConstant::COPY;
         }
         $params['ctc'] = $courseId;
-        $gradebookCategory = array();
+        $gradeBookCategory = array();
         $gradeBookData =  GbCats::getByCourseId($courseId);
         if ($gradeBookData){
             foreach ($gradeBookData as $singleRecord){
-                $gradebookCategory[$singleRecord['id']] = $singleRecord['id'];
+                $gradeBookCategory[$singleRecord['id']] = $singleRecord['id'];
             }
         }
         $outComes = array();
@@ -659,53 +665,52 @@ public $oa = array();
         $blockCount = $courseData['blockcnt'];
         $items = unserialize($courseData['itemorder']);
         $notImportant = array();
-        $this->copysubone($items,'0',false,$notImportant,$tocopy,$blockCount,$gradebookCategory,$params);
+        $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
         CopyItemsUtility::copyrubrics();
-
         $itemOrder = serialize($items);
         Course::setBlockCount($itemOrder,$blockCount,$courseId);
         return $this->successResponse();
     }
 
-    public function copysubone(&$items,$parent,$copyinside,&$addtoarr,$tocopy,$blockCount,$gradebookCategory,$params) {
-        foreach ($items as $k=>$item) {
+    public function copyCourseItems(&$items, $parent, $copyInside, &$addToArray, $copyItemId, $blockCount, $gradeBookCategory, $params) {
+        foreach ($items as $k => $item) {
             if (is_array($item)) {
-                if (($parent.'-'.($k+1)==$tocopy) || $copyinside) { //copy block
-                    $newblock = array();
-                    $newblock['name'] = $item['name'].stripslashes($params['append']);
-                    $newblock['id'] = $blockCount;
+                if (($parent.'-'.($k+AppConstant::NUMERIC_ONE)==$copyItemId) || $copyInside) { //copy block
+                    $newBlock = array();
+                    $newBlock['name'] = $item['name'].stripslashes($params['append']);
+                    $newBlock['id'] = $blockCount;
                     $blockCount++;
-                    $newblock['startdate'] = $item['startdate'];
-                    $newblock['enddate'] = $item['enddate'];
-                    $newblock['avail'] = $item['avail'];
-                    $newblock['SH'] = $item['SH'];
-                    $newblock['colors'] = $item['colors'];
-                    $newblock['fixedheight'] = $item['fixedheight'];
-                    $newblock['grouplimit'] = $item['grouplimit'];
-                    $newblock['items'] = array();
-                    if (count($item['items'])>0) {
-                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),true,$newblock['items'],$tocopy,$blockCount,$gradebookCategory,$params);
+                    $newBlock['startdate'] = $item['startdate'];
+                    $newBlock['enddate'] = $item['enddate'];
+                    $newBlock['avail'] = $item['avail'];
+                    $newBlock['SH'] = $item['SH'];
+                    $newBlock['colors'] = $item['colors'];
+                    $newBlock['fixedheight'] = $item['fixedheight'];
+                    $newBlock['grouplimit'] = $item['grouplimit'];
+                    $newBlock['items'] = array();
+                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+                        $this->copyCourseItems($items[$k]['items'], $parent.'-'.($k+AppConstant::NUMERIC_ONE), true, $newBlock['items'], $copyItemId, $blockCount, $gradeBookCategory, $params);
                     }
-                    if (!$copyinside) {
-                        array_splice($items,$k+1,0,array($newblock));
-                        return 0;
+                    if (!$copyInside) {
+                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($newBlock));
+                        return AppConstant::NUMERIC_ZERO;
                     } else {
-                        $addtoarr[] = $newblock;
+                        $addToArray[] = $newBlock;
                     }
                 } else {
-                    if (count($item['items'])>0) {
-                        $nothin = array();
-                        $this->copysubone($items[$k]['items'],$parent.'-'.($k+1),false,$nothin,$tocopy,$blockCount,$gradebookCategory,$params);
+                    if (count($item['items'])>AppConstant::NUMERIC_ZERO) {
+                        $emptyArray = array();
+                        $this->copyCourseItems($items[$k]['items'],$parent.'-'.($k+AppConstant::NUMERIC_ONE),false,$emptyArray,$copyItemId,$blockCount,$gradeBookCategory,$params);
                     }
                 }
             } else {
-                if ($item==$tocopy || $copyinside) {
-                    $newitem = CopyItemsUtility::copyitem($item,$gradebookCategory,$params);
-                    if (!$copyinside) {
-                        array_splice($items,$k+1,0,$newitem);
-                        return 0;
+                if ($item==$copyItemId || $copyInside) {
+                    $newItem = CopyItemsUtility::copyitem($item,$gradeBookCategory,$params);
+                    if (!$copyInside) {
+                        array_splice($items,$k+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,intval($newItem));
+                        return AppConstant::NUMERIC_ZERO;
                     } else {
-                        $addtoarr[] = $newitem;
+                        $addToArray[] = intval($newItem);
                     }
                 }
             }
@@ -713,8 +718,6 @@ public $oa = array();
     }
 
 }
-
-
 
 
 

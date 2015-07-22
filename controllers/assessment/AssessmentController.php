@@ -307,9 +307,22 @@ class AssessmentController extends AppController
                          * HtmLawed in progress
                          */
                     }
-//AppUtility::dump($params);
+                    $params['startdate'] = $startDate;
+                    $params['enddate'] = $endDate;
+                    $params['reviewdate'] = $reviewDate;
+                    $params['timelimit'] = $timeLimit;
+                    $params['shuffle'] = $shuffle;
+                    $params['deffeedback'] = $defFeedback;
+                    $params['tutoredit'] = $tutorEdit;
+                    $params['showhints'] = $showHints;
+                    $params['endmsg'] = $endMsg;
+                    $params['deffeedbacktext'] = $defFeedbackText;
+                    $params['istutorial'] = $isTutorial;
+                    $params['isgroup'] = $isGroup;
+                    $params['caltag'] = $calTag;
+                    $params['calrtag'] = $calrTag;
+
                 if ($params['id']) {  //already have id; update
-                    AppUtility::dump('update');
                     if ($isGroup==AppConstant::NUMERIC_ZERO) { //set agroupid=0 if switching from groups to non groups
                         $query = $assessmentData['isgroup'];
                         if ($query>AppConstant::NUMERIC_ZERO) {
@@ -330,12 +343,11 @@ class AssessmentController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='. $courseId));
                     }
                 } else { //add new
-//                    AppUtility::dump('add');
                     if (!isset($params['copyendmsg'])) {
                         $endMsg = '';
                     }
                     $assessment = new Assessments();
-                    $newAssessmentId = $assessment->createAssessment($params,$startDate,$endDate,$reviewDate,$timeLimit,$shuffle,$defFeedback,$tutorEdit,$showHints,$endMsg,$defFeedbackText,$isTutorial);
+                    $newAssessmentId = $assessment->createAssessment($params);
                     $itemAssessment = new Items();
                     $itemId = $itemAssessment->saveItems($courseId,$newAssessmentId,'Assessment');
                     $itemOrder = $course['itemorder'];

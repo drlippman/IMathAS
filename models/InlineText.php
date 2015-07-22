@@ -31,28 +31,25 @@ class InlineText extends BaseImasInlinetext
     }
     public function saveChanges($params, $courseId)
     {
-
-        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
-        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
+        $endDate =   AppUtility::parsedatetime($params['enddate'],$params['end_end_time']);
+        $startDate = AppUtility::parsedatetime($params['startdate'],$params['start_end_time']);
         $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
         if($params['hidetitle'] == 1)
         {
             $params['title'] = '';
         }
         $this->title = isset($params['title']) ? $params['title'] : null;
-        $this->courseid = $courseId;
-        $this->text = isset($params['inlineText']) ? $params['inlineText'] : null;
+        $this->courseid = $params['courseid'];
+        $this->text = isset($params['text']) ? $params['text'] : null;
         $this->avail = isset($params['avail']) ? $params['avail'] : null;
-
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            if($params['available-after'] == 0){
+            if($params['sdatetype'] == 0){
                 $startDate = 0;
             }
-            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+            if($params['edatetype'] == AppConstant::ALWAYS_TIME){
                 $endDate = AppConstant::ALWAYS_TIME;
             }
-
             $this->startdate = $startDate;
             $this->enddate = $endDate;
         }else
@@ -60,7 +57,6 @@ class InlineText extends BaseImasInlinetext
             $this->startdate = AppConstant::NUMERIC_ZERO;
             $this->enddate = AppConstant::ALWAYS_TIME;
         }
-
         $this->oncal = isset($params['oncal']) ? $params['oncal'] : null;
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
@@ -81,7 +77,6 @@ class InlineText extends BaseImasInlinetext
         else{
             $this->caltag = '!';
         }
-
         $this->isplaylist = 0;
         $this->save();
         return $this->id;
@@ -151,6 +146,6 @@ class InlineText extends BaseImasInlinetext
 
     public static function getByIdLimited($id)
     {
-        return InlineText::find()->select('title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder')->where(['id' => $id]);
+        return InlineText::find()->select('title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder')->where(['id' => $id])->one();
     }
 } 

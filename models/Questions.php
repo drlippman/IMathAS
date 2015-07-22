@@ -56,4 +56,27 @@ class Questions extends BaseImasQuestions
             $rubricData->save();
         }
     }
+
+    public static function getByItemOrder($itemorder){
+        $questionDataArray = array();
+        foreach($itemorder as $itam){
+            $questionData = Questions::findOne(['id',$itam]);
+            array_push($questionDataArray,$questionData);
+        }
+        return $questionDataArray;
+    }
+
+    public function addQuestions($params){
+        $this->assessmentid = $params['assessmentid'];
+        $this->questionsetid = $params['questionsetid'];
+        $this->points = $params['points'];
+        $this->attempts = $params['attempts'];
+        $this->penalty = $params['penalty'];
+        $this->category = $params['category'];
+        $this->regen = $params['regen'];
+        $this->showans = $params['showans'];
+        $this->showhints = $params['showhints'];
+        $this->save();
+        return $this->id;
+    }
 } 

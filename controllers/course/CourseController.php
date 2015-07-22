@@ -42,6 +42,7 @@ use yii\helpers\Html;
 
 class CourseController extends AppController
 {
+    public $filehandertypecfiles = 'local';
     /**
      * Display all course in item order
      */
@@ -918,18 +919,21 @@ class CourseController extends AppController
 //
         }if($this->isPost()){
         $outcomes = array();
-        $params = $this->getRequestParams();
+//        $params = $this->getRequestParams();
         $modifyLinkId = $params['id'];
-        if(isset($modifyLinkId)){
+        if($modifyLinkId){
             $link = new LinkedText();
             $link->updateLinkData($params);
         }else{
-            foreach ($params['outcomes'] as $o) {
-                if (is_numeric($o) && $o>0) {
-                    $outcomes[] = intval($o);
+            if($params['outcomes']){
+                foreach ($params['outcomes'] as $o) {
+                    if (is_numeric($o) && $o>0) {
+                        $outcomes[] = intval($o);
+                    }
                 }
+                $outcomes = implode(',',$outcomes);
+
             }
-            $outcomes = implode(',',$outcomes);
 
             $processingerror = false;
 //            if ($params['linktype']=='text') {
@@ -997,8 +1001,10 @@ class CourseController extends AppController
                     }
                 }
             }
-            $s = new ExternalTools();
-            $s->updateExternalToolsData($params);
+            if ($params['linktype']=='tool') {
+                $externalToolsData = new ExternalTools();
+                $externalToolsData->updateExternalToolsData($params);
+            }
             $linkText = new LinkedText();
             $linkTextId = $linkText->AddLinkedText($params,$outcomes);
             $itemType = AppConstant::LINK;

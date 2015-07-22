@@ -35,50 +35,54 @@ class LinkedText extends BaseImasLinkedtext
         $data = $command->queryAll();
         return $data;
     }
-    public function AddLinkedText($params,$outcomes)
+    public function addLinkedText($params)
     {
-//        courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points
-
-        $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
-        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
-        $this->courseid = $params['cid'];
-        $this->title = $params['name'];
+        if ($params['id']){
+            $endDate = $params['enddate'];
+            $startDate = $params['startdate'];
+        }else{
+            $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+            $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
+        }
+        $this->courseid = $params['courseid'];
+        $this->title = $params['title'];
         $this->summary = $params['summary'];
         $this->text = $params['text'];
         $this->avail = $params['avail'];
-        $this->oncal = $params['place-on-calendar'];
-        $this->caltag = $params['tag'];
-        $this->target = $params['open-page-in'];
-        $this->outcomes = $outcomes;
-        $this->points= $params['points'];
-        if($params['avail'] == AppConstant::NUMERIC_ONE)
-        {
-            if($params['available-after'] == 0){
-                $startDate = 0;
+        $this->oncal = $params['oncal'];
+        $this->caltag = $params['caltag'];
+        $this->target = $params['target'];
+        if($params['outcomes']){
+            $this->outcomes = $params['outcomes'];
+        }
+        $this->points = $params['points'];
+        if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+            if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
+                $startDate = AppConstant::NUMERIC_ZERO;
             }
-            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+            if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
                 $endDate = AppConstant::ALWAYS_TIME;
             }
             $this->startdate = $startDate;
             $this->enddate = $endDate;
-        }else
-        {
+        } else {
             $this->startdate = AppConstant::NUMERIC_ZERO;
             $this->enddate = AppConstant::ALWAYS_TIME;
         }
         $this->save();
         return $this->id;
     }
+
     public static function getById($id)
     {
         $linkData = LinkedText::find()->where(['id' => $id])->one();
         return $linkData;
     }
+
     public function updateLinkData($params)
     {
 //        courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points
         $updaateLink = LinkedText::findOne(['id' => $params['id']]);
-//        AppUtility::dump($updaateLink);
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
         $updaateLink->courseid = $params['cid'];
