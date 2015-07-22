@@ -725,7 +725,7 @@ class RosterController extends AppController
 
 //Controller method to assign lock on student.
     public function actionMarkLockAjax()
-    {AppUtility::dump("hiii");
+    {
         $this->layout = false;
         $params = $this->getRequestParams();
         foreach ($params['checkedstudents'] as $students) {
