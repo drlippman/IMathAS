@@ -4,6 +4,7 @@ namespace app\controllers\course;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\AssessmentUtility;
 use app\models\AppModel;
 use app\models\AssessmentSession;
 use app\models\Blocks;
@@ -703,6 +704,7 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $inlineTextId = $params['id'];
         $saveTitle = '';
+
         if(isset($params['id']))
         {
             $hideTitle = false;
@@ -722,7 +724,7 @@ class CourseController extends AppController
                 $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
                 $saveChanges = new InlineText();
-                $lastInlineId = $saveChanges->saveChanges($params);
+                $lastInlineId = $saveChanges->saveChanges($params, $courseId);
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId,$lastInlineId,'InlineText');
                 $courseItemOrder = Course::getItemOrder($courseId);

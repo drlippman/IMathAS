@@ -29,7 +29,7 @@ class InlineText extends BaseImasInlinetext
     {
         return InlineText::findOne(['courseid' => $courseId]);
     }
-    public function saveChanges($params)
+    public function saveChanges($params, $courseId)
     {
 
         $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
@@ -40,7 +40,7 @@ class InlineText extends BaseImasInlinetext
             $params['title'] = '';
         }
         $this->title = isset($params['title']) ? $params['title'] : null;
-        $this->courseid = 1;
+        $this->courseid = $courseId;
         $this->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $this->avail = isset($params['avail']) ? $params['avail'] : null;
 
@@ -101,7 +101,7 @@ class InlineText extends BaseImasInlinetext
                 $params['title'] = '';
             }
         $updateId->title = isset($params['title']) ? $params['title'] : null;
-        $updateId->courseid = 1;
+        $updateId->courseid = $params['courseId'];
         $updateId->text = isset($params['inlineText']) ? $params['inlineText'] : null;
         $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
 

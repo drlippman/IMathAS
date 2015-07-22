@@ -82,7 +82,7 @@ class Wiki extends BaseImasWikis
         foreach($updateIdArray as $key => $updateId)
         {
             $updateId->name = isset($params['name']) ? $params['name'] : null;
-            $updateId->courseid = 1;
+            $updateId->courseid = $params['courseId'];
             $updateId->description = isset($params['description']) ? $params['description'] : null;
             $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
 
