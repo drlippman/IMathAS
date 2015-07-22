@@ -1618,8 +1618,9 @@ if (!isset($_POST['embedpostback'])) {
 					echo "</form>\n";
 					
 				}
-				
-				echo "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+				if ($testsettings['testtype']!="NoScores") {
+					echo "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+				}
 				
 				echo "</div>\n";
 			    }
@@ -1680,7 +1681,7 @@ if (!isset($_POST['embedpostback'])) {
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
 					}
-					if ($lefttodo == 0) {
+					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
 					}
 					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
@@ -1786,7 +1787,11 @@ if (!isset($_POST['embedpostback'])) {
 					$done = true;
 				} 
 				if (!$done) {
-					echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="showtest.php?action=seq&amp;done=true">here</a> to see a summary of your score.'), "</p>\n";
+					if ($testsettings['testtype']!="NoScores") {
+						echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="showtest.php?action=seq&amp;done=true">here</a> to see a summary of your score.'), "</p>\n";
+					} else {
+						echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>'), "</p>\n";
+					}
 					echo "</div>\n";
 					echo "<hr/>";
 				} else {
@@ -2220,7 +2225,7 @@ if (!isset($_POST['embedpostback'])) {
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
 				echo substr(trim($intro),0,-6);
-				if (!$sessiondata['istutorial']) {
+				if (!$sessiondata['istutorial'] && $testsettings['testtype']!="NoScores") {
 					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 				}
 				echo '</div>';
@@ -2405,7 +2410,7 @@ if (!isset($_POST['embedpostback'])) {
 			
 			
 			echo '</div>'; //ends either inset or formcontents div
-			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
 				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 			}
 			echo '</form>';
