@@ -465,8 +465,8 @@ switch($_GET['action']) {
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
 				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
-				echo 'Key: placein_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
-				echo 'Key: placein_'.$_GET['id'].'_1 (to only allow access through the LMS )';
+				echo 'Key: LTIkey_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
+				echo 'Key: LTIkey_'.$_GET['id'].'_1 (to only allow access through the LMS )';
 			} else {
 				echo 'Course ID not yet set.';
 			}		
