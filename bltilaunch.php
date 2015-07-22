@@ -63,8 +63,13 @@ $sessionid = session_id();
 $atstarthasltiuserid = isset($_SESSION['ltiuserid']);
 $askforuserinfo = false;
 
-
-if (isset($_SESSION['place_aid']) || isset($_REQUEST['custom_place_aid'])) {
+//use new behavior for place_aid requests that don't come from a placein_###_# key
+if (
+    (isset($_SESSION['place_aid']) && isset($_SESSION['lti_keytype']) && $_SESSION['lti_keytype']=='cc-a')
+    ||
+    (isset($_REQUEST['custom_place_aid']) && isset($_REQUEST['oauth_consumer_key']) && substr($_REQUEST['oauth_consumer_key'],0,7)!='placein')
+    ) {
+//if (isset($_SESSION['place_aid']) || isset($_REQUEST['custom_place_aid'])) {
 /*use new behavior for place_aid requests */
 
 
@@ -318,6 +323,7 @@ if (isset($_GET['launch'])) {
 		}
 	} else {
 		//ask for student info
+		$flexwidth = true;
 		$nologo = true;
 		require("header.php");
 		if (isset($infoerr)) {
@@ -508,7 +514,7 @@ if (isset($_GET['launch'])) {
 	$_SESSION['ltiorigkey'] = $ltikey;
 	
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
-	if ($keyparts[0]=='placein') {  //cid:org
+	if ($keyparts[0]=='LTIkey') {  //cid:org
 		$_SESSION['ltilookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
 		$keytype = 'gc';
@@ -517,7 +523,7 @@ if (isset($_GET['launch'])) {
 		$ltiorg = $ltikey.':'.$ltiorg;
 		$keytype = 'g';
 	}
-	if (isset($_REQUEST['custom_place_aid'])) { //common catridge blti placement using placein_### key type
+	if (isset($_REQUEST['custom_place_aid'])) { //common catridge lti placement, or Canvas LTI selection
 		$placeaid = intval($_REQUEST['custom_place_aid']);
 		$keytype = 'cc-a';
 		$_SESSION['place_aid'] = $_REQUEST['custom_place_aid'];
@@ -702,18 +708,20 @@ if (mysql_num_rows($result)==0) {
 				if ($copycourse=="notify" || $copycourse=="ask") {
 					$_SESSION['userid'] = $userid; //remember me
 					$nologo = true;
+					$flexwidth = true;
 					require("header.php");
 					
 					echo "<form method=\"post\" action=\"{$_SERVER['PHP_SELF']}\">";
 					if ($copycourse=="ask") {
-						echo "<p>Your LMS course is not yet connected to a course on $installname.  The assignment this 
-							link is pointing to is in a course you are already a teacher of (course ID $aidsourcecid).
-							Would you like to connect this LMS course with that course on $installname?  This means
-							that your students will show up in the Roster and Gradebook in that course.  Alternatively,
-							a copy of the $installname assignments can be made for you automatically, and this LMS
-							course associated with that copy instead.</p>
+						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this 
+							link is located in a $installname course you are already a teacher of (course ID $aidsourcecid).
+							Would you like to associate this LMS course with that $installname course?  This means
+							that your students in your LMS course will show up in the Roster and Gradebook in that 
+							$installname course.  If you don't want to use your existing $installname course,
+							a copy of the $installname assignments can be made for you automatically and associated with
+							this LMS course.</p>
 							<p>
-							<input name=\"docoursecopy\" type=\"radio\" value=\"useexisting\" checked />Link this LMS course with my existing course on $installname<br/>
+							<input name=\"docoursecopy\" type=\"radio\" value=\"useexisting\" checked />Associate this LMS course with my existing course on $installname<br/>
 							<input name=\"docoursecopy\" type=\"radio\" value=\"makecopy\" />Create a copy of my existing course on $installname.
 							</p>
 							<p>The first option is best if this is your first time using this $installname course.  The second option
@@ -721,10 +729,10 @@ if (mysql_num_rows($result)==0) {
 							show in a separate $installname course.</p>
 							<p><input type=\"submit\" value=\"Continue\"/> (this may take a few moments - please be patient)</p>";
 					} else {
-						echo "<p>Your LMS course is not yet connected to a course on $installname.  The assignment this 
-							link is pointing to is in a course you are not a teacher of (course ID $aidsourcecid).
-							In order to use this content, a copy of the $installname assignments will be made for you automatically,
-							and this LMS course will be associated with that copy.  This will allow you to make changes to the assignments
+						echo "<p>Your LMS course is not yet associated with a course on $installname.  The assignment associated with this 
+							link is located in a $installname course you are not a teacher of (course ID $aidsourcecid).
+							To use this content, a copy of the assignments will be made for you automatically,
+							and this LMS course will be associated with that copy in $installname.  This will allow you to make changes to the assignments
 							without affecting the original course, and will ensure your student records are housed in your own
 							$installname course.
 							<input name=\"docoursecopy\" type=\"hidden\" value=\"makecopy\" />
@@ -1517,6 +1525,7 @@ if (isset($_GET['launch'])) {
 	} else {
 		//ask for student info
 		$nologo = true;
+		$flexwidth = true;
 		require("header.php");
 		if (isset($infoerr)) {
 			echo '<p style="color:red">'.$infoerr.'</p>';

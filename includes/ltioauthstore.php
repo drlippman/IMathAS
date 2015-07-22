@@ -23,7 +23,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
     	    
 	$keyparts = explode('_',$consumer_key);
 	
-	if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
+	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 		$keyparts[1] = intval($keyparts[1]);
 		$query = "SELECT ltisecret FROM imas_courses WHERE id='{$keyparts[1]}'";
 	} else if ($keyparts[0]=='aid') {
@@ -39,7 +39,7 @@ class IMathASLTIOAuthDataStore extends OAuthDataStore {
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)>0) {
 		$secret = mysql_result($result,0,0);
-		if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein') {
+		if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			$rights = 11;
 			$groupid = 0;
 		} else {
