@@ -592,6 +592,7 @@ class AppUtility extends Component
 
     public static function calculateLevel($title)
     {
+
         $n = 0;
         while (strpos($title, 'Re: ') === 0) {
             $title = substr($title, 4);
@@ -604,7 +605,6 @@ class AppUtility extends Component
         }
         return array('title' => $title, 'level' => $n);
     }
-
     public static function addslashes_deep($value) {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
     }

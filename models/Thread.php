@@ -24,24 +24,17 @@ class Thread extends BaseImasForumThreads
         return Thread::findOne(['id' => $id]);
     }
 
-    public static function getNextThreadId($currentId,$next=null,$prev=null,$forumId)
+    public static function getPreOrNextThreadId($currentId,$next=null,$prev=null,$forumId)
     {
-//        AppUtility::dump($currentId);
+
         if($next == AppConstant::NUMERIC_TWO){
             $thread = Thread::find()->where(['>', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
+//            AppUtility::dump($thread['id']);
         }elseif($prev == AppConstant::NUMERIC_ONE){
             $thread = Thread::find()->where(['<', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
+//            AppUtility::dump($thread['id']);
         }
-        $minThreadId = Thread::find()->where(['forumid' => $forumId])->min('id');
-        $maxThreadId = Thread::find()->where(['forumid' => $forumId])->max('id');
-        $prevNextValueArray = array();
-        $prevNextValueArray = array(
-        'threadId' =>$thread->id,
-        'maxThread' =>$maxThreadId,
-            'minThread' =>$minThreadId,
-    );
-//        AppUtility::dump($prevNextValueArray);
-        return $prevNextValueArray;
+        return $thread;
     }
     public static function deleteThreadByForumId($itemId)
     {
@@ -51,6 +44,17 @@ class Thread extends BaseImasForumThreads
         }
 
     }
+
+    public static function deleteThreadById($itemId)
+    {
+        $thread = Thread::findOne(['id' => $itemId]);
+        if($thread){
+            $thread->delete();
+        }
+
+    }
+
+
     public static function moveAndUpdateThread($forumId,$threadId)
     {
         $ForumPost = Thread::findOne(['id' => $threadId]);
@@ -62,5 +66,36 @@ class Thread extends BaseImasForumThreads
         $threadData = Yii::$app->db->createCommand("SELECT * FROM imas_forum_threads WHERE forumid = $forumId AND stugroupid>0 LIMIT 1")->queryAll();
         return $threadData;
     }
+    public static function checkPreOrNextThreadByForunId($forumId)
+    {
+        $minThreadId = Thread::find()->where(['forumid' => $forumId])->min('id');
+        $maxThreadId = Thread::find()->where(['forumid' => $forumId])->max('id');
+        $prevNextValueArray = array(
+            'maxThread' =>$maxThreadId,
+            'minThread' =>$minThreadId,
+        );
+        return $prevNextValueArray;
+    }
+    public static function getAllThread($forumId)
+    {
 
+        $forumData = Thread::findAll(['forumid'=> $forumId]);
+        $allThreadId = array();
+        foreach($forumData as $key=>$singleForum){
+            $allThreadId[$key] = $singleForum['id'];
+        }
+        return $allThreadId;
+    }
+    public static function getByForumIdAndId($forumId,$threadId)
+    {
+        $thread = Thread::find()->where(['id' => $threadId])->andWhere(['forumid' => $forumId])->one();
+        return $thread['views'];
+    }
+
+    public static function saveViews($threadid)
+    {
+        $views = Thread::find(['views'])->where(['id' => $threadid])->one();
+        $views->views++;
+        $views->save();
+    }
 } 

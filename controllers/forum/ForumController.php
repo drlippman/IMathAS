@@ -32,7 +32,7 @@ class ForumController extends AppController
     public $postData = array();
     public $totalPosts = array();
     public $children = array();
-    public $filehandertypecfiles = 'local';
+    public $threadLevel = 1;
 
     /*
     * Controller Action To Redirect To Search Forum Page
@@ -146,10 +146,9 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumid');
         $users = $this->getAuthenticatedUser();
         $this->setReferrer();
-        $qq = 0;
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
-        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'qq' => $qq);
+        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course);
         return $this->renderWithData('thread', $responseData);
     }
 
@@ -174,7 +173,7 @@ class ForumController extends AppController
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
-//AppUtility::dump($threads);
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
                     if ($tagged[0]['tagged'] == AppConstant::NUMERIC_ONE) {
                         $temparray = array
                         (
@@ -182,7 +181,7 @@ class ForumController extends AppController
                             'threadId' => $thread['threadid'],
                             'forumiddata' => $thread['forumid'],
                             'subject' => $thread['subject'],
-                            'views' => $thread['views'],
+                            'views' => $views,
                             'replyby' => $thread['replyby'],
                             'postdate' => date('F d, o g:i a', $thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
@@ -205,6 +204,7 @@ class ForumController extends AppController
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
                     if ($thread['postdate'] >= $lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id) {
                         $temparray = array
                         (
@@ -212,7 +212,7 @@ class ForumController extends AppController
                             'threadId' => $thread['threadid'],
                             'forumiddata' => $thread['forumid'],
                             'subject' => $thread['subject'],
-                            'views' => $thread['views'],
+                            'views' => $views,
                             'replyby' => $thread['replyby'],
                             'postdate' => date('F d, o g:i a', $thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
@@ -241,13 +241,14 @@ class ForumController extends AppController
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
                     $count = ForumView::uniqueCount($thread['threadid']);
+                    $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
                     $temparray = array
                     (
                         'parent' => $thread['parent'],
                         'threadId' => $thread['threadid'],
                         'forumiddata' => $thread['forumid'],
                         'subject' => $thread['subject'],
-                        'views' => $thread['views'],
+                        'views' => $views,
                         'replyby' => $thread['replyby'],
                         'postdate' => date('F d, o g:i a', $thread['postdate']),
                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
@@ -363,41 +364,24 @@ class ForumController extends AppController
                     'threadId' => $data['threadid'],
                     'subject' => $data['subject'],
                     'message' => $data['message'],
+                    'postType' => $data['posttype'],
+                    'replyBy' => $data['replyby']
                 );
-//                AppUtility::dump($data);
                 array_push($threadArray, $tempArray);
             }
         }
-
+        $forumPostData = ForumPosts::getbyid($threadId);
+        $threadCreatedUserData = User::getById($forumPostData[0]['userid']);
         if($this->isPost())
         {
             $params = $this->getRequestParams();
             ForumPosts::modifyPost($params);
-            $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser);
-            return $this->renderWithData('modifyPost', $responseData);
+            $this->redirect('thread?cid='.$courseId.'&forumid='.$forumId);
         }
         $this->setReferrer();
-        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser);
+        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser,'threadCreatedUserData' => $threadCreatedUserData);
         return $this->renderWithData('modifyPost', $responseData);
     }
-
-    /*
-    * controller ajax method for fetch modified thread from Modify page and store in database.
-    */
-//    public function actionModifyPostAjax()
-//    {
-//        $params = $this->getRequestParams();
-//        AppUtility::dump($params);
-//        $threadId = $params['threadId'];
-//        $message = trim($params['message']);
-//        $subject = trim($params['subject']);
-//        $replyBy = trim($params['replyBy']);
-//        $postType = trim($params['postType']);
-//        ForumPosts::modifyPost($threadId, $message, $subject, $postType, $replyBy);
-//        $this->includeJS(['forum/modifypost.js']);
-//        return $this->successResponse();
-//    }
-
     /*
     * Controller Action To Redirect To Post Page
     */
@@ -409,12 +393,8 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $forumId = $this->getParamVal('forumid');
-        $prev = $this->getParamVal('prev');
-        $next = $this->getParamVal('next');
-        if ($next || $prev) {
-            $prevNextValueArray = Thread::getNextThreadId($threadId, $next, $prev, $forumId);
-            $threadId = $prevNextValueArray['threadId'];
-        }
+        $allThreadIds = Thread::getAllThread($forumId);
+        $prevNextValueArray =Thread::checkPreOrNextThreadByForunId($forumId);
         $isNew = ForumView::getById($threadId, $currentUser);
         $tagValue = $isNew[0]['tagged'];
         $FullThread = ForumPosts::getbyid($threadId);
@@ -440,6 +420,7 @@ class ForumController extends AppController
             $likeCnt = $count->CalculateCount($postData['id']);
             $studentCount = AppConstant::NUMERIC_ZERO;
             $teacherCount = AppConstant::NUMERIC_ZERO;
+            $isReplies = ForumPosts::isThreadHaveReply($postData['id']);
             foreach ($likeCnt as $like) {
                 $Rights = User::getById($like['userid']);
                 if ($Rights->rights == AppConstant::STUDENT_RIGHT) {
@@ -452,6 +433,10 @@ class ForumController extends AppController
                     'studentCount' => $studentCount,
                     'teacherCount' => $teacherCount,
                 );
+            }
+            if($postData['parent'] == 0)
+            {
+                $replyBy = $postData['replyby'];
             }
             array_push($titleCountArray, $tempArray);
             $tempArray = array();
@@ -474,21 +459,56 @@ class ForumController extends AppController
             $tempArray['lastView'] = $isNew[AppConstant::NUMERIC_ZERO]['lastview'];
             $tempArray['message'] = $postData['message'];
             $tempArray['level'] = $titleLevel['level'];
-            $tempArray['replyBy'] = $postData['replyby'];
+            $tempArray['parent'] = $postData['parent'];
+            $tempArray['isReplies'] = $isReplies;
+            if($postData['parent'] != AppConstant::NUMERIC_ZERO){
+                if(substr($postData['subject'],0,4) !== 'Re: '){
+                    $this->threadLevel = AppConstant::NUMERIC_ONE;
+                    $this->calculatePostLevel($postData);
+                    $tempArray['level'] = $this->threadLevel;
+                }
+            }
             $this->postData[$postData['id']] = $tempArray;
         }
-        ForumPosts::saveViews($threadId);
+
+        Thread::saveViews($threadId);
         $viewsData = new ForumView();
         $viewsData->updateData($threadId, $currentUser);
-        $this->createChild($this->children[key($this->children)]);
+        $this->createChild($this->children[0]);
         $Count = new ForumLike();
         $likeCount = $Count->findCOunt($threadId);
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
+        foreach($this->totalPosts as $key=>$threadArray){
+            if($threadArray){
+                foreach($this->totalPosts as $singleThread) {
+                    if($threadArray['parent'] == $singleThread['id'])
+                    {
+
+                        if(substr($threadArray['subject'],0,2) === 'Re') {
+                            $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
+                        }
+                    }
+                }
+            }
+            $FinalPostArray[$key] = $threadArray;
+        }
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
-        $responseData = array('postdata' => $this->totalPosts, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray);
+        $responseData = array('postdata' => $FinalPostArray, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
         return $this->render('post', $responseData);
+    }
+    public function calculatePostLevel($data)
+    {
+        $parentData = ForumPosts::getParentDataByParentId($data['parent']);
+        if($parentData['parent'] == 0)
+        {
+            return 0;
+        }else
+        {
+            $this->threadLevel++;
+            $this->calculatePostLevel($parentData);
+        }
     }
 
     public function createChild($childArray, $arrayKey = AppConstant::NUMERIC_ZERO)
@@ -515,13 +535,17 @@ class ForumController extends AppController
     {
         $params = $this->getBodyParams();
         $threadId = $params['threadId'];
-        $checkPostOrThread = $params['checkPostOrThread'];
-        ForumPosts::removeThread($threadId, $checkPostOrThread);
-        ForumThread::removeThread($threadId);
-        ForumView::removeThread($threadId);
-        return $this->successResponse();
+        $parentId = $params['parentId'];
+        $deleteThreadData = ForumPosts::getPostById($threadId);
+        ForumPosts::removeThread($threadId, $parentId);
+        if($parentId == AppConstant::NUMERIC_ZERO){
+            ForumThread::removeThread($threadId);
+            ForumView::removeThread($threadId);
+        }else{
+            ForumPosts::updateParentId($threadId,$deleteThreadData['parent']);
+        }
+          return $this->successResponse($parentId);
     }
-
     /*
      * Controller Action To Reply To A Post
      */
@@ -612,13 +636,13 @@ class ForumController extends AppController
     {
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
+        $userId = $params['userId'];
         if ($rowId == -1) {
             $threadId = $params['threadId'];
-            $userId = $params['userId'];
             ForumView::deleteByUserIdAndThreadId($threadId, $userId);
         } else {
             $updateView = new ForumView();
-            $updateView->updateFlagValue($rowId, $params['userId']);
+            $updateView->updateFlagValue($rowId, $userId);
         }
         return $this->successResponse();
     }

@@ -88,7 +88,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     		<?php
                 $selectedtool = array();
                 array_push($selectedtool,$toollabels);
-//                AppUtility::dump($selectedtool);
                 if (count($toolvals) > 0) {
                     AssessmentUtility::writeHtmlSelect('tool', $toolvals, $toollabels, $selectedtool);
                     echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="' . htmlentities($toolcustom) . '" /><br/>';

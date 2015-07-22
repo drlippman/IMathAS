@@ -13,6 +13,7 @@ use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\forms\CourseSettingForm;
 use app\models\InstrFiles;
+use app\models\LinkedText;
 use app\models\Links;
 use app\models\Forums;
 use app\models\GbScheme;
@@ -918,7 +919,6 @@ class CourseController extends AppController
         $params = $this->getRequestParams();
         $modifyLinkId = $params['id'];
         if(isset($modifyLinkId)){
-//            AppUtility::dump($params);
             $link = new LinkedText();
             $link->updateLinkData($params);
         }else{

@@ -15,9 +15,16 @@ class ForumPosts extends BaseImasForumPosts
 {
     public static function updatePostMoveThread($threadId, $moveThreadId)
     {
+        $ForumPost = ForumPosts::find()->where(['id' => $threadId])->one();
         $ForumPosts = ForumPosts::findAll(['threadid' => $threadId]);
-        foreach ($ForumPosts as $ForumPost) {
-            $ForumPost->threadid = $moveThreadId;
+        if($ForumPosts)
+        {
+            foreach($ForumPosts as $singleForum){
+                $singleForum->threadid = $moveThreadId;
+                $singleForum->save();
+            }
+        }
+        if($ForumPost) {
             $ForumPost->parent = $moveThreadId;
             $ForumPost->save();
         }
@@ -29,10 +36,10 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static function getbyidpost($Id)
+    public static function getbyidpost($id)
     {
 
-        $ForumPost = ForumPosts::findAll(['id' => $Id]);
+        $ForumPost = ForumPosts::findAll(['id' => $id]);
         return $ForumPost;
     }
 
@@ -41,24 +48,21 @@ class ForumPosts extends BaseImasForumPosts
         $threadPost = ForumPosts::findOne(['id' => $params['threadId']]);
         $threadPost->subject = $params['subject'];
         $threadPost->message = $params['message'];
-
-        if($params['always-replies']) {
-            if ($params['always-replies'] != AppConstant::NUMERIC_THREE) {
-                $threadPost->replyby = $params['always-replies'];
+            if($params['always-replies'] != AppConstant::NUMERIC_THREE) {
+                $replyBy = $params['always-replies'];
             } else {
                 $replyBy = AppUtility::parsedatetime($params['startDate'], $params['startTime']);
                 $threadPost->replyby = $replyBy;
             }
-        }
-        if($params['post-type']){
+            $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
-        }
-        $threadPost->save();
+            $threadPost->save();
     }
 
-    public static function removeThread($threadId, $checkPostOrThread)
+    public static function removeThread($threadId, $parentId)
     {
-        if ($checkPostOrThread == AppConstant::NUMERIC_ONE) {
+
+        if ($parentId == AppConstant::NUMERIC_ZERO) {
             $threads = ForumPosts::findAll(['threadid' => $threadId]);
         } else {
             $threads = ForumPosts::findAll(['id' => $threadId]);
@@ -125,15 +129,6 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static function saveViews($threadid)
-    {
-        $views = ForumPosts::find('views')->where(['threadid' => $threadid])->all();
-        foreach ($views as $view) {
-            $view->views++;
-            $view->save();
-        }
-    }
-
     public static function getbyThreadIdAndUserID($threadId, $currentUserId)
     {
 
@@ -144,7 +139,7 @@ class ForumPosts extends BaseImasForumPosts
     public static function getbyParentId($parent)
     {
         $parentThread = ForumPosts::findOne(['threadid' => $parent]);
-        return $parentThread;
+         return $parentThread;
     }
 
     public static function findCount($threadId)
@@ -173,5 +168,28 @@ class ForumPosts extends BaseImasForumPosts
             $postId = $entry['id'];
             return $postId;
         }
+    }
+    public static function updateParentId($threadId,$parentId)
+    {
+        $entries = ForumPosts::findAll(['parent' => $threadId]);
+        foreach($entries as $entry)
+        {
+            $entry['parent'] = $parentId;
+            $entry->save();
+        }
+    }
+    public static function getParentDataByParentId($threadId)
+    {
+        $entries = ForumPosts::findOne(['id' => $threadId]);
+         return $entries;
+    }
+    public static function isThreadHaveReply($id)
+    {
+      $entry = ForumPosts::find()->where(['parent' => $id])->all();
+        if($entry)
+        {
+            return AppConstant::NUMERIC_ONE;
+        }
+        return AppConstant::NUMERIC_ZERO;
     }
 }

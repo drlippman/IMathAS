@@ -3,6 +3,7 @@
 use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
+use app\components\AssessmentUtility;
 use app\components\AppUtility;
 date_default_timezone_set("Asia/Calcutta");
 $this->title = 'Modify Thread';
@@ -18,14 +19,14 @@ $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/t
 $this->params['breadcrumbs'][] = $this->title;?>
 <div>
     <h2><b>Modify Post</b></h2>
-
     <br><br><br>
+ <form method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">
     <input type="hidden" id="forum-id" value="<?php echo $forumId ?>">
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
     <div>
         <span class="col-md-1"><b>Subject:</b></span>
-        <span class="col-md-8"><input class="textbox subject" type="text" value="<?php echo $thread[0]['subject'] ?>"></span>
+        <span class="col-md-8"><input class="textbox subject" name="subject" type="text" value="<?php echo $thread[0]['subject'] ?>"></span>
     </div>
     <br><br><br>
 
@@ -36,30 +37,30 @@ $this->params['breadcrumbs'][] = $this->title;?>
         echo "</textarea></div></span><br>"; ?>
     </div>
 
-    <?php if($currentUser['rights'] > 10)
+    <?php if($threadCreatedUserData['rights'] > 10)
     {?>
         <div >
             <span class="col-md-2"><b>Post Type:</b></span>
         <span class="col-md-10" id="post-type">
-            <input type="radio" name="post-type" id="regular" value="0" checked >Regular<br>
-            <input type="radio" name="post-type" id="displayed_at_top_of_list" value="1" >Displayed at top of list<br>
-            <input type="radio" name="post-type" id="displayed_at_top_and_locked" value="2">Displayed at top and locked (no replies)<br>
-            <input type="radio" name="post-type" id="only_students_can_see" value="3">Displayed at top and students can only see their own replies <br>
+            <input type="radio" name="post-type" class="post-type" value="0"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'],AppConstant::NUMERIC_ZERO);?>>Regular<br>
+            <input type="radio" name="post-type" class="post-type" value="1"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'],AppConstant::NUMERIC_ONE);?> >Displayed at top of list<br>
+            <input type="radio" name="post-type" class="post-type" value="2"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'],AppConstant::NUMERIC_TWO);?>>Displayed at top and locked (no replies)<br>
+            <input type="radio" name="post-type" class="post-type" value="3"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'],AppConstant::NUMERIC_THREE);?>>Displayed at top and students can only see their own replies <br>
             </span>
         </div>
         <div>
             <span class="col-md-2"><b>Always Replies:</b></span>
         <span class="col-md-10" id="reply-by" >
-            <input type="radio" name="always-replies" value="NULL" checked >Use default<br>
-            <input type="radio" name="always-replies"  value="0" >Always<br>
-            <input type="radio" name="always-replies"  value="2000000000">Never<br>
-            <input type="radio" name="always-replies" class="end pull-left "  id="always" value="3"><label class="end pull-left ">Before</label>
+            <input type="radio" name="always-replies" value="1"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],1);?> >Use default<br>
+            <input type="radio" name="always-replies"  value="0"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],AppConstant::NUMERIC_ZERO);?> >Always<br>
+            <input type="radio" name="always-replies"  value="2000000000"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],AppConstant::ALWAYS_TIME);?>>Never<br>
+            <input type="radio" name="always-replies" class="end pull-left "  id="always" value="3"<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],AppConstant::NUMERIC_THREE);?>><label class="end pull-left ">Before</label>
 
 
                 <div class="col-md-3" id="datepicker-id">
                     <?php
                     echo DatePicker::widget([
-                        'name' => 'endDate',
+                        'name' => 'startDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'value' => date("m/d/Y",strtotime("+1 week")),
                         'pluginOptions' => [
@@ -84,13 +85,13 @@ $this->params['breadcrumbs'][] = $this->title;?>
 
                     echo '</div>';?>
                 </div>
-
             </span>
         </div>
     <?php }?>
 
     <div class="col-lg-offset-2 col-md-8">
         <br>
-        <a class="btn btn-primary" id="save-changes">Save changes</a>
+        <input class="btn btn-primary" type="submit" id="save-changes" value="Save changes">
     </div>
 </div>
+</form>>

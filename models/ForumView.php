@@ -36,6 +36,7 @@ class ForumView extends BaseImasForumViews
         $thread = ForumView::find()->where(['threadid' => $threadId])->andWhere(['userid' => $userId])->one();
 
         if($thread){
+
             $thread->tagged = $thread['tagged'] ^ AppConstant::NUMERIC_ONE;
             $thread->save();
         }else{
@@ -43,7 +44,6 @@ class ForumView extends BaseImasForumViews
             $this->threadid = $threadId;
             $this->lastview = AppConstant::NUMERIC_ZERO;
             $this->tagged = AppConstant::NUMERIC_ONE;
-//            AppUtility::dump($this);
             $this->save();
         }
 

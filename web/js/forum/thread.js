@@ -297,7 +297,7 @@ function changeImage(element,checkFlagValue, rowId) {
 
 function markAsRemoveSuccess(response) {
     var forumid = $("#forumid").val();
-    var courseid = $("#course-id").val();
+    var courseid = $("#courseid").val();
     var result = JSON.parse(response);
     if(result.status == 0)
     {

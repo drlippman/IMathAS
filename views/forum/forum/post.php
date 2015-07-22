@@ -41,22 +41,25 @@ $currentLevel = 0;
         </div>
     </div>
     <div class="midwrapper">
-
-        <?php if ($threadId > $prevNextValueArray['minThread']) { ?>
-            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?forumid=' . $forumId . '&courseid=' . $course->id . '&threadid=' . $threadId . '&prev=1'); ?>">Prev</a>&nbsp;
+        <?php
+        $a = 0;
+        foreach ($allThreadIds as $key => $threadFromAllThreadArray) {
+            if ($threadFromAllThreadArray == $threadId) {
+                $a = $key;
+                break;
+            }
+        }
+        if ($threadId > $prevNextValueArray['minThread']) { ?>
+            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?forumid=' . $forumId . '&courseid=' . $course->id . '&threadid=' . $allThreadIds[$a - 1]); ?>">Prev</a>&nbsp;
         <?php } else { ?>
             <span>Prev</span>
         <?php
         }
-        if ($threadId < $prevNextValueArray['maxThread']) {
-            ?>
-            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?forumid=' . $forumId . '&courseid=' . $course->id . '&threadid=' . $threadId . '&next=2'); ?>"">Next</a> &nbsp;
+        if ($threadId < $prevNextValueArray['maxThread']) { ?>
+            <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/post?forumid=' . $forumId . '&courseid=' . $course->id . '&threadid=' . $allThreadIds[$a + 1]); ?>"">Next</a> &nbsp;
         <?php } else { ?>
-
             <span>Next</span>
-
         <?php } ?>
-
         <a href="#" onclick="markAsUnreadPost()">Mark Unread</a>&nbsp;|
         <a href="#" id="flag-link" onclick="changeImage(false, <?php echo $threadId ?>)">Flag</a><a href="#"
                                                                                                     id="unflag-link"
@@ -70,8 +73,8 @@ $currentLevel = 0;
 
 
         <?php $cnt = AppConstant::NUMERIC_ZERO;
+        $now = time();
         foreach ($postdata as $index => $data){
-
         ?>
 
         <?php if ($data['level'] != AppConstant::NUMERIC_ZERO && $data['level'] < $currentLevel)
@@ -110,33 +113,46 @@ $currentLevel = 0;
                               ?>
 
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/move-thread?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Move</a>&nbsp;
+
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>&nbsp;
-                              <a href="#" name="remove" data-var="<?php echo $data['id'] ?>"
-                                 class="mark-remove">Remove</a> <?php
-                          } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) {
-                              ?>
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">
-                                  Modify</a><?php } ?>
-
-                              <a
-                              href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">
-                              Reply</a>
-
+                              <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove">Remove</a> <?php
+                          } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
+                           <?php if(($data['settings'] & 2) == 2){   ?>
+                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>
+                          <?php } ?>
+                              <?php if(($data['settings'] & 4) == 4 && $data['isReplies']== 0){  ?>
+                                  <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove">Remove</a>
+                              <?php  } ?>
+                          <?php }   ?>
+                           <?php if($currentUser['rights'] == AppConstant::STUDENT_RIGHT ){    ?>
+                              <?php if($replyBy == AppConstant::ALWAYS_TIME || $replyBy === null){?>
+                             <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply</a>
+                                   <?php }elseif($replayBy < $now ){ ?>
+                                  <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply1</a>
+                              <?php } ?>
+                         <?php }else if($currentUser['rights'] > AppConstant::STUDENT_RIGHT ){ ?>
+                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>"> Reply2</a>
+                          <? } ?>
                       <?php
                       } else if ($data['postType'] == AppConstant::NUMERIC_TWO) {
                           if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) {
+                              AppUtility::dump($currentUser);
                               ?>
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">
-                                  Modify</a><?php
-                          } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] > AppConstant::STUDENT_RIGHT) {
+                              <?php if(($data['settings'] & 2) == 2){   ?>
+                                  <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>
+                              <?php } ?>
+                              <?php if(($data['settings'] & 4) == 4 && $data['isReplies']== 0){  ?>
+                                  <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove">Remove</a>
+                              <?php  } ?>
+                         <?php } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] > AppConstant::STUDENT_RIGHT) {
                               ?>
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/move-thread?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Move</a>&nbsp;
+
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>&nbsp;
-                          <a href="#" name="remove" data-var="<?php echo $data['id'] ?>" class="mark-remove">
-                                  Remove</a><?php } ?>
+                          <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove"> Remove</a><?php } ?>
                       <?php } else if ($data['postType'] < strtotime(date('F d, o g:i a')) && $data['userRights'] == AppConstant::STUDENT_RIGHT) { ?>
 
-                          <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">Reply</a>
+<!--                          <a href="--><?php //echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?><!--">Reply</a>-->
 
                       <?php } ?>
                 <input type=button class="btn btn-primary" id="buti<?php echo $index ?>" value="Hide"
@@ -161,13 +177,13 @@ $currentLevel = 0;
                                      src="<?php echo AppUtility::getAssetURL() ?>img/likedgray.png" title=""
                                      onclick="saveLikes(this,true,<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)">
                 <?php } ?>
-                <?php if($data['likeCnt'] == 0){
+                <?php if ($data['likeCnt'] == 0) {
                     $data['likeCnt'] = '';
-                }else{
+                } else {
                     $data['likeCnt'] = $data['likeCnt'];
-                }?>
+                } ?>
                 <span class="pointer" id="likeCnt<?php echo $data['id'] ?>"
-                onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
+                      onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
             <?php } ?>
         </div>
         <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>

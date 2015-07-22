@@ -378,9 +378,3 @@ You will likely also want to disable modifying posts
         </div>
         </div>
     </form>
-<script type="application/javascript">
-    function toggleGBdetail(v) {
-        document.getElementById("gbdetail").style.display = v?"block":"none";
-    }
-
-</script>

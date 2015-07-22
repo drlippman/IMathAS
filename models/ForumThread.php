@@ -25,7 +25,6 @@ class ForumThread extends BaseImasForumThreads
         $this->lastpostuser = $userId;
         $this->views = AppConstant::NUMERIC_ZERO;
         $this->save();
-
     }
 
     public static  function removeThread($threadId)

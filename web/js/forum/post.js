@@ -8,9 +8,14 @@ $(document).ready(function () {
 });
     $("a[name=remove]").on("click", function () {
         var threadid = $(this).attr("data-var");
+        var parentId = $(this).attr("data-parent");
         var checkPostOrThread = 0;
+        if(parentId == 0){
+            var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
+        }else{
+            var html = '<div><p>Are you SURE you want to remove this post?</p></div>';
+        }
 
-        var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto',resizable: false,
@@ -23,7 +28,7 @@ $(document).ready(function () {
                 "confirm": function () {
                     $(this).dialog("close");
                     var threadId = threadid;
-                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread}, 'markAsRemoveSuccess');
+                    jQuerySubmit('mark-as-remove-ajax', {threadId:threadId,checkPostOrThread:checkPostOrThread,parentId:parentId}, 'markAsRemoveSuccess');
                     return true;
                 }
             },
@@ -32,23 +37,6 @@ $(document).ready(function () {
             }
         });
     });
-
-
-function toggleshow(bnum) {
-    var node = document.getElementById('block' + bnum);
-    var butn = document.getElementById('butb' + bnum);
-    if (node.className == 'forumgrp') {
-        node.className = 'hidden';
-        //if (butn.value=='Collapse') {butn.value = 'Expand';} else {butn.value = '+';}
-        //       butn.value = 'Expand';
-        butn.src = '../../img/expand.gif';
-    } else {
-        node.className = 'forumgrp';
-        //if (butn.value=='Expand') {butn.value = 'Collapse';} else {butn.value = '-';}
-        //       butn.value = 'Collapse';
-        butn.src = '../../img/Collapse.gif';
-    }
-}
 function toggleitem(inum) {
     var node = document.getElementById('item' + inum);
     var butn = document.getElementById('buti' + inum);
@@ -65,10 +53,12 @@ function expandall() {
     for (var i = 0; i < postCount; i++) {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
+        if(node){
         node.className = 'forumgrp';
+        }
         //     butn.value = 'Collapse';
         //if (butn.value=='Expand' || butn.value=='Collapse') {butn.value = 'Collapse';} else {butn.value = '-';}
-        butn.src = '../../img/Collapse.gif';
+        //butn.src = '../../img/Collapse.gif';
     }
 }
 function collapseall() {
@@ -76,10 +66,13 @@ function collapseall() {
     for (var i = 0; i <= postCount; i++) {
         var node = document.getElementById('block' + i);
         var butn = document.getElementById('butb' + i);
-        node.className = 'hidden';
+        if(node){
+            node.className = 'hidden';
+        }
+
         //     butn.value = 'Expand';
         //if (butn.value=='Collapse' || butn.value=='Expand' ) {butn.value = 'Expand';} else {butn.value = '+';}
-        butn.src = '../../img/expand.gif';
+        //butn.src = '../../img/expand.gif';
     }
 }
 function showall() {
@@ -87,11 +80,13 @@ function showall() {
     for (var i = 0; i <= postCount; i++) {
         var node = document.getElementById('item' + i);
         var buti = document.getElementById('buti' + i);
+        //console.log(node);
         node.className = "blockitems";
         buti.value = "Hide";
     }
 }
 function hideall() {
+
     var postCount =  $( "#postCount" ).val();
     for (var i = 0; i <= postCount; i++) {
         var node = document.getElementById('item' + i);
@@ -104,14 +99,19 @@ function markAsRemoveSuccess(response) {
     var forumid = $("#forum-id").val();
     var courseid = $("#course-id").val();
     var result = JSON.parse(response);
-    if(result.status == 0)
+    var threadId = $("#thread-id").val();
+    if(result.data == 0)
     {
         window.location = "thread?cid="+courseid+"&forumid="+forumid;
+    }else if(result.data != 0)
+    {
+        window.location = "post?courseid="+courseid+"&threadid="+threadId+"&forumid="+forumid;
     }
 
 }
 function changeImage(checkFlagValue, rowId) {
-
+    //alert(rowId);
+    var userId = $("#user-id").val();
     if(checkFlagValue == false){
         $('#flag-link').hide();
         $('#unflag-link').show();
@@ -120,7 +120,7 @@ function changeImage(checkFlagValue, rowId) {
         $('#unflag-link').hide();
         $('#flag-link').show();
     }
-    var row = {rowId: rowId};
+    var row = {rowId: rowId,userId:userId};
     jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
 
 }
