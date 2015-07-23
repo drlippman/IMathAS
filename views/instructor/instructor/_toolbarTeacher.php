@@ -22,9 +22,9 @@ use app\components\AppUtility;
             <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><i class="fa fa-calendar icon-nav"></i><?php AppUtility::t('Calendar'); ?></a></li>
             <?php } ?>
             <?php if($section == 'roster'){ ?>
-                <li class="active master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
+                <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
             <?php } else { ?>
-                <li class="master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
+                <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
             <?php } ?>
             <?php if($section == 'Forums'){ ?>
                 <li class="active master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"><i class="fa fa-weixin icon-nav"></i><?php AppUtility::t('Forums'); ?></a></li>

@@ -9,39 +9,30 @@ $(document).ready(function () {
 var studentData;
 function studentRosterSuccess(response) {
     response = JSON.parse(response);
-    var isCode = response.data.isCode;
-    var isSection = response.data.isSection;
-    var isImageColumnPresent = response.data.isImageColumnPresent;
     if (response.status == 0) {
         var students = response.data.query;
-        showStudentInformation(students, isCode, isSection, isImageColumnPresent);
+        showStudentInformation(students);
         studentData = students;
     }
 }
 
-function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
+function showStudentInformation(students)
 {
     var courseId =  $( "#course-id" ).val();
+    var isImagePresent =  $( "#image-id" ).val();
     var html = "";
     $.each(students, function (index, student) {
-        html += "<tr> <td><div class='checkbox'><label><input type='checkbox' name='student-information-check' value='" + student.id + "'><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
-        if (isImageColumnPresent == 1) {
+        html += "<tr> <td><div class='checkbox'><label><input type='checkbox' name='student-information-check' value='" + student.id + "'>" +
+        "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
+        if (isImagePresent == 1) {
             imageURL = 'dummy_profile.jpg';
-            if (student.hasuserimg != 0) {
-                imageURL = student.id + ".jpg";
-            }
-            html += "<td><img  class='images circular-image' src='../../Uploads/" + imageURL + "' ></td>";
+            if (student.hasuserimg != 0) { imageURL = student.id + ".jpg"; }
+            html += "<td><img  class='circular-image profile-pic' src='../../Uploads/" + imageURL + "' onclick='rotatepics()'></td>";
         }
         html += "<td class = 'LastName ";
-        if (student.locked != 0) {
-            html += " locked-student";
-        }
+        if (student.locked != 0) { html += " locked-student";  }
         html += " '>"+ capitalizeFirstLetter(student.lastname) + "</td>";
-        if (student.locked == 0) {
-            html += "<td class = 'FirstName'>";
-        } else {
-            html += "<td  class='FirstName locked-student '>";
-        }
+        if (student.locked == 0) { html += "<td class = 'FirstName'>"; } else { html += "<td  class='FirstName locked-student '>"; }
         html += capitalizeFirstLetter(student.firstname) + "</td>";
         html += "<td>" + student.email + "</td>";
         html += "<td class = 'Username'>" + student.username + "</td>";
@@ -55,18 +46,18 @@ function showStudentInformation(students,isCode,isSection,isImageColumnPresent)
         else {
             html += "<td><a>Is locked out</a></a></td>"
         }
-        html += "<td><ul class='nav nav-tabs roster-settings'>" +
-        "<li class='dropdown'> <a class='dropdown-toggle' data-toggle='dropdown' href='#'><i class='fa fa-cog icon-nav'></i>Settings<span class='caret caret-settings'></span></a>" +
-        "<ul class='dropdown-menu settings-menu'><li>" +
-        "<a href='#'><img class='small-icon' src='../../img/gradebook.png'>&nbsp;Grades</a>" +
-        "<a class ='roster-make-exception' href='make-exception?cid="+courseId+"&student-data="+ student.id +"&section-data="+ student.section +"'><i class='fa fa-plus-square fa-fw'></i>&nbsp;Exception</a>" +
-        "<a href='change-student-information?cid=" + courseId + "&uid=" + student.id + "'><i class='fa fa-cogs'></i>&nbsp;Change Information</a>";
+        html += "<td><div class='btn-group'> <a class='btn btn-primary'>" +
+        "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+        "<ul class='dropdown-menu'>" +
+        "<li><a href='#'><img class='small-icon' src='../../img/gradebook.png'></i> Grades</a></li>" +
+        "<li><a class ='roster-make-exception' href='make-exception?cid="+courseId+"&student-data="+ student.id +"&section-data="+ student.section +"'><i class='fa fa-plus-square fa-fw'></i>&nbsp;Exception</a></li>" +
+        "<li><a href='change-student-information?cid=" + courseId + "&uid=" + student.id + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Change Information</a></li>";
         if (student.locked == 0) {
-            html += "<a  href='#' onclick='lockUnlockStudent(false," + student.id + ")'><i class='fa fa-lock fa-fw'></i>&nbsp;Lock</a>";
+            html += "<li><a  href='#' onclick='lockUnlockStudent(false," + student.id + ")'><i class='fa fa-lock fa-fw'></i>&nbsp;Lock</a></li>";
         } else {
-            html += "<a href='#' onclick='lockUnlockStudent(true," + student.id + ")'><i class='fa fa-unlock'></i>&nbsp;Unlock</a>";
+            html += "<li><a href='#' onclick='lockUnlockStudent(true," + student.id + ")'><i class='fa fa-unlock'></i>&nbsp;Unlock</a></li>";
         }
-        html += "</li></ul></li></ul></td>";
+        html += "</ul></div></td>";
     });
     $('#student-information-table').append(html);
     createDataTable('student-data-table');
@@ -310,31 +301,22 @@ function teacherMakeException() {
 }
 var picsize = 0;
 function rotatepics() {
-    picsize = (picsize + 1) % 3;
-    picshow(picsize);
-}
-function picshow(size) {
-    var course_id = $("#course-id").val();
-    if (size == 0) {
-        els = document.getElementById("student-information").getElementsByTagName("img");
+    els = document.getElementsByClassName("profile-pic");
+    if(picsize == 0){
         for (var i = 0; i < els.length; i++) {
-            els[i].style.display = "none";
+            els[i].style.width = "100px";
+            els[i].style.height = "100px";
         }
-    } else {
-        els = document.getElementById("student-information").getElementsByTagName("img");
+        picsize =1;
+    }else{
         for (var i = 0; i < els.length; i++) {
-            els[i].style.display = "inline";
-            if (size == 2) {
-                els[i].style.width = "100px";
-                els[i].style.height = "100px"
-            }
-            if (size == 1) {
-                els[i].style.width = "50px";
-                els[i].style.height = "50px";
-            }
+            els[i].style.width = "50px";
+            els[i].style.height = "50px";
         }
+        picsize =0;
     }
 }
+
 function lockUnlockStudent(lockOrUnlock, studentId) {
     var courseId = $("#course-id").val();
     if (lockOrUnlock == true) {
@@ -343,7 +325,7 @@ function lockUnlockStudent(lockOrUnlock, studentId) {
         jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
     } else {
         lockOrUnlock = 0;
-        var html = '<div><p>Are you sure? You want to lock out student from course</p></div><p>';
+        var html = '<div><p>Are you sure? You want to lock out student from course.</p></div><p>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,

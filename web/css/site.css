@@ -276,10 +276,6 @@ ul#navlist a {
     margin-left: 15px;
 }
 
-table tbody tr.odd {
-    background-color: #e0e0e0 !important;
-}
-
 #change-button{
 
     margin-left: 0px;
@@ -467,7 +463,7 @@ a.msg-notification:visited{
 }
 
 .table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
-    background-color: #DDFFFF !important;
+    background-color: #dff0d8 !important;
 }
 #lockbtn{
     height: auto;
@@ -578,6 +574,10 @@ table.dataTable thead > tr > th {
     transform: scale(1) rotateZ(0deg);
     opacity: 1;
 }
+.checkbox label input[type="checkbox"]:checked + .cr{
+    background-color: #3441AC;
+    color: #ffffff;
+}
 
 .checkbox label input[type="checkbox"]:disabled + .cr,
 .radio label input[type="radio"]:disabled + .cr {
@@ -600,4 +600,13 @@ img.small-icon{
     border-color: #ddd;
     background: none;
     color: inherit;
+}
+.btn-primary {
+    color: #FFF;
+    background-color: #3441AC;
+    border-color: #357EBD;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background-color: #2C368E;
+    border-color: #285E8E;
 }

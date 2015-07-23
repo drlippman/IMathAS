@@ -13,8 +13,9 @@
     font-size: 30px;
     color: #6d6d6d;
 }
-.col-lg-10.page-title{
+.col-lg-8.page-title{
     padding: 0;
+    width: 64%;
 }
 .nav-tabs.nav-justified > .dropdown .enroll-options{
     background: #f8f8f8;
@@ -34,12 +35,14 @@
 .nav-tabs.nav-justified > .dropdown .enroll-options > li > a :hover{
     color: #428bca;
 }
+
 .nav-tabs.nav-justified > .dropdown .enroll-options{
     background: #f8f8f8;
 }
 .col-lg-2.with-selected{
     padding-left: 0;
     padding-right: 0;
+    width: 18%;
 }
 .nav-tabs.nav-justified > .dropdown .selected-options{
     background: #f8f8f8;
@@ -94,7 +97,7 @@ div.dataTables_info {
     display: inline-block;
     width: 0;
     height: 0;
-    margin-left: 50px;
+    margin-left: 5px;
     vertical-align: middle;
     border-top: 4px solid;
     border-right: 4px solid transparent;
@@ -115,11 +118,11 @@ div.dataTables_info {
     padding: 5px 15px;
 }
 .nav-tabs.roster-settings > li > a:hover{
-    background: #3441AC;
+    background: #3075AC;
     text-decoration: none;
 }
 .nav-tabs.roster-settings > li > a:visited{
-    background: #3441AC;
+    background: #3075AC;
     text-decoration: none;
 }
 .roster-settings > li:hover{
@@ -148,5 +151,24 @@ div.dataTables_info {
     color: #6d6d6d;
 }
 .nav-tabs .settings-menu > li > a:hover{
-    color: #3441AC;
+    color: #3075AC;
+}
+.nav-tabs.nav-justified > .dropdown .enroll-options > li > a:hover{
+    color: #3075AC;
+}
+.btn-group, .btn-group-vertical {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+}
+.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: 80%;
+}
+.btn-group > .btn + .dropdown-toggle {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 20%;
 }

@@ -37,34 +37,24 @@ use app\models\forms\ChangeUserInfoForm;
 
 class RosterController extends AppController
 {
-//Controller method to display student information on student roster page.
+/*
+ * Controller method to display student information on student roster page.
+ */
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
+        $isShowPic = $this->getParamVal('showpic');
         $course = Course::getById($courseId);
-        $students = Student::findByCid($courseId);
-        $isImageColumnPresent = AppConstant::NUMERIC_ZERO;
-        if ($students) {
-            $isCodePresent = false;
-            $isSectionPresent = false;
-            foreach ($students as $student) {
-                $users = User::getById($student['userid']);
-                if ($users['hasuserimg'] == AppConstant::NUMERIC_ONE) {
-                    $isImageColumnPresent = AppConstant::NUMERIC_ONE;
-                }
-                if ($student->code != '') {
-                    $isCodePresent = true;
-                }
-                if ($student->section != '') {
-                    $isSectionPresent = true;
-                }
-            }
+        if($isShowPic == 0){
+            $isImageColumnPresent = AppConstant::NUMERIC_ZERO;
+        }else{
+            $isImageColumnPresent = AppConstant::NUMERIC_ONE;
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
-        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
+        $responseData = array('course' => $course, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
 
     }
