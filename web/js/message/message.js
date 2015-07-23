@@ -9,11 +9,33 @@ $(document).ready(function () {
     jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
-    markAsRead();
-    markAsUnread();
-    markAsDelete();
+//    markAsRead();
+//    markAsUnread();
+//    markAsDelete();
     limitToTagShow();
     filterByCourse();
+
+    $('.with-selected-dropdown').click(function(){
+
+        var with_selected = $('.with-selected :selected').val();
+
+        if(with_selected  == 0)
+        {
+            markAsUnread();
+
+        }
+        else if(with_selected  == 1)
+        {
+            markAsRead();
+
+
+        }else if(with_selected  == 2){
+
+                markAsDelete();
+
+        }
+    });
+
 });
 
 var messageData;
@@ -23,7 +45,7 @@ var selectedCourseId ;
 var courseInfo = [];
 function createTableHeader() {
     var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
+    html += "<thead><tr><th><div class='checkbox'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
     html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
@@ -38,24 +60,34 @@ function showMessage(messageData, status) {
         $.each(messageData, function (index, msg) {
 
             if (msg.isread == 1 || msg.isread == 5 || msg.isread == 9 || msg.isread == 13) {
-                html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
+                html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><div class='checkbox'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
             else {
-                html += "<tr class='unread-message message-row message-row-" + msg.id + "'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
+                html += "<tr class='unread-message message-row message-row-'" + msg.id + "> <td><div class='checkbox'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
-            html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> " + msg.title + "</a></td>";
+
+            html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
             if (msg.replied == 1) {
-                html += "<th>Yes</th>";
+               html += "&nbsp;<i class='fa fa-reply'></i></a><br>"+msg.title +"</b>";
+            }else{
+                html +="</a><br>"+msg.title +"</b></td>";
+            }
+            html += "<td>" + msg.senddate + "</td>";
+
+            var rowid = msg.id;
+
+            html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
+            if (msg.replied == 1) {
+                html += "<td>Yes</td>";
             }
             else {
-                html += "<th>No</th>";
+                html += "<td>No</td>";
             }
-            var rowid = msg.id;
             if (msg.isread < 7) {
                 if(msg.hasuserimg == 0 ){
-                    html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                    html += "<td class='flag-bg-color'><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
                 }else{
-                    html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                    html += "<td class='flag-bg-color'><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
                 }
             }
             else {
@@ -65,9 +97,7 @@ function showMessage(messageData, status) {
                     html += "<td><img class='images circular-image' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
                 }
             }
-            html += "<td>" + msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1) + "</td>";
-            html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
-            html += "<td>" + msg.senddate + "</td>";
+
         });
     }
     $('.message-div div').remove();
@@ -100,16 +130,19 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox() {
-    $('.check-all').click(function () {
-        $('.message-table-body input:checkbox').each(function () {
-            $(this).prop('checked', true);
-        })
-    });
+    $('.display-message-table input[name = "header-checked"]').click(function(){
+console.log("sjkdjfjkf");
+        alert("sadasd");
+//        $('.message-table-body input:checkbox').each(function () {
+//            $(this).prop('checked', true);
+//        })
+//
+//
+//            $('.message-table-body input:checkbox').each(function () {
+//                $(this).prop('checked', false);
+//            })
 
-    $('.uncheck-all').click(function () {
-        $('.message-table-body input:checkbox').each(function () {
-            $(this).prop('checked', false);
-        })
+
     });
 }
 
@@ -135,33 +168,36 @@ function courseDisplay(courseData) {
 }
 
 function markAsUnread() {
-    $('#mark-as-unread').click(function () {
-        var markArray = [];
 
+
+        var markArray = [];
+        alert("asdasd");
 
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             $(this).closest('tr').css('font-weight', 'bold');
             markArray.push($(this).val());
             $(this).prop('checked', false);
         });
-        if( markArray.length !=0){
-        var readMsg = {checkedMsg: markArray};
-        jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
-    }
-        else {
+        if( markArray.length !=0)
+        {
+            var readMsg = {checkedMsg: markArray};
+            jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
+        }
+        else
+        {
 
             var msg ="Select atleast one message to unread";
             CommonPopUp(msg);
 
         }
-    });
+    
 }
 
 function markAsUnreadSuccess(response) {
 }
 
 function markAsRead() {
-    $("#mark-read").click(function () {
+
 
         var markArray = [];
 
@@ -185,7 +221,7 @@ function markAsRead() {
         }
 
 
-    });
+
 }
 
 function filterByCourse() {
@@ -273,7 +309,7 @@ function userDisplay(userData) {
 }
 
 function markAsDelete() {
-    $("#mark-delete").click(function (e) {
+
 
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
@@ -283,7 +319,6 @@ function markAsDelete() {
             var html = '<div><p>Are you sure? This will delete your message from</p>' +
                 '<p>Inbox.</p></div>';
             var cancelUrl = $(this).attr('href');
-            e.preventDefault();
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
@@ -318,7 +353,7 @@ function markAsDelete() {
             var msg ="Select atleast one message to delete";
             CommonPopUp(msg);
         }
-    });
+
 }
 
 function limitToTagShow() {

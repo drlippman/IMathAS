@@ -26,6 +26,7 @@ class MessageController extends AppController
      */
     public function actionIndex()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
         $isNewMessage = $this->getParamVal('newmsg');
@@ -37,7 +38,7 @@ class MessageController extends AppController
             $rights = $this->getAuthenticatedUser();
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
-            $this->includeCSS(['dataTables.bootstrap.css']);
+            $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/message.js', 'general.js' ]);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage);
             return $this->renderWithData('messages', $responseData);
@@ -240,6 +241,7 @@ class MessageController extends AppController
 
     public function actionViewMessage()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser();
         $messageId = $this->getParamVal('message');
@@ -250,7 +252,7 @@ class MessageController extends AppController
             $messages = Message::getByMsgId($msgId);
             Message::updateRead($msgId);
             $fromUser = User::getById($messages->msgfrom);
-            $this->includeCSS(['jquery-ui.css']);
+            $this->includeCSS(['jquery-ui.css', 'message.css']);
             $this->includeJS(['message/viewmessage.js']);
             $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights,'messageId' =>$messageId);
             return $this->renderWithData('viewMessage', $responseData);
