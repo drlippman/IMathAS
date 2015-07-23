@@ -125,8 +125,9 @@ class AppConstant
     const FORUMTYPE = '1';
     const WIKI = 'WIKI';
     const LINK ='LINK';
-    const ASSESSEMENT ='ASSESSMENT';
+    const ASSESSMENT ='ASSESSMENT';
     const INLINE_TEXT = 'INLINE';
     const CALENDAR = 'CALENDAR';
     const BLOCK = 'BLOCK';
+    const FORUM = 'Forum';
 }

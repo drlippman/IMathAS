@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-email-form">
                             <input type="hidden" id="student-id" name="student-data" value=""/>
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                            <a class="with-selected-list" href="javascript: studentEmail()"><img class="fa-fw" src="<?php echo AppUtility::getAssetURL()?>img/email.png">&nbsp;<?php AppUtility::t('Email');?></a></li>
+                            <a class="with-selected-list" href="javascript: studentEmail()"><i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email');?></a></li>
 
                         </form>
                     <li>

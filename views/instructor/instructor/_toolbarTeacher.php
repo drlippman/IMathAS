@@ -26,6 +26,11 @@ use app\components\AppUtility;
             <?php } else { ?>
                 <li class="master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
             <?php } ?>
+            <?php if($section == 'Forums'){ ?>
+                <li class="active master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"><i class="fa fa-weixin icon-nav"></i><?php AppUtility::t('Forums'); ?></a></li>
+            <?php } else { ?>
+                <li class="master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"><i class="fa fa-weixin icon-nav"></i><?php AppUtility::t('Forums'); ?></a></li>
+            <?php } ?>
         </ul>
     </div>
 

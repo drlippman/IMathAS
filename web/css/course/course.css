@@ -1,0 +1,125 @@
+.course-copy-export{
+    background-color: #f8f8f8;
+    display: block;
+    padding: 12px 22px;
+}
+.course-top-menu{
+    padding-right: 0;
+    padding-left: 0;
+}
+.add-item{
+    background-color: #f0f0f0;
+    display: block;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-top: 12px;
+    border-bottom: 1px #dadada solid;
+    border-top: 1px #dadada solid;
+}
+
+.add-item-text{
+    padding-right: 0;
+    padding-left: 0;
+}
+.plus-icon{
+    padding-right: 0;
+    padding-left: 0;
+}
+.ui-dialog-titlebar, .ui-widget-header, .ui-corner-all, .ui-helper-clearfix, .ui-draggable-handle{
+    background-color: #ffffff;
+    display: none;
+}
+
+.assessment{
+    position: absolute;
+    top: 20px;
+    left:10px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.icon-center{
+    position: relative;
+    top: 5px;
+    margin-left: 40px;
+    margin-right: 20px;
+}
+.item-name{
+    margin-top:10px;
+    text-align: center;
+}
+.inline-text{
+    position: absolute;
+    top: 20px;
+    left:140px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.link{
+    position: absolute;
+    top: 20px;
+    left:270px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.forum{
+    position: absolute;
+    top: 120px;
+    left:10px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.wiki{
+    position: absolute;
+    top: 120px;
+    left:140px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.calendar{
+    position: absolute;
+    top: 120px;
+    left:270px;
+    width: 110px;
+    height:80px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+div.dialog-items{
+    min-height: 220px !important;
+}
+.item-name-small{
+    margin-top:10px;
+    text-align: center;
+    margin-right: 0;
+}
+
+.mvsel{
+    width: 5%!important;
+    float: left!important;
+    background-color: #9a9a9a;
+}
+.course-setting-button{
+    width: 30px;
+    height: 30px;
+}
+.select1{
+    display:none; /* Hide it first of all */
+    background:#F8F8F8;
+    border:1px solid #CCC;
+    box-shadow:0 1px 3px rgba(0,0,0,0.15);
+    position:relative;
+    left:0px;
+    border-radius:3px;
+    margin-right: -60px;
+    margin-top: 30px;
+}
