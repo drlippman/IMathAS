@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 $hidetitle = false;
 ?>
-
+<?php AppUtility::dump($forumData);?>
 
 <h3><b><?php echo $pageTitle; ?></b>
 <!--    <img src="--><?php //echo AppUtility::getAssetURL() ?><!--img/help.gif" alt="Help"-->
@@ -310,7 +310,6 @@ You will likely also want to disable modifying posts
                     <span class=formright>
                 <?php AssessmentUtility::writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$forumData['tutoredit']); ?>
 </span><br class=form>
-
                     <span class="form">Use Scoring Rubric</span><span class=formright>
                    <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$forumData['rubric']); ?>
                             <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>">Add new

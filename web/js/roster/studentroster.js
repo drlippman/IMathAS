@@ -368,7 +368,7 @@ function lockUnlockStudent(lockOrUnlock, studentId) {
         jQuerySubmit('lock-unlock-ajax', data, 'lockUnlockSuccess');
     } else {
         lockOrUnlock = 0;
-        var html = '<div><p>Are you sure? You want to lock out student from course</p></div><p>';
+        var html = '<div><p>Are you SURE? you want to lock this student out of the course.</p></div><p>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,

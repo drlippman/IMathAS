@@ -27,7 +27,12 @@ $(document).ready(function () {
                     alwaysReplies = selected.val();
                 }
                 var body = $("#message").val();
-                var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time };
+                var settings = 0;
+                var status = $('#post-anonymously').is(':checked');
+                if(status == true){
+                    settings = 1;
+                }
+                var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings };
                 jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
             }
     });

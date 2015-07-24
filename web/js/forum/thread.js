@@ -130,6 +130,9 @@ function threadSuccess(response)
     response = JSON.parse(response);
     var fid = $('#forumid').val();
     var courseId = $('#courseid').val();
+    var settings = $('#settings').val();
+    var isModifyThread = ( settings & 2) == 2;
+    var isRemoveThread = ( settings & 4) == 4;
     if (response.status == 0) {
         var threads = response.data.threadArray;
         var uniquesDataArray = response.data.uniquesDataArray;
@@ -137,7 +140,6 @@ function threadSuccess(response)
         var checkFlagValue;
         var html = "";
         $.each(threads, function (index, thread) {
-
             if (fid == thread.forumiddata) {
                 count =0;
                 $.each(threads,function (index,data)
@@ -149,7 +151,13 @@ function threadSuccess(response)
                 });
                 count--;
                 if(thread.parent == 0){
-                    html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
+                    if(thread.isanon == 0){
+                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
+                    }else{
+                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>Anonymous </td>";
+                    }
+
+
                     if (thread.tagged != 1 && thread.posttype == 0 ) {
                         html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
                     }
@@ -161,8 +169,17 @@ function threadSuccess(response)
                     if(thread.userright > 10) {
                         html += " <td><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
                     }else if(thread.currentUserId == thread.postUserId){
-                        html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
+                        if(isModifyThread && thread.isReplies == 0 && isRemoveThread){
+                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        }else if(isModifyThread){
+                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
+                        }else if(thread.isReplies == 0 && isRemoveThread){
+                            html += " <td><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+                        }else { html += " <td> - </td> "; }
                     }else { html += " <td> - </td> "; }
+                    if(thread.groupSetId > 0 && thread.userright > 10){
+                        html += "<td>Non-group-specific</td>";
+                    }
                     if(count >= 0){
                     html += "<td>" + count + "</td>";}
                     var uniqueView = thread.countArray;

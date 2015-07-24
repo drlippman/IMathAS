@@ -34,13 +34,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <input type="hidden" id="forumid" value="<?php echo $forumid ?>">
     <input type="hidden" id="courseid" value="<?php echo $course->id ?>">
     <input type="hidden" id="user-id" value="<?php echo $users['id']?>">
-
+    <input type="hidden" id="settings" value="<?php echo $forumData['settings']?>">
     <div id="data">
         <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table">
             <thead>
             <th>Topic</th>
             <th>Flag</th>
             <th>Actions</th>
+            <?php if($forumData['groupsetid'] > 0 && $users['rights'] > 10){ ?>
+            <th>Groups</th>
+            <?php } ?>
             <th>Replies</th>
             <th>Views(Unique)</th>
             <th>Last Post Date</th>

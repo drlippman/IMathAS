@@ -14,11 +14,11 @@ else{
 
 //$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumName->id]];
+$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumData->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="" xmlns="http://www.w3.org/1999/html">
-    <h3><b>Add Thread - <?php echo $forumName->name;?></h3>
+    <h3><b>Add Thread - <?php echo $forumData->name;?></h3>
     <br><br>
     <div>
         <div class="col-md-2"><b>Subject</b></div>
@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div>
         <br>
         <input type="hidden" id="userId" value="<?php echo $userId; ?>">
-        <input type="hidden" id="forumId" value="<?php echo $forumName->id; ?>">
+        <input type="hidden" id="forumId" value="<?php echo $forumData->id; ?>">
         <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
 
     </div>
@@ -88,7 +88,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </span>
         </div>
- <?php }?>
+ <?php }elseif($rights == 10 && ($forumData['settings'] & 1 == 1)){?>
+        <div>
+            <div class="col-md-2"><b>Post Anonymously:</b></div>
+            <div class="col-md-8"><input id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
+        </div>
+    <?php } ?>
     <div class="col-md-4  col-lg-offset-2">
     <input type="button" class="btn btn-primary" id="addNewThread" value="Post Thread">
         </div>

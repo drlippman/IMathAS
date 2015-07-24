@@ -48,12 +48,20 @@ class ForumPosts extends BaseImasForumPosts
         $threadPost = ForumPosts::findOne(['id' => $params['threadId']]);
         $threadPost->subject = $params['subject'];
         $threadPost->message = $params['message'];
-            if($params['always-replies'] != AppConstant::NUMERIC_THREE) {
-                $replyBy = $params['always-replies'];
-            } else {
+
+            if($params['always-replies'] == AppConstant::NUMERIC_THREE) {
                 $replyBy = AppUtility::parsedatetime($params['startDate'], $params['startTime']);
                 $threadPost->replyby = $replyBy;
+            }else if($params['always-replies'] == AppConstant::NUMERIC_ONE){
+                $threadPost->replyby = 'null';
+            }else {
+                $replyBy = $params['always-replies'];
             }
+        $isANonValue = 0;
+            if($params['post-anonymously']){
+                $isANonValue = $params['post-anonymously'];
+            }
+            $threadPost->isanon = $isANonValue;
             $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
             $threadPost->save();
@@ -95,7 +103,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
     }
 
-    public function createThread($params, $userId, $postType, $alwaysReplies, $date)
+    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue)
     {
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
@@ -107,17 +115,20 @@ class ForumPosts extends BaseImasForumPosts
         }
         $this->subject = trim($params['subject']);
         $this->userid = isset($userId) ? $userId : null;
-        $postdate = strtotime(date('F d, o g:i a'));
-        $this->postdate = $postdate;
         $this->message = isset($params['body']) ? $params['body'] : null;
-        $this->posttype = $postType;
-        if ($alwaysReplies == AppConstant::NUMERIC_ONE) {
-            $this->replyby = AppConstant::ALWAYS_TIME;
-        } elseif ($alwaysReplies == AppConstant::NUMERIC_TWO) {
-            $this->replyby = AppConstant::NUMERIC_ZERO;
-        } elseif ($alwaysReplies == AppConstant::NUMERIC_THREE) {
-            $this->replyby = $date;
-        }
+            $postdate = strtotime(date('F d, o g:i a'));
+            $this->postdate = $postdate;
+            $this->posttype = $postType;
+            if ($alwaysReplies == AppConstant::NUMERIC_ONE) {
+                $this->replyby = AppConstant::ALWAYS_TIME;
+            } elseif ($alwaysReplies == AppConstant::NUMERIC_TWO) {
+                $this->replyby = AppConstant::NUMERIC_ZERO;
+            } elseif ($alwaysReplies == AppConstant::NUMERIC_THREE) {
+                $this->replyby = $date;
+            }else{
+                $this->replyby = null;
+            }
+        $this->isanon = $isNonValue;
         $this->save();
         return ($this->threadid);
 
@@ -186,10 +197,6 @@ class ForumPosts extends BaseImasForumPosts
     public static function isThreadHaveReply($id)
     {
       $entry = ForumPosts::find()->where(['parent' => $id])->all();
-        if($entry)
-        {
-            return AppConstant::NUMERIC_ONE;
-        }
-        return AppConstant::NUMERIC_ZERO;
+        return $entry;
     }
 }
