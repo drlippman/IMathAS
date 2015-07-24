@@ -962,9 +962,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 	}
 	if ($hasreattempts) {
 		if ($noindivscores) {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
 		} else {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions missed where allowed'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";
 		}
 	} else {
 		echo "<p>", _('No attempts left on current versions of questions.'), "</p>\n";
