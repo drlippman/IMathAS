@@ -42,23 +42,38 @@ $now = $currentTime;
              <div class="col-sm-2">
                  <span>From: <?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName) ?></span>
              </div>
+             <?php $sent = $messageId;?>
+             <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
              <div class=" pull right col-sm-8">
-                 <a  id="mark-delete"> Delete Message</a>&nbsp;
+                 <a href="#" id="mark-delete"> Delete Message</a>
              </div>
              <div class="col-sm-2 pull right">
-                <a id="mark-as-unread"> Mark Unread </a>&nbsp;
+                <a  href="#" id="mark-as-unread"> Mark Unread </a>
              </div>
+             <?php }?>
          </div>
-
-         <br>
-         <div class="col-sm-12">
-
-                <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
+        <div class="col-md-12 message-body">
+        <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
              {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">[Show trimmed content]</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>
-                <?php echo $messages->message ?>
+           <?php echo $messages->message ?>
          </div>
 
-</div>
+         <div class="reply message-body">
+             <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
+                    <span class="message-reply">
+                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
+                            class="btn1  reply-button "> <i class="fa fa-reply"></i>&nbsp;&nbsp;Reply</a>
+                    </span>
+             <?php }?>
+                     <span class="message-reply">
+                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;View Conversation </a>
+                    </span>
+         </div>
+
+
+
+
+    </div>
     <br>
  </div>

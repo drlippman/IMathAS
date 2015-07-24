@@ -17,12 +17,18 @@ echo '<div class="dropdown dropdown-class">
         <span class="caret"></span></button>
       </div>';
 echo Nav::widget([
-    'options' => ['class' => 'navbar-nav navbar-right'],
+    'options' => ['class' => 'navbar-nav notification navbar-right'],
     'items' => [
         Yii::$app->user->isGuest ?
             ['label' => 'Notifications', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ['label' => 'Notifications', 'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']],
+            ['label' => 'Notifications',
+                'items' => [
+                    ['label' => 'Message' , 'url' => '../../message/message/index?cid=9' ],
+                    '<li class="divider"></li>',
+                    ['label' => 'Forum', 'url' => '#'],
+                ],
+                'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']],
         Yii::$app->user->isGuest ?
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?

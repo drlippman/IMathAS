@@ -1,18 +1,20 @@
 $(document).ready(function () {
     $("#show-all-link").hide();
     var cid = $(".send-msg").val();
-    var isNewMessage = $(".msg-type").val();
+    var isImportant = $('.is-important').val();
     var ShowRedFlagRow = -1;
+    var isNewMessage = $(".msg-type").val();
     var userId = $(".send-userId").val();
+    if(isImportant == 1){
+        ShowRedFlagRow = 1;
+        $("#limit-to-tag-link").hide();
+        $("#show-all-link").show();
+    }
     var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
     jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
     jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
-//    markAsRead();
-//    markAsUnread();
-//    markAsDelete();
-    limitToTagShow();
     filterByCourse();
 
     $('.with-selected-dropdown').click(function(){
@@ -43,10 +45,10 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
+
+
 function createTableHeader() {
-    var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th><div class='checkbox'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
-    html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
+
     $('.message-div').append(html);
 }
 
@@ -65,12 +67,15 @@ function showMessage(messageData, status) {
             else {
                 html += "<tr class='unread-message message-row message-row-'" + msg.id + "> <td><div class='checkbox'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
-
-            html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
-            if (msg.replied == 1) {
-               html += "&nbsp;<i class='fa fa-reply'></i></a><br>"+msg.title +"</b>";
+            if(msg.hasuserimg == 0 ){
+            html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
             }else{
-                html +="</a><br>"+msg.title +"</b></td>";
+            html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
+            }
+            if (msg.replied == 1) {
+               html += "&nbsp;<i class='fa fa-reply'></i></a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b>";
+            }else{
+                html +="</a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b></td>";
             }
             html += "<td>" + msg.senddate + "</td>";
 
@@ -84,24 +89,16 @@ function showMessage(messageData, status) {
                 html += "<td>No</td>";
             }
             if (msg.isread < 7) {
-                if(msg.hasuserimg == 0 ){
-                    html += "<td class='flag-bg-color'><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
-                }else{
-                    html += "<td class='flag-bg-color'><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
-                }
+
+                    html += "<td class='flag-bg-color'> <img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
             }
             else {
-                if(msg.hasuserimg == 0 ){
-                    html += "<td><img class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
-                }else{
-                    html += "<td><img class='images circular-image' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
-                }
+
+                    html += "<td><img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
             }
 
         });
     }
-    $('.message-div div').remove();
-    createTableHeader();
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable({"bPaginate": false});
     $(".images").hide();
@@ -110,7 +107,6 @@ function showMessage(messageData, status) {
 function showMessageSuccess(response) {
     response = JSON.parse(response);
     messageData = response.data;
-    calculateCourseList();
     if(response.status == 0)
     {
         var filterArrayForUser = [];
@@ -130,19 +126,17 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox() {
-    $('.display-message-table input[name = "header-checked"]').click(function(){
-console.log("sjkdjfjkf");
-        alert("sadasd");
-//        $('.message-table-body input:checkbox').each(function () {
-//            $(this).prop('checked', true);
-//        })
-//
-//
-//            $('.message-table-body input:checkbox').each(function () {
-//                $(this).prop('checked', false);
-//            })
-
-
+    $('.message-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
     });
 }
 
@@ -150,8 +144,8 @@ function getCourseSuccess(response) {
     var result = JSON.parse(response);
     var course = result.data;
     if (result.status == 0) {
-        //courseDisplay(course);
-        //filterByCourse();
+        courseDisplay(course);
+        filterByCourse();
     }
 }
 
@@ -168,10 +162,7 @@ function courseDisplay(courseData) {
 }
 
 function markAsUnread() {
-
-
         var markArray = [];
-        alert("asdasd");
 
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             $(this).closest('tr').css('font-weight', 'bold');
@@ -356,31 +347,6 @@ function markAsDelete() {
 
 }
 
-function limitToTagShow() {
-
-    $("#limit-to-tag-link").click(function () {
-        $("#limit-to-tag-link").hide();
-        $("#show-all-link").show();
-        var ShowRedFlagRow = 1;
-        var cid = $(".send-msg").val();
-        var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-        jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-
-    });
-    $("#show-all-link").click(function () {
-        $("#limit-to-tag-link").show();
-        $("#show-all-link").hide();
-        ShowRedFlagRow = 0;
-        var cid = $(".send-msg").val();
-        var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-        jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-    });
-}
-
 function changeImage(element, temp, rowId) {
 
     if(temp == false){
@@ -422,18 +388,4 @@ function picshow(size) {
         }
     }
 
-}
-
-function calculateCourseList(){
-    var name= [];
-    var courseTest= [];
-    $.each(messageData, function (index, msg) {
-        if(!inArray(msg.name,name)){
-            var obj = {courseName:msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1), courseId:msg.courseid}
-            name.push(msg.name);
-            courseInfo.push(obj);
-        }
-    });
-    courseDisplay(courseInfo);
-    //filterByCourse();
 }

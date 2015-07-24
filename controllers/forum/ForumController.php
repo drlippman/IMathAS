@@ -29,6 +29,7 @@ class ForumController extends AppController
 /*Controller Action To Redirect To Search Forum Page*/
     public function actionSearchForum()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
         $forum = Forums::getByCourseId($cid);
@@ -47,8 +48,10 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $param = $this->getRequestParams();
+        $userId = $this->getAuthenticatedUser()->id;
+        $courseId = $param['cid'];
         $search = $param['search'];
-        $query = ForumForm::byAllSubject($search);
+        $query = ForumForm::byAllSubject($search,$courseId,$userId);
             if ($query)
             {
                 $searchThread = array();

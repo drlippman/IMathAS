@@ -30,6 +30,7 @@ class MessageController extends AppController
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
         $isNewMessage = $this->getParamVal('newmsg');
+        $isImportant = $this->getParamVal('show');
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();
             $course = Course::getById($courseId);
@@ -40,7 +41,7 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/message.js', 'general.js' ]);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant);
             return $this->renderWithData('messages', $responseData);
         }
     }
@@ -187,6 +188,8 @@ class MessageController extends AppController
                     'courseName' => $teacher->course->name);
                 array_push($teacherArray, $tempArray);
             }
+            $sort_by = array_column($teacherArray, 'courseName');
+            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $teacherArray);
             return $this->successResponse($teacherArray);
         } else {
             return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
