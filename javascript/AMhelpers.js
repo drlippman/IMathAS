@@ -39,6 +39,8 @@ function calculate(inputId,outputId,format) {
 		  }
 		  if (format.indexOf('mixednumber')!=-1) {
 		  	  str = str.replace(/_/,' ');
+		  } else if (format.indexOf('scinot')!=-1) {
+			  str = str.replace(/(x|X|\u00D7)/,"xx");
 		  } else {
 		  	  str = str.replace(/([0-9])\s+([0-9])/g,"$1*$2");
 		  	  str = str.replace(/\s/g,'');
@@ -50,7 +52,7 @@ function calculate(inputId,outputId,format) {
 				  evalstr = evalstr.replace(/(\d+)\s+(\d+\s*\/\s*\d+)/,"($1+$2)");
 			  }
 			  if (format.indexOf('scinot')!=-1) {
-				   evalstr = evalstr.replace("xx","*");
+			  	  evalstr = evalstr.replace("xx","*");
 			  }
 			  with (Math) var res = eval(mathjs(evalstr));
 		  } catch(e) {
@@ -649,11 +651,14 @@ function AMpreview(inputId,outputId) {
   
   
   ptlist = pts[qn].split(",");
+  var err = '';
   var tstpt = 0; var res = NaN; var isnoteqn = false;
   if (iseqn[qn]==1) {
   	if (!str.match(/=/)) {isnoteqn = true;}
   	else if (str.match(/=/g).length>1) {isnoteqn = true;}
 	str = str.replace(/(.*)=(.*)/,"$1-($2)");
+  } else {
+  	if (!str.match(/=/)) {isnoteqn = true;}  
   }
   if (fl!='') {
 	  reg = new RegExp("("+fl+")\\(","g");
@@ -668,7 +673,7 @@ function AMpreview(inputId,outputId) {
 		totest += "var " + vars[j] + "="+testvals[j]+";"; 
 	  }
 	  totest += totesteqn;
-	  var err=_("syntax ok");
+	  err =_("syntax ok");
 	  try {
 	    with (Math) var res = scopedeval(totest);
 	  } catch(e) {
@@ -690,8 +695,8 @@ function AMpreview(inputId,outputId) {
   	  	  err += ". "+formaterr;
   	  }
   }
-
   if (iseqn[qn]==1 && isnoteqn) { err = _("syntax error: this is not an equation");}
+  else if ((typeof iseqn[qn] === 'undefined') && !isnoteqn) { err = _("syntax error: you gave an equation, not an expression");}
   outnode.appendChild(document.createTextNode(" " + err));
 
 }
@@ -887,6 +892,8 @@ function doonsubmit(form,type2,skipconfirm) {
 		if (document.getElementById("tc"+qn)==null) {continue;}
 		str = document.getElementById("tc"+qn).value;
 		str = normalizemathunicode(str);
+		str = str.replace(/=/,'');
+		str = str.replace(/(\d)\s*,(?=\s*\d{3}\b)/g,"$1");
 		if (calcformat[qn].indexOf('list')!=-1) {
 			strarr = str.split(/,/);
 		} else {
@@ -953,6 +960,8 @@ function doonsubmit(form,type2,skipconfirm) {
 		str = normalizemathunicode(str);
 		if (iseqn[qn]==1) {
 			str = str.replace(/(.*)=(.*)/,"$1-($2)");
+		} else {
+			if (str.match("=")) {continue;}	
 		}
 		fl = flist[qn];
 		varlist = vlist[qn];

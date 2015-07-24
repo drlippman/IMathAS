@@ -1388,6 +1388,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
+			} else if (in_array("scinot",$ansformats)) {
+				$sa = '`'.makescinot($answer,-1,'*').'`';
 			} else {
 				$sa = $answer;
 			}
