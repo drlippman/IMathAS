@@ -3,6 +3,7 @@ namespace app\components;
 use \yii\base\Component;
 use app\components\AppUtility;
 use app\components\AppConstant;
+
 class CourseItemsUtility extends Component
 {
 public $cnt = 0;
@@ -13,11 +14,11 @@ public $cnt = 0;
 if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
 ?>
 <div class="item">
-<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
 <div class="title">
 <b>
     <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>" class="confirmation-require assessment-link"
-       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+       id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
 </b>
 <div class="floatright">
     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -51,13 +52,13 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
 ?>
 <div class="item">
-<img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+<img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
 
 <div class="title">
 <b>
     <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
        class="confirmation-require assessment-link"
-       id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+       id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
 </b>
 <div class="floatright">
     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -93,14 +94,13 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 }else if ($assessment->startdate >= 0 || $assessment->enddate == AppConstant::ALWAYS_TIME) {
 ?>
 <div class="item">
-    <img alt="assess" class="floatleft"
-         src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
 
     <div class="title">
         <b>
             <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
                class="confirmation-require assessment-link"
-               id="<?php echo $assessment->id ?>"><?php echo $assessment->name ?></a>
+               id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
         </b>
         <div class="floatright">
             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -176,9 +176,9 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <!--Hide title and icon-->
                 <?php if ($forum->name != '##hidden##') {
                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                 <div class="title">
-                    <b><a><?php echo $forum->name ?></a></b>
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
@@ -222,9 +222,9 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <!--Hide title and icon-->
                 <?php if ($forum->name != '##hidden##') {
                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                 <div class="title">
-                    <b><a><?php echo $forum->name ?></a></b>
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
@@ -248,9 +248,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <div class="item">
                 <?php if ($forum->name != '##hidden##') {
                 $endDate = AppUtility::formatDate($forum->enddate);?>
-                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
-                <div class="title">
-                    <b><a><?php echo $forum->name ?></a></b> <br>
+                <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>                <div class="title">
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b> <br>
                 </div>
                 <div class="itemsum"><p>
                         <?php }
@@ -272,12 +271,11 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
          <?php if ($wikis->avail == AppConstant::NUMERIC_ZERO) { ?>
 
          <div class="item">
-             <img alt="wiki" class="floatleft"
-                  src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
 
              <div class="title">
                  <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
-                         <?php echo $wikis->name ?></a></b>
+                         <?php echo ucfirst($wikis->name) ?></a></b>
                  <div class="floatright">
                      <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                      <ul class=" select1 dropdown-menu selected-options">
@@ -299,12 +297,11 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
          </div>
      <?php } elseif ($wikis->avail == AppConstant::NUMERIC_ONE) { ?>
          <div class="item">
-             <img alt="wiki" class="floatleft"
-                  src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
 
              <div class="title">
                  <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
-                         <?php echo $wikis->name ?></a></b>
+                         <?php echo ucfirst($wikis->name) ?></a></b>
                  <div class="floatright">
                      <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                      <ul class=" select1 dropdown-menu selected-options">
@@ -333,12 +330,10 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
          </div>
      <?php } else if ($wikis->avail == AppConstant::NUMERIC_TWO) { ?>
          <div class="item">
-             <img alt="wiki" class="floatleft"
-                  src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
-
+             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
              <div class="title">
                  <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
-                         <?php echo $wikis->name ?></a></b>
+                         <?php echo ucfirst($wikis->name) ?></a></b>
                  <div class="floatright">
                      <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                      <ul class=" select1 dropdown-menu selected-options">
@@ -382,7 +377,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <b><a href="<?php echo $text ?>" target="_blank"><?php echo $link->title ?>&nbsp;<img
                                     src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
                     <?php } else { ?>
-                        <b><a href="<?php echo $text ?>"><?php echo $link->title; ?></a></b>
+                        <b><a href="<?php echo $text ?>"><?php echo ucfirst($link->title); ?></a></b>
                     <?php } ?>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -449,7 +444,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         $filename = substr(strip_tags($link->text), 5);
                         require_once("../components/filehandler.php");
                         $alink = getcoursefileurl($filename);
-                        echo '<a href="' . $alink . '">' . $link->title . '</a>';
+                        echo '<a href="' . $alink . '">' . ucfirst($link->title) . '</a>';
                     } ?>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -513,7 +508,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
                     <?php } else { ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid . '&id=' . $link->id) ?>">
-                                <?php echo $link->title ?></a></b>
+                                <?php echo ucfirst($link->title) ?></a></b>
                     <?php } ?>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
@@ -568,7 +563,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                     <?php if ($link->target != 0) { ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid . '&id=' . $link->id) ?>"
                               target="_blank">
-                                <?php echo $link->title ?>&nbsp;<img
+                                <?php echo ucfirst($link->title) ?>&nbsp;<img
                                     src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
                     <?php } else { ?>
                         <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid . '&id=' . $link->id) ?>">
@@ -633,7 +628,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <!--Hide title and icon-->
                 <?php if ($inline->title != '##hidden##') {
                 $endDate = AppUtility::formatDate($inline->enddate);?>
-            <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
                 <div class="title">
                     <b><?php echo ucfirst($inline->title)?></b>
 
@@ -681,7 +676,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <!--Hide title and icon-->
                 <?php if ($inline->title != '##hidden##') {
                 $endDate = AppUtility::formatDate($inline->enddate);?>
-            <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
+
                 <div class="title">
                     <b><?php echo ucfirst($inline->title) ?></b>
                     <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/><br>
@@ -707,7 +703,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
             <div class="item">
                 <?php if ($inline->title != '##hidden##') {
                 $endDate = AppUtility::formatDate($inline->enddate);?>
-                <img alt="text item" class="floatleft faded" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
+
                 <div class="title">
                     <b><?php echo ucfirst($inline->title) ?></b>
                     <img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/><br>
@@ -726,12 +723,12 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
         public static function  AddCalendar($item,$parent,$course)
         {
             ?>
+            <div class="item" style="padding-bottom: 15px; padding-right: 15px">
             <pre><a href="#" onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
                     href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
             <div class='calendar'>
-                <div id="demo">
-                </div>
+            </div>
             </div>
   <?php }
 

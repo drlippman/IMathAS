@@ -62,17 +62,17 @@ body {
     height: 50px;
     width: 150px
 }
-.index-header .right-side .right-item{
+/*.index-header .right-side .right-item{*/
 
-}
-.index-header .right-side .item-icon{
-    float: left;
-    margin-top: 10px;
-    margin-left: 5px;
-    height: 34px;
-    width: 34px;
-    background: url("../img/two_gears.png");
-}
+/*}*/
+/*.index-header .right-side .item-icon{*/
+    /*float: left;*/
+    /*margin-top: 10px;*/
+    /*margin-left: 5px;*/
+    /*height: 34px;*/
+    /*width: 34px;*/
+    /*background: url("../img/two_gears.png");*/
+/*}*/
 
 .left-float{
     float: left;
@@ -134,11 +134,11 @@ body {
     padding-right: 12%;
     padding-left: 0%;
 }
-.right-side-button{
-    background-color: #2C368E;
-    height: 50px;
-    width: 150px
-}
+/*.right-side-button{*/
+    /*background-color: #2C368E;*/
+    /*height: 50px;*/
+    /*width: 150px*/
+/*}*/
 .btn{
     padding: 6px 6px;
 }
@@ -209,10 +209,12 @@ body {
 }
 .notification-alignment{
     background-color: #008E71;
+    text-decoration-color: #ffffff;
 }
 .common-navbar #nav .active > a {
     color: #ffffff;
     background-color: #2C368E;
+    border-bottom: none;
 }
 .icon-nav{
     font-size: 1.3em;
@@ -264,4 +266,12 @@ padding-left: 1%;
 .calendar-container{
     padding-top: 15px;
     padding-bottom: 15px;
+}
+.fc-day-grid-event,.fc-h-event, .fc-event, .fc-start, .fc-end{
+    /*width: 90%;*/
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.fc-event{
+    cursor: pointer;
 }

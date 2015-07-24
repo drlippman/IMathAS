@@ -35,18 +35,19 @@
     top: 20px;
     left:10px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
 .icon-center{
     position: relative;
-    top: 5px;
-    margin-left: 40px;
+    top: 15px;
+    margin-left: 35px;
     margin-right: 20px;
+    margin-bottom: 10px;
 }
 .item-name{
-    margin-top:10px;
+    margin-top:14px;
     text-align: center;
 }
 .inline-text{
@@ -54,7 +55,7 @@
     top: 20px;
     left:140px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
@@ -63,42 +64,42 @@
     top: 20px;
     left:270px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
 .forum{
     position: absolute;
-    top: 120px;
+    top: 140px;
     left:10px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
 .wiki{
     position: absolute;
-    top: 120px;
+    top: 140px;
     left:140px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
-.calendar{
+.calendar-pop-up{
     position: absolute;
-    top: 120px;
+    top: 140px;
     left:270px;
     width: 110px;
-    height:80px;
+    height:100px;
     border: 1px solid black;
     border-radius: 10px;
 }
 div.dialog-items{
-    min-height: 220px !important;
+    min-height: 380px !important;
 }
 .item-name-small{
-    margin-top:10px;
+    margin-top:14px;
     text-align: center;
     margin-right: 0;
 }
@@ -106,7 +107,15 @@ div.dialog-items{
 .mvsel{
     width: 5%!important;
     float: left!important;
-    background-color: #9a9a9a;
+    background-color: #6d6d6d;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 5px;
+;
+}
+.arrow{
+    color: #ffffff;
 }
 .course-setting-button{
     width: 30px;
@@ -122,4 +131,39 @@ div.dialog-items{
     border-radius:3px;
     margin-right: -60px;
     margin-top: 30px;
+}
+.block-item{
+    position: absolute;
+    top: 260px;
+    left:140px;
+    width: 110px;
+    height:100px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.icon-size{
+    width: 40px;
+    height: 40px;
+}
+.item-icon-alignment{
+    padding-top: 2px;
+    width: 24px;
+    height: 24px;
+}
+
+.right-side{
+    height: 40px;
+    width: 150px;
+    background-color: #2C368E;
+}
+.index-header .right-side .item-icon{
+    float: left;
+    margin-left: 5px;
+    padding: 0;
+    height: 34px;
+    width: 34px;
+    background: url("../../img/courseSettingToday.png");
+}
+.display-item-details{
+    padding-top: 7px;
 }
