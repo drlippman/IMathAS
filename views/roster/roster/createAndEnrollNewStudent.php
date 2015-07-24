@@ -1,17 +1,23 @@
+
 <?php
+use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use app\components\AppUtility;
-$this->title = 'Create And Enroll New Student';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->title = 'Enroll From Other Course';
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<h2>Enroll a New Student</h2>
-<br>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
 
-<div class="site-login">
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+
+<div class="tab-content shadowBox"">
+<?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+<div class="inner-content">
+    <div class="title-middle center"><?php AppUtility::t('Enroll a New Student');?></div>
     <?php $form =ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -30,12 +36,10 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <?= $form->field($model, 'section') ?>
     <?= $form->field($model, 'code') ?>
     <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-10">
+        <div class="col-lg-offset-2 col-lg-3">
             <?= Html::submitButton('Create and Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         </div>
     </div>
-
-
     <?php ActiveForm::end(); ?>
+</div>
 </div>

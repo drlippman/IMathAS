@@ -11,9 +11,9 @@
             <?php echo isset($page_title) ?  $page_title : ""; ?>
         </div>
     </div>
-            <div class="add-help left-float" style="">
-               <a href="#"> <i class="fa fa-question fa-align-center help-icon"></i> </a>
-            </div>
+<!--            <div class="add-help left-float" style="">-->
+<!--               <a href="#"> <i class="fa fa-question fa-align-center help-icon"></i> </a>-->
+<!--            </div>-->
     <div class="clear-both"></div>
 </div>
 

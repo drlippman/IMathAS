@@ -1,33 +1,41 @@
 <?php
+use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use app\components\AppUtility;
-$this->title = 'Enroll Student';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->title = 'Student Enrollment';
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<h2>Enroll an Existing user</h2>
-<br>
-<div class="site-login">
-    <?php $form =ActiveForm::begin(
-        [
-            'options' => ['class' => 'form-horizontal'],
-            'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
-            ],
-        ]
-    ) ?>
-    <?= $form->field($model, 'usernameToEnroll') ?>
-    <?= $form->field($model, 'section') ?>
-    <?= $form->field($model, 'code') ?>
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-10">
-            <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
-        </div>
-    </div>
-    <?php ActiveForm::end(); ?>
+
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
+
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+
+<div class="tab-content shadowBox"">
+    <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+    <div class="inner-content">
+        <div class="title-middle center"><?php AppUtility::t('Enroll an Existing user');?></div>
+        <?php $form =ActiveForm::begin(
+            [
+                'options' => ['class' => 'form-horizontal'],
+                'fieldConfig' => [
+                    'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
+                    'labelOptions' => ['class' => 'col-lg-2 select-text-margin'],
+                ],
+            ]
+        ) ?>
+        <?= $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => 'Username')); ?>
+        <?= $form->field($model, 'section')->textInput(array('placeholder' => 'Section')); ?>
+        <?= $form->field($model, 'code')->textInput(array('placeholder' => 'Code')); ?>
+        <div class="form-group">
+            <div class="col-lg-offset-2 col-lg-3">
+                <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
+            </div>
+        </div>
+        <?php ActiveForm::end(); ?>
+    </div>
+</div>
+

@@ -59,7 +59,9 @@ class RosterController extends AppController
 
     }
 
-//Controller method for redirect to Login Grid View page.
+/*
+ * Controller method for redirect to Login Grid View page.
+ */
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
@@ -71,7 +73,9 @@ class RosterController extends AppController
         return $this->render('loginGridView', $responseData);
     }
 
-//Controller ajax method to retrieve student data form Login grid table
+/*
+ * Controller ajax method to retrieve student data form Login grid table
+ */
     public function actionLoginGridViewAjax()
     {
         $this->guestUserHandler();
@@ -170,10 +174,11 @@ class RosterController extends AppController
     public function actionStudentEnrollment()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $model = new StudentEnrollmentForm();
         $course = Course::getById($courseId);
-        if ($model->load(\Yii::$app->request->post())) {
+        if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollmentForm'];
             $uid = User::findByUsername($param['usernameToEnroll']);
@@ -196,6 +201,8 @@ class RosterController extends AppController
                 }
             }
         }
+        $this->includeJS(['roster/studentEnrollment.js']);
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'model' => $model);
         return $this->render('studentEnrollment', $responseData);
     }
@@ -273,6 +280,7 @@ class RosterController extends AppController
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $model = new EnrollFromOtherCourseForm();
         $course = Course::getById($courseId);
@@ -297,6 +305,7 @@ class RosterController extends AppController
                 $this->setErrorFlash("Select course from list to choose students");
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'data' => $courseDetails, 'model' => $model);
         return $this->render('enrollFromOtherCourse', $responseData);
     }
@@ -305,6 +314,7 @@ class RosterController extends AppController
     public function actionEnrollStudents()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $selectedCourseId = $this->getParamVal('courseData');
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
@@ -362,6 +372,7 @@ class RosterController extends AppController
                 $this->setErrorFlash('Select student from list to enroll in a course');
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $this->includeJS(['roster/enrollstudents.js']);
         $responseData = array('course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $courseId);
         return $this->render('enrollStudents', $responseData);
@@ -371,6 +382,7 @@ class RosterController extends AppController
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $model = new CreateAndEnrollNewStudentForm();
@@ -384,11 +396,13 @@ class RosterController extends AppController
                 $newStudent = new Student();
                 $newStudent->createNewStudent($studentid['id'], $courseId, $params['CreateAndEnrollNewStudentForm']);
                 $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
+                return $this->redirect('student-roster?cid=' . $courseId);
 
             } else {
                 $this->setErrorFlash(AppConstant::USER_EXISTS);
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'model' => $model);
         return $this->renderWithData('createAndEnrollNewStudent', $responseData);
     }

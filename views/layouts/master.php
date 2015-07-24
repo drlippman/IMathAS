@@ -40,6 +40,16 @@ AppAsset::register($this);
         <div class="container-lower-white">
             <div class="master-items-container">
                 <div class="page-content">
+                    <div id="flash-message">
+                        <?php
+                        $flashes = Yii::$app->session->getAllFlashes();
+                        if (isset($flashes)) {
+                            foreach (Yii::$app->session->getAllFlashes() as $key => $message) {
+                                echo '<div class="alert alert-' . $key . '">' . $message . "</div>\n";
+                            }
+                        }
+                        ?>
+                    </div>
                     <?php echo $content; ?>
                 </div>
             </div>

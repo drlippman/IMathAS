@@ -1,20 +1,24 @@
 <?php
 use app\components\AppUtility;
-use app\components\AppConstant;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
-$this->title = 'Enroll From Other Course';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->title = 'Student Enrollment';
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<h2>Enroll Student From Another Course</h2>
 
-<div class="site-login">
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
 
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+
+<div class="tab-content shadowBox"">
+<?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+
+<div class="inner-content">
+    <div class="title-middle center"><?php AppUtility::t('Enroll Student From Another Course');?></div>
     <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -24,36 +28,39 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             ],
         ]
     ) ?>
-    <div><br>
-        <h4>Select students to enroll: </h4>
-        Check: <a id = "checkAll" class = "check-all" href = "#">All</a> /
-        <a id = "checkNone" class = "un-check-all" href = "#">None</a>
+    <div>
+        <h4><?php echo AppUtility::t('Select students to enroll')?>: </h4>
+        <?php echo AppUtility::t('Check')?>: <a id = "checkAll" class = "check-all" href = "#"><?php echo AppUtility::t('All')?></a> /
+        <a id = "checkNone" class = "un-check-all" href = "#"><?php echo AppUtility::t('None')?></a>
         <br><br>
     <div id = "list">
         <?php
         foreach($data as $value){
 
-            echo "<tr><td>";
+            echo "<tr><div class='checkbox student-enroll'><label class='checkbox-size'><td>";
             if($value['isCheck'] == 1)
-                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'>";
+                echo "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'><span class='cr'><i class='cr-icon fa fa-check'></i></span>";
+//                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master' checked = 'true'>";
             else
-                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master'>";
-            echo "</td>"." " ."<td>{$value['lastName']}".", " ."{$value['firstName']}</td></tr><br>";
+                echo "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master'><span class='cr'><i class='cr-icon fa fa-check'></i></span>";
+//                echo  "<input type='checkbox' name = 'student[".$value['id']."]' value = '{$value['id']}' class = 'master'>";
+            echo "</label></td>"." " ."<td><span>{$value['lastName']}".", " ."{$value['firstName']}</span></td></div></tr><br>";
         }
         ?>
     </div>
         <br><br>
-        <?= $form->field($model, 'section') ?>
+        <?php echo $form->field($model, 'section') ?>
 
     </div>
 
     <div class="form-group">
         <div class="col-lg-offset-0 col-lg-10 ">
             <br>
-            <?= Html::submitButton('Enroll These Students', ['class' => 'btn btn-primary', 'id' => 'change-button','name' => 'enroll-students']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$cid)  ?>">Back</a>
+            <?php echo Html::submitButton('Enroll These Students', ['class' => 'btn btn-primary', 'id' => 'change-button','name' => 'enroll-students']) ?>
+            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$cid)  ?>"><?php echo AppUtility::t('Back ')?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
+</div>
 </div>
 

@@ -1,18 +1,24 @@
+
 <?php
 use app\components\AppUtility;
-use app\components\AppConstant;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-
 $this->title = 'Enroll From Other Course';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='. $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<h2>Enroll Student From Another Course</h2>
-<div class="site-login">
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
+
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+
+<div class="tab-content shadowBox"">
+    <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+
+<div class="inner-content">
+    <div class="title-middle center"><?php AppUtility::t('Enroll Student From Another Course');?></div>
     <?php $form =ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
@@ -22,12 +28,12 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             ],
         ]
     ) ?>
-      <div><br>
-          <h4>Select a course to choose students from:</h4>
+      <div>
+          <h4><?php AppUtility::t('Select a course to choose students from');?>:</h4>
         <?php
              foreach($data as $value)
              {
-                 echo "<tr><td><input type='radio' name='name' value='{$value['id']}'></td>"." " ."<td>{$value['name']}</td></tr><br>";
+                 echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='name' value='{$value['id']}'><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>"." " ."<td>{$value['name']}</td></div></tr>";
              }
         ?>
     </div>
@@ -35,9 +41,9 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <div class="col-lg-11">
             <br>
             <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back');?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
 </div>
-
+</div>

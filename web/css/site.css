@@ -287,6 +287,7 @@ ul#navlist a {
 
 #enroll-btn {
     margin-left: 0px;
+    width: 100%;
 }
 .rights_alignment{
     margin-right: 9%;
@@ -554,7 +555,7 @@ table.dataTable thead > tr > th {
     left: 20%;
 }
 .radio .cr .cr-icon {
-    margin-left: 0.04em;
+    margin-left: 0;
 }
 
 .checkbox label input[type="checkbox"],
@@ -574,7 +575,7 @@ table.dataTable thead > tr > th {
     transform: scale(1) rotateZ(0deg);
     opacity: 1;
 }
-.checkbox label input[type="checkbox"]:checked + .cr{
+.checkbox label input[type="checkbox"]:checked + .cr, .radio label input[type="radio"]:checked + .cr{
     background-color: #3441AC;
     color: #ffffff;
 }

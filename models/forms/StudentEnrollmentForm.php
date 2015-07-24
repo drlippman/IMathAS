@@ -26,9 +26,9 @@ class StudentEnrollmentForm extends Model
     {
         return
             [
-                'usernameToEnroll' => 'Username to enroll',
-                'section' => 'Section (optional)',
-                'code' => 'Code (optional)'
+                'usernameToEnroll' => 'Username to enroll:',
+                'section' => 'Section (optional):',
+                'code' => 'Code (optional):'
             ];
     }
 
