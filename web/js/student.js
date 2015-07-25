@@ -7,8 +7,6 @@ $(document).ready(function(){
     var m = date.getMonth();
     var y = date.getFullYear();
     calendar();
-
-
     /**
      * Show Dialog Pop Up for Assessment time
      */
@@ -77,7 +75,6 @@ function calendar() {
                     var events = [];
                     $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';
-
                         if(assessmentDetail.endDateString < assessmentDetail.now && assessmentDetail.reviewDateString != 0 && assessmentDetail.reviewDateString > assessmentDetail.now)
                         {
                             eventColor = 'red';
@@ -99,7 +96,6 @@ function calendar() {
                                 color: eventColor,
                                 reviewMode: true
                             });
-
                         }
                         /**
                          * If assessment is not in review mode, event

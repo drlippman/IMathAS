@@ -76,4 +76,9 @@ class Wiki extends BaseImasWikis
             $updateId->save();
         }
     }
-} 
+    public static function getAllDataWiki($wikiId)
+    {
+        $query =\Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryOne();
+        return $query;
+    }
+}

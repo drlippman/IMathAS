@@ -6,9 +6,8 @@ $(document).ready(function(){
             var block = 0;
             var tb = 't';
 
-//            var strk = parenta+','+tb;
             var html = '<div class="">' +
-                            '<a href="../../instructor/instructor/add-assessment?cid='+ courseId+'">' +
+                            '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'">' +
                              '<div class="assessment" >' +
                                 '<img class="icon-center icon-size" id=\"addtype$parent-$tb\" onclick= \"additem(1, t)" src="../../img/iconAssessment.png">' +
                                 '<div class="item-name">Assessment</div>'+

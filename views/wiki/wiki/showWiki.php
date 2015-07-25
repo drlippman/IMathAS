@@ -2,7 +2,6 @@
 use app\components\AppUtility;
 echo $this->render('_toolbar',['course'=> $course]);
 require_once("../filter/filter.php");
-use serhatozles\htmlawed\htmLawed;
 ?>
 
 <div id="wikiName">
@@ -51,7 +50,6 @@ if (count($countOfRevision)>1) {
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
                 <?php //$text = $singleWikiRevision->revision;  echo strip_tags($text);
                 $in = '<td>Hello Tudip</div>';
-                $out = \serhatozles\htmlawed\htmLawed::htmLawed($in);
                 echo strip_tags($out);?>
     </textarea>
     <?php }?>
@@ -79,7 +77,10 @@ if (count($countOfRevision)>1) {
      * To get JSON data on click of show revision history from wikiUtility.
      */
     $('#show-revision').click(function(){
-        $.get( "get-revisions", function( data ) {
+        var courseId = $('.course-id').val();
+        var wikiId = $('.wiki-id').val();
+
+        $.get( "get-revisions?courseId="+courseId+"&wikiId="+wikiId, function( data ) {
             jsonData = $.parseJSON(data);
 
             original = jsonData.o;

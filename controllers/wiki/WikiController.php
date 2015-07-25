@@ -35,12 +35,15 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-        $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
+        $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId);
         return $this->renderWithData('showWiki', $responseData);
     }
 
     public function actionGetRevisions(){
-        $revisions = WikiUtility::getWikiRevision();
+        $param = $this->getRequestParams();
+        $courseId = $param['courseId'];
+        $wikiId = $param['wikiId'];
+        $revisions = WikiUtility::getWikiRevision($courseId, $wikiId);
         return $revisions;
     }
     /**
@@ -49,7 +52,6 @@ class WikiController extends AppController
     public function actionEditPage()
     {
         $userData = $this->getAuthenticatedUser();
-//        $userId = $userData->id;
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $wikiId = $this->getParamVal('wikiId');

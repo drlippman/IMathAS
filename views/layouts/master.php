@@ -63,3 +63,16 @@ AppAsset::register($this);
 <?php echo $this->render('_footer'); ?>
 </html>
 <?php $this->endPage() ?>
+<!--<script>-->
+<!--    $(document).ready(function(){-->
+<!--        setMinHeightToContainer();-->
+<!--    });-->
+<!---->
+<!--    function setMinHeightToContainer() {-->
+<!--        var lowerContainer = $( ".container-lower-white" ).height();-->
+<!--        var windowLength = $( window ).height();-->
+<!--        var heightMin = lowerContainer<windowLength?windowLength-60:lowerContainer+120;-->
+<!--        $(".master-wrap").css('min-height', heightMin+"px");-->
+<!--    }-->
+<!---->
+<!--</script>-->

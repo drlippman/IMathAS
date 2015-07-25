@@ -722,13 +722,27 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
         public static function  AddCalendar($item,$parent,$course)
         {
+            $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
             ?>
             <div class="item" style="padding-bottom: 15px; padding-right: 15px">
             <pre><a href="#" onclick="deleteItem('<?php echo $item['Calendar'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
                     href="
             <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
-            <div class='calendar'>
-            </div>
+<!--            <div class='calendar'>-->
+<!--            </div>-->
+                <div class="col-lg-12 padding-alignment calendar-container">
+                    <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                        <input type="hidden" class="current-time" value="<?php echo $currentTime?>">
+                        <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                        <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+                    </div>
+                    <div class="calendar-day-details-right-side pull-left col-lg-3">
+                        <div class="day-detail-border">
+                            <b>Day Details:</b>
+                        </div>
+                        <div class="calendar-day-details"></div>
+                    </div>
+                </div>
             </div>
   <?php }
 

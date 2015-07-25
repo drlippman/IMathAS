@@ -11,8 +11,12 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 </div>
 
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);?>
-
+    <?php
+    if($user->rights == 100 || $user->rights == 20) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'calendar']);
+    } elseif($user->rights == 10){
+        echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'calendar']);
+    }?>
     <div class="tab-content col-lg-12">
         <div class="col-lg-12 padding-alignment calendar-container">
             <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>

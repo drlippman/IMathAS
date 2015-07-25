@@ -1,29 +1,28 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+$this->title = ucfirst($course->name);
 ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <!--Get current time-->
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-
-echo $this->render('_toolbar',['course'=> $course]);
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
 
-<div class=" col-lg-2 needed">
-    <?php echo $this->render('_leftSide',['course'=> $course, 'messageList' => $messageList]);?>
-</div>
+
 <!--Course name-->
-<div class="col-lg-10">
-<div class="">
-    <h3>
-        <b><?php echo $course->name ?></b>
-    </h3>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithButton",['link_title'=>'Home', 'link_url' => AppUtility::getHomeURL().'site/index', 'page_title' => $this->title]); ?>
+</div>
+
+<div class="item-detail-content">
+    <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course']);?>
 </div>
 
 <!-- ////////////////// Assessment here //////////////////-->
+<div class="tab-content shadowBox">
 <?php if(count($courseDetail)){
 foreach($courseDetail as $key => $item){
 
@@ -425,9 +424,22 @@ case 'Assessment': ?>
 
     <!-- Calender Here-->
 <?php case 'Calendar':?>
-    <div class ='calendar'>
+    <div class="col-lg-12 padding-alignment calendar-container item">
+        <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+            <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
             <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+            <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+        </div>
+        <div class="calendar-day-details-right-side pull-left col-lg-3">
+            <div class="day-detail-border">
+                <b>Day Details:</b>
+            </div>
+            <div class="calendar-day-details"></div>
+        </div>
     </div>
+<!--    <div class ='calendar item' style="padding: 10px">-->
+<!--            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>-->
+<!--    </div>-->
     <?php break; ?>
 
     <!--  Block here-->

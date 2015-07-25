@@ -66,12 +66,12 @@ body {
 
 /*}*/
 /*.index-header .right-side .item-icon{*/
-    /*float: left;*/
-    /*margin-top: 10px;*/
-    /*margin-left: 5px;*/
-    /*height: 34px;*/
-    /*width: 34px;*/
-    /*background: url("../img/two_gears.png");*/
+/*float: left;*/
+/*margin-top: 10px;*/
+/*margin-left: 5px;*/
+/*height: 34px;*/
+/*width: 34px;*/
+/*background: url("../img/two_gears.png");*/
 /*}*/
 
 .left-float{
@@ -106,8 +106,8 @@ body {
 }
 
 .dropdown-class > button{
-   background-color: #2C368E;
-   border-color: #2C368E;
+    background-color: #2C368E;
+    border-color: #2C368E;
 }
 .dropdown-class >img{
     width: 20px;
@@ -135,9 +135,9 @@ body {
     padding-left: 0%;
 }
 /*.right-side-button{*/
-    /*background-color: #2C368E;*/
-    /*height: 50px;*/
-    /*width: 150px*/
+/*background-color: #2C368E;*/
+/*height: 50px;*/
+/*width: 150px*/
 /*}*/
 .btn{
     padding: 6px 6px;
@@ -183,7 +183,7 @@ body {
     padding-right: 5%;
 }
 .row{
-   margin: 0%;
+    margin: 0%;
     padding-left: 0%;
 }
 .row-alignment{
@@ -232,7 +232,7 @@ body {
     padding-top: 47px;
 }
 .left-side-content {
-padding-left: 1%;
+    padding-left: 1%;
 }
 .back-arrow{
     padding-top: 0;
@@ -248,7 +248,7 @@ padding-left: 1%;
     border-right: 0;
 }
 .icon-padding-right{
-  padding-right: 5px;
+    padding-right: 5px;
 }
 .fc-unthemed .fc-today {
     background-color: #D4E1F1;

@@ -39,8 +39,10 @@ class CourseController extends AppController
      * Display all course in item order
      */
     public $enableCsrfValidation = false;
+
     public function actionIndex()
     {
+        $this->layout = 'master';
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $userId = $user->id;
@@ -147,7 +149,7 @@ class CourseController extends AppController
                     array_push($msgList,$singleMessage);
             }
         }
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
         $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
@@ -712,11 +714,12 @@ class CourseController extends AppController
     {
         $this->layout = "master";
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        $responseData = array('course' => $course );
+        $responseData = array('course' => $course, 'user' => $user);
         return $this->render('calendar', $responseData);
     }
 
