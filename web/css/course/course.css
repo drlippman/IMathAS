@@ -27,7 +27,7 @@
 }
 .ui-dialog-titlebar, .ui-widget-header, .ui-corner-all, .ui-helper-clearfix, .ui-draggable-handle{
     background-color: #ffffff;
-    display: none;
+    /*display: none;*/
 }
 
 .assessment{

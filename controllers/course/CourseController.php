@@ -53,11 +53,12 @@ class CourseController extends AppController
         $responseData = array();
         $calendarCount = array();
         $course = Course::getById($courseId);
-        if ($course && count($itemOrders = unserialize($course->itemorder))) {
+        if ($course && ($itemOrders = unserialize($course->itemorder))) {
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
-                if (is_array($itemOrder) && count($blockItems = $itemOrder['items'])) {
+                if (is_array($itemOrder) || count($blockItems = $itemOrder['items'])) {
                     $tempAray['Block'] = $itemOrder;
+                    $blockItems = $itemOrder['items'];
                     $tempItemList = array();
                     foreach ($blockItems as $blockKey => $blockItem) {
                         $tempItem = array();
@@ -210,29 +211,6 @@ class CourseController extends AppController
                 $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
                 $exception->enddate = $exception->enddate + $addTime;
                 $exception->islatepass = $exception->islatepass + AppConstant::NUMERIC_ONE;
-            }
-
-            if ($exception->islatepass != AppConstant::NUMERIC_ZERO) {
-                echo "<p>Un-use late-pass</p>";
-                if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * 60 * 60) {
-                    echo '<p>Too late to un-use this LatePass</p>';
-                } else {
-                    if ($currentTime < $assessment->enddate) {
-                        $exception->islatepass = $exception->islatepass - AppConstant::NUMERIC_ONE;
-                    } else {
-                        //figure how many are unused
-                        $n = floor(($exception->enddate - $currentTime) / ($course->latepasshrs * 60 * 60));
-                        $newend = $exception->enddate - $n * $course->latepasshrs * 60 * 60;
-                        if ($exception->islatepass > $n) {
-                            $exception->islatepass = $exception->islatepass - $n;
-                            $exception->enddate = $newend;
-                        } else {
-                            // @TODO push anything into db.
-                        }
-                    }
-                    echo "<p>Returning $n LatePass" . ($n > AppConstant::NUMERIC_ONE ? "es" : "") . "</p>";
-                    $student->latepass = $student->latepass + $n;
-                }
             }
             $exception->attributes = $param;
             $exception->save();

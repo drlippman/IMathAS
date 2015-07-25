@@ -38,10 +38,10 @@ $now = $currentTime;
 <div class="tab-content shadowBox">
     <div class="row course-copy-export">
         <div class="col-md-1 course-top-menu">
-            <a href="#">Copy All</a>
+            <a href="#"><?php AppUtility::t('Copy All');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
-            <a href="#">Export Course</a>
+            <a href="#"><?php AppUtility::t('Export Course');?></a>
         </div>
     </div>
     <div class="clear-both"></div>
@@ -50,7 +50,7 @@ $now = $currentTime;
             <i class="fa fa-plus fa-2x"></i>
         </div>
         <div class=" col-md-2 add-item-text">
-            <p>Add An Item...</p>
+            <p><?php AppUtility::t('Add An Item...');?></p>
         </div>
 
     </div>

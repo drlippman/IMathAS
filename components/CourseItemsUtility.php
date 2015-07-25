@@ -620,7 +620,6 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
             $inline = $item[key($item)];
             ?>
-
             <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
             <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
             <div class="item">
@@ -748,7 +747,8 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
 
         public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
         {
-                             $block = $item[key($item)];?>
+                             $block = $item[key($item)];
+            ?>
                              <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
                              <input type="hidden" id="id" value="<?php echo $block['id']?>" >
                              <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
