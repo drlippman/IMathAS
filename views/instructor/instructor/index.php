@@ -107,3 +107,36 @@ $now = $currentTime;
             <?php } ?>
        </div>
     </div>
+<script>
+    $(document).ready(function ()
+    {
+        var SH = $('#SH').val();
+        var id = $('#id').val();
+        var isHidden = $('#isHidden').val();
+        if(SH == 'HC')
+        {
+            var node = document.getElementById('block5' + id);
+            var img = document.getElementById('img' + id);
+            if (node.className == 'blockitems')
+            {
+                node.className = 'hidden';
+                img.src = '../../img/expand.gif'
+            }
+        }
+    });
+    function xyz(e,id)
+    {
+        var node = document.getElementById('block5' + id);
+        var img = document.getElementById('img' + id);
+        if (node.className == 'blockitems')
+        {
+            node.className = 'hidden';
+            img.src = '../../img/expand.gif'
+        }
+        else
+        {
+            node.className = 'blockitems';
+            img.src = '../../img/collapse.gif'
+        }
+    }
+</script>

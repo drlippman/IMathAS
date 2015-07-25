@@ -445,9 +445,6 @@
                 <div class="calendar-day-details"></div>
             </div>
         </div>
-    <!--    <div class ='calendar item' style="padding: 10px">-->
-    <!--            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>-->
-    <!--    </div>-->
         <?php break; ?>
 
         <!--  Block here-->
@@ -477,7 +474,7 @@
         <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
     </div>
     </div>
-            <div class=blockitems id="block5">
+            <div class=blockitems id="block5<?php echo $block['id']?>">
             <?php if(count($item['itemList'])) {?>
                 <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                     <?php switch(key($item)):
@@ -915,7 +912,7 @@
         <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
     </div>
  </div>
-            <div class=blockitems id="block5">
+            <div class=blockitems id="block5<?php echo $block['id']?>">
             <?php if(count($item['itemList'])) {?>
                 <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                     <?php switch(key($item)):
@@ -1344,17 +1341,36 @@
     <?php }?>
     </div>
     <script>
-        $(document).ready(function(){
-            $(function() {
-                $(".block").click(function() {
-                    $(".blockitems").toggle();
-
-                });
-            });
-            $(".img").click(function() {
-                $(this).find('img').toggle();
-            });
+        $(document).ready(function ()
+        {
+            var SH = $('#SH').val();
+            var id = $('#id').val();
+            var isHidden = $('#isHidden').val();
+            if(SH == 'HC')
+            {
+                var node = document.getElementById('block5' + id);
+                var img = document.getElementById('img' + id);
+                if (node.className == 'blockitems')
+                {
+                    node.className = 'hidden';
+                    img.src = '../../img/expand.gif'
+                }
+            }
         });
-
+        function xyz(e,id)
+        {
+            var node = document.getElementById('block5' + id);
+            var img = document.getElementById('img' + id);
+            if (node.className == 'blockitems')
+            {
+                node.className = 'hidden';
+                img.src = '../../img/expand.gif'
+            }
+            else
+            {
+                node.className = 'blockitems';
+                img.src = '../../img/collapse.gif'
+            }
+        }
     </script>
 
