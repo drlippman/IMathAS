@@ -2633,21 +2633,6 @@ class AppUtility extends Component
         return $date;
     }
 
-    public static function itemOrder($courseId,$block,$itemId){
-        $course = Course::getById($courseId);
-        $itemOrder = $course['itemorder'];
-        $items = unserialize($itemOrder);
-        $blockTree = explode('-',$block);
-        $sub =& $items;
-        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
-        }
-        $key = array_search($itemId,$sub);
-        array_splice($sub,$key,AppConstant::NUMERIC_ONE);
-        $itemList = serialize($items);
-        Course::setItemOrder($itemList,$courseId);
-    }
-
     public static function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
         //$name is the html name for the select list
         //$valList is an array of strings for the html value tag
@@ -2681,5 +2666,21 @@ class AppUtility extends Component
             }
         }
     }
-
+    /*
+     * Method for item ordering when the course items are deleted.
+     */
+    public static function itemOrder($courseId,$block,$itemId){
+        $course = Course::getById($courseId);
+        $itemOrder = $course['itemorder'];
+        $items = unserialize($itemOrder);
+        $blockTree = explode('-',$block);
+        $sub =& $items;
+        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+        }
+        $key = array_search($itemId,$sub);
+        array_splice($sub,$key,AppConstant::NUMERIC_ONE);
+        $itemList = serialize($items);
+        Course::setItemOrder($itemList,$courseId);
+    }
 }

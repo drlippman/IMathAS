@@ -26,7 +26,9 @@ class MessageController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
+        $this->userAuthentication($user, $courseId);
         $isNewMessage = $this->getParamVal('newmsg');
         if ($this->getAuthenticatedUser()) {
             $model = new MessageForm();

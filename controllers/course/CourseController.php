@@ -51,10 +51,11 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $this->userAuthentication($user, $courseId);
         $userId = $user->id;
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
-        $courseId = $this->getParamVal('cid');
         $exception = Exceptions::getTotalData($userId);
         $responseData = array();
         $calendarCount = array();
@@ -378,31 +379,29 @@ class CourseController extends AppController
     {
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            if ($this->getAuthenticatedUser()->rights == AppConstant::GROUP_ADMIN_RIGHT) // 75 is instructor right
-            {
-                /*
-                 * Group admin rights not implemented
-                 */
-            } elseif ($this->getAuthenticatedUser()->rights > AppConstant::GROUP_ADMIN_RIGHT) {
-                $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
-                if ($course) {
-                    $course->ownerid = $params['newOwner'];
-                    $course->save();
-                    $teacher = Teacher::getByUserId($params['oldOwner'], $params['cid']);
-                    if ($teacher) {
-                        $teacher->delete();
-                    }
-                    $newTeacher = new Teacher();
-                    $newTeacher->create($params['oldOwner'], $params['cid']);
+            $user = $this->getAuthenticatedUser();
+            if ($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT){
+                $this->setErrorFlash(AppConstant::NO_ACCESS_RIGHTS);
+            }
+            $exec = false;
+            $row = Course::setOwner($params,$user);
+            if($user->rights == AppConstant::GROUP_ADMIN_RIGHT){
+                $courseitem = Course::getByCourseAndGroupId($params,$user);
+                if($courseitem > 0){
+                    $row = Course::setOwner($params,$user);
+                    $exec = true;
                 }
-            } elseif ($this->getAuthenticatedUser()->rights > AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
-                if ($params['oldOwner'] == $this->getUserId()) {
-                    $course = Course::getByIdandOwnerId($params['cid'], $params['oldOwner']);
-                    if ($course) {
-                        $course->ownerid = $params['newOwner'];
-                        $course->save();
-                    }
+            }else{
+                $exec = true;
+            }
+
+            if ($exec && $row > 0) {
+                $teacher = Teacher::getByUserId($user->id,$params['cid']);
+                if ($teacher == 0) {
+                    $newTeacher =new Teacher();
+                    $newTeacher->create($params['newOwner'],$params['cid']);
                 }
+                Teacher::removeTeacher($user->id, $params['cid']);
             }
             return $this->successResponse();
         }
@@ -510,7 +509,7 @@ class CourseController extends AppController
         $bestSeedsList = $seedList;
         $bestLaList = $laList;
         $startTime = time();
-        $defFeedbackText = addslashes($assessment->deffeedbacktext);
+        $defFeedbackText = $assessment->deffeedbacktext;
         $ltiSourcedId = '';
         $param['questions'] = $qList;
         $param['seeds'] = $seedList;

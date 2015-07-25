@@ -29,7 +29,7 @@ class InlineText extends BaseImasInlinetext
     {
         return InlineText::findOne(['courseid' => $courseId]);
     }
-    public function saveChanges($params, $courseId)
+    public function saveChanges($params)
     {
         $endDate =   AppUtility::parsedatetime($params['enddate'],$params['end_end_time']);
         $startDate = AppUtility::parsedatetime($params['startdate'],$params['start_end_time']);

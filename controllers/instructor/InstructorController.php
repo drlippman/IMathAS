@@ -52,9 +52,10 @@ public $oa = array();
     public function actionIndex()
     {
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
+        $this->userAuthentication($user,$courseId);
         $type = $this->getParamVal('type');
-        if($type){
             switch ($type) {
                 case 'assessment':
                      return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
@@ -79,14 +80,12 @@ public $oa = array();
                 case '':
                     break;
             }
-        }
-        $user = $this->getAuthenticatedUser();
         $courseData = $this->getRequestParams();
         $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
-        if (!($teacherId)) {
-            $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
-            return $this->goBack();
-        }
+//        if (!($teacherId)) {
+//            $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
+//            return $this->goBack();
+//        }
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $courseId = $this->getParamVal('cid');

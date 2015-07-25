@@ -41,7 +41,7 @@ Intro/Instructions:<BR>
 		<span class=formright>
 			<input type=radio name="sdatetype" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/>
 			Always until end date<br/>
-			<input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/>
+			<input type=radio name="sdatetype" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/>
 
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
@@ -75,7 +75,7 @@ Intro/Instructions:<BR>
 		<span class=formright>
 			<input type=radio name="edatetype" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/>
 			 Always after start date<br/>
-			<input type=radio name="edatetype" class="pull-left" value="edate"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/>
+			<input type=radio name="edatetype" class="pull-left" value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/>
             <?php
             echo '<div class = "pull-left col-lg-4 time-input">';
             echo DatePicker::widget([
@@ -108,7 +108,7 @@ Intro/Instructions:<BR>
 		<span class="formright">
 			<input type=radio name="doreview" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>> Never<br/>
 			<input type=radio name="doreview" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],2000000000,AppConstant::NUMERIC_ZERO); ?>> Always after due date<br/>
-			<input type=radio name="doreview" class="pull-left " value="rdate" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>>
+			<input type=radio name="doreview" class="pull-left " value="1" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>>
             <?php
             echo '<label class="end pull-left"> Until</label>';
             echo '<div class = "pull-left col-lg-4 time-input">';

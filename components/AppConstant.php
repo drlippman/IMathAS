@@ -9,6 +9,7 @@ class AppConstant
     const ZERO_VALUE = '0';
     const INVALID_USERNAME_PASSWORD = 'Invalid username or password.';
     const MAX_SESSION_TIME = 86400;
+    const GIVE_OLD_SESSION_TIME = 90000;
     const LOGIN_FIRST = 'Please login into the system.';
     const FORGOT_PASS_MAIL_SUBJECT = 'Password Reset Request';
     const FORGOT_USER_MAIL_SUBJECT = 'User Name Request';
@@ -61,6 +62,7 @@ class AppConstant
     const NUMERIC_FIFTEEN = 15;
     const NUMERIC_THOUSAND = 10000;
     const NUMERIC_NEGATIVE_ONE = -1;
+    const NUMERIC_SIXTY_ONE = 61;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;
@@ -149,4 +151,5 @@ class AppConstant
     const CREATE_BLOCK = 'Create Block';
     const SIXTEEN = 16;
     const COPY = " (Copy)";
+    const NO_ACCESS_RIGHTS = "You don't have the authority for this action";
 }

@@ -144,7 +144,6 @@ class Course extends BaseImasCourses {
         return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
     }
 
-
     public function SaveOutcomes($courseId,$outcomeGrp)
     {
 
@@ -157,15 +156,11 @@ class Course extends BaseImasCourses {
                    $outcome->save();
                }
         }
-
     }
 
     public static function getByCourseIdOutcomes($courseId)
     {
-
         return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
-
-
     }
 
     public static function setBlockCount($itemOrder,$blockCount,$courseId)
@@ -176,7 +171,6 @@ class Course extends BaseImasCourses {
         $course->save();
     }
 
-
     public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {
         $isRecord = Course::findOne(['id' =>$course]);
@@ -185,8 +179,33 @@ class Course extends BaseImasCourses {
             $isRecord->itemorder = $finalBlockItems;
             $isRecord->blockcnt = $blockCnt;
             $isRecord->save();
+        }
+    }
 
+    public static function setOwner($params,$user){
+        if($user->rights < AppConstant::GROUP_ADMIN_RIGHT){
+            $courseData = Course::findAll(['id' => $params['cid'],'ownerid' => $user->id]);
+        }else{
+            $courseData = Course::findOne(['id' => $params['cid']]);
+        }
+        if($courseData){
+            $courseData->ownerid = $params['newOwner'];
+            $courseData->save();
+            return $courseData->id;
+        }
+    }
 
+    public static function getByCourseAndGroupId($params,$user)
+    {
+        return Yii::$app->db->createCommand("SELECT imas_courses.id FROM imas_courses,imas_users WHERE imas_courses.id='{$params['cid']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='{$user['groupid']}'")->queryAll();
+    }
+
+    public static function getByAvailable($params){
+        if(isset($params['cid'])){
+            $courseId = intval($params['cid']);
+            return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4 AND id= $courseId")->queryAll();
+        }else{
+            return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4")->queryAll();
         }
     }
 }

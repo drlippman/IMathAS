@@ -77,14 +77,13 @@ class SiteController extends AppController
     public function actionLogin()
     {
         $this->unauthorizedAccessHandler();
-
+        $params = $this->getRequestParams();
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load($this->isPostMethod())) {
             if ($model->login()) {
 
-                Yii::$app->session->set('tzoffset', $this->getParam('tzoffset'));
-                Yii::$app->session->set('tzname', $this->getParam('tzname'));
-
+                Yii::$app->session->set('tzoffset', $this->getParamVal('tzoffset'));
+                Yii::$app->session->set('tzname', $this->getParamVal('tzname'));
                 return $this->redirect('dashboard');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_USERNAME_PASSWORD);

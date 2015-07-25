@@ -212,7 +212,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $message = "Username {$StudentDataArray} already existed in system";
         return $message;
     }
-    Public static function findTeachersToList($courseId)
+    public static function findTeachersToList($courseId)
     {
         $query = new Query();
         $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
@@ -226,5 +226,27 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+
+    public function saveGuestUserRecord($params){
+        $remainingData = AppUtility::removeEmptyAttributes($params);
+        if(isset($remainingData['password']))
+        {
+            $remainingData['password'] = AppUtility::passwordHash($remainingData['password']);
+        }
+        $this->attributes = $remainingData;
+        $this->save();
+        return $this->id;
+    }
+
+    public static function updateUser($now,$password,$userId){
+        $user = User::getById($userId);
+        if ($user){
+            $user->lastaccess = $now;
+            if($password !=''){
+                $user->password = $password;
+            }
+            $user->save();
+        }
     }
 }

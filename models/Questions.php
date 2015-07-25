@@ -33,12 +33,14 @@ class Questions extends BaseImasQuestions
 
     public static function setQuestionByAssessmentId($assessmentId){
         $assessment = Questions::findOne(['assessmentid' => $assessmentId]);
-        $assessment->points = 9999;
-        $assessment->attempts = 9999;
-        $assessment->penalty = 9999;
-        $assessment->regen = 0;
-        $assessment->showans = 0;
-        $assessment->save();
+        if($assessment){
+            $assessment->points = 9999;
+            $assessment->attempts = 9999;
+            $assessment->penalty = 9999;
+            $assessment->regen = 0;
+            $assessment->showans = 0;
+            $assessment->save();
+        }
     }
 
     public static function deleteByAssessmentId($assessmentId){

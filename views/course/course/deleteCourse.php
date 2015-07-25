@@ -20,7 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php
         echo'Are you sure you want to delete the course:'.$course->id;
-        AppUtility::dump($course->id);
     ?>
 
     <div class="form-group">

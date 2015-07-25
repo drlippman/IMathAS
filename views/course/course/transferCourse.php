@@ -39,16 +39,16 @@ $( document ).ready(function() {
         var transferTo = $("#seluid option:selected").val();
         var courseId = $("#courseId").val();
         var ownerId = $("#userId").val();
-
         var transferData = {newOwner: transferTo,cid: courseId,oldOwner: ownerId};
+        alert(JSON.stringify(transferData));
         jQuerySubmit('update-owner', transferData, 'updateSuccess');
 
     });
 });
 
-function updateSuccess(response) {
-    var data = JSON.parse(response);
-    if (data.status) {
+function updateSuccess(response) {alert('jkj');
+    var data = response;alert(response);
+    if (data.status==0) {
         $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');
     }
 }

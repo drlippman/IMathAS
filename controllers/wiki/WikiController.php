@@ -64,7 +64,7 @@ class WikiController extends AppController
             $order = AppConstant::DESCENDING;
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
         }
-        if ($this->isPost())
+        if ($this->isPostMethod())
         {
             $params = $this->getRequestParams();
             $saveRevision = new WikiRevision();
@@ -117,7 +117,7 @@ class WikiController extends AppController
         if(isset($params['id']))
         {
             $pageTitle = 'Modify Wiki';
-            if($this->isPost()){
+            if($this->isPostMethod()){
                 $page_formActionTag = AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wiki->id.'&courseId=' .$course->id);
 
                 $saveChanges = new Wiki();
@@ -128,7 +128,7 @@ class WikiController extends AppController
         }
         else {
             $pageTitle = 'Add Wiki';
-            if($this->isPost()){
+            if($this->isPostMethod()){
                 $params = $_POST;
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
                 $saveChanges = new Wiki();
