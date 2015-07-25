@@ -821,7 +821,6 @@ class CourseController extends AppController
 
         }
         if ($params['id']) {
-//            $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
             $linkData = LinkedText::getById($params['id']);
             $gbcat = 0;
             $cntingb = 1;
@@ -880,7 +879,6 @@ class CourseController extends AppController
                 'title' => $linkData['title'],
                 'summary' =>  $linkData['summary'],
                 'text' =>  $linkData['text'],
-//            $line['text'] = "<p>Enter text here</p>";
                 'startdate' => $linkData['startdate'],
                 'enddate' => $linkData['enddate'],
                 'gbcat' => 0,
@@ -893,7 +891,6 @@ class CourseController extends AppController
                 'altoncal' => 0,
                 'type' => $type,
                 'gradeoutcomes' => $gradeoutcomes,
-//            $selectedgbitem = 0,
                 'points' => $points,
                 'toolparts' => $toolparts,
                 'cntingb' => $cntingb,
@@ -905,7 +902,6 @@ class CourseController extends AppController
                 'points' => $points,
             );
         } else {
-//            //set defaults
             $checkboxesValues = array(
                 'saveButtonTitle' => "Create Link",
                 'saveTitle' => "Create Link",
@@ -913,21 +909,19 @@ class CourseController extends AppController
                 'summary' => "Enter summary here (displays on course page)",
                 'text' => "Enter text here",
                 'points' => 0,
-
             );
-//
-        }if($this->isPost()){
+        }
+        if($this->isPost()){
         $outcomes = array();
-//        $params = $this->getRequestParams();
         $modifyLinkId = $params['id'];
         if($modifyLinkId){
             $link = new LinkedText();
             $link->updateLinkData($params);
         }else{
             if($params['outcomes']){
-                foreach ($params['outcomes'] as $o) {
-                    if (is_numeric($o) && $o>0) {
-                        $outcomes[] = intval($o);
+                foreach ($params['outcomes'] as $outcome) {
+                    if (is_numeric($outcome) && $outcome > 0) {
+                        $outcomes[] = intval($outcome);
                     }
                 }
                 $outcomes = implode(',',$outcomes);
@@ -935,49 +929,14 @@ class CourseController extends AppController
             }
 
             $processingerror = false;
-//            if ($params['linktype']=='text') {
-//
-//            } else
-            if ($params['linktype']=='file') {
+             if ($params['linktype']=='file') {
          if ($_FILES['userfile']['name']!='') {
                     $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
                     $filename = $userfilename;
                     $extension = strtolower(strrchr($userfilename,"."));
                     $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                    $params['text'] = $filename;
 
-                    if (in_array($extension,$badextensions)) {
-                        $overwriteBody = 1;
-                        $body = "<p>File type is not allowed</p>";
-                    } else {
-
-                        if ($_FILES['userfile']['error']==1 || $_FILES['userfile']['error']==2) {
-
-                            $errormsg = "File size too large";
-                            $params['text'] = "File upload error - $errormsg";
-                            $uploaderror = true;
-                        } else {
-
-                            if (($filename=$this->storeuploadedcoursefile('userfile',$courseId.'/'.$filename))===false) {
-
-                                $errormsg = "Try again";
-                                $params['text'] = "File upload error - $errormsg";
-                                $uploaderror = true;
-                            } else {
-                                $params['text'] = "file:$filename";
-
-                            }
-
-                        }
-                    }
-
-                } else if (!empty($_POST['curfile'])) {
-                    if (!($this->doesfileexist('cfile',$_POST['curfile']))) {
-                        $processingerror = true;
-                    } else {
-                        $_POST['text'] = "file:".$_POST['curfile'];
-                    }
-                } else {
-                    $processingerror = true;
                 }
             } else if ($params['linktype']=='web') {
                 $params['text'] = trim(strip_tags($params['web']));
@@ -1004,8 +963,44 @@ class CourseController extends AppController
                 $externalToolsData = new ExternalTools();
                 $externalToolsData->updateExternalToolsData($params);
             }
+            if ($params['id']){
+                $endDate = $params['enddate'];
+                $startDate = $params['startdate'];
+            }else{
+                $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+                $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
+            }
+            $finalArray['courseid'] = $params['cid'];
+            $finalArray['title'] = $params['name'];
+            $finalArray['summary'] = $params['summary'];
+            $finalArray['text'] = $params['text'];
+            $finalArray['avail'] = $params['avail'];
+            $finalArray['oncal'] = $params['place-on-calendar'];
+            $finalArray['caltag'] = $params['caltag'];
+            $finalArray['target'] = $params['target'];
+            $finalArray['points'] = $params['points'];
+            $finalArray['target'] = $params['open-page-in'];
+            $finalArray['caltag'] = $params['points'];
+            $finalArray['outcomes'] = ' ';
+            if($params['outcomes']){
+                $finalArray['outcomes'] = $outcomes;
+            }
+            $finalArray['points'] = $params['points'];
+            if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+                if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
+                    $startDate = AppConstant::NUMERIC_ZERO;
+                }
+                if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
+                    $endDate = AppConstant::ALWAYS_TIME;
+                }
+                $finalArray['startdate'] = $startDate;
+                $finalArray['enddate'] = $endDate;
+            } else {
+                $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
+                $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
+            }
             $linkText = new LinkedText();
-            $linkTextId = $linkText->AddLinkedText($params,$outcomes);
+            $linkTextId = $linkText->AddLinkedText($finalArray);
             $itemType = AppConstant::LINK;
             $itemId = new Items();
             $lastItemId =   $itemId -> saveItems($courseId, $linkTextId, $itemType);
@@ -1030,56 +1025,6 @@ class CourseController extends AppController
         $responseData = array('course' => $course,'groupNames' => $groupNames,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,'modifyLinkId' => $modifyLinkId,
             'pageOutcomes' => $pageOutcomes,'toolvals' => $toolvals,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'toollabels' => $toollabels,'checkboxesValues' => $checkboxesValues);
         return $this->renderWithData('addLink',$responseData);
-    }
-
-    function storeuploadedcoursefile($id,$key,$sec="public-read") {
-        if ($this->filehandertypecfiles == 's3') {
-
-            if ($sec=="public" || $sec=="public-read") {
-                $sec = "public-read";
-            } else {
-                $sec = "private";
-            }
-            if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-                $t=0;
-                $fn = $key;
-                while ($s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false) !==false) {
-                    $key = substr($fn,0,strpos($fn,"."))."_$t".strstr($fn,".");
-                    $t++;
-                }
-                if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
-                    return $key;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else {
-
-            if (is_uploaded_file($_FILES[$id]['tmp_name'])) {
-                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/Uploads';
-                $keydir = dirname($key);
-                $dir = $base.dirname($key);
-                $fn = basename($key);
-                if (!is_dir($dir)) {
-                    $this->mkdir_recursive($dir);
-                }
-                $t=0; $tfn = $fn;
-                while(file_exists($dir.'/'.$fn)){
-                    $fn = substr($tfn,0,strpos($tfn,"."))."_$t".strstr($tfn,".");
-                    $t++;
-                }
-                if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
-                    return $keydir.'/'.$fn;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
     }
     function mkdir_recursive($pathname, $mode=0777)
     {

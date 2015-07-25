@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title; ?>
 
         <div>
             <span class="col-md-2"><b>Subject:</b></span>
-            <span class="col-md-8"><input class="textbox 3" name="subject" type="text"
+            <span class="col-md-8"><input class="subject textbox 3" name="subject" type="text"
                                           value="<?php echo $thread[0]['subject'] ?>"></span>
         </div>
         <br><br><br>

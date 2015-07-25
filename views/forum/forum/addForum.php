@@ -13,7 +13,6 @@ $this->params['breadcrumbs'][] = $this->title;
 echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 $hidetitle = false;
 ?>
-<?php AppUtility::dump($forumData);?>
 
 <h3><b><?php echo $pageTitle; ?></b>
 <!--    <img src="--><?php //echo AppUtility::getAssetURL() ?><!--img/help.gif" alt="Help"-->
@@ -39,18 +38,17 @@ $hidetitle = false;
         <!--    Text Editor-->
         <BR class=form>
         &nbsp;&nbsp; Description:<BR>
-
+        <?php $text = "<p>Enter forum description here</p>";
+        if ($forumData) {
+        $text = $forumData['description'];
+        } ?>
         <div>
-            <?php echo "<span class='left col-md-11'><div class= 'editor'>
-            <textarea id='forum-description' name='forum-description'  style='width: 100%;' rows='20' cols='200'>";
-            $text = "<p>Enter forum description here</p>";
-            if ($forumData) {
-                $text = $forumData['description'];
-            }
-            echo htmlentities($text);
-            ?>
-            </textarea>
+            <?php echo "<div class='left col-md-11'><div class= 'editor'>
+            <textarea id='forum-description' name='forum-description' style='width: 100%;' rows='20' cols='200'>
+            $text
+            </textarea></div> "?>
         </div>
+
         <!--Show-->
         <div>
             <span class=form>Show:</span>
@@ -72,7 +70,7 @@ $hidetitle = false;
                            value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], '0', AppConstant::NUMERIC_ZERO) ?>/>
 			        Always until end date<br/>
 			        <input type=radio name="available-after" class="pull-left"
-                           value="sdate" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'] , '0', AppConstant::NUMERIC_ONE) ?>/>
+                           value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'] , '1', AppConstant::NUMERIC_ONE) ?>/>
                     <?php
                     echo '<div class = "pull-left col-lg-4 time-input">';
                     echo DatePicker::widget([
@@ -105,7 +103,7 @@ $hidetitle = false;
                            value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], '2000000000', 0) ?>/>
                         Always after start date<br/>
                         <input type=radio name="available-until" class="pull-left"
-                               value="edate" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], '2000000000', 1) ?>/>
+                               value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], '2000000000', 1) ?>/>
                     <?php
                     echo '<div class = "pull-left col-lg-4 time-input">';
                     echo DatePicker::widget([
@@ -133,20 +131,9 @@ $hidetitle = false;
                     echo '</div>'; ?>
 		    </span><BR class=form>
             </div>
-
-<!--                 --><?php //AppUtility::dump($groupNames);?>
                 <span class=form>Group forum?</span>
-<!--                    <span class=formright>-->
-<!--                      <select name="group-forum" class="form-control">-->
-<!--                          <option value="0" selected>Not group forum</option>-->
-<!--                          --><?php //foreach ($groupNames as $groupName) { ?>
-<!--                              <option value="--><?php //echo $groupName['id']; ?><!--" selected>Use group-->
-<!--                                  set:--><?php //echo $groupName['name']; ?><!--</option>-->
-<!--                          --><?php //} ?>
-<!--                      </select>-->
-
-                        <?php
-//                        AssessmentUtility::writeHtmlSelect ("copyfrom",$groupNameId,$groupNameLabel,AppConstant::NUMERIC_ZERO,"None - use settings below",AppConstant::NUMERIC_ZERO," onChange=\"chgcopyfrom()\"");
+                    <span class=formright>
+                         <?php
                         AssessmentUtility::writeHtmlSelect("groupsetid",$groupNameId,$groupNameLabel,$forumData['groupsetid'],"Not group forum",0);
                         if ($forumData['groupsetid'] > 0 && $defaultValue['hasGroupThreads']) {
                             echo '<br/>WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
@@ -289,7 +276,7 @@ You will likely also want to disable modifying posts
 		<span class=formright>
             <input type=radio name="count-in-gradebook" value="0" <?php if ($defaultValue['cntInGb']==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/>No<br/>
 			<input type=radio name="count-in-gradebook" value="1" <?php if ($defaultValue['cntInGb']==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes<br/>
-			<input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb']==0 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, but hide from students for now<br/>
+			<input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb']==4 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, but hide from students for now<br/>
 			<input type=radio name="count-in-gradebook" value="2" <?php if ($defaultValue['cntInGb']==2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/>Yes, as extra credit<br/>
 
 		</span><br class="form"/>
@@ -302,13 +289,13 @@ You will likely also want to disable modifying posts
 
                     <span class=form>Gradebook Category:</span>
                     <span class=formright>
- <?php AssessmentUtility::writeHtmlSelect("gbcat",$gbcatsId,$gbcatsLabel,$defaultValue['gbCat'],"Default",0); ?>
+ <?php AssessmentUtility::writeHtmlSelect("gradebook-category",$gbcatsId,$gbcatsLabel,$defaultValue['gbCat'],"Default",0); ?>
             </span><br class=form>
                      <?php $page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
                     $page_tutorSelect['val'] = array(2,0,1); ?>
                     <span class=form>Tutor Access:</span>
                     <span class=formright>
-                <?php AssessmentUtility::writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$forumData['tutoredit']); ?>
+                <?php AssessmentUtility::writeHtmlSelect("tutor-edit",$page_tutorSelect['val'],$page_tutorSelect['label'],$forumData['tutoredit']); ?>
 </span><br class=form>
                     <span class="form">Use Scoring Rubric</span><span class=formright>
                    <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$forumData['rubric']); ?>

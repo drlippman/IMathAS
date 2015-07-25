@@ -171,8 +171,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                        value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/>
                 Always until end date<br/>
                 <input type=radio name="available-after" class="pull-left"
-                       value="sdate" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "0", AppConstant::NUMERIC_ONE); ?>/>
-
+                       value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/>
                     <?php
                     echo '<div class = "pull-left col-lg-4 time-input">';
                     echo DatePicker::widget([
@@ -207,7 +206,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                        value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 0); ?>/>
                  Always after start date<br/>
                 <input type=radio name="available-until" class="pull-left"
-                       value="edate"  <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 1); ?>/>
+                       value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 1); ?>/>
                 <?php
                 echo '<div class = "pull-left col-lg-4 time-input">';
                 echo DatePicker::widget([

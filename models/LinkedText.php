@@ -37,13 +37,6 @@ class LinkedText extends BaseImasLinkedtext
     }
     public function addLinkedText($params)
     {
-        if ($params['id']){
-            $endDate = $params['enddate'];
-            $startDate = $params['startdate'];
-        }else{
-            $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
-            $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
-        }
         $this->courseid = $params['courseid'];
         $this->title = $params['title'];
         $this->summary = $params['summary'];
@@ -52,23 +45,10 @@ class LinkedText extends BaseImasLinkedtext
         $this->oncal = $params['oncal'];
         $this->caltag = $params['caltag'];
         $this->target = $params['target'];
-        if($params['outcomes']){
-            $this->outcomes = $params['outcomes'];
-        }
+        $this->outcomes = $params['outcomes'];
         $this->points = $params['points'];
-        if ($params['avail'] == AppConstant::NUMERIC_ONE) {
-            if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
-                $startDate = AppConstant::NUMERIC_ZERO;
-            }
-            if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
-                $endDate = AppConstant::ALWAYS_TIME;
-            }
-            $this->startdate = $startDate;
-            $this->enddate = $endDate;
-        } else {
-            $this->startdate = AppConstant::NUMERIC_ZERO;
-            $this->enddate = AppConstant::ALWAYS_TIME;
-        }
+        $this->startdate = $params['startdate'];
+        $this->enddate = $params['enddate'];
         $this->save();
         return $this->id;
     }
@@ -81,7 +61,6 @@ class LinkedText extends BaseImasLinkedtext
 
     public function updateLinkData($params)
     {
-//        courseid,title,summary,text,startdate,enddate,avail,oncal,caltag,target,outcomes,points
         $updaateLink = LinkedText::findOne(['id' => $params['id']]);
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
@@ -93,7 +72,6 @@ class LinkedText extends BaseImasLinkedtext
         $updaateLink->oncal = $params['place-on-calendar'];
         $updaateLink->caltag = $params['tag'];
         $updaateLink->target = $params['open-page-in'];
-//        $this->outcomes = $outcomes;
         $updaateLink->points= $params['points'];
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {

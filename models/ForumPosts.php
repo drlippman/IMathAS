@@ -85,9 +85,11 @@ class ForumPosts extends BaseImasForumPosts
     public static function updateMoveThread($forumId, $threadId)
     {
 
-        $ForumPost = ForumPosts::findOne(['threadid' => $threadId]);
+        $ForumPosts = ForumPosts::findAll(['threadid' => $threadId]);
+        foreach($ForumPosts as $ForumPost){
         $ForumPost->forumid = $forumId;
         $ForumPost->save();
+        }
     }
 
     public function createReply($params, $user)

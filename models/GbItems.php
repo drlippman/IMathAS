@@ -71,20 +71,19 @@ class GbItems extends BaseImasGbitems
     }
     public static function updateGrade($gradeId,$AssignValue,$temp)
     {
-        $grade = GbItems::find()->where(['id' => $gradeId])->all();
+        $grade = GbItems::find()->where(['id' => $gradeId])->one();
         if($grade){
-            foreach($grade as $d ){
-           if($temp == 1){
-               $d->showdate = $AssignValue;
-           }else if($temp == 2){
-               $d->cntingb = $AssignValue;
-           }else if($temp == 3){
-               $d->tutoredit = $AssignValue;
+           if($temp == AppConstant::NUMERIC_ONE){
+               $grade->showdate = $AssignValue;
+           }else if($temp == AppConstant::NUMERIC_TWO){
+               $grade->cntingb = $AssignValue;
+           }else if($temp == AppConstant::NUMERIC_THREE){
+               $grade->tutoredit = $AssignValue;
+           }elseif($temp == AppConstant::NUMERIC_FOUR){
+               $grade->gbcategory = $AssignValue;
            }
-                $d->save();
+            $grade->save();
             }
-        }
-
     }
 
     public static  function findOfflineGradeItemForOutcomes($courseId,$istutor,$catfilter, $now)
