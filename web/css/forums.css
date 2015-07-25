@@ -137,14 +137,13 @@ table.dataTable thead th, table.dataTable thead td {
 .main-div{
     padding: 15px;
 }
-#forum_search{
-
-    background-color: #1460AA;
-    color: white;
-    border-radius: 0px;
-    height: 36px;
-    width: 9%;
-}
+/*#forum_search{*/
+    /*background-color: #1460AA;*/
+    /*color: white;*/
+    /*border-radius: 0px;*/
+    /*height: 36px;*/
+    /*width: 9%;*/
+/*}*/
 
 #search_text
 {
@@ -178,5 +177,34 @@ table.dataTable thead th, table.dataTable thead td {
     height: 60px;
     margin-right: 12px;
 }
+#forum_search{
+    background-color: #1460AA;
+    color: white;
+    border-radius: 0px;
+    height: 34px;
+    width: 9%;
+}
+.btn1{
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+}
+.message-reply > a:hover{
+    color:white;
+    text-decoration: none;
+}
 
+.second-level-div
+{
+
+    margin-right: 3px;
+}
 

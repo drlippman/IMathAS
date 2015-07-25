@@ -15,6 +15,9 @@ $(document).ready(function () {
     jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
+//    markAsRead();
+//    markAsUnread();
+//    markAsDelete();
     filterByCourse();
 
     $('.with-selected-dropdown').click(function(){
@@ -45,10 +48,13 @@ var cid = $(".send-msg").val();
 var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
-
-
 function createTableHeader() {
 
+
+
+    var html = " <table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
+    html += "<thead><tr><th><div class='checkbox'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
+    html += "    </tr></thead><tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
 
@@ -99,6 +105,8 @@ function showMessage(messageData, status) {
 
         });
     }
+    $('.message-div div').remove();
+    createTableHeader();
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable({"bPaginate": false});
     $(".images").hide();

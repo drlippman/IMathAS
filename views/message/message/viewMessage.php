@@ -4,7 +4,7 @@ use app\components\AssessmentUtility;
 use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 
-$this->title = ucfirst($course->name);
+$this->title = AppUtility::t('Message',false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
@@ -45,16 +45,16 @@ $now = $currentTime;
              <?php $sent = $messageId;?>
              <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
              <div class=" pull right col-sm-8">
-                 <a href="#" id="mark-delete"> Delete Message</a>
+                 <a href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
              </div>
              <div class="col-sm-2 pull right">
-                <a  href="#" id="mark-as-unread"> Mark Unread </a>
+                <a  href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark Unread ')?></a>
              </div>
              <?php }?>
          </div>
         <div class="col-md-12 message-body">
         <?php  if (($parent = strpos($messages['message'],'<hr'))!==false)
-             {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">[Show trimmed content]</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
+             {$messages['message'] = substr($messages['message'],0,$parent).'<a href="#" class="small" onclick="showtrimmedcontent(this);return false;">['.AppUtility::t('Show trimmed content', false).']</a><div id="trimmed" style="display:none;">'.substr($messages['message'],$parent).'</div>';
                    } ?>
            <?php echo $messages->message ?>
          </div>
@@ -63,17 +63,13 @@ $now = $currentTime;
              <?php if ($sent != AppConstant::NUMERIC_ONE) {?>
                     <span class="message-reply">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $messages->id.'&cid='.$course->id); ?>"
-                            class="btn1  reply-button "> <i class="fa fa-reply"></i>&nbsp;&nbsp;Reply</a>
+                            class="btn1  reply-button "> <i class="fa fa-reply"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Reply')?></a>
                     </span>
              <?php }?>
                      <span class="message-reply">
-                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;View Conversation </a>
+                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
                     </span>
          </div>
-
-
-
-
-    </div>
+</div>
     <br>
  </div>

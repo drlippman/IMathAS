@@ -1,27 +1,24 @@
 var selected;
 $('.search-dropdown').click(function(){
     selected = $('.select_option :selected').val();
+    $(".select_option").css('border-color', 'white');
 });
 $(document).ready(function ()
-{
-    var courseId = $('.courseId').val();
+{  var courseId = $('.courseId').val();
     jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
     $('#search-thread').hide();
     $('#search-post').hide();
     $('#result').hide();
-
-
     $('#forum_search').click(function ()
     {
-
         var searchReg = /^[a-zA-Z0-9-]+$/;
         var search = $('#search_text').val();
         var courseId = $('.courseId').val();
         if(search.length > 0)
         {
+            $("#search_text").css('border-color', 'white');
             if(search.match(/^[a-z A-Z 0-9-]+$/))
             {
-
                 $('#flash-message').hide();
                 if(selected == 0)
                 {
@@ -31,30 +28,32 @@ $(document).ready(function ()
                     $('#result').hide();
                     jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: selected},'threadSuccess');
                 }
-                else
+                else if(selected == 1)
                 {
                     $('#search-thread').hide();
                     $('#display').hide();
                     $('#search-post').show();
                     $('#result').hide();
                     jQuerySubmit('get-search-post-ajax',{search: search, courseid: courseId , value: selected},'postSuccess');
-
+                }else
+                {
+                    $(".select_option").css('border-color', 'red');
                 }
-
             }
             else
             {
                 $('#flash-message').show();
                 $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
             }
-
         }
         else
         {
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
+            $("#search_text").css('border-color', 'red');
+            if(selected != 1 || selected != 0)
+            {
 
-
+                $(".select_option").css('border-color', 'red');
+            }
         }
 
 
@@ -62,6 +61,7 @@ $(document).ready(function ()
     });
 
 });
+
 
 function postSuccess(response)
 {

@@ -93,6 +93,7 @@ class ForumController extends AppController
         $orderBy = 'id';
         $forums = Forums::getByCourseIdOrdered($cid,$sort,$orderBy);
         $user = $this->getAuthenticatedUser();
+//        $NewPostCount = Thread::findNewPostCnt($cid,$user);
         if ($forums)
         {
             $forumArray = array();

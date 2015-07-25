@@ -267,6 +267,7 @@ body {
     padding-top: 15px;
     padding-bottom: 15px;
 }
+
 .fc-day-grid-event,.fc-h-event, .fc-event, .fc-start, .fc-end{
     /*width: 90%;*/
     margin-left: 10px;
@@ -275,6 +276,13 @@ body {
 .fc-event{
     cursor: pointer;
 }
+
 .big-title{
     font-size: 30px;
+}
+
+
+.navbar-inverse .notification > .open > a, .navbar-inverse .notification > .open > a:hover, .navbar-inverse .notification > .open > a:focus {
+    color: #fff;
+    background-color: #008E43;
 }

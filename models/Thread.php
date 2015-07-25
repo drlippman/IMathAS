@@ -13,6 +13,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
 use app\models\_base\BaseImasInstrFiles;
+use yii\db\Query;
 
 class Thread extends BaseImasForumThreads
 {
@@ -25,7 +26,7 @@ class Thread extends BaseImasForumThreads
 
     public static function getNextThreadId($currentId,$next=null,$prev=null,$forumId)
     {
-//        AppUtility::dump($currentId);
+
         if($next == AppConstant::NUMERIC_TWO){
             $thread = Thread::find()->where(['>', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
         }elseif($prev == AppConstant::NUMERIC_ONE){
@@ -39,7 +40,6 @@ class Thread extends BaseImasForumThreads
         'maxThread' =>$maxThreadId,
             'minThread' =>$minThreadId,
     );
-//        AppUtility::dump($prevNextValueArray);
         return $prevNextValueArray;
     }
     public static function deleteThreadById($id)
@@ -56,5 +56,7 @@ class Thread extends BaseImasForumThreads
         $ForumPost->forumid = $forumId;
         $ForumPost->save();
     }
+
+
 
 } 
