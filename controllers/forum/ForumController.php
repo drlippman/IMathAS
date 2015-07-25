@@ -39,6 +39,7 @@ class ForumController extends AppController
     */
     public function actionSearchForum()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
         $forum = Forums::getByCourseId($cid);

@@ -43,29 +43,18 @@ class RosterController extends AppController
     public function actionStudentRoster()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
+        $isShowPic = $this->getParamVal('showpic');
         $course = Course::getById($courseId);
-        $students = Student::findByCid($courseId);
-        $isImageColumnPresent = AppConstant::NUMERIC_ZERO;
-        if ($students) {
-            $isCodePresent = false;
-            $isSectionPresent = false;
-            foreach ($students as $student) {
-                $users = User::getById($student['userid']);
-                if ($users['hasuserimg'] == AppConstant::NUMERIC_ONE) {
-                    $isImageColumnPresent = AppConstant::NUMERIC_ONE;
-                }
-                if ($student->code != '') {
-                    $isCodePresent = true;
-                }
-                if ($student->section != '') {
-                    $isSectionPresent = true;
-                }
-            }
+        if($isShowPic == 0){
+            $isImageColumnPresent = AppConstant::NUMERIC_ZERO;
+        }else{
+            $isImageColumnPresent = AppConstant::NUMERIC_ONE;
         }
-        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
-        $responseData = array('course' => $course, 'isSection' => $isSectionPresent, 'isCode' => $isCodePresent, 'isImageColumnPresent' => $isImageColumnPresent);
+        $responseData = array('course' => $course, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
     }
 
@@ -184,10 +173,11 @@ class RosterController extends AppController
     public function actionStudentEnrollment()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $model = new StudentEnrollmentForm();
         $course = Course::getById($courseId);
-        if ($model->load(\Yii::$app->request->post())) {
+        if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollmentForm'];
             $uid = User::findByUsername($param['usernameToEnroll']);
@@ -210,6 +200,8 @@ class RosterController extends AppController
                 }
             }
         }
+        $this->includeJS(['roster/studentEnrollment.js']);
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'model' => $model);
         return $this->render('studentEnrollment', $responseData);
     }
@@ -287,6 +279,7 @@ class RosterController extends AppController
     public function actionEnrollFromOtherCourse()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $model = new EnrollFromOtherCourseForm();
         $course = Course::getById($courseId);
@@ -311,6 +304,7 @@ class RosterController extends AppController
                 $this->setErrorFlash(AppConstant::CHOOSE_STUDENT);
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'data' => $courseDetails, 'model' => $model);
         return $this->render('enrollFromOtherCourse', $responseData);
     }
@@ -319,6 +313,7 @@ class RosterController extends AppController
     public function actionEnrollStudents()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $selectedCourseId = $this->getParamVal('courseData');
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
@@ -376,6 +371,7 @@ class RosterController extends AppController
                 $this->setErrorFlash('Select student from list to enroll in a course');
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $this->includeJS(['roster/enrollstudents.js']);
         $responseData = array('course' => $course, 'data' => $studentDetails, 'model' => $model, 'cid' => $courseId);
         return $this->render('enrollStudents', $responseData);
@@ -385,6 +381,7 @@ class RosterController extends AppController
     public function actionCreateAndEnrollNewStudent()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $model = new CreateAndEnrollNewStudentForm();
@@ -398,11 +395,13 @@ class RosterController extends AppController
                 $newStudent = new Student();
                 $newStudent->createNewStudent($studentid['id'], $courseId, $params['CreateAndEnrollNewStudentForm']);
                 $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
+                return $this->redirect('student-roster?cid=' . $courseId);
 
             } else {
                 $this->setErrorFlash(AppConstant::USER_EXISTS);
             }
         }
+        $this->includeCSS( ['roster/roster.css']);
         $responseData = array('course' => $course, 'model' => $model);
         return $this->renderWithData('createAndEnrollNewStudent', $responseData);
     }
@@ -730,7 +729,7 @@ class RosterController extends AppController
 
 //Controller method to assign lock on student.
     public function actionMarkLockAjax()
-    {AppUtility::dump("hiii");
+    {
         $this->layout = false;
         $params = $this->getRequestParams();
         foreach ($params['checkedstudents'] as $students) {

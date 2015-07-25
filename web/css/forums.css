@@ -82,10 +82,7 @@ span.leftbtns img {
 }
 
 
-#forum_search{
-    margin-left: 0px;
 
-}
 
 #searchpost > div > label{
 font-weight:400;
@@ -131,3 +128,83 @@ table.dataTable thead th, table.dataTable thead td {
 
     margin-top: 20px;
 }
+
+.Search-btn
+{
+
+
+}
+.main-div{
+    padding: 15px;
+}
+/*#forum_search{*/
+    /*background-color: #1460AA;*/
+    /*color: white;*/
+    /*border-radius: 0px;*/
+    /*height: 36px;*/
+    /*width: 9%;*/
+/*}*/
+
+#search_text
+{
+
+    height: 32px;
+    text-align: center;
+}
+
+.search-dropdown
+{
+
+    height: 30px;
+    width: 30px;
+    
+}
+.form-control-forum{
+    height: 35px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+
+
+}
+.forum-background
+{
+    background-color: #f8f8f8;
+    padding: 15px;
+    height: 60px;
+    margin-right: 12px;
+}
+#forum_search{
+    background-color: #1460AA;
+    color: white;
+    border-radius: 0px;
+    height: 34px;
+    width: 9%;
+}
+.btn1{
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+}
+.message-reply > a:hover{
+    color:white;
+    text-decoration: none;
+}
+
+.second-level-div
+{
+
+    margin-right: 3px;
+}
+

@@ -1,94 +1,130 @@
 <?php
 use app\components\AppUtility;
 
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
-
-$this->title = 'Roster';
-$this->params['breadcrumbs'][] = ['label' => ucfirst($course->name), 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
+$this->title = AppUtility::t('Roster', false);
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<div><h2>Student Roster </h2></div>
-<div class="cpmid">
-            <span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid=' . $course->id) ?>">View Login Grid</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid=' . $course->id); ?>">Assign Sections and/or Codes</a><br>
-            </span>
-            <span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid=' . $course->id); ?>">Manage LatePasses</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid=' . $course->id); ?>">Manage Tutors</a><br/>
-            </span>
-            <span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid=' . $course->id . '&enroll=student'); ?>">Enroll Student with known username</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid=' . $course->id); ?>">Enroll students from another course</a><br/>
-            </span>
-            <span class="column" style="width:auto;">
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid=' . $course->id); ?>">Import Students from File</a><br/>
-                <a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid=' . $course->id); ?>">Create and Enroll new student</a><br/>
-            </span><br class="clear"/>
-</div>
-<div class="button-container">
-    <form>
-        <span>Check: <a class="check-all" href="#">All</a>/<a class="non-locked" href="#">Non-locked</a>/<a class="uncheck-all" href="#">None</a> With Selected:</span>
-    </form>
-    <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">
-        <input type="hidden" id="student-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-email" value="Email"></span>
-    </form>
-    <form action="roster-message?cid=<?php echo $course->id ?>" method="post" id="roster-form">
-        <input type="hidden" id="message-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-message" value="Message"></span>
-    </form>
-        <span> <a class="btn btn-primary" id="unenroll-btn">Unenroll</a></span>
-        <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
-    <form action="make-exception?cid=<?php echo $course->id ?>" name="teacherMakeException" id="make-student" method="post">
-        <input type="hidden" id="exception-id" name="student-data" value=""/>
-        <input type="hidden" id="section-name" name="section-data" value=""/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-makeExc" value="Make Exception"></span>
-    </form>
-    <form action="copy-student-email?cid=<?php echo $course->id ?>" method="post" id="roster-form">
-        <input type="hidden" id="email-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy Emails"></span>
-    </form>
-    <form>
-        <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >
-    </form>
-</div>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
-<div class="roster-info">
-<!--<table class="student-data-table table table-bordered table-striped table-hover data-table" id="student-information" bPaginate="false" >-->
-<!--    <thead>-->
-<!--    <tr>-->
-<!--        <th></th>-->
-<!--        --><?php //if ($isImageColumnPresent == 1) {
-//            ?><!--<th></th>-->
-<!--        --><?php //}
-//            if ($isSection == true) {
-//            ?>
-<!--            <th>Section</th>-->
-<!--        --><?php
-//        }
-//        if ($isCode == true) {
-//            ?>
-<!--            <th>Code</th>-->
-<!--        --><?php //} ?>
-<!--        <th>Last</th>-->
-<!--        <th>First</th>-->
-<!--        <th>Email</th>-->
-<!--        <th>UserName</th>-->
-<!--        <th>Last Access</th>-->
-<!--        <th>Grades</th>-->
-<!--        <th>Due Dates</th>-->
-<!--        <th>Change Info</th>-->
-<!--        <th>Lock Out</th>-->
-<!--    </tr>-->
-<!--    </thead>-->
-<!--    <tbody id="student-information-table">-->
-<!--    </tbody>-->
-<!--</table>-->
+<input type="hidden" id="image-id" value="<?php echo $isImageColumnPresent ?>">
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Roster Settings</button>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
+</div>
+<div class="tab-content shadowBox"">
+<?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
+<div class="roster-upper-content col-lg-12">
+    <div class="page-title col-lg-8 pull-left"><?php AppUtility::t('Student Roster'); ?>
+    </div>
+    <div class="with-selected col-lg-2 pull-left">
+        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><i class="fa fa-user ic"></i>&nbsp;<?php AppUtility::t('Pictures'); ?>
+                    <span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu selected-options">
+                    <li>
+                        <a href="student-roster?cid=<?php echo $course->id ?>&showpic=1"><?php AppUtility::t('Show'); ?></a>
+                    </li>
+                    <li>
+                        <a href="student-roster?cid=<?php echo $course->id ?>&showpic=0"><?php AppUtility::t('Hide'); ?></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="with-selected col-lg-2 pull-left">
+        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu selected-options">
+                    <li><a class="non-locked" href="#"><i
+                                class="fa fa-unlock-alt fa-fw"></i>&nbsp;<?php AppUtility::t('Select non-locked'); ?>
+                        </a></li>
+                    <li>
+                        <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-email-form">
+                            <input type="hidden" id="student-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a class="with-selected-list" href="javascript: studentEmail()"><i
+                                    class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
+                    </li>
+                    </form>
+                    <li>
+                        <form action="roster-message?cid=<?php echo $course->id ?>" method="post"
+                              id="roster-message-form">
+                            <input type="hidden" id="message-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a class="with-selected-list" href="javascript: studentMessage()"><i
+                                    class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
+                    </li>
+                    </form>
+                    <li><a id="un-enroll-link" href="#"><i
+                                class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a></li>
+                    <li><a id="lock-btn" href="#"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>
+                        </a></li>
+                    <li>
+                        <form action="make-exception?cid=<?php echo $course->id ?>" id="make-exception-form"
+                              method="post">
+                            <input type="hidden" id="exception-id" name="student-data" value=""/>
+                            <input type="hidden" id="section-name" name="section-data" value=""/>
+                            <a class="with-selected-list" href="javascript: teacherMakeException()"><i
+                                    class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
+                            </a>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="copy-student-email?cid=<?php echo $course->id ?>" method="post"
+                              id="copy-emails-form">
+                            <input type="hidden" id="email-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a class="with-selected-list" href="javascript: copyStudentsEmail()"><i
+                                    class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Copy Emails'); ?></a>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+</div>
+<div class="roster-table">
+    <table class="student-data-table table table-striped table-hover data-table" id="student-information"
+           bPaginate="false">
+        <thead>
+        <tr>
+            <th class="studentId">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="header-checked" value="">
+                        <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                    </label>
+                </div>
+            </th>
+            <?php if ($isImageColumnPresent == 1) {
+                ?>
+                <th><?php AppUtility::t('Picture') ?></th>
+            <?php } ?>
+            <th><?php AppUtility::t('Last') ?></th>
+            <th><?php AppUtility::t('First') ?></th>
+            <th><?php AppUtility::t('Email') ?></th>
+            <th><?php AppUtility::t('UserName') ?></th>
+            <th><?php AppUtility::t('Last Access') ?></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="student-information-table">
+        </tbody>
+    </table>
 </div>
 

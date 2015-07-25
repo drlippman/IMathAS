@@ -2,21 +2,35 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
-
 ?>
-<?php AppUtility::includeCSS('_leftSide.css');?>
-<div class=mainbody>
-    <div class="headerwrapper">
-        <div id="navlistcont">
-            <ul id="navlist">
-                <li><a class="activetab" href="<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>">Course</a></li>
-                <li><a class="ahrefAlign" href="#">Messages</a></li>
-                <li><a class="ahrefAlign" href="#">Forums</a></li>
-                <li><a class="ahrefAlign" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>">Roster</a></li>
-                <li><a class="ahrefAlign" href="#">Calendar</a></li>
-                <li><a class="ahrefAlign" href="#">Gradebook</a></li>
-            </ul>
-            <br class="clear"/>
-        </div>
-    </div>
+
+<div class="common-navbar">
+    <ul class="nav nav-tabs teacher-tab nav-justified nav-tabs-non-shadow" id="nav">
+        <?php if($section == 'course'){ ?>
+            <li class="active master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>"><i class="fa fa-book icon-nav"></i><?php AppUtility::t('Course'); ?></a></li>
+        <?php } else { ?>
+            <li class="master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>"><i class="fa fa-book icon-nav"></i><?php AppUtility::t('Course'); ?></a></li>
+        <?php } ?>
+        <?php if($section == 'gradebook'){ ?>
+            <li class="active master-tabs"><a class="grey-color-link"  href = "#"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
+        <?php } else { ?>
+            <li class="master-tabs"><a class="grey-color-link"  href = "#"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
+        <?php } ?>
+        <?php if($section == 'calendar'){ ?>
+            <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><i class="fa fa-calendar icon-nav"></i><?php AppUtility::t('Calendar'); ?></a></li>
+        <?php } else { ?>
+            <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><i class="fa fa-calendar icon-nav"></i><?php AppUtility::t('Calendar'); ?></a></li>
+        <?php } ?>
+        <?php if($section == 'roster'){ ?>
+            <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
+        <?php } else { ?>
+            <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id); ?>"><i class="fa fa-users icon-nav"></i><?php AppUtility::t('Roster'); ?></a></li>
+        <?php } ?>
+        <?php if($section == 'Forums'){ ?>
+            <li class="active master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"><i class="fa fa-weixin icon-nav"></i><?php AppUtility::t('Forums'); ?></a></li>
+        <?php } else { ?>
+            <li class="master-tabs border-right-zero"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('forum', 'forum/search-forum?cid='.$course->id); ?>"><i class="fa fa-weixin icon-nav"></i><?php AppUtility::t('Forums'); ?></a></li>
+        <?php } ?>
+    </ul>
 </div>
+

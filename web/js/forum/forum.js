@@ -1,59 +1,59 @@
+var selected;
+$('.search-dropdown').click(function(){
+    selected = $('.select_option :selected').val();
+    $(".select_option").css('border-color', 'white');
+});
 $(document).ready(function ()
-{
-    var courseId = $('.courseId').val();
+{  var courseId = $('.courseId').val();
     jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
     $('#search-thread').hide();
     $('#search-post').hide();
     $('#result').hide();
-
     $('#forum_search').click(function ()
     {
-
         var searchReg = /^[a-zA-Z0-9-]+$/;
         var search = $('#search_text').val();
         var courseId = $('.courseId').val();
-        var val=document.querySelector('input[name="ForumForm[thread]"]:checked').value;
-
-
-        if(search.length>0)
+        if(search.length > 0)
         {
+            $("#search_text").css('border-color', 'white');
             if(search.match(/^[a-z A-Z 0-9-]+$/))
             {
-
                 $('#flash-message').hide();
-                if(val == 'subject')
+                if(selected == 0)
                 {
                     $('#search-thread').show();
                     $('#display').hide();
                     $('#search-post').hide();
                     $('#result').hide();
-                    var courseId = $('.courseId').val();
-                    jQuerySubmit('get-forum-name-ajax',{search: search, courseId: courseId , value: val},'threadSuccess');
+                    jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: selected},'threadSuccess');
                 }
-                else
+                else if(selected == 1)
                 {
                     $('#search-thread').hide();
                     $('#display').hide();
                     $('#search-post').show();
                     $('#result').hide();
-                    jQuerySubmit('get-search-post-ajax',{search: search, courseid: courseId , value: val},'postSuccess');
-
+                    jQuerySubmit('get-search-post-ajax',{search: search, courseid: courseId , value: selected},'postSuccess');
+                }else
+                {
+                    $(".select_option").css('border-color', 'red');
                 }
-
             }
             else
             {
                 $('#flash-message').show();
                 $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
             }
-
         }
         else
         {
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>Search text cannot be blank");
+            $("#search_text").css('border-color', 'red');
+            if(selected != 1 || selected != 0)
+            {
 
-
+                $(".select_option").css('border-color', 'red');
+            }
         }
 
 
@@ -61,6 +61,7 @@ $(document).ready(function ()
     });
 
 });
+
 
 function postSuccess(response)
 {
@@ -117,7 +118,7 @@ function threadSuccess(response)
        });
       $(".forum-search-table-body tr").remove();
       $(".forum-search-table-body").append(html);
-      $('.forum-search-table').DataTable();
+      $('.forum-search-table').DataTable({bPaginate:false});
     }
     else
     {
@@ -146,22 +147,24 @@ function forumsSuccess(response) {
         {
             if(forum.rights > 10)
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
-                html += "<td>" + forum.threads + "</td>";
-                html += "<td>" + forum.posts + "</td>";
-                html += "<td>" + forum.lastPostDate + "</td>";
+                html += "<tr><td>&nbsp;&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
+                html += "<td>&nbsp;&nbsp;<a>Modify</a></td>";
+                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.threads + "</td>";
+                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.posts + "</td>";
+                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
             }
             else if(forum.endDate > forum.currentTime )
             {
-                html += "<tr> <td><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
-                html += "<td>" + forum.threads + "</td>";
-                html += "<td>" + forum.posts + "</td>";
-                html += "<td>" + forum.lastPostDate + "</td>";
+                html += "<tr><td>&nbsp;&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
+                html += "<td>&nbsp;&nbsp;<a>Modify</a></td>";
+                html += "<td>&nbsp;&nbsp;" + forum.threads + "</td>";
+                html += "<td>&nbsp;&nbsp;" + forum.posts + "</td>";
+                html += "<td>&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
             }
 
         });
         $(".forum-table-body tr").remove();
         $(".forum-table-body").append(html);
-        $('.forum-table').DataTable({"ordering": false});
+        $('.forum-table').DataTable({"ordering": false,bPaginate:false});
     }
 

@@ -36,12 +36,15 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
-        $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count);
+        $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId);
         return $this->renderWithData('showWiki', $responseData);
     }
 
     public function actionGetRevisions(){
-        $revisions = WikiUtility::getWikiRevision();
+        $param = $this->getRequestParams();
+        $courseId = $param['courseId'];
+        $wikiId = $param['wikiId'];
+        $revisions = WikiUtility::getWikiRevision($courseId, $wikiId);
         return $revisions;
     }
     /**
@@ -50,7 +53,6 @@ class WikiController extends AppController
     public function actionEditPage()
     {
         $userData = $this->getAuthenticatedUser();
-//        $userId = $userData->id;
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $wikiId = $this->getParamVal('wikiId');
@@ -119,7 +121,6 @@ class WikiController extends AppController
             $pageTitle = 'Modify Wiki';
             if($this->isPostMethod()){
                 $page_formActionTag = AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wiki->id.'&courseId=' .$course->id);
-
                 $saveChanges = new Wiki();
                 $saveChanges->updateChange($params, $wikiid);
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
@@ -133,14 +134,11 @@ class WikiController extends AppController
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
                 $saveChanges = new Wiki();
                 $lastWikiId = $saveChanges->createItem($params,$courseId);
-
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemorder = $courseItemOrder->itemorder;
-
                 $items = unserialize($itemorder);
-
                 $blocktree = array(0);
                 $sub =& $items;
 
@@ -151,12 +149,10 @@ class WikiController extends AppController
                 $itemorder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
-
                 return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
             }
             $saveTitle = AppConstant::New_Item;
         }
-
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames);
         return $this->render('addWiki', $returnData);

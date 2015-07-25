@@ -22,9 +22,11 @@ div.pagetitle h2 {
 }
 div.item {
 	margin-bottom: 10px;
-	padding: 5px;
+	/*padding-right: 5%;*/
+	padding-top: 15px;
+    padding-left: 15px;
 	overflow: auto;
-	border-radius: 5px;
+	/*border-radius: 5px;*/
 }
 div.signup {
 	border: 1px solid #000;
@@ -42,7 +44,7 @@ span.iteminfo {
 }
 div.title {
 	/*display: inline;*/
-	margin-left: 30px;
+	margin-left: 35px;
 }
 div.block, div.blockitems div.blockitems div.block {
 	padding: 5px;
@@ -578,7 +580,7 @@ span.boxed {
 	padding: 2px 5px;
 }
 a.attach {
-    background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;
+    /*background: url(editor/plugins/attach/img/ed_attach.gif) center left no-repeat;*/
     padding-left: 20px;
 }
 /*div.forumgrp img {*/
@@ -618,29 +620,29 @@ div.multiselitem {
 .fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
 .video-wrapper-wrapper{width:100%;padding:0;}	
 
-.vidmute { background: url(img/vidicons.png) no-repeat 0px 0px; width:24px; height:20px; display: inline-block;}
-.vidmute:hover { background: url(img/vidicons.png) no-repeat -24px 0px; width:24px; height:20px; display: inline-block;}
-.vidmuteI { background: url(img/vidicons.png) no-repeat -48px 0px; width:24px; height:20px; display: inline-block;}	
-.vidvol { background: url(img/vidicons.png) no-repeat 0px -24px; width:24px; height:20px; display: inline-block;}
-.vidvol:hover { background: url(img/vidicons.png) no-repeat -24px -24px; width:24px; height:20px; display: inline-block;}
-.vidvolI { background: url(img/vidicons.png) no-repeat -48px -24px; width:24px; height:20px; display: inline-block;}	
-.vidpause { background: url(img/vidicons.png) no-repeat 0px -48px; width:24px; height:20px; display: inline-block;}
-.vidpause:hover { background: url(img/vidicons.png) no-repeat -24px -48px; width:24px; height:20px; display: inline-block;}
-.vidpauseI { background: url(img/vidicons.png) no-repeat -48px -48px; width:24px; height:20px; display: inline-block;}		
-.vidrew { background: url(img/vidicons.png) no-repeat 0px -72px; width:24px; height:20px; display: inline-block;}
-.vidrew:hover { background: url(img/vidicons.png) no-repeat -24px -72px; width:24px; height:20px; display: inline-block;}
-.vidrewI { background: url(img/vidicons.png) no-repeat -48px -72px; width:24px; height:20px; display: inline-block;}	
-.vidff { background: url(img/vidicons.png) no-repeat 0px -96px; width:24px; height:20px; display: inline-block;}
-.vidff:hover { background: url(img/vidicons.png) no-repeat -24px -96px; width:24px; height:20px; display: inline-block;}
-.vidffI { background: url(img/vidicons.png) no-repeat -48px -96px; width:24px; height:20px; display: inline-block;}	
-.vidplay { background: url(img/vidicons.png) no-repeat 0px -120px; width:24px; height:20px; display: inline-block;}
-.vidplay:hover { background: url(img/vidicons.png) no-repeat -24px -120px; width:24px; height:20px; display: inline-block;}
-.vidplayI { background: url(img/vidicons.png) no-repeat -48px -120px; width:24px; height:20px; display: inline-block;}	
-.vidtracksA { background: url(img/vidicons.png) no-repeat 0px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
-.vidtracksA:hover { background: url(img/vidicons.png) no-repeat -24px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
-.vidtracks { background: url(img/vidicons.png) no-repeat 0px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
-.vidtracks:hover { background: url(img/vidicons.png) no-repeat -24px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}
-.vidtracksI { background: url(img/vidicons.png) no-repeat -48px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}	
+/*.vidmute { background: url(img/vidicons.png) no-repeat 0px 0px; width:24px; height:20px; display: inline-block;}*/
+/*.vidmute:hover { background: url(img/vidicons.png) no-repeat -24px 0px; width:24px; height:20px; display: inline-block;}*/
+/*.vidmuteI { background: url(img/vidicons.png) no-repeat -48px 0px; width:24px; height:20px; display: inline-block;}	*/
+/*.vidvol { background: url(img/vidicons.png) no-repeat 0px -24px; width:24px; height:20px; display: inline-block;}*/
+/*.vidvol:hover { background: url(img/vidicons.png) no-repeat -24px -24px; width:24px; height:20px; display: inline-block;}*/
+/*.vidvolI { background: url(img/vidicons.png) no-repeat -48px -24px; width:24px; height:20px; display: inline-block;}	*/
+/*.vidpause { background: url(img/vidicons.png) no-repeat 0px -48px; width:24px; height:20px; display: inline-block;}*/
+/*.vidpause:hover { background: url(img/vidicons.png) no-repeat -24px -48px; width:24px; height:20px; display: inline-block;}*/
+/*.vidpauseI { background: url(img/vidicons.png) no-repeat -48px -48px; width:24px; height:20px; display: inline-block;}		*/
+/*.vidrew { background: url(img/vidicons.png) no-repeat 0px -72px; width:24px; height:20px; display: inline-block;}*/
+/*.vidrew:hover { background: url(img/vidicons.png) no-repeat -24px -72px; width:24px; height:20px; display: inline-block;}*/
+/*.vidrewI { background: url(img/vidicons.png) no-repeat -48px -72px; width:24px; height:20px; display: inline-block;}	*/
+/*.vidff { background: url(img/vidicons.png) no-repeat 0px -96px; width:24px; height:20px; display: inline-block;}*/
+/*.vidff:hover { background: url(img/vidicons.png) no-repeat -24px -96px; width:24px; height:20px; display: inline-block;}*/
+/*.vidffI { background: url(img/vidicons.png) no-repeat -48px -96px; width:24px; height:20px; display: inline-block;}	*/
+/*.vidplay { background: url(img/vidicons.png) no-repeat 0px -120px; width:24px; height:20px; display: inline-block;}*/
+/*.vidplay:hover { background: url(img/vidicons.png) no-repeat -24px -120px; width:24px; height:20px; display: inline-block;}*/
+/*.vidplayI { background: url(img/vidicons.png) no-repeat -48px -120px; width:24px; height:20px; display: inline-block;}	*/
+/*.vidtracksA { background: url(img/vidicons.png) no-repeat 0px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}*/
+/*.vidtracksA:hover { background: url(img/vidicons.png) no-repeat -24px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}*/
+/*.vidtracks { background: url(img/vidicons.png) no-repeat 0px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}*/
+/*.vidtracks:hover { background: url(img/vidicons.png) no-repeat -24px -168px; width:24px; height:20px; margin-right: 5px; display: inline-block;}*/
+/*.vidtracksI { background: url(img/vidicons.png) no-repeat -48px -144px; width:24px; height:20px; margin-right: 5px; display: inline-block;}	*/
 
 .playlistbar { background-color: #ccc; padding: 3px;}
 .playlistbar > * {vertical-align: top;}
@@ -677,5 +679,5 @@ div.multiselitem {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background: transparent url("img/cc.png") no-repeat right bottom;
+	/*background: transparent url("img/cc.png") no-repeat right bottom;*/
 }

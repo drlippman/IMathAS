@@ -53,6 +53,7 @@ public $oa = array();
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $this->userAuthentication($user,$courseId);
         $type = $this->getParamVal('type');
@@ -270,7 +271,7 @@ public $oa = array();
         }
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js', 'instructor.js', 'course/addItem.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
         return $this->renderWithData('index', $returnData);
     }
@@ -343,6 +344,7 @@ public $oa = array();
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
+        $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $assessments = Assessments::getByCourseId($courseId);
         $calendarItems = CalItem::getByCourseId($courseId);
         $calendarLinkItems = Links::getByCourseId($courseId);
@@ -358,8 +360,9 @@ public $oa = array();
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
-                'name' => $assessment['name'],
+                'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate'],
@@ -368,58 +371,53 @@ public $oa = array();
                 'courseId' => $assessment['courseid']
             );
         }
-        /**
-         * Display managed events by admin.
-         */
+
         $calendarArray = array();
         foreach ($calendarItems as $calendarItem)
         {
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'title' => $calendarItem['title'],
-                'tag' => $calendarItem['tag']
+                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
+                'title' => ucfirst($calendarItem['title']),
+                'tag' => ucfirst($calendarItem['tag'])
             );
         }
-        /**
-         * Display link text: tags.
-         */
         $calendarLinkArray = array();
         foreach ($calendarLinkItems as $calendarLinkItem)
         {
             $calendarLinkArray[] = array(
-                'courseId' => $calendarLinkItem['courseid'],
-                'title' => $calendarLinkItem['title'],
+       'courseId' => $calendarLinkItem['courseid'],
+                'title' => ucfirst($calendarLinkItem['title']),
                 'startDate' => AppUtility::getFormattedDate($calendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($calendarLinkItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($calendarLinkItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarLinkItem['startdate'],
                 'endDateString' => $calendarLinkItem['enddate'],
                 'linkedId' => $calendarLinkItem['id'],
-                'calTag' => $calendarLinkItem['caltag']
+                'calTag' => ucfirst($calendarLinkItem['caltag'])
             );
         }
-        /**
-         * Display inline text: tags.
-         */
         $calendarInlineTextArray = array();
         foreach ($calendarInlineTextItems as $calendarInlineTextItem)
         {
             $calendarInlineTextArray[] = array(
                 'courseId' => $calendarInlineTextItem['courseid'],
                 'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($calendarInlineTextItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarInlineTextItem['startdate'],
                 'endDateString' => $calendarInlineTextItem['enddate'],
-                'calTag' => $calendarInlineTextItem['caltag']
+                'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
         return $this->successResponse($responseData);
     }
-/*
- * Manage Calendar Event
- */
+    /*
+     * Manage Calendar Event
+     */
     public function actionManageEvents()
     {
         $this->guestUserHandler();

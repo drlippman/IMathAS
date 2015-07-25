@@ -47,8 +47,10 @@ class CourseController extends AppController
      * Display all course in item order
      */
     public $enableCsrfValidation = false;
+
     public function actionIndex()
     {
+        $this->layout = 'master';
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
@@ -60,12 +62,12 @@ class CourseController extends AppController
         $responseData = array();
         $calendarCount = array();
         $course = Course::getById($courseId);
-        if ($course && count($itemOrders = unserialize($course->itemorder))) {
+        if ($course && ($itemOrders = unserialize($course->itemorder))) {
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
-                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
-                {
+                if (is_array($itemOrder) || count($blockItems = $itemOrder['items'])) {
                     $tempAray['Block'] = $itemOrder;
+                    $blockItems = $itemOrder['items'];
                     $tempItemList = array();
                     $blockItems = $itemOrder['items'];
                     foreach ($blockItems as $blockKey => $blockItem) {
@@ -157,7 +159,7 @@ class CourseController extends AppController
                     array_push($msgList,$singleMessage);
             }
         }
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
         $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
@@ -212,26 +214,6 @@ class CourseController extends AppController
                 $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
                 $exception->enddate = $exception->enddate + $addTime;
                 $exception->islatepass = $exception->islatepass + AppConstant::NUMERIC_ONE;
-            }
-            if ($exception->islatepass != AppConstant::NUMERIC_ZERO) {
-                echo "<p>Un-use late-pass</p>";
-                if ($currentTime > $assessment->enddate && $exception->enddate < $currentTime + $course->latepasshrs * AppConstant::SECONDS * AppConstant::SECONDS) {
-                    echo '<p>Too late to un-use this LatePass</p>';
-                } else {
-                    if ($currentTime < $assessment->enddate) {
-                        $exception->islatepass = $exception->islatepass - AppConstant::NUMERIC_ONE;
-                    } else {
-                        //figure how many are unused
-                        $n = floor(($exception->enddate - $currentTime) / ($course->latepasshrs * AppConstant::SECONDS * AppConstant::SECONDS));
-                        $newend = $exception->enddate - $n * $course->latepasshrs * AppConstant::SECONDS * AppConstant::SECONDS;
-                        if ($exception->islatepass > $n) {
-                            $exception->islatepass = $exception->islatepass - $n;
-                            $exception->enddate = $newend;
-                        }
-                    }
-                    echo "<p>Returning $n LatePass" . ($n > AppConstant::NUMERIC_ONE ? "es" : "") . "</p>";
-                    $student->latepass = $student->latepass + $n;
-                }
             }
             $exception->attributes = $param;
             $exception->save();
@@ -551,6 +533,7 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $cid = $params['cid'];
+        $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
         $assessments = Assessments::getByCourseId($cid);
         $calendarItems = CalItem::getByCourseId($cid);
         $CalendarLinkItems = Links::getByCourseId($cid);
@@ -561,8 +544,9 @@ class CourseController extends AppController
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($assessment['enddate']),
                 'reviewDate' => AppUtility::getFormattedDate($assessment['reviewdate']),
-                'name' => $assessment['name'],
+                'name' => ucfirst($assessment['name']),
                 'startDateString' => $assessment['startdate'],
                 'endDateString' => $assessment['enddate'],
                 'reviewDateString' => $assessment['reviewdate'],
@@ -577,8 +561,9 @@ class CourseController extends AppController
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
-                'title' => $calendarItem['title'],
-                'tag' => $calendarItem['tag']
+                'dueTime' => AppUtility::getFormattedTime($calendarItem['date']),
+                'title' => ucfirst($calendarItem['title']),
+                'tag' => ucfirst($calendarItem['tag'])
             );
         }
         $calendarLinkArray = array();
@@ -586,14 +571,15 @@ class CourseController extends AppController
         {
             $calendarLinkArray[] = array(
                 'courseId' => $CalendarLinkItem['courseid'],
-                'title' => $CalendarLinkItem['title'],
+                'title' => ucfirst($CalendarLinkItem['title']),
                 'startDate' => AppUtility::getFormattedDate($CalendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($CalendarLinkItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($CalendarLinkItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $CalendarLinkItem['startdate'],
                 'endDateString' => $CalendarLinkItem['enddate'],
                 'linkedId' => $CalendarLinkItem['id'],
-                'calTag' => $CalendarLinkItem['caltag']
+                'calTag' => ucfirst($CalendarLinkItem['caltag'])
             );
         }
         $calendarInlineTextArray = array();
@@ -602,13 +588,14 @@ class CourseController extends AppController
             $calendarInlineTextArray[] = array(
                 'courseId' => $calendarInlineTextItem['courseid'],
                 'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
+                'dueTime' => AppUtility::getFormattedTime($calendarInlineTextItem['enddate']),
                 'now' => AppUtility::parsedatetime(date('m/d/Y'), date('h:i a')),
                 'startDateString' => $calendarInlineTextItem['startdate'],
                 'endDateString' => $calendarInlineTextItem['enddate'],
-                'calTag' => $calendarInlineTextItem['caltag']
+                'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray);
+        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
         return $this->successResponse($responseData);
     }
 
@@ -686,10 +673,15 @@ class CourseController extends AppController
 //    Display calendar on click of menuBars
     public function actionCalendar()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
-        return $this->render('calendar');
+        $responseData = array('course' => $course, 'user' => $user);
+        return $this->render('calendar', $responseData);
     }
     /**
      * Modify inline text: Teacher
@@ -940,7 +932,6 @@ class CourseController extends AppController
                 }
             } else if ($params['linktype']=='web') {
                 $params['text'] = trim(strip_tags($params['web']));
-
                 if (substr($params['text'],0,4)!='http') {
 
                     $processingerror = true;
@@ -1017,7 +1008,6 @@ class CourseController extends AppController
             $saveItemOrderIntoCourse = new Course();
             $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
         }
-
         $this->includeJS(["editor/tiny_mce.js","general.js"]);
         return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
     }

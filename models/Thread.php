@@ -14,6 +14,7 @@ use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
 use Yii;
 use app\models\_base\BaseImasInstrFiles;
+use yii\db\Query;
 
 class Thread extends BaseImasForumThreads
 {
@@ -26,13 +27,10 @@ class Thread extends BaseImasForumThreads
 
     public static function getPreOrNextThreadId($currentId,$next=null,$prev=null,$forumId)
     {
-
         if($next == AppConstant::NUMERIC_TWO){
             $thread = Thread::find()->where(['>', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
-//            AppUtility::dump($thread['id']);
         }elseif($prev == AppConstant::NUMERIC_ONE){
             $thread = Thread::find()->where(['<', 'id', $currentId])->andWhere(['forumid' => $forumId])->one();
-//            AppUtility::dump($thread['id']);
         }
         return $thread;
     }
@@ -42,7 +40,6 @@ class Thread extends BaseImasForumThreads
         if($thread){
             $thread->delete();
         }
-
     }
 
     public static function deleteThreadById($itemId)
@@ -51,9 +48,7 @@ class Thread extends BaseImasForumThreads
         if($thread){
             $thread->delete();
         }
-
     }
-
 
     public static function moveAndUpdateThread($forumId,$threadId)
     {
@@ -91,7 +86,6 @@ class Thread extends BaseImasForumThreads
         $thread = Thread::find()->where(['id' => $threadId])->andWhere(['forumid' => $forumId])->one();
         return $thread['views'];
     }
-
     public static function saveViews($threadid)
     {
         $views = Thread::find(['views'])->where(['id' => $threadid])->one();

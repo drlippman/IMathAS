@@ -1,19 +1,46 @@
 $(document).ready(function () {
     $("#show-all-link").hide();
     var cid = $(".send-msg").val();
-    var isNewMessage = $(".msg-type").val();
+    var isImportant = $('.is-important').val();
     var ShowRedFlagRow = -1;
+    var isNewMessage = $(".msg-type").val();
     var userId = $(".send-userId").val();
+    if(isImportant == 1){
+        ShowRedFlagRow = 1;
+        $("#limit-to-tag-link").hide();
+        $("#show-all-link").show();
+    }
     var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow, showNewMsg: isNewMessage};
     jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-    //jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
+    jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
-    markAsRead();
-    markAsUnread();
-    markAsDelete();
-    limitToTagShow();
+//    markAsRead();
+//    markAsUnread();
+//    markAsDelete();
     filterByCourse();
+
+    $('.with-selected-dropdown').click(function(){
+
+        var with_selected = $('.with-selected :selected').val();
+
+        if(with_selected  == 0)
+        {
+            markAsUnread();
+
+        }
+        else if(with_selected  == 1)
+        {
+            markAsRead();
+
+
+        }else if(with_selected  == 2){
+
+            markAsDelete();
+
+        }
+    });
+
 });
 
 var messageData;
@@ -22,9 +49,12 @@ var selectedUserId = $('#user-id').val();
 var selectedCourseId ;
 var courseInfo = [];
 function createTableHeader() {
-    var html = "<table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th></th><th>Message</th><th>Replied</th><th>Flag</th><th>From</th><th>Course</th><th>Sent</th>";
-    html += "</tr></thead><tbody class='message-table-body'></tbody></table>";
+
+
+
+    var html = " <table id='message-table display-message-table' class='message-table display-message-table table table-bordered table-striped table-hover data-table'>";
+    html += "<thead><tr><th><div class='checkbox'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label>   </div></th><th>Message</th><th>Sent</th><th>Course</th><th>Replied</th><th>Action</th>";
+    html += "    </tr></thead><tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
 
@@ -38,36 +68,41 @@ function showMessage(messageData, status) {
         $.each(messageData, function (index, msg) {
 
             if (msg.isread == 1 || msg.isread == 5 || msg.isread == 9 || msg.isread == 13) {
-                html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
+                html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><div class='checkbox'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
             else {
-                html += "<tr class='unread-message message-row message-row-" + msg.id + "'> <td><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ></td>";
+                html += "<tr class='unread-message message-row message-row-'" + msg.id + "> <td><div class='checkbox'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
-            html += "<td><a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> " + msg.title + "</a></td>";
+            if(msg.hasuserimg == 0 ){
+                html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
+            }else{
+                html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<a href='view-message?message=0&id=" + msg.id + "&cid="+ cid +"'> "+msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1);
+            }
             if (msg.replied == 1) {
-                html += "<th class='read-message'>Yes</th>";
+                html += "&nbsp;<i class='fa fa-reply'></i></a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b>";
+            }else{
+                html +="</a><br>&nbsp;&nbsp;&nbsp;"+msg.title +"</b></td>";
             }
-            else {
-                html += "<th class='unread-message'>No</th>";
-            }
-            var rowid = msg.id;
-            if (msg.isread < 7) {
-                if(msg.hasuserimg == 0 ){
-                    html += "<td><img  class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
-                }else{
-                    html += "<td><img class='images circular-image' src='../../Uploads/" + msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
-                }
-            }
-            else {
-                if(msg.hasuserimg == 0 ){
-                    html += "<td><img class='images circular-image' src='../../Uploads/dummy_profile.jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
-                }else{
-                    html += "<td><img class='images circular-image' src='../../Uploads/"+ msg.msgfrom+".jpg' >&nbsp;&nbsp;<img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
-                }
-            }
-            html += "<td>" + msg.FirstName.substr(0, 1).toUpperCase() + msg.FirstName.substr(1) + " " + msg.LastName.substr(0, 1).toUpperCase() + msg.LastName.substr(1) + "</td>";
-            html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
             html += "<td>" + msg.senddate + "</td>";
+
+            var rowid = msg.id;
+
+            html += "<td>" + msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1) + "</td>";
+            if (msg.replied == 1) {
+                html += "<td>Yes</td>";
+            }
+            else {
+                html += "<td>No</td>";
+            }
+            if (msg.isread < 7) {
+
+                html += "<td class='flag-bg-color'> <img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+            }
+            else {
+
+                html += "<td><img src='../../img/flagfilled.gif' onclick='changeImage(this," + true + "," + rowid + ")'/></td>";
+            }
+
         });
     }
     $('.message-div div').remove();
@@ -80,13 +115,12 @@ function showMessage(messageData, status) {
 function showMessageSuccess(response) {
     response = JSON.parse(response);
     messageData = response.data;
-    calculateCourseList();
     if(response.status == 0)
     {
         var filterArrayForUser = [];
         var filteredArray = [];
         $.each(response.data, function (index, msg) {
-                filterArrayForUser.push(msg.msgfrom);
+            filterArrayForUser.push(msg.msgfrom);
             if(cid == msg.courseid){
                 filteredArray.push(msg);
             }
@@ -100,16 +134,17 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox() {
-    $('.check-all').click(function () {
-        $('.message-table-body input:checkbox').each(function () {
-            $(this).prop('checked', true);
-        })
-    });
-
-    $('.uncheck-all').click(function () {
-        $('.message-table-body input:checkbox').each(function () {
-            $(this).prop('checked', false);
-        })
+    $('.message-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.message-table-body input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
     });
 }
 
@@ -117,8 +152,8 @@ function getCourseSuccess(response) {
     var result = JSON.parse(response);
     var course = result.data;
     if (result.status == 0) {
-        //courseDisplay(course);
-        //filterByCourse();
+        courseDisplay(course);
+        filterByCourse();
     }
 }
 
@@ -135,57 +170,57 @@ function courseDisplay(courseData) {
 }
 
 function markAsUnread() {
-    $('#mark-as-unread').click(function () {
-        var markArray = [];
+    var markArray = [];
 
-
-        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-            $(this).closest('tr').css('font-weight', 'bold');
-            markArray.push($(this).val());
-            $(this).prop('checked', false);
-        });
-        if( markArray.length !=0){
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+        $(this).closest('tr').css('font-weight', 'bold');
+        markArray.push($(this).val());
+        $(this).prop('checked', false);
+    });
+    if( markArray.length !=0)
+    {
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-unread-ajax', readMsg, 'markAsUnreadSuccess');
     }
-        else {
+    else
+    {
 
-            var msg ="Select atleast one message to unread";
-            CommonPopUp(msg);
+        var msg ="Select atleast one message to unread";
+        CommonPopUp(msg);
 
-        }
-    });
+    }
+
 }
 
 function markAsUnreadSuccess(response) {
 }
 
 function markAsRead() {
-    $("#mark-read").click(function () {
-
-        var markArray = [];
 
 
+    var markArray = [];
 
-        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-            markArray.push($(this).val());
-            $(this).closest('tr').css('font-weight', 'normal');
-            $(this).prop('checked', false);
-        });
-        if( markArray.length !=0){
+
+
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+        markArray.push($(this).val());
+        $(this).closest('tr').css('font-weight', 'normal');
+        $(this).prop('checked', false);
+    });
+    if( markArray.length !=0){
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-read-ajax', readMsg,{ });
 
 
     }
-        else {
+    else {
 
-            var msg ="Select atleast one message to read";
-            CommonPopUp(msg);
-        }
+        var msg ="Select atleast one message to read";
+        CommonPopUp(msg);
+    }
 
 
-    });
+
 }
 
 function filterByCourse() {
@@ -267,83 +302,57 @@ function getUserSuccess(response) {
 function userDisplay(userData) {
     var html = "";
     $.each(userData, function (index, userData) {
-        html += "<option value = " + userData.id + ">"+ userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1) +", "+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1) + "</option>"
+        html += "<option value = " + userData.id + ">"+ userData.LastName.substr(0,1).toUpperCase()+ userData.LastName.substr(1) +" "+userData.FirstName.substr(0,1).toUpperCase()+ userData.FirstName.substr(1) + "</option>"
     });
     $(".show-users").append(html);
 }
 
 function markAsDelete() {
-    $("#mark-delete").click(function (e) {
 
-        var markArray = [];
-        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-            markArray.push($(this).val());
-        });
-        if (markArray.length != 0) {
-            var html = '<div><p>Are you sure? This will delete your message from</p>' +
-                '<p>Inbox.</p></div>';
-            var cancelUrl = $(this).attr('href');
-            e.preventDefault();
-            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-                width: 'auto', resizable: false,
-                closeText: "hide",
-                buttons: {
-                    "Cancel": function () {
-                        $(this).dialog('destroy').remove();
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            $(this).prop('checked', false);
-                        });
-                        return false;
-                    },
-                    "Confirm": function () {
-                        $('.message-table-body input[name="msg-check"]:checked').each(function () {
-                            $(this).prop('checked', false);
-                            $(this).closest('tr').remove();
-                        });
-                        $(this).dialog("close");
 
-                        var readMsg = {checkedMsg: markArray};
-                        jQuerySubmit('mark-as-delete-ajax', readMsg,{ });
-                        return true;
-                    }
+    var markArray = [];
+    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+        markArray.push($(this).val());
+    });
+    if (markArray.length != 0) {
+        var html = '<div><p>Are you sure? This will delete your message from</p>' +
+            '<p>Inbox.</p></div>';
+        var cancelUrl = $(this).attr('href');
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                        $(this).prop('checked', false);
+                    });
+                    return false;
                 },
-                close: function (event, ui) {
-                    $(this).remove();
+                "Confirm": function () {
+                    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+                        $(this).prop('checked', false);
+                        $(this).closest('tr').remove();
+                    });
+                    $(this).dialog("close");
+
+                    var readMsg = {checkedMsg: markArray};
+                    jQuerySubmit('mark-as-delete-ajax', readMsg,{ });
+                    return true;
                 }
-            });
-        }
-        else {
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+    }
+    else {
 
-            var msg ="Select atleast one message to delete";
-            CommonPopUp(msg);
-        }
-    });
-}
+        var msg ="Select atleast one message to delete";
+        CommonPopUp(msg);
+    }
 
-function limitToTagShow() {
-
-    $("#limit-to-tag-link").click(function () {
-        $("#limit-to-tag-link").hide();
-        $("#show-all-link").show();
-        var ShowRedFlagRow = 1;
-        var cid = $(".send-msg").val();
-        var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-        jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-
-    });
-    $("#show-all-link").click(function () {
-        $("#limit-to-tag-link").show();
-        $("#show-all-link").hide();
-        ShowRedFlagRow = 0;
-        var cid = $(".send-msg").val();
-        var userId = $(".send-userId").val();
-        var allMessage = {cid: cid, userId: userId, ShowRedFlagRow: ShowRedFlagRow};
-        jQuerySubmit('display-message-ajax', allMessage, 'showMessageSuccess');
-
-    });
 }
 
 function changeImage(element, temp, rowId) {
@@ -387,18 +396,4 @@ function picshow(size) {
         }
     }
 
-}
-
-function calculateCourseList(){
-    var name= [];
-    var courseTest= [];
-    $.each(messageData, function (index, msg) {
-        if(!inArray(msg.name,name)){
-            var obj = {courseName:msg.name.substr(0, 1).toUpperCase() + msg.name.substr(1), courseId:msg.courseid}
-            name.push(msg.name);
-            courseInfo.push(obj);
-        }
-    });
-    courseInfo.sort();
-    courseDisplay(courseInfo);
 }
