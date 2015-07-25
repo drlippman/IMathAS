@@ -2,12 +2,12 @@
 use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-$this->title = 'Student Enrollment';
+$this->title = AppUtility::t('Student Enrollment', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>[AppUtility::t('Home', false),$course->name,AppUtility::t('Roster',false)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 
 <div class="item-detail-content">
@@ -27,12 +27,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]
         ) ?>
-        <?= $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => 'Username')); ?>
-        <?= $form->field($model, 'section')->textInput(array('placeholder' => 'Section')); ?>
-        <?= $form->field($model, 'code')->textInput(array('placeholder' => 'Code')); ?>
+        <?php echo $form->field($model, 'usernameToEnroll')->textInput(array('placeholder' => AppUtility::t('username', false))); ?>
+        <?php echo $form->field($model, 'section')->textInput(array('placeholder' => AppUtility::t('Section', false))); ?>
+        <?php echo $form->field($model, 'code')->textInput(array('placeholder' => AppUtility::t('Code', false))); ?>
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-3">
-                <?= Html::submitButton('Enroll', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
+                <?php echo Html::submitButton(AppUtility::t('Enroll', false), ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'enroll-button']) ?>
             </div>
         </div>
         <?php ActiveForm::end(); ?>

@@ -3,7 +3,7 @@
 namespace app\models\forms;
 
 use yii\base\Model;
-
+use app\components\AppUtility;
 class StudentEnrollmentForm extends Model
 {
     public $usernameToEnroll;
@@ -15,7 +15,7 @@ class StudentEnrollmentForm extends Model
     {
         return [
 
-            [['usernameToEnroll'], 'required', 'message'=>'Username cannot be blank'],
+            [['usernameToEnroll'], 'required', 'message'=>AppUtility::t('Username cannot be blank', false)],
             [['section'],'string'],
             [['code'],'string'],
         ];
@@ -26,9 +26,9 @@ class StudentEnrollmentForm extends Model
     {
         return
             [
-                'usernameToEnroll' => 'Username to enroll:',
-                'section' => 'Section (optional):',
-                'code' => 'Code (optional):'
+                'usernameToEnroll' => AppUtility::t('Username to enroll:',false),
+                'section' => AppUtility::t('Section (optional):', false),
+                'code' => AppUtility::t('Code (optional):', false)
             ];
     }
 

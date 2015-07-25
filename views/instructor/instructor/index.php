@@ -15,8 +15,21 @@ $now = $currentTime;
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="courseId" value="<?php echo $course->id?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithButton",['item_name'=>'Course Settings', 'link_title'=>'Home', 'link_url' => AppUtility::getHomeURL().'site/index', 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
 </div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Settings</button>
+        </div>
+    </div>
+</div>
+<!--<div class="item-detail-header">-->
+<!--    --><?php //echo $this->render("../../itemHeader/_indexWithButton",['item_name'=>'Course Settings', 'link_title'=>'Home', 'link_url' => AppUtility::getHomeURL().'site/index', 'page_title' => $this->title]); ?>
+<!--</div>-->
 
 <div class="item-detail-content">
     <?php echo $this->render("_toolbarTeacher", ['course' => $course, 'section' => 'course']);?>

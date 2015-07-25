@@ -3,11 +3,11 @@
 use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-$this->title = 'Enroll From Other Course';
+$this->title = AppUtility::t('Enroll From Other Course', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,AppUtility::t('Roster', false)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 
 <div class="item-detail-content">
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="form-group">
         <div class="col-lg-11">
             <br>
-            <?= Html::submitButton('Choose Students', ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
+            <?php echo Html::submitButton(AppUtility::t('Choose Students', false), ['class' => 'btn btn-primary','id' => 'change-button','name' => 'choose-button']) ?>
             <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back');?></a>
         </div>
     </div>

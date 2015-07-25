@@ -10,6 +10,14 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+
 <div class="item-detail-content">
     <?php
     if($user->rights == 100 || $user->rights == 20) {

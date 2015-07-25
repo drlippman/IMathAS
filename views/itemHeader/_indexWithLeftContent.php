@@ -7,9 +7,6 @@
                 <a href="<?php echo isset($link_url[$i]) ?  $link_url[$i] : ""; ?>"><?php echo isset($link_title[$i]) ?  $link_title[$i] : ""; ?> </a>>>
             <?php } ?>
         </div>
-        <div class="big-title">
-            <?php echo isset($page_title) ?  $page_title : ""; ?>
-        </div>
     </div>
 <!--            <div class="add-help left-float" style="">-->
 <!--               <a href="#"> <i class="fa fa-question fa-align-center help-icon"></i> </a>-->

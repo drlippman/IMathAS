@@ -611,3 +611,24 @@ img.small-icon{
     background-color: #2C368E;
     border-color: #285E8E;
 }
+.checkbox-size{
+    font-size: 14px;
+}
+.title-page{
+    font-size: 30px;
+    color: #ffffff;
+}
+.vertical-align{
+    vertical-align: middle;
+}
+.page-heading{
+    width: 70%;
+}
+.header-btn{
+    width: 30%;
+}
+.btn.btn-primary.page-settings{
+    color: #FFF;
+    background-color: #2C368E;
+    border-color: #285E8E;
+}

@@ -12,6 +12,7 @@
 .page-title{
     font-size: 30px;
     color: #6d6d6d;
+    text-transform: capitalize;
 }
 .col-lg-8.page-title{
     padding: 0;
@@ -188,6 +189,7 @@ div.dataTables_info {
     margin-right: 0;
 }
 .title-middle{
+    text-transform: capitalize;
     font-size: 30px;
     color: white;
     background-color: #6d6d6d;
@@ -202,7 +204,4 @@ div.dataTables_info {
 .checkbox.student-enroll label, .radio.student-enroll label{
     padding-left: 0;
     vertical-align: middle;
-}
-.checkbox-size{
-    font-size: 14px;
 }

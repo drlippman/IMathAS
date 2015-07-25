@@ -8,6 +8,7 @@
 
 namespace app\models\forms;
 
+use app\components\AppUtility;
 use yii\base\Model;
 
 class CreateAndEnrollNewStudentForm extends Model
@@ -25,12 +26,12 @@ class CreateAndEnrollNewStudentForm extends Model
     {
         return [
 
-            [['username'],'required','message'=>'Username cannot be blank'],
-            [['password'],'required','message'=>'Password cannot be blank'],
-            [['FirstName'],'required','message'=>'First Name cannot be blank'],
-            [['LastName'],'required','message'=>'Last Name cannot be blank'],
-            [['email'],'required','message'=>'Email Address cannot be blank'],
-            ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and Underscore(_).'],
+            [['username'],'required','message'=>AppUtility::t('Username cannot be blank', false)],
+            [['password'],'required','message'=>AppUtility::t('Password cannot be blank', false)],
+            [['FirstName'],'required','message'=>AppUtility::t('First Name cannot be blank', false)],
+            [['LastName'],'required','message'=>AppUtility::t('Last Name cannot be blank', false)],
+            [['email'],'required','message'=>AppUtility::t('Email Address cannot be blank', false)],
+            ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => AppUtility::t('Username can contain only alphanumeric characters and Underscore(_).', false)],
             [['FirstName', 'LastName'], 'string'],
             ['email','email'],
             [['section'],'string'],
@@ -43,13 +44,13 @@ class CreateAndEnrollNewStudentForm extends Model
     {
         return
             [
-                'username' => 'Username :',
-                'password' => 'Choose a password :',
-                'FirstName'=> 'Enter First Name :',
-                'LastName' => 'Enter Last Name :',
-                'email'    => 'Enter E-mail address :',
-                'section' => 'Section (optional) :',
-                'code' => 'Code (optional) :'
+                'username' => AppUtility::t('Username:', false),
+                'password' => AppUtility::t('Choose a password:', false),
+                'FirstName'=> AppUtility::t('Enter First Name:', false),
+                'LastName' => AppUtility::t('Enter Last Name:', false),
+                'email'    => AppUtility::t('Enter E-mail address:', false),
+                'section' => AppUtility::t('Section (optional):', false),
+                'code' => AppUtility::t('Code (optional):', false)
             ];
     }
 

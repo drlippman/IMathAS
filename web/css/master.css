@@ -275,3 +275,6 @@ body {
 .fc-event{
     cursor: pointer;
 }
+.big-title{
+    font-size: 30px;
+}
