@@ -477,7 +477,7 @@ $now = $currentTime;
                             <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class=blockitems id="block5">
+                    <div class=blockitems id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):
@@ -915,7 +915,7 @@ $now = $currentTime;
                             <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class=blockitems id="block5">
+                    <div class=blockitems id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):

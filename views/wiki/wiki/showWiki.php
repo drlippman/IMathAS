@@ -49,7 +49,8 @@ if (count($countOfRevision)>1) {
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
                 <?php $text = $singleWikiRevision->revision;
-                echo strip_tags($text);?>
+                echo $text;?>
+
     </textarea>
     <?php }?>
     <?php }?>
@@ -187,6 +188,7 @@ if (count($countOfRevision)>1) {
     function showrevisions() {
         showrev = 1 - showrev;
         if (showrev==1) {
+
             contentdiv.innerHTML = colorrevisions(curcontent,curversion);
             document.getElementById("showrev").value = "Hide Changes";
         } else {
@@ -196,6 +198,51 @@ if (count($countOfRevision)>1) {
         wikirendermath();
     }
 
+//    function colorrevisions(content,ver) {
+//
+//        if (ver==wikihistory.length-1) {return content.join(' ');};
+//        current = content.slice();
+//        var diff = wikihistory[ver+1].c;
+//        for (var i=diff.length-1; i>=0; i--) {
+//            deled = null;  insed = null;
+//            if (diff[i][0]==2) {
+//                deled = diff[i][3].join(' ');
+//                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
+//            } else if (diff[i][0]==0) {
+//                deled = diff[i][2].join(' ');
+//            } else if (diff[i][0]==1) {
+//                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
+//            }
+//            if (insed != null) {
+//                if (insed.match(/<p>/)) {
+//                    insed = insed.split('<p>').join('<p><ins>');
+//                }
+//                if (insed.match(/<\/p>/)) {
+//                    insed = insed.split('</p>').join('</ins></p>');
+//                }
+//            }
+//            if (deled != null) {
+//                if (deled.match(/<p>/)) {
+//                    deled = deled.split('<p>').join('<p><del>');
+//                }
+//                if (deled.match(/<\/p>/)) {
+//                    deled = deled.split('</p>').join('</del></p>');
+//                }
+//            }
+//
+//            if (diff[i][0]==2) {  //replace
+//                    alert('in if')
+//                current.splice(diff[i][1], 0, "<del>"+deled+"</del><ins>"+insed+"</ins>");
+//            } else if (diff[i][0]==0) {//insert
+//                alert('in  elsle if')
+//                current.splice(diff[i][1], 0, "<del>"+deled+"</del>");
+//            } else if (diff[i][0]==1) {//delete
+//                alert('in esle')
+//                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins>");
+//            }
+//        }
+//        return current.join(' ');
+//    }
     function colorrevisions(content,ver) {
 
         if (ver==wikihistory.length-1) {return content.join(' ');};
@@ -227,6 +274,7 @@ if (count($countOfRevision)>1) {
                     deled = deled.split('</p>').join('</del></p>');
                 }
             }
+
             if (diff[i][0]==2) { //replace
                 current.splice(diff[i][1], 0, "<del>"+deled+"</del><ins>"+insed+"</ins>");
             } else if (diff[i][0]==0) {//insert
@@ -235,6 +283,6 @@ if (count($countOfRevision)>1) {
                 current.splice(diff[i][1], 0, "<ins>"+insed+"</ins>");
             }
         }
-        return current.join(' ');
+        return current.join('');
     }
 </script>
