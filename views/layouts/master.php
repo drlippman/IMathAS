@@ -19,7 +19,6 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
 </head>
 

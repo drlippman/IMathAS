@@ -50,9 +50,9 @@ class CourseController extends AppController
 
     public function actionIndex()
     {
-        $this->layout = 'master';
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $this->userAuthentication($user, $courseId);
         $userId = $user->id;

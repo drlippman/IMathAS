@@ -1032,7 +1032,6 @@ class ForumController extends AppController
                 $updateForum = new Forums();
                 $updateForum->UpdateForum($params, $modifyForumId);
             } else {
-
                 $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
                 $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
                 $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);

@@ -1,4 +1,5 @@
 <header class="header-wraper">
+
 <?php
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -11,6 +12,7 @@ NavBar::begin([
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
 ]);
+
 echo '<div class="dropdown dropdown-class">
         <img src="../../img/class.png">
         <button class="btn btn-primary dropdown-toggle" type="submit" data-toggle="dropdown">My Classes
@@ -29,6 +31,7 @@ echo Nav::widget([
                     ['label' => 'Forum', 'url' => '#'],
                 ],
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']],
+
         Yii::$app->user->isGuest ?
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
         Yii::$app->user->isGuest ?
@@ -41,12 +44,11 @@ echo Nav::widget([
 ]);
 NavBar::end();
 ?>
-
 </header>
-
 </div>
 <script>
 
 
 
 </script>
+

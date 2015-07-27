@@ -9,7 +9,6 @@ body {
     padding: 0 5%;
     position: relative;
     bottom: 240px;
-
 }
 .navbar-inverse {
     background-color: #2C368E;
@@ -28,11 +27,6 @@ body {
     background-color: #fafafa;
     margin: 0px;
     padding: 0px;
-}
-.container-lower-white:after{
-    display: table;
-    content: "";
-    clear: both;
 }
 .graphic-math-img{
     width: 336px;
@@ -73,7 +67,14 @@ body {
 /*width: 34px;*/
 /*background: url("../img/two_gears.png");*/
 /*}*/
-
+.index-header .right-side .item-icon{
+    float: left;
+    margin-top: 10px;
+    margin-left: 5px;
+    height: 34px;
+    width: 34px;
+    background: url("../img/two_gears.png");
+}
 .left-float{
     float: left;
 }

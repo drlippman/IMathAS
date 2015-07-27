@@ -38,17 +38,18 @@ $hidetitle = false;
         <!--    Text Editor-->
         <BR class=form>
         &nbsp;&nbsp; Description:<BR>
-        <?php $text = "<p>Enter forum description here</p>";
-        if ($forumData) {
-        $text = $forumData['description'];
-        } ?>
+<!--        --><?php //$text = "<p>Enter forum description here</p>";
+//        if ($forumData) {
+//        $text = $forumData['description'];
+//        } ?>
+<!--        <div>-->
+<!--            <div class='left col-md-11'><div class= 'editor'>-->
+<!--            <textarea id='forum-description' name='forum-description' style='width: 100%;' rows='20' cols='200'></textarea></div>-->
+<!--        </div>-->
         <div>
             <?php echo "<div class='left col-md-11'><div class= 'editor'>
-            <textarea id='forum-description' name='forum-description' style='width: 100%;' rows='20' cols='200'>
-            $text
-            </textarea></div> "?>
+        <textarea cols=50 rows=15 id=summary name=summary style='width: 100%'></textarea></div></div><br>"; ?>
         </div>
-
         <!--Show-->
         <div>
             <span class=form>Show:</span>

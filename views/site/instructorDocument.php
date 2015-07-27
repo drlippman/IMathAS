@@ -20,104 +20,104 @@ $this->params['breadcrumbs'][] = $this->title;
     <li><a href="#common-task"><?php AppUtility::t('Common Tasks in IMathAS');?></a>.  <?php AppUtility::t('A walkthrough of common instructor activities.')?></li>
     <li><a href="#manage-question-library"><?php AppUtility::t('Managing Libraries and Questions in IMathAS')?></a>.  A guide to the library and question
         set management tools</li>
-    <li><a href="#administrator">Administration</a>.  A guide to administering IMathAS for Full and Group Admins.</li>
-    <li><a href="#diagnostics">Diagnostics</a>.  A guide to setting up diagnostic assessment login pages.</li>
+    <li><a href="#administrator"><?php AppUtility::t('Administration');?></a>.  <?php AppUtility::t('A guide to administering IMathAS for Full and Group Admins')?>.</li>
+    <li><a href="#diagnostics"><?php AppUtility::t('Diagnostics')?></a>. <?php AppUtility::t(' A guide to setting up diagnostic assessment login pages')?>.</li>
 
 </ul>
 
 
-<h4>Video Guides</h4>
+<h4><?php AppUtility::t('Video Guides')?></h4>
 <ul>
-    <li><a href="#getting-started">Getting Started in IMathAS</a> video guide.</li>
-    <li><a href="#">Training Videos</a>.  A complete training course set of video guides.</li>
-    <li><a href="#">Examples of Course Layouts</a>.  Some ideas for how to lay out a course page</li>
-    <li><a href="#">Using Course Templates</a>.  How to copy pre-created course templates to use
-        course assignments created by your colleagues.</li>
-    <li><a href="#">Video versions of several other guides</a> are also available.</p></li>
+    <li><a href="#getting-started"><?php AppUtility::t('Getting Started in IMathAS')?></a> <?php AppUtility::t('video guide')?>.</li>
+    <li><a href="#"><?php AppUtility::t('Training Videos')?></a>.  <?php AppUtility::t('A complete training course set of video guides')?>.</li>
+    <li><a href="#"><?php AppUtility::t('Examples of Course Layouts')?></a>.  <?php AppUtility::t('Some ideas for how to lay out a course page')?></li>
+    <li><a href="#">Using Course Templates</a>.  <?php AppUtility::t('How to copy pre-created course templates to use course assignments created by your colleagues')?>
+        .</li>
+    <li><a href="#"><?php AppUtility::t('Video versions of several other guides')?></a><?php AppUtility::t('are also available')?>.</p></li>
 </ul>
 
 
-<h4>Question Writing Guides</h4>
+<h4><?php AppUtility::t('Question Writing Guides')?></h4>
 <ul>
-    <li><a href="#intro-question-writing">Intro to Question Writing in IMathAS</a>.  A step-by-step guide for writing
-        your first IMathAS question.</li>
-    <li><a href="#more-question-examples">More Question Examples</a>.  Examples of several questions, with explanation.</li>
-    <li><a href="#question-oddities">Question Oddities</a>.  Common pitfalls and oddities in the IMathAS question language.</li>
-    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/langquickref.doc" target="_blank">Language Quick Reference</a>.  Short document with quick function reference.</li>
+    <li><a href="#intro-question-writing"><?php AppUtility::t('Intro to Question Writing in IMathAS')?></a>.  <?php AppUtility::t('A step-by-step guide for writing
+        your first IMathAS question')?>.</li>
+    <li><a href="#more-question-examples"><?php AppUtility::t('More Question Examples')?></a>.  <?php AppUtility::t('Examples of several questions, with explanation')?>.</li>
+    <li><a href="#question-oddities"><?php AppUtility::t('Question Oddities')?></a>.  <?php AppUtility::t('Common pitfalls and oddities in the IMathAS question language')?>.</li>
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/langquickref.doc" target="_blank"><?php AppUtility::t('Language Quick Reference') ?></a>.  <?php AppUtility::t('Short document with quick function reference')?>.</li>
 </ul>
 
 
-<h2>Documentation</h2>
+<h2><?php AppUtility::t('Documentation')?></h2>
 <ul>
-    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">Help file</a>.  Detailed documentation of all of IMathAS's features and
-        question language</li>
-    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/AccessingOnlineHomeworkinWAMAP.doc">Getting enrolled for students</a>.  Not so much documentation, but
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank"><?php AppUtility::t('Help file')?></a>.  <?php AppUtility::t("Detailed documentation of all of IMathAS's features and
+question language")?></li>
+    <li><a href="<?php echo AppUtility::getHomeURL()?>docs/AccessingOnlineHomeworkinWAMAP.doc"><?php AppUtility::t('Getting enrolled for students')?></a>.<?php AppUtility::t('Not so much documentation, but
         a word document containing instructions for students to sign up and enroll in your course.  Suitable for including
-        in your syllabus or handing out to students</li>
-    <li><a href="#asciimath-syntax">ASCIIMath syntax reference</a>.  A reference sheet for ASCIIMath symbol entry.</li>
-    <li><a href="#installation">Installation</a>.  Step-by-step installation instructions, part of the system's
-        readme file.  This is only needed for server installation - teachers should not need this</li>
+        in your syllabus or handing out to students')?></li>
+    <li><a href="#asciimath-syntax"><?php AppUtility::t('ASCIIMath syntax reference')?></a>.  <?php AppUtility::t('A reference sheet for ASCIIMath symbol entry')?>.</li>
+    <li><a href="#installation"><?php AppUtility::t('Installation')?></a>.<?php AppUtility::t("Step-by-step installation instructions, part of the system's
+        readme file.  This is only needed for server installation - teachers should not need this")?></li>
 </ul>
 
-<p>Many of these guides were written with development grant support from the WA State Distance Learning Council</p>
+<p><?php AppUtility::t('Many of these guides were written with development grant support from the WA State Distance Learning Council')?></p>
 
 <!--Getting started with IMathAS-->
 <div id="getting-started">
 
-    <h2>Purpose of this document</h2>
-    <p>This document will guide you through the process of creating your first IMathAS
+    <h2><?php AppUtility::t('Purpose of this document')?></h2>
+    <p><?php AppUtility::t('This document will guide you through the process of creating your first IMathAS
         course and setting up a few items and assessments.  This is not a comprehensive
-        guide; please refer to the <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank">help file</a> for more
-        detailed information on any process.</p>
+        guide; please refer to the')?> <a href="<?php echo AppUtility::getHomeURL()?>docs/help.html" target="_blank"><?php AppUtility::t('help file')?></a> <?php AppUtility::t('for more
+        detailed information on any process')?>.</p>
 
-    <p>This document presumes that you have Limited Course Creator rights.  If you have
+    <p><?php AppUtility::t('This document presumes that you have Limited Course Creator rights.  If you have
         Teacher rights, you will not be able to add a new course to the system yourself;  contact
-        your IMathAS admin to setup the course, then start this document at step 2. </p>
+        your IMathAS admin to setup the course, then start this document at step 2')?>. </p>
 
-    <h2>1. Adding a New Course</h2>
+    <h2>1. <?php AppUtility::t('Adding a New Course')?></h2>
     <ol>
-        <li>After logging in to IMathAS, click on "Go to Admin Page" in the grey control panel box.</li>
-        <li>Click the "Add New Course" button.</li>
-        <li>Enter your course name and an enrollment key.  The course name is the name that will show
-            up in your "Classes You're Teaching" list and in the student's "Classes You're Taking" list.  The
-            enrollment key is the password that students must enter to enroll themselves in your course.</li>
-        <li>Click "Submit".</li>
-        <li>Back at the Admin page, note the Course ID of the course you just created.  Your students
-            will need both your Course ID and enrollment key to sign up for your course.</li>
-        <li>Click on the Course Name to enter your course.  In the future, the course will show up on your
-            Home Page under "Classes You're Teaching".
+        <li><?php AppUtility::t('After logging in to IMathAS, click on "Go to Admin Page" in the grey control panel box')?>.</li>
+        <li><?php AppUtility::t('Click the "Add New Course" button')?>.</li>
+        <li><?php AppUtility::t('Enter your course name and an enrollment key.  The course name is the name that will show
+            up in your "Classes You\'re Teaching" list and in the student\'s "Classes You\'re Taking" list.  The
+            enrollment key is the password that students must enter to enroll themselves in your course')?>.</li>
+        <li><?php AppUtility::t('Click "Submit"')?>.</li>
+        <li><?php AppUtility::t('Back at the Admin page, note the Course ID of the course you just created.  Your students
+            will need both your Course ID and enrollment key to sign up for your course')?>.</li>
+        <li><?php AppUtility::t('Click on the Course Name to enter your course.  In the future, the course will show up on your
+            Home Page under "Classes You\'re Teaching"')?>.
     </ol>
 
-    <p><em>Note</em>: If you have Admin or Course Creator rights, you will not automatically be
+    <p><em><?php AppUtility::t('Note')?></em>: <?php AppUtility::t('If you have Admin or Course Creator rights, you will not automatically be
         registered as instructor for the course.  To do so, click the "Add/Remove Teachers" link, then
-        click the "Add as Teacher" link next to your name.</p>
+        click the "Add as Teacher" link next to your name')?>.</p>
 
-    <h2>2.  The Course Page</h2>
-    <p>When you first access your course, the only thing you will see is two grey control panel
-    boxes.  To familiarize yourself with the control options, here are some brief descriptions:</p>
+    <h2>2.  <?php AppUtility::t('The Course Page')?></h2>
+    <p><?php AppUtility::t('When you first access your course, the only thing you will see is two grey control panel
+    boxes.  To familiarize yourself with the control options, here are some brief descriptions')?>:</p>
 
     <ul>
-        <li><strong>Add an item</strong>:  Used to add items to your course</li>
-        <li><strong>List Students</strong>:  List the students in your course.  This page also provides options for
-        importing students into your course and for setting testing due date exceptions.</li>
-        <li><strong>Show Gradebook</strong>:  Your course gradebook.  From here you can review individual students'
-        tests, adjust grades, accept overtime tests, and export the gradebook to a file.</li>
-        <li><strong>Manage Question Set</strong>:  Search, modify, and add questions to the system question database.</li>
-        <li><strong>Manage Libraries</strong>:  Add to or modify the question library structure.</li>
-        <li><strong>Copy Course Items</strong>:  Copy items in your course, or copy items from other instructors' courses</li>
-        <li><strong>Export/Import Course Items</strong>:  For sharing course items with other IMathAS installations.</li>
-        <li><strong>Shift all Course Dates</strong>:  Change all course item dates at one time.</li>
-        <li><strong>Mass Change Assessments</strong>:  Change several assessments' settings at once.</li>
+        <li><strong><?php AppUtility::t('Add an item')?></strong>:  <?php AppUtility::t('Used to add items to your course')?></li>
+        <li><strong><?php AppUtility::t('List Students')?></strong>:<?php AppUtility::t('List the students in your course.  This page also provides options for
+        importing students into your course and for setting testing due date exceptions')?>.</li>
+        <li><strong><?php AppUtility::t('Show Gradebook');?></strong>: <?php AppUtility::t('Your course gradebook.  From here you can review individual students\'
+        tests, adjust grades, accept overtime tests, and export the gradebook to a file');?>.</li>
+        <li><strong><?php AppUtility::t('Manage Question Set')?></strong>:  <?php AppUtility::t('Search, modify, and add questions to the system question database')?>.</li>
+        <li><strong>Manage Libraries</strong>:<?php AppUtility::t('Add to or modify the question library structure')?>.</li>
+        <li><strong><?php AppUtility::t('Copy Course Items')?></strong>:  <?php AppUtility::t('Copy items in your course, or copy items from other instructors\' courses')?></li>
+        <li><strong><?php AppUtility::t('Export/Import Course Items')?></strong>:  <?php AppUtility::t('For sharing course items with other IMathAS installations')?>.</li>
+        <li><strong><?php AppUtility::t('Shift all Course Dates')?></strong>:  <?php AppUtility::t('Change all course item dates at one time')?>.</li>
+        <li><strong><?php AppUtility::t('Mass Change Assessments')?></strong>:  <?php AppUtility::t('Change several assessments\' settings at once')?>.</li>
 
     </ul>
-    <p>Once you add items to the course page, each item will have an icon attached to it.  The icons change
+    <p><?php AppUtility::t('Once you add items to the course page, each item will have an icon attached to it.  The icons change
     color based on the due date;  grey when unavailable, and green for 2 weeks or more until due date, changing to yellow
-    then red as the due date approaches</p>
+    then red as the due date approaches')?></p>
 
-    <h2>3. Add an Inline Text Item</h2>
-    <p>Inline Text items display announcements or other text on the course page.</p>
+    <h2>3. <?php AppUtility::t('Add an Inline Text Item')?></h2>
+    <p><?php AppUtility::t('Inline Text items display announcements or other text on the course page')?>.</p>
     <ol>
-        <li>Select "Inline Text" from the "Add An Item" pulldown</li>
+        <li><?php AppUtility::t('Select "Inline Text" from the "Add An Item" pulldown')?></li>
         <li>Enter a title for the text item, e.g. "Welcome to the Class!"</li>
         <li>Enter the item text.  The editor will allow you to format your text item.  The editor
         has been extended with support for math and graphs.

@@ -23,9 +23,7 @@ use app\components\AppUtility;
     </div>
     <div class="row">
         <div class="col-md-4 footer-brand">
-
                 <b><?php AppUtility::t('MyOpenMath')?></b>
-
         </div>
     </div>
 </div>

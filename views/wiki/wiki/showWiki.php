@@ -48,7 +48,7 @@ if (count($countOfRevision)>1) {
         <?php if(!empty($wikiRevisionData)){
             foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
     <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
-                <?php $text = $singleWikiRevision->revision;  echo strip_tags($text);
+                <?php $text = $singleWikiRevision->revision;
                 echo strip_tags($text);?>
     </textarea>
     <?php }?>
@@ -78,7 +78,6 @@ if (count($countOfRevision)>1) {
     $('#show-revision').click(function(){
         var courseId = $('.course-id').val();
         var wikiId = $('.wiki-id').val();
-
         $.get( "get-revisions?courseId="+courseId+"&wikiId="+wikiId, function( data ) {
             jsonData = $.parseJSON(data);
 

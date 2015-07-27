@@ -10,7 +10,6 @@ require_once("../filter/filter.php");
 
 class WikiUtility extends Component
 {
-
     public static function getWikiRevision($courseId, $wikiId)
     {
         $stuGroupId = AppConstant::NUMERIC_ZERO;
