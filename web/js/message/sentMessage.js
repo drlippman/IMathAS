@@ -82,7 +82,7 @@ function selectCheckBox(){
     });
 }
 
-function getCourseSuccess(response) {   console.log(response);
+function getCourseSuccess(response) {
     var result = JSON.parse(response);
     if (result.status == 0) {
         var courseData = result.data;

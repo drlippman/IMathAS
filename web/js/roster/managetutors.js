@@ -1,13 +1,13 @@
 
 $(document).ready(function () {
     var sessionCount = 0;
-    $('.display-tutor-table').DataTable();
+    $('.display-tutor-table').DataTable({bPaginate: false});
     var sessionVar = $.session.get("userNotFound");
     if(sessionVar)
     {
         if(sessionCount == 0)
         {
-            $("#user-div").append("<b>Following Usernames Were Not Found :</b>&nbsp;");
+            $("#user-div").append("<b>Following usernames were not found :</b>&nbsp;");
             sessionCount++;
         }
             $("#user-div").append(sessionVar);

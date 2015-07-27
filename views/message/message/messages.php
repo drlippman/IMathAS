@@ -13,11 +13,11 @@ $now = $currentTime;
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
 
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-        <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+        <input type="hidden" class="send-userId" value="<?php echo $userId ?>">
         <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
     <?php } else {?>
         <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-        <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
+        <input type="hidden" class="send-userId" value="<?php echo $userId ?>">
         <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
     <?php } ?>
 </div>

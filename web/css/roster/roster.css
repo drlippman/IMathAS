@@ -205,3 +205,8 @@ div.dataTables_info {
     padding-left: 0;
     vertical-align: middle;
 }
+#datepicker-id > .input-group, #datepicker-id1 > .input-group{
+    width: 210px;
+    padding-left: 15px;
+    padding-right: 15px;
+}

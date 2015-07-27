@@ -1,28 +1,37 @@
 <?php
-
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
-$this->title = 'Manage Tutors';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->title = AppUtility::t('Manage Tutors', false);
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>[AppUtility::t('Home', false),$course->name,AppUtility::t('Roster',false)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+<div class="tab-content shadowBox"">
+<?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+<div class="inner-content">
+
 <input type="hidden" class="courseId" value="<?php echo $courseId ?>">
 <?php $sectionArray = $section?>
-
-<p><div id="user-div"></div></p>
-<h2>Manage Tutors</h2>
-
+    <div class="title-middle center"><?php AppUtility::t('Manage Tutors');?></div>
+    <p><div id="user-div"></div></p>
 <div>
 
-<table class='list display-tutor-table'>
+<table class='list display-tutor-table table table-bordered table-striped table-hover data-table' bPaginate = 'false'>
     <thead>
-        <th>Tutor Name</th>
-        <th>Limit to Section</th>
-        <th>Remove?  Check <a id="check-all" class="check-all" href="#">All</a> /
-            <a id="check-none" class="uncheck-all" href="#">None</a></th>
+        <th><?php AppUtility::t('Tutor Name')?></th>
+        <th><?php AppUtility::t('Limit to Section')?></th>
+        <th><?php AppUtility::t('Remove')?>?  <?php AppUtility::t('Check')?> <a id="check-all" class="check-all" href="#"><?php AppUtility::t('All')?></a> /
+            <a id="check-none" class="uncheck-all" href="#"><?php AppUtility::t('None')?></a></th>
     </thead>
     <tbody class="tutor-table-body">
         <div>
@@ -48,7 +57,14 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                                     }
                                 }
                             }
-                            echo "</select><td><input type = 'checkbox' name = 'tutor-check' value = '{$value['id']}' class = 'master'></td></tr>";
+                            echo "</select><td>
+                                               <div class='checkbox'>
+                    <label>
+                        <input type='checkbox' name='tutor-check' value='{$value['id']}' class = 'master'>
+                        <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                    </label>
+                </div>
+</td></tr>";
                 }
             ?>
         </div>
@@ -56,10 +72,12 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 </table>
 </div><br><br>
 
-<p><b>Add new tutors.</b> Provide a list of usernames below, separated by commas, to add as tutors.</p>
+<p><b><?php AppUtility::t('Add new tutors.')?></b> <?php AppUtility::t('Provide a list of usernames below, separated by commas, to add as tutors.')?></p>
 <br>
     <textarea name = "newTutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
-<a class = "btn btn-primary" id = "update-button">Update</a>
-<a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+<a class = "btn btn-primary" id = "update-button"><?php AppUtility::t('Update')?></a>
+<a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
 
+</div>
+</div>

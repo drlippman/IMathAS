@@ -132,11 +132,11 @@ function loginGridViewSuccess(response) {
     var tableString = '';
     headerArray = data.header;
     rows = data.rows;
-    tableString = "<table border='1px'><tr>";
+    tableString = "<table class='login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
     for(i=0; i<headerArray.length; i++){
         tableString = tableString + "<th>" + headerArray[i]+"</th>";
     }
-    tableString = tableString+ "</tr>";
+    tableString = tableString+ "</thead><tbody>";
     $.each( rows, function(id, studata){
         name = studata.name;
         rows = studata.row;
@@ -148,6 +148,6 @@ function loginGridViewSuccess(response) {
         }
         tableString = tableString+ "</tr>";
     });
-    tableString = tableString + "</table>";
+    tableString = tableString + "</tbody></table>";
     $('#table_placeholder').html(tableString);
 }

@@ -64,10 +64,11 @@ class RosterController extends AppController
     public function actionLoginGridView()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $this->includeCSS(['jquery-ui.css']);
-        $this->includeJS(['logingridview.js', 'general.js']);
+        $this->includeCSS(['jquery-ui.css', 'roster/roster.css', 'dataTables.bootstrap.css']);
+        $this->includeJS(['logingridview.js', 'general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course);
         return $this->render('loginGridView', $responseData);
     }
@@ -210,13 +211,14 @@ class RosterController extends AppController
     public function actionAssignSectionsAndCodes()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $query = Student::findByCid($courseId);
         $course = Course::getById($courseId);
         $studentArray = array();
         if ($query) {
             foreach ($query as $student) {
-                $tempArray = array('Name' => $student->user->FirstName . ' ' . $student->user->LastName,
+                $tempArray = array('Name' => ucfirst($student->user->LastName).', '.ucfirst($student->user->FirstName),
                     'code' => $student->code,
                     'section' => $student->section,
                     'userid' => $student->userid
@@ -234,7 +236,7 @@ class RosterController extends AppController
             }
             $this->redirect('student-roster?cid=' . $courseId);
         }
-        $this->includeCSS(['jquery-ui.css']);
+        $this->includeCSS(['jquery-ui.css', 'roster/roster.css', 'dataTables.bootstrap.css']);
         $this->includeJS(['roster/assignSectionsAndCodes.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('studentInformation' => $studentArray, 'cid' => $courseId, 'course' => $course);
         return $this->render('assignSectionsAndCodes', $responseData);
@@ -244,6 +246,7 @@ class RosterController extends AppController
     public function actionManageLatePasses()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $model = Student::findByCid($courseId);
         $course = Course::getById($courseId);
@@ -269,7 +272,7 @@ class RosterController extends AppController
                 }
             }
         }
-        $this->includeCSS(['jquery-ui.css', '../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeCSS(['jquery-ui.css', 'dataTables.bootstrap.css', 'roster/roster.css']);
         $this->includeJS(['roster/managelatepasses.js', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('studentInformation' => $studentArray, 'course' => $course);
         return $this->render('manageLatePasses', $responseData);
@@ -410,6 +413,7 @@ class RosterController extends AppController
     public function actionManageTutors()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $tutors = Tutor::getByCourseId($courseId);
@@ -429,7 +433,7 @@ class RosterController extends AppController
                 array_push($sectionArray, $section->section);
             }
         }
-        $this->includeCSS(['../js/DataTables-1.10.6/media/css/jquery.dataTables.css']);
+        $this->includeCSS(['roster/roster.css', 'dataTables.bootstrap.css']);
         $this->includeJS(['general.js?ver=012115', 'roster/managetutors.js?ver=012115', 'jquery.session.js?ver=012115', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
         $responseData = array('course' => $course, 'courseId' => $courseId, 'tutors' => $tutorInfo, 'section' => $sectionArray);
         return $this->renderWithData('manageTutors', $responseData);
@@ -458,22 +462,24 @@ class RosterController extends AppController
         if (count($users)) {
             foreach ($users as $entry) {
                 $entry = trim($entry);
-                $userId = User::findByUsername($entry);
-                if (!$userId) {
-                    array_push($userNotFoundArray, $entry);
-                } else {
-                    array_push($userIdArray, $userId->id);
-                    $isTeacher = Teacher::getUniqueByUserId($userId->id);
-                    if ($isTeacher) {
-                        $tutors = Tutor::getByUserId($isTeacher->userid, $courseId);
-                        if (!$tutors) {
-                            $tutorInfo = array('Name' => AppUtility::getFullName($userId->FirstName, $userId->LastName), 'id' => $userId->id);
-                            array_push($tutorsArray, $tutorInfo);
-                            $tutor = new Tutor();
-                            $tutor->create($isTeacher->userid, $courseId);
-                        }
+                if($entry != null){
+                    $userId = User::findByUsername($entry);
+                    if (!$userId) {
+                        array_push($userNotFoundArray, $entry);
                     } else {
-                        array_push($studentArray, $userId->id);
+                        array_push($userIdArray, $userId->id);
+                        $isTeacher = Teacher::getUniqueByUserId($userId->id);
+                        if ($isTeacher) {
+                            $tutors = Tutor::getByUserId($isTeacher->userid, $courseId);
+                            if (!$tutors) {
+                                $tutorInfo = array('Name' => AppUtility::getFullName($userId->FirstName, $userId->LastName), 'id' => $userId->id);
+                                array_push($tutorsArray, $tutorInfo);
+                                $tutor = new Tutor();
+                                $tutor->create($isTeacher->userid, $courseId);
+                            }
+                        } else {
+                            array_push($studentArray, $userId->id);
+                        }
                     }
                 }
             }

@@ -13,6 +13,7 @@ use app\models\User;
 use Yii;
 use app\controllers\AppController;
 use app\models\forms\MessageForm;
+use app\components\htmLawed;
 
 class MessageController extends AppController
 {
@@ -42,7 +43,7 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/message.js', 'general.js' ]);
-            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant);
+            $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id);
             return $this->renderWithData('messages', $responseData);
         }
     }
@@ -199,18 +200,30 @@ class MessageController extends AppController
         $params = $this->getRequestParams();
         $userId = $params['userId'];
         $teachers = Teacher::getTeacherByUserId($userId);
-        $teacherArray = array();
+        $students = Student::getByUserId($userId);
+        $courseArray = array();
         if ($teachers) {
             foreach ($teachers as $teacher) {
                 $tempArray = array(
                     'courseId' => $teacher->course->id,
                     'courseName' => $teacher->course->name
                 );
-                array_push($teacherArray, $tempArray);
+                array_push($courseArray, $tempArray);
             }
-            $sort_by = array_column($teacherArray, 'courseName');
-            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $teacherArray);
-            return $this->successResponse($teacherArray);
+            $sort_by = array_column($courseArray, 'courseName');
+            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $courseArray);
+            return $this->successResponse($courseArray);
+        } elseif ( $students){
+            foreach ($students as $student) {
+                $tempArray = array(
+                    'courseId' => $student->course->id,
+                    'courseName' => $student->course->name
+                );
+                array_push($courseArray, $tempArray);
+            }
+            $sort_by = array_column($courseArray, 'courseName');
+            array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $courseArray);
+            return $this->successResponse($courseArray);
         } else {
             return $this->terminateResponse(AppConstant::NO_COURSE_FOUND);
         }

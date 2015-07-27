@@ -376,6 +376,7 @@ a:focus {
 
 .btn-primary {
     color: #fff; background-color: #428bca; border-color: #357ebd;
+    text-transform: capitalize;
 
 }
 .breadcrumb > li + li:before {
@@ -441,6 +442,7 @@ a:focus {
 .back-btn{
     width: 72px;
     height: 35px;
+
 }
 .msg-notification{
     color: red;
@@ -510,7 +512,7 @@ table> thead{
     border-top: 0;
     padding: 8px;
     line-height: 1.42857143;
-    vertical-align: top;
+    vertical-align: middle;
 }
 table.dataTable thead .studentId.sorting_asc:after, .studentId.sorting:after, .studentId.sorting_desc:after {
     content: "\e155";
@@ -518,6 +520,7 @@ table.dataTable thead .studentId.sorting_asc:after, .studentId.sorting:after, .s
 }
 table.dataTable thead > tr > th {
     padding-right: 0;
+    vertical-align: middle;
 }
 .checkbox label:after,
 .radio label:after {
@@ -607,8 +610,9 @@ img.small-icon{
 }
 .btn-primary {
     color: #FFF;
-    background-color: #3441AC;
+    background-color: #2C368E;
     border-color: #357EBD;
+    text-transform: capitalize;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
     background-color: #2C368E;
@@ -620,6 +624,7 @@ img.small-icon{
 .title-page{
     font-size: 30px;
     color: #ffffff;
+    text-transform: capitalize;
 }
 .vertical-align{
     vertical-align: middle;
@@ -634,4 +639,54 @@ img.small-icon{
     color: #FFF;
     background-color: #2C368E;
     border-color: #285E8E;
+    text-transform: capitalize;
+}
+.input-group-addon {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1;
+    text-align: center;
+    border-radius: 4px;
+    background-color: #2C368E;
+    color: white;
+    border: 1px solid #101A66;
+}
+input[type="submit"], input[type="button"], button, a.abutton {
+    color: #ffffff;
+    background-color: #2C368E;
+    border-radius: 4px;
+    border: 1px solid #285E8E;
+    font: inherit;
+    height: 2.5em;
+    padding: 0px 8px;
+    margin: 2px 3px;
+}
+input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:hover, input[type="submit"]:hover, button:hover, input[type="button"]:hover, a.abutton:hover{
+    background-color: #2C368E;
+}
+.table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
+    background-color: #ddd;
+}
+.table-striped > tbody > tr:nth-child(even) > td, .table-striped > tbody > tr:nth-child(even) > th {
+    background-color: #fafafa;
+}
+.table-bordered {
+     border: 0;
+}
+table.student-data-table.dataTable thead > tr > th {
+    height: 36px;
+}
+table.student-data-table.dataTable thead .sorting:after, table.student-data-table.dataTable thead .sorting_asc:after, table.student-data-table.dataTable thead .sorting_desc:after {
+    top: 16px;
+}
+table.student-data-table > .form-inline .radio, .form-inline .checkbox {
+    top: 2px;
+}
+.datepicker table tr td.active:hover, .datepicker table tr td.active:hover:hover, .datepicker table tr td.active.disabled:hover, .datepicker table tr td.active.disabled:hover:hover, .datepicker table tr td.active:focus, .datepicker table tr td.active:hover:focus, .datepicker table tr td.active.disabled:focus, .datepicker table tr td.active.disabled:hover:focus, .datepicker table tr td.active:active, .datepicker table tr td.active:hover:active, .datepicker table tr td.active.disabled:active, .datepicker table tr td.active.disabled:hover:active, .datepicker table tr td.active.active, .datepicker table tr td.active:hover.active, .datepicker table tr td.active.disabled.active, .datepicker table tr td.active.disabled:hover.active, .open .dropdown-toggle.datepicker table tr td.active, .open .dropdown-toggle.datepicker table tr td.active:hover, .open .dropdown-toggle.datepicker table tr td.active.disabled, .open .dropdown-toggle.datepicker table tr td.active.disabled:hover{
+    background-color:#2C368E ;
+}
+.radio, .checkbox {
+    margin-top: 0;
+    margin-bottom: 0;
 }

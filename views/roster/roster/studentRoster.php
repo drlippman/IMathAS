@@ -14,9 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Roster Settings</button>
-        </div>
     </div>
 </div>
 <div class="item-detail-content">

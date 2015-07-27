@@ -1,15 +1,25 @@
 <?php
-
 use app\components\AppUtility;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
-$this->title = 'Manage Late Passes';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
+$this->title = AppUtility::t('Manage Late Passes', false);
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>[AppUtility::t('Home', false),$course->name,AppUtility::t('Roster',false)], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'/roster/roster/student-roster?cid='.$course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+</div>
+<div class="tab-content shadowBox"">
+<?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
+<div class="inner-content">
 <?php $form = ActiveForm::begin([
     'id' => 'login-form',
     'options' => ['class' => 'form-horizontal'],
@@ -19,12 +29,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         'labelOptions' => ['class' => 'col-lg-4'],
     ],
 ]); ?>
-
-    <div><h1>Manage Late Passes</h1></div>
-    <p><em> Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.
+    <div class="title-middle center"><?php AppUtility::t('Manage Late Passes');?></div>
+    <p><?php AppUtility::t('Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.
             Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow
-            use after the due date (but within 1 LatePass period, specified below) </em></p>
-    <p><em>Late Passes extend the due date by
+            use after the due date (but within 1 LatePass period, specified below)');?></p>
+    <p><?php AppUtility::t('Late Passes extend the due date by');?>
 
            <?php
             $isCheck=false;
@@ -33,22 +42,22 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                 {
                     $isCheck=true;
                     ?>
-                    <input type=text size=3 value="<?php echo $singleStudentInformation['latePassHrs']?>" name="passhours"/> hours</em></p>
+                    <input type=text size=3 value="<?php echo $singleStudentInformation['latePassHrs']?>" name="passhours"/><?php AppUtility::t('hours');?></p>
                 <?php } ?>
 
 
             <?php } ?>
-    <p><em>To all students: <input type="text" size="3" id="txt_add" name="addpass" value="1"/>
-            <input type="button" class="btn btn-primary" value="Add" onclick="addReplaceMultiplyTextValue(1)"/>
-     <input type="button" class="btn btn-primary" value="Replace" onclick="addReplaceMultiplyTextValue(2)"/>
+    <p><?php AppUtility::t('To all students');?>: <input type="text" size="3" id="txt_add" name="addpass" value="1"/>
+            <input type="button" class="btn btn-primary" value="<?php AppUtility::t('Add')?>" onclick="addReplaceMultiplyTextValue(1)"/>
+     <input type="button" class="btn btn-primary" value="<?php AppUtility::t('Replace')?>" onclick="addReplaceMultiplyTextValue(2)"/>
 
 
     <table class="student-data table table-bordered table-striped table-hover data-table" bPaginate="false" id="student-data-table">
         <thead>
         <tr>
-            <th>Name</th>
-            <th>Section</th>
-            <th>LatePasses Remaining</th>
+            <th><?php AppUtility::t('Name')?></th>
+            <th><?php AppUtility::t('Section')?></th>
+            <th><?php AppUtility::t('LatePasses Remaining')?></th>
         </tr>
         </thead>
         <tbody>
@@ -62,7 +71,9 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <?php }?>
         <tbody>
     </table>
-    <input type="submit" class="btn btn-primary" id="change-button" value="Save Changes">
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+    <input type="submit" class="btn btn-primary" id="change-button" value="<?php AppUtility::t('Save Changes')?>">
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
 
  <?php ActiveForm::end(); ?>
+</div>
+</div>

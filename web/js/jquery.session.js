@@ -40,7 +40,8 @@
             var cookies = document.cookie.split(';');
             this._cookieCache = {};
             for (var i in cookies) {
-                var kv = cookies[i].split('=');
+                //var kv = cookies[i].split('=');
+                var kv = cookies[i];
                 if ((new RegExp(this._generatePrefix() + '.+')).test(kv[0]) && kv[1]) {
                     this._cookieCache[kv[0].split(':', 3)[2]] = kv[1];
                 }
