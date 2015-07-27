@@ -1,4 +1,6 @@
 <?php
+
+
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
@@ -15,6 +17,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/t
 $this->params['breadcrumbs'][] = $this->title;
 $currentLevel = 0;
 ?>
+
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" xmlns="http://www.w3.org/1999/html"/>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,11 +73,12 @@ $currentLevel = 0;
         <button onclick="hideall()" class="btn btn-primary expand">Hide All</button>
 
         <br><br>
-
-
-        <?php $cnt = AppConstant::NUMERIC_ZERO;
+    <?php $cnt = AppConstant::NUMERIC_ZERO;
         $now = time();
+
+
         foreach ($postdata as $index => $data){
+
         ?>
 
         <?php if ($data['level'] != AppConstant::NUMERIC_ZERO && $data['level'] < $currentLevel)
@@ -84,7 +88,7 @@ $currentLevel = 0;
         for ($i = $currentLevel;
         $data['level'] < $i;
         $i--){
-        ?>
+//        ?>
 
     </div>
     <?php }
@@ -116,25 +120,30 @@ $currentLevel = 0;
 
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>&nbsp;
                               <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove">Remove</a> <?php
-                          } else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
+                          }
+                          else if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) { ?>
                            <?php if(($data['settings'] & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO){   ?>
                           <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/modify-post?forumId=' . $data['forumIdData'] . '&courseId=' . $course->id . '&threadId=' . $data['id']); ?>">Modify</a>
                           <?php } ?>
                               <?php if(($data['settings'] & AppConstant::NUMERIC_FOUR) == AppConstant::NUMERIC_FOUR && $data['isReplies']== AppConstant::NUMERIC_ZERO){  ?>
                                   <a href="#" name="remove" data-parent="<?php echo $data['parent'] ?>" data-var="<?php echo $data['id'] ?>" class="mark-remove">Remove</a>
                               <?php  } ?>
-                          <?php }   ?>
-                           <?php if($currentUser['rights'] == AppConstant::STUDENT_RIGHT ){    ?>
+                          <?php }  ?>
+
+                           <?php  if($currentUser['rights'] == AppConstant::STUDENT_RIGHT ){ ?>
                               <?php if($replyBy == AppConstant::ALWAYS_TIME || $replyBy === null){?>
                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply</a>
-                                   <?php }elseif($replyBy > $now ){ ?>
+                                   <?php }
+                              elseif($replyBy > $now ){ ?>
                                   <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply</a>
                               <?php } ?>
-                         <?php }else if($currentUser['rights'] > AppConstant::STUDENT_RIGHT ){ ?>
+                         <?php }
+                           else if($currentUser['rights'] > AppConstant::STUDENT_RIGHT ){ ?>
                               <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>"> Reply</a>
-                          <? } ?>
-                      <?php
-                      } else if ($data['postType'] == AppConstant::NUMERIC_TWO) {
+                          <?php } ?>
+                <?php
+                      }
+                      else if ($data['postType'] == AppConstant::NUMERIC_TWO) {
                           if ($currentUser['id'] == $data['userId'] && $currentUser['rights'] == AppConstant::STUDENT_RIGHT) {
                               ?>
                               <?php if(($data['settings'] & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO){   ?>
@@ -200,6 +209,7 @@ $currentLevel = 0;
 <?php
 }
 }?>
+
     <?php
     $currentLevel = $data['level'];
     $postCount = (count($postdata) - AppConstant::NUMERIC_ONE);
@@ -211,4 +221,3 @@ $currentLevel = 0;
             to Forum Topics</a>
     </div>
 </div>
-<?php

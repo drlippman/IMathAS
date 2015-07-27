@@ -92,4 +92,43 @@ class Thread extends BaseImasForumThreads
         $views->views++;
         $views->save();
     }
+    public static function  findNewPostCnt($cid,$user)
+    {
+
+        $query = "SELECT imas_forum_threads.forumid, COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
+        $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
+        $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$user->id' ";
+        $query .= "WHERE (imas_forum_threads.lastposttime>mfv.lastview OR (mfv.lastview IS NULL)) ";
+        if ($user->rights == AppConstant::TEACHER_RIGHT) {
+            $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid='$userid')) ";
+        }
+        $query .= "GROUP BY imas_forum_threads.forumid";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+//
+//                $query = new Query();
+//                $query ->select('imas_forum_threads.forumid , COUNT(imas_forum_threads.id)')
+//                       ->from('imas_forum_threads')
+//                        ->join( 'JOIN',
+//                               'imas_forums','imas_forum_threads.forumid=imas_forums.id')
+//                        ->andWhere(['imas_forums.courseid' =>$cid])
+//                        ->leftJoin('imas_forum_views AS mfv','mfv.threadid=imas_forum_threads.id')
+//                        ->andWhere(['mfv.userid' => $user->id])
+//                         ->andWhere(['>','imas_forum_threads.lastposttime','mfv.lastview'])
+//                          ->orWhere(['LIKE','mfv.lastview' ,'NULL']);
+////                if ($user->rights == AppConstant::TEACHER_RIGHT){
+////                    $query->andWhere(['LIKE','imas_forum_threads.stugroupid','0'])
+////                            ->orWhere(['IN','imas_forum_threads.stugroupid',' SELECT stugroupid FROM imas_stugroupmembers'])
+////                            ->andWhere(['userid' => $user->id]);
+////                }
+//                $query->groupBy(['imas_forum_threads.forumid']);
+//
+//                $command = $query->createCommand();
+//                $data = $command->queryAll();
+        return $data;
+
+
+
+
+
+    }
 } 

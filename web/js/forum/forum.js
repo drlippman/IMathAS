@@ -49,7 +49,7 @@ $(document).ready(function ()
         else
         {
             $("#search_text").css('border-color', 'red');
-            if(selected != 1 || selected != 0)
+            if(selected != 1 && selected != 0)
             {
 
                 $(".select_option").css('border-color', 'red');
@@ -100,7 +100,6 @@ function threadSuccess(response)
     var courseId = $('.courseId').val();
     response = JSON.parse(response);
 
-
     if (response.status == 0)
     {
         var searchdata = response.data;
@@ -145,9 +144,16 @@ function forumsSuccess(response) {
         var html = "";
         $.each(forums, function (index, forum)
         {
+
             if(forum.rights > 10)
             {
-                html += "<tr><td>&nbsp;&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" + forum.forumName + "</a></td>+ <a href='Modify'> ";
+                if(forum.countId == 0)
+                {
+                    html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
+                }else{
+                    html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
+                }
+
                 html += "<td>&nbsp;&nbsp;<a>Modify</a></td>";
                 html += "<td>&nbsp;&nbsp;&nbsp;" + forum.threads + "</td>";
                 html += "<td>&nbsp;&nbsp;&nbsp;" + forum.posts + "</td>";

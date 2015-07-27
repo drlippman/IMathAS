@@ -105,15 +105,44 @@ class ForumController extends AppController
         $orderBy = 'id';
         $forums = Forums::getByCourseIdOrdered($cid, $sort, $orderBy);
         $user = $this->getAuthenticatedUser();
-        if ($forums) {
-            $forumArray = array();
-            foreach ($forums as $key => $forum) {
-                $threadCount = ForumThread::findThreadCount($forum->id);
+        $NewPostCounts = Thread::findNewPostCnt($cid,$user);
+        if ($forums)
+        {
+           $forumArray = array();
+            foreach ($forums as $key => $forum)
+            {
+
+                   $threadCount = ForumThread::findThreadCount($forum->id);
                 $postCount = count($forum->imasForumPosts);
                 $lastObject = '';
                 if ($postCount > AppConstant::NUMERIC_ZERO) {
                     $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
                 }
+                $flag = 0;
+                foreach($NewPostCounts as $count)
+                {
+                    if($count['forumid'] == $forum->id ){
+                        $tempArray = array
+                        (
+                            'forumId' => $forum->id,
+                            'forumName' => $forum->name,
+                            'threads' => count($threadCount),
+                            'posts' => $postCount,
+                            'currentTime' => $currentTime,
+                            'endDate' => $forum->enddate,
+                            'rights' => $user->rights,
+                            'countId' => $count['forumid'],
+                            'count' =>$count['COUNT(imas_forum_threads.id)'],
+                            'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+
+                        );
+                        $flag = 1;
+                        array_push($forumArray, $tempArray);
+                    }
+
+             }
+             if($flag == 0){
+
                 $tempArray = array
                 (
                     'forumId' => $forum->id,
@@ -123,15 +152,23 @@ class ForumController extends AppController
                     'currentTime' => $currentTime,
                     'endDate' => $forum->enddate,
                     'rights' => $user->rights,
-                    'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : ''
+                    'countId' => AppConstant::NUMERIC_ZERO,
+                    'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
                 );
-                array_push($forumArray, $tempArray);
+                 array_push($forumArray, $tempArray);
             }
+
+
+
+        }
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/forum.js']);
 
             return $this->successResponse($forumArray);
-        } else {
+
+        }
+        else
+        {
             return $this->terminateResponse('No data');
         }
     }
@@ -141,16 +178,18 @@ class ForumController extends AppController
      */
     public function actionThread()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
         $forumId = $this->getParamVal('forumid');
+        $page= $this->getParamVal('page');
         $forumData = Forums::getById($forumId);
         $users = $this->getAuthenticatedUser();
         $this->setReferrer();
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
-        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'forumData' => $forumData);
+        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'forumData' => $forumData,'page' => $page);
         return $this->renderWithData('thread', $responseData);
     }
 

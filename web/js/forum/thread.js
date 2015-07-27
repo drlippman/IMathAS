@@ -2,24 +2,74 @@ $(document).ready(function ()
 {
     var forumid= $('#forumid').val();
     var isValue = -1;
+    var courseid = $("#courseid").val();
     $("#show-all-link").hide();
+    var page = $('#page').val();
     $('#result').hide();
     $('#noThread').hide();
     $('.forumResult').hide();
-    jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
+    if(page)
+    {
+        limitToNew();
+    }else
+    {
+        jQuerySubmit('get-thread-ajax',{forumid: forumid,isValue:isValue },'threadSuccess');
+    }
     limitToTagShow();
 
+    $('.select_option').click(function(){
+        selected = $('.select_option :selected').val();
+        if(selected == 0)
+        {
+            window.location = "list-post-by-name?cid="+courseid+"&forumid="+forumid;
+
+        }
+        else if(selected == 1)
+        {
+
+            $('.forum-table').DataTable().destroy();
+            $("#limit-to-tag-link").hide();
+            $('#limit-to-new-link').hide();
+            $("#show-all-link").show();
+            var isValue = 1;
+            var forumid= $('#forumid').val();
+            var thread = {forumid: forumid , isValue: isValue};
+            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+
+        }
+        else if(selected == 2)
+        {
+
+            $('.forum-table').DataTable().destroy();
+            $("#limit-to-tag-link").hide();
+            $('#limit-to-new-link').hide();
+            $("#show-all-link").show();
+            var isValue = 2;
+            var forumid= $('#forumid').val();
+            var thread = {forumid: forumid , isValue: isValue};
+            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+
+        }
+        else if(selected == 3)
+        {
+            var isValue = 3;
+            var forumid= $('#forumid').val();
+            $('.forum-table').DataTable().destroy();
+            var thread = {forumid: forumid , isValue: isValue};
+            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+        }
+    });
+
+
+
     $('#change-button').click(function(){
-
-
-        var searchText = $('#searchText').val();
+        var searchText = $('#search_text').val();
         var courseid = $('#courseid').val();
         if(searchText.length>0)
         {
             if(searchText.match(/^[a-z A-Z 0-9-]+$/))
             {
-
-                $('#flash-message').hide();
+            $('#flash-message').hide();
                 if(document.getElementById('searchAll').checked)
                 {
                     $('#searchpost').show();
@@ -39,7 +89,7 @@ $(document).ready(function ()
             {
                 $('#flash-message').show();
                 $('#flash-message').html("<div class='alert alert-danger'>Search text can contain only alphanumeric values");
-                $('#searchText').val(null);
+                $('#search_text').val(null);
             }
         }else
         {
@@ -58,6 +108,7 @@ function postSearchSuccess(response)
     if (response.status == 0)
     {
         $('#searchpost').empty();
+        $('#data').empty();
         var courseid = $('#courseid').val();
         var postData = response.data.data;
         $.each(postData, function(index, Data)
@@ -94,6 +145,7 @@ function postSearchUnchecked(response)
     if (response.status == 0)
     {
         $('#searchpost').empty();
+        $('#data').empty();
         var courseid = $('#courseid').val();
         var postData = response.data.data;
         $.each(postData, function(index, Data)
@@ -152,9 +204,9 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
                     if(thread.isanon == 0){
-                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>"+ thread.name+" </td>";
+                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+" </td>";
                     }else{
-                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"&nbsp;</a>Anonymous </td>";
+                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br></a>Anonymous </td>";
                     }
 
 
@@ -194,13 +246,14 @@ function threadSuccess(response)
                         }
                     if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
                     {
-                           html += "<td>" + thread .postdate + "&nbsp;<span style='color: red'>New</span></td>";
+                           html += "<td>" + thread .postdate + "&nbsp;<span class='new-tag'>New</span></td>";
                            newCount++;
 
                     }
                     else
                     {
-                        html += "<td>" + thread .postdate + "</td>";
+//                        html += "<td>" + thread .postdate + "</td>";
+                        html += "<td>" + thread .postdate + "&nbsp;<div class='new-tag'>New</div></td>";
                     }
 
                 }
@@ -208,7 +261,7 @@ function threadSuccess(response)
         });
         $('.forum-table-body').empty();
         $(".forum-table-body").append(html);
-        $('.forum-table').DataTable({"ordering": false});
+        $('.forum-table').DataTable({"ordering": false ,bPaginate: false});
         if(isValue == 2)
         {
             $('#limit-to-new-link').hide();
@@ -270,7 +323,7 @@ function threadSuccess(response)
         var html = '<div><p>Thread Views : </p></div><p>';
         html +=  '<span class="col-lg-11" >Name     LastView </span><br>';
         $.each(uniquesDataArray, function (index, uniqueEntry) {
-            console.log(uniqueEntry);
+
             if(threadsid == uniqueEntry.threadId){
                 html += '<span class="col-lg-12 pull-left " >'+ uniqueEntry.name +''+uniqueEntry.lastView+'</span><br>';
             }
@@ -324,14 +377,7 @@ function markAsRemoveSuccess(response) {
 function limitToTagShow() {
 
     $("#limit-to-tag-link").click(function () {
-        $('.forum-table').DataTable().destroy();
-        $("#limit-to-tag-link").hide();
-        $('#limit-to-new-link').hide();
-        $("#show-all-link").show();
-        var isValue = 1;
-        var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , isValue: isValue};
-        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+
 
     });
     $("#show-all-link").click(function () {
@@ -346,22 +392,24 @@ function limitToTagShow() {
 
     });
     $("#limit-to-new-link").click(function () {
-        $('.forum-table').DataTable().destroy();
-        $("#limit-to-tag-link").hide();
-        $('#limit-to-new-link').hide();
-        $("#show-all-link").show();
-        var isValue = 2;
-        var forumid= $('#forumid').val();
-        var thread = {forumid: forumid , isValue: isValue};
-        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+
 
     });
+
+
 
     $('#markRead').click(function(){
-        var isValue = 3;
-        var forumid= $('#forumid').val();
-        $('.forum-table').DataTable().destroy();
-        var thread = {forumid: forumid , isValue: isValue};
-        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+
     });
+}
+function limitToNew()
+{
+    $('.forum-table').DataTable().destroy();
+    $("#limit-to-tag-link").hide();
+    $('#limit-to-new-link').hide();
+    $("#show-all-link").show();
+    var isValue = 2;
+    var forumid= $('#forumid').val();
+    var thread = {forumid: forumid , isValue: isValue};
+    jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 }

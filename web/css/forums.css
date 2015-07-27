@@ -150,6 +150,7 @@ table.dataTable thead th, table.dataTable thead td {
 
     height: 32px;
     text-align: center;
+    width: auto;
 }
 
 .search-dropdown
@@ -207,4 +208,53 @@ table.dataTable thead th, table.dataTable thead td {
 
     margin-right: 3px;
 }
+.new-post{
 
+    color: #12856E;
+
+}
+
+.btn.btn-primary.add-new-thread{
+    color: #FFF;
+    background-color: #008E71;
+    border-color: #285E8E;
+    border-radius: 0px;
+}
+.inner-content
+{
+    height: 60px;
+    width: 100%;
+    background-color:#f8f8f8;
+}
+.view-drop-down{
+    padding-top: 10px;
+}
+
+select > option{
+    background-color: #f8f8f8;
+}
+.mark-as-read-link{
+    padding-top: 18px;
+    margin-left: 11px;
+
+}
+.btn.btn-primary.search-button
+{
+
+    background-color: #1460AA;
+    color: white;
+    border-radius: 0px;
+}
+.checkbox-thread{
+    padding-top: 8px;
+    margin-left: 11px;
+    margin-right: 15px;
+
+}
+.new-tag
+{
+width: 50px;
+background-color: #12866E;
+    color: #FFF;
+    text-align: center;
+}
