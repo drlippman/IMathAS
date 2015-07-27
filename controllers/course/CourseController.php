@@ -603,6 +603,7 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $responseData = array();
         $calendarCount = array();
@@ -664,7 +665,7 @@ class CourseController extends AppController
                     array_push($msgList,$singleMessage);
             }
         }
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
         $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData);
         return $this->render('blockIsolate', $returnData);
@@ -689,6 +690,8 @@ class CourseController extends AppController
     public function actionModifyInlineText()
     {
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
@@ -697,71 +700,118 @@ class CourseController extends AppController
         $inlineTextId = $params['id'];
         $saveTitle = '';
 
-        if(isset($params['id']))
-        {
-            $hideTitle = false;
-            $pageTitle = AppConstant::INLINE_TEXT_MODIFY_TITLE;
-            if($this->isPostMethod()){
-                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inlineText->id.'&courseId=' .$course->id);
-                $saveChanges = new InlineText();
-                $saveChanges->updateChanges($params, $inlineTextId);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
-            }
-            $saveTitle = AppConstant::SAVE_BUTTON;
-        }
-        else {
-            $pageTitle = AppConstant::INLINE_TEXT_ADD_TITLE;
-            if($this->isPostMethod()){
-                $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
-                $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
-                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/modify-inline-text?courseId=' .$course->id);
-                $saveChanges = new InlineText();
-                $lastInlineId = $saveChanges->saveChanges($params, $courseId);
-                $saveItems = new Items();
-                $lastItemsId = $saveItems->saveItems($courseId,$lastInlineId,'InlineText');
+        $pageTitle = AppConstant::ADD_INLINE_TEXT;
+        $saveTitle = AppConstant::CREATE_INLINE_TEXT;
+        $defaultValue = array(
+            'startDate' => time(),
+            'sDate' => date("m-d-y"),
+            'sTime' => date("g:i A"),
+            'eDate' => date("m-d-y"),
+            'eTime' => date("g:i A"),
+        );
+        if ($this->isPost()) {
+
+            $params = $this->getRequestParams();
+
+            if ($inlineTextId) {
+                $updateForum = new InlineText();
+                $updateForum->updateChanges($params, $inlineTextId);
+            } else {
+                $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
+                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+                $finalArray['title'] = trim($params['title']);
+                if(empty($params['text']))
+                {
+                    $params['text'] = ' ';
+                }
+                $finalArray['text'] = trim($params['text']);
+                $finalArray['courseid'] = $params['cid'];
+
+                if($params['avail'] == AppConstant::NUMERIC_ONE)
+                {
+                    if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                    }
+                    if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                        $endDate = AppConstant::ALWAYS_TIME;
+                    }
+                    $finalArray['startdate'] = $startDate;
+                    $finalArray['enddate'] = $endDate;
+                }else
+                {
+
+                    $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
+                    $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
+                }
+                $finalArray['avail'] = $params['avail'];
+                $finalArray['courseid'] = $courseId;
+                $finalArray['oncal'] = $params['place-on-calendar'];
+                $finalArray['isplaylist'] = $params['isplaylist'];
+                $finalArray['caltag']= '!';
+                $newInline = new InlineText();
+                $inlineId = $newInline->saveChanges($finalArray);
+                $itemType = 'InlineText';
+                $itemId = new Items();
+                $lastItemId = $itemId->saveItems($courseId, $inlineId, $itemType);
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                if ($_FILES['userfile']['name']!='') {
-                    $uploadDir = rtrim(dirname(__FILE__), '/\\') .'/files/';
-                    $userFileName = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
-                    $fileName = $userFileName;
-
-                    $extension = strtolower(strrchr($userFileName,"."));
-                    $badExtensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
-                    if (in_array($extension,$badExtensions)) {
-                        echo "<p>File type is not allowed</p>";
-                    } else {
-                        include_once('../components/filehandler.php');
-                        if (($fileName = storeuploadedcoursefile('userfile',$courseId.'/'.$fileName))!==false) {
-                            if (trim($params['newfiledescr'])=='') {
-                                $params['newfiledescr'] = $fileName;
-                            }
-                            $file = new InstrFiles();
-                            $fileId = $file->saveFile($params, $lastInlineId);
-                        } else {
-                            echo "<p>Error uploading file!</p>\n";
-                        }
-                    }
-                }
-                $blockTree = array(AppConstant::NUMERIC_ZERO);
+                $blockTree = array(0);
                 $sub =& $items;
-                for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
-                    }
-                array_unshift($sub,intval($lastItemsId));
-                $itemOrder = (serialize($items));
+                for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
+                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
+                }
+                array_unshift($sub, intval($lastItemId));
+                $itemOrder = serialize($items);
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
             }
-            $saveTitle = AppConstant::New_Item;
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
-        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'inlineText' => $inlineText, 'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'hidetitle' => $hideTitle);
-        return $this->render('modifyInlineText', $returnData);
-    }
+        if (isset($inlineTextId)) {
+            $pageTitle = 'Modify Inline Text';
+            $saveTitle = AppConstant::SAVE_BUTTON;
+            $inlineTextData = InlineText::getById($inlineTextId);
+            $startDate = $inlineTextData['startdate'];
+            $endDate = $inlineTextData['enddate'];
+            $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_THOUSAND;
+            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
+            $minutes = $courseDefTime % AppConstant::SECONDS;
+            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
+            $defTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
+            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
+            $minutes = $courseDefTime % AppConstant::SECONDS;
+            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
+            $defStartTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
 
+            if ($startDate != AppConstant::NUMERIC_ZERO) {
+                $sDate = AppUtility::tzdate("m/d/Y", $startDate);
+                $sTime = AppUtility::tzdate("g:i a", $startDate);
+            } else {
+                $sDate = AppUtility::tzdate("m/d/Y", time());
+                $sTime = $defStartTime;
+            }
+            if ($endDate != AppConstant::ALWAYS_TIME) {
+                $eDate = AppUtility::tzdate("m/d/Y", $endDate);
+                $eTime = AppUtility::tzdate("g:i a", $endDate);
+            } else {
+                $eDate = AppUtility::tzdate("m/d/Y", time() + AppConstant::WEEK_TIME);
+                $eTime = $defTime;
+            }
+            $defaultValue = array(
+                'sDate' => $sDate,
+                'sTime' => $sTime,
+                'eDate' => $eDate,
+                'eTime' => $eTime,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            );
+        }
+        $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js" , "editor/tiny_mce_src.js", "general.js"]);
+        $responseData = array('course' => $course,'saveTitle' => $saveTitle,'inlineText' => $inlineText, 'pageTitle' => $pageTitle,'defaultValue' => $defaultValue);
+        return $this->renderWithData('modifyInlineText', $responseData);
+    }
     public function actionAddLink()
     {
         $params = $this->getRequestParams();

@@ -74,86 +74,85 @@ include_once('../components/filehandler.php');
 
     <!--Show by dates-->
         <div id="datediv" style="display:<?php echo ($inlineText['avail']==1)?"block":"none"; ?>">
-
+            <?php $startTime = $eTime;?>
             <span class=form>Available After:</span>
 		        <span class=formright>
-			        <input type=radio name="sdatetype" value="0" <?php writeHtmlChecked($startdate,'0',0) ?>/>
+			        <input type=radio name="available-after" value="0" <?php writeHtmlChecked($defaultValue['startDate'], '0', AppConstant::NUMERIC_ZERO) ?>/>
 			        Always until end date<br/>
-			        <input type=radio name="sdatetype" class="pull-left" value="sdate" <?php writeHtmlChecked($startdate,'0',1) ?>/>
-                        <?php
-                        echo '<div class = "pull-left col-lg-4 time-input">';
-                        echo DatePicker::widget([
-                            'name' => 'startdate',
-                            'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                            'value' => date("m/d/Y"),
-                            'removeButton' => false,
-                            'pluginOptions' => [
-                                'autoclose' => true,
-                                'format' => 'mm/dd/yyyy' ]
-                        ]);
-                        echo '</div>';?>
-                        <?php
-                        echo '<label class="end pull-left col-lg-1"> at </label>';
-                        echo '<div class="pull-left col-lg-6">';
-
-                        echo TimePicker::widget([
-                            'name' => 'start_end_time',
-                            'value' => time(),
-                            'pluginOptions' => [
-                                'showSeconds' => false,
-                                'class' => 'time'
-                            ]
-                        ]);
-                        echo '</div>';?>
+			        <input type=radio name="available-after" class="pull-left" value="1" <?php writeHtmlChecked($defaultValue['startDate'] , '1', AppConstant::NUMERIC_ONE) ?>/>
+                    <?php
+                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo DatePicker::widget([
+                        'name' => 'sdate',
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        'value' => date("m-d-Y"),
+                        'removeButton' => false,
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                            'format' => 'mm/dd/yyyy']
+                    ]);
+                    echo '</div>'; ?>
+                    <?php
+                    echo '<label class="end pull-left col-lg-1"> at </label>';
+                    echo '<div class="pull-left col-lg-6">';
+                    echo TimePicker::widget([
+                        'name' => 'stime',
+                        'value' => $defaultValue['sTime'],
+                        'pluginOptions' => [
+                            'showSeconds' => false,
+                            'class' => 'time'
+                        ]
+                    ]);
+                    echo '</div>'; ?>
 		        </span><BR class=form>
 
             <span class=form>Available Until:</span>
 		        <span class=formright>
-			        <input type=radio name="edatetype" value="2000000000" <?php writeHtmlChecked($enddate,'2000000000',0) ?>/>
+			        <input type=radio name="available-until" value="2000000000" <?php writeHtmlChecked($defaultValue['endDate'], '2000000000', 0) ?>/>
                         Always after start date<br/>
-                        <input type=radio name="edatetype" class="pull-left" value="edate" <?php writeHtmlChecked($enddate,'2000000000',1) ?>/>
-                        <?php
-                        echo '<div class = "pull-left col-lg-4 time-input">';
-                        echo DatePicker::widget([
-                            'name' => 'enddate',
-                            'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                            'value' => date("m/d/Y"),
-                            'removeButton' => false,
-                            'pluginOptions' => [
-                                'autoclose' => true,
-                                'format' => 'mm/dd/yyyy' ]
-                        ]);
-                        echo '</div>';?>
-                        <?php
-                        echo '<label class="end pull-left col-lg-1"> at </label>';
-                        echo '<div class="pull-left col-lg-6">';
+                        <input type=radio name="available-until" class="pull-left" value="1" <?php writeHtmlChecked($defaultValue['endDate'], '2000000000', 1) ?>/>
+                    <?php
+                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo DatePicker::widget([
+                        'name' => 'edate',
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        'value' => date("m-d-Y"),
+                        'removeButton' => false,
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                            'format' => 'mm/dd/yyyy']
+                    ]);
+                    echo '</div>'; ?>
+                    <?php
+                    echo '<label class="end pull-left col-lg-1"> at </label>';
+                    echo '<div class="pull-left col-lg-6">';
 
-                        echo TimePicker::widget([
-                            'name' => 'end_end_time',
-                            'value' => time(),
-                            'pluginOptions' => [
-                                'showSeconds' => false,
-                                'class' => 'time'
-                            ]
-                        ]);
-                        echo '</div>';?>
+                    echo TimePicker::widget([
+                        'name' => 'etime',
+                        'value' => $defaultValue['eTime'],
+                        'pluginOptions' => [
+                            'showSeconds' => false,
+                            'class' => 'time'
+                        ]
+                    ]);
+                    echo '</div>'; ?>
 		    </span><BR class=form>
 
             <!--Place on Calendar-->
             <span class=form>Place on Calendar?</span>
 		        <span class=formright>
-                    <input type=radio name="oncal" value=0 <?php writeHtmlChecked($inlineText['oncal'],0); ?> /> No<br/>
-                    <input type=radio name="oncal" value=1 <?php writeHtmlChecked($inlineText['oncal'],1); ?> /> Yes, on Available after date (will only show after that date)<br/>
-                    <input type=radio name="oncal" value=2 <?php writeHtmlChecked($inlineText['oncal'],2); ?> /> Yes, on Available until date<br/>
-                    With tag: <input name="caltag" type=text size=1 value="<?php echo $inlineText['caltag'];?>"/>
+                    <input type=radio name="place-on-calendar" value=0 <?php writeHtmlChecked($inlineText['oncal'],AppConstant::NUMERIC_ZERO); ?> /> No<br/>
+                    <input type=radio name="place-on-calendar" value=1 <?php writeHtmlChecked($inlineText['oncal'],AppConstant::NUMERIC_ONE); ?> /> Yes, on Available after date (will only show after that date)<br/>
+                    <input type=radio name="place-on-calendar" value=2 <?php writeHtmlChecked($inlineText['oncal'],AppConstant::NUMERIC_TWO); ?> /> Yes, on Available until date<br/>
+                    With tag: <input name="caltag" type=text size=3 value="!"/>
                 </span><br class="form" />
         </div>
         <div id="altcaldiv" style="display:<?php echo ($inlineText['avail']==2)?"block":"none"; ?>">
 
             <span class=form>Place on Calendar?</span>
 		        <span class=formright>
-                    <input type=radio name="altoncal" value="0" <?php writeHtmlChecked($altoncal,0); ?> /> No<br/>
-                    <input type=radio name="altoncal" class="pull-left" value="1" <?php writeHtmlChecked($altoncal,1); ?> /> Yes, on
+                    <input type=radio name="place-on-calendar" value="0" <?php writeHtmlChecked($inlineText['altoncal'],AppConstant::NUMERIC_ZERO); ?> /> No<br/>
+                    <input type=radio name="place-on-calendar" class="pull-left" value="1" <?php writeHtmlChecked($inlineText['altoncal'],AppConstant::NUMERIC_ONE); ?> /> Yes, on
                     <?php
                     echo '<div class = "pull-left col-lg-4 time-input">';
                     echo DatePicker::widget([
@@ -180,7 +179,7 @@ include_once('../components/filehandler.php');
                     ]);
                     echo '</div>';?>
                     <br/><br>
-                    With tag: <input name="altcaltag" type=text size=1 value="<?php echo $inlineText['caltag'];?>"/>
+                    With tag: <input name="tag" type=text size=3 value="!"/>
                 </span><BR class=form>
         </div>
     </div>
@@ -240,3 +239,6 @@ function getHtmlSelected ($var,$test,$notEqual=null) {
     }
 }
 ?>
+<script>
+
+</script>

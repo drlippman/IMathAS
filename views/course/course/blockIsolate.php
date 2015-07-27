@@ -1,26 +1,35 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+
 ?>
 <?php
+$this->title = ucfirst($courseDetail[0]['Block']['name']);
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-echo $this->render('_toolbar',['course'=> $course]);
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
-<div class=" col-lg-3 needed">
-    <?php echo $this->render('_leftSide',['course'=> $course, 'messageList' => $messageList]);?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL().'site/index']]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
 </div>
 
-<div class="col-lg-9 container">
+<div class="item-detail-content">
+    <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course']);?>
+</div>
+
+<div class="tab-content shadowBox">
 <?php if(count($courseDetail)){
     foreach($courseDetail as $key => $item){
     switch(key($item)):
     case 'Block': ?>
     <?php $block = $item[key($item)];?>
-    <h3>
-        <b><?php echo $block['name'] ?></b>
-    </h3>
 
     <?php if ($block['avail'] != 0 && $block['SH'] == 'HO' && $block['startdate'] < $currentTime && $block['enddate'] > $currentTime) { ?>
 
@@ -33,7 +42,7 @@ echo $this->render('_toolbar',['course'=> $course]);
         <?php $assessment = $item[key($item)]; ?>
                             <?php if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) { ?>
         <div class="item">
-            <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                 <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
@@ -60,6 +69,7 @@ echo $this->render('_toolbar',['course'=> $course]);
         ?>
         <div class="item">
             <div class="icon" style="background-color: #1f0;">?</div>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link"><?php echo $assessment->name ?></a></b>
                 <input type="hidden" class="confirmation-require" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
@@ -85,7 +95,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
     <div class="item">
-        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+               <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
                     <?php echo $forum->name ?></a></b>
@@ -96,7 +106,7 @@ echo $this->render('_toolbar',['course'=> $course]);
     </div>
     <?php } elseif ($forum->avail == 2) { ?>
     <div class="item">
-        <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+        <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
                     <?php echo $forum->name ?></a></b>
@@ -221,7 +231,7 @@ echo $this->render('_toolbar',['course'=> $course]);
     <div class="item">
         <!--Hide title and icon-->
         <?php if ($inline->title != '##hidden##') { ?>
-        <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
         <div class="title">
             <b><?php echo $inline->title ?></b>
         </div>
@@ -242,7 +252,7 @@ echo $this->render('_toolbar',['course'=> $course]);
     <div class="item">
         <!--Hide title and icon-->
         <?php if ($inline->title != '##hidden##') { ?>
-        <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
         <div class="title">
             <b><?php echo $inline->title ?></b>
         </div>
@@ -263,12 +273,24 @@ echo $this->render('_toolbar',['course'=> $course]);
 
         <!-- Calender Here-->
     <?php case 'Calendar': ?>
-        <div class ='calendar'></div>
+           <div class="col-lg-12 padding-alignment calendar-container item">
+               <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                   <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
+                   <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                   <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+               </div>
+               <div class="calendar-day-details-right-side pull-left col-lg-3">
+                   <div class="day-detail-border">
+                       <b>Day Details:</b>
+                   </div>
+                   <div class="calendar-day-details"></div>
+               </div>
+           </div>
     <?php break; ?>
                     <?php endswitch; ?>
             <?php }?>
         <?php }?>
-    </div>
+
         <div class="clear"></div>
     <?php } elseif ($block['avail'] == 2) { ?>
         <!--Show Always-->
@@ -392,7 +414,7 @@ echo $this->render('_toolbar',['course'=> $course]);
                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
     <div class="item">
-        <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+         <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
 
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
@@ -410,7 +432,7 @@ echo $this->render('_toolbar',['course'=> $course]);
 
     <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
     <div class="item">
-        <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+        <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
         <div class="title">
             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $wikis->courseid) ?>">
                     <?php echo $wikis->name ?></a></b>
@@ -504,7 +526,7 @@ echo $this->render('_toolbar',['course'=> $course]);
     <div class="item">
         <!--Hide title and icon-->
         <?php if ($inline->title != '##hidden##') { ?>
-        <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
         <div class="title">
             <b><?php echo $inline->title ?></b>
         </div>
@@ -525,7 +547,7 @@ echo $this->render('_toolbar',['course'=> $course]);
     <div class="item">
         <!--Hide title and icon-->
         <?php if ($inline->title != '##hidden##') { ?>
-        <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
         <div class="title"><b><?php echo $inline->title ?></b>
         </div>
         <?php } ?>
@@ -544,9 +566,19 @@ echo $this->render('_toolbar',['course'=> $course]);
 
                         <!--         Calender Here-->
                <?php case 'Calendar': ?>
-                       <div class ='calendar'>
-                           <div class="demo"></div>
-                           </div>
+                    <div class="col-lg-12 padding-alignment calendar-container item">
+                        <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                            <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
+                            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                            <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+                        </div>
+                        <div class="calendar-day-details-right-side pull-left col-lg-3">
+                            <div class="day-detail-border">
+                                <b>Day Details:</b>
+                            </div>
+                            <div class="calendar-day-details"></div>
+                        </div>
+                    </div>
                        <?php break; ?>
                <?php endswitch; ?>
             <?php }?>
@@ -558,8 +590,10 @@ echo $this->render('_toolbar',['course'=> $course]);
     <?php break; ?>
 
 <?php endswitch;?>
+
 <div class="col-lg-12 align-linked-text-right">
 <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $course->id) ?>">Back</a>
+</div>
 </div>
  <?php }
 }?>

@@ -456,7 +456,7 @@ $now = $currentTime;
                 $blockId = $block['id'];
                 ?>
                 <?php if ($block['avail'] == 1){  ?>
-                    <div class=block>
+                    <div class= "block item">
                         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                             <span class=left>
              <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -489,7 +489,7 @@ $now = $currentTime;
                                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                                             ?>
                                             <div class="item">
-                                                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->timelimit > 0) { //timelimit
                                                         if($assessment->password == '') {?> <!--Set password-->
@@ -572,7 +572,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
                                             <div class="item">
-                                                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->password == '') {?>
                                                         <b>
@@ -612,7 +612,7 @@ $now = $currentTime;
                                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
                                                 <div class="item">
-                                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
                                                         <?php echo $forum->name ?></a></b>
@@ -623,7 +623,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($forum->avail == 2) { ?>
                                             <div class="item">
-                                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
                                                             <?php echo $forum->name ?></a></b>
@@ -643,7 +643,7 @@ $now = $currentTime;
                                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
                                                 <div class="item">
-                                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                                                         <?php echo $wikis->name ?></a></b>
@@ -656,7 +656,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
                                             <div class="item">
-                                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                                                             <?php echo $wikis->name ?></a></b>
@@ -840,7 +840,7 @@ $now = $currentTime;
                                             <div class="item">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
-                                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                                    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
                                                     <div class="title">
                                                         <b><?php echo $inline->title ?></b>
                                                     </div>
@@ -861,7 +861,7 @@ $now = $currentTime;
                                             <div class="item">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
-                                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                                    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
                                                     <div class="title">
                                                         <b><?php echo $inline->title ?></b>
                                                     </div>
@@ -894,7 +894,7 @@ $now = $currentTime;
                     <div class="clear"></div>
                 <?php } elseif(($block['avail']) == AppConstant::NUMERIC_TWO){?>
                     <!--Show Always-->
-                    <div class=block>
+                    <div class="block item">
                         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                             <span class=left>
           <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -927,7 +927,7 @@ $now = $currentTime;
                                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                                             ?>
                                             <div class="item">
-                                                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getAssetURL() ?>img/assess.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->timelimit > 0) { //timelimit
                                                         if($assessment->password == '') {?> <!--Set password-->
@@ -1010,7 +1010,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
                                             <div class="item">
-                                                <img alt="assess" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/assess.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->password == '') {?>
                                                         <b>
@@ -1050,7 +1050,7 @@ $now = $currentTime;
                                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
                                                 <div class="item">
-                                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
                                                         <?php echo $forum->name ?></a></b>
@@ -1062,7 +1062,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($forum->avail == 2) { ?>
                                             <div class="item">
-                                                <img alt="forum" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/forum.png"/>
+                                                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
 
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -1084,7 +1084,7 @@ $now = $currentTime;
                                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
                                                 <div class="item">
-                                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                                                         <?php echo $wikis->name ?></a></b>
@@ -1097,7 +1097,7 @@ $now = $currentTime;
                                             </div>
                                         <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
                                             <div class="item">
-                                                <img alt="wiki" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/wiki.png"/>
+                                                <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
                                                             <?php echo $wikis->name ?></a></b>
@@ -1282,7 +1282,7 @@ $now = $currentTime;
                                             <div class="item">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
-                                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                                    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
                                                     <div class="title">
                                                         <b><?php echo $inline->title ?></b>
                                                     </div>
@@ -1303,7 +1303,7 @@ $now = $currentTime;
                                             <div class="item">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
-                                                    <img alt="text item" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/inline.png"/>
+                                                    <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
                                                     <div class="title">
                                                         <b><?php echo $inline->title ?></b>
                                                     </div>
@@ -1324,8 +1324,18 @@ $now = $currentTime;
 
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
-                                        <div class ='calendar'>
-                                            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                                        <div class="col-lg-12 padding-alignment calendar-container item">
+                                            <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                                                <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
+                                                <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                                                <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+                                            </div>
+                                            <div class="calendar-day-details-right-side pull-left col-lg-3">
+                                                <div class="day-detail-border">
+                                                    <b>Day Details:</b>
+                                                </div>
+                                                <div class="calendar-day-details"></div>
+                                            </div>
                                         </div>
                                         <?php break; ?>
                                     <?php endswitch; ?>

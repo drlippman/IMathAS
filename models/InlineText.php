@@ -31,53 +31,16 @@ class InlineText extends BaseImasInlinetext
     }
     public function saveChanges($params)
     {
-        $endDate =   AppUtility::parsedatetime($params['enddate'],$params['end_end_time']);
-        $startDate = AppUtility::parsedatetime($params['startdate'],$params['start_end_time']);
-        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
-        if($params['hidetitle'] == 1)
-        {
-            $params['title'] = '';
-        }
-        $this->title = isset($params['title']) ? $params['title'] : null;
+        $this->title = trim($params['title']);
+        $this->text = $params['text'];
         $this->courseid = $params['courseid'];
-        $this->text = isset($params['text']) ? $params['text'] : null;
-        $this->avail = isset($params['avail']) ? $params['avail'] : null;
-        if($params['avail'] == AppConstant::NUMERIC_ONE)
-        {
-            if($params['sdatetype'] == 0){
-                $startDate = 0;
-            }
-            if($params['edatetype'] == AppConstant::ALWAYS_TIME){
-                $endDate = AppConstant::ALWAYS_TIME;
-            }
-            $this->startdate = $startDate;
-            $this->enddate = $endDate;
-        }else
-        {
-            $this->startdate = AppConstant::NUMERIC_ZERO;
-            $this->enddate = AppConstant::ALWAYS_TIME;
-        }
-        $this->oncal = isset($params['oncal']) ? $params['oncal'] : null;
-        if($params['avail'] == AppConstant::NUMERIC_ONE)
-        {
-            if($params['oncal'] == 0)
-            {
-                $params['caltag'] = '!';
-            }elseif($params['oncal'] == 1){
-                $this['caltag'] = $params['caltag'];
-
-            }elseif($params['oncal'] == 2)
-            {
-                $this['caltag'] = $params['caltag'];
-            }
-        }
-        if($params['altoncal'] == 1){
-            $this->caltag  = $params['altcaltag'];
-        }
-        else{
-            $this->caltag = '!';
-        }
-        $this->isplaylist = 0;
+        $this->startdate = $params['startdate'];
+        $this->enddate = $params['enddate'];
+        $this->avail = $params['avail'];
+        $this->caltag = $params['caltag'];
+        $this->isplaylist = $params['isplaylist'];
+        $this->oncal = $params['oncal'];
+        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }
