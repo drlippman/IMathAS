@@ -601,7 +601,9 @@ function AMpreview(inputId,outputId) {
    var dispstr = str;
    
   for (var i=0; i<vars.length; i++) {
-  	  if (vars[i].charCodeAt(0)>96) { //lowercase
+  	  if (vars[i] == "varE") {
+		  str = str.replace("E","varE");	
+	  } else if (vars[i].charCodeAt(0)>96) { //lowercase
 		  if (arraysearch(vars[i].toUpperCase(),vars)==-1) {
 			//vars[i] = vars[i].toLowerCase();
 			str = str.replace(new RegExp(vars[i],"gi"),vars[i]);	  
@@ -626,7 +628,7 @@ function AMpreview(inputId,outputId) {
 				break;
 			  }
 		  }
-		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/)) {
+		  if (!isgreek && !vars[i].match(/^(\w)_\d+$/) && vars[i]!="varE") {
 			  varstoquote.push(vars[i]);
 		  }
 	  }
@@ -636,6 +638,7 @@ function AMpreview(inputId,outputId) {
 	  var reg = new RegExp("("+vltq+")","g");
 	  dispstr = str.replace(reg,"\"$1\"");
   }
+  dispstr = dispstr.replace("varE","E");
   
   var outnode = document.getElementById(outputId);
   var n = outnode.childNodes.length;
@@ -968,7 +971,9 @@ function doonsubmit(form,type2,skipconfirm) {
 		
 		vars = varlist.split("|");
 		for (var j=0; j<vars.length; j++) {
-			  if (vars[j].charCodeAt(0)>96) { //lowercase
+			  if (vars[j] == "varE") {
+			  	  str = str.replace("E","varE");	
+			  } else if (vars[j].charCodeAt(0)>96) { //lowercase
 				  if (arraysearch(vars[j].toUpperCase(),vars)==-1) {
 					 // vars[j] = vars[j].toLowerCase();
 					  str = str.replace(new RegExp(vars[j],"gi"),vars[j]);	  
@@ -989,7 +994,6 @@ function doonsubmit(form,type2,skipconfirm) {
 		vars = varlist.split("|");
 		var nh = document.getElementById("qn" + qn);
 		nh.value = mathjs(str,varlist);
-
 		ptlist = pts[qn].split(",");
 		vals= new Array();
 		for (var fj=0; fj<ptlist.length;fj++) { //for each set of inputs
