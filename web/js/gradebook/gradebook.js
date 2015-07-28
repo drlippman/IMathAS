@@ -4,7 +4,7 @@ $(document).ready(function () {
     studentMessage();
     studentEmail();
     var allMessage = {courseId: courseId, userId:userId};
-    jQuerySubmit('display-gradebook-ajax', allMessage, 'showGradebookSuccess');
+    //jQuerySubmit('display-gradebook-ajax', allMessage, 'showGradebookSuccess');
     selectCheckBox();
     studentLock();
     studentCopyEmail();

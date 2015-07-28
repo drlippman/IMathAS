@@ -3,7 +3,7 @@ use app\components\AppUtility;
 $this->title = 'Gradebook';
 $this->params['breadcrumbs'][] = ['label' => ucfirst($course->name), 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
+
 ?>
 <h2>Gradebook</h2>
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>

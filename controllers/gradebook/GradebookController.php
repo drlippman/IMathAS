@@ -39,26 +39,45 @@ class GradebookController extends AppController
 {
     public $a;
 
+    public function getpts($sc) {
+        if (strpos($sc,'~')===false) {
+            if ($sc>0) {
+                return $sc;
+            } else {
+                return 0;
+            }
+        } else {
+            $sc = explode('~',$sc);
+            $tot = 0;
+            foreach ($sc as $s) {
+                if ($s>0) {
+                    $tot+=$s;
+                }
+            }
+            return round($tot,1);
+        }
+    }
+
     public function actionGradebook()
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
+        $gradebook = $this->gbtable($user->id, $courseId);
         $this->includeJS(['gradebook/gradebook.js']);
-        $responseData = array('course' => $course, 'user' => $user);
+        $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebook);
         $this->includeJS(['general.js']);
         return $this->renderWithData('gradebook', $responseData);
 
     }
 
-    public function actionDisplayGradebookAjax()
+    public function gbtable($userId, $courseId)
     {
-        $params = $this->getRequestParams();
-        $teacherid = Teacher::getByUserId($params['userId'], $params['courseId']);
-        $tutorid = Tutor::getByUserId($params['userId'], $params['courseId']);
+        $teacherid = Teacher::getByUserId($userId, $courseId);
+        $tutorid = Tutor::getByUserId($userId, $courseId);
         $tutorsection = trim($tutorid->section);
-        $sectionQuery = Student::findDistinctSection($params['courseId']);
+        $sectionQuery = Student::findDistinctSection($courseId);
         $sections = array();
         if ($sectionQuery) {
             foreach ($sectionQuery as $item) {
@@ -118,15 +137,15 @@ class GradebookController extends AppController
             $canviewall = false;
         }
         if ($canviewall) {
-            $defgbmode = GbScheme::findOne(['courseid' => $params['courseId']]);
+            $defgbmode = GbScheme::findOne(['courseid' => $courseId]);
             $gbmode = $defgbmode->defgbmode;
             $colorized = $defgbmode->colorize;
             $catfilter = -1;
-            if (isset($tutorsection) && $tutorsection != '') {
-                $secfilter = $tutorsection;
-            } else {
+//            if (isset($tutorsection) && $tutorsection != '') {
+//                $secfilter = $tutorsection;
+//            } else {
                 $secfilter = -1;
-            }
+//            }
             $overridecollapse = array();
 
             //Gbmode : Links NC Dates
@@ -160,20 +179,21 @@ class GradebookController extends AppController
 
         $isdiag = false;
         if ($canviewall) {
-            $query = Diags::findOne(['cid' => $params['courseId']]);
+            $query = Diags::findOne(['cid' => $courseId]);
             if ($query) {
                 $isdiag = true;
                 $sel1name = $query->sel1name;
                 $sel2name = $query->sel2name;
             }
         }
-        if ($canviewall && func_num_args() > 0) {
-            $limuser = func_get_arg(0);
+        if ($canviewall && func_num_args() > 2) {
+            $limuser = func_get_arg(2);
         } else if (!$canviewall) {
-            $limuser = $params['userId'];
+            $limuser = $userId;
         } else {
             $limuser = 0;
         }
+
         if (!isset($lastlogin)) {
             $lastlogin = 0;
         }
@@ -184,9 +204,8 @@ class GradebookController extends AppController
         $gradebook = array();
 
         $ln = 0;
-
         //Pull Gradebook Scheme info
-        $query = GbScheme::findOne(['courseid' => $params['courseId']]);
+        $query = GbScheme::findOne(['courseid' => $courseId]);
         $useweights = $query->useweights;
         $orderby = $query->orderby;
         $defaultcat = $query->defaultcat;
@@ -197,7 +216,6 @@ class GradebookController extends AppController
         if (isset($GLOBALS['setorderby'])) {
             $orderby = $GLOBALS['setorderby'];
         }
-
         //Build user ID headers
 
         $gradebook[0][0][0] = "Name";
@@ -209,7 +227,7 @@ class GradebookController extends AppController
         } else {
             $gradebook[0][0][1] = "Username";
         }
-        $query = Student::findByCid($params['courseId']);
+        $query = Student::findByCid($courseId);
         if ($query) {
             $countSection = 0;
             $countCode = 0;
@@ -248,7 +266,7 @@ class GradebookController extends AppController
 
         //orderby 10: course order (11 cat first), 12: course order rev (13 cat first)
         if ($orderby >= 10 && $orderby <= 13) {
-            $query = Course::getById($params['courseId']);
+            $query = Course::getById($courseId);
             if ($query) {
                 $courseitemorder = unserialize($query->itemorder);
                 $courseitemsimporder = array();
@@ -266,7 +284,7 @@ class GradebookController extends AppController
                 flattenitems($courseitemorder, $courseitemsimporder);
                 $courseitemsimporder = array_flip($courseitemsimporder);
                 $courseitemsassoc = array();
-                $query = Items::getByCourseId($params['courseId']);
+                $query = Items::getByCourseId($courseId);
                 if ($query) {
                     foreach ($query as $item) {
                         if (!isset($courseitemsimporder[$item->id])) {
@@ -278,10 +296,9 @@ class GradebookController extends AppController
                 }
             }
         }
-
         //Pull Assessment Info
         $now = time();
-        $query = Assessments::findAllAssessmentForGradebook($params['courseId'], $canviewall, $istutor, $isteacher, $catfilter, $now);
+        $query = Assessments::findAllAssessmentForGradebook($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         $overallpts = 0;
         $now = time();
         $kcnt = 0;
@@ -389,7 +406,7 @@ class GradebookController extends AppController
         }
 
         //Pull Offline Grade item info
-        $gbItems = GbItems::findAllOfflineGradeItem($params['courseId'], $canviewall, $istutor, $isteacher, $catfilter, $now);
+        $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         if ($gbItems) {
             foreach ($gbItems as $item) {
                 $grades[$kcnt] = $item['id'];
@@ -413,7 +430,7 @@ class GradebookController extends AppController
             }
         }
         //Pull Discussion Grade info
-        $query = Forums::findDiscussionGradeInfo($params['courseId'], $canviewall, $istutor, $isteacher, $catfilter, $now);
+        $query = Forums::findDiscussionGradeInfo($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         if ($query) {
             foreach ($query as $item) {
                 $discuss[$kcnt] = $item['id'];
@@ -460,7 +477,7 @@ class GradebookController extends AppController
             }
         }
         //Pull External Tools info
-        $query = LinkedText::findExternalToolsInfo($params['courseId'], $canviewall, $istutor, $isteacher, $catfilter, $now);
+        $query = LinkedText::findExternalToolsInfo($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         if ($query) {
             foreach ($query as $text) {
                 if (substr($text['text'], 0, 8) != 'exttool:') {
@@ -519,7 +536,7 @@ class GradebookController extends AppController
             $catcolcnt++;
         }
 
-        $query = GbCats::findCategoryByCourseId(['courseid' => $params['courseId']]);
+        $query = GbCats::findCategoryByCourseId(['courseid' => $courseId]);
         if ($query) {
             foreach ($query as $row) {
                 if (in_array($row['id'], $category)) { //define category if used
@@ -532,7 +549,6 @@ class GradebookController extends AppController
                 }
             }
         }
-
         //create item headers
         $pos = 0;
         $catposspast = array();
@@ -836,10 +852,9 @@ class GradebookController extends AppController
             $gradebook[0][3][1] = $overallptscur;
             $gradebook[0][3][2] = $overallptsfuture;
         }
-
         //Pull student data
         $ln = 1;
-        $query = Student::findStudentByCourseId($params['courseId'], $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort);
+        $query = Student::findStudentByCourseId($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort);
         $alt = 0;
         $sturow = array();
         $timelimitmult = array();
@@ -889,7 +904,7 @@ class GradebookController extends AppController
 
         //pull logincnt if needed
         if ($logincnt == 1) {
-            $query = LoginLog::findLoginCount($params['courseId']);
+            $query = LoginLog::findLoginCount($courseId);
             if ($query) {
                 foreach ($query as $log) {
                     $gradebook[$sturow[$log['userid']]][0][] = $log['count'];
@@ -899,7 +914,7 @@ class GradebookController extends AppController
 
         //pull exceptions
         $exceptions = array();
-        $query = Exceptions::findExceptions($params['courseId']);
+        $query = Exceptions::findExceptions($courseId);
         if ($query) {
             foreach ($query as $exception) {
                 if (!isset($sturow[$exception['userid']])) {
@@ -910,9 +925,10 @@ class GradebookController extends AppController
                 $gradebook[$sturow[$exception['userid']]][1][$assesscol[$exception['assessmentid']]][3] = 10; //will get overwritten later if assessment session exists
             }
         }
+
         //Get assessment scores
         $assessidx = array_flip($assessments);
-        $query = AssessmentSession::findAssessmentsSession($params['courseId'], $limuser);
+        $query = AssessmentSession::findAssessmentsSession($courseId, $limuser);
         if ($query) {
             foreach ($query as $assessment) {
                 if (!isset($assessidx[$assessment['assessmentid']]) || !isset($sturow[$assessment['userid']]) || !isset($assesscol[$assessment['assessmentid']])) {
@@ -933,24 +949,7 @@ class GradebookController extends AppController
                 $scores = explode(',', $sp[0]);
                 $pts = 0;
                 for ($j = 0; $j < count($scores); $j++) {
-//                    $pts += getpts($scores[$j]);
-                    if (strpos($scores[$j], '~') === false) {
-                        if ($scores[$j] > 0) {
-                            $pts += $scores[$j];
-                        } else {
-                            $pts += 0;
-                        }
-                    } else {
-                        $scores[$j] = explode('~', $scores[$j]);
-                        $tot = 0;
-                        foreach ($scores[$j] as $s) {
-                            if ($s > 0) {
-                                $tot += $s;
-                            }
-                        }
-                        $pts += round($tot, 1);
-                    }
-                    //if ($scores[$i]>0) {$total += $scores[$i];}
+                    $pts += $this->getpts($scores[$j]);
                 }
                 $timeused = $assessment['endtime'] - $assessment['starttime'];
                 if ($assessment['endtime'] == 0 || $assessment['starttime'] == 0) {
@@ -972,6 +971,7 @@ class GradebookController extends AppController
                 } else {
                     $IP = 0;
                 }
+
                 /*
 		        Moved up to exception finding so LP mark will show on unstarted assessments
 		        if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
@@ -1232,6 +1232,7 @@ class GradebookController extends AppController
                 }
             }
         }
+
         //fill out cattot's with zeros
         for ($ln = 1; $ln < count($sturow) + 1; $ln++) {
             $cattotattempted[$ln] = $cattotcur[$ln];  //copy current to attempted - we will fill in zeros for past due stuff
@@ -1773,6 +1774,7 @@ class GradebookController extends AppController
 
             }
         }
+
         if ($limuser < 1) {
             //create averages
             $gradebook[$ln][0][0] = "Averages";
@@ -1895,13 +1897,13 @@ class GradebookController extends AppController
 //        for($i=2;$i<count($gradebook);$i++){
 //            for($j=1;$j<count($gradebook[0][1]);$j++){
 //                if($gradebook[0][1][$j][6]==0)
-//                AppUtility::dump($gradebook);
+                return $gradebook;
 //            }
 //        }
-        $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
-            'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate,);
-        return $this->successResponse($responseData);
+//        $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
+//            'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
+//            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate,);
+//        return $this->successResponse($responseData);
     }
 
     public function gbpercentile($a, $p)
