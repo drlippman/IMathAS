@@ -204,31 +204,35 @@ function threadSuccess(response)
                 count--;
                 if(thread.parent == 0){
                     if(thread.isanon == 0){
-                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+" </td>";
-                    }else{
-                        html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br></a>Anonymous </td>";
+                        if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                        {
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a><input type='button' class='new-tag' value='New'/><br> "+ thread.name+"</td>";
+                            newCount++;
+                        }else{
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+"</td>";
+                        }
+                    }else
+
+                        {if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                        {
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<div class='new-tag'>New</div><br></a>Anonymous </td>";
+                        }else
+                        {
+                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br></a>Anonymous </td>";
+                        }
                     }
 
 
-                    if (thread.tagged != 1 && thread.posttype == 0 ) {
-                        html += " <td> <img src='../../img/flagempty.gif'  onclick='changeImage(this," + false + "," + thread.threadId + ")'></td> ";
-                    }
-                    else if(thread.posttype == 0 ){
-                        html += " <td> <img src='../../img/flagfilled.gif'  onclick='changeImage(this," + true + "," + thread.threadId + ")'></td> ";
-                    }else {
-                        html += " <td> - </td> ";
-                    }
-                    if(thread.userright > 10) {
-                        html += " <td><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Move</a> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
-                    }else if(thread.currentUserId == thread.postUserId){
-                        if(isModifyThread && thread.isReplies == 0 && isRemoveThread){
-                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
-                        }else if(isModifyThread){
-                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
-                        }else if(thread.isReplies == 0 && isRemoveThread){
-                            html += " <td><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
-                        }else { html += " <td> - </td> "; }
-                    }else { html += " <td> - </td> "; }
+
+//                   else if(thread.currentUserId == thread.postUserId){
+//                        if(isModifyThread && thread.isReplies == 0 && isRemoveThread){
+//                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+//                        }else if(isModifyThread){
+//                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
+//                        }else if(thread.isReplies == 0 && isRemoveThread){
+//                            html += " <td><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
+//                        }else { html += " <td> - </td> "; }
+//                    }else { html += " <td> - </td> "; }
                     if(thread.groupSetId > 0 && thread.userright > 10){
                         html += "<td>Non-group-specific</td>";
                     }
@@ -244,18 +248,77 @@ function threadSuccess(response)
                         } else {
                             html += "<td>" + thread.views + "(" + uniqueView + ")" + "</td>";
                         }
-                    if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
-                    {
-                           html += "<td>" + thread .postdate + "&nbsp;<span class='new-tag'>New</span></td>";
-                           newCount++;
+                        html += "<td>" + thread .postdate + "</td>";
+                        if (thread.tagged != 1 && thread.posttype == 0 )
+                        {
+                                html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn' onclick='changeImage(this," + true + "," + thread.threadId+" )'>" +
+                                "<i class='fa fa-flag-o'></i> Flag</a><a class='btn btn-primary dropdown-toggle ' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+                                "<ul class='dropdown-menu'>" ;
+                                 if(thread.userright > 10)
+                                 {
+                                    html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
+                                    "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
+                                    "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                }
+                                 else if(thread.currentUserId == thread.postUserId)
+                                 {
+                                     if(isModifyThread && thread.isReplies == 0 && isRemoveThread)
+                                     {
+                                         html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
+                                             "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                     }else if(isModifyThread)
+                                     {
+                                         html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>";
+                                     }
+                                     else if(thread.isReplies == 0 && isRemoveThread)
+                                     {
+                                         html += "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                     }
+                                     else {html += "<li><a href='#'><i class='fa fa-exclamation'></i></i></i>&nbsp;No Action Allowed</a></li>";}
 
-                    }
-                    else
-                    {
-//                        html += "<td>" + thread .postdate + "</td>";
-                        html += "<td>" + thread .postdate + "&nbsp;<div class='new-tag'>New</div></td>";
-                    }
+                                 }
+                                 else
+                                 {
+                                     html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+                                 }
+                         }
+                         else if(thread.posttype == 0 )
+                        {
 
+                                html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn' onclick='changeImage(this," + true + "," + thread.threadId +" )' >"+
+                                "<i class='fa fa-flag'></i> Unflag</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+                                "<ul class='dropdown-menu'>";
+                                if(thread.userright > 10) {
+                                    html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
+                                        "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
+                                        "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                }
+                                else if(thread.currentUserId == thread.postUserId)
+                                {
+                                    if(isModifyThread && thread.isReplies == 0 && isRemoveThread)
+                                    {
+                                        html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
+                                            "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                    }else if(isModifyThread){
+                                        html+="<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>";
+                                    }
+                                    else if(thread.isReplies == 0 && isRemoveThread){
+                                        html += "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                                    }
+                                    else {
+                                        html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+                                    }
+
+                                }
+                                else {
+
+                                    html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+                                }
+                        }
+                        else
+                        {
+                            html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+                        }
                 }
             }
         });
@@ -352,17 +415,16 @@ var isValue;
 function changeImage(element,checkFlagValue, rowId) {
 
     var userId = $("#user-id").val();
-    if(checkFlagValue == false){
-        element.src = element.bln ? '../../img/flagempty.gif' : '../../img/flagfilled.gif';
-        element.bln = !element.bln;
-    }
-    if(checkFlagValue ==true ){
-        element.src = element.bln ? '../../img/flagfilled.gif' : '../../img/flagempty.gif';
-        element.bln = !element.bln;
-    }
-    var row = {rowId: rowId,userId:userId};
-    jQuerySubmit('change-image-ajax', row,{});
 
+    var row = {rowId: rowId,userId:userId};
+    jQuerySubmit('change-image-ajax', row,'flagResponse');
+
+}
+
+
+function flagResponse()
+{
+    window.location.reload();
 }
 
 function markAsRemoveSuccess(response) {

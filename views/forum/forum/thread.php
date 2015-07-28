@@ -47,14 +47,14 @@ $now = $currentTime;
         </div>
 
         <div class="mark-as-read-link pull-left col-lg-4 pull-left">
-            <a href="#" class="">Mark as Read</a>
+            <a href="#" id="markRead"><?php echo AppUtility::t('Mark as Read')?></a>
         </div>
         <div class="pull-right view-drop-down">
-            <button class="btn btn-primary search-button" id="change-button"><i class="fa fa-search"></i>&nbsp;<b>Search</b></button>
+            <button class="btn btn-primary search-button" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></button>
         </div>
         <div class="checkbox checkbox-thread pull-right">
             <label>
-                <input type="checkbox" name="allforums" id="searchAll" value="">All Forum in Courses?
+                <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
             </label>
         </div>
@@ -71,15 +71,14 @@ $now = $currentTime;
     <div id="data">
         <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
             <thead>
-            <th>Topic</th>
-            <th>Flag</th>
-            <th>Actions</th>
+            <th><?php echo AppUtility::t('Topic')?></th>
             <?php if($forumData['groupsetid'] > 0 && $users['rights'] > 10){ ?>
-                <th>Groups</th>
+                <th><?php echo AppUtility::t('Groups')?></th>
             <?php } ?>
-            <th>Replies</th>
-            <th>Views(Unique)</th>
-            <th>Last Post Date</th>
+            <th><?php echo AppUtility::t('Replies')?></th>
+            <th><?php echo AppUtility::t('Views(Unique)')?></th>
+            <th><?php echo AppUtility::t('Last Post Date')?></th>
+            <th><?php echo AppUtility::t('Action')?></th>
             </thead>
             <tbody class="forum-table-body">
             </tbody>
@@ -87,6 +86,6 @@ $now = $currentTime;
     </div>
     <div id="searchpost"></div>
     <div id="noThread">
-        <h5><Strong>No posts have been made yet. Click Add New Thread to start a new discussion</Strong></h5>
+        <h5><Strong><?php echo AppUtility::t('No posts have been made yet. Click Add New Thread to start a new discussion')?></Strong></h5>
     </div>
 </div>

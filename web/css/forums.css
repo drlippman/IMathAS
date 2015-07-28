@@ -251,10 +251,86 @@ select > option{
     margin-right: 15px;
 
 }
-.new-tag
-{
-width: 50px;
-background-color: #12866E;
+input[type=button].new-tag {
+
+    background-color: #12866E;
     color: #FFF;
     text-align: center;
+    border-radius: 0px;
+    border-color: #FFF;
+    font: inherit;
+     height: 22px;
+    margin-left: 8px;
+
+}
+.btn-primary.flag-btn {
+    color: #FFF;
+    background-color: #1460AA;
+    border-color: #357EBD;
+    border-radius:0px;
+    width:73px;
+}
+
+.btn-primary.dropdown-toggle{
+    color: #FFF;
+    background-color: #1460AA;
+    border-color: #357EBD;
+    border-radius:0px;
+}
+.view-message-inner-contents
+{
+    height: auto;
+    background-color: #F8f8f8;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+.title-middle{
+    text-transform: capitalize;
+    font-size: 30px;
+    color: white;
+    background-color: #6d6d6d;
+    width: 100%;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    padding: 8px 0 12px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+.title-option
+{
+
+    margin-left: 50px;
+    margin-top: 50px;
+}
+.align-option
+{
+
+    margin-bottom: 2px;
+}
+
+.checkbox.student-enroll label, .radio.student-enroll label{
+    padding-left: 0;
+    vertical-align: middle;
+}
+.title-middle-option{
+
+    text-transform: capitalize;
+    font-size: 15px;
+    color: white;
+    background-color: #6d6d6d;
+    width: 24%;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    padding: 8px 0 12px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    height: 38px;
+}
+.radio .cr .cr-icon.align-check {
+    margin-left: -1px;
+}
+
+.btn.btn-primary.search-button.align-btn {
+    margin-bottom:10px;
 }

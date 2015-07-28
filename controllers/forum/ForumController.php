@@ -360,6 +360,7 @@ class ForumController extends AppController
      */
     public function actionMoveThread()
     {
+        $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadId');
@@ -406,7 +407,7 @@ class ForumController extends AppController
                 $responseData = array('cid' => $courseId, 'users' => $user, 'forumid' => $forumId, 'course' => $course);
                 return $this->renderWithData('thread', $responseData);
             }
-            $this->setReferrer();
+            $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/movethread.js']);
             $responseData = array('forums' => $forumArray, 'threads' => $threadArray, 'threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'user' => $user);
             return $this->renderWithData('moveThread', $responseData);

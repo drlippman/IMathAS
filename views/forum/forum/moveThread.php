@@ -1,65 +1,74 @@
 <?php
-use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'Move Thread';
-if ($user->rights > AppConstant::STUDENT_RIGHT){
+use app\components\AssessmentUtility;
+use app\components\CourseItemsUtility;
+use app\components\AppConstant;
+use yii\widgets\ActiveForm;
 
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumId]];
-$this->params['breadcrumbs'][] = $this->title;?>
+$this->title = AppUtility::t('Move Thread',false);
+$this->params['breadcrumbs'][] = $this->title;
+$currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+$now = $currentTime;
+?>
 <form id="myForm" method="post" action="move-thread?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
-
-<input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
-
-<div>
-    <h3>OpenMath - Move Thread</h3>
-
-    <p>What do you want to do?<br/>
-
-        <input type="radio" checked name="movetype" value="0" onclick="select(0)"/> Move thread to different forum<br/>
-        <input type="radio" name="movetype" value="1" onclick="select(1)"/> Move post to be a reply to a thread
-
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
-
-
-
-<div id="move-forum">Move to forum:
-    <div>
-        <?php $currentTime = time();
-        foreach ($forums as $forum) {
-             if($forum['forumId'] == $forumId){?>
-            <input type="radio" checked id="<?php echo $forum['forumId'] ?>" name="forum-name"
-                   value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
-<?php }else{?>
-                 <input type="radio" id="<?php echo $forum['forumId'] ?>" name="forum-name"
-                        value="<?php echo $forum['forumId'] ?>"><?php echo $forum['forumName'] ?><br>
-      <?php           }?>
-        <?php  } ?>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+        </div>
     </div>
 </div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+</div>
+<div class="tab-content shadowBox ">
+    <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
+    <div class="view-message-inner-contents">
+        <div class="title-middle center"><?php AppUtility::t('Move Thread');?></div>
+        <div class="title-option">
+            <h4><?php AppUtility::t('What Do You Want To Do?');?>:</h4>
+            <tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' checked name='movetype' value='0' onclick="select(0)">
+            <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move thread to different forum</td></div></tr>
+            <tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='movetype' value='1' onclick="select(1)">
+                            <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move post to be a reply to a thread</td></div></tr>
 
 
-<div id="move-thread">Move to thread:
-    <div>
+        <div id="move-forum"><div class="title-middle-option center"><?php AppUtility::t('Move to forum');?></div>
+            <div>
+                <?php $currentTime = time();
+                foreach ($forums as $forum) {
+                    if($forum['forumId'] == $forumId)
+                    {?>
+                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='{$forum['forumId']}' value=''><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
-        <?php
-        foreach ($threads as $thread) { ?>
-            <?php
+                    <?php }else{?>
+                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='{$forum['forumId']}' value=''><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
-            if ( $thread['forumIdData'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) { ?>
-             <input type="radio" id="<?php echo $thread['threadId'] ?>" name="thread-name" value="<?php echo $thread['threadId'] ?>"><?php echo $thread['subject']?><br>
-            <?php }
-        } ?>
+
+                    <?php           }?>
+                <?php  } ?>
+            </div>
+        </div>
+
+            <div id="move-thread"><div class="title-middle-option center"><?php AppUtility::t('Move to thread');?></div>
+                <div>
+
+                    <?php
+                    foreach ($threads as $thread) { ?>
+                        <?php
+
+                        if( $thread['forumIdData'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) { ?>
+                            <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='thread-name' id='{$thread['threadId']}' value='{$thread['threadId']}'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$thread['subject']}</td></div></tr>";?>
+                        <?php }
+                    } ?>
+                </div>
+            </div>
+            <input type=submit class="btn btn-primary search-button align-btn" id="move-button" value="<?php echo AppUtility::t('Move')?>">
+            <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
+        </div>
     </div>
 </div>
-
-
-    <input type=submit class="btn btn-primary" id="move-button" value="Move">
-    <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>">Cancel</a>
 </form>
-
