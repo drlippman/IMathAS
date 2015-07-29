@@ -701,7 +701,7 @@ class CourseController extends AppController
         $saveTitle = '';
 
         $pageTitle = AppConstant::ADD_INLINE_TEXT;
-        $saveTitle = AppConstant::CREATE_INLINE_TEXT;
+        $saveTitle = AppConstant::CREATE_ITEM;
         $defaultValue = array(
             'startDate' => time(),
             'sDate' => date("m-d-y"),
@@ -809,6 +809,7 @@ class CourseController extends AppController
             );
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js" , "editor/tiny_mce_src.js", "general.js"]);
+        $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'saveTitle' => $saveTitle,'inlineText' => $inlineText, 'pageTitle' => $pageTitle,'defaultValue' => $defaultValue);
         return $this->renderWithData('modifyInlineText', $responseData);
     }

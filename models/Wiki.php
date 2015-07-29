@@ -31,14 +31,14 @@ class Wiki extends BaseImasWikis
         return $query;
     }
 
-    public function createItem($params, $courseId)
+    public function createItem($params)
     {
         $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
         $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
         $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
 
         $this->name = isset($params['name']) ? $params['name'] : null;
-        $this->courseid = $courseId;
+        $this->courseid = $params['courseId'];
         if(empty($params['description']))
         {
             $params['description'] = ' ';
@@ -66,9 +66,13 @@ class Wiki extends BaseImasWikis
         if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
             $tag = $params['rdatetype'];
         }
-        $this->editbydate = $tag;
-        $this->groupsetid = $params['group-wiki'];
+//        $this->editbydate = 200000;
+        if(!empty($params['group-wiki']))
+        {
+            $this->groupsetid = $params['group-wiki'];
+        }
         $this->save();
+//        AppUtility::dump($this);
         return $this->id;
     }
 

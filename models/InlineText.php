@@ -40,7 +40,6 @@ class InlineText extends BaseImasInlinetext
         $this->caltag = $params['caltag'];
         $this->isplaylist = $params['isplaylist'];
         $this->oncal = $params['oncal'];
-        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }

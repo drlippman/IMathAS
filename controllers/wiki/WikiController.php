@@ -108,6 +108,8 @@ class WikiController extends AppController
     public function actionAddWiki()
     {
         $this->guestUserHandler();
+        $this->getAuthenticatedUser();
+        $this->layout = "master";
         $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
@@ -115,6 +117,8 @@ class WikiController extends AppController
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
+
+
         $saveTitle = '';
         if(isset($params['id']))
         {
@@ -130,10 +134,10 @@ class WikiController extends AppController
         else {
             $pageTitle = 'Add Wiki';
             if($this->isPostMethod()){
-                $params = $_POST;
+                $params = $this->getRequestParams();
                 $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
                 $saveChanges = new Wiki();
-                $lastWikiId = $saveChanges->createItem($params,$courseId);
+                $lastWikiId = $saveChanges->createItem($params);
                 $saveItems = new Items();
                 $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
                 $courseItemOrder = Course::getItemOrder($courseId);
@@ -154,7 +158,7 @@ class WikiController extends AppController
             $saveTitle = AppConstant::New_Item;
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'pageTitle' => $pageTitle);
         return $this->render('addWiki', $returnData);
     }
 }

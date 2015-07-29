@@ -4,34 +4,45 @@ use app\components\AppUtility;
 use app\components\AppConstant;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
-$this->title = 'Modify InlineText';
+$this->title = $pageTitle;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 $hidetitle = false;
 include_once('../components/filehandler.php');
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share"></i><?php echo $saveTitle ?></button>
+        </div>
+    </div>
+</div>
 
-
-<h3><b><?php echo $pageTitle; ?></b><img src="<?php echo AppUtility::getAssetURL() ?>img/help.gif"  alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=inlinetextitems','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></h3>
+<div class="tab-content shadowBox" style="margin-top:30px">
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
-    <span class=form>Title: </span>
-	<span class=formright>
+    <span class="col-lg-2" style="margin-top: 20px">Name of Inline Text </span>
+	<span class="col-lg-10" style="margin-top: 20px">
         <!-- Title-->
          <?php $title = 'Enter title here';
             if($inlineText['title']){
                 $title = $inlineText['title'];
          } ?>
-        <input type=text size=0 name=title value="<?php echo $title ;?>"><br/>
+        <input type=text size=0 name=title style="height: 50px; border: #6d6d6d 1px solid; width: 98%" value="<?php echo $title ;?>"><br/>
 
 		<input type="checkbox" name="hidetitle" value="1" <?php writeHtmlChecked($hidetitle,true) ?>/>Hide title and icon
 	</span>
         <!--    Text Editor-->
-    <BR class=form>
-    Text:<BR>
-    <div>
-        <?php echo "<span class='left col-md-11'><div class= 'editor'>
-            <textarea id='inlineText' name='text'  style='width: 100%;' rows='20' cols='200'>";
-                $text = "<p>Enter text here</p>";
+    <BR>
+    <span class="col-lg-2">Summary</span>
+      <div class= 'editor col-lg-10 pull-right' style='width: 85%;'>
+            <textarea id='inlineText' name='text' style='width: 98%' rows='20' cols='50'>
+                <?php  echo $text = "<p>Enter text here</p>";
                 if($inlineText['text'])
                 {
                     $text = $inlineText['text'];
@@ -41,14 +52,8 @@ include_once('../components/filehandler.php');
     </div>
 
     <!--File Attachment -->
-	<span class=form>Attached Files:</span>
-	<span class=wideformright>
-
-        <a href="<?php echo getcoursefileurl($arr['link']); ?>" target="_blank">
-            View</a>
-		<input type="text" name="filedescr-<?php echo $arr['fid'] ?>" value="<?php echo $arr['desc'] ?>"/>
-		Delete? <input type=checkbox name="delfile-<?php echo $arr['fid'] ?>"/><br/>
-
+	<span class=col-lg-2>Attached Files:</span>
+	<span class=col-lg-10>
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
 		    New file<sup>*</sup>: <input type="file" name="userfile" /> <br/>
 		    Description: <input type="text" name="newfiledescr"/><br/>
@@ -183,9 +188,8 @@ include_once('../components/filehandler.php');
                 </span><BR class=form>
         </div>
     </div>
-    <div class=submit><button type=submit name="submitbtn" class="btn btn-primary" value="Submit"><?php echo $saveTitle ?></button></div>
 </form>
-
+</div>
 <!--Functions-->
 <?php
 function writeHtmlChecked ($var,$test,$notEqual=null) {

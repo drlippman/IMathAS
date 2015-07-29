@@ -153,5 +153,5 @@ class AppConstant
     const COPY = " (Copy)";
     const NO_ACCESS_RIGHTS = "You don't have the authority for this action";
     const ADD_INLINE_TEXT = "Add Inline Text";
-    const CREATE_INLINE_TEXT = "Create Inline Text";
+    const CREATE_ITEM = "Create Item";
 }

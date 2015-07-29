@@ -151,17 +151,16 @@ body {
 }
 
 .help-icon {
-    width: 25px;
-    height: 25px;
+    width: 35px;
+    height: 35px;
     color: white;
     background: #2C368E;
     border-radius: 100%;
     text-align: center;
-    padding: 20%;
+    /*padding: 20%;*/
 }
 
 .add-help{
-
     padding-top: 31px;
     padding-left: 12px
 }

@@ -4,31 +4,52 @@ use app\components\AppUtility;
 use app\components\AppConstant;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
-$this->title = 'Wiki';
+$this->title = $pageTitle;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 $hidetitle = false;
 ?>
-    <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
-        <span class=form>Name: </span>
-    <span class=formright>
-        <?php $title = 'Enter wiki name here';
-        if($wiki['name']){
-            $title = $wiki['name'];
-        } ?>
-        <input type=text size=60 name=name value="<?php echo $title;?>"></span>
+ <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+    </div>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+            </div>
+            <div class="pull-left header-btn">
+                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share"></i><?php echo $saveTitle ?></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content shadowBox" style="margin-top:30px">
+        <div style="padding-top: 20px">
+            <div class="col-lg-2">Name of Wiki</div>
+            <div class="col-lg-10">
+                <?php if($wiki['name']){
+                      $title = $wiki['name'];
+                    } ?>
+                <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=name value="<?php echo $title;?>">
+            </div>
+        </div>
         <BR class=form>
 
-        Description:<BR>
-        <div class=editor>
-            <textarea cols=60 rows=20 id=description name=description style="width: 100%">
-                <?php $text = "<p>Enter Wiki description here</p>";
-                if($wiki['description'])
-                {
-                    $text = $wiki['description'];
-                }
-                echo htmlentities($text);?>
-            </textarea>
+        <div style="margin-top: 20px">
+            <div class="col-lg-2">Description</div>
+            <div class="col-lg-10">
+                <div class=editor>
+                    <textarea cols=5 rows=12 id=description name=description style="width: 100%">
+                        <?php $text = "<p>Enter Wiki description here</p>";
+                        if($wiki['description'])
+                        {
+                            $text = $wiki['description'];
+                        }
+                        echo htmlentities($text);?>
+                    </textarea>
+                </div>
+            </div>
         </div>
 
         <span class=form>Show:</span>
@@ -137,7 +158,7 @@ if ($started) {
             echo '<div class="pull-left col-lg-6">';
 
             echo TimePicker::widget([
-                'name' => 'calendar_    end_time',
+                'name' => 'calendar_end_time',
                 'value' => time(),
                 'pluginOptions' => [
                     'showSeconds' => false,
@@ -146,10 +167,8 @@ if ($started) {
             ]);
             echo '</div>';?>
 		</span><br class="form" />
-        <div class=submit><input type=submit class="btn btn-primary" value="<?php echo $saveTitle;?>"></div>
     </form>
-
-
+</div>
 <?php
 function writeHtmlChecked ($var,$test,$notEqual=null) {
     if ((isset($notEqual)) && ($notEqual==1)) {
