@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]);?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
@@ -29,7 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'labelOptions' => ['class' => 'col-lg-4'],
     ],
 ]); ?>
-    <div class="title-middle center"><?php AppUtility::t('Manage Late Passes');?></div>
     <p><?php AppUtility::t('Students can redeem LatePasses for automatic extensions to assessments where allowed by the instructor.
             Students must redeem the LatePass before the Due Date, unless you opt in your assessment settings to allow
             use after the due date (but within 1 LatePass period, specified below)');?></p>

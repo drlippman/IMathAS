@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
@@ -27,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="midwrapper">
         <div id="headerlogo" class="hideinmobile" onclick="mopen('homemenu',1)" onmouseout="mclosetime()"></div>
         <div id="homemenu" class="ddmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()"></div>
-        <div id="headerlogingrid" class="title-middle center pagetitle"><?php AppUtility::t('Login Grid View'); ?></div>
         <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <p><?php AppUtility::t('Showing Number of Logins')?>&nbsp;<label id="first-date-label"></label> &nbsp;<?php AppUtility::t('through')?>&nbsp;<label id="last-date-label"></label>
         <div class="pull-left select-text-margin">

@@ -26,9 +26,9 @@ class StudentEnrollmentForm extends Model
     {
         return
             [
-                'usernameToEnroll' => AppUtility::t('Username to enroll:',false),
-                'section' => AppUtility::t('Section (optional):', false),
-                'code' => AppUtility::t('Code (optional):', false)
+                'usernameToEnroll' => AppUtility::t('Username to enroll',false),
+                'section' => AppUtility::t('Section (optional)', false),
+                'code' => AppUtility::t('Code (optional)', false)
             ];
     }
 

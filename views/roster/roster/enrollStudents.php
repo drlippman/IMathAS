@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = AppUtility::t('Student Enrollment', false);
+$this->title = AppUtility::t('Enroll Student From Another Course', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
@@ -17,23 +17,22 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="inner-content">
-    <div class="title-middle center"><?php AppUtility::t('Enroll Student From Another Course'); ?></div>
     <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
                 'template' => "{label}\n<div class = \"col-lg-3\">{input}</div>\n<div class = \"col-lg-7 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2'],
+                'labelOptions' => ['class' => 'col-lg-3'],
             ],
         ]
     ) ?>
     <div>
-        <h4><?php echo AppUtility::t('Select students to enroll') ?>: </h4>
+        <h4><?php echo AppUtility::t('Select students to enroll') ?> </h4>
         <?php echo AppUtility::t('Check') ?>: <a id="checkAll" class="check-all"
                                                  href="#"><?php echo AppUtility::t('All') ?></a> /
         <a id="checkNone" class="un-check-all" href="#"><?php echo AppUtility::t('None') ?></a>

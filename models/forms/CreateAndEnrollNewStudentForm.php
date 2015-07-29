@@ -44,13 +44,13 @@ class CreateAndEnrollNewStudentForm extends Model
     {
         return
             [
-                'username' => AppUtility::t('Username:', false),
-                'password' => AppUtility::t('Choose a password:', false),
-                'FirstName'=> AppUtility::t('Enter First Name:', false),
-                'LastName' => AppUtility::t('Enter Last Name:', false),
-                'email'    => AppUtility::t('Enter E-mail address:', false),
-                'section' => AppUtility::t('Section (optional):', false),
-                'code' => AppUtility::t('Code (optional):', false)
+                'username' => AppUtility::t('Username', false),
+                'password' => AppUtility::t('Choose a password', false),
+                'FirstName'=> AppUtility::t('Enter First Name', false),
+                'LastName' => AppUtility::t('Enter Last Name', false),
+                'email'    => AppUtility::t('Enter E-mail address', false),
+                'section' => AppUtility::t('Section (optional)', false),
+                'code' => AppUtility::t('Code (optional)', false)
             ];
     }
 

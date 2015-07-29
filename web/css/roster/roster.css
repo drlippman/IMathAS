@@ -177,10 +177,7 @@ div.dataTables_info {
     height: auto;
     position: relative;
     overflow: hidden;
-    width: 96%;
-    background-color: #f7f7f7;
-    padding: 20px 25px 30px;
-    margin: 25px auto 25px;
+    padding: 30px 25px 30px;
     border-radius: 2px;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.3);
 }

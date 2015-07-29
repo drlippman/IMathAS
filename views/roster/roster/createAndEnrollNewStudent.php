@@ -3,7 +3,7 @@ use app\components\AppUtility;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = AppUtility::t('Enroll From Other Course', false);
+$this->title = AppUtility::t('Create and Enroll a New Student', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
@@ -18,13 +18,12 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]); ?>
 <div class="inner-content">
-    <div class="title-middle center"><?php AppUtility::t('Enroll a New Student'); ?></div>
     <?php $form = ActiveForm::begin(
         [
             'options' => ['class' => 'form-horizontal'],

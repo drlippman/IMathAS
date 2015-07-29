@@ -24,7 +24,7 @@ class EnrollStudentsForm extends model{
 
     public function attributeLabels()
     {
-        return [ 'section' => AppUtility::t('Assign to Section (optional):', false)];
+        return [ 'section' => AppUtility::t('Assign to Section (optional)', false)];
     }
 
 

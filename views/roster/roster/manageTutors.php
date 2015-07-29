@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']);?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]);?>
 </div>
 <div class="tab-content shadowBox"">
 <?php echo $this->render("_toolbarRoster", ['course' => $course]);?>
@@ -22,7 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <input type="hidden" class="courseId" value="<?php echo $courseId ?>">
 <?php $sectionArray = $section?>
-    <div class="title-middle center"><?php AppUtility::t('Manage Tutors');?></div>
     <p><div id="user-div"></div></p>
 <div>
 

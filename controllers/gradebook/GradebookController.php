@@ -64,9 +64,9 @@ class GradebookController extends AppController
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $gradebook = $this->gbtable($user->id, $courseId);
+        $gradebookData = $this->gbtable($user->id, $courseId);
         $this->includeJS(['gradebook/gradebook.js']);
-        $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebook);
+        $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
         $this->includeJS(['general.js']);
         return $this->renderWithData('gradebook', $responseData);
 
@@ -864,6 +864,8 @@ class GradebookController extends AppController
                 unset($pts);
                 unset($IP);
                 unset($timeused);
+                $student['LastName'] = ucfirst($student['LastName']);
+                $student['FirstName'] = ucfirst($student['FirstName']);
                 $cattotpast[$ln] = array();
                 $cattotpastec[$ln] = array();
                 $cattotcur[$ln] = array();
@@ -1894,15 +1896,10 @@ class GradebookController extends AppController
             $gradebook[1] = $gradebook[$ln];
         }
 
-//        for($i=2;$i<count($gradebook);$i++){
-//            for($j=1;$j<count($gradebook[0][1]);$j++){
-//                if($gradebook[0][1][$j][6]==0)
-                return $gradebook;
-//            }
-//        }
-//        $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
-//            'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-//            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate,);
+        $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
+            'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'showPics' => $showpics);
+        return $responseData;
 //        return $this->successResponse($responseData);
     }
 
