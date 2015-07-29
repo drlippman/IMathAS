@@ -24,4 +24,18 @@ class LoginLog extends BaseImasLoginLog
         $data = $command->queryAll();
         return $data;
     }
+
+    public function createLog($userid,$cid,$now){
+        $this->courseid = $cid;
+        $this->userid = $userid;
+        $this->logintime = $now;
+        $this->save();
+        return $this->id;
+    }
+    public static function setLastAction($id, $now){
+        $logData = LoginLog::findOne(['id' => $id]);
+        if($logData){
+            $logData->lastaction = $now;
+        }
+    }
 }

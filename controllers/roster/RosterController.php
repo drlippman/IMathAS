@@ -677,7 +677,6 @@ class RosterController extends AppController
         $newStudents = array();
         $existingStudent = array();
         $existingStudentUsernameArray = array();
-//        AppUtility::dump($studentInformation);
          if($studentInformation['existingUsers']){
         foreach ($studentInformation['existingUsers'] as $singleExistingStudent) {
             array_push($existingStudentUsernameArray, $singleExistingStudent['userName']);
@@ -709,7 +708,6 @@ class RosterController extends AppController
                 }
             }
         }
-//        AppUtility::dump($existingStudent);
         $tempArrayForNewStudent = array();
         $uniqueStudentsForNewStudent = array();
         $duplicateStudentsForNewStudent = array();
@@ -721,12 +719,10 @@ class RosterController extends AppController
                 array_push($duplicateStudentsForNewStudent, $singleStudent);
             }
         }
-//        AppUtility::dump($duplicateStudentsForNewStudent);
         if(count($uniqueStudentsForNewStudent) == 0){
             $this->setErrorFlash(AppConstant::RECORD_EXISTS);
         }
 
-//        AppUtility::dump($uniqueStudentsForNewStudent);
         $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/importstudent.js', 'general.js']);
         $responseData = array('existingStudent' => $uniqueStudentsForExistingStudent, 'isSectionPresent' => $isSectionPresent, 'isCodePresent' => $isCodePresent, 'courseId' => $courseId, 'uniqueStudents' => $uniqueStudentsForNewStudent, 'duplicateStudents' => $duplicateStudentsForNewStudent, 'course' => $course);

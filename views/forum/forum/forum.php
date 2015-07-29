@@ -14,12 +14,14 @@ $now = $currentTime;
     <?php echo $this->render("../../itemHeader/_indexWithButton",['item_name'=>'Message', 'link_title'=>AppUtility::t('Home',false), 'link_url' => AppUtility::getHomeURL().'site/index', 'page_title' => $this->title]); ?>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+    <?php if($users->rights == 100 || $users->rights == 20) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+    } elseif($users->rights == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    }?>
 </div>
 <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
 <div class="tab-content shadowBox ">
-
-
         <div class="forum-background">
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',

@@ -487,7 +487,7 @@ public $oa = array();
      */
     public function actionDeleteItemsAjax()
     {
-        $params = $this->getRequestParams();
+        $params = $this->getRequestParams();AppUtility::dump($params);
         $courseId = $params['courseId'];
         $block = $params['block'];
         $itemType = $params['itemType'];

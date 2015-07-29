@@ -882,8 +882,18 @@ $now = $currentTime;
 
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
-                                        <div class ='calendar'>
-                                            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                                        <div class="col-lg-12 padding-alignment calendar-container item">
+                                            <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                                                <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
+                                                <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                                                <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+                                            </div>
+                                            <div class="calendar-day-details-right-side pull-left col-lg-3">
+                                                <div class="day-detail-border">
+                                                    <b>Day Details:</b>
+                                                </div>
+                                                <div class="calendar-day-details"></div>
+                                            </div>
                                         </div>
                                         <?php break; ?>
                                     <?php endswitch; ?>

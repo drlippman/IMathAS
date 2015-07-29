@@ -15,9 +15,9 @@ use yii\db\Query;
 
 class Tutor extends BaseImasTutors
 {
-    public static function getByUserId($id,$courseid)
+    public static function getByUserId($userid,$courseid)
     {
-        return static::findOne( ['userid' => $id,'courseid' => $courseid]);
+        return static::findOne( ['userid' => $userid,'courseid' => $courseid]);
     }
     public static function getByCourseId($courseid)
     {

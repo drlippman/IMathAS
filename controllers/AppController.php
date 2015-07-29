@@ -11,10 +11,13 @@ namespace app\controllers;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasSessions;
+use app\models\Assessments;
 use app\models\Course;
 use app\models\DbSchema;
+use app\models\LoginLog;
 use app\models\Sessions;
 use app\models\Student;
+use app\models\Tutor;
 use app\models\User;
 use yii\web\Controller;
 use app\models\Teacher;
@@ -107,7 +110,7 @@ class AppController extends Controller
     function includeAssets($fileArray, $assetType){
         $cnt = count($fileArray);
         $assetUrl = AppUtility::getAssetURL();
-        for($i = 0; $i < $cnt; $i++){
+        for($i = AppConstant::NUMERIC_ZERO; $i < $cnt; $i++){
             $fileURL = $assetUrl . $assetType . "/" . $fileArray[$i];
             if($assetType == AppConstant::ASSET_TYPE_CSS){
                 $this->getView()->registerCssFile($fileURL."?ver=".AppConstant::VERSION_NUMBER);
@@ -193,18 +196,53 @@ class AppController extends Controller
 
     public function checkSession($params){
         $session = Yii::$app->session;
-        if ($session->isActive){
-            $session->close();
+        if (isset($sessionpath) && $sessionpath!='') {
+            session_save_path($sessionpath);
+        }
+        Yii::$app->session->set('session.gc_maxlifetime',AppConstant::MAX_SESSION_TIME);
+        Yii::$app->session->set('auto_detect_line_endings',true);
+
+        if ($_SERVER['HTTP_HOST'] != 'localhost') {
+            session_set_cookie_params(AppConstant::NUMERIC_ZERO, '/', '.'.implode('.',array_slice(explode('.',$_SERVER['HTTP_HOST']),isset($CFG['GEN']['domainlevel'])?$CFG['GEN']['domainlevel']:-AppConstant::NUMERIC_TWO)));
+        }
+        if (isset($CFG['GEN']['randfunc'])) {
+            $randf = $CFG['GEN']['randfunc'];
+        } else {
+            $randf = 'rand';
         }
         $session->open();
         $sessionId = $session->getId();
         if((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO']=='https'))  {
-            $urlmode = 'https://';
+            $urlMode = 'https://';
         } else {
-            $urlmode = 'http://';
+            $urlMode = 'http://';
         }
         $randomString = $this->generaterandstring();
         $check =$this->checkeditorok();
+
+        $myRights = AppConstant::NUMERIC_ZERO;
+        $isPublic = false;
+        /*
+         * Domain checks for special themes, etc. if desired
+         */
+        $requestAddress = $_SERVER['HTTP_HOST'] .$_SERVER['PHP_SELF'];
+        if (isset($CFG['CPS']['theme'])) {
+            $defaultCourseTheme = $CFG['CPS']['theme'][0];
+        } else if (!isset($defaultCourseTheme)) {
+            $defaultCourseTheme = "default.css";
+        }
+        $courseTheme = $defaultCourseTheme; //will be overwritten later if set
+        if (!isset($CFG['CPS']['miniicons'])) {
+            $CFG['CPS']['miniicons'] = array(
+                'assess'=>'assess_tiny.png',
+                'drill'=>'assess_tiny.png',
+                'inline'=>'inline_tiny.png',
+                'linked'=>'html_tiny.png',
+                'forum'=>'forum_tiny.png',
+                'wiki'=>'wiki_tiny.png',
+                'folder'=>'folder_tiny.png',
+                'calendar'=>'1day.png');
+        }
         /*
          * check for bad session ids.
          */
@@ -217,7 +255,7 @@ class AppController extends Controller
         $sessionData = array();
         $haveSession = Sessions::getById($sessionId);
         if ($haveSession > AppConstant::NUMERIC_ZERO) {
-            $userid = $haveSession['userid'];
+            $userId = $haveSession['userid'];
             $tzoffset = $haveSession['tzoffset'];
             $tzname = '';
             if (isset($haveSession['tzname']) && $haveSession['tzname']!='') {
@@ -225,15 +263,15 @@ class AppController extends Controller
                     $tzname = $haveSession['tzname'];
                 }
             }
-            $enc = $haveSession['sessiondata'];
-            if ($enc!='0') {
-                $sessiondata = unserialize(base64_decode($enc));
+            $sessionContent = $haveSession['sessiondata'];
+            if ($sessionContent!=AppConstant::NUMERIC_ZERO) {
+                $sessionData = unserialize(base64_decode($sessionContent));
                 /*
                  * delete own session if old and not posting
                  */
                 if ((time()-$haveSession['time'])>AppConstant::MAX_SESSION_TIME && (!isset($params) || count($params)==AppConstant::NUMERIC_ZERO)) {
-                    Sessions::deleteSession($userid);
-                    unset($userid);
+                    Sessions::deleteSession($userId);
+                    unset($userId);
                 }
             } else {
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -245,78 +283,72 @@ class AppController extends Controller
                 if (isset($params['savesettings'])) {
                     setcookie('mathgraphprefs',$params['mathdisp'].'-'.$params['graphdisp'],AppConstant::ALWAYS_TIME);
                 }
-                $enc = base64_encode(serialize($sessionData));
-                Sessions::setSessionId($sessionId,$enc);
+                $sessionContent = base64_encode(serialize($sessionData));
+                Sessions::setSessionId($sessionId,$sessionContent);
                 AppUtility::getURLFromHome('site','work-in-progress');
             }
         }
-        $hasusername = isset($userid);
-        $haslogin = isset($params['LoginForm']['password']);
-        if (!$hasusername && !$haslogin && isset($params['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
-            $haslogin = true;
-            $params['username']='guest';
+        $hasUserName = isset($userId);
+        $hasLogin = isset($params['LoginForm']['password']);
+        if (!$hasUserName && !$hasLogin && isset($params['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
+            $hasLogin = true;
+            $params['LoginForm']['username']='guest';
             $params['mathdisp'] = AppConstant::NUMERIC_ZERO;
             $params['graphdisp'] = AppConstant::NUMERIC_TWO;
         }
-        if (isset($params['checksess']) && !$hasusername) {
+        if (isset($params['checksess']) && !$hasUserName) {
             echo '<html><body>';
             echo 'Unable to establish a session. This is most likely caused by your browser blocking third-party cookies.  Please adjust your browser settings and try again.';
             echo '</body></html>';
             exit;
         }
         $verified = false;  $err = '';
-        //Just put in username and password, trying to log in
-        if ($haslogin && !$hasusername) {
-            //clean up old sessions
+        /*
+         * Just put in username and password, trying to log in
+         */
+        if ($hasLogin && !$hasUserName) {
+            /*
+             * clean up old sessions
+             */
             $now = time();
             $old = $now - AppConstant::GIVE_OLD_SESSION_TIME;
             Sessions::deleteByTime($old);
 
             if (isset($CFG['GEN']['guesttempaccts']) && $params['LoginForm']['username']=='guest') { // create a temp account when someone logs in w/ username: guest
                 $dbData = DbSchema::getById(AppConstant::NUMERIC_TWO);
-                $guestcnt = $dbData['id'];
+                $guestCount = $dbData['id'];
                 DbSchema::setById(AppConstant::NUMERIC_TWO);
                 if (isset($CFG['GEN']['homelayout'])) {
-                    $homelayout = $CFG['GEN']['homelayout'];
+                    $homeLayout = $CFG['GEN']['homelayout'];
                 } else {
-                    $homelayout = '|0,1,2||0,1';
+                    $homeLayout = '|0,1,2||0,1';
                 }
                 $userArray = array(
-                    'SID' => 'guestacct'.$guestcnt,
+                    'SID' => 'guestacct'.$guestCount,
                     'password' => '',
-                    'rights' => 5,
+                    'rights' => AppConstant::GUEST_RIGHT,
                     'FirstName' => 'Guest',
                     'LastName' => 'Account',
                     'email' => 'none@none.com',
-                    'msgnotify' => 0,
-                    'homelayout' => $homelayout
+                    'msgnotify' => AppConstant::NUMERIC_ZERO,
+                    'homelayout' => $homeLayout
                 );
                 $user = new User();
-                $userid = $user->saveGuestUserRecord($userArray);
-                $query = Course::getByAvailable($params);
-                if ($query > 0) {
-//                    foreach($query as $singfleData){
-//                        $singfleData
-//                    }
-//                    $query = Student::
-//                        "INSERT INTO imas_students (userid,courseid) VALUES ";
-//                    $i = 0;
-//                    while ($row = mysql_fetch_row($result)) {
-//                        if ($i>0) {
-//                            $query .= ',';
-//                        }
-//                        $query .= "($userid,{$row[0]})";
-//                        $i++;
-//                    }
-//                    mysql_query($query) or die("Query failed : " . mysql_error());
+                $userId = $user->saveGuestUserRecord($userArray);
+                $courseIds = Course::getByAvailable($params);
+                $newUser = new Student();
+                if ($courseIds > AppConstant::NUMERIC_ZERO) {
+                    foreach($courseIds as $id){
+                        $newUser->createNewStudent($userId,$id,$params);
+                    }
                 }
 
-                $haveSession['id'] = $userid;
-                $haveSession['rights'] = 5;
-                $haveSession['groupid'] = 0;
-                $params['password'] = 'temp';
+                $haveSession['id'] = $userId;
+                $haveSession['rights'] = AppConstant::GUEST_RIGHT;
+                $haveSession['groupid'] = AppConstant::NUMERIC_ZERO;
+                $params['LoginForm']['password'] = 'temp';
                 if (isset($CFG['GEN']['newpasswords'])) {
-                    $haveSession['password'] =  AppUtility::passwordHash($params['password']);
+                    $haveSession['password'] =  AppUtility::passwordHash($params['LoginForm']['password']);
                 } else {
                     $haveSession['password'] = md5('temp');
                 }
@@ -324,289 +356,262 @@ class AppController extends Controller
             } else {
                 $haveSession = User::getByName($params['LoginForm']['username']);
             }
-
-            if (($haveSession != null) && (
-                    ((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($haveSession['password'].$_SESSION['challenge']) == $params['password']) ||($haveSession['password'] == md5($params['password']))))
-                    || (isset($CFG['GEN']['newpasswords']) && password_verify($params['password'],$haveSession['password']))	)) {
+            if (($haveSession != null) && (((!isset($CFG['GEN']['newpasswords']) || $CFG['GEN']['newpasswords']!='only') && ((md5($haveSession['password'].$_SESSION['challenge']) == $params['LoginForm']['password']) ||($haveSession['password'] ==  AppUtility::passwordHash($params['LoginForm']['password']))))
+                    || (password_verify($params['LoginForm']['password'],$haveSession['password']))	)) {
                 unset($_SESSION['challenge']); //challenge is used up - forget it.
-                $userid = $haveSession['id'];
-                $groupid = $haveSession['groupid'];
-                if ($haveSession['rights']==0) {
-                    echo "You have not yet confirmed your registration.  You must respond to the email ";
-                    echo "that was sent to you by IMathAS.";
+                $userId = $haveSession['id'];
+                $groupId = $haveSession['groupid'];
+                if ($haveSession['rights']==AppConstant::NUMERIC_ZERO) {
+                    echo 'You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.';
                     exit;
                 }
-
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];
                 $sessionData['ip'] = $_SERVER['REMOTE_ADDR'];
-
-                $sessionData['secsalt'] = $randomString();
-                if ($params['access']==1) { //text-based
+                $sessionData['secsalt'] = $randomString;
+                if ($params['access']==AppConstant::NUMERIC_ONE) { //text-based
                     $sessionData['mathdisp'] = $params['mathdisp']; //to allow for accessibility
-                    $sessionData['graphdisp'] = 0;
-                    $sessionData['useed'] = 0;
-                    $enc = base64_encode(serialize($sessionData));
-                } else if ($params['access']==2) { //img graphs
+                    $sessionData['graphdisp'] = AppConstant::NUMERIC_ZERO;
+                    $sessionData['useed'] = AppConstant::NUMERIC_ZERO;
+                    $sessionContent = base64_encode(serialize($sessionData));
+                } else if ($params['access']==AppConstant::NUMERIC_TWO) { //img graphs
                     //deprecated
-                    $sessionData['mathdisp'] = 2-$params['mathdisp'];
-                    $sessionData['graphdisp'] = 2;
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO-$params['mathdisp'];
+                    $sessionData['graphdisp'] = AppConstant::NUMERIC_TWO;
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
-                } else if ($params['access']==4) { //img math
+                    $sessionContent = base64_encode(serialize($sessionData));
+                } else if ($params['access']==AppConstant::NUMERIC_FOUR) { //img math
                     //deprecated
-                    $sessionData['mathdisp'] = 2;
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO;
                     $sessionData['graphdisp'] = $params['graphdisp'];
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
-                } else if ($params['access']==3) { //img all
-                    $sessionData['mathdisp'] = 2;
-                    $sessionData['graphdisp'] = 2;
+                    $sessionContent = base64_encode(serialize($sessionData));
+                } else if ($params['access']=AppConstant::NUMERIC_THREE) { //img all
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO;
+                    $sessionData['graphdisp'] = AppConstant::NUMERIC_TWO;
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
-                } else if ($params['access']==5) { //mathjax experimental
+                    $sessionContent = base64_encode(serialize($sessionData));
+                } else if ($params['access']==AppConstant::NUMERIC_FIVE) { //mathjax experimental
                     //deprecated, as mathjax is now default
-                    $sessionData['mathdisp'] = 1;
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_ONE;
                     $sessionData['graphdisp'] = $params['graphdisp'];
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
+                    $sessionContent = base64_encode(serialize($sessionData));
                 } else if (!empty($params['isok'])) {
-                    $sessionData['mathdisp'] = 1;
-                    $sessionData['graphdisp'] = 1;
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_ONE;
+                    $sessionData['graphdisp'] = AppConstant::NUMERIC_ONE;
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
+                    $sessionContent = base64_encode(serialize($sessionData));
                 } else {
-                    $sessionData['mathdisp'] = 2-$params['mathdisp'];
+                    $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO-$params['mathdisp'];
                     $sessionData['graphdisp'] = $params['graphdisp'];
                     $sessionData['useed'] = $check;
-                    $enc = base64_encode(serialize($sessionData));
+                    $sessionContent = base64_encode(serialize($sessionData));
                 }
+                $session = new Sessions();
                 if (isset($params['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-                    $session = new Sessions();
-                    $session->createSession($sessionId,$userid,$now,$params['tzoffset'],$params['tzname'],$enc);
+                    $session->createSession($sessionId,$userId,$now,$params['tzoffset'],$params['tzname'],$sessionContent);
                 } else {
-                    $session->createSession($sessionId,$userid,$now,$params['tzoffset'],'',$enc);
+                    $session->createSession($sessionId,$userId,$now,$params['tzoffset'],'',$sessionContent);
                 }
-                if (isset($CFG['GEN']['newpasswords']) && strlen($haveSession['password'])==32) { //old password - rehash it
-                    $hashpw = AppUtility::passwordHash($params['password']);;
-                    User::updateUser($now,$hashpw,$userid);
+                if (isset($CFG['GEN']['newpasswords']) && strlen($haveSession['password'])==AppConstant::NUMERIC_THIRTY_TWO) { //old password - rehash it
+                    $hashPassword = AppUtility::passwordHash($params['password']);;
+                    User::updateUser($now,$hashPassword,$userId);
                 } else {
-                    User::updateUser($now,'',$userid);
+                    User::updateUser($now,'',$userId);
                 }
-
-//                if (isset($_SERVER['QUERY_STRING'])) {
-//                    $querys = '?'.$_SERVER['QUERY_STRING'].(isset($addtoquerystring)?'&'.$addtoquerystring:'');
-//                } else {
-//                    $querys = (isset($addtoquerystring)?'?'.$addtoquerystring:'');
-//                }
-//                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $querys);
+                if (isset($_SERVER['QUERY_STRING'])) {
+                    $queries = '?'.$_SERVER['QUERY_STRING'].(isset($addToQueryString)?'&'.$addToQueryString:'');
+                } else {
+                    $queries = (isset($addToQueryString)?'?'.$addToQueryString:'');
+                }
+                header('Location: ' . $urlMode  . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $queries);
             } else {
                 if (empty($_SESSION['challenge'])) {
-                    $badsession = true;
+                    $badSession = true;
                 } else {
-                    $badsession = false;
+                    $badSession = false;
                 }
             }
 
         }
-
-        if ($hasusername) {
-            //$username = $_COOKIE['username'];
-            $query = "SELECT SID,rights,groupid,LastName,FirstName,deflib";
+        if ($hasUserName) {
+            $userData = User::getById($userId);
+            $userName = $userData['SID'];
+            $myRights = $userData['rights'];
+            $groupId = $userData['groupid'];
+            $userDefLibrary = $userData['deflib'];
             if (strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
-                $query .= ',listperpage,hasuserimg';
+                $listPerPage = $userData['listperpage'];
+                $selfHasUserImage = $userData['hasuserimg'];
             }
-            $query .= " FROM imas_users WHERE id='$userid'";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            $line = mysql_fetch_array($result, MYSQL_ASSOC);
-            $username = $line['SID'];
-            $myrights = $line['rights'];
-            $groupid = $line['groupid'];
-            $userdeflib = $line['deflib'];
-            $listperpage = $line['listperpage'];
-            $selfhasuserimg = $line['hasuserimg'];
-            $userfullname = $line['FirstName'] . ' ' . $line['LastName'];
-            $previewshift = -1;
-            $basephysicaldir = rtrim(dirname(__FILE__), '/\\');
-            if ($myrights==100 && (isset($_GET['debug']) || isset($sessiondata['debugmode']))) {
-                ini_set('display_errors',1);
+            $userFullName = $userData['FirstName'] . ' ' . $userData['LastName'];
+            $previewShift = -AppConstant::NUMERIC_ONE;
+            $basePhysicalDir = rtrim(dirname(__FILE__), '/\\');
+            if ($myRights==AppConstant::ADMIN_RIGHT && (isset($params['debug']) || isset($sessionData['debugmode']))) {
+                ini_set('display_errors',AppConstant::NUMERIC_ONE);
                 error_reporting(E_ALL ^ E_NOTICE);
-                if (isset($_GET['debug'])) {
-                    $sessiondata['debugmode'] = true;
-                    writesessiondata();
+                if (isset($params['debug'])) {
+                    $sessionData['debugmode'] = true;
+                    $this->writesessiondata($sessionData,$sessionId);
                 }
             }
-            if (isset($_GET['fullwidth'])) {
-                $sessiondata['usefullwidth'] = true;
-                $usefullwidth = true;
-                writesessiondata();
-            } else if (isset($sessiondata['usefullwidth'])) {
-                $usefullwidth = true;
+            if (isset($params['fullwidth'])) {
+                $sessionData['usefullwidth'] = true;
+                $useFullWidth = true;
+                $this->writesessiondata($sessionData,$sessionId);
+            } else if (isset($sessionData['usefullwidth'])) {
+                $useFullWidth = true;
             }
 
-            if (isset($_GET['mathjax'])) {
-                $sessiondata['mathdisp'] = 1;
-                writesessiondata();
+            if (isset($params['mathjax'])) {
+                $sessionData['mathdisp'] = AppConstant::NUMERIC_ONE;
+                $this->writesessiondata($sessionData,$sessionId);
             }
 
-            if (isset($_GET['readernavon'])) {
-                $sessiondata['readernavon'] = true;
-                writesessiondata();
+            if (isset($params['readernavon'])) {
+                $sessionData['readernavon'] = true;
+                $this->writesessiondata($sessionData,$sessionId);
             }
-            if (isset($_GET['useflash'])) {
-                $sessiondata['useflash'] = true;
-                writesessiondata();
+            if (isset($params['useflash'])) {
+                $sessionData['useflash'] = true;
+                $this->writesessiondata($sessionData,$sessionId);
             }
-            if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-                header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php");
+            if (isset($sessionData['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'show-assessment')===false) {
             }
-            if (isset($sessiondata['ltiitemtype'])) {
-                $flexwidth = true;
-                if ($sessiondata['ltiitemtype']==1) {
-                    if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
+            if (isset($sessionData['ltiitemtype'])) {
+                $flexWidth = true;
+                if ($sessionData['ltiitemtype']==AppConstant::NUMERIC_ONE) {
+                    if (strpos(basename($_SERVER['PHP_SELF']),'show-assessment')===false && isset($params['cid']) && $sessionData['ltiitemid']!=$params['cid']) {
                         echo "You do not have access to this page";
-                        echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
+                        if($myRights < AppConstant::TEACHER_RIGHT){
+                            echo "<a href='".AppUtility::getURLFromHome('course','course/index?cid='.$sessionData['ltiitemid'])."'>Return to home page</a>";
+                        }else{
+                            echo "<a href='".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$sessionData['ltiitemid'])."'>Return to home page</a>";
+                        }
                         exit;
                     }
-                } else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
-                    $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid={$_GET['cid']}&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
-                    $urlparts = parse_url($_SERVER['PHP_SELF']);
-                    if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php'))) {
-                        //if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
-                        $query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
-                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                        $cid = mysql_result($result,0,0);
-                        header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+                } else if ($sessionData['ltiitemtype']==AppConstant::NUMERIC_ZERO && $sessionData['ltirole']=='learner') {
+                    $urlParts = parse_url($_SERVER['PHP_SELF']);
+                    if (!in_array(basename($urlParts['path']),array('show-assessment','print-test','messages','sent-message','view-message','view-conversation','work-in-progress','work-in-progress','work-in-progress'))) {
+                        $assessment = Assessments::getByAssessmentId($sessionData['ltiitemid']);
+                        $courseId = $assessment['id'];
+                        AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId.'&id='.$sessionData['ltiitemid']);
                         exit;
                     }
-                } else if ($sessiondata['ltirole']=='instructor') {
-                    $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+                } else if ($sessionData['ltirole']=='instructor') {
+                    $breadcrumbBase = "<a href='".AppUtility::getURLFromHome('site','login')."'>LTI Home</a> &gt; ";
                 } else {
-                    $breadcrumbbase = '';
+                    $breadcrumbBase = '';
                 }
             } else {
-                $breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
+                $breadcrumbBase = "<a href='".AppUtility::getURLFromHome('site','login')."'>Home</a> &gt; ";
             }
-
-            if ((isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) || (isset($sessiondata['courseid']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')!==false)) {
-                if (isset($_GET['cid'])) {
-                    $cid = $_GET['cid'];
+            if ((isset($params['cid']) && $params['cid']!="admin" && $params['cid']>AppConstant::NUMERIC_ZERO) || (isset($sessionData['courseid']) && strpos(basename($_SERVER['PHP_SELF']),'show-assessment')!==false)) {
+                if (isset($params['cid'])) {
+                    $courseId = $params['cid'];
                 } else {
-                    $cid = $sessiondata['courseid'];
+                    $courseId = $sessionData['courseid'];
                 }
-                $query = "SELECT id,locked,timelimitmult,section FROM imas_students WHERE userid='$userid' AND courseid='$cid'";
-                $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                $line = mysql_fetch_array($result, MYSQL_ASSOC);
-                if ($line != null) {
-                    $studentid = $line['id'];
-                    $studentinfo['timelimitmult'] = $line['timelimitmult'];
-                    $studentinfo['section'] = $line['section'];
-                    if ($line['locked']>0) {
-                        require("header.php");
+
+                $studentData = Student::getByCourseId($courseId,$userId);
+                if ($studentData != null) {
+                    $studentId = $studentData['id'];
+                    $studentInfo['timelimitmult'] = $studentData['timelimitmult'];
+                    $studentInfo['section'] = $studentData['section'];
+                    if ($studentData['locked']>AppConstant::NUMERIC_ZERO) {
                         echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
-                        echo "<p><a href=\"$imasroot/index.php\">Home</a></p>";
-                        require("footer.php");
+                        return AppUtility::getURLFromHome('site','dashboard');
                         exit;
                     } else {
                         $now = time();
-                        if (!isset($sessiondata['lastaccess'.$cid])) {
-                            $query = "UPDATE imas_students SET lastaccess='$now' WHERE id=$studentid";
-                            mysql_query($query) or die("Query failed : " . mysql_error());
-                            $sessiondata['lastaccess'.$cid] = $now;
-                            $query = "INSERT INTO imas_login_log (userid,courseid,logintime) VALUES ($userid,'$cid',$now)";
-                            mysql_query($query) or die("Query failed : " . mysql_error());
-                            $sessiondata['loginlog'.$cid] = mysql_insert_id();
-                            writesessiondata();
+                        if (!isset($sessionData['lastaccess'.$courseId])) {
+                            Student::setLastAccess($studentId,$now);
+                            $sessionData['lastaccess'.$courseId] = $now;
+                            $loginLog = new LoginLog();
+                            $logId = $loginLog->createLog($userId,$courseId,$now);
+                            $sessionData['loginlog'.$courseId] = $logId;
+                            $this->writesessiondata($sessionData,$sessionId);
                         } else if (isset($CFG['GEN']['keeplastactionlog'])) {
-                            $query = "UPDATE imas_login_log SET lastaction=$now WHERE id=".$sessiondata['loginlog'.$cid];
-                            mysql_query($query) or die("Query failed : " . mysql_error());
+                            LoginLog::setLastAction($sessionData['loginlog'.$courseId],$now);
                         }
                     }
                 } else {
-                    $query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    $line = mysql_fetch_array($result, MYSQL_ASSOC);
-                    if ($line != null) {
-                        if ($myrights>19) {
-                            $teacherid = $line['id'];
-                            if (isset($_GET['stuview'])) {
-                                $sessiondata['stuview'] = $_GET['stuview'];
-                                writesessiondata();
+                    $teacherData = Teacher::getByUserId($userId,$courseId);
+                    if ($teacherData != null) {
+                        if ($myRights>AppConstant::STUDENT_RIGHT) {
+                            $teacherId = $teacherData['id'];
+                            if (isset($params['stuview'])) {
+                                $sessionData['stuview'] = $params['stuview'];
+                                $this->writesessiondata($sessionData,$sessionId);
                             }
-                            if (isset($_GET['teachview'])) {
-                                unset($sessiondata['stuview']);
-                                writesessiondata();
+                            if (isset($params['teachview'])) {
+                                unset($sessionData['stuview']);
+                                $this->writesessiondata($sessionData,$sessionId);
                             }
-                            if (isset($sessiondata['stuview'])) {
-                                $previewshift = $sessiondata['stuview'];
-                                unset($teacherid);
-                                $studentid = $line['id'];
+                            if (isset($sessionData['stuview'])) {
+                                $previewShift = $sessionData['stuview'];
+                                unset($teacherId);
+                                $studentId = $teacherData['id'];
                             }
                         } else {
-                            $tutorid = $line['id'];
+                            $tutorId = $teacherData['id'];
                         }
-                    } else if ($myrights==100) {
-                        $teacherid = $userid;
-                        $adminasteacher = true;
+                    } else if ($myRights==AppConstant::ADMIN_RIGHT) {
+                        $teacherId = $userId;
+                        $adminAsTeacher = true;
                     } else {
 
-                        $query = "SELECT id,section FROM imas_tutors WHERE userid='$userid' AND courseid='$cid'";
-                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                        $line = mysql_fetch_array($result, MYSQL_ASSOC);
-                        if ($line != null) {
-                            $tutorid = $line['id'];
-                            $tutorsection = trim($line['section']);
+                        $tutorData = Tutor::getByUserId($userId,$courseId);
+                        if ($tutorData != null) {
+                            $tutorId = $tutorData['id'];
+                            $tutorSection = trim($tutorData['section']);
                         }
 
                     }
                 }
-                $query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons ";
-                $query .= "FROM imas_courses,imas_users WHERE imas_courses.id='$cid' AND imas_users.id=imas_courses.ownerid";
-                $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                if (mysql_num_rows($result)>0) {
-                    $crow = mysql_fetch_row($result);
-                    $coursename = $crow[0]; //mysql_result($result,0,0);
-                    $coursetheme = $crow[5]; //mysql_result($result,0,5);
-                    $coursenewflag = $crow[6]; //mysql_result($result,0,6);
-                    $coursemsgset = $crow[7]%5;
-                    $coursetopbar = explode('|',$crow[8]);
-                    $coursetopbar[0] = explode(',',$coursetopbar[0]);
-                    $coursetopbar[1] = explode(',',$coursetopbar[1]);
-                    $coursetoolset = $crow[9];
-                    $coursedeftime = $crow[10]%10000;
+                $courseData = Course::getByCourseAndUser($courseId);
+                if ($courseData>AppConstant::NUMERIC_ZERO) {
+                    $crow = $courseData;
+                    $courseName = $crow[0]; //mysql_result($result,0,0);
+                    $courseTheme = $crow[5]; //mysql_result($result,0,5);
+                    $courseNewFlag = $crow[6]; //mysql_result($result,0,6);
+                    $courseMsgSet = $crow[7]%AppConstant::NUMERIC_FIVE;
+                    $courseTopbar = explode('|',$crow[8]);
+                    $courseTopbar[0] = explode(',',$courseTopbar[0]);
+                    $courseTopbar[1] = explode(',',$courseTopbar[1]);
+                    $courseToolset = $crow[9];
+                    $courseDefTime = $crow[10]%10000;
                     if ($crow[10]>10000) {
-                        $coursedefstime = floor($crow[10]/10000);
+                        $courseDefSTime = floor($crow[10]/10000);
                     } else {
-                        $coursedefstime = $coursedeftime;
+                        $courseDefSTime = $courseDefTime;
                     }
-                    $picicons = $crow[11];
-                    if (!isset($coursetopbar[2])) { $coursetopbar[2] = 0;}
-                    if ($coursetopbar[0][0] == null) {unset($coursetopbar[0][0]);}
-                    if ($coursetopbar[1][0] == null) {unset($coursetopbar[1][0]);}
-                    if (isset($studentid) && $previewshift==-1 && (($crow[1])&1)==1) {
+                    $picIcons = $crow[11];
+                    if (!isset($courseTopbar[2])) { $courseTopbar[2] = AppConstant::NUMERIC_ZERO;}
+                    if ($courseTopbar[0][0] == null) {unset($courseTopbar[0][0]);}
+                    if ($courseTopbar[1][0] == null) {unset($courseTopbar[1][0]);}
+                    if (isset($studentId) && $previewShift==-AppConstant::NUMERIC_ONE && (($crow[1])&AppConstant::NUMERIC_ONE)==AppConstant::NUMERIC_ONE) {
                         echo "This course is not available at this time";
                         exit;
                     }
-                    $lockaid = $crow[2]; //ysql_result($result,0,2);
-                    if (isset($studentid) && $lockaid>0) {
-                        if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-                            require("header.php");
+                    $lockAssessId = $crow[2]; //ysql_result($result,0,2);
+                    if (isset($studentId) && $lockAssessId>AppConstant::NUMERIC_ZERO) {
+                        if (strpos(basename($_SERVER['PHP_SELF']),'show-assessment')===false) {
                             echo '<p>This course is currently locked for an assessment</p>';
-                            echo "<p><a href=\"$imasroot/assessment/showtest.php?cid=$cid&id=$lockaid\">Go to Assessment</a> | <a href=\"$imasroot/index.php\">Go Back</a></p>";
-                            require("footer.php");
-                            //header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/assessment/showtest.php?cid=$cid&id=$lockaid");
+                            echo "<p><a href='".AppUtility::getURLFromHome('assessment','assessment/show-assessment?cid='.$courseId.'&id='.$lockAssessId)."'>Go to Assessment</a> | <a href='".AppUtility::getURLFromHome('site','login')."'>Go Back</a></p>";
                             exit;
                         }
                     }
-                    unset($lockaid);
-                    if ($myrights==75 && !isset($teacherid) && !isset($studentid) && $crow[4]==$groupid) {
+                    unset($lockAssessId);
+                    if ($myRights==75 && !isset($teacherId) && !isset($studentId) && $crow[4]==$groupId) {
                         //group admin access
-                        $teacherid = $userid;
-                        $adminasteacher = true;
-                    } else if ($myrights>19 && !isset($teacherid) && !isset($studentid) && !isset($tutorid) && $previewshift==-1) {
+                        $teacherId = $userId;
+                        $adminAsTeacher = true;
+                    } else if ($myRights>19 && !isset($teacherId) && !isset($studentId) && !isset($tutorId) && $previewShift==-AppConstant::NUMERIC_ONE) {
                         if ($crow[3]==2) {
-                            $guestid = $userid;
-                        } else if ($crow[3]==1 && $crow[4]==$groupid) {
-                            $guestid = $userid;
+                            $guestId = $userId;
+                        } else if ($crow[3]==AppConstant::NUMERIC_ONE && $crow[4]==$groupId) {
+                            $guestId = $userId;
                         }
                     }
                 }
@@ -615,58 +620,54 @@ class AppController extends Controller
         }
 
         if (!$verified) {
-            if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
-                if (!isset($loginpage)) {
-                    $loginpage = "loginpage.php";
-                }
-                require($loginpage);
-                exit;
-            }
+//            if (!isset($skiploginredirect) && strpos(basename($_SERVER['SCRIPT_NAME']),'directaccess.php')===false) {
+//                if (!isset($loginpage)) {
+//                    $loginpage = "loginpage.php";
+//                }
+//                require($loginpage);
+//                exit;
+//            }
         }
 
-        if (!isset($coursename)) {
-            $coursename = "Course Page";
+        if (!isset($courseName)) {
+            $courseName = "Course Page";
         }
     }
 
 
 function tzdate($string,$time) {
     global $tzoffset, $tzname;
-    //$dstoffset = date('I',time()) - date('I',$time);
-    //return gmdate($string, $time-60*($tzoffset+60*$dstoffset));
     if ($tzname != '') {
         return date($string, $time);
     } else {
         $serveroffset = date('Z') + $tzoffset*60;
         return date($string, $time-$serveroffset);
     }
-    //return gmdate($string, $time-60*$tzoffset);
 }
 
-function writesessiondata() {
-    global $sessiondata,$sessionid;
-    $enc = base64_encode(serialize($sessiondata));
-    $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
-    mysql_query($query) or die("Query failed : " . mysql_error());
+function writesessiondata($sessionData,$sessionId) {
+    global $sessionData,$sessionId;
+    $sessionContent = base64_encode(serialize($sessionData));
+    Sessions::setSessionId($sessionId,$sessionContent);
 }
 function checkeditorok() {
     $ua = $_SERVER['HTTP_USER_AGENT'];
     if (strpos($ua,'iPhone')!==false || strpos($ua,'iPad')!==false) {
         preg_match('/OS (\d+)_(\d+)/',$ua,$match);
         if ($match[1]>=5) {
-            return 1;
+            return AppConstant::NUMERIC_ONE;
         } else {
-            return 0;
+            return AppConstant::NUMERIC_ZERO;
         }
     } else if (strpos($ua,'Android')!==false) {
         preg_match('/Android\s+(\d+)((?:\.\d+)+)\b/',$ua,$match);
         if ($match[1]>=4) {
-            return 1;
+            return AppConstant::NUMERIC_ONE;
         } else {
-            return 0;
+            return AppConstant::NUMERIC_ZERO;
         }
     } else {
-        return 1;
+        return AppConstant::NUMERIC_ONE;
     }
 }
 function stripslashes_deep($value) {
@@ -676,8 +677,8 @@ function stripslashes_deep($value) {
 function generaterandstring() {
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     $pass = '';
-    for ($i=0;$i<10;$i++) {
-        $pass .= substr($chars,rand(0,61),1);
+    for ($i=AppConstant::NUMERIC_ZERO;$i<10;$i++) {
+        $pass .= substr($chars,rand(AppConstant::NUMERIC_ZERO,61),AppConstant::NUMERIC_ONE);
     }
     return $pass;
 }

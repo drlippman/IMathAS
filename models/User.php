@@ -167,7 +167,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function getByName($uname)
     {
-        return static::findAll(['SID'=>$uname]);
+        return static::findOne(['SID'=>$uname]);
     }
 
     public static function findAllById($id)

@@ -52,54 +52,16 @@ $now = $currentTime;
     <input type="hidden" class="home-path" value="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">
     <input type="hidden" class="block-check" value="<?php echo $tb = 't'; ?>">
     <div class="display-item-details">
-        <?php
-        $parent = \app\components\AppConstant::NUMERIC_ZERO;
-
-        $countCourseDetails = count($courseDetail);
-        if ($countCourseDetails){
-
-            $assessment = $blockList = array();
-            foreach ($courseDetail as $key => $item){
-                echo AssessmentUtility::createItemOrder($key, $countCourseDetails, $parent, $blockList);
-                switch (key($item)):
-                    case 'Assessment': ?>
-                        <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent);?>
-                        <input type="hidden" class="assessment-link" value="<?php echo $assessment->id?>">
-                        <?php break; ?>
-                        <!-- ///////////////////////////// Forum here /////////////////////// -->,
-                    <?php case 'Forum': ?>
-                    <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent); ?>
-                    <?php break; ?>
-                    <!-- ////////////////// Wiki here //////////////////-->
-                <?php case 'Wiki': ?>
-                    <?php CourseItemsUtility::AddWiki($item,$course,$parent); ?>
-                    <?php break; ?>
-                    <!-- ////////////////// Linked text here //////////////////-->
-                <?php
-                    case 'LinkedText': ?>
-                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent,$course);?>
-                        <?php break; ?>
-                        <!-- ////////////////// Inline text here //////////////////-->
-                    <?php case 'InlineText': ?>
-                    <?php CourseItemsUtility::AddInlineText($item,$currentTime,$course,$parent);?>
-                    <?php break; ?>
-                    <!-- Calender Here-->
-                <?php case 'Calendar': ?>
-                    <?php CourseItemsUtility::AddCalendar($item,$parent,$course);?>
-                    <?php break; ?>
-                    <!--  Block here-->
-                <?php case  'Block': ?>
-                    <?php  $cnt++; ?>
-                    <?php $displayBlock = new CourseItemsUtility();
-                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
-                    ?>
-                    <?php break; ?>
-                <?php endswitch;
-                ?>
-
-            <?php }?>
-
-        <?php } ?>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div style="padding-left: 20px"><h2>Coming Soon</h2></div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
     </div>
 </div>
 

@@ -323,4 +323,11 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
+    public static function setLastAccess($studentid,$now){
+        $studentData = Student::findOne(['id' => $studentid]);
+        if($studentData){
+            $studentData->lastaccess = $now;
+            $studentData->save();
+        }
+    }
 } 

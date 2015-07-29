@@ -51,6 +51,8 @@ class CourseController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $this->checkSession($params);
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
@@ -679,7 +681,7 @@ class CourseController extends AppController
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css']);
+        $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
         $responseData = array('course' => $course, 'user' => $user);
         return $this->render('calendar', $responseData);
@@ -692,11 +694,11 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
+        $params = $this->getRequestParams();
         $courseId = $this->getParamVal('courseId');
         $inlineId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $inlineText = InlineText::getById($inlineId);
-        $params = $this->getRequestParams();
         $inlineTextId = $params['id'];
         $saveTitle = '';
 

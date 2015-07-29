@@ -208,5 +208,9 @@ class Course extends BaseImasCourses {
             return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4")->queryAll();
         }
     }
+
+    public static function getByCourseAndUser($cid){
+        return Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= $cid AND imas_users.id=imas_courses.ownerid")->queryAll();
+    }
 }
 

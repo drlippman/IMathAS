@@ -6,8 +6,8 @@ use app\components\AppConstant;
 $this->title = 'Check Browser';
 $this->params['breadcrumbs'][] = $this->title;
 
-$sessiondata['mathdisp'] = 1;
-$sessiondata['graphdisp'] = 1;
+$sessionData['mathdisp'] = 1;
+$sessionData['graphdisp'] = 1;
 $nologo = true;
 ?>
 

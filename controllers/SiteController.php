@@ -12,6 +12,7 @@ use app\models\forms\LoginForm;
 use app\models\forms\RegistrationForm;
 use app\models\forms\ResetPasswordForm;
 use app\models\Message;
+use app\models\Sessions;
 use app\models\Student;
 use app\models\forms\StudentEnrollCourseForm;
 use app\models\forms\StudentRegisterForm;
@@ -81,9 +82,9 @@ class SiteController extends AppController
         $model = new LoginForm();
         if ($model->load($this->isPostMethod())) {
             if ($model->login()) {
-
                 Yii::$app->session->set('tzoffset', $this->getParamVal('tzoffset'));
                 Yii::$app->session->set('tzname', $this->getParamVal('tzname'));
+                $this->checkSession($params);
                 return $this->redirect('dashboard');
             } else {
                 $this->setErrorFlash(AppConstant::INVALID_USERNAME_PASSWORD);
@@ -292,6 +293,8 @@ class SiteController extends AppController
     public function actionLogout()
     {
         if ($this->getAuthenticatedUser()) {
+            $sessionId = Yii::$app->session->getId();
+            Sessions::deleteBySessionId($sessionId);
             Yii::$app->user->logout();
             return $this->redirect(AppUtility::getURLFromHome('site', 'login'));
         }

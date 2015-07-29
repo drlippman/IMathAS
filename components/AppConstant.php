@@ -63,6 +63,7 @@ class AppConstant
     const NUMERIC_THOUSAND = 10000;
     const NUMERIC_NEGATIVE_ONE = -1;
     const NUMERIC_SIXTY_ONE = 61;
+    const NUMERIC_THIRTY_TWO = 32;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;
