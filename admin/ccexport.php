@@ -202,6 +202,12 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
+					
+					//if s3 filehandler, do files as weblinks rather than including the file itself
+					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
+						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
+					}
+					
 					if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 						$alink = trim($row[1]);
 						$fp = fopen($newdir.'/weblink'.$iteminfo[$item][1].'.xml','w');
