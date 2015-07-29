@@ -63,6 +63,7 @@
 .nav-tabs.nav-justified > .dropdown .selected-options > li > a:hover{
     text-decoration: none;
     color: #3075AC;
+    background-color: #f5f5f5;;
 }
 div.dataTables_info {
     padding-top: 8px;
@@ -91,7 +92,7 @@ div.dataTables_info {
     border-bottom: none;
     border: 1px solid #ddd;
 }
-.roster-menu-bar-nav.sub-menu{
+.sub-menu-bar-nav.sub-menu{
     background: #ffffff;
 }
 .caret.right-aligned {
@@ -138,7 +139,7 @@ div.dataTables_info {
 .fa-cog.icon-nav{
     padding-right: 10px;
 }
-.nav-tabs.nav-justified.roster-menu-bar-nav > li > a{
+.nav-tabs.nav-justified.sub-menu-bar-nav > li > a{
     border-bottom: none;:
 }
 .nav-tabs .settings-menu{
@@ -153,9 +154,11 @@ div.dataTables_info {
 }
 .nav-tabs .settings-menu > li > a:hover{
     color: #3075AC;
+    background-color: #f5f5f5;
 }
 .nav-tabs.nav-justified > .dropdown .enroll-options > li > a:hover{
     color: #3075AC;
+    background-color: #f5f5f5;
 }
 .btn-group, .btn-group-vertical {
     position: relative;

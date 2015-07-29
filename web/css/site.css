@@ -591,7 +591,7 @@ table.dataTable thead > tr > th {
     opacity: .5;
 }
 img.small-icon{
-    width: 1.1em;
+    width: 1.2em;
     text-align: center;
     height: 1.3em;
 }
@@ -638,7 +638,6 @@ img.small-icon{
 .btn.btn-primary.page-settings{
     color: #FFF;
     background-color: #2C368E;
-    border-color: #285E8E;
     text-transform: capitalize;
 }
 .input-group-addon {
@@ -689,4 +688,48 @@ table.student-data-table > .form-inline .radio, .form-inline .checkbox {
 .radio, .checkbox {
     margin-top: 0;
     margin-bottom: 0;
+}
+.pull-left.gradebook-header-links{
+    padding-top: 4px;
+}
+.green-btn, .green-btn:focus, .green-btn:hover, .green-btn.open, .btn-primary.green-btn:hover, .btn-primary.green-btn:active, .btn-primary.green-btn.active, .open > .dropdown-toggle.btn-primary.green-btn{
+    background-color: #008E71;
+}
+.green-carret, .green-carret:focus, .green-carret:hover, .dropdown-class .btn-primary.green-carret:hover, .btn-primary.green-carret:active, .btn-primary.green-carret.active, .open > .dropdown-toggle.btn-primary.green-carret {
+    background-color: #00755d;
+    border-color: #008E71;
+}
+.disable-btn{
+    pointer-events: none;
+    cursor: not-allowed;
+}
+.sub-menu-bar-nav{
+    background: #f8f8f8;
+}
+.nav-tabs.nav-justified.sub-menu-bar-nav > li > a {
+    border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+}
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #2c38ae;
+}
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+    border: 1px solid rgba(0, 0, 0, .15);
+}
+.inner-content-gradebook{
+    padding: 15px;
+}
+#gradebook-table_wrapper > th,#gradebook-table_wrapper td { white-space: nowrap; }
+div.dataTables_wrapper {
+    width: 100%;
+    margin: 0 auto;
+}
+#gradebook-table_wrapper > div > div.col-sm-12 {
+    padding-left: 0;
+    padding-right: 0;
+}
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+    border-bottom: 0;
 }

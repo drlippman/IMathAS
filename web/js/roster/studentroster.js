@@ -46,7 +46,7 @@ function showStudentInformation(students)
         else {
             html += "<td><a>Is locked out</a></a></td>"
         }
-        html += "<td><div class='btn-group'> <a class='btn btn-primary'>" +
+        html += "<td><div class='btn-group'> <a class='btn btn-primary disable-btn'>" +
         "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
         "<ul class='dropdown-menu'>" +
         "<li><a href='#'><img class='small-icon' src='../../img/gradebook.png'></i> Grades</a></li>" +

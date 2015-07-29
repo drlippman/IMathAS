@@ -7,6 +7,11 @@ $(document).ready(function () {
     studentLock();
     studentCopyEmail();
     teacherMakeException();
+    $('.gradebook-table').dataTable( {
+        "scrollX": true,
+        "paginate": false
+
+    } );
 });
 var data;
 var showPics = 0;

@@ -61,11 +61,13 @@ class GradebookController extends AppController
     public function actionGradebook()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $gradebookData = $this->gbtable($user->id, $courseId);
-        $this->includeJS(['gradebook/gradebook.js']);
+        $this->includeCSS(['jquery.dataTables.css']);
+        $this->includeJS(['gradebook/gradebook.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
         $this->includeJS(['general.js']);
         return $this->renderWithData('gradebook', $responseData);
@@ -1898,7 +1900,7 @@ class GradebookController extends AppController
 
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'showPics' => $showpics);
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'showPics' => $showpics, 'hideLocked' => $hidelocksed);
         return $responseData;
 //        return $this->successResponse($responseData);
     }

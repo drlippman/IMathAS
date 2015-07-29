@@ -12,9 +12,9 @@ use app\components\AppUtility;
             <li class="master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('instructor/instructor', 'index?cid='.$course->id); ?>"><i class="fa fa-book icon-nav"></i><?php AppUtility::t('Course'); ?></a></li>
         <?php } ?>
         <?php if($section == 'gradebook'){ ?>
-            <li class="active master-tabs"><a class="grey-color-link"  href = "#"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
+            <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
         <?php } else { ?>
-            <li class="master-tabs"><a class="grey-color-link"  href = "#"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
+            <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id); ?>"><i class="fa fa-file icon-nav"></i><?php AppUtility::t('Gradebook'); ?></a></li>
         <?php } ?>
         <?php if($section == 'calendar'){ ?>
             <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><i class="fa fa-calendar icon-nav"></i><?php AppUtility::t('Calendar'); ?></a></li>
