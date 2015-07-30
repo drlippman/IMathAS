@@ -1,7 +1,5 @@
 <?php
 use app\components\AppUtility;
-use app\components\AssessmentUtility;
-use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 use yii\widgets\ActiveForm;
 
@@ -22,12 +20,12 @@ $now = $currentTime;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
 <div class="tab-content shadowBox ">
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>" >
     <div class="view-message-inner-contents">
-        <div class="title-middle center"><?php AppUtility::t('Move Thread');?></div>
+        <div class="title-middle center"></div>
         <div class="title-option">
             <h4><?php AppUtility::t('What Do You Want To Do?');?>:</h4>
             <tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' checked name='movetype' value='0' onclick="select(0)">
@@ -42,10 +40,10 @@ $now = $currentTime;
                 foreach ($forums as $forum) {
                     if($forum['forumId'] == $forumId)
                     {?>
-                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='{$forum['forumId']}' value=''><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
                     <?php }else{?>
-                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='{$forum['forumId']}' value=''><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
 
                     <?php           }?>
@@ -66,8 +64,11 @@ $now = $currentTime;
                     } ?>
                 </div>
             </div>
-            <input type=submit class="btn btn-primary search-button align-btn" id="move-button" value="<?php echo AppUtility::t('Move')?>">
-            <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
+            <div class="buttons-div">
+                <input type=submit class="btn btn-primary search-button align-btn" id="move-button" value="<?php echo AppUtility::t('Move')?>">
+                <a class="btn btn-primary search-button align-btn" href="<?php echo AppUtility::getURLFromHome('forum/forum', 'thread?cid='.$course->id.'&forumid='.$forumId)  ?>"><?php echo AppUtility::t('Cancel')?></a>
+            </div>
+
         </div>
     </div>
 </div>

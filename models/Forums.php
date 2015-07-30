@@ -194,5 +194,4 @@ class Forums extends BaseImasForums {
             $rubricData->save();
         }
     }
-
-} 
+}

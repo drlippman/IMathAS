@@ -6,7 +6,6 @@ $(document).ready(function ()
     $("#show-all-link").hide();
     var page = $('#page').val();
     $('#result').hide();
-    $('#noThread').hide();
     $('.forumResult').hide();
     if(page)
     {
@@ -21,6 +20,7 @@ $(document).ready(function ()
         selected = $('.select_option :selected').val();
         if(selected == 0)
         {
+            var forumid= $('#forumid').val();
             window.location = "list-post-by-name?cid="+courseid+"&forumid="+forumid;
 
         }
@@ -216,23 +216,13 @@ function threadSuccess(response)
                         {if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
                         {
                             html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<div class='new-tag'>New</div><br></a>Anonymous </td>";
+                            newCount++;
                         }else
                         {
                             html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br></a>Anonymous </td>";
                         }
                     }
 
-
-
-//                   else if(thread.currentUserId == thread.postUserId){
-//                        if(isModifyThread && thread.isReplies == 0 && isRemoveThread){
-//                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
-//                        }else if(isModifyThread){
-//                            html += " <td> <a href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'>Modify</a> </td> ";
-//                        }else if(thread.isReplies == 0 && isRemoveThread){
-//                            html += " <td><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'> Remove </a></td> ";
-//                        }else { html += " <td> - </td> "; }
-//                    }else { html += " <td> - </td> "; }
                     if(thread.groupSetId > 0 && thread.userright > 10){
                         html += "<td>Non-group-specific</td>";
                     }
@@ -317,7 +307,18 @@ function threadSuccess(response)
                         }
                         else
                         {
-                            html += "<li><a href='#'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+                            html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn disable-btn-not-allowed'>"+
+                                " -</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down '></span></a>" +
+                                "<ul class='dropdown-menu'>";
+                            if(thread.userright > 10) {
+                                html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
+                                    "<li><a class ='roster-make-excetion' href='modify-post?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Modify</a></li>" +
+                                    "<li><a href='#' name='tabs' data-var='" + thread.threadId + "' class='mark-remove'><i class='fa fa-trash-o'></i></i>&nbsp;Remove</a></li>";
+                            }else
+                            {
+                                html+="<li><a href='#' class='disable-btn-not-allowed'><i class='fa fa-exclamation'></i></i>&nbsp;No Action Allowed</a></li>";
+
+                            }
                         }
                 }
             }
@@ -342,11 +343,8 @@ function threadSuccess(response)
         }
 
     }
-    else if (response.status == -1) {
-
-        $('#data').hide();
-        $('#noThread').show();
-        $('#limit-to-new-link').hide();
+    else if (response.status == -1)
+    {
         $('#markRead').hide();
     }
     if(isValue == 3)
@@ -354,6 +352,8 @@ function threadSuccess(response)
         window.location.reload();
 
     }
+
+
     $("a[name=tabs]").on("click", function () {
         var threadsid = $(this).attr("data-var");
         var checkPostOrThread = 1;
@@ -438,10 +438,6 @@ function markAsRemoveSuccess(response) {
 }
 function limitToTagShow() {
 
-    $("#limit-to-tag-link").click(function () {
-
-
-    });
     $("#show-all-link").click(function () {
         $('.forum-table').DataTable().destroy();
         $("#limit-to-tag-link").show();
@@ -453,16 +449,8 @@ function limitToTagShow() {
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
-    $("#limit-to-new-link").click(function () {
 
 
-    });
-
-
-
-    $('#markRead').click(function(){
-
-    });
 }
 function limitToNew()
 {

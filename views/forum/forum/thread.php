@@ -28,7 +28,7 @@ $now = $currentTime;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
 <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
 <div class="tab-content shadowBox ">
@@ -85,7 +85,4 @@ $now = $currentTime;
         </table>
     </div>
     <div id="searchpost"></div>
-    <div id="noThread">
-        <h5><Strong><?php echo AppUtility::t('No posts have been made yet. Click Add New Thread to start a new discussion')?></Strong></h5>
-    </div>
 </div>

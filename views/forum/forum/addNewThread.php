@@ -3,63 +3,84 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
 use app\components\AppConstant;
-date_default_timezone_set("Asia/Calcutta");
-$this->title = 'Add New Thread';
-if ($rights > AppConstant::STUDENT_RIGHT){
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
-
-//$this->params['breadcrumbs'][] = ['label' => 'Course', 'url' => [Yii::$app->session->get('referrer')]];
-$this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid='.$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid='.$course->id.'&forumid='.$forumData->id]];
+$this->title = AppUtility::t('Add New Thread',false);
 $this->params['breadcrumbs'][] = $this->title;
+$currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+$now = $currentTime;
 ?>
-<div class="" xmlns="http://www.w3.org/1999/html">
-    <h3><b>Add Thread - <?php echo $forumData->name;?></h3>
-    <br><br>
-    <div>
-        <div class="col-md-2"><b>Subject</b></div>
-        <div class="col-md-8"><input class="subject form-control" type="text" ></div>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Forums:',false);?><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn">
+            <a href="#"class="btn btn-primary pull-right add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
+        </div>
     </div>
-    <br><br><br>
-    <div>
-        <div class="col-md-2"><b>Message</b></div>
-        <?php echo "<div class='left col-md-10'><div class= 'editor'>
-        <textarea id='message' name='message' style='width: 100%;' rows='20' cols='20'></textarea></div></div><br>"; ?>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+</div>
+<input type="hidden" id="userId" value="<?php echo $userId; ?>">
+<input type="hidden" id="forumId" value="<?php echo $forumData->id; ?>">
+<input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
+<div class="tab-content shadowBox">
+    <div style="padding-top: 20px">
+        <div class="col-lg-2 subject-label">Subject</div>
+        <div class="col-lg-10">
+            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=name value="" class="subject">
+        </div>
     </div>
-    <div>
-        <br>
-        <input type="hidden" id="userId" value="<?php echo $userId; ?>">
-        <input type="hidden" id="forumId" value="<?php echo $forumData->id; ?>">
-        <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
+    <BR class=form>
 
+    <div class="editor-div">
+        <div class="col-lg-2 message-label">Message</div>
+        <div class="col-lg-10 message-div">
+            <div class=editor>
+                <textarea cols=5 rows=12 id=message name=message style="width: 100%">
+                </textarea>
+            </div>
+        </div>
     </div>
     <?php if($rights > 10)
     {?>
-         <div >
-            <span class="col-md-2"><b>Post Type:</b></span>
-        <span class="col-md-10" id="post-type-radio-list">
-            <input type="radio" name="post-type" id="regular" value="0" checked >Regular<br>
-            <input type="radio" name="post-type" id="displayed_at_top_of_list" value="1" >Displayed at top of list<br>
-            <input type="radio" name="post-type" id="displayed_at_top_and_locked" value="2">Displayed at top and locked (no replies)<br>
-            <input type="radio" name="post-type" id="only_students_can_see" value="3">Displayed at top and students can only see their own replies <br>
+        <div >
+            <span class="col-md-2">Post Type</span>
+            <span class="col-md-10" id="post-type-radio-list">
+                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                 <input type='radio' checked name='post-type' id="regular" value='0'>
+                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Regular</td></div></tr>
+                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                 <input type='radio'  name='post-type' id="displayed_at_top_of_list" value='1'>
+                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Displayed at top of list</td></div></tr>
+                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                 <input type='radio'  name='post-type' id="displayed_at_top_and_locked" value='2'>
+                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Displayed at top and locked (no replies)</td></div></tr>
+                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                 <input type='radio'  name='post-type' id="only_students_can_see" value='3'>
+                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Displayed at top and students can only see their own replies </td></div></tr>
             </span>
         </div>
         <div>
-            <span class="col-md-2"><b>Always Replies:</b></span>
-        <span class="col-md-10" id="always-replies-radio-list" >
-            <input type="radio" name="always-replies" value="0" checked >Use default<br>
-            <input type="radio" name="always-replies"  value="1" >Always<br>
-            <input type="radio" name="always-replies"  value="2">Never<br>
-            <input type="radio" name="always-replies" class="end pull-left "  id="always" value="3"><label class="end pull-left ">Before</label>
-
-
-                <div class="col-md-3" id="datepicker-id">
-                    <?php
-                    echo DatePicker::widget([
+            <span class="col-md-2">Always Replies</span>
+            <span class="col-md-10" id="always-replies-radio-list">
+                <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                <input type='radio' checked  name='always-replies' value='0'>
+                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Use default</td></div></tr>
+                <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                <input type='radio' name='always-replies' value='1'>
+                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Always</td></div></tr>
+                <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
+                <input type='radio' name='always-replies' value='2'>
+                <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Never</td></div></tr>
+                <div class='radio student-enroll visibility pull-left'><label class='checkbox-size label-visibility pull-left'><td>
+                <input type=radio name="always-replies" value="3" /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td></div>
+                <?php
+                echo '<div class = "col-lg-4 time-input" id="datepicker-id">';
+                echo DatePicker::widget([
                         'name' => 'endDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
                         'value' => date("m/d/Y",strtotime("+1 week")),
@@ -67,12 +88,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'autoclose' => true,
                             'format' => 'mm/dd/yyyy' ]
                     ]);
-                 echo '</div>';?>
-                    <?php
-                    echo '<label class="end pull-left  select-text-margin"> At</label>';
-                   echo '<div class="pull-left col-lg-4">';
-
-                    echo TimePicker::widget([
+                echo '</div>';?>
+                <?php
+                echo '<label class="end col-lg-1">At</label>';
+                echo '<div class="pull-left col-lg-4">';
+                echo TimePicker::widget([
                         'name' => 'startTime',
                         'options' => ['placeholder' => 'Select operating time ...'],
                         'convertFormat' => true,
@@ -82,21 +102,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             'todayHighlight' => true,
                         ]
                     ]);
-
-                   echo '</div>';?>
-            </div>
-
+                echo '</div>';?>
             </span>
         </div>
- <?php }elseif($rights == 10 && ($forumData['settings'] & 1 == 1)){?>
+    <?php }elseif($rights == 10 && ($forumData['settings'] & 1 == 1)){?>
         <div>
             <div class="col-md-2"><b>Post Anonymously:</b></div>
             <div class="col-md-8"><input id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
         </div>
     <?php } ?>
-    <div class="col-md-4  col-lg-offset-2">
-    <input type="button" class="btn btn-primary" id="addNewThread" value="Post Thread">
-        </div>
-    
 </div>
 

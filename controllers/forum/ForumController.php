@@ -112,8 +112,7 @@ class ForumController extends AppController
            $forumArray = array();
             foreach ($forums as $key => $forum)
             {
-
-                   $threadCount = ForumThread::findThreadCount($forum->id);
+                $threadCount = ForumThread::findThreadCount($forum['id']);
                 $postCount = count($forum->imasForumPosts);
                 $lastObject = '';
                 if ($postCount > AppConstant::NUMERIC_ZERO) {
@@ -122,20 +121,21 @@ class ForumController extends AppController
                 $flag = 0;
                 foreach($NewPostCounts as $count)
                 {
-                    if($count['forumid'] == $forum->id ){
+                    if($count['forumid'] == $forum['id'] ){
                         $tempArray = array
                         (
-                            'forumId' => $forum->id,
-                            'forumName' => $forum->name,
+                            'forumId' => $forum['id'],
+                            'forumName' => $forum['name'],
                             'threads' => count($threadCount),
                             'posts' => $postCount,
                             'currentTime' => $currentTime,
-                            'endDate' => $forum->enddate,
-                            'rights' => $user->rights,
+                            'endDate' => $forum['enddate'],
+                            'rights' => $user['rights'],
+                            'avail' => $forum['avail'],
+                            'startDate' => $forum['startdate'],
                             'countId' => $count['forumid'],
                             'count' =>$count['COUNT(imas_forum_threads.id)'],
                             'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
-
                         );
                         $flag = 1;
                         array_push($forumArray, $tempArray);
@@ -146,25 +146,23 @@ class ForumController extends AppController
 
                 $tempArray = array
                 (
-                    'forumId' => $forum->id,
-                    'forumName' => $forum->name,
+                    'forumId' => $forum['id'],
+                    'forumName' => $forum['name'],
                     'threads' => count($threadCount),
                     'posts' => $postCount,
                     'currentTime' => $currentTime,
-                    'endDate' => $forum->enddate,
-                    'rights' => $user->rights,
+                    'endDate' => $forum['enddate'],
+                    'rights' => $user['rights'],
+                    'avail' => $forum['avail'],
+                    'startDate' => $forum['startdate'],
                     'countId' => AppConstant::NUMERIC_ZERO,
                     'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
                 );
                  array_push($forumArray, $tempArray);
             }
-
-
-
         }
             $this->includeCSS(['forums.css']);
             $this->includeJS(['forum/forum.js']);
-
             return $this->successResponse($forumArray);
 
         }
@@ -394,11 +392,13 @@ class ForumController extends AppController
                 $params = $this->getRequestParams();
                 $moveType = $params['movetype'];
                 $thread_Id = $params['threadId'];
+
                 if ($moveType == AppConstant::NUMERIC_ONE) {
                     $moveThreadId = $params['thread-name'];
                     ForumPosts::updatePostMoveThread($thread_Id, $moveThreadId);
                     Thread::deleteThreadById($thread_Id);
                 } else {
+
                     $forum_Id = $params['forum-name'];
                     Thread::moveAndUpdateThread($forum_Id, $thread_Id);
                     ForumPosts::updateMoveThread($forum_Id, $thread_Id);
@@ -687,6 +687,7 @@ class ForumController extends AppController
      */
     public function actionAddNewThread()
     {
+        $this->layout = 'master';
         $user = $this->getAuthenticatedUser();
         $userId = $this->getUserId();
         $rights = $user->rights;
@@ -694,6 +695,7 @@ class ForumController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $forumData = Forums::getById($forumId);
+        $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
         $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
         return $this->renderWithData('addNewThread', $responseData);

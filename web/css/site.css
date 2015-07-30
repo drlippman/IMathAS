@@ -703,6 +703,13 @@ table.student-data-table > .form-inline .radio, .form-inline .checkbox {
     pointer-events: none;
     cursor: not-allowed;
 }
+.disable-btn-not-allowed{
+    pointer-events: auto;
+    cursor: not-allowed;
+}
+.disable-btn-not-allowed:hover{
+    background-color: #1460AA;
+}
 .sub-menu-bar-nav{
     background: #f8f8f8;
 }
