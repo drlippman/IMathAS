@@ -39,8 +39,9 @@ class InlineText extends BaseImasInlinetext
         $this->avail = $params['avail'];
         $this->caltag = $params['caltag'];
         $this->isplaylist = $params['isplaylist'];
-        $this->oncal = $params['oncal'];
+//        $this->oncal = $params['oncal'];
         $this->save();
+
         return $this->id;
     }
 

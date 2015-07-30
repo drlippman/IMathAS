@@ -753,7 +753,7 @@ class CourseController extends AppController
                 $finalArray['caltag']= '!';
                 $newInline = new InlineText();
                 $inlineId = $newInline->saveChanges($finalArray);
-                $itemType = 'InlineText';
+                    $itemType = 'InlineText';
                 $itemId = new Items();
                 $lastItemId = $itemId->saveItems($courseId, $inlineId, $itemType);
                 $courseItemOrder = Course::getItemOrder($courseId);

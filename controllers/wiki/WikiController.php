@@ -158,6 +158,7 @@ class WikiController extends AppController
             $saveTitle = AppConstant::New_Item;
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'pageTitle' => $pageTitle);
         return $this->render('addWiki', $returnData);
     }

@@ -23,7 +23,7 @@ div.item {
 
 /*Container for editor*/
 div.editor {
-	border: 1px solid #000;
+    border: #6d6d6d 1px solid;
 }
 
 /*Default block container*/

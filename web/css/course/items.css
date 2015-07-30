@@ -8,3 +8,12 @@
     height: auto;
     margin-left: 17px;
 }
+.visibility{
+    padding-top: 10px;
+}
+label.inline-checkbox{
+    padding-left: 0;
+}
+.radio label, .checkbox label{
+    padding: 0;
+}
