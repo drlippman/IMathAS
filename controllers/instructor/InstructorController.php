@@ -487,7 +487,7 @@ public $oa = array();
      */
     public function actionDeleteItemsAjax()
     {
-        $params = $this->getRequestParams();AppUtility::dump($params);
+        $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $block = $params['block'];
         $itemType = $params['itemType'];
@@ -544,28 +544,28 @@ public $oa = array();
                 $course = Course::getById($courseId);
                 $blockData = unserialize($course['itemorder']);
                 $blockTree = explode('-',$itemId);
-                $blockCnt=" ";
-                $blockId = array_pop($blockTree) - 1;
+                $blockCnt='';
+                $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
                 $sub =& $blockData;
-                if (count($blockTree)>1)
+                if (count($blockTree)>AppConstant::NUMERIC_ONE)
                 {
-                    for ($i=1;$i<count($blockTree);$i++)
+                    for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
                     {
-                        $sub =& $sub[$blockTree[$i]-1]['items'];
+                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
                     }
                 }
                 if (is_array($sub[$blockId])) {
                     $blockItems = $sub[$blockId]['items'];
                     $obId = $sub[$blockId]['id'];
 
-                    if (count($blockItems)>0)
+                    if (count($blockItems)>AppConstant::NUMERIC_ZERO)
                     {
                         $this->deleteRecursive($blockItems);
-                        array_splice($sub,$blockId,1);
+                        array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
 
                     }else
                     {
-                            array_splice($sub,$blockId,1);
+                            array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
                     }
                 }
                 $itemList =(serialize($blockData));

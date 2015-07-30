@@ -281,7 +281,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
 
@@ -307,7 +307,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
                             <br><span> Showing until:</span>
@@ -339,7 +339,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
                             <br><span>Showing Always</span>
@@ -384,7 +384,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
 
@@ -451,7 +451,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
 
@@ -515,7 +515,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
 
@@ -574,7 +574,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <ul class=" select1 dropdown-menu selected-options">
                                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                    <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                 </ul>
                             </div>
                             <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>

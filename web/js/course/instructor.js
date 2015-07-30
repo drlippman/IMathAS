@@ -23,8 +23,7 @@ function additem(blk,tb) {
 
 function deleteItem(id,type,block,courseId) {
     var itemType = type;
-
-    var html = '<div><p>Are you sure? This will delete the '+ itemType+' .</p></div>';
+    var html = '<div><p>Are you sure? This will delete the '+itemType+' .</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
@@ -48,8 +47,8 @@ function deleteItem(id,type,block,courseId) {
     });
 }
 function responseSuccess(response)
-{console.log(response);
-    window.location = homePath;
+{
+    //window.location = homePath;
 }
 
 function copyItem(id,type,block,courseId) {

@@ -66,13 +66,11 @@ class Wiki extends BaseImasWikis
         if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
             $tag = $params['rdatetype'];
         }
-//        $this->editbydate = 200000;
         if(!empty($params['group-wiki']))
         {
             $this->groupsetid = $params['group-wiki'];
         }
         $this->save();
-//        AppUtility::dump($this);
         return $this->id;
     }
 
@@ -127,4 +125,19 @@ class Wiki extends BaseImasWikis
         $query =\Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryOne();
         return $query;
     }
+
+    public function addWiki($wiki){
+        $this->courseid = isset($wiki['courseid']) ? $wiki['courseid'] : null;
+        $this->name = isset($wiki['name']) ? $wiki['name'] : null;
+        $this->description = isset($wiki['description']) ? $wiki['description'] : null;
+        $this->startdate = isset($wiki['startdate']) ? $wiki['startdate'] : null;
+        $this->enddate = isset($wiki['enddate']) ? $wiki['enddate'] : null;
+        $this->editbydate = isset($wiki['editbydate']) ? $wiki['editbydate'] : null;
+        $this->avail = isset($wiki['avail']) ? $wiki['avail'] : null;
+        $this->settings = isset($wiki['settings']) ? $wiki['settings'] : null;
+        $this->groupsetid = isset($wiki['groupsetid']) ? $wiki['groupsetid'] : null;
+        $this->save();
+        return $this->id;
+    }
+
 } 

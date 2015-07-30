@@ -159,5 +159,12 @@ class ForumView extends BaseImasForumViews
             $viewEntry->delete();
         }
     }
+
+    public function addView($threadid, $forumViewArray){
+        $this->userid = $forumViewArray['userid'];
+        $this->threadid = $threadid;
+        $this->lastview = $forumViewArray['postdate'];
+        $this->save();
+    }
 }
 

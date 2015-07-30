@@ -77,27 +77,27 @@ class Forums extends BaseImasForums {
     }
     public function addNewForum($params)
     {
-        $this->name = trim($params['name']);
-        $this->description = $params['description'];
-        $this->courseid = $params['courseid'];
-        $this->settings = $params['settings'];
-        $this->startdate = $params['startdate'];
-        $this->enddate = $params['enddate'];
-        $this->sortby = $params['sortby'];
-        $this->defdisplay = $params['defdisplay'];
-        $this->postby = $params['postby'];
-        $this->replyby = $params['replyby'];
-        $this->groupsetid = $params['groupsetid'];
-        $this->cntingb = $params['cntingb'];
-        $this->avail = $params['avail'];
-        $this->forumtype = $params['forumtype'];
-        $this->caltag = $params['caltag'];
-        $this->taglist = $params['taglist'];
-        $this->gbcategory = $params['gbcategory'];
-        $this->points = $params['points'];
-        $this->tutoredit = $params['tutoredit'];
-        $this->rubric = $params['rubric'];
-        $this->outcomes = $params['outcomes'];
+        $this->name = trim(isset($params['name']))?$params['name']:null;
+        $this->description = isset($params['description']) ? $params['description'] : null;
+        $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
+        $this->settings = isset($params['settings']) ? $params['settings'] : null;
+        $this->startdate = isset($params['startdate']) ? $params['startdate'] : null;
+        $this->enddate = isset($params['enddate']) ? $params['enddate'] : null;
+        $this->sortby = isset($params['sortby']) ? $params['sortby'] : null;
+        $this->defdisplay = isset($params['defdisplay']) ? $params['defdisplay'] : null;
+        $this->postby = isset($params['postby']) ? $params['postby'] : null;
+        $this->replyby = isset($params['replyby']) ? $params['replyby'] : null;
+        $this->groupsetid = isset($params['groupsetid']) ? $params['groupsetid'] : null;
+        $this->cntingb = isset($params['cntingb']) ? $params['cntingb'] : null;
+        $this->avail = isset($params['avail']) ? $params['avail'] : null;
+        $this->forumtype = isset($params['forumtype']) ? $params['forumtype'] : null;
+        $this->caltag = isset($params['caltag']) ? $params['caltag'] : null;
+        $this->taglist = isset($params['taglist']) ? $params['taglist'] : null;
+        $this->gbcategory = isset($params['gbcategory']) ? $params['gbcategory'] : null;
+        $this->points = isset($params['points']) ? $params['points'] : null;
+        $this->tutoredit = isset($params['tutoredit']) ? $params['tutoredit'] : null;
+        $this->rubric = isset($params['rubric']) ? $params['rubric'] : null;
+        $this->outcomes = isset($params['outcomes']) ? $params['outcomes'] : null;
         $this->save();
         return $this->id;
     }

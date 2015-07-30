@@ -214,4 +214,19 @@ class ForumPosts extends BaseImasForumPosts
             $threadData->save();
         }
     }
+
+    public function savePost($forumPostArray){
+        $this->forumid = $forumPostArray['forumid'];
+        $this->userid = $forumPostArray['userid'];
+        $this->parent = $forumPostArray['parent'];
+        $this->postdate = $forumPostArray['postdate'];
+        $this->subject = $forumPostArray['subject'];
+        $this->message = $forumPostArray['message'];
+        $this->posttype = $forumPostArray['posttype'];
+        $this->isanon = $forumPostArray['isanon'];
+        $this->replyby = $forumPostArray['replyby'];
+        $this->save();
+        return $this->id;
+    }
+
 }

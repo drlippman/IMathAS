@@ -7,7 +7,10 @@
  */
 namespace app\components;
 use app\models\Assessments;
+use app\models\ForumPosts;
 use app\models\Forums;
+use app\models\ForumThread;
+use app\models\ForumView;
 use app\models\GbItems;
 use app\models\InlineText;
 use app\models\InstrFiles;
@@ -15,6 +18,7 @@ use app\models\Items;
 use app\models\LinkedText;
 use app\models\Questions;
 use app\models\Rubrics;
+use app\models\Wiki;
 use \yii\base\Component;
 use app\components\AppUtility;
 use app\components\AppConstant;
@@ -66,7 +70,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $newtypeid = $inlineText->saveChanges($row);
         $instrFiles = InstrFiles::getAllData($typeid);
         $addedfiles = array();
-        foreach ($instrFiles as $singleData){
+        foreach ($instrFiles as $singleData) {
             $curid = $singleData['id'];
             array_pop($singleData);
             $singleData = "'" . implode("','", AppUtility::addslashes_deep($singleData)) . "'";
@@ -80,9 +84,9 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                 $addedfilelist[] = $addedfiles[$fid];
             }
             $addedfilelist = implode(',', $addedfilelist);
-            InlineText::setFileOrder($newtypeid,$addedfilelist);
+            InlineText::setFileOrder($newtypeid, $addedfilelist);
         }
-    } else if ($itemtype == "LinkedText") {
+    } elseif ($itemtype == "LinkedText") {
         $query = LinkedText::getById($typeid);
         $istool = (substr($query['text'], 0, 8) == 'exttool:');
         if ($istool) {
@@ -113,10 +117,72 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($istool) {
             $exttooltrack[$newtypeid] = intval($tool[0]);
         }
-    } else if ($itemtype == "Forum") {
-
-    } else if ($itemtype == "Wiki") {
-    } else if ($itemtype == "Assessment") {
+    } elseif ($itemtype == "Forum") {
+        $ForumData = Forums::getById($typeid);
+        if ($sethidden) {
+            $ForumData['avail'] = 0;
+        }
+        if (isset($gbcats[$ForumData['gbcategory']])) {
+            $ForumData['gbcategory'] = $gbcats[$ForumData['gbcategory']];
+        } else if ($params['ctc'] != $cid) {
+            $ForumData['gbcategory'] = 0;
+        }
+        $rubric = $ForumData['rubric'];
+        $ForumData['name'] .= stripslashes($params['append']);
+        if ($ForumData['outcomes'] != '') {
+            $curoutcomes = explode(',', $ForumData['outcomes']);
+            $newoutcomes = array();
+            foreach ($curoutcomes as $o) {
+                if (isset($outcomes[$o])) {
+                    $newoutcomes[] = $outcomes[$o];
+                }
+            }
+            $row['outcomes'] = implode(',', $newoutcomes);
+        }
+        $forum = new Forums();
+        $newtypeid = $forum->addNewForum($ForumData);
+        if ($_POST['ctc'] != $cid) {
+            $forumtrack[$typeid] = $newtypeid;
+        }
+        if ($rubric != 0) {
+            $frubrictrack[$newtypeid] = $rubric;
+        }
+        if ($copystickyposts) {
+            //copy instructor sticky posts
+            $query = ForumPosts::getByForumId($typeid);
+            foreach ($query as $row) {
+                $forumPostArray = array(
+                    'forumid' => $newtypeid,
+                    'userid' => $userid,
+                    'parent' => AppConstant::NUMERIC_ZERO,
+                    'postdate' => $now,
+                    'subject' => $row['subject'],
+                    'message' => $row['message'],
+                    'posttype' => $row['posttype'],
+                    'isanon' => $row['isanon'],
+                    'replyby' => $row['replyby'],
+                );
+                if (is_null($row['replyby']) || trim($row['replyby']) == '') {
+                    $forumPostArray['replyby'] = NULL;
+                }
+                $forumPost = new ForumPosts();
+                $threadid = $forumPost->savePost($forumPostArray);
+                ForumPosts::setThreadIdById($threadid);
+                $forumThread = new ForumThread();
+                $forumThread->addThread($threadid, $forumPostArray);
+                $forumView = new ForumView();
+                $forumView->addView($threadid, $forumPostArray);
+            }
+        }
+    } elseif ($itemtype == "Wiki") {
+        $row = Wiki::getById($typeid);
+        if ($sethidden) {
+            $row['avail'] = 0;
+        }
+        $row['name'] .= stripslashes($params['append']);
+        $wiki = new Wiki();
+        $newtypeid = $wiki->addWiki($row);
+    } elseif ($itemtype == "Assessment") {
         $assessmentData = Assessments::getByAssessmentId($typeid);
         if ($sethidden) {
             $assessmentData['avail'] = 0;
@@ -155,12 +221,12 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $thiswithdrawn = array();
 
         $query = Assessments::getByAssessmentId($typeid);
-        $itemorder = explode(',',$query['itemorder']);
-        if ($itemorder != '') {
+        if (trim($query['itemorder']) != '') {
+            $itemorder = explode(',', $query['itemorder']);
             $query = Questions::getByItemOrder($itemorder);
             $inss = array();
             $insorder = array();
-            foreach ($query as $singleData){
+            foreach ($query as $singleData) {
                 if ($singleData['withdrawn'] > 0 && $removewithdrawn) {
                     $thiswithdrawn[$singleData['id']] = 1;
                     continue;
@@ -177,15 +243,15 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                 }
                 $rubric[$singleData['id']] = $singleData['rubric'];
                 $insorder[] = $singleData['id'];
-                array_push($inss,$singleData);
+                array_push($inss, $singleData);
             }
             $idtoorder = array_flip($insorder);
             if (count($inss) > 0) {
                 $question = new Questions();
-                $questionIdArray =array();
-                foreach($inss as $in){
+                $questionIdArray = array();
+                foreach ($inss as $in) {
                     $firstnewid = $question->addQuestions($in);
-                    array_push($questionIdArray,$firstnewid);
+                    array_push($questionIdArray, $firstnewid);
                 }
                 $aitems = $itemorder;
                 $newaitems = array();
@@ -225,17 +291,16 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                     }
                 }
                 $newitemorder = implode(',', $newaitems);
-                Assessments::setItemOrder($newitemorder,$newtypeid);
+                Assessments::setItemOrder($newitemorder, $newtypeid);
             }
         }
-    } else if ($itemtype == "Calendar") {
+    } elseif ($itemtype == "Calendar") {
     }
     $items = new Items();
-    $newItemId = $items->saveItems($params['courseId'],$newtypeid,$itemtype);
+    $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
     return $newItemId;
 }
-
-public  static function copysub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
+public static function copysub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
 {
     global $checked, $blockcnt;
     foreach ($items as $k => $item) {
@@ -500,7 +565,7 @@ public static function copyrubrics($offlinerubrics = array())
     }
 }
 
-public  static function handleextoolcopy($sourcecid)
+public static function handleextoolcopy($sourcecid)
 {
     //assumes this is a copy into a different course
     global $cid, $userid, $groupid, $exttooltrack;
