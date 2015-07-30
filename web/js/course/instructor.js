@@ -48,7 +48,7 @@ function deleteItem(id,type,block,courseId) {
 }
 function responseSuccess(response)
 {
-    //window.location = homePath;
+    window.location = homePath;
 }
 
 function copyItem(id,type,block,courseId) {
