@@ -778,7 +778,7 @@ function enditem($canedit) {
 			   $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
 			   $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			
-			   $isvideo = (preg_match_all('/youtu/',$line['text'],$matches)>1) && ($line['isplaylist']>0);
+			   $isvideo = ($line['isplaylist']>0) && (preg_match_all('/youtu/',$line['text'],$matches)>1 || preg_match_all('/google\.com\/file/',$line['text'],$matches)>1);
 			   if ($isvideo) {
 			   	   $json = array();
 			   	   preg_match_all('/<a[^>]*(youtube\.com|youtu\.be)(.*?)"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);
@@ -804,6 +804,13 @@ function enditem($canedit) {
 			   	   	}
 			   	   	$json[] = '{"name":"'.str_replace('"','\\"',$m[3]).'", "vidid":"'.str_replace('"','\\"',$vidid).'", "start":'.$start.', "end":'.$end.'}';
 			   	   	$line['text'] = str_replace($m[0],'<a href="#" onclick="playliststart('.$typeid.','.$k.');return false;">'.$m[3].'</a>',$line['text']);
+			   	   }
+			   	   preg_match_all('/<a[^>]*google\.com\/file\/d\/(.*?)\/view[^"]*?"[^>]*?>(.*?)<\/a>/',$line['text'],$matches, PREG_SET_ORDER);
+			   	   foreach ($matches as $k=>$m) {
+			   	   	$vidid = $m[1];
+			   	   	
+			   	   	$json[] = '{"name":"'.str_replace('"','\\"',$m[2]).'", "vidid":"'.str_replace('"','\\"',$vidid).'", "start":0, "end":0, "isGdrive":true}';
+			   	   	$line['text'] = str_replace($m[0],'<a href="#" onclick="playliststart('.$typeid.','.$k.');return false;">'.$m[2].'</a>',$line['text']);
 			   	   }
 			   	   
 			   	   $playlist = '<div class="playlistbar" id="playlistbar'.$typeid.'"><div class="vidtracksA"></div> <span> Playlist</span> ';

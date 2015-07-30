@@ -1530,7 +1530,11 @@ function makescinot($n,$d=8,$f="x") {
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
 	$exp = floor(log10($n));
-	$mant = number_format($n/pow(10,$exp),$d);
+	if ($d==-1) {
+		$mant = round($n/pow(10,$exp),8);
+	} else {
+		$mant = number_format($n/pow(10,$exp),$d);
+	}
 	if ($f=="*") {
 		return "$isneg $mant * 10^($exp)";
 	} else if ($f=="E") {

@@ -1388,6 +1388,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
+			} else if (in_array("scinot",$ansformats)) {
+				$sa = '`'.makescinot($answer,-1,'*').'`';
 			} else {
 				$sa = $answer;
 			}
@@ -1561,7 +1563,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
-		
+		if (($v = array_search('E', $variables))!==false) {
+			$variables[$v] = 'varE';
+		}
 		if (count($ovar)==0) {
 			$ovar[] = "x";
 		}
@@ -3545,6 +3549,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$flist = implode("|",$ofunc);
 			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
+		if (($v = array_search('E', $variables))!==false) {
+			$variables[$v] = 'varE';
+			$answer = str_replace('E','varE',$answer);
+		}
 		$vlist = implode("|",$variables);
 		
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
@@ -3589,11 +3597,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = mathphppre($answer);
 			$answer = makepretty($answer);
 			$answer = mathphp($answer,$vlist);
-			//echo $answer;
+			
 			for($i=0; $i < count($variables); $i++) {
 				$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 			}
-	
+			
 			$myans = explode(",",$_POST["qn$qn-vals"]);
 			
 			$cntnan = 0;
@@ -3615,6 +3623,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$tp[$j] = $tps[$i][$j];
 				}
 				$realans = eval("return ($answer);");
+				
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 				if ($answerformat=="equation") {  //if equation, store ratios

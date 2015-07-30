@@ -20,7 +20,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($gues
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = $_GET['cid'];
 	
-	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas'])) {
+	if (isset($teacherid) && isset($sessiondata['sessiontestid']) && !isset($sessiondata['actas']) && $sessiondata['courseid']==$cid) {
 		//clean up coming out of an assessment
 		require_once("../includes/filehandler.php");
 		//deleteasidfilesbyquery(array('id'=>$sessiondata['sessiontestid']),1);
