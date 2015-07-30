@@ -61,8 +61,8 @@ class Questions extends BaseImasQuestions
 
     public static function getByItemOrder($itemorder){
         $questionDataArray = array();
-        foreach($itemorder as $itam){
-            $questionData = Questions::findOne(['id',$itam]);
+        foreach($itemorder as $item){
+            $questionData = Questions::findOne(['id',$item]);
             array_push($questionDataArray,$questionData);
         }
         return $questionDataArray;

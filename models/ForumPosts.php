@@ -201,4 +201,17 @@ class ForumPosts extends BaseImasForumPosts
       $entry = ForumPosts::find()->where(['parent' => $id])->all();
         return $entry;
     }
+
+    public static function getByForumId($forumId){
+        return ForumPosts::find()->where(['forumid' => $forumId])->andWhere(['>','posttype', 0])->all();
+
+    }
+
+    public static function setThreadIdById($id){
+        $threadData = ForumPosts::findOne(['id'=> $id]);
+        if($threadData){
+            $threadData->threadid = $id;
+            $threadData->save();
+        }
+    }
 }

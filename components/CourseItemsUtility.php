@@ -26,7 +26,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                 <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
             </ul>
         </div>
 
@@ -66,7 +66,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                         <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
                         <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
                         <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                        <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                     </ul>
                 </div>
 
@@ -108,7 +108,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                 <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
                                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
                                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                             </ul>
                         </div>
 
@@ -184,7 +184,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     <ul class=" select1 dropdown-menu selected-options">
                                         <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?id=' . $forum->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                         <li><a id="delete" href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                        <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                     </ul>
                                 </div>
                                 <br>
@@ -201,7 +201,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                         echo "Showing until: Always"; ?>
                                     <?php   }
                                     else{
-                                        echo "Showing until: " .$endDate;?> <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?id=' . $forum->id . '&cid=' . $course->id) ?>"> Modify  </a> | <a href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"> Delete </a> | <a href="#"> Copy </a><br>
+                                        echo "Showing until: " .$endDate;?>
                                     <?php
                                     }
                                 }
@@ -230,7 +230,7 @@ if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTi
                                     <ul class=" select1 dropdown-menu selected-options">
                                         <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?id=' . $forum->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
                                         <li><a id="delete" href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                                        <li><a id="copy" href="#" ><?php AppUtility::t('Copy');?></a></li>
+                                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                                     </ul>
                                 </div>
                                 <br>
