@@ -23,7 +23,8 @@ $now = $currentTime;
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
         <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Settings</button>
+            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$course->id); ?>"
+               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting</a>
         </div>
     </div>
 </div>
@@ -41,7 +42,7 @@ $now = $currentTime;
         </div>
     </div>
     <div class="clear-both"></div>
-    <div class=" row add-item">
+    <div class="row add-item">
         <div class="col-md-1 plus-icon">
             <i class="fa fa-plus fa-2x"></i>
         </div>
@@ -52,7 +53,7 @@ $now = $currentTime;
     </div>
     <input type="hidden" class="home-path" value="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id) ?>">
     <input type="hidden" class="block-check" value="<?php echo $tb = 't'; ?>">
-    <div class="display-item-details">
+    <div class="display-item-details" style="padding-top: 20px">
         <?php
         $parent = AppConstant::NUMERIC_ZERO;
 

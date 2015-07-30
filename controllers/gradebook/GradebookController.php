@@ -70,6 +70,7 @@ class GradebookController extends AppController
         $this->includeJS(['gradebook/gradebook.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
         $this->includeJS(['general.js']);
+        $this->includeCSS(['course/course.css']);
         return $this->renderWithData('gradebook', $responseData);
 
     }

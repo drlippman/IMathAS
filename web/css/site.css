@@ -148,14 +148,14 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 }
 
 .ui-dialog-titlebar-close{
-display: none;
+/*display: none;*/
 }
 
 
 .ui-widget-header {
-    border: 1px solid #aaaaaa !important;
+    border: 0 !important;
     background: none !important;
-    background-color: #003366 !important;
+    background-color: #ffffff !important;
     color: #fff !important;
     font-weight: bold !important;
 }

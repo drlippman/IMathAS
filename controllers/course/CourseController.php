@@ -290,6 +290,7 @@ class CourseController extends AppController
     public function actionCourseSetting()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         if ($course) {

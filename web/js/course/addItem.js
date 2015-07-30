@@ -63,8 +63,4 @@ $(document).ready(function(){
                 }
             });
         });
-
-    $('.select_button1').click(function() {
-        $('.select1').toggle();
-    });
 });

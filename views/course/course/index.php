@@ -30,7 +30,7 @@ $now = $currentTime;
 </div>
 
 <!-- ////////////////// Assessment here //////////////////-->
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox student-no-second-level-nav">
     <?php if(count($courseDetail)){
         foreach($courseDetail as $key => $item){
 
@@ -40,7 +40,7 @@ $now = $currentTime;
 
                     if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                         ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                             <div class="title">
                                 <?php if($assessment->timelimit > 0) { //timelimit
@@ -123,7 +123,7 @@ $now = $currentTime;
                             </div>
                         </div>
                     <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                             <div class="title">
                                 <?php if($assessment->password == '') {?>
@@ -162,7 +162,7 @@ $now = $currentTime;
                 <?php $forum = $item[key($item)] ?>
                 <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                     <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                         <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                     <div class="title">
                         <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
@@ -174,7 +174,7 @@ $now = $currentTime;
                     </div>
                     </div>
                 <?php } elseif ($forum->avail == 2) { ?>
-                    <div class="item">
+                    <div class="item student-course-alignment">
                         <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                         <div class="title">
                             <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -193,7 +193,7 @@ $now = $currentTime;
                 $hasNew = false;?>
                 <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                     <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                         <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                     <div class="title">
                         <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -206,7 +206,7 @@ $now = $currentTime;
                     <div class="clear"></div>
                     </div>
                 <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
-                    <div class="item">
+                    <div class="item student-course-alignment">
                         <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                         <div class="title">
                             <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -228,7 +228,7 @@ $now = $currentTime;
                     <!--Link type : http-->
                     <?php $text = $link->text;?>
                     <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                             <div class="title">
                                 <?php if($link->target == 1){?>
@@ -244,7 +244,7 @@ $now = $currentTime;
                         </div>
                         <!--Link type : file-->
                     <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                             <div class="title">
                                 <?php if($link->target != 0) {?>
@@ -269,7 +269,7 @@ $now = $currentTime;
                         </div>
                         <!--Link type : external tool-->
                     <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                             <div class="title">
                                 <!--open on new window or on same window-->
@@ -286,7 +286,7 @@ $now = $currentTime;
                             <div class="clear"></div>
                         </div>
                     <?php } else { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                             <div class="title">
                                 <?php if($link->target != 0) {?>
@@ -307,7 +307,7 @@ $now = $currentTime;
                     <!--Link type : http-->
                     <?php $text = $link->text;?>
                     <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                             <div class="title">
                                 <?php if($link->target == 1){?>
@@ -323,7 +323,7 @@ $now = $currentTime;
                         </div>
                         <!--Link type : file-->
                     <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                             <div class="title">
                                 <?php if($link->target != 0) {?>
@@ -347,7 +347,7 @@ $now = $currentTime;
                         </div>
                         <!--Link type : external tool-->
                     <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                             <div class="title">
                                 <!--open on new window or on same window-->
@@ -364,7 +364,7 @@ $now = $currentTime;
                             <div class="clear"></div>
                         </div>
                     <?php } else { ?>
-                        <div class="item">
+                        <div class="item student-course-alignment">
                             <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                             <div class="title">
                                 <?php if($link->target != 0) {?>
@@ -387,7 +387,7 @@ $now = $currentTime;
             <?php case 'InlineText': ?>
                 <?php $inline = $item[key($item)]; ?>
                 <?php if ($inline->avail != 0 && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
-                    <div class="item">
+                    <div class="item student-course-alignment">
                         <!--Hide title and icon-->
                         <?php if ($inline->title != '##hidden##') { ?>
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -408,7 +408,7 @@ $now = $currentTime;
                     </div>
                     <div class="clear"></div>
                 <?php } elseif ($inline->avail == 2) { ?> <!--Hide ends and displays show always-->
-                    <div class="item">
+                    <div class="item student-course-alignment">
                         <!--Hide title and icon-->
                         <?php if ($inline->title != '##hidden##') { ?>
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -432,6 +432,7 @@ $now = $currentTime;
 
                 <!-- Calender Here-->
             <?php case 'Calendar':?>
+                <div class="student-course-alignment student-course-alignment-calendar">
                 <div class="col-lg-12 padding-alignment calendar-container item">
                     <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                         <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
@@ -445,9 +446,7 @@ $now = $currentTime;
                         <div class="calendar-day-details"></div>
                     </div>
                 </div>
-                <!--    <div class ='calendar item' style="padding: 10px">-->
-                <!--            <div id="demo" style="display:table-cell; vertical-align:middle;"></div>-->
-                <!--    </div>-->
+                </div>
                 <?php break; ?>
 
                 <!--  Block here-->
@@ -488,7 +487,7 @@ $now = $currentTime;
 
                                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                                             ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->timelimit > 0) { //timelimit
@@ -571,7 +570,7 @@ $now = $currentTime;
                                                 </div>
                                             </div>
                                         <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->password == '') {?>
@@ -611,7 +610,7 @@ $now = $currentTime;
                                         <?php $forum = $item[key($item)]; ?>
                                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
@@ -622,7 +621,7 @@ $now = $currentTime;
                                             </div>
                                             </div>
                                         <?php } elseif ($forum->avail == 2) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $forum->courseid) ?>">
@@ -642,7 +641,7 @@ $now = $currentTime;
                                         $hasNew = false;?>
                                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -655,7 +654,7 @@ $now = $currentTime;
                                             <div class="clear"></div>
                                             </div>
                                         <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -678,7 +677,7 @@ $now = $currentTime;
                                             <!--Link type : http-->
                                             <?php $text = $link->text;?>
                                             <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                                                     <div class="title">
                                                         <?php if($link->target == 1){?>
@@ -694,7 +693,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : file-->
                                             <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -719,7 +718,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : external tool-->
                                             <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <!--open on new window or on same window-->
@@ -736,7 +735,7 @@ $now = $currentTime;
                                                     <div class="clear"></div>
                                                 </div>
                                             <?php } else { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -757,7 +756,7 @@ $now = $currentTime;
                                             <!--Link type : http-->
                                             <?php $text = $link->text;?>
                                             <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                                                     <div class="title">
                                                         <?php if($link->target == 1){?>
@@ -773,7 +772,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : file-->
                                             <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -797,7 +796,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : external tool-->
                                             <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <!--open on new window or on same window-->
@@ -814,7 +813,7 @@ $now = $currentTime;
                                                     <div class="clear"></div>
                                                 </div>
                                             <?php } else { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -837,7 +836,7 @@ $now = $currentTime;
                                     <?php case 'InlineText':?>
                                         <?php $inline = $item[key($item)]; ?>
                                         <?php if ($inline->avail != 0 && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
                                                     <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -858,7 +857,7 @@ $now = $currentTime;
                                             </div>
                                             <div class="clear"></div>
                                         <?php } elseif ($inline->avail == 2) { ?> <!--Hide ends and displays show always-->
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
                                                     <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -882,7 +881,8 @@ $now = $currentTime;
 
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
-                                        <div class="col-lg-12 padding-alignment calendar-container item">
+                                        <div class="student-course-alignment student-course-alignment-calendar">
+                                        <div class="col-lg-12 padding-alignment calendar-container item" style="margin-left: 20px">
                                             <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                                                 <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                                                 <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
@@ -895,6 +895,7 @@ $now = $currentTime;
                                                 <div class="calendar-day-details"></div>
                                             </div>
                                         </div>
+                                            </div>
                                         <?php break; ?>
                                     <?php endswitch; ?>
                             <?php }?>
@@ -936,7 +937,7 @@ $now = $currentTime;
 
                                         if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                                             ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->timelimit > 0) { //timelimit
@@ -1019,7 +1020,7 @@ $now = $currentTime;
                                                 </div>
                                             </div>
                                         <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                                                 <div class="title">
                                                     <?php if($assessment->password == '') {?>
@@ -1059,7 +1060,7 @@ $now = $currentTime;
                                         <?php $forum = $item[key($item)]; ?>
                                         <?php if ($forum->avail != 0 && $forum->startdate < $currentTime && $forum->enddate > $currentTime) { ?>
                                             <?php if ($forum->avail == 1 && $forum->enddate > $currentTime && $forum->startdate < $currentTime) ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $forum->courseid) ?>">
@@ -1071,7 +1072,7 @@ $now = $currentTime;
                                             </div>
                                             </div>
                                         <?php } elseif ($forum->avail == 2) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
 
                                                 <div class="title">
@@ -1093,7 +1094,7 @@ $now = $currentTime;
                                         $hasNew = false;?>
                                         <?php if ($wikis->avail != 0 && $wikis->startdate < $currentTime && $wikis->enddate > $currentTime) { ?>
                                             <?php if ($wikis->avail == 1 && $wikis->enddate > $currentTime && $wikis->startdate < $currentTime) ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                             <div class="title">
                                                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -1106,7 +1107,7 @@ $now = $currentTime;
                                             <div class="clear"></div>
                                             </div>
                                         <?php } elseif ($wikis->avail == 2 && $wikis->enddate == 2000000000) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
                                                 <div class="title">
                                                     <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid .'&wikiId=' .$wikis->id) ?>">
@@ -1129,7 +1130,7 @@ $now = $currentTime;
                                             <!--Link type : http-->
                                             <?php $text = $link->text;?>
                                             <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                                                     <div class="title">
                                                         <?php if($link->target == 1){?>
@@ -1145,7 +1146,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : file-->
                                             <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -1170,7 +1171,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : external tool-->
                                             <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <!--open on new window or on same window-->
@@ -1187,7 +1188,7 @@ $now = $currentTime;
                                                     <div class="clear"></div>
                                                 </div>
                                             <?php } else { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -1208,7 +1209,7 @@ $now = $currentTime;
                                             <!--Link type : http-->
                                             <?php $text = $link->text;?>
                                             <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to web" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
                                                     <div class="title">
                                                         <?php if($link->target == 1){?>
@@ -1224,7 +1225,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : file-->
                                             <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to doc" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -1248,7 +1249,7 @@ $now = $currentTime;
                                                 </div>
                                                 <!--Link type : external tool-->
                                             <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <!--open on new window or on same window-->
@@ -1265,7 +1266,7 @@ $now = $currentTime;
                                                     <div class="clear"></div>
                                                 </div>
                                             <?php } else { ?>
-                                                <div class="item">
+                                                <div class="item student-course-alignment">
                                                     <img alt="link to html" class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
@@ -1289,7 +1290,7 @@ $now = $currentTime;
 
                                         <?php $inline = $item[key($item)]; ?>
                                         <?php if ($inline->avail != 0 && $inline->startdate < $currentTime && $inline->enddate > $currentTime) { ?>
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
                                                     <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -1310,7 +1311,7 @@ $now = $currentTime;
                                             </div>
                                             <div class="clear"></div>
                                         <?php } elseif ($inline->avail == 2) { ?> <!--Hide ends and displays show always-->
-                                            <div class="item">
+                                            <div class="item student-course-alignment">
                                                 <!--Hide title and icon-->
                                                 <?php if ($inline->title != '##hidden##') { ?>
                                                     <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
@@ -1334,6 +1335,7 @@ $now = $currentTime;
 
                                         <!-- Calender Here-->
                                     <?php case 'Calendar': ?>
+                                        <div class="student-course-alignment student-course-alignment-calendar">
                                         <div class="col-lg-12 padding-alignment calendar-container item">
                                             <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
                                                 <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
@@ -1347,6 +1349,7 @@ $now = $currentTime;
                                                 <div class="calendar-day-details"></div>
                                             </div>
                                         </div>
+                                            </div>
                                         <?php break; ?>
                                     <?php endswitch; ?>
                             <?php }?>

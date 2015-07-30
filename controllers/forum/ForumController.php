@@ -50,6 +50,7 @@ class ForumController extends AppController
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['forum/forum.js', 'general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $this->setReferrer();
+        $this->includeCSS(['course/course.css']);
         $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user, 'course' => $course);
         return $this->renderWithData('forum', $responseData);
     }

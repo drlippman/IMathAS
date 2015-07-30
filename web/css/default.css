@@ -17,13 +17,14 @@ a:hover {
 
 /*Container for course items*/
 div.item {
-	border: 1px solid #000;
+	border: 1px solid #a9a9a9;
 	background-color: #fff;
+    margin-right: 20px;
 }
 
 /*Container for editor*/
 div.editor {
-    border: #6d6d6d 1px solid;
+    border: #a9a9a9 1px solid;
 }
 
 /*Default block container*/

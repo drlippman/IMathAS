@@ -52,7 +52,7 @@ class RosterController extends AppController
         }else{
             $isImageColumnPresent = AppConstant::NUMERIC_ONE;
         }
-        $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css']);
+        $this->includeCSS(['dataTables.bootstrap.css', 'roster/roster.css', 'course/course.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'roster/studentroster.js', 'general.js']);
         $responseData = array('course' => $course, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->render('studentRoster', $responseData);
