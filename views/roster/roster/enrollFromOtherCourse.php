@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
              foreach($data as $value)
              {
-                 echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='name' value='{$value['id']}'><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>"." " ."<td>{$value['name']}</td></div></tr>";
+                 echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='name' value='{$value['id']}'><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>"." " ."<td>{$value['name']}</td></div></tr>";
              }
         ?>
     </div>

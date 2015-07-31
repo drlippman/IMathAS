@@ -46,9 +46,7 @@ div {
     line-height: 0;
 }
 .password_checkbox{
-    width: 36%;
-    margin-left: -19px;
-    text-align: right;
+    padding-left: 21px;
 }
 .notify_checkbox{
     width: 64%;

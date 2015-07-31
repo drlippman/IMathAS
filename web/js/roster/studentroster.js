@@ -22,7 +22,7 @@ function showStudentInformation(students)
     var isImagePresent =  $( "#image-id" ).val();
     var html = "";
     $.each(students, function (index, student) {
-        html += "<tr> <td><div class='checkbox'><label><input type='checkbox' name='student-information-check' value='" + student.id + "'>" +
+        html += "<tr> <td><div class='checkbox override-hidden'><label><input type='checkbox' name='student-information-check' value='" + student.id + "'>" +
         "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
         if (isImagePresent == 1) {
             imageURL = 'dummy_profile.jpg';

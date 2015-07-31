@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]
     ) ?>
     <?php echo $form->field($model, 'username') ?>
-    <?php echo $form->field($model, 'password') ?>
+    <?php echo $form->field($model, 'password')->passwordInput(); ?>
     <?php echo $form->field($model, 'FirstName') ?>
     <?php echo $form->field($model, 'LastName') ?>
     <?php echo $form->field($model, 'email') ?>

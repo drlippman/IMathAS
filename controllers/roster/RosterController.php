@@ -504,11 +504,13 @@ class RosterController extends AppController
     public function actionImportStudent()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $model = new ImportStudentForm();
         $nowTime = time();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $studentRecords = '';
+        $this->includeCSS(['roster/roster.css']);
         if ($model->load($this->getPostData())) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
@@ -1323,10 +1325,12 @@ class RosterController extends AppController
     public function actionChangeStudentInformation()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $tzName = AppUtility::getTimezoneName();
         $params = $this->getRequestParams();
         $userId = $params['uid'];
         $courseId = $params['cid'];
+        $course = Course::getById($courseId);
         $studentData = Student::getByCourseId($courseId, $userId);
         $user = User::findByUserId($userId);
         $model = new ChangeUserInfoForm();
@@ -1350,9 +1354,9 @@ class RosterController extends AppController
             $this->setSuccessFlash(AppConstant::UPDATE_STUDENT_SUCCESSFULLY);
             return $this->redirect('student-roster?cid=' . $courseId);
         }
-        $this->includeCSS(['dashboard.css']);
+        $this->includeCSS(['dashboard.css', 'roster/roster.css']);
         $this->includeJS(['changeUserInfo.js']);
-        $responseData = array('model' => $model, 'user' => $user->attributes, 'tzname' => $tzName, 'userId' => $userId, 'studentData' => $studentData, 'courseId' => $courseId);
+        $responseData = array('model' => $model, 'user' => $user->attributes, 'tzname' => $tzName, 'userId' => $userId, 'studentData' => $studentData, 'courseId' => $courseId, 'course' => $course);
         return $this->renderWithData('changeStudentInformation', $responseData);
     }
 }

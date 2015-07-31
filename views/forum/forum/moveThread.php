@@ -28,9 +28,9 @@ $now = $currentTime;
         <div class="title-middle center"></div>
         <div class="title-option">
             <h4><?php AppUtility::t('What Do You Want To Do?');?>:</h4>
-            <tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' checked name='movetype' value='0' onclick="select(0)">
+            <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' checked name='movetype' value='0' onclick="select(0)">
             <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move thread to different forum</td></div></tr>
-            <tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='movetype' value='1' onclick="select(1)">
+            <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='movetype' value='1' onclick="select(1)">
                             <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td >Move post to be a reply to a thread</td></div></tr>
 
 
@@ -40,12 +40,10 @@ $now = $currentTime;
                 foreach ($forums as $forum) {
                     if($forum['forumId'] == $forumId)
                     {?>
-                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
+                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' checked id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
 
                     <?php }else{?>
-                        <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
-
-
+                        <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='forum-name' id='".$forum['forumId']."' value='".$forum['forumId']."'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$forum['forumName']}</td></div></tr>";?>
                     <?php           }?>
                 <?php  } ?>
             </div>

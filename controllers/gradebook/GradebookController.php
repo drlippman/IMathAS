@@ -846,7 +846,7 @@ class GradebookController extends AppController
             }
             if ($useweights == 0 && $cats[$cat][5] > -1) { //if scaling cat total to point value
                 if ($catposspast[$cat] > 0) {
-                    $gradebook[0][2][$pos][3] = $cats[$cat][5]; //score for past
+                    $gradebook[0][2][$pos][3] = $cats[  $cat][5]; //score for past
                 } else {
                     $gradebook[0][2][$pos][3] = 0; //fix to 0 if no scores in past yet
                 }

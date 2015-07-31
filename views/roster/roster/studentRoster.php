@@ -101,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <thead>
         <tr>
             <th class="studentId">
-                <div class="checkbox">
+                <div class="checkbox override-hidden">
                     <label>
                         <input type="checkbox" name="header-checked" value="">
                         <span class="cr"><i class="cr-icon fa fa-check"></i></span>

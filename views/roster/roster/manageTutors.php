@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                             }
                             echo "</select><td>
-                                               <div class='checkbox'>
+                                               <div class='checkbox override-hidden'>
                     <label>
                         <input type='checkbox' name='tutor-check' value='{$value['id']}' class = 'master'>
                         <span class='cr'><i class='cr-icon fa fa-check'></i></span>

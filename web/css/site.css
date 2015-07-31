@@ -313,7 +313,7 @@ a:link:focus{
 
 
 div.user-image{
-    padding: 5px;
+    padding:  5px 9px 10px;
     padding-bottom: 10px;
 }
 p#settimezone{
@@ -564,8 +564,8 @@ table.dataTable thead > tr > th {
     margin-left: 0;
 }
 
-.checkbox label input[type="checkbox"],
-.radio label input[type="radio"] {
+.checkbox.override-hidden label input[type="checkbox"],
+.radio.override-hidden label input[type="radio"] {
     display: none;
 }
 
@@ -739,4 +739,12 @@ div.dataTables_wrapper {
 }
 .dataTables_wrapper.no-footer .dataTables_scrollBody {
     border-bottom: 0;
+}
+.col-sm-offset.display_field{
+    margin-left: 25%;
+    padding-left: 0px;
+}
+.col-sm-9.display_field{
+    /*margin-left: 25%;*/
+    padding-left: 5px;
 }
