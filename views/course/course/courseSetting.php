@@ -21,20 +21,31 @@ $model->courseAsTemplate = $selectionList['isTemplate'];
 
 $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
 ?>
-
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+    </div>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
+<div class="tab-content shadowBox" style="margin-top:30px">
 <div class="site-login">
     <fieldset>
-        <legend>Course Settings</legend>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-5 clear-both col-lg-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
+                'template' => "{label}\n<div class=\"col-sm-10\">{input}</div>\n<div class=\"clear-both col-sm-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-sm-2  text-align-left'],
             ],
         ]); ?>
-        <div class="form-label-alignment">
+
+
+        <div class="form-label-alignment" style="margin:20px 20px">
 
             <?= $form->field($model, 'courseName')->textInput(); ?>
             <?= $form->field($model, 'enrollmentKey')->textInput() ?>
@@ -80,6 +91,7 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
             <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
         </div>
     </div>
+</div>
 </div>
 
 <?php ActiveForm::end(); ?>

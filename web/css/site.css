@@ -153,9 +153,9 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 
 
 .ui-widget-header {
-    border: 0 !important;
+    border: 1px solid #aaaaaa !important;
     background: none !important;
-    background-color: #ffffff !important;
+    background-color: #003366 !important;
     color: #fff !important;
     font-weight: bold !important;
 }
