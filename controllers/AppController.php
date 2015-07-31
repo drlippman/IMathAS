@@ -682,4 +682,14 @@ function generaterandstring() {
     }
     return $pass;
 }
+
+   public function getSessionId(){
+       return Yii::$app->session->getId();
+   }
+
+    public function getSessionData($sessionId){
+        $session = Sessions::getById($sessionId);
+        return $session['sessiondata'];
+    }
+
 }
