@@ -20,8 +20,8 @@ class GbCats extends BaseImasGbcats
         $query = new Query();
         $query->select(['id', 'name', 'scale', 'scaletype', 'chop', 'dropn', 'weight', 'hidden', 'calctype'])
             ->from('imas_gbcats')
-            ->where(['courseid'=>$courseId]);
-//            ->orderBy('name');
+            ->where(['courseid'=>$courseId])
+            ->orderBy('name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -66,5 +66,16 @@ class GbCats extends BaseImasGbcats
         $query->hidden = $hide;
         $query->calctype = $calcType;
         $query->save();
+    }
+    public static function getByCourseIdAndOrderByName($courseId)
+    {
+        $query = new Query();
+        $query->select(['id', 'name'])
+            ->from('imas_gbcats')
+            ->where(['courseid'=>$courseId])
+            ->orderBy('name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 }

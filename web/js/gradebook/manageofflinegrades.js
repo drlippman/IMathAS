@@ -25,8 +25,7 @@ function deleteGrade() {
             markArray.push($(this).val());
         });
         if (markArray.length != 0) {
-            var html = '<div><p>Are you sure? This will delete your message from</p>' +
-                '<p>Inbox.</p></div>';
+            var html = '<div><p>Are you sure? This will delete your Grade.</p></div>';
             var cancelUrl = $(this).attr('href');
             e.preventDefault();
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({

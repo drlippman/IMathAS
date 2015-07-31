@@ -213,5 +213,9 @@ function teacherMakeException() {
         }
     });
 }
+function chgfilter() {
+    var ffilter = document.getElementById("ffilter").value;
+    window.location = tagfilterurl+'&ffilter='+ffilter;
+}
 
 

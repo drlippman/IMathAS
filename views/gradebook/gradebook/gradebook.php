@@ -314,8 +314,11 @@ $this->params['breadcrumbs'][] = $this->title;
             if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) {
                 echo "<input type=\"checkbox\" name='checked[]' value='{$gradebook[$i][4][0]}' />&nbsp;";
             }
-            echo "<a href=\"#\">";
-            if ($gradebook[$i][4][1] > 0) {
+            ?>
+            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
+
+                <?php
+                if ($gradebook[$i][4][1] > 0) {
                 echo '<span class="greystrike">' . $gradebook[$i][0][0] . '</span>';
             } else {
                 echo $gradebook[$i][0][0];

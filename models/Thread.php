@@ -53,8 +53,12 @@ class Thread extends BaseImasForumThreads
     public static function moveAndUpdateThread($forumId,$threadId)
     {
         $ForumPost = Thread::findOne(['id' => $threadId]);
-        $ForumPost->forumid = $forumId;
-        $ForumPost->save();
+        if($ForumPost){
+            $ForumPost->forumid = $forumId;
+            $ForumPost->save();
+        }
+
+
     }
     public static function getByForumId($forumId)
     {

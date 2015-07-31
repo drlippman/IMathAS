@@ -2,6 +2,7 @@
 namespace app\controllers\forum;
 
 use app\components\AppConstant;
+use app\components\AssessmentUtility;
 use app\models\Course;
 use app\models\ExternalTools;
 use app\models\forms\ChangeUserInfoForm;
@@ -1006,7 +1007,7 @@ class ForumController extends AppController
         $user = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $modifyForumId = $params['id'];
+        $modifyForumId = $params['modifyFid'];
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ZERO;
         foreach ($groupNames as $group) {
@@ -1069,119 +1070,7 @@ class ForumController extends AppController
             'eDate' => date("m-d-Y"),
             'eTime' => time("h-m-s"),
         );
-        if ($this->isPost()) {
-            $params = $this->getRequestParams();
-            if ($modifyForumId) {
-                $updateForum = new Forums();
-                $updateForum->UpdateForum($params, $modifyForumId);
-            } else {
-                $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
-                $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
-                $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
-                $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
-                $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
-                $finalArray['name'] = trim($params['title']);
-                if(empty($params['forum-description']))
-                {
-                    $params['forum-description'] = ' ';
-                }
-                $finalArray['description'] = trim($params['forum-description']);
-                $finalArray['courseid'] = $params['cid'];
-
-                $finalArray['settings'] = $settingValue;
-
-                if($params['avail'] == AppConstant::NUMERIC_ONE)
-                {
-                    if($params['available-after'] == AppConstant::NUMERIC_ZERO){
-
-                        $startDate = AppConstant::NUMERIC_ZERO;
-                    }
-                    if($params['available-until'] == AppConstant::ALWAYS_TIME){
-                        $endDate = AppConstant::ALWAYS_TIME;
-                    }
-                    $finalArray['startdate'] = $startDate;
-                    $finalArray['enddate'] = $endDate;
-                }else
-                {
-
-                    $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
-                    $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
-                }
-
-                $finalArray['sortby'] = $params['sort-thread'];
-                $finalArray['defdisplay'] = $params['default-display'];
-                if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
-                    $finalArray['postby'] = $replayPostDate;
-                }else{
-                $finalArray['postby'] = $params['reply-to-posts'];
-                }
-                if($params['new-thread'] == AppConstant::NUMERIC_ONE){
-
-                    $finalArray['replyby'] = $newThreadDate;
-                }else{
-                    $finalArray['replyby'] = $params['new-thread'];
-                }
-
-                if($params['count-in-gradebook'] != AppConstant::NUMERIC_ZERO){
-
-
-                    $finalArray['gbcategory'] = $params['gradebook-category'];
-                    $finalArray['points'] = $params['points'];
-                    $finalArray['tutoredit'] = $params['tutor-edit'];
-                    $finalArray['rubric'] = $params['rubric'];
-
-                    if($params['outcomes']){
-                        foreach ($params['outcomes'] as $outcomeId) {
-
-                            if (is_numeric($outcomeId) && $outcomeId > 0) {
-                                $outcomes[] = intval($outcomeId);
-                            }
-                        }
-                        $params['outcomes'] = implode(',',$outcomes);
-
-                    }
-                    $finalArray['outcomes'] = $params['outcomes'];
-                }else{
-                    $finalArray['gbcategory']  = 0;
-                    $finalArray['points'] = 0;
-                    $finalArray['tutoredit'] = 0;
-                    $finalArray['rubric'] = 0;
-                    $finalArray['outcomes'] = '';
-                }
-                    $finalArray['groupsetid'] = $params['groupsetid'];
-                $finalArray['cntingb'] = $params['count-in-gradebook'];
-                $finalArray['avail'] = $params['avail'];
-                $finalArray['forumtype'] = $params['forum-type'];
-                $finalArray['caltag'] = $params['calendar-icon-text1'].'--'.$params['calendar-icon-text2'];
-                $tagList = '';
-                if($params['categorize-posts'] == AppConstant::NUMERIC_ONE){
-                    $tagList = trim($params['taglist']);
-                }
-                $finalArray['taglist'] = $tagList;
-
-                $newForum = new Forums();
-                $forumId = $newForum->addNewForum($finalArray);
-                $itemType = 'Forum';
-                $itemId = new Items();
-                $lastItemId = $itemId->saveItems($courseId, $forumId, $itemType);
-                $subscriptionEntry = new ForumSubscriptions();
-                $subscriptionEntry->AddNewEntry($forumId, $user['id']);
-                $courseItemOrder = Course::getItemOrder($courseId);
-                $itemOrder = $courseItemOrder->itemorder;
-                $items = unserialize($itemOrder);
-                $blockTree = array(0);
-                $sub =& $items;
-                for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
-                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
-                }
-                array_unshift($sub, intval($lastItemId));
-                $itemOrder = serialize($items);
-                $saveItemOrderIntoCourse = new Course();
-                $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
-            }
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
-        }
-        if (isset($modifyForumId)) {
+        if ($modifyForumId) {
             $pageTitle = 'Modify Forum';
             $saveTitle = AppConstant::SAVE_BUTTON;
             $forumData = Forums::getById($modifyForumId);
@@ -1258,6 +1147,117 @@ class ForumController extends AppController
                 'points' => $forumData['points'],
                 'gbCat' => $forumData['gbcategory']
             );
+        }
+        if ($this->isPost()) {
+             if ($params['modifyFid']) {
+                $updateForum = new Forums();
+                $updateForum->UpdateForum($params);
+            } else {
+                $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
+                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+                $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
+                $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
+                $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
+                $finalArray['name'] = trim($params['title']);
+                if(empty($params['forum-description']))
+                {
+                    $params['forum-description'] = ' ';
+                }
+                $finalArray['description'] = trim($params['forum-description']);
+                $finalArray['courseid'] = $params['cid'];
+
+                $finalArray['settings'] = $settingValue;
+
+                if($params['avail'] == AppConstant::NUMERIC_ONE)
+                {
+                    if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                    }
+                    if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                        $endDate = AppConstant::ALWAYS_TIME;
+                    }
+                    $finalArray['startdate'] = $startDate;
+                    $finalArray['enddate'] = $endDate;
+                }else
+                {
+
+                    $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
+                    $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
+                }
+
+                $finalArray['sortby'] = $params['sort-thread'];
+                $finalArray['defdisplay'] = $params['default-display'];
+                if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
+                    $finalArray['postby'] = $replayPostDate;
+                }else{
+                    $finalArray['postby'] = $params['reply-to-posts'];
+                }
+                if($params['new-thread'] == AppConstant::NUMERIC_ONE){
+
+                    $finalArray['replyby'] = $newThreadDate;
+                }else{
+                    $finalArray['replyby'] = $params['new-thread'];
+                }
+
+                if($params['count-in-gradebook'] != AppConstant::NUMERIC_ZERO){
+
+
+                    $finalArray['gbcategory'] = $params['gradebook-category'];
+                    $finalArray['points'] = $params['points'];
+                    $finalArray['tutoredit'] = $params['tutor-edit'];
+                    $finalArray['rubric'] = $params['rubric'];
+
+                    if($params['outcomes']){
+                        foreach ($params['outcomes'] as $outcomeId) {
+
+                            if (is_numeric($outcomeId) && $outcomeId > 0) {
+                                $outcomes[] = intval($outcomeId);
+                            }
+                        }
+                        $params['outcomes'] = implode(',',$outcomes);
+
+                    }
+                    $finalArray['outcomes'] = $params['outcomes'];
+                }else{
+                    $finalArray['gbcategory']  = 0;
+                    $finalArray['points'] = 0;
+                    $finalArray['tutoredit'] = 0;
+                    $finalArray['rubric'] = 0;
+                    $finalArray['outcomes'] = '';
+                }
+                $finalArray['groupsetid'] = $params['groupsetid'];
+                $finalArray['cntingb'] = $params['count-in-gradebook'];
+                $finalArray['avail'] = $params['avail'];
+                $finalArray['forumtype'] = $params['forum-type'];
+                $finalArray['caltag'] = $params['calendar-icon-text1'].'--'.$params['calendar-icon-text2'];
+                $tagList = '';
+                if($params['categorize-posts'] == AppConstant::NUMERIC_ONE){
+                    $tagList = trim($params['taglist']);
+                }
+                $finalArray['taglist'] = $tagList;
+
+                $newForum = new Forums();
+                $forumId = $newForum->addNewForum($finalArray);
+                $itemType = 'Forum';
+                $itemId = new Items();
+                $lastItemId = $itemId->saveItems($courseId, $forumId, $itemType);
+                $subscriptionEntry = new ForumSubscriptions();
+                $subscriptionEntry->AddNewEntry($forumId, $user['id']);
+                $courseItemOrder = Course::getItemOrder($courseId);
+                $itemOrder = $courseItemOrder->itemorder;
+                $items = unserialize($itemOrder);
+                $blockTree = array(0);
+                $sub =& $items;
+                for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
+                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
+                }
+                array_unshift($sub, intval($lastItemId));
+                $itemOrder = serialize($items);
+                $saveItemOrderIntoCourse = new Course();
+                $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
+            }
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
             $this->includeJS(["forum/addforum.js","editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
             $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,

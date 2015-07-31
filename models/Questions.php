@@ -81,4 +81,10 @@ class Questions extends BaseImasQuestions
         $this->save();
         return $this->id;
     }
+    public static function findQuestionForGradebook($assessmentId)
+    {
+        $query = Questions::find()->select('points,id')->where(['assessmentid' =>$assessmentId])->all();
+        return $query;
+
+    }
 } 

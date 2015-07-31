@@ -11,9 +11,9 @@ use app\components\AppUtility;
             <li class="master-tabs"><a class="grey-color-link" href = "<?php echo AppUtility::getURLFromHome('course/course', 'index?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/course.png"/><?php AppUtility::t(' Course'); ?></a></li>
             <?php } ?>
             <?php if($section == 'gradebook'){ ?>
-            <li class="active master-tabs"><a class="grey-color-link"  href = "#"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><?php AppUtility::t(' Gradebook'); ?></a></li>
+            <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' .$course->id);?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><?php AppUtility::t(' Gradebook'); ?></a></li>
             <?php } else { ?>
-            <li class="master-tabs"><a class="grey-color-link"  href = "#"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><?php AppUtility::t(' Gradebook'); ?></a></li>
+            <li class="master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' .$course->id);?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/gradbook.png"/><?php AppUtility::t(' Gradebook'); ?></a></li>
             <?php } ?>
             <?php if($section == 'calendar'){ ?>
             <li class="active master-tabs"><a class="grey-color-link"  href = "<?php echo AppUtility::getURLFromHome('course/course', 'calendar?cid='.$course->id); ?>"><img class="nav-course-icon" src="<?php echo AppUtility::getAssetURL()?>img/iconCalendar.png"/><?php AppUtility::t(' Calendar'); ?></a></li>

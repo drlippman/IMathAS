@@ -17,18 +17,15 @@ class Rubrics extends BaseImasRubrics
 
     public function createNewEntry($params,$currentUserId,$rubricTextDataArray)
     {
-//        AppUtility::dump($rubricTextDataArray);
         $this->ownerid = $currentUserId;
-        $this->groupid = ($params['AddRubricForm']['ShareWithGroup']-AppConstant::NUMERIC_ONE);
-//        $this->name = isset() ? $params['AddRubricForm']['Name'] : null;
+        $this->groupid = ($params['ShareWithGroup']-AppConstant::NUMERIC_ONE);
         if($params['AddRubricForm']['Name']){
             $this->name =  $params['AddRubricForm']['Name'];
         }else{
             $this->name ='null';
         }
-        $this->rubrictype = $params['AddRubricForm']['RubricType'];
+        $this->rubrictype = $params['rubtype'];
         $this->rubric = $rubricTextDataArray;
-//        AppUtility::dump($this);
         $this->save();
     }
     public static function getByUserIdAndRubricId($currentUserId,$rubricId)
@@ -58,5 +55,26 @@ class Rubrics extends BaseImasRubrics
     public static function getByUserIdAndGroupIdAndRubric($rubric,$userid,$groupid){
         $rubricsData = Rubrics::find()->where(['rubric'=> $rubric])->andWhere('ownerid = :ownerid',[':ownerid' => $userid] or ['groupid = :groupid',':groupid' => $groupid])->all();
         return $rubricsData;
+    }
+    public static function updateRubrics($params, $currentUserId, $rubricTextDataArray,$rubricId)
+    {
+
+        $rubricsData = Rubrics::find()->where(['ownerid' => $currentUserId])->Andwhere(['id' => $rubricId])->one();
+        $ShareWithGroup = -1;
+        if(isset($params['ShareWithGroup'])){
+
+            $ShareWithGroup = 0;
+        }
+        $rubricsData ->groupid = $ShareWithGroup;
+        if($params['AddRubricForm']['Name']){
+            $rubricsData ->name =  $params['AddRubricForm']['Name'];
+        }else{
+            $rubricsData ->name ='null';
+        }
+        $rubricsData ->rubrictype = $params['rubtype'];
+        $rubricsData ->rubric = $rubricTextDataArray;
+
+        $rubricsData ->save();
+
     }
 }

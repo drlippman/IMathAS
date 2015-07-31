@@ -108,7 +108,7 @@ class Forums extends BaseImasForums {
             $forum->delete();
         }
     }
-    public function updateForum($params,$forumId)
+    public function updateForum($params)
     {
 
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
@@ -117,7 +117,7 @@ class Forums extends BaseImasForums {
         $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
 
-        $updateForumData = Forums::findOne(['id' => $forumId]);
+        $updateForumData = Forums::findOne(['id' => $params['modifyFid']]);
         $updateForumData->name = trim($params['title']);
 
         if(empty($params['forum-description']))

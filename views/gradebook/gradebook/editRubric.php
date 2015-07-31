@@ -1,7 +1,6 @@
 <?php
 use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
-//  \app\components\AppUtility::dump($rubicData);
 ?>
 <fieldset xmlns="http://www.w3.org/1999/html">
     <legend>Edit Rubrics</legend>
@@ -13,7 +12,7 @@ use app\components\AppUtility;
             'labelOptions' => ['class' => 'col-lg-3 select-text-margin'],
         ],
     ]); ?>
-    Select a rubric to edit or <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric') ?>" >Add new rubric</a>
+    Select a rubric to edit or <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$course->id) ?>" >Add new rubric</a>
 <table >
     <thead>
     <tr>
@@ -25,11 +24,10 @@ use app\components\AppUtility;
     <tbody>
 
     <?php
-    foreach($rubicData as $singleStudentInformation){ ?>
+    foreach($rubicData as $singleRubricInformation){ ?>
         <tr>
-<!--            --><?php //\app\components\AppUtility::dump(); ?>
-            <td><pre><?php echo $singleStudentInformation['name']?></pre></td>
-            <td><pre><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?rubricId='.$singleStudentInformation['id']) ?>">Edit</a></pre></td>
+            <td><pre><?php echo $singleRubricInformation['name']?></pre></td>
+            <td><pre><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid='.$course->id.'&rubricId='.$singleRubricInformation['id']) ?>">Edit</a></pre></td>
         </tr>
     <?php }?>
     <tbody>

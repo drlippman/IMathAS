@@ -245,4 +245,24 @@ class Assessments extends BaseImasAssessments
             $assessmentData->itemorder = $itemOrder;
         }
     }
+    public static function findOneAssessmentDataForGradebook($courseId,$istutor, $isteacher, $catfilter){
+        $query = new Query();
+        $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
+            ->from('imas_assessments')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['>', 'avail', 0]);
+        if($istutor){
+            $query->andWhere(['<', 'tutoredit', 2]);
+        }
+        if(!$isteacher){
+//            $query->andWhere(['<', 'startdate', $time]);
+        }
+        if($catfilter > -1){
+            $query->andWhere(['gbcategory' => $catfilter]);
+        }
+        $query->orderBy('enddate, name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }
