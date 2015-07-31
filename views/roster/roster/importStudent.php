@@ -37,7 +37,7 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
                 'labelOptions' => ['class' => 'col-sm-3  text-align-left'],
             ],
         ]); ?>
-        <div class="text-label"><?php echo "Register and enroll students from a CSV (comma separated values) file"?></div>
+        <div class="text-label"><?php echo AppUtility::t("Register and enroll students from a CSV (comma separated values) file", false)?></div>
         <?php echo $form->field($model, 'file')->fileInput(); ?>
         <?php echo $form->field($model, 'headerRow')->radioList([AppConstant::NUMERIC_ONE => 'Yes',AppConstant::NUMERIC_ZERO=>'No']); ?>
         <?php echo $form->field($model, 'firstName')->textInput(); ?>
@@ -52,8 +52,8 @@ $model->sectionValue = AppConstant::ZERO_VALUE;
     </fieldset>
     <div class="form-group">
         <div class="col-sm-offset-3 roster-submit">
-            <?php echo Html::submitButton('Submit and Review', ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <?php echo Html::submitButton(AppUtility::t('Submit and Review', false), ['class' => 'btn btn-primary', 'id' => 'submit_and_review', 'name' => 'Submit']) ?>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
         </div>
     </div>
 <?php ActiveForm::end(); ?>

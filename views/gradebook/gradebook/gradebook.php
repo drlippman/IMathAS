@@ -319,10 +319,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?php
                 if ($gradebook[$i][4][1] > 0) {
-                echo '<span class="greystrike">' . $gradebook[$i][0][0] . '</span>';
-            } else {
-                echo $gradebook[$i][0][0];
-            }
+                    echo '<span class="greystrike">' . $gradebook[$i][0][0] . '</span>';
+                } else {
+                    echo $gradebook[$i][0][0];
+                }
             echo '</a>';
             if ($gradebook[$i][4][3] == 1) {
                 echo '<sup>*</sup>';

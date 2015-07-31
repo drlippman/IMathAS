@@ -242,13 +242,13 @@ echo $lpmsg;
             if ($studentId>0 && $isteacher) {
 ?>
             <th><?php AppUtility::t('Time Spent (In Questions)');?></th>
-  <?          $sarr = "false,'S','N','N','N','N'";
+            <?php $sarr = "false,'S','N','N','N','N'";
             if ($includelastchange) { ?>
              <th> <?php AppUtility::t('Last Changed');?></th>
            <?php $sarr .= ",'D'";
             }
             if ($includeduedate) {
-            echo '<th>',AppUtility::t('Due Date'),'</th>';
+            echo '<th>',AppUtility::t('Due Date', false),'</th>';
             $sarr .= ",'D'";
             }
             } else {

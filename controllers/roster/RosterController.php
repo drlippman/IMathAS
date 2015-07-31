@@ -972,6 +972,7 @@ class RosterController extends AppController
     {
         $isGradebook = null;
         $this->guestUserHandler();
+        $this->layout = "master";
         if ($this->getRequestParams()) {
             $data = $this->getRequestParams();
             $isGradebook = $data['gradebook'];
@@ -1086,12 +1087,12 @@ class RosterController extends AppController
                     $exceptionArray = $this->createExceptionList($studentArray, $assessments);
                     $latePassMsg = $this->findLatepassMsg($studentArray, $courseId);
                 }
-
                 $sort_by = array_column($exceptionArray, 'Name');
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $exceptionArray);
                 $sort_by = array_column($studentArray, 'LastName');
                 array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
             }
+            $this->includeCSS(['roster/roster.css']);
             $this->includeJS(['roster/makeException.js']);
             $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'existingExceptions' => $exceptionArray, 'section' => $section, 'latePassMsg' => $latePassMsg, 'gradebook' =>  $isGradebook);
             if(count($studentArray) > AppConstant::NUMERIC_ZERO){

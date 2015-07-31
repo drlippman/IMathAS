@@ -40,7 +40,9 @@ class ChangeUserInfoForm extends Model
     public function rules()
     {
         return [
-            [['FirstName', 'LastName', 'email'], 'required'],
+            [['email'], 'required', 'message' => AppUtility::t('email field cannot be blank', false)],
+            [['LastName'], 'required', 'message' => AppUtility::t('Last name field cannot be blank', false)],
+            [['FirstName'], 'required', 'message' => AppUtility::t('First name field cannot be blank', false)],
             ['rePassword', 'compare', 'compareAttribute'=>'password'],
             [['FirstName', 'LastName','oldPassword'], 'string'],
             ['email','email'],
@@ -57,25 +59,25 @@ class ChangeUserInfoForm extends Model
     public function attributeLabels()
     {
         return [
-            'oldPassword' => 'Old Password',
-            'password' => 'Change Password',
-            'rePassword'=>'Confirm Password',
-            'changePassword'=>'Click here to change password',
-            'FirstName' => 'Enter First Name',
-            'LastName' => 'Enter Last Name',
-            'email' => ' Enter Email',
-            'SID' => 'Enter User Name (login name)',
-            'NotifyMeByEmailWhenIReceiveANewMessage'=>'Notify me by email when I receive a new message',
-            'file'=>'Picture',
-            'message'=>'Messages/Posts per page',
-            'homepage'=>'Show on home page',
-            'remove' => 'Remove',
-            'section' => 'Section(optional)',
-            'code' => 'Code(optional)',
-            'timelimitmult' =>'Time Limit Multiplier',
-            'locked' => 'Lock out of course?',
-            'hidefromcourselist' =>'Student has course hidden from course list?',
-            'ispasswordchange' => 'Reset Password',
+            'oldPassword' => AppUtility::t('Old Password', false),
+            'password' => AppUtility::t('Change Password', false),
+            'rePassword'=>AppUtility::t('Confirm Password', false),
+            'changePassword'=>AppUtility::t('Click here to change password', false),
+            'FirstName' => AppUtility::t('Enter First Name', false),
+            'LastName' => AppUtility::t('Enter Last Name', false),
+            'email' => AppUtility::t('Enter Email', false),
+            'SID' => AppUtility::t('Enter User Name (login name)', false),
+            'NotifyMeByEmailWhenIReceiveANewMessage'=>AppUtility::t('Notify me by email when I receive a new message', false),
+            'file'=>AppUtility::t('Picture', false),
+            'message'=> AppUtility::t('Messages/Posts per page', false),
+            'homepage'=>AppUtility::t('Show on home page', false),
+            'remove' => AppUtility::t('Remove', false),
+            'section' => AppUtility::t('Section(optional)', false),
+            'code' => AppUtility::t('Code(optional)', false),
+            'timelimitmult' => AppUtility::t('Time Limit Multiplier', false),
+            'locked' => AppUtility::t('Lock out of course?', false),
+            'hidefromcourselist' => AppUtility::t('Student has course hidden from course list?', false),
+            'ispasswordchange' => AppUtility::t('Reset Password', false),
         ];
     }
 
@@ -84,19 +86,19 @@ class ChangeUserInfoForm extends Model
             if($this->changePassword)
             {
                 if(!$this->oldPassword)
-                    return  $this->addError('oldPassword', 'Old password is required.');
+                    return  $this->addError('oldPassword', AppUtility::t('Old password is required.', false));
                 if(!$this->password)
-                    return  $this->addError('password', 'Password is required.');
+                    return  $this->addError('password', AppUtility::t('Password is required.', false));
                 if(!($this->password == $this->rePassword))
                 {
-                    $this->addError('rePassword', 'Password did not matched with re-password.');
+                    $this->addError('rePassword', AppUtility::t('Password did not matched with re-password.', false));
                     return false;
                 }
 
                 $user_password = Yii::$app->user->identity->password;
                 if(!(AppUtility::verifyPassword($this->oldPassword, $user_password)))
                 {
-                  $this->addError('invalid', 'Old password did not matched.');
+                  $this->addError('invalid', AppUtility::t('Old password did not matched.', false));
                     return false;
                 }
             }

@@ -29,13 +29,13 @@ class ImportStudentForm extends Model
     public function rules()
     {
         return [
-            [['lastName'],'required','message' => 'Last name field cannot be blank'],
-            [['firstName'],'required','message' => 'First name field cannot be blank'],
-            [['emailAddress'],'required','message' => 'Email field cannot be blank'],
-            [['lastName'],'number','message' => 'Last name is in column  must be integer value'],
-            [['firstName'],'number','message' => 'First name is in column  must be integer value'],
-            [['emailAddress'],'number','message' => 'Email address is in column  must be integer value'],
-            ['file', 'required', 'message' => 'Upload the CSV file'],
+            [['lastName'],'required','message' => AppUtility::t('Last name field cannot be blank', false)],
+            [['firstName'],'required','message' => AppUtility::t('First name field cannot be blank', false)],
+            [['emailAddress'],'required','message' => AppUtility::t('Email field cannot be blank', false)],
+            [['lastName'],'number','message' => AppUtility::t('Last name is in column  must be integer value', false)],
+            [['firstName'],'number','message' => AppUtility::t('First name is in column  must be integer value', false)],
+            [['emailAddress'],'number','message' => AppUtility::t('Email address is in column  must be integer value', false)],
+            ['file', 'required', 'message' => AppUtility::t('Upload the CSV file', false)],
             ['file', 'safe'],
             [['file'], 'file', 'extensions' => 'csv'],
         ];
@@ -44,18 +44,18 @@ class ImportStudentForm extends Model
     public function attributeLabels()
     {
         return [
-            'file' => 'Import File',
-            'headerRow' => 'File contains a header row',
-            'firstName' => 'First name is in column',
-            'nameFirstColumn' => 'In that column, first name is',
-            'lastName' => 'Last name is in column',
-            'nameLastColumn' => 'In that column, last name is',
-            'emailAddress' => 'Email address is in column:Enter 0 if no email column',
-            'userName' => 'Does a column contain a desired username:',
-            'setPassword' => 'Set password to',
-            'codeNumber' => 'Assign code number?',
-            'sectionValue' => 'Assign section value?',
-            'enrollStudent' => 'Enroll students in',
+            'file' => AppUtility::t('Import File', false),
+            'headerRow' => AppUtility::t('File contains a header row', false),
+            'firstName' => AppUtility::t('First name is in column', false),
+            'nameFirstColumn' => AppUtility::t('In that column, first name is', false),
+            'lastName' => AppUtility::t('Last name is in column', false),
+            'nameLastColumn' => AppUtility::t('In that column, last name is', false),
+            'emailAddress' => AppUtility::t('Email address is in column:Enter 0 if no email column', false),
+            'userName' => AppUtility::t('Does a column contain a desired username:', false),
+            'setPassword' => AppUtility::t('Set password to', false),
+            'codeNumber' => AppUtility::t('Assign code number?', false),
+            'sectionValue' => AppUtility::t('Assign section value?', false),
+            'enrollStudent' => AppUtility::t('Enroll students in', false),
         ];
     }
 }

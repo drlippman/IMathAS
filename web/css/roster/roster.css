@@ -210,3 +210,41 @@ div.dataTables_info {
     padding-left: 15px;
     padding-right: 15px;
 }
+.name{
+    margin-top: 0px;
+}
+.margin-5{
+    margin-top: 5px;
+}
+div.items-list > div > ul > li > ul {
+    list-style-type: none;
+    margin-top: 10px;
+}
+.items-list{
+    background: #fafafa;
+    padding: 15px;
+}
+.cr.margin-bottom{
+    margin-bottom: 7px;
+}
+.alert.alert-margin-bottom{
+    margin-bottom: 0px;
+}
+span.form.select-text-margin{
+    padding-top: 0;
+    padding-right: 5px;
+}
+
+.padding-left-right{
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.items-list > ul > li{
+    list-style-type: none;
+}
+.padding-top-five{
+    padding-top: 5px;
+}
+.radio label.padding-left-zero, .checkbox label.padding-left-zero{
+    padding-left: 0;
+}

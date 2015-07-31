@@ -3,9 +3,6 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\widgets\FileInput;
 use app\components\AppUtility;
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\changeUserInfoForm */
 $this->title = AppUtility::t('Change student Information', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -51,49 +48,49 @@ $this->params['breadcrumbs'][] = $this->title;
                 'labelOptions' => ['class' => 'col-sm-3 select-text-margin'],
             ],
         ]); ?>
-        <?= $form->field($model, 'SID')->textInput(); ?>
+        <?php echo $form->field($model, 'SID')->textInput(); ?>
 
-        <?= $form->field($model, 'FirstName')->textInput(); ?>
+        <?php echo $form->field($model, 'FirstName')->textInput(); ?>
 
-        <?= $form->field($model, 'LastName')->textInput() ?>
+        <?php echo $form->field($model, 'LastName')->textInput() ?>
 
-                <?= $form->field($model, 'email') ?>
+        <?php echo $form->field($model, 'email') ?>
         <br>
         <div class="col-sm-offset-3 user-image">
             <?php
             if($user['hasuserimg']==0)
             {?>
-                <img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg" width="150" alt="file not found" /><br><br>
+                <img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg" width="150" alt="<?php echo AppUtility::t('file not found')?>" /><br><br>
                 <?php
-                echo "Upload profile picture";
+                echo AppUtility::t("Upload profile picture");
             }
             else
             {?>
-                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" width="150" alt="file not found" /></br>
+                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" width="150" alt="<?php echo AppUtility::t('file not found')?>" /></br>
                  <div class="update-checkbox">
-                <?= $form->field($model, 'remove')->checkbox() ?>
+                  <?php echo $form->field($model, 'remove')->checkbox() ?>
             </div>
            <?php }?>
         </div>
-        <?= $form->field($model, 'file')->fileInput() ?>
-        <?= $form->field($model, 'section')->textInput(); ?>
-        <?= $form->field($model, 'code')->textInput(); ?>
-        <?= $form->field($model, 'timelimitmult')->textInput(); ?>
+        <?php echo $form->field($model, 'file')->fileInput() ?>
+        <?php echo $form->field($model, 'section')->textInput(); ?>
+        <?php echo $form->field($model, 'code')->textInput(); ?>
+        <?php echo $form->field($model, 'timelimitmult')->textInput(); ?>
         <div class="col-sm-offset-3 div-change-student-info" >
-        <?= $form->field($model, 'locked')->checkbox(); ?>
-        <?= $form->field($model, 'hidefromcourselist')->checkbox(); ?>
+            <?php echo $form->field($model, 'locked')->checkbox(); ?>
+            <?php echo $form->field($model, 'hidefromcourselist')->checkbox(); ?>
         </div>
         <div class="col-sm-offset-3 password_checkbox">
-            <?= $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
+            <?php echo $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
         <div class="change-password-content">
-            <?= $form->field($model, 'password')->textInput(); ?>
+            <?php echo $form->field($model, 'password')->textInput(); ?>
          </div>
     </fieldset>
      <div class="form-group">
         <div class=" col-sm-9 col-sm-offset-3 display_field">
-            <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-            <a class="btn btn-primary back-button-change-student-info"  href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$courseId) ?>">Back</a>
+            <?php echo Html::submitButton(AppUtility::t('Save', false), ['class' => 'btn btn-primary col-sm-1', 'name' => 'login-button']) ?>
+            <a class="btn btn-primary back-button-change-student-info col-sm-1"  href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$courseId) ?>"><?php echo AppUtility::t('Back')?></a>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
