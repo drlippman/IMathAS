@@ -1003,6 +1003,7 @@ class ForumController extends AppController
     public function actionAddForum()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
@@ -1260,6 +1261,7 @@ class ForumController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
             $this->includeJS(["forum/addforum.js","editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+            $this->includeCSS(['course/items.css']);
             $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
             'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
                 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);

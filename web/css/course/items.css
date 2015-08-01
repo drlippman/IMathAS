@@ -17,3 +17,35 @@ label.inline-checkbox{
 .radio label, .checkbox label{
     padding: 0;
 }
+.name-of-item{
+    padding-top: 20px
+}
+.non-nav-tab-item{
+    margin-top:30px
+}
+.editor-summary{
+    margin-top: 20px
+}
+.input-item-title{
+    width: 100%;
+    height: 40px;
+    border: #a9a9a9 1px solid;
+}
+.textarea-width{
+    width: 100%;
+}
+.visibility-item{
+    margin-top: 20px
+}
+.youtube-video{
+    margin-top: 20px;
+}
+.radio label.label-visible, .checkbox label.label-visible {
+    padding-left: 0;
+}
+.group-wiki{
+    padding-top: 15px;
+}
+.item-alignment{
+    padding-top: 20px;
+}

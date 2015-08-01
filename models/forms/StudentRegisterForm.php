@@ -2,6 +2,7 @@
 
 namespace app\models\forms;
 
+use app\components\AppUtility;
 use Yii;
 use yii\base\Model;
 
@@ -35,7 +36,6 @@ class StudentRegisterForm extends Model
             [['FirstName', 'LastName'], 'string'],
             ['email', 'email','message' => 'Enter a valid email address.'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
-            /*[['NotifyMeByEmailWhenIReceiveANewMessage'],'requiredValue' => 1, 'message' => 'ghg'],*/
             [['courseID', 'EnrollmentKey'], 'string'],
         ];
 
@@ -47,15 +47,15 @@ class StudentRegisterForm extends Model
     public function attributeLabels()
     {
         return [
-            'SID' => 'Enter username',
-            'password' => 'Password',
-            'rePassword' => 'Confirm password',
-            'FirstName' => 'First name',
-            'LastName' => 'Last name',
-            'email' => 'Email',
-            'CourseId' => 'Course Id',
-            'EnrollmentKey' => 'Enrollment Key',
-            'NotifyMeByEmailWhenIReceiveANewMessage' => 'Notify me by email when I receive a new message'
+            'SID' => AppUtility::t('Enter username', false),
+            'password' => AppUtility::t('Password', false),
+            'rePassword' => AppUtility::t('Confirm password', false),
+            'FirstName' => AppUtility::t('First name', false),
+            'LastName' => AppUtility::t('Last name', false),
+            'email' => AppUtility::t('Email', false),
+            'CourseId' => AppUtility::t('Course Id', false),
+            'EnrollmentKey' => AppUtility::t('Enrollment Key', false),
+            'NotifyMeByEmailWhenIReceiveANewMessage' => AppUtility::t('Notify me by email when I receive a new message', false)
         ];
     }
 }

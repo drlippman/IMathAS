@@ -39,7 +39,7 @@ $(document).ready(function(){
                                 '<div class="item-name">Calendar</div>'+
                             '</div></a>' +
 
-                            '<a href="../../block/block/add-block?cid='+ courseId+'"><div class="block-item">' +
+                            '<a href="../../block/block/add-block?courseId='+ courseId+'&block='+block+'&tb='+tb+'"><div class="block-item">' +
                                 '<img class="icon-center icon-size" src="../../img/block.png">' +
                                 '<div class="item-name-small">Block</div>'+
                             '</div></a>' +

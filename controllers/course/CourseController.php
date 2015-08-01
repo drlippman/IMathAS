@@ -256,6 +256,7 @@ class CourseController extends AppController
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $model = new CourseSettingForm();
         if ($model->load($this->getPostData())) {
             $isSuccess = false;
@@ -811,7 +812,7 @@ class CourseController extends AppController
                 'endDate' => $endDate,
             );
         }
-        $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js" , "editor/tiny_mce_src.js", "general.js"]);
+        $this->includeJS(["editor/tiny_mce.js" , "editor/tiny_mce_src.js", "general.js", 'editor.js']);
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'saveTitle' => $saveTitle,'inlineText' => $inlineText, 'pageTitle' => $pageTitle,'defaultValue' => $defaultValue);
         return $this->renderWithData('modifyInlineText', $responseData);

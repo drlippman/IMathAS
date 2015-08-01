@@ -21,6 +21,7 @@ class BlockController extends AppController
 
     public function actionAddBlock()
     {
+
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);

@@ -290,3 +290,6 @@ body {
     height: 24px;
     width: 24px;
 }
+.header-right-btn{
+    padding-right:6px;
+}
