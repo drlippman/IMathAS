@@ -5,39 +5,42 @@ $(document).ready(function () {
     });
     $("#addNewThread").click(function()
     {
+        var file_data = $('#newfile-0').prop('files')[0];
+        var form_data = new FormData();
+        form_data.append('file', file_data);
         tinyMCE.triggerSave();
-            var forumId = $("#forumId").val();
-            var subject = $(".subject").val();
-            if(!subject.length > 0)
-            {
-                $('#flash-message').show();
-                $(".subject").css('border-color', 'red');
-                $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank");
+        var forumId = $("#forumId").val();
+        var subject = $(".subject").val();
+        if(!subject.length > 0)
+        {
+            $('#flash-message').show();
+            $(".subject").css('border-color', 'red');
+            $('#flash-message').html("<div class='alert alert-danger'>Subject cannot be blank");
+        }
+        else
+        {
+            document.getElementById("addNewThread").disabled = 'true';
+            var date = $( "#datepicker-id input" ).val();
+            var time = $("#w1").val();
+            var postType = "";
+            var selected = $("#post-type-radio-list input[type='radio']:checked");
+            if (selected.length > 0) {
+                postType = selected.val();
             }
-            else
-            {
-                document.getElementById("addNewThread").disabled = 'true';
-                var date = $( "#datepicker-id input" ).val();
-                var time = $("#w1").val();
-                var postType = "";
-                var selected = $("#post-type-radio-list input[type='radio']:checked");
-                if (selected.length > 0) {
-                    postType = selected.val();
-                }
-                var alwaysReplies = "";
-                var selected = $("#always-replies-radio-list input[type='radio']:checked");
-                if (selected.length > 0) {
-                    alwaysReplies = selected.val();
-                }
-                var body = $("#message").val();
-                var settings = 0;
-                var status = $('#post-anonymously').is(':checked');
-                if(status == true){
-                    settings = 1;
-                }
-                var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings };
-                jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
+            var alwaysReplies = "";
+            var selected = $("#always-replies-radio-list input[type='radio']:checked");
+            if (selected.length > 0) {
+                alwaysReplies = selected.val();
             }
+            var body = $("#message").val();
+            var settings = 0;
+            var status = $('#post-anonymously').is(':checked');
+            if(status == true){
+                settings = 1;
+            }
+            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings,form_data:form_data };
+            jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
+        }
     });
     $("input").keypress(function(e){
         var subject = $(".subject").val();
@@ -57,6 +60,7 @@ $(document).ready(function () {
     });
 });
 
+
 function newThreadSuccess(response)
 {
     var forumId = $("#forumId").val();
@@ -68,4 +72,12 @@ function newThreadSuccess(response)
 
         window.location = "thread?cid="+courseId+"&forumid="+forumId;
     }
+}
+
+var filecnt = 1;
+function addnewfile(t) {
+    var s = document.createElement("span");
+    s.innerHTML ="Description:<br/><input type='text' size=0 style='width: 30%;height: 30px; border: #6d6d6d 1px solid;' name='newfiledesc-\"+filecnt+\"' value='' class='subject'><br/>File: <input type='file' name='newfile-\"+filecnt+\"' /><br/>";
+    t.parentNode.insertBefore(s,t);
+    filecnt++;
 }

@@ -3,6 +3,8 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AppUtility;
 use app\components\AppConstant;
+use yii\widgets\ActiveForm;
+
 $this->title = AppUtility::t('Add New Thread',false);
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -45,6 +47,9 @@ $now = $currentTime;
             </div>
         </div>
     </div>
+    <?php if($forumData['forumtype'] == 1){?>
+
+    <?php }?>
     <?php if($rights > 10)
     {?>
         <div >
@@ -112,4 +117,5 @@ $now = $currentTime;
         </div>
     <?php } ?>
 </div>
+
 

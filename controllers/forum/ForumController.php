@@ -458,7 +458,7 @@ class ForumController extends AppController
             }
         }
         $this->setReferrer();
-        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser,'threadCreatedUserData' => $threadCreatedUserData,'forumData' => $forumData);
+        $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser,'threadCreatedUserData' => $threadCreatedUserData,'forumData' => $forumData,'forumPostData' => $forumPostData );
         return $this->renderWithData('modifyPost', $responseData);
     }
     /*
@@ -689,6 +689,7 @@ class ForumController extends AppController
     public function actionAddNewThread()
     {
         $this->layout = 'master';
+//        AppUtility::dump("asdadasd");
         $user = $this->getAuthenticatedUser();
         $userId = $this->getUserId();
         $rights = $user->rights;
@@ -698,7 +699,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
+        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights,'model' => $model);
         return $this->renderWithData('addNewThread', $responseData);
     }
     /*
@@ -708,6 +709,7 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
             $params = $this->getRequestParams();
+        AppUtility::dump($params);
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
             $isNonValue = AppConstant::NUMERIC_ZERO;

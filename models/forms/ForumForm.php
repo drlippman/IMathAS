@@ -5,18 +5,21 @@ use app\components\AppUtility;
 use yii\base\Model;
 use Yii;
 use yii\db\Query;
+use yii\web\UploadedFile;
 
 class ForumForm extends Model
 {
     public $search;
     public $thread;
     public $post;
+    public $file;
 
     public function rules()
     {
         return
             [
-                [['search'],'required']
+                [['search'],'required'],
+                [['file'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg', 'maxFiles' => 4]
             ];
     }
 

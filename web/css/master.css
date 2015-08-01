@@ -281,7 +281,6 @@ body {
     font-size: 30px;
 }
 
-
 .navbar-inverse .notification > .open > a, .navbar-inverse .notification > .open > a:hover, .navbar-inverse .notification > .open > a:focus {
     color: #fff;
     background-color: #008E43;
@@ -290,6 +289,7 @@ body {
     height: 24px;
     width: 24px;
 }
+
 .header-right-btn{
     padding-right:6px;
 }

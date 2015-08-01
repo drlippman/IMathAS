@@ -17,5 +17,13 @@ $(document).ready(function () {
 
     });
 });
+var filecnt = 1;
+function addnewfile(t) {
+    var s = document.createElement("span");
+    s.innerHTML ="Description:<br/><input type='text' size=0 style='width: 30%;height: 30px; border: #6d6d6d 1px solid;' name='newfiledesc-\"+filecnt+\"' value='' class='subject'><br/>File: <input type='file' name='newfile-\"+filecnt+\"' /><br/>";
+    t.parentNode.insertBefore(s,t);
+    filecnt++;
+}
+
 
 

@@ -26,7 +26,7 @@ $(document).ready(function ()
                     $('#display').hide();
                     $('#search-post').hide();
                     $('#result').hide();
-                    jQuerySubmit('get-forum-name-ajax',{search: search, cid: courseId , value: selected},'threadSuccess');
+                    jQuerySubmit('get-forum-name-ajax',{search: search, courseId: courseId , value: selected},'threadSuccess');
                 }
                 else if(selected == 1)
                 {

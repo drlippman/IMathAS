@@ -15,7 +15,9 @@ if ($currentUser->rights > AppConstant::STUDENT_RIGHT) {
 }
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid=' . $course->id . '&forumid=' . $forumId]];
-$this->params['breadcrumbs'][] = $this->title; ?>
+$this->params['breadcrumbs'][] = $this->title;
+?>
+
 <div>
     <h2><b>Modify Post</b></h2>
     <br><br><br>
@@ -41,7 +43,23 @@ $this->params['breadcrumbs'][] = $this->title; ?>
             echo "</textarea></div></span><br>"; ?>
         </div>
         <br class=form><br class=form>
-
+<!--        --><?php //if($forumData['forumtype'] == 1){?>
+<!--        --><?php // echo "<span class=form>Files:</span>";
+//        echo "<span class=formright>";?>
+<!--            --><?php //if($forumPostData[0]['files']!= ''){
+//            $files = explode('@@',$forumPostData[0]['files']);
+//                for($i=0;$i<count($files)/2;$i++){
+//                    echo '<input type="text" name="filedesc['.$i.']" value="'.$files[2*$i].'"/>';
+//                    echo '<a href="'.getuserfileurl('ffiles/'.$_GET['modify'].'/'.$files[2*$i+1]).'" target="_blank">View</a> ';
+//                    echo 'Delete? <input type="checkbox" name="filedel['.$i.']" value="1"/><br/>';
+//                }
+//            }?>
+<!--            <div style="margin-left: 18%">-->
+<!--                Description:<br/><input type=text size=0 style="width: 30%;height: 30px; border: #6d6d6d 1px solid;" name=newfiledesc-0 value="" class="subject"><br/>-->
+<!--                File:<input type="file" name="newfile-0" style="width: 200px" /><br/>-->
+<!--                <a href="#" onclick="addnewfile(this);return false;"><i class="fa fa-plus-circle"></i>&nbsp;Add another file</a>-->
+<!--            </div>-->
+<!--        --><?php //}?>
 
             <?php if ($threadCreatedUserData['rights'] > 10)
             {

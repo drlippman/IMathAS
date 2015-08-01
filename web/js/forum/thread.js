@@ -308,7 +308,7 @@ function threadSuccess(response)
                         else
                         {
                             html += "<td><div class='btn-group'> <a class='btn btn-primary flag-btn disable-btn-not-allowed'>"+
-                                " -</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down '></span></a>" +
+                                " No Flag</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down '></span></a>" +
                                 "<ul class='dropdown-menu'>";
                             if(thread.userright > 10) {
                                 html+="<li><a href='move-thread?forumId=" + thread.forumiddata + "&courseId=" + courseId + "&threadId=" + thread.threadId + "'><i class='fa fa-scissors'></i>&nbsp;Move</a></li>" +
