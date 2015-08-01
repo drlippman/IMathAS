@@ -111,8 +111,7 @@ class CourseController extends AppController
                         case 'Assessment':
                             $assessment = Assessments::getByAssessmentId($item->typeid);
                             $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
-                            if($exception)
-                            {
+                            if($exception){
                                 $assessment->startdate = $exception->startdate;
                                 $assessment->enddate = $exception->enddate;
                             }
@@ -234,16 +233,12 @@ class CourseController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
-        if ($this->isPostMethod())
-        {
+        if ($this->isPostMethod()){
             $params = $this->getRequestParams();
             $password = $params['SetPassword']['password'];
-            if($password == $assessment->password)
-            {
+            if($password == $assessment->password){
                 return $this->redirect(AppUtility::getURLFromHome('course', 'course/password?id=' . $assessment->id.'&cid=' .$course->id));
-            }
-            else
-            {
+            }else {
                 $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
             }
         }
