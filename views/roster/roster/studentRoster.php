@@ -55,8 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
                             <a class="with-selected-list" href="javascript: studentEmail()"><i
                                     class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
+                        </form>
                     </li>
-                    </form>
                     <li>
                         <form action="roster-message?cid=<?php echo $course->id ?>" method="post"
                               id="roster-message-form">
@@ -64,8 +64,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
                             <a class="with-selected-list" href="javascript: studentMessage()"><i
                                     class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
+                        </form>
                     </li>
-                    </form>
                     <li><a id="un-enroll-link" href="#"><i
                                 class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a></li>
                     <li><a id="lock-btn" href="#"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>

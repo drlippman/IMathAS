@@ -745,6 +745,7 @@ class RosterController extends AppController
     public function actionRosterEmail()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         if ($this->isPost()) {
             $selectedStudents = $this->getRequestParams();
             $isGradebook = $selectedStudents['gradebook'];
@@ -762,6 +763,7 @@ class RosterController extends AppController
                         $student = User::getById($studentId);
                         array_push($studentArray, $student->attributes);
                     }
+                    $this->includeCSS(['roster/roster.css']);
                     $this->includeJS(['roster/rosterEmail.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', '', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course,  'gradebook' => $isGradebook);
                     return $this->renderWithData('rosterEmail', $responseData);

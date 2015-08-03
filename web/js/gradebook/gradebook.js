@@ -1,16 +1,13 @@
 $(document).ready(function () {
     var courseId = $(".course-info").val();
     var userId = $(".user-info").val();
-    studentMessage();
-    studentEmail();
     selectCheckBox();
     studentLock();
-    studentCopyEmail();
     teacherMakeException();
     $('.gradebook-table').dataTable( {
         "scrollX": true,
-        "paginate": false
-
+        "paginate": false,
+        "ordering":false
     } );
 });
 var data;
@@ -175,24 +172,36 @@ function createStudentList(appendId, e){
 }
 
 function studentMessage() {
-    $('#roster-message').click(function (e) {
-        var appendId =  document.getElementById("message-id");
-        createStudentList(appendId, e);
-    });
+    var markArray = createStudentList();
+    if (markArray.length != 0) {
+        document.getElementById("message-id").value = markArray;
+        document.forms["gradebook-message-form"].submit();
+    } else {
+        var msg = "Select at least one student to send Message.";
+        CommonPopUp(msg);
+    }
 }
 
 function studentEmail() {
-    $('#roster-email').click(function (e) {
-        var appendId =  document.getElementById("student-id");
-        createStudentList(appendId, e);
-    });
+    var markArray = createStudentList();
+    if (markArray.length != 0) {
+        document.getElementById("student-id").value = markArray;
+        document.forms["gradebook-email-form"].submit();
+    } else {
+        var msg = "Select at least one student to send Email.";
+        CommonPopUp(msg);
+    }
 }
 
 function studentCopyEmail() {
-    $('#roster-copy-emails').click(function (e) {
-        var appendId =  document.getElementById("email-id");
-        createStudentList(appendId, e);
-    });
+    var markArray = createStudentList();
+    if (markArray.length != 0) {
+        document.getElementById("email-id").value = markArray;
+        document.forms["copy-emails-form"].submit();
+    } else {
+        var msg = "Select at least one student.";
+        CommonPopUp(msg);
+    }
 }
 
 function teacherMakeException() {
@@ -217,5 +226,11 @@ function chgfilter() {
     var ffilter = document.getElementById("ffilter").value;
     window.location = tagfilterurl+'&ffilter='+ffilter;
 }
-
+function createStudentList(){
+    var markArray = [];
+    $('.gradebook-table input[name = "checked"]:checked').each(function () {
+        markArray.push($(this).val());
+    });
+    return markArray;
+}
 

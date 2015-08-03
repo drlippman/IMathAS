@@ -375,7 +375,7 @@ a:focus {
 }
 
 .btn-primary {
-    color: #fff; background-color: #428bca; border-color: #357ebd;
+    color: #fff; background-color: #428bca; border-color: #2C368E;
     text-transform: capitalize;
 
 }
@@ -611,12 +611,13 @@ img.small-icon{
 .btn-primary {
     color: #FFF;
     background-color: #2C368E;
-    border-color: #357EBD;
+    border-color: #2C368E;
+    border-radius: 0px;
     text-transform: capitalize;
 }
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
     background-color: #2C368E;
-    border-color: #285E8E;
+    border-color: #2C368E;
 }
 .checkbox-size{
     font-size: 14px;
@@ -630,10 +631,11 @@ img.small-icon{
     vertical-align: middle;
 }
 .page-heading{
-    width: 70%;
+    width: 60%;
 }
+
 .header-btn{
-    width: 30%;
+    width: 40%;
 }
 .btn.btn-primary.page-settings{
     color: #FFF;
@@ -646,7 +648,7 @@ img.small-icon{
     font-weight: normal;
     line-height: 1;
     text-align: center;
-    border-radius: 4px;
+    border-radius: 0px;
     background-color: #2C368E;
     color: white;
     border: 1px solid #101A66;
@@ -654,7 +656,7 @@ img.small-icon{
 input[type="submit"], input[type="button"], button, a.abutton {
     color: #ffffff;
     background-color: #2C368E;
-    border-radius: 4px;
+    border-radius: 0px;
     border: 1px solid #285E8E;
     font: inherit;
     height: 2.5em;
@@ -694,6 +696,7 @@ table.student-data-table > .form-inline .radio, .form-inline .checkbox {
 }
 .green-btn, .green-btn:focus, .green-btn:hover, .green-btn.open, .btn-primary.green-btn:hover, .btn-primary.green-btn:active, .btn-primary.green-btn.active, .open > .dropdown-toggle.btn-primary.green-btn{
     background-color: #008E71;
+    border-color: #008E71;
 }
 .green-carret, .green-carret:focus, .green-carret:hover, .dropdown-class .btn-primary.green-carret:hover, .btn-primary.green-carret:active, .btn-primary.green-carret.active, .open > .dropdown-toggle.btn-primary.green-carret {
     background-color: #00755d;
@@ -747,4 +750,22 @@ div.dataTables_wrapper {
 .col-sm-9.display_field{
     /*margin-left: 25%;*/
     padding-left: 5px;
+}
+.dropdown-menu.with-selected > li > form > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.dropdown-menu.with-selected > li > form > a:hover, .dropdown-menu.with-selected > li > form > a:focus {
+    color: #ffffff;
+    text-decoration: none;
+    background-color: #2c38ae;
+}
+.inner-sub-content{
+    padding: 15px;
 }

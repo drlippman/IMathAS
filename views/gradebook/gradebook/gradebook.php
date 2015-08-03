@@ -40,45 +40,62 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox"">
 <div class="inner-content-gradebook">
 <div class="button-container">
-    <form>
-        <span>Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all"
-                                                              href="#">None</a> With Selected:</span>
-    </form>
-    <form>
-        <span> <a class="btn btn-primary" id="unenroll-btn">Print Report</a></span>
-    </form>
-    <form
-        action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid=' . $course->id . '&gradebook=1') ?>"
-        method="post" id="roster-form">
-        <input type="hidden" id="student-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-email" value="E-mail"></span>
-    </form>
-    <form
-        action="<?php echo AppUtility::getURLFromHome('roster', 'roster/copy-student-email?cid=' . $course->id . '&gradebook=1') ?>"
-        method="post" id="roster-form">
-        <input type="hidden" id="email-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-copy-emails" value="Copy E-mails"></span>
-    </form>
-    <form
-        action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-message?cid=' . $course->id . '&gradebook=1') ?>"
-        method="post" id="roster-form">
-        <input type="hidden" id="message-id" name="student-data" value=""/>
-        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-        <span> <input type="submit" class="btn btn-primary" id="roster-message" value="Message"></span>
-    </form>
-    <span> <a class="btn btn-primary" id="unenroll-btn" onclick="studentUnenroll()">Unenroll</a></span>
-    <span> <a class="btn btn-primary" id="lock-btn">Lock</a></span>
+        <span>Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a> With Selected:</span>
+    <span class="with-selected col-lg-2 pull-right">
+        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu with-selected">
+                    <li><a href="#">
+                            <i class="fa fa-fw fa-print"></i><?php AppUtility::t('Print Report'); ?>
+                        </a>
+                    </li>
+                    <li>
+                        <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid=' . $course->id . '&gradebook=1') ?>" method="post" id="gradebook-email-form">
+                            <input type="hidden" id="student-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a href="javascript: studentEmail()"><i class="fa fa-at fa-fw"></i><?php AppUtility::t('Email'); ?></a>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/copy-student-email?cid=' . $course->id . '&gradebook=1') ?>" method="post"
+                              id="copy-emails-form">
+                            <input type="hidden" id="email-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a class="with-selected-list" href="javascript: studentCopyEmail()"><i
+                                    class="fa fa-clipboard fa-fw"></i><?php AppUtility::t('Copy Emails'); ?></a>
+                        </form>
+                    </li>
+                    <li>
+                        <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-message?cid=' . $course->id . '&gradebook=1') ?>" method="post"
+                              id="gradebook-message-form">
+                            <input type="hidden" id="message-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                            <a class="with-selected-list" href="javascript: studentMessage()"><i
+                                    class="fa fa-envelope-o fa-fw"></i><?php AppUtility::t('Message'); ?></a>
+                        </form>
+                    </li>
+                    <li><a id="unenroll-btn" onclick="studentUnenroll()"><i class="fa fa-trash-o fa-fw"></i><?php AppUtility::t('Unenroll'); ?></a></li>
+                    <li><a id="lock-btn"><i class='fa fa-lock fa-fw'></i><?php AppUtility::t('Lock'); ?>
+                        </a></li>
+                    <li>
+                        <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/make-exception?cid=' . $course->id . '&gradebook=1') ?>" id="make-exception-form"
+                              method="post">
+                            <input type="hidden" id="exception-id" name="student-data" value=""/>
+                            <input type="hidden" id="section-name" name="section-data" value=""/>
+                            <a class="with-selected-list" href="javascript: teacherMakeException()"><i
+                                    class='fa fa-plus-square fa-fw'></i><?php AppUtility::t('Make Exception'); ?>
+                            </a>
+                        </form>
+                    </li>
 
-    <form
-        action="<?php echo AppUtility::getURLFromHome('roster', 'roster/make-exception?cid=' . $course->id . '&gradebook=1') ?>"
-        name="teacherMakeException" id="make-student" method="post">
-        <input type="hidden" id="exception-id" name="student-data" value=""/>
-        <input type="hidden" id="section-name" name="section-data" value=""/>
-        <span> <input type="submit" class="btn btn-primary" id="gradebook-makeExc" value="Make Exception"></span>
-    </form>
+                </ul>
+            </li>
+        </ul>
+    </span>
 </div><br/>
+
 
 <div class="gradebook-div">
 
@@ -295,7 +312,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
         </thead>
-        <tbody>
+        <tbody class='gradebook-table-body'>
         <?php
         for ($i = 1; $i < count($gradebook); $i++) {
             if ($i == 1) {
@@ -312,7 +329,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             echo '<td class="locked" scope="row"><div class="trld">';
             if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) {
-                echo "<input type=\"checkbox\" name='checked[]' value='{$gradebook[$i][4][0]}' />&nbsp;";
+                echo "<input type=\"checkbox\" name='checked' value='{$gradebook[$i][4][0]}' />&nbsp;";
             }
             ?>
             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
