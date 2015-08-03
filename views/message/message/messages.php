@@ -30,8 +30,9 @@ $now = $currentTime;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
-        <div class="pull-left header-btn">
-            <button class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Send New Message</button>
+        <div class="pull-left header-btn hide-hover">
+            <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
+               class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
         </div>
     </div>
 </div>
@@ -40,19 +41,12 @@ $now = $currentTime;
 </div>
 <div class="tab-content shadowBox">
     <div class="second-level-message-navigation">
-
-        <!--                <a href="--><?php //echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?><!--"-->
-        <!--                   class="btn btn-primary">Send New Message</a>-->
-
             <span class="pull left col-sm-3 message-second-level">
                  <a  id="limit-to-tag-link" href="index?cid=<?php echo $course->id; ?>&show=1">Limit to Tagged</a>
                  <a  id="show-all-link" href="index?cid=<?php echo $course->id; ?>">Show All</a>
                  <a id="sent-message"  href="<?php echo AppUtility::getURLFromHome('message', 'message/sent-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>">Sent Messages</a>
             </span>
-
-
 <!--         <input type="button"  id='imgtab' class="btn btn-primary" value="Pictures" onclick="rotatepics()" >-->
-
             <span class="pull-left message-second-level" >With Selected :</span>
             <span class="col-sm-2 with-selected-dropdown">
                 <select  class="form-control with-selected" >
@@ -74,8 +68,8 @@ $now = $currentTime;
                  </select>
              </span>
    </div>
-
     <div class="message-div">
-
     </div>
 </div>
+
+<script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/message/message.js" ></script>

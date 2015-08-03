@@ -1,56 +1,61 @@
 <?php
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 use app\components\AppUtility;
 use app\components\AppConstant;
-$this->title = 'Sent Messages';
-
-if ($userRights->rights > AppConstant::STUDENT_RIGHT){
-
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid='.$course->id]];
+use app\components\AssessmentUtility;
+$this->title = AppUtility::t('Sent Message ',false);
 $this->params['breadcrumbs'][] = $this->title;
+$currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+$now = $currentTime;
 ?>
-<div>
-    <input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
-    <input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
-    <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
-        <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
-
-    <?php } else {?>
-
-        <?php echo $this->render('../../course/course/_toolbar', ['course' => $course]);?>
-
-    <?php } ?>
-
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
-<div class="message-container">
-    <div><p><a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>">Received Messages</a></p>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Message:',false);?><?php echo $this->title ?></div>
+        </div>
     </div>
-    <div>
-        <p><span class="select-text-margin pull-left"><b>Filter By Courses :</b></span>
-        <span class="col-md-3">
-            <select name="seluid" class="show-course form-control" id="course-sent-id">
-            <option value="0">All Courses</option>
-            </select>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+</div>
+<input type="hidden" class="send-course-id" value="<?php echo $course->id ?>">
+<input type="hidden" class="send-user-id" value="<?php echo $course->ownerid ?>">
+<div class="tab-content shadowBox">
+    <div class="col-sm-12 second-level-message-navigation">
+        <div class=" col-sm-2 align-links-message">
+            <a  href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='.$course->id); ?>"><?php echo AppUtility::t('Received Messages')?></a>
+        </div>
+        <div class=" col-sm-3 align-links-dropdwn">
+            <span class="select-text-margin pull-left"><?php echo AppUtility::t('Filter By Courses')?></span>
+        <span class="col-sm-4 with-selected-dropdown">
+            <select name="seluid" class="show-course form-control-message" id="course-sent-id">
+                <option value="0"><?php echo AppUtility::t('All Courses')?></option>
+            </select></span>
 
-        </span> <span class="select-text-margin pull-left"><b>By Recipient :</b></span>
-        <span class="col-md-3">
-        <select name="seluid" class="show-users form-control" id="user-sent-id">
-            <option value="0">Select a user</option>
-            </select>
-        </span></p>
-    </div><br><br>
-    <div>
-        <p>Check: <a id="check-all-box" class="check-all" href="#">All</a>/<a id="uncheck-all-box" class="uncheck-all" href="#">None</a>
-            With Selected:
-            <a class="btn btn-primary"id="mark-sent-delete">Remove From Sent Message List</a>
-            <a class="btn btn-primary" id="mark-unsend">Unsend</a>
-        </p>
+        </div>
+        <div class="col-sm-3 align-links-dropdwn">
+            <span class="select-text-margin pull-left"><?php echo AppUtility::t('By Recipient')?></span>
+        <span class="col-sm-4 with-selected-dropdown">
+        <select name="seluid" class="show-users form-control-message" id="user-sent-id">
+            <option value="0"><?php echo AppUtility::t('Select a user')?></option>
+        </select>
+        </span>
+        </div>
+        <div class="col-sm-3 align-links-dropdwn">
+            <span class="pull-left message-second-level" ><?php echo AppUtility::t('With Selected')?></span>
+            <span class="col-sm-4 with-selected-dropdown">
+                <select  class="form-control-message with-selected" >
+                    <option value="0"><?php echo AppUtility::t('Select')?></option>
+                    <option value="1" id="mark-sent-delete"><?php echo AppUtility::t('Remove From Sent Message List')?></option>
+                    <option value="2" id="mark-unsend"><?php echo AppUtility::t('Unsend')?></option>
+                </select>
+            </span>
+        </div>
+
     </div>
     <div class="message-div"></div>
-    </div>
+</div>
+
+<script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/message/sentMessage.js" ></script>

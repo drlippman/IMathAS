@@ -42,7 +42,7 @@ class MessageController extends AppController
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
-            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/message.js', 'general.js' ]);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js' ]);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id);
             return $this->renderWithData('messages', $responseData);
         }
@@ -52,6 +52,7 @@ class MessageController extends AppController
      */
     public function actionSendMessage()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser();
         $newTo = $this->getParamVal('new');
@@ -149,6 +150,7 @@ class MessageController extends AppController
      */
     public function actionSentMessage()
     {
+        $this->layout = "master";
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
         $userRights = $this->getAuthenticatedUser();
@@ -160,8 +162,8 @@ class MessageController extends AppController
             $users = User::findAllUser($sortBy, $order);
             $teacher = Teacher::getTeachersById($courseId);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
-            $this->includeCSS(['dataTables.bootstrap.css']);
-            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','message/sentMessage.js', 'general.js' ]);
+            $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
+            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
             return $this->renderWithData('sentMessage', $responseData);
         }
     }

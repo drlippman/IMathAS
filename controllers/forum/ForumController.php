@@ -422,6 +422,7 @@ class ForumController extends AppController
     */
     public function actionModifyPost()
     {
+        $this->layout = 'master';
         $this->guestUserHandler();
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
@@ -458,6 +459,7 @@ class ForumController extends AppController
             }
         }
         $this->setReferrer();
+        $this->includeCSS(['forums.css']);
         $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser,'threadCreatedUserData' => $threadCreatedUserData,'forumData' => $forumData,'forumPostData' => $forumPostData );
         return $this->renderWithData('modifyPost', $responseData);
     }

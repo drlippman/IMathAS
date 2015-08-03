@@ -376,4 +376,7 @@ padding-top: 5px;
     pointer-events: auto;
     cursor: not-allowed;
 }
+.align-title{
+    margin-top: 11px;
+}
 

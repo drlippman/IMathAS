@@ -15,9 +15,6 @@ $(document).ready(function () {
     jQuerySubmit('get-course-ajax', allMessage, 'getCourseSuccess');
     jQuerySubmit('get-user-ajax', allMessage, 'getUserSuccess');
     selectCheckBox();
-//    markAsRead();
-//    markAsUnread();
-//    markAsDelete();
     filterByCourse();
 
     $('.with-selected-dropdown').click(function(){
@@ -68,7 +65,7 @@ function showMessage(messageData, status) {
         $.each(messageData, function (index, msg) {
 
             if (msg.isread == 1 || msg.isread == 5 || msg.isread == 9 || msg.isread == 13) {
-                html += "<tr class='read-message message-row message-row-'" + msg.id + "> <td><div class='checkbox override-hidden'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
+                html += "<tr class='read-message message-row message-row-'" + msg.id + "><td><div class='checkbox override-hidden'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             }
             else {
                 html += "<tr class='unread-message message-row message-row-'" + msg.id + "> <td><div class='checkbox override-hidden'><label><input type='checkbox' id='Checkbox' name='msg-check' value='" + msg.id + "' class='message-checkbox-" + msg.id + "' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";

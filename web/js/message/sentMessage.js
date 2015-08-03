@@ -6,8 +6,25 @@ $(document).ready(function () {
     selectCheckBox();
     jQuerySubmit('get-sent-course-ajax',  inputData, 'getCourseSuccess');
     jQuerySubmit('get-sent-user-ajax',  inputData, 'getUserSuccess');
-    markSentDelete();
-    markUnsend();
+
+
+
+    $('.with-selected-dropdown').click(function(){
+
+        var with_selected = $('.with-selected :selected').val();
+
+        if(with_selected  == 1)
+        {
+            markSentDelete()
+
+        }
+        else if(with_selected  == 2)
+        {
+
+            markUnsend();
+
+        }
+    });
 });
 
 var messageData;
@@ -17,7 +34,7 @@ var selectedCourseId;
 function createTableHeader()
 {
     var html = "<table id='message-table-show display-message-table' class='message-table-show display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>"
+    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>"
     html += "<tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
@@ -49,7 +66,7 @@ function showMessage(messageData, status)
     var htmlCourse ="";
     if(status == 0){
         $.each(messageData, function(index, msg){
-            html += "<tr> <td><input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ></td>";
+            html += "<tr class='message-checkbox-'" + msg.id + "><td><div class='checkbox override-hidden'><label><input type='checkbox' name='msg-check' value='"+msg.id+"' class='message-checkbox-"+msg.id+"' ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></td>";
             html += "<td><a href='view-message?message=1&id="+msg.id+"&cid="+cid+"'> "+msg.title+"</a></td>";
             html += "<td>"+msg.FirstName.substr(0,1).toUpperCase()+ msg.FirstName.substr(1)+" "+msg.LastName.substr(0,1).toUpperCase()+ msg.LastName.substr(1)+"</td>";
             if(msg.isread==0)
@@ -104,7 +121,7 @@ function courseDisplay(courseData)
 }
 function markSentDelete()
 {
-    $("#mark-sent-delete").click(function(e){
+
         var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
@@ -113,7 +130,7 @@ function markSentDelete()
             var html = '<div><p>Are you sure ? you want to Remove.</p></div>';
 
             var cancelUrl = $(this).attr('href');
-            e.preventDefault();
+            e.preventDefault;
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
@@ -154,7 +171,7 @@ function markSentDelete()
             var msg ="Select atleast one message to delete";
             CommonPopUp(msg);
         }
-    });
+
 
 }
 function markDeleteSuccess(){}
@@ -247,11 +264,9 @@ function filterByUser()
     });
 }
 
-function markUnsend() {
-
-    $("#mark-unsend").click(function (e) {
-
-        var markArray = [];
+function markUnsend()
+{
+    var markArray = [];
         $('.message-table-body input[name="msg-check"]:checked').each(function () {
             markArray.push($(this).val());
         });
@@ -259,7 +274,7 @@ function markUnsend() {
             var html = '<div><p>Are you sure ? you want to Unsend. </p></div>';
 
             var cancelUrl = $(this).attr('href');
-            e.preventDefault();
+            e.preventDefault;
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
@@ -294,7 +309,7 @@ function markUnsend() {
             var msg ="Select atleast one message to delete";
             CommonPopUp(msg);
         }
-    });
+
 }
 function markUnsendSuccess(){
 }

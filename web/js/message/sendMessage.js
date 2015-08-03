@@ -9,17 +9,22 @@ $(document).ready(function () {
         var subject = $(".subject").val();
         var body = $("#message").val();
         if(receiver != 0){
-            if(subject != ''){
-                    $('#subjecttext').hide();
-                    $('#to').hide();
-                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
-            }else{
-                changeColorSub();
-                $('#to').css('color','white');
+            if(subject != '')
+            {
+                        $('#subjecttext').hide();
+                        $('#to').hide();
+                        jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
+            }
+            else
+            {
+                    changeColorSub();
+                    $('#to').css('color','white');
 
 
             }
-        }else{
+        }
+        else
+        {
             changeColorTo();
             $('#subjecttext').css('color','white');
         }

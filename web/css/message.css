@@ -36,7 +36,6 @@
     height: 70px;
     padding-top: 8px;
     background-color: #F8f8f8;
-
 }
 
 .flag-alignment{
@@ -109,5 +108,56 @@ background-color: #12856D;
     width: 24px;
     height: 24px;
 }
+.align-links-message{
+    margin-top: 20px;
+}
+.btn-color
+{
+    background-color: #12856D;
+    color:whitesmoke;
+}
+.btn-primary-1 {
+    color: #FFF;
+    background-color: #12856D;
+    color:whitesmoke;
+    text-transform: capitalize;
+    border-radius: 0px;
+}
+.hide-hover > a:hover{
+    text-decoration: none;
+    color: #FFF;
+}
 
+.form-control-message {
+    display: block;
+    width: 245%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 0px;
 
+}
+
+.align-links-dropdwn{
+    margin-top: 16px;
+}
+.padding-top
+{
+
+    padding-top: 40px;
+}
+
+.inner-reply-msg-content
+{
+    background-color: #f8f8f8;
+    width: 1120px;
+    height: 600px;
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}

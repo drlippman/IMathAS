@@ -54,7 +54,7 @@ $now = $currentTime;
         <div class="pull-right view-drop-down">
             <button class="btn btn-primary search-button" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></button>
         </div>
-        <div class="checkbox checkbox-thread pull-right">
+        <div class="checkbox checkbox-thread override-hidden pull-right">
             <label>
                 <input type="checkbox" name="allforums" id="searchAll" value=""><?php echo AppUtility::t('All Forum in Courses?')?>
                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
