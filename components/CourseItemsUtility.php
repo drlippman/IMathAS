@@ -765,7 +765,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
     <?php $endDate = AppUtility::formatDate($block['enddate']);?>
 
     <?php if ($block['avail'] == 1){  ?>
-    <div class=block>
+    <div class="block item">
         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
             <span class=left>
                                   <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -807,7 +807,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
                                 </span>
         </div>
     </div>
-    <div class=blockitems id="block5<?php echo $block['id']?>">
+    <div class="blockitems block-alignment" id="block5<?php echo $block['id']?>">
         <?php if (count($item['itemList'])) { ?>
             <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
                 <?php switch (key($item)):
@@ -858,7 +858,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
     <div class="clear"></div>
 <?php }elseif(($block['avail']) == AppConstant::NUMERIC_TWO){?>
     <!--Show Always-->
-    <div class=block>
+    <div class="block item">
         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
             <span class=left>
                                   <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -894,7 +894,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
                                 </span>
         </div>
     </div>
-    <div class=blockitems id="block5<?php echo $block['id']?>">
+    <div class="blockitems block-alignment" id="block5<?php echo $block['id']?>">
         <?php if (count($item['itemList'])) { ?>
             <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
                 <?php switch (key($item)):
@@ -945,7 +945,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
     <div class="clear"></div>
 <?php }else {  ?>
     <input type="hidden" id="isHidden" value="1">
-    <div class=block>
+    <div class="block item">
         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
             <span class=left>
                                 <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
@@ -972,7 +972,7 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
                                     </span>
         </div>
     </div>
-    <div class=blockitems id="block5<?php echo $block['id']?>">
+    <div class="blockitems block-alignment" id="block5<?php echo $block['id']?>">
         <?php if (count($item['itemList'])) { ?>
             <?php foreach ($item['itemList'] as $itemlistKey => $item) { ?>
                 <?php switch (key($item)):

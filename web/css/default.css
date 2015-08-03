@@ -29,15 +29,20 @@ div.editor {
 
 /*Default block container*/
 div.block, div.blockitems div.blockitems div.block {
-	border: 1px solid #000;
+    border: 1px solid #a9a9a9;
 	background-color: #ddf;
 }
 
 /*Default block item container*/
 div.blockitems, div.blockitems div.blockitems div.blockitems {
-	border: 1px solid #000;
+    border: 1px solid #a9a9a9;
 	border-top: 0px;
+
 	background-color: #eef;
+}
+div.blockitems.block-alignment{
+    margin-left: 93px;
+    margin-right: 20px;
 }
 
 /*Second level default block container*/

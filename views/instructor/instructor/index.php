@@ -115,7 +115,7 @@ $now = $currentTime;
         {
             var node = document.getElementById('block5' + id);
             var img = document.getElementById('img' + id);
-            if (node.className == 'blockitems')
+            if (node.className == 'blockitems block-alignment')
             {
                 node.className = 'hidden';
                 img.src = '../../img/expand.gif'
@@ -126,14 +126,14 @@ $now = $currentTime;
     {
         var node = document.getElementById('block5' + id);
         var img = document.getElementById('img' + id);
-        if (node.className == 'blockitems')
+        if (node.className == 'blockitems block-alignment')
         {
             node.className = 'hidden';
             img.src = '../../img/expand.gif'
         }
         else
         {
-            node.className = 'blockitems';
+            node.className = 'blockitems block-alignment';
             img.src = '../../img/collapse.gif'
         }
     }
