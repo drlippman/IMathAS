@@ -44,7 +44,7 @@ $now = $currentTime;
     <div class="clear-both"></div>
     <div class="row add-item">
         <div class="col-md-1 plus-icon">
-            <i class="fa fa-plus fa-2x"></i>
+            <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
         </div>
         <div class=" col-md-2 add-item-text">
             <p><?php AppUtility::t('Add An Item...');?></p>

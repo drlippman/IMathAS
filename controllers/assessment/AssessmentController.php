@@ -79,6 +79,7 @@ class AssessmentController extends AppController
     public function actionPassword()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $model = new SetPassword();
         $assessmentId = $this->getParamVal('id');
         $courseId = $this->getParamVal('cid');
@@ -94,6 +95,7 @@ class AssessmentController extends AppController
                 $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
             }
         }
+        $this->includeCSS(['course/items.css']);
         $returnData = array('model' => $model, 'assessments' => $assessment);
         return $this->renderWithData('setPassword', $returnData);
     }

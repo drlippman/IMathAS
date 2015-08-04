@@ -771,5 +771,7 @@ div.dataTables_wrapper {
 }
 .ui-dialog .ui-dialog-titlebar-close {
    visibility: hidden;
-
+}
+.a:hover{
+    color: #0000ff;
 }

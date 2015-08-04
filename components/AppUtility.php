@@ -140,6 +140,10 @@ class AppUtility extends Component
     public static function getFormattedDate($dateStr, $format = 'Y-m-d'){
         return date($format, $dateStr);
     }
+    public static function getFormattedDateCalendar($dateStr, $format = 'm-d-yy'){
+        return date($format, $dateStr);
+    }
+
 
     public static function getFormattedTime($dateStr, $format = 'h:i A'){
         return date($format, $dateStr);

@@ -880,26 +880,15 @@ public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent
 <?php }
 
 public static function AddItemsDropDown()
-{ ?>
-    <div class="padding-zero" style="width: 25%">
-        <?php  $parent = AppConstant::NUMERIC_ZERO;
-        $tb = 't';
-        $html = "<select class='form-control padding-zero' name=addtype id=\"addtype$parent-$tb\" onchange=\"additem('$parent','$tb')\" ";
-        if ($tb == 't') {
-            $html .= 'style="margin-bottom:5px;"';
-        }
-        $html .= ">\n";
-        $html .= "<option value=\"\">" . _('Add An Item...') . "</option>\n";
-        $html .= "<option value=\"assessment\">" . _('Add Assessment') . "</option>\n";
-        $html .= "<option value=\"inlinetext\">" . _('Add Inline Text') . "</option>\n";
-        $html .= "<option value=\"linkedtext\">" . _('Add Link') . "</option>\n";
-        $html .= "<option value=\"forum\">" . _('Add Forum') . "</option>\n";
-        $html .= "<option value=\"wiki\">" . _('Add Wiki') . "</option>\n";
-        $html .= "<option value=\"block\">" . _('Add Block') . "</option>\n";
-        $html .= "<option value=\"calendar\">" . _('Add Calendar') . "</option>\n";
-        $html .= "</select><BR>\n";
-        echo $html;
-        ?>
+{
+    ?>
+    <div class="row add-item">
+        <div class="col-md-1 plus-icon">
+            <i class="fa fa-plus fa-2x"></i>
+        </div>
+        <div class=" col-md-2 add-item-text">
+            <p><?php AppUtility::t('Add An Item...');?></p>
+        </div>
     </div>
 <?php }
 

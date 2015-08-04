@@ -53,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
             <!--Show-->
         <div>
-        <div class="col-lg-2">Visibility</div>
+        <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
         <div class="col-lg-10">
             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none'; "/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Hide')?></td></div>
             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show by Dates')?></td></div>
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--Show by dates-->
                 <div id="datediv" style="display:<?php echo ($forum['avail'] == 1) ? "block" : "none"; ?>">
                     <?php $startTime = $eTime; ?>
-                    <div class=col-lg-2>Available After:</div>
+                    <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
                     <div class=col-lg-10>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="available-after" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], '0', AppConstant::NUMERIC_ZERO) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always until end date')?></td></div>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility pull-left label-visible'><td><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'] , '1', AppConstant::NUMERIC_ONE) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
@@ -93,7 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '</div>'; ?>
                     </div></div><BR class=form>
 
-                    <div class=col-lg-2>Available Until:</div>
+                    <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
                     <div class=col-lg-10>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="available-until" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], '2000000000', 0) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always after start date')?></td></div>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility pull-left label-visible'><td><input type=radio name="available-until" class="pull-left value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], '2000000000', 1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
@@ -128,53 +128,53 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div style="margin-top: 20px">
-                    <div class=col-lg-2>Group forum?</div>
+                    <div class=col-lg-2><?php AppUtility::t('Group forum?')?></div>
                         <div class=col-lg-10>
                              <?php
                             AssessmentUtility::writeHtmlSelect("groupsetid",$groupNameId,$groupNameLabel,$forumData['groupsetid'],"Not group forum",0);
                             if ($forumData['groupsetid'] > 0 && $defaultValue['hasGroupThreads']) {
-                                echo '<br/>WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
+                                echo '<br/> WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
                             }        ?>
 
                 </div></div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Allow anonymous posts:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Allow anonymous posts')?></div>
                             <div class=col-lg-10>
                                 <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowanon']) { echo "checked=1";}?> ><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                             </div>
                     </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Allow students to modify posts:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Allow students to modify posts')?></div>
                             <div class=col-lg-10>
                                 <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowmod']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div>
                     </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Allow students to delete own posts (if no replies):</div>
+                        <div class=col-lg-2><?php AppUtility::t('Allow students to delete own posts (if no replies)')?></div>
                             <div class=col-lg-10>
                                 <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowdel']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div>
                     </div><br class=form>
 
-                    <div class=col-lg-2>Turn on "liking" posts:</div>
+                    <div class=col-lg-2><?php AppUtility::t('Turn on "liking" posts')?></div>
                         <div class=col-lg-10>
                             <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowlikes']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Viewing before posting:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Viewing before posting')?></div>
                         <div class=col-lg-10>
                             <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="viewing-before-posting" value="16"<?php if ($defaultValue['viewAfterPost']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
-                            Prevent students from viewing posts until they have created a thread.
-                            You will likely also want to disable modifying posts
+                            <?php AppUtility::t('Prevent students from viewing posts until they have created a thread.
+                            You will likely also want to disable modifying posts')?>
                         </div>
                     </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Get email notify of new posts:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Get email notify of new posts')?></div>
                         <div class=col-lg-10>
                             <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="Get-email-notify-of-new-posts" value="1"<?php if ($defaultValue['hasSubScrip']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
 
@@ -182,7 +182,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Default display:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Default display')?></div>
                             <div class=col-lg-10>
                             <select name="default-display" class="form-control">
                                 <option value="0" <?php if ($defaultValue['defDisplay']==0 || $defaultValue['defDisplay']==1) {echo "selected=1";}?>>Expanded</option>
@@ -192,7 +192,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Sort threads by:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Sort threads by')?></div>
                             <div class=col-lg-10>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="sort-thread" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],0);?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Thread start date')?></td></div>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="sort-thread" value="1"<?php AssessmentUtility::writeHtmlChecked($defaultValue['sortBy'],1);?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Most recent reply date')?></td></div>
@@ -200,13 +200,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Students can create new threads:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Students can create new threads')?></div>
                         <div class="col-lg-10">
                             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="0" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
                             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="2000000000" <?php if ($defaultValue['postBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
                             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="new-thread" class="pull-left " value="1" <?php if ($defaultValue['postBy']<2000000000 && $defaultValue['postBy']>0) { echo "checked=1";}?> ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
                             <?php
-                            echo '<label class="end pull-left">Before:</label>';
+                            echo '<label class="end pull-left"> Before:</label>';
                             echo '<div class = "col-lg-4 time-input">';
                             echo DatePicker::widget([
                                 'name' => 'newThreadDate',
@@ -236,7 +236,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div><BR class=form>
 
                         <div class="item-alignment">
-                            <div class=col-lg-2>Students can reply to posts:</div>
+                            <div class=col-lg-2><?php AppUtility::t('Students can reply to posts')?></div>
                             <div class="col-lg-10">
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="0" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="2000000000" <?php if ($defaultValue['replyBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
@@ -271,15 +271,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div></div><BR class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Calendar icon:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Calendar icon')?></div>
                            <div class=col-lg-10>
-                        New Threads: <input type="text" name="calendar-icon-text1" value="<?php echo $defaultValue['postTag'];?>" size="2"> ,
-                        Replies: <input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2">
+                        <?php AppUtility::t('New Threads')?><input type="text" name="calendar-icon-text1" value="<?php echo $defaultValue['postTag'];?>" size="2"> ,
+                        <?php AppUtility::t('Replies')?> <input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2">
                             </div><br class=form>
                     </div>
 
                  <div class="item-alignment">
-                    <div class=col-lg-2>Count in gradebook?</div>
+                    <div class=col-lg-2><?php AppUtility::t('Count in gradebook?')?></div>
                     <div class=col-lg-10>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="count-in-gradebook" value="0" <?php if ($defaultValue['cntInGb']==0) { echo 'checked=1';}?> onclick="toggleGBdetail(false)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="count-in-gradebook" value="1" <?php if ($defaultValue['cntInGb']==1) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes')?></td></div>
@@ -290,13 +290,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="item-alignment">
                     <div id="gbdetail" <?php if ($defaultValue['cntingb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>>
 
-                        <div class=col-lg-2>Points:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Points:')?></div>
                         <div class=col-lg-10>
-                            <input type="text" name="points" value="<?php echo $defaultValue['points'];?>" size="3"> points
+                            <input type="text" name="points" value="<?php echo $defaultValue['points'];?>" size="3"> <?php AppUtility::t('Points:')?>
                 </div><br class=form>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Gradebook Category:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Gradebook Category')?></div>
                         <div class=col-lg-10>
                              <?php AssessmentUtility::writeHtmlSelect("gradebook-category",$gbcatsId,$gbcatsLabel,$defaultValue['gbCat'],"Default",0); ?>
                         </div><br class=form>
@@ -304,26 +304,25 @@ $this->params['breadcrumbs'][] = $this->title;
                         $page_tutorSelect['val'] = array(2,0,1); ?>
                     </div>
                     <div class="item-alignment">
-                        <div class=col-lg-2>Tutor Access:</div>
+                        <div class=col-lg-2><?php AppUtility::t('Tutor Access:')?></div>
                         <div class=col-lg-10>
                             <?php AssessmentUtility::writeHtmlSelect("tutor-edit",$page_tutorSelect['val'],$page_tutorSelect['label'],$forumData['tutoredit']); ?>
                         </div><br class=form>
                     </div>
                     <div class="item-alignment">
-                        <div class="col-lg-2">Use Scoring Rubric</div>
+                        <div class="col-lg-2"><?php AppUtility::t('Use Scoring Rubric')?></div>
                         <div class=col-lg-10>
                                 <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$forumData['rubric'],'None',0); ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>">Add new
-                                rubric</a> | <a
-                                href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>">Edit
-                                rubrics</a>
+                                <?php AppUtility::t('rubric')?></a> | <a
+                                href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>"><?php AppUtility::t('Edit rubrics')?></a>
                           </div>
                           <br class=form>
                     </div>
                     </div>
                     <div class="item-alignment">
                         <?php if (count($pageOutcomesList) > 0) { ?>
-                        <div class="col-lg-2">Associate Outcomes:</div><div class="col-lg-10">
+                        <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div><div class="col-lg-10">
                         <?php
                             $gradeoutcomes = array();
                             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
@@ -333,19 +332,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div></div>
 
                     <div class="item-alignment">
-                       <div class=col-lg-2>Forum Type:</div>
+                       <div class=col-lg-2><?php AppUtility::t('Forum Type')?></div>
                             <div class=col-lg-10>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="0" <?php if ($forumData['forumtype']==0) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Regular forum')?></td></div>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="1" <?php if ($forumData['forumtype']==1) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t(' File sharing forum')?></td></div>
                             </div><br class="form"/></div>
 
                     <div class="item-alignment">
-                        <div class=col-lg-2>Categorize posts?</div>
+                        <div class=col-lg-2><?php AppUtility::t('Categorize posts?')?></div>
                          <div class=col-lg-10>
                              <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type=checkbox name="categorize-posts" value="1" <?php if ($forumData['taglist'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
 
                               <span id="tagholder" style="display:<?php echo ($forumData['taglist'] == '') ? "none" : "inline"; ?>">
-                              Enter in format CategoryDescription:category,category,category<br/>
+                              <?php AppUtility::t('Enter in format CategoryDescription:category,category,category')?><br/>
                               <input type="text" size="50" height="20" name="taglist"><?php echo $forumData['taglist']; ?>
                               </span><br class=form><br class=form>
             </div>

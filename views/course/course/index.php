@@ -454,29 +454,31 @@ $now = $currentTime;
                 <?php $block = $item[key($item)];
                 $blockId = $block['id'];
                 ?>
+                <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
+                <input type="hidden" id="id" value="<?php echo $block['id']?>" >
                 <?php if ($block['avail'] == 1){  ?>
-                    <div class= "block item">
+                    <div class= "block item student-course-alignment">
                         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                             <span class=left>
-             <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
-        </span>
+                                <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                            </span>
                         <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
                             <span class=left>
-              <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
-              </span>
+                                 <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                            </span>
                         <?php } else { ?>
                             <span class=left>
-               <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
-        </span>
+                                      <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                                    </span>
                         <?php } ?>
                         <div class=title>
-        <span class="right">
-            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>">Isolate</a>
-        </span>
+                            <span class="right">
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>">Isolate</a>
+                            </span>
                             <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class=blockitems id="block5<?php echo $block['id']?>">
+                    <div class="blockitems student-block-alignment" id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):
@@ -905,28 +907,28 @@ $now = $currentTime;
                     <div class="clear"></div>
                 <?php } elseif(($block['avail']) == AppConstant::NUMERIC_TWO){?>
                     <!--Show Always-->
-                    <div class="block item">
+                    <div class="block item student-course-alignment">
                         <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                             <span class=left>
-          <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
-        </span>
+                                <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                            </span>
                         <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
                             <span class=left>
-            <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
-        </span>
+                                 <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                            </span>
                         <?php } else { ?>
                             <span class=left>
-            <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
-        </span>
+                                      <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                                    </span>
                         <?php } ?>
                         <div class=title>
-        <span class="right">
-            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>">Isolate</a>
-        </span>
-                            <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
+                            <span class="right">
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>">Isolate</a>
+                            </span>
+                                                <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class=blockitems id="block5<?php echo $block['id']?>">
+                    <div class="blockitems student-block-alignment" id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):
@@ -1369,15 +1371,17 @@ $now = $currentTime;
 <script>
     $(document).ready(function ()
     {
+
         var SH = $('#SH').val();
         var id = $('#id').val();
-        var isHidden = $('#isHidden').val();
+//        var isHidden = ('#isHidden').val();
         if(SH == 'HC')
         {
             var node = document.getElementById('block5' + id);
             var img = document.getElementById('img' + id);
             if (node.className == 'blockitems')
             {
+                alert("sdsdf");
                 node.className = 'hidden';
                 img.src = '../../img/expand.gif'
             }

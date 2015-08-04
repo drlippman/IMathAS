@@ -283,6 +283,7 @@ function calendar() {
                     var title = "<a style='color: #0000ff' href='#'>"+selectedDate.title+"</a>";
                     if(currentDate == formattedSelectedDay){
                         var dateH = "Due " +selectedDate.dueTime+"";
+
                     }else{
                         var dateH = "Due " +selectedDate.start+" "+selectedDate.dueTime+"";
                     }
