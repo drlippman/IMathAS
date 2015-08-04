@@ -102,7 +102,7 @@ $now = $currentTime;
                 <?php case  'Block': ?>
                     <?php  $cnt++; ?>
                     <?php $displayBlock = new CourseItemsUtility();
-                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$blockList,$key, $countCourseDetails);
+                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
                     ?>
                     <?php break; ?>
                 <?php endswitch;

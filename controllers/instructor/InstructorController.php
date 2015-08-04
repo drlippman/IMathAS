@@ -122,26 +122,30 @@ public $oa = array();
                                     case 'Assessment':
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
-                                        $tempAray['assessment'] = $item;
+                                        $tempItem['assessment'] = $item;
                                         break;
                                     case 'Calendar':
-                                        $tempItem[$item->itemtype] = $itemOrder;
+                                        $tempItem[$item->itemtype] = $item;
                                         break;
                                     case 'Forum':
                                         $form = Forums::getById($item->typeid);
                                         $tempItem[$item->itemtype] = $form;
+                                        $tempItem['forum'] = $item;
                                         break;
                                     case 'Wiki':
                                         $wiki = Wiki::getById($item->typeid);
                                         $tempItem[$item->itemtype] = $wiki;
+                                        $tempItem['wiki'] = $item;
                                         break;
                                     case 'LinkedText':
                                         $linkedText = Links::getById($item->typeid);
                                         $tempItem[$item->itemtype] = $linkedText;
+                                        $tempItem['link'] = $item;
                                         break;
                                     case 'InlineText':
                                         $inlineText = InlineText::getById($item->typeid);
                                         $tempItem[$item->itemtype] = $inlineText;
+                                        $tempItem['inline'] = $item;
                                         break;
                                 }
                                 array_push($tempItemList, $tempItem);
@@ -157,7 +161,7 @@ public $oa = array();
                                 $tempAray['assessment'] = $item;
                                 break;
                             case 'Calendar':
-                                $tempAray[$item->itemtype] = $itemOrder;
+                                $tempAray[$item->itemtype] = $item;
                                 break;
                             case 'Forum':
                                 $form = Forums::getById($item->typeid);

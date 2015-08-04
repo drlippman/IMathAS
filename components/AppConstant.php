@@ -134,7 +134,7 @@ class AppConstant
     const WIKI = 'Wiki';
     const LINK ='LinkedText';
     const ASSESSMENT ='Assessment';
-    const INLINE_TEXT = 'Inline';
+    const INLINE_TEXT = 'InlineText';
     const CALENDAR = 'Calendar';
     const BLOCK = 'Block';
     const MESSAGE_SUCCESS = 'Message sent successfully.';

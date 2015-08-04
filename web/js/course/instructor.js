@@ -46,7 +46,7 @@ function deleteItem(id,type,block,courseId) {
     });
 }
 function responseSuccess(response)
-{console.log(response);
+{
     window.location = homePath;
 }
 
