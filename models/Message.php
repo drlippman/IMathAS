@@ -261,5 +261,17 @@ class Message extends BaseImasMsgs
         }
         return $hasChild;
     }
+    public function saveNewMessage($params,$currentUser)
+    {
+        $now = time();
+        $this->courseid = $params['cid'];
+        $this->msgfrom = $currentUser['id'];
+        $this->msgto = $params['sendto'];
+        $this->title = $params['subject'];
+        $this->message = $params['message'];
+        $this->senddate = $now;
+        $this->isread = AppConstant::NUMERIC_ZERO;
+        $this->save();
+    }
 }
 

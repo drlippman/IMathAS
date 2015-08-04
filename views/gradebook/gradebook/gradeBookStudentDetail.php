@@ -7,10 +7,7 @@ use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AssessmentUtility;
-$studentId = -1;
-if($StudentData){
-    $studentId = $currentUser['id'];
-}
+
 if($studentId > 0){
 
     $this->title = 'Grade Book Student Detail';
@@ -23,22 +20,7 @@ if($studentId > 0){
 //$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 //$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-?>
-
-        <?php $form = ActiveForm::begin([
-            'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
-            'action' => '',
-            'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-5 clear-both col-lg-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-3  text-align-left'],
-            ],
-        ]);  ?>
-
-<?php
-  //show student view
-//     $pagetitle = _('Gradebook');
-
+   //show student view
 $gradebook = $totalData['gradebook'];
 $hidenc = $defaultValuesArray['hidenc'];
 $cid = $defaultValuesArray['hidenc'];
@@ -56,16 +38,17 @@ if($totalData['isTeacher']){
     $isteacher = true;
     $canviewall = true;
 }
+$studentId = $defaultValuesArray['studentId'];
 $istutor = false;
 if($totalData['isTutor']){
     $istutor = true;
     $canviewall = true;
 }
-if ($canviewall) {
-    echo "<div class=cpmid>";
-    echo _('Category'), ': <select id="filtersel" onchange="chgfilter()">';
-    echo '<option value="-1" ';
-    if ($catfilter==-1) {echo "selected=1";}
+if ($canviewall) { ?>
+    <div class=cpmid>
+    <?php AppUtility::t('Save Changes')?>('Category'), ': <select id="filtersel" onchange="chgfilter()">';
+    <option value="-1"
+   <?php if ($catfilter==-1) {echo "selected=1";}
     echo '>', _('All'), '</option>';
     echo '<option value="0" ';
     if ($catfilter==0) { echo "selected=1";}
@@ -103,16 +86,13 @@ if ($availshow==4) {
 $availshow=1;
 $hidepast = true;
 }
-$studentId = -1;
-if($StudentData){
-$studentId = $currentUser['id'];
-}
 if ($studentId>0) {
     $showlatepass = $course['showlatepass'];
   $latepasshrs = $course['latepasshrs'];
 }
 
 if ($studentId>0) {
+
 echo '<div style="font-size:1.1em;font-weight:bold">';
     if ($isteacher || $istutor) {
     if ($gradebook[1][0][1] != '') {
@@ -120,7 +100,6 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
     } else {
     $usersort = 1;
     }
-
     if ($gradebook[1][4][2]==1) {
     if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
     echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
@@ -128,26 +107,20 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
     echo "<img src=\"$imasroot/course/files/userimg_sm{$gradebook[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
     }
     }
-    $query = "SELECT iu.id,iu.FirstName,iu.LastName,istu.section FROM imas_users AS iu JOIN imas_students as istu ON iu.id=istu.userid WHERE istu.courseid='$cid' ";
-    if ($usersort==0) {
-    $query .= "ORDER BY istu.section,iu.LastName,iu.FirstName";
-    } else {
-    $query .= "ORDER BY iu.LastName,iu.FirstName";
-    }
-    $result = mysql_query($query) or die("Query failed : " . mysql_error());
     echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
         $lastsec = '';
-        while ($row = mysql_fetch_row($result)) {
-        if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
+        foreach($allStudentsinformation as $studiinfo) {
+
+        if ($studiinfo[3]!='' && $studiinfo[3]!=$lastsec && $usersort==0) {
         if ($lastsec=='') {echo '</optgroup>';}
-        echo '<optgroup label="Section '.htmlentities($row[3]).'">';
-            $lastsec = $row[3];
+        echo '<optgroup label="Section '.htmlentities($studiinfo[3]).'">';
+            $lastsec = $studiinfo[3];
             }
-            echo '<option value="'.$row[0].'"';
-            if ($row[0]==$stu) {
+            echo '<option value="'.$studiinfo[0].'"';
+            if ($studiinfo[0]==$studentId) {
             echo ' selected="selected"';
             }
-            echo '>'.$row[2].', '.$row[1].'</option>';
+            echo '>'.$studiinfo[2].', '.$studiinfo[1].'</option>';
             }
             if ($lastsec!='') {echo '</optgroup>';}
         echo '</select>';
@@ -176,20 +149,17 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
    <?php } ?>
     <span class="small">Last Login: <?php echo AppUtility::tzdate('D n/j/y g:ia', $lastaccess);?></span>
     </div>
-<?php if ($isteacher) {
-echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
-    //echo '<a href="mailto:'.$stuemail.'">', _('Email'), '</a> | ';
-    echo "<a href=\"#\" onclick=\"GB_show('Send Email','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=email&cid=$cid',800,'auto')\" title=\"Send Email\">", _('Email'), "</a> | ";
-
-    //echo "<a href=\"$imasroot/msgs/msglist.php?cid={$_GET['cid']}&add=new&to=$stu\">", _('Message'), "</a> | ";
-    echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?to=$stu&sendtype=msg&cid=$cid',800,'auto')\" title=\"Send Message\">", _('Message'), "</a> | ";
-    echo "<a href=\"gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\">", _('Make Exception'), "</a> | ";
-    echo "<a href=\"listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\">", _('Change Info'), "</a> | ";
-    echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
-    echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a> | ";
-    echo "<a href=\"#\" onclick=\"makeofflineeditable(this); return false;\">", _('Edit Offline Scores'), "</a>";
-    echo '</div>';
-} else if ($istutor) {
+<?php if ($isteacher) { ?>
+   <div style="clear:both;display:inline-block" class="cpmid secondary">
+    <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email"><?php AppUtility::t('Email')?></a> |
+    <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message"><?php AppUtility::t('Message')?></a> |
+    <a href="gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\"><?AppUtility::t('Make Exception')?></a> |
+    <a href="listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\"><?php AppUtility::t('Change Info')?></a> |
+    <a href="viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\"><?php AppUtility::t('Login Log')?></a> |
+    <a href="viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\"><?php AppUtility::t('Activity Log')?></a> |
+    <a href="#" onclick="makeofflineeditable(this); return false;"><?php AppUtility::t('Edit Offline Scores')?></a>
+    </div>
+<?php } else if ($istutor) {
 echo '<div style="clear:both;display:inline-block" class="cpmid">';
     echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
     echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
@@ -197,10 +167,10 @@ echo '<div style="clear:both;display:inline-block" class="cpmid">';
 }
 
 if (trim($gbcomment)!='' || $isteacher) {
-if ($isTeacher) { ?>
- <form method=post action=\"gradebook.php?{$_SERVER['QUERY_STRING']}\">
-    Gradebook Comment: <input type=submit value="Update Comment"><br/>
-  <textarea name=\"usrcomments\" rows=3 cols=60><?php echo $gbcomment;?></textarea>
+if ($isteacher) { ?>
+ <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
+     Gradebook Comment: <input type=submit value="Update Comment"><br/><br/>
+  <textarea name="usrcomments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
      </form>
     <?php
 } else { ?>
@@ -220,10 +190,12 @@ echo $lpmsg;
 
 }
 ?>
- <form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$studentId\">
-<!--    <input type='button' onclick='conditionalColor(\"myTable\",1,50,80);' value='Color'/> -->
+<!-- <form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$studentId\">-->
+ <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
  <?php if ($isteacher && $studentId>0) {
-    echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
+     ?>
+    <button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button>
+     <?php
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
     echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
@@ -610,14 +582,8 @@ echo "<script>initSortTable('myTable',Array($sarr),false,-3);</script>\n";
 echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
 }
 */
-?>
-
-<?php ActiveForm::end(); ?>
-<?php
 echo "<p>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
 ?>
-
-
  <script type="text/javascript">
     function showhidefb(el,n) {
         el.style.display="none";

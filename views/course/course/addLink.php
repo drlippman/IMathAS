@@ -238,11 +238,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <span class=form>Place on Calendar?</span>
 		 <span class=formright>
 			<input type=radio name="place-on-calendar"
-                   value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['oncal'],AppConstant::NUMERIC_ZERO); ?>  /> No<br/>
+                   value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'],AppConstant::NUMERIC_ZERO); ?>  /> No<br/>
 			<input type=radio name="place-on-calendar"
-                   value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['oncal'], AppConstant::NUMERIC_ONE); ?>  /> Yes, on Available after date (will only show after that date)<br/>
+                   value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ONE); ?>  /> Yes, on Available after date (will only show after that date)<br/>
             <input type=radio name="place-on-calendar"
-                   value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['oncal'], AppConstant::NUMERIC_ZERO); ?>  /> Yes, on Available until date<br/>
+                   value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ZERO); ?>  /> Yes, on Available until date<br/>
             <br>With tag:<input type="text" size="3" value="!" name="tag">
          </span><br class="form"/>
     </div>

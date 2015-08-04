@@ -12,6 +12,7 @@ use app\models\CalItem;
 use app\models\Course;
 use app\models\Assessments;
 use app\models\Exceptions;
+use app\models\forms\ChangeUserInfoForm;
 use app\models\forms\CourseSettingForm;
 use app\models\InstrFiles;
 use app\models\LinkedText;
@@ -32,6 +33,7 @@ use app\models\GbCats;
 use app\models\StuGroupSet;
 use app\models\Rubrics;
 use app\models\Outcomes;
+use yii\web\UploadedFile;
 use app\models\ExternalTools;
 use Yii;
 use app\controllers\AppController;
@@ -154,17 +156,18 @@ class CourseController extends AppController
         $message = Message::getByCourseIdAndUserId($courseId, $user->id);
         $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
         $msgList = array();
-        if($message){
-            foreach($message as $singleMessage){
-                if(in_array($singleMessage->isread, $isReadArray))
-                    array_push($msgList,$singleMessage);
+        if ($message) {
+            foreach ($message as $singleMessage) {
+                if (in_array($singleMessage->isread, $isReadArray))
+                    array_push($msgList, $singleMessage);
             }
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' =>$calendarCount,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
+        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
     }
+
     /**
      * Display assessment details
      */
@@ -181,9 +184,10 @@ class CourseController extends AppController
         $this->saveAssessmentSession($assessment, $id);
         $this->includeCSS(['mathtest.css', 'default.css', 'showAssessment.css']);
         $this->includeJS(['timer.js']);
-        $returnData = array('cid'=> $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet,'assessmentSession' => $assessmentSession,'now' => time());
+        $returnData = array('cid' => $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet, 'assessmentSession' => $assessmentSession, 'now' => time());
         return $this->render('ShowAssessment', $returnData);
     }
+
     /**
      * Show late passes of assessment.
      */
@@ -222,6 +226,7 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
+
     /**
      * Display password, when assessment need password.
      */
@@ -245,6 +250,7 @@ class CourseController extends AppController
         $returnData = array('model' => $model, 'assessments' => $assessment);
         return $this->renderWithData('setPassword', $returnData);
     }
+
     /**
      * Create new course at admin side
      */
@@ -280,6 +286,7 @@ class CourseController extends AppController
         $returnData = array('model' => $model);
         return $this->renderWithData('addNewCourse', $returnData);
     }
+
     /**
      * Setting in created course.
      */
@@ -309,8 +316,7 @@ class CourseController extends AppController
                 $courseSetting = AppUtility::removeEmptyAttributes($courseSetting);
                 $course->attributes = $courseSetting;
                 $course->save();
-            }
-            else{
+            } else {
                 $selectionList = AppUtility::prepareSelectedItemOfCourseSetting($course);
                 $this->includeCSS(["courseSetting.css"]);
                 $returnData = array('model' => $model, 'course' => $course, 'selectionList' => $selectionList);
@@ -319,6 +325,7 @@ class CourseController extends AppController
         }
         return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
+
     /**
      * To delete existing course.
      */
@@ -339,6 +346,7 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
+
     /**
      * @return string
      */
@@ -361,32 +369,33 @@ class CourseController extends AppController
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
-            if ($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT){
+            if ($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
                 $this->setErrorFlash(AppConstant::NO_ACCESS_RIGHTS);
             }
             $exec = false;
-            $row = Course::setOwner($params,$user);
-            if($user->rights == AppConstant::GROUP_ADMIN_RIGHT){
-                $courseitem = Course::getByCourseAndGroupId($params,$user);
-                if($courseitem > 0){
-                    $row = Course::setOwner($params,$user);
+            $row = Course::setOwner($params, $user);
+            if ($user->rights == AppConstant::GROUP_ADMIN_RIGHT) {
+                $courseitem = Course::getByCourseAndGroupId($params, $user);
+                if ($courseitem > 0) {
+                    $row = Course::setOwner($params, $user);
                     $exec = true;
                 }
-            }else{
+            } else {
                 $exec = true;
             }
 
             if ($exec && $row > 0) {
-                $teacher = Teacher::getByUserId($user->id,$params['cid']);
+                $teacher = Teacher::getByUserId($user->id, $params['cid']);
                 if ($teacher == 0) {
-                    $newTeacher =new Teacher();
-                    $newTeacher->create($params['newOwner'],$params['cid']);
+                    $newTeacher = new Teacher();
+                    $newTeacher->create($params['newOwner'], $params['cid']);
                 }
                 Teacher::removeTeacher($user->id, $params['cid']);
             }
             return $this->successResponse();
         }
     }
+
     public function actionAddRemoveCourse()
     {
         $this->guestUserHandler();
@@ -476,6 +485,7 @@ class CourseController extends AppController
             return $this->successResponse();
         }
     }
+
     /**
      * @param $assessment
      * @param $param
@@ -512,6 +522,7 @@ class CourseController extends AppController
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
     }
+
     /**
      * Display linked text on course page
      */
@@ -524,6 +535,7 @@ class CourseController extends AppController
         $returnData = array('course' => $course, 'links' => $link);
         return $this->renderWithData('showLinkedText', $returnData);
     }
+
     /**
      * To handle event on calendar.
      */
@@ -538,8 +550,7 @@ class CourseController extends AppController
         $CalendarLinkItems = Links::getByCourseId($cid);
         $calendarInlineTextItems = InlineText::getByCourseId($cid);
         $assessmentArray = array();
-        foreach ($assessments as $assessment)
-        {
+        foreach ($assessments as $assessment) {
             $assessmentArray[] = array(
                 'startDate' => AppUtility::getFormattedDate($assessment['startdate']),
                 'endDate' => AppUtility::getFormattedDate($assessment['enddate']),
@@ -555,8 +566,7 @@ class CourseController extends AppController
             );
         }
         $calendarArray = array();
-        foreach ($calendarItems as $calendarItem)
-        {
+        foreach ($calendarItems as $calendarItem) {
             $calendarArray[] = array(
                 'courseId' => $calendarItem['courseid'],
                 'date' => AppUtility::getFormattedDate($calendarItem['date']),
@@ -566,8 +576,7 @@ class CourseController extends AppController
             );
         }
         $calendarLinkArray = array();
-        foreach ($CalendarLinkItems as $CalendarLinkItem)
-        {
+        foreach ($CalendarLinkItems as $CalendarLinkItem) {
             $calendarLinkArray[] = array(
                 'courseId' => $CalendarLinkItem['courseid'],
                 'title' => ucfirst($CalendarLinkItem['title']),
@@ -582,8 +591,7 @@ class CourseController extends AppController
             );
         }
         $calendarInlineTextArray = array();
-        foreach ($calendarInlineTextItems as $calendarInlineTextItem)
-        {
+        foreach ($calendarInlineTextItems as $calendarInlineTextItem) {
             $calendarInlineTextArray[] = array(
                 'courseId' => $calendarInlineTextItem['courseid'],
                 'endDate' => AppUtility::getFormattedDate($calendarInlineTextItem['enddate']),
@@ -594,7 +602,7 @@ class CourseController extends AppController
                 'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray,'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
+        $responseData = array('assessmentArray' => $assessmentArray, 'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
         return $this->successResponse($responseData);
     }
 
@@ -658,10 +666,10 @@ class CourseController extends AppController
         $message = Message::getByCourseIdAndUserId($courseId, $user->id);
         $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
         $msgList = array();
-        if($message){
-            foreach($message as $singleMessage){
-                if(in_array($singleMessage->isread, $isReadArray))
-                    array_push($msgList,$singleMessage);
+        if ($message) {
+            foreach ($message as $singleMessage) {
+                if (in_array($singleMessage->isread, $isReadArray))
+                    array_push($msgList, $singleMessage);
             }
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
@@ -683,6 +691,7 @@ class CourseController extends AppController
         $responseData = array('course' => $course, 'user' => $user);
         return $this->render('calendar', $responseData);
     }
+
     /**
      * Modify inline text: Teacher
      */
@@ -716,29 +725,26 @@ class CourseController extends AppController
                 $updateForum = new InlineText();
                 $updateForum->updateChanges($params, $inlineTextId);
             } else {
-                $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
-                $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+                $endDate = AssessmentUtility::parsedatetime($params['edate'], $params['etime']);
+                $startDate = AssessmentUtility::parsedatetime($params['sdate'], $params['stime']);
                 $finalArray['title'] = trim($params['title']);
-                if(empty($params['text']))
-                {
+                if (empty($params['text'])) {
                     $params['text'] = ' ';
                 }
                 $finalArray['text'] = trim($params['text']);
                 $finalArray['courseid'] = $params['cid'];
 
-                if($params['avail'] == AppConstant::NUMERIC_ONE)
-                {
-                    if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+                if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+                    if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
 
                         $startDate = AppConstant::NUMERIC_ZERO;
                     }
-                    if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                    if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
                         $endDate = AppConstant::ALWAYS_TIME;
                     }
                     $finalArray['startdate'] = $startDate;
                     $finalArray['enddate'] = $endDate;
-                }else
-                {
+                } else {
 
                     $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
@@ -747,10 +753,10 @@ class CourseController extends AppController
                 $finalArray['courseid'] = $courseId;
                 $finalArray['oncal'] = $params['place-on-calendar'];
                 $finalArray['isplaylist'] = $params['isplaylist'];
-                $finalArray['caltag']= '!';
+                $finalArray['caltag'] = '!';
                 $newInline = new InlineText();
                 $inlineId = $newInline->saveChanges($finalArray);
-                    $itemType = 'InlineText';
+                $itemType = 'InlineText';
                 $itemId = new Items();
                 $lastItemId = $itemId->saveItems($courseId, $inlineId, $itemType);
                 $courseItemOrder = Course::getItemOrder($courseId);
@@ -766,7 +772,7 @@ class CourseController extends AppController
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
             }
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
         if (isset($inlineTextId)) {
             $pageTitle = 'Modify Inline Text';
@@ -807,11 +813,13 @@ class CourseController extends AppController
                 'endDate' => $endDate,
             );
         }
-        $this->includeJS(["editor/tiny_mce.js" , "editor/tiny_mce_src.js", "general.js", 'editor.js']);
+        $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
+
         $this->includeCSS(['course/items.css']);
-        $responseData = array('course' => $course,'saveTitle' => $saveTitle,'inlineText' => $inlineText, 'pageTitle' => $pageTitle,'defaultValue' => $defaultValue);
+        $responseData = array('course' => $course, 'saveTitle' => $saveTitle, 'inlineText' => $inlineText, 'pageTitle' => $pageTitle, 'defaultValue' => $defaultValue);
         return $this->renderWithData('modifyInlineText', $responseData);
     }
+
     public function actionAddLink()
     {
         $params = $this->getRequestParams();
@@ -825,25 +833,25 @@ class CourseController extends AppController
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
         if ($query) {
-            foreach($query as $singleData) {
+            foreach ($query as $singleData) {
                 $pageOutcomes[$singleData['id']] = $singleData['name'];
                 $key++;
             }
         }
         $pageOutcomesList = array();
-        if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
+        if ($key > AppConstant::NUMERIC_ZERO) {//there were outcomes
             $query = $course['outcomes'];
             $outcomeArray = unserialize($query);
             $result = $this->flatArray($outcomeArray);
-            if($result){
-                foreach($result as $singlePage){
-                    array_push($pageOutcomesList,$singlePage);
+            if ($result) {
+                foreach ($result as $singlePage) {
+                    array_push($pageOutcomesList, $singlePage);
                 }
             }
         }
-        $key = 0;
+        $key = AppConstant::NUMERIC_ZERO;
         $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach($gbcatsData as $group){
+        foreach ($gbcatsData as $group) {
             $gbcatsId[$key] = $group['id'];
             $gbcatsLabel[$key] = $group['name'];
             $key++;
@@ -851,30 +859,30 @@ class CourseController extends AppController
         $toolsData = ExternalTools::externalToolsData($courseId);
         $toolvals = array();
         $toolvals[0] = AppConstant::NUMERIC_ZERO;
-        $key = 1;
-        foreach($toolsData as $tool){
+        $key = AppConstant::NUMERIC_ONE;
+        foreach ($toolsData as $tool) {
             $toolvals[$key++] = $tool['id'];
 
         }
         $toollabels[0] = 'Select a tool...';
-        $key = 1;
-        foreach($toolsData as $tool){
+        $key = AppConstant::NUMERIC_ONE;
+        foreach ($toolsData as $tool) {
             $toollabels[$key++] = $tool['name'];
 
         }
         if ($params['id']) {
             $linkData = LinkedText::getById($params['id']);
-            $gbcat = 0;
-            $cntingb = 1;
-            $tutoredit = 0;
+            $gbcat = AppConstant::NUMERIC_ZERO;
+            $cntingb = AppConstant::NUMERIC_ONE;
+            $tutoredit = AppConstant::NUMERIC_ZERO;
             $gradesecret = uniqid();
 
-            if ($linkData['avail'] == 2 && $linkData['startdate'] > 0) {
-                $altoncal = 1;
+            if ($linkData['avail'] == AppConstant::NUMERIC_TWO && $linkData['startdate'] > AppConstant::NUMERIC_ZERO) {
+                $altoncal = AppConstant::NUMERIC_ONE;
             } else {
-                $altoncal = 0;
+                $altoncal = AppConstant::NUMERIC_ONE;
             }
-            if (substr($linkData['text'], 0, 4) == 'http') {
+            if (substr($linkData['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR) == 'http') {
                 $type = 'web';
                 $webaddr = $linkData['text'];
                 $linkData['text'] = "<p>Enter text here</p>";
@@ -885,20 +893,20 @@ class CourseController extends AppController
             } else if (substr($linkData['text'], 0, 8) == 'exttool:') {
                 $type = 'tool';
                 $points = $linkData['points'];
-                $toolparts = explode('~~', substr($linkData['text'], 8));
+                $toolParts = explode('~~', substr($linkData['text'], AppConstant::NUMERIC_EIGHT));
 
-                $selectedtool = $toolparts[0];
-                $toolcustom = $toolparts[1];
-                if (isset($toolparts[2])) {
-                    $toolcustomurl = $toolparts[2];
+                $selectedTool = $toolParts[0];
+                $toolcustom = $toolParts[1];
+                if (isset($toolParts[2])) {
+                    $toolcustomurl = $toolParts[2];
                 } else {
                     $toolcustomurl = '';
                 }
-                if (isset($toolparts[3])) {
-                    $gbcat = $toolparts[3];
-                    $cntingb = $toolparts[4];
-                    $tutoredit = $toolparts[5];
-                    $gradesecret = $toolparts[6];
+                if (isset($toolParts[3])) {
+                    $gbcat = $toolParts[3];
+                    $cntingb = $toolParts[4];
+                    $tutoredit = $toolParts[5];
+                    $gradesecret = $toolParts[6];
                 }
                 $line['text'] = "<p>Enter text here</p>";
             } else {
@@ -919,22 +927,16 @@ class CourseController extends AppController
             $gradeoutcomes = array();
             $checkboxesValues = array(
                 'title' => $linkData['title'],
-                'summary' =>  $linkData['summary'],
-                'text' =>  $linkData['text'],
+                'summary' => $linkData['summary'],
+                'text' => $linkData['text'],
                 'startdate' => $linkData['startdate'],
                 'enddate' => $linkData['enddate'],
-                'gbcat' => 0,
-                'cntingb' => 1,
-                'tutoredit' => 0,
-                'gradesecret' => uniqid(),
                 'webaddr' => $webaddr,
                 'filename' => $filename,
                 'altoncal' => $altoncal,
-                'altoncal' => 0,
                 'type' => $type,
                 'gradeoutcomes' => $gradeoutcomes,
-                'points' => $points,
-                'toolparts' => $toolparts,
+                'toolparts' => $toolParts,
                 'cntingb' => $cntingb,
                 'gbcat' => $gbcat,
                 'tutoredit' => $tutoredit,
@@ -942,6 +944,10 @@ class CourseController extends AppController
                 'saveButtonTitle' => $saveButtonTitle,
                 'saveTitle' => $saveTitle,
                 'points' => $points,
+                'selectedtool' => $selectedTool,
+                'toolcustom' => $toolcustom,
+                'toolcustomurl' => $toolcustomurl,
+                'gradesecret' => $gradesecret,
             );
         } else {
             $checkboxesValues = array(
@@ -950,146 +956,152 @@ class CourseController extends AppController
                 'title' => "Enter title here",
                 'summary' => "Enter summary here (displays on course page)",
                 'text' => "Enter text here",
-                'points' => 0,
+                'points' => AppConstant::NUMERIC_ZERO,
             );
         }
-        if($this->isPost()){
-        $outcomes = array();
-        $modifyLinkId = $params['id'];
-        if($modifyLinkId){
-            $link = new LinkedText();
-            $link->updateLinkData($params);
-        }else{
-            if($params['outcomes']){
-                foreach ($params['outcomes'] as $outcome) {
-                    if (is_numeric($outcome) && $outcome > 0) {
-                        $outcomes[] = intval($outcome);
-                    }
-                }
-                $outcomes = implode(',',$outcomes);
-
-            }
-
-            $processingerror = false;
-             if ($params['linktype']=='file') {
-         if ($_FILES['userfile']['name']!='') {
-                    $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
-                    $filename = $userfilename;
-                    $extension = strtolower(strrchr($userfilename,"."));
-                    $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
-                    $params['text'] = $filename;
-
-                }
-            } else if ($params['linktype']=='web') {
-                $params['text'] = trim(strip_tags($params['web']));
-                if (substr($params['text'],0,4)!='http') {
-
-                    $processingerror = true;
-                }
-
-            } else if ($params['linktype']=='tool') {
-                if ($params['tool']==0) {
-                    $processingerror = true;
-                } else {
-                    $params['text'] = 'exttool:'.$params['tool'].'~~'.$params['toolcustom'].'~~'.$params['toolcustomurl'];
-                    if ($params['usegbscore']==0 || $params['points']==0) {
-                        $points = 0;
-                    } else {
-                        $params['text'] .= '~~'.$params['gbcat'].'~~'.$params['cntingb'].'~~'.$params['tutoredit'].'~~'.$params['gradesecret'];
-                        $points = intval($params['points']);
-                    }
-                }
-            }
-            if ($params['linktype']=='tool') {
-                $externalToolsData = new ExternalTools();
-                $externalToolsData->updateExternalToolsData($params);
-            }
-            if ($params['id']){
-                $endDate = $params['enddate'];
-                $startDate = $params['startdate'];
-            }else{
-                $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
-                $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
-            }
-            $finalArray['courseid'] = $params['cid'];
-            $finalArray['title'] = $params['name'];
-            $finalArray['summary'] = $params['summary'];
-            $finalArray['text'] = $params['text'];
-            $finalArray['avail'] = $params['avail'];
-            $finalArray['oncal'] = $params['place-on-calendar'];
-            $finalArray['caltag'] = $params['caltag'];
-            $finalArray['target'] = $params['target'];
-            $finalArray['points'] = $params['points'];
-            $finalArray['target'] = $params['open-page-in'];
-            $finalArray['caltag'] = $params['points'];
-            $finalArray['outcomes'] = ' ';
-            if($params['outcomes']){
-                $finalArray['outcomes'] = $outcomes;
-            }
-            $finalArray['points'] = $params['points'];
-            if ($params['avail'] == AppConstant::NUMERIC_ONE) {
-                if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
-                    $startDate = AppConstant::NUMERIC_ZERO;
-                }
-                if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
-                    $endDate = AppConstant::ALWAYS_TIME;
-                }
-                $finalArray['startdate'] = $startDate;
-                $finalArray['enddate'] = $endDate;
+        if ($this->isPost()) {
+            $outcomes = array();
+            $modifyLinkId = $params['id'];
+            if ($modifyLinkId) {
+                $link = new LinkedText();
+                $link->updateLinkData($params);
             } else {
-                $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
-                $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
+                if ($params['outcomes']) {
+                    foreach ($params['outcomes'] as $outcome) {
+                        if (is_numeric($outcome) && $outcome > AppConstant::NUMERIC_ZERO) {
+                            $outcomes[] = intval($outcome);
+                        }
+                    }
+                    $outcomes = implode(',', $outcomes);
+                }
+                if ($_POST['linktype'] == 'text') {
+                    /*
+                     * To add htmllawed to link text
+                     */
+                } else if ($params['linktype'] == 'file') {
+                    if ($_FILES['userfile']['name'] != '') {
+                        $userfilename = preg_replace('/[^\w\.]/', '', basename($_FILES['userfile']['name']));
+                        $filename = $userfilename;
+                        $extension = strtolower(strrchr($userfilename, "."));
+                        $badextensions = array(".php", ".php3", ".php4", ".php5", ".bat", ".com", ".pl", ".p");
+                        $params['text'] = $filename;
+                    }
+                } else if ($params['linktype'] == 'web') {
+
+                    $params['text'] = trim(strip_tags($params['web']));
+                    if (substr($params['text'], 0, 4) != 'http') {
+                        $this->setSuccessFlash('Web link should start with http://');
+                    }
+
+                } else if ($params['linktype'] == 'tool') {
+                    if ($params['tool'] == AppConstant::NUMERIC_ZERO) {
+                        $this->setSuccessFlash('Select external Tool');
+                    } else {
+                        $params['text'] = 'exttool:' . $params['tool'] . '~~' . $params['toolcustom'] . '~~' . $params['toolcustomurl'];
+                        if ($params['usegbscore'] == AppConstant::NUMERIC_ZERO || $params['points'] == AppConstant::NUMERIC_ZERO) {
+                            $points = AppConstant::NUMERIC_ZERO;
+                        } else {
+                            $params['text'] .= '~~' . $params['gbcat'] . '~~' . $params['cntingb'] . '~~' . $params['tutoredit'] . '~~' . $params['gradesecret'];
+                            $points = intval($params['points']);
+                        }
+
+                    }
+                }
+                if ($params['linktype'] == 'tool') {
+                    $externalToolsData = new ExternalTools();
+                    $externalToolsData->updateExternalToolsData($params);
+                }
+                if ($params['id']) {
+                    $endDate = $params['enddate'];
+                    $startDate = $params['startdate'];
+                } else {
+                    $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+                    $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
+                }
+                $finalArray['courseid'] = $params['cid'];
+                $finalArray['title'] = $params['name'];
+                $finalArray['summary'] = $params['summary'];
+                $finalArray['text'] = $params['text'];
+                $finalArray['avail'] = $params['avail'];
+                $finalArray['oncal'] = $params['place-on-calendar'];
+                $finalArray['caltag'] = $params['caltag'];
+                $finalArray['target'] = $params['target'];
+                $finalArray['points'] = $params['points'];
+                $finalArray['target'] = $params['open-page-in'];
+                $finalArray['caltag'] = $params['points'];
+                $finalArray['outcomes'] = ' ';
+                if ($params['outcomes']) {
+                    $finalArray['outcomes'] = $outcomes;
+                }
+                $finalArray['points'] = $params['points'];
+                if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+                    if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                    }
+                    if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
+                        $endDate = AppConstant::ALWAYS_TIME;
+                    }
+                    $finalArray['startdate'] = $startDate;
+                    $finalArray['enddate'] = $endDate;
+                } else {
+                    $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
+                    $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
+                }
+                $linkText = new LinkedText();
+                $linkTextId = $linkText->AddLinkedText($finalArray);
+                $itemType = AppConstant::LINK;
+                $itemId = new Items();
+                $lastItemId = $itemId->saveItems($courseId, $linkTextId, $itemType);
+                $courseItemOrder = Course::getItemOrder($courseId);
+                $itemOrder = $courseItemOrder->itemorder;
+                $items = unserialize($itemOrder);
+                $blocktree = array(0);
+                $sub =& $items;
+                for ($i = AppConstant::NUMERIC_ONE; $i < count($blocktree); $i++) {
+                    $sub =& $sub[$blocktree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
+                }
+                array_unshift($sub, intval($lastItemId));
+                $itemorder = (serialize($items));
+                $saveItemOrderIntoCourse = new Course();
+                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
             }
-            $linkText = new LinkedText();
-            $linkTextId = $linkText->AddLinkedText($finalArray);
-            $itemType = AppConstant::LINK;
-            $itemId = new Items();
-            $lastItemId =   $itemId -> saveItems($courseId, $linkTextId, $itemType);
-            $courseItemOrder = Course::getItemOrder($courseId);
-            $itemOrder = $courseItemOrder->itemorder;
-            $items = unserialize($itemOrder);
-            $blocktree = array(0);
-            $sub =& $items;
-            for ($i=1;$i<count($blocktree);$i++) {
-                $sub =& $sub[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-            }
-            array_unshift($sub,intval($lastItemId));
-            $itemorder = (serialize($items));
-            $saveItemOrderIntoCourse = new Course();
-            $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+            $this->includeJS(["editor/tiny_mce.js", "general.js"]);
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-        $this->includeJS(["editor/tiny_mce.js","general.js"]);
-        return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+        $model = new ChangeUserInfoForm();
+        $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
+        $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'modifyLinkId' => $modifyLinkId,
+            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'checkboxesValues' => $checkboxesValues);
+        return $this->renderWithData('addLink', $responseData);
     }
-        $this->includeJS(["editor/tiny_mce.js","course/addlink.js","general.js"]);
-        $responseData = array('course' => $course,'groupNames' => $groupNames,'rubricsData' => $rubricsData,'pageOutcomesList' => $pageOutcomesList,'modifyLinkId' => $modifyLinkId,
-            'pageOutcomes' => $pageOutcomes,'toolvals' => $toolvals,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'toollabels' => $toollabels,'checkboxesValues' => $checkboxesValues);
-        return $this->renderWithData('addLink',$responseData);
-    }
-    function mkdir_recursive($pathname, $mode=0777)
+
+    function mkdir_recursive($pathname, $mode = 0777)
     {
         is_dir(dirname($pathname)) || $this->mkdir_recursive(dirname($pathname), $mode);
         return is_dir($pathname) || @mkdir($pathname, $mode);
     }
-    function doesfileexist($type,$key) {
-        if ($type=='cfile') {
+
+    function doesfileexist($type, $key)
+    {
+        if ($type == 'cfile') {
             if ($GLOBALS['filehandertypecfiles'] == 's3') {
-                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
-                return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/'.$key, false);
+                $s3 = new S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
+                return $s3->getObjectInfo($GLOBALS['AWSbucket'], 'cfiles/' . $key, false);
             } else {
-                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files/';
-                return file_exists($base.$key);
+                $base = rtrim(dirname(dirname(__FILE__)), '/\\') . '/course/files/';
+                return file_exists($base . $key);
             }
         } else {
             if ($GLOBALS['filehandertype'] == 's3') {
-                $s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
+                $s3 = new S3($GLOBALS['AWSkey'], $GLOBALS['AWSsecret']);
                 return $s3->getObjectInfo($GLOBALS['AWSbucket'], $key, false);
             } else {
-                $base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore/';
-                return file_exists($base.$key);
+                $base = rtrim(dirname(dirname(__FILE__)), '/\\') . '/filestore/';
+                return file_exists($base . $key);
             }
         }
     }
+
     public function flatArray($outcomesData)
     {
         global $pageOutcomesList;

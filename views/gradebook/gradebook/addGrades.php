@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'labelOptions' => ['class' => 'col-lg-3 select-text-margin'],
             ],
         ]); ?>
+<!--<form action=add-grades?cid='.$course['id']>-->
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
         <?php
         $model->Points = AppUtility::getStringVal(AppConstant::NUMERIC_ZERO);

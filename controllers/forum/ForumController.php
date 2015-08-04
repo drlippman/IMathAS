@@ -389,7 +389,7 @@ class ForumController extends AppController
                 );
                 array_push($threadArray, $tempArray);
             }
-            if ($this->isPost()) {
+            if ($this->isPostMethod()) {
                 $params = $this->getRequestParams();
                 $moveType = $params['movetype'];
                 $thread_Id = $params['threadId'];
@@ -448,7 +448,7 @@ class ForumController extends AppController
         }
         $forumPostData = ForumPosts::getbyid($threadId);
         $threadCreatedUserData = User::getById($forumPostData[0]['userid']);
-        if($this->isPost())
+        if($this->isPostMethod())
         {
             $params = $this->getRequestParams();
             if(strlen(trim($params['subject'])) > 0) {
@@ -675,7 +675,7 @@ class ForumController extends AppController
     public function actionReplyPostAjax()
     {
         $this->guestUserHandler();
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $isPost = $params['isPost'];
             $user = $this->getAuthenticatedUser();
@@ -691,7 +691,6 @@ class ForumController extends AppController
     public function actionAddNewThread()
     {
         $this->layout = 'master';
-//        AppUtility::dump("asdadasd");
         $user = $this->getAuthenticatedUser();
         $userId = $this->getUserId();
         $rights = $user->rights;
@@ -701,7 +700,7 @@ class ForumController extends AppController
         $forumData = Forums::getById($forumId);
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
-        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights,'model' => $model);
+        $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
         return $this->renderWithData('addNewThread', $responseData);
     }
     /*
@@ -711,7 +710,6 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
             $params = $this->getRequestParams();
-        AppUtility::dump($params);
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
             $isNonValue = AppConstant::NUMERIC_ZERO;
@@ -947,7 +945,7 @@ class ForumController extends AppController
     public function actionReplyListPostAjax()
     {
         $this->guestUserHandler();
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
             $reply = new ForumPosts();
@@ -962,7 +960,7 @@ class ForumController extends AppController
         $userId = $this->getAuthenticatedUser()->id;
         $params = $this->getRequestParams();
         $like = $params['like'];
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
 
             if ($like == AppConstant::NUMERIC_ZERO) {
                 $like = new ForumLike();
@@ -1153,7 +1151,7 @@ class ForumController extends AppController
                 'gbCat' => $forumData['gbcategory']
             );
         }
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
              if ($params['modifyFid']) {
                 $updateForum = new Forums();
                 $updateForum->UpdateForum($params);

@@ -24,6 +24,7 @@ use app\models\Items;
 use app\models\LinkedText;
 use app\models\LoginLog;
 use app\models\loginTime;
+use app\models\Message;
 use app\models\Rubrics;
 use app\models\Questions;
 use app\models\Student;
@@ -78,7 +79,7 @@ class GradebookController extends AppController
 
     }
 
-    public function gbtable($userId, $courseId)
+    public function gbtable($userId, $courseId,$studentId=null)
     {
 
         $teacherid = Teacher::getByUserId($userId, $courseId);
@@ -202,8 +203,12 @@ class GradebookController extends AppController
             $includeduedate = false;
             $includelastchange = false;
         }
-        $stu = 0;
 
+        if ($canviewall && $studentId) {
+            $stu = $studentId;
+        } else {
+            $stu = 0;
+        }
         $isdiag = false;
         if ($canviewall) {
             $query = Diags::findOne(['cid' => $courseId]);
@@ -214,8 +219,7 @@ class GradebookController extends AppController
             }
         }
         if ($canviewall && func_num_args() > 2) {
-//            $limuser = func_get_arg(2);
-            $limuser = -1;/*Assign hard coded -1 to $limuser */
+            $limuser = $studentId;
         } else if (!$canviewall) {
             $limuser = $userId;
         } else {
@@ -431,8 +435,7 @@ class GradebookController extends AppController
 
             }
         }
-
-        //Pull Offline Grade item info
+//Pull Offline Grade item info
         $istutor = false;
         $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         if ($gbItems) {
@@ -1003,7 +1006,6 @@ class GradebookController extends AppController
                 } else {
                     $IP = 0;
                 }
-
                 /*
 		        Moved up to exception finding so LP mark will show on unstarted assessments
 		        if (isset($exceptions[$l['assessmentid']][$l['userid']])) {
@@ -1806,7 +1808,6 @@ class GradebookController extends AppController
 
             }
         }
-
         if ($limuser < 1) {
             //create averages
             $gradebook[$ln][0][0] = "Averages";
@@ -1932,7 +1933,6 @@ class GradebookController extends AppController
 //                return $gradebook;
 //            }
 //        }
-
         $defaultValuesArray = array(
             'secfilter' => $secfilter,
             'catfilter' => $catfilter,
@@ -1946,6 +1946,7 @@ class GradebookController extends AppController
             'lastlogin' => $lastlogin,
             'includeduedate' => $includeduedate,
             'includelastchange' => $includelastchange,
+            'studentId' => $stu,
         );
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
@@ -1991,7 +1992,7 @@ class GradebookController extends AppController
             }
         }
         if ($this->isPost()) {
-            $params = $_POST;
+            $params = $this->getRequestParams();
             $gbItems = new GbItems();
             $gbItemsId = $gbItems->createGbItemsByCourseId($courseId, $params);
             if ($params['AddGradesForm']['UploadGrades'] == AppConstant::NUMERIC_ZERO) {
@@ -2481,19 +2482,99 @@ class GradebookController extends AppController
     {
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
+        $userId = $params['studentId'];
         $course = Course::getById($courseId);
         $currentUser = $this->getAuthenticatedUser();
-        $StudentData = Student::getByUserId($currentUser['id']);
-        $totalData = $this->gbtable($currentUser['id'], $course['id']);
+        $StudentData = Student::getByUserId($userId);
+        $totalData = $this->gbtable($currentUser['id'], $course['id'],$userId);
         $defaultValuesArray = $totalData['defaultValuesArray'];
         $stugbmode = GbScheme::getByCourseId($courseId);
         $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
         $contentTrackData = ContentTrack::getByCourseIdUserIdAndType($courseId, $currentUser['id']);
+        if ($totalData['gradebook'][1][0][1] != '') {
+            $usersort = $stugbmode['usersort'];
+        } else {
+            $usersort = 1;
+        }
+        $allStudentsData = User::studentGradebookData($courseId,$usersort);
+        $allStudentsinformation = array();
+        foreach($allStudentsData as $stud){
+
+            $tempArray[0] = $stud['id'];
+            $tempArray[1] = $stud['FirstName'];
+            $tempArray[2] = $stud['LastName'];
+            $tempArray[3] = $stud['section'];
+            array_push($allStudentsinformation,$tempArray);
+        }
+        if($this->isPostMethod()){
+
+        }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css']);
-        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode);
+        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js','gradebookstudentdetail.js']);
+        $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode,'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
 
+    }
+
+    public function actionSendMessageModel()
+    {
+        $params = $this->getRequestParams();
+        $currentUser = $this->getAuthenticatedUser();
+        $userId = $params['sendto'];
+        $sendType = $params['sendtype'];
+        $coueseId = $params['cid'];
+        $course = Course::getById($coueseId);
+        $receiverInformation = User::getById($userId);
+        if($this->isPostMethod()){
+    $htmlawedconfig = array('elements'=>'*-script');
+
+    $msgto = intval($params['sendto']);
+    $error = '';
+    if ($params['sendtype']=='msg') {
+        $newMessage = new Message();
+        $newMessage->saveNewMessage($params,$currentUser);
+        $success = AppUtility::t('Message sent');
+    } else if ($params['sendtype']=='email') {
+        $receiverData = array(
+            '0' => $receiverInformation['FirstName'],
+            '1' => $receiverInformation['LastName'],
+            '2' => $receiverInformation['email'],
+        );
+        $receiverData[2] = trim($receiverData[2]);
+        if ($receiverData[2]!='' && $receiverData[2]!='none@none.com') {
+            $receiver = "{$receiverData[0]} {$receiverData[1]} <{$receiverData[2]}>";
+            $subject = stripslashes($params['subject']);
+            $message = stripslashes($params['message']);
+            $sessiondata['mathdisp']=2;
+            $sessiondata['graphdisp']=2;
+            $headers  = 'MIME-Version: 1.0' . "\r\n";
+            $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+            $senderInformation = User::getById($currentUser['id']);
+            $senderInformation = array(
+                '0' => $senderInformation['FirstName'],
+                '1' => $senderInformation['LastName'],
+                '2' => $senderInformation['email'],
+            );
+            $self = "{$senderInformation[0]} {$senderInformation[1]} <{$senderInformation[2]}>";
+            $headers .= "From: $self\r\n";
+            mail($receiver,$subject,$message,$headers);
+            $success = AppUtility::t('Email sent');
+        } else {
+            $error = AppUtility::t('Unable to send: Invalid email address');
+        }
+    }
+
+    if ($error=='') {
+        echo $success;
+    } else {
+        echo $error;
+    }
+    echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
+
+    exit;
+        }
+        $responseData = array('receiverInformation' => $receiverInformation,'params' => $params,'course' => $course);
+        return $this->renderWithData('sendMessageModel',$responseData);
     }
 }
 

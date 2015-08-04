@@ -249,4 +249,26 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
             $user->save();
         }
     }
+
+    public static function studentGradebookData($courseId,$usersort)
+    {
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName','imas_students.section'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId]);
+
+          if ($usersort==0) {
+              $query ->orderBy('imas_students.section','imas_users.LastName','imas_users.FirstName');
+        } else {
+              $query ->orderBy('imas_users.LastName','imas_users.FirstName');
+        }
+
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

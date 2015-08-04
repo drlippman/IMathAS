@@ -246,10 +246,10 @@ function GB_show(caption,url,width,height) {
 	document.getElementById("GB_window").style.display = "block";
 	document.getElementById("GB_overlay").style.display = "block";
 	document.getElementById("GB_loading").style.display = "block";
-	
+
 	var de = document.documentElement;
 	var w = self.innerWidth || (de&&de.clientWidth) || document.body.clientWidth;
-	
+
 	document.getElementById("GB_window").style.width = width + "px";
 	document.getElementById("GB_window").style.height = (h-30) + "px";
 	document.getElementById("GB_window").style.left = ((w - width)/2)+"px";
