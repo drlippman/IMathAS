@@ -58,9 +58,10 @@ div.question {
 	font-size: medium;
 	background-color: #ddf; 
 	border: 1px solid #00f; 
-	margin-top: 0px;
+	margin-top: 60px;
 	margin-bottom: 5px;
-	padding: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 	/*width: 99%;*/
 }
 div.inactive {
@@ -137,9 +138,8 @@ div.navbar {
 	width:120px;
 	padding:10px;
 	margin-top:0px;
-	background-color: #e0ffe0;
-	border:1px solid #000;
-	color:#000;
+    min-height:200px;
+    color: #000000;
 }
 
 div.navbar h4 {

@@ -1,53 +1,68 @@
 <?php
 use yii\helpers\Html;
 use app\components\AppUtility;
+
+$this->title = $assessment->name;
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<script type="text/javascript">var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";</script>
-<?php AppUtility::includeJS('ASCIIMathTeXImg_min.js') ?>
-<script type="text/x-mathjax-config">
-if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
-MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
-} else {
-MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
-}
-</script>
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
-<script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+    </div>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
 
-<?php AppUtility::includeJS('confirmsubmit.js') ?>
-<?php AppUtility::includeJS('AMhelpers.js') ?>
-<?php AppUtility::includeJS('drawing.js') ?>
-<style type="text/css">span.MathJax { font-size: 105%;}</style>
-<input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessment->timelimit)?>">
+<div class="tab-content shadowBox non-nav-tab-item">
+    <script type="text/javascript">var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";</script>
+    <?php AppUtility::includeJS('ASCIIMathTeXImg_min.js') ?>
+    <script type="text/x-mathjax-config">
+    if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {
+    MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", imageFont:null}});
+    } else {
+    MathJax.Hub.Config({"HTML-CSS": {preferredFont: "STIX", webFont: "STIX-Web", imageFont:null}});
+    }
+    </script>
+    <script type="text/javascript" src="<?php echo AppUtility::getHomeURL() ?>js/mathjax/MathJax.js?config=AM_HTMLorMML"></script>
+    <script type="text/javascript">noMathRender = false; var usingASCIIMath = true; var AMnoMathML = false; var MathJaxCompatible = true; function rendermathnode(node) { MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]); } </script>
 
-<html>
-<!--    Show total time and remaining time-->
-<?php
-/*Conversion into hour, minute and seconds*/
-$hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
-$min = floor((abs($assessment->timelimit)%3600)/60);
-?>
-<input type="hidden" id="user-rights" value="<?php echo $user['rights'];?>">
-<input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
-<input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
-<input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
-<input type="hidden" id="endDateString" name="endDate" value="<?php echo $assessment->enddate; ?>">
-<input type="hidden" id="startDateString" name="endDate" value="<?php echo $assessment->startdate; ?>">
-<input type="hidden" id="reviewDateString" name="endDate" value="<?php echo $assessment->reviewdate; ?>">
+    <?php AppUtility::includeJS('confirmsubmit.js') ?>
+    <?php AppUtility::includeJS('AMhelpers.js') ?>
+    <?php AppUtility::includeJS('drawing.js') ?>
+    <style type="text/css">span.MathJax { font-size: 105%;}</style>
+    <input type="hidden" id="timerlimit" name="time" value="<?php echo abs($assessment->timelimit)?>">
 
-<input type="hidden" id="courseId" value='<?php echo $courseId ?>'/>
-<input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
-<input type="hidden" id="timelimit" value="<?php echo $assessment->timelimit;?>">
-<input type="hidden" id="now" value="<?php echo $now;?>">
-<input type="hidden" id="to" value="<?php echo $isShowExpiredTime;?>">
+    <html>
+    <!--    Show total time and remaining time-->
+    <?php
+    /*Conversion into hour, minute and seconds*/
+    $hour = (floor(abs($assessment->timelimit)/3600) < 10) ? '0'+floor(abs($assessment->timelimit)/3600) : floor(abs($assessment->timelimit)/3600);
+    $min = floor((abs($assessment->timelimit)%3600)/60);
+    ?>
+    <input type="hidden" id="user-rights" value="<?php echo $user['rights'];?>">
+    <input type="hidden" id="hour" name="hour" value="<?php echo $hour;?>">
+    <input type="hidden" id="min" name="min" value="<?php echo $min; ?>">
+    <input type="hidden" id="endDate" name="endDate" value="<?php echo AppUtility::formatDate($assessment->enddate); ?>">
+    <input type="hidden" id="endDateString" name="endDate" value="<?php echo $assessment->enddate; ?>">
+    <input type="hidden" id="startDateString" name="endDate" value="<?php echo $assessment->startdate; ?>">
+    <input type="hidden" id="reviewDateString" name="endDate" value="<?php echo $assessment->reviewdate; ?>">
+
+    <input type="hidden" id="courseId" value='<?php echo $courseId ?>'/>
+    <input type="hidden" id="assessmentsession" value="<?php echo $assessmentSession->starttime;?>">
+    <input type="hidden" id="timelimit" value="<?php echo $assessment->timelimit;?>">
+    <input type="hidden" id="now" value="<?php echo $now;?>">
+    <input type="hidden" id="to" value="<?php echo $isShowExpiredTime;?>">
 
 
-<?php if(!empty($isQuestions)){echo $response;}else{?>
-    <input type="hidden" id="noQuestion" value="1">
-<?php }?>
-<div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>
-<div id="eh" class="eh"></div>
-
+    <?php if(!empty($isQuestions)){echo $response;}else{?>
+        <input type="hidden" id="noQuestion" value="1">
+    <?php }?>
+    <div id="ehdd" class="ehdd"><span id="ehddtext"></span> <span onclick="showeh(curehdd);" style="cursor:pointer;">[more..]</span></div>
+    <div id="eh" class="eh"></div>
+</div>
 <script type="text/javascript">
     $(document).ready(function(){
         var timer = $('#timerlimit').val();

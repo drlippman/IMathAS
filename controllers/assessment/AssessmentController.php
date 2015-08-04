@@ -27,11 +27,13 @@ class AssessmentController extends AppController
     public function actionShowAssessment()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $assessmentId = isset($params['id']) ? trim($params['id']) : "";
         $to = isset($params['to']) ? $params['to'] : AppConstant::NUMERIC_ZERO;
         $courseId = isset($params['cid']) ? trim($params['cid']) : "";
+        $course = Course::getById($courseId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $teacher = Teacher::getByUserId($user->getId(), $courseId);
         $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
@@ -44,7 +46,7 @@ class AssessmentController extends AppController
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to,'user' => $user);
+        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to,'user' => $user, 'course' => $course);
         return $this->render('ShowAssessment', $responseData);
     }
 
@@ -103,6 +105,7 @@ class AssessmentController extends AppController
     public function actionPrintTest()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $user = $this->getAuthenticatedUser();
         $isTeacher = false;
         $printData = '';
@@ -111,12 +114,13 @@ class AssessmentController extends AppController
             $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
             if($assessmentSession){
                 $courseId = $assessmentSession->assessment->course->id;
+                $course = $assessmentSession->assessment->course->name;
                 $teacher = Teacher::getByUserId($user->id, $courseId);
                 if($teacher){
                     $isTeacher = true;
                     $teacherId = $teacher->id;
                 }
-                $printData = AppUtility::printTest($teacherId, $isTeacher, $assessmentSession->id, $user);
+                $printData = AppUtility::printTest($teacherId, $isTeacher, $assessmentSession->id, $user, $course);
                 $this->includeCSS(['showAssessment.css', 'mathtest.css', 'print.css']);
                 $responseData = array('response' => $printData);
                 return $this->renderWithData('printTest', $responseData);

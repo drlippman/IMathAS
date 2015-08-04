@@ -360,11 +360,12 @@ td.locked-student{
     vertical-align: middle;
 }
 div.navbar{
-    min-width: 160px;
+    min-width: 220px;
 }
 
 .margin-right-inset{
     margin-right: 1%;
+    border-bottom: 1px solid #a9a9a9;
 }
 
 a:focus {

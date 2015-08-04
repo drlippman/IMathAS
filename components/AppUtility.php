@@ -819,7 +819,7 @@ class AppUtility extends Component
             $useeqnhelper = $testsettings['eqnhelper'];
 
             $responseString .= '<div id="headershowtest" class="pagetitle">';
-            $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
+//            $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
             $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'><b>Time Expired</b></span> </div>\n";
             if ($testsettings['testtype']=="Practice" && !$isreview) {
                 echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
@@ -1129,7 +1129,7 @@ class AppUtility extends Component
         $poss = 0;
         $responseString .= "<a href='#beginquestions'><img class=skipnav src='".AppUtility::getHomeURL()."img/blank.gif' alt='Skip Navigation')'/></a>\n";
         $responseString .= "<div class=navbar>";
-        $responseString .= "<h4>Questions</h4>\n";
+        $responseString .= "<h4>Questions List</h4>\n";
         $responseString .= "<ul class=qlist>\n";
         for ($i = 0; $i < count($questions); $i++) {
             $responseString .= "<li>";
@@ -1174,9 +1174,9 @@ class AppUtility extends Component
                 }
             } else {
                 if ($qi[$questions[$i]]['withdrawn']==1) {
-                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">Q ". ($i+1) . "</span></a>";
+                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">Question ". ($i+1) . "</span></a>";
                 } else {
-                    $responseString .= "<a href=\"show-assessment?id=$assessmentId&amp;cid=$courseId&amp;to=$i\">Q ". ($i+1) . "</a>";
+                    $responseString .= "<a href=\"show-assessment?id=$assessmentId&amp;cid=$courseId&amp;to=$i\">Question ". ($i+1) . "</a>";
                 }
             }
             if ($showeachscore) {
@@ -1254,7 +1254,7 @@ class AppUtility extends Component
         return Yii::$app->getBasePath();
     }
 
-    public static function printTest($teacherid, $isteacher, $assessmentSessionId, $user)
+    public static function printTest($teacherid, $isteacher, $assessmentSessionId, $user, $course)
     {
         global $allowedmacros, $mathfuncs, $questions, $seeds, $responseString;
         $allowedmacros = array();

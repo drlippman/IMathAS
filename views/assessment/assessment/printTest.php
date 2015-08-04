@@ -6,6 +6,16 @@ use app\components\AppUtility;
 <?php
 AppUtility::includeJS('ASCIIMathTeXImg_min.js');
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php  ?></div>
+        </div>
+    </div>
+</div>
 
 <script type="text/x-mathjax-config">
 if (MathJax.Hub.Browser.isChrome || MathJax.Hub.Browser.isSafari) {

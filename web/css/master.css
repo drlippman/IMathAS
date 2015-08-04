@@ -11,7 +11,7 @@ body {
     bottom: 240px;
 }
 .navbar-inverse {
-    background-color: #2C368E;
+    background-color: #104E88;
     border: none;
 }
 .navbar-inverse .navbar-brand{
@@ -20,7 +20,7 @@ body {
     /*padding: 10% 4.7%;*/
 }
 .container-upper-blue{
-    background-color: #3441AC;
+    background-color: #1460aa;
     height: 320px;
 }
 .container-lower-white{
@@ -52,7 +52,7 @@ body {
 }
 .buttons-alignment
 {
-    background-color: #2C368E;
+    background-color: #104E88;
     height: 50px;
     width: 150px
 }
@@ -107,8 +107,8 @@ body {
 }
 
 .dropdown-class > button{
-    background-color: #2C368E;
-    border-color: #2C368E;
+    background-color: #104E88;
+    border-color: #104E88;
 }
 .dropdown-class >img{
     width: 20px;
@@ -116,7 +116,7 @@ body {
 
 }
 .dropdown-class .btn-primary:hover,.btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
-    background-color: #2C368E; border-color: #2C368E;
+    background-color: #104E88; border-color: #104E88;
 }
 
 .tab{
@@ -136,7 +136,7 @@ body {
     padding-left: 0%;
 }
 /*.right-side-button{*/
-/*background-color: #2C368E;*/
+/*background-color: #104E88;*/
 /*height: 50px;*/
 /*width: 150px*/
 /*}*/
@@ -154,7 +154,7 @@ body {
     width: 35px;
     height: 35px;
     color: white;
-    background: #2C368E;
+    background: #104E88;
     border-radius: 100%;
     text-align: center;
     /*padding: 20%;*/
@@ -213,7 +213,7 @@ body {
 }
 .common-navbar #nav .active > a {
     color: #ffffff;
-    background-color: #2C368E;
+    background-color: #104E88;
     border-bottom: none;
 }
 .icon-nav{
@@ -292,4 +292,10 @@ body {
 
 .header-right-btn{
     padding-right:6px;
+}
+.padding-top{
+    padding-top: 10px;
+}
+.non-nav-tab-item{
+    margin-top:30px
 }

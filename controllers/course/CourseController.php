@@ -226,31 +226,6 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
-
-    /**
-     * Display password, when assessment need password.
-     */
-    public function actionPassword()
-    {
-        $this->guestUserHandler();
-        $model = new SetPassword();
-        $assessmentId = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $assessment = Assessments::getByAssessmentId($assessmentId);
-        if ($this->isPostMethod()){
-            $params = $this->getRequestParams();
-            $password = $params['SetPassword']['password'];
-            if($password == $assessment->password){
-                return $this->redirect(AppUtility::getURLFromHome('course', 'course/password?id=' . $assessment->id.'&cid=' .$course->id));
-            }else {
-                $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
-            }
-        }
-        $returnData = array('model' => $model, 'assessments' => $assessment);
-        return $this->renderWithData('setPassword', $returnData);
-    }
-
     /**
      * Create new course at admin side
      */
@@ -529,10 +504,12 @@ class CourseController extends AppController
      */
     public function actionShowLinkedText()
     {
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $id = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $link = Links::getById($id);
+        $this->includeCSS(['course/items.css']);
         $returnData = array('course' => $course, 'links' => $link);
         return $this->renderWithData('showLinkedText', $returnData);
     }

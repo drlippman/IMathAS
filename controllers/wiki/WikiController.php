@@ -18,13 +18,14 @@ class WikiController extends AppController
     public function actionShowWiki()
     {
         $userData = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $userId = $userData->id;
         $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('wikiId');
         $course = Course::getById($courseId);
         $subject = $this->getBodyParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
-        $stugroupId = 0;
+        $stugroupId = AppConstant::NUMERIC_ZERO;
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);
         $wikiTotalData = Wiki::getAllData($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
@@ -36,6 +37,7 @@ class WikiController extends AppController
             $wikiRevisionSortedByTime = WikiRevision::getEditedWiki($sortBy, $order,$singleWikiData->id);
 
         }
+        $this->includeCSS(['course/wiki.css']);
         $responseData = array('body' => $subject,'course' => $course, 'revisionTotalData'=> $revisionTotalData, 'wikiTotalData'=>$wikiTotalData, 'wiki' => $wiki, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData, 'countOfRevision' => $count, 'wikiId' => $wikiId, 'courseId' => $courseId);
         return $this->renderWithData('showWiki', $responseData);
     }
@@ -53,12 +55,12 @@ class WikiController extends AppController
     public function actionEditPage()
     {
         $userData = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $wikiId = $this->getParamVal('wikiId');
         $wiki = Wiki::getById($wikiId);
         $wikiRevisionData = WikiRevision::getByRevisionId($wikiId);
-        $stugroupId = 0;
         $wikiRevisionSortedByTime = '';
         $wikiRevision = WikiRevision::getByRevisionId($wikiId);
         foreach($wikiRevisionData as $singleWikiData){
@@ -72,36 +74,26 @@ class WikiController extends AppController
             $saveRevision = new WikiRevision();
             $saveRevision->saveRevision($params);
         }
-
+        $this->includeCSS(['course/wiki.css']);
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
         $responseData = array('wiki' => $wiki, 'course' => $course, 'wikiRevision' => $wikiRevision, 'wikiRevisionData' => $wikiRevisionSortedByTime, 'userData' => $userData);
         return $this->renderWithData('editPage', $responseData);
     }
+
     public function wikiEditedRevisionData($wikiRevisionData, $wikiData)
     {
         $revisiontext = $wikiRevisionData->revision;
-        $revisionid = $wikiRevisionData->id;
         if ($wikiRevisionData->revision!= null) { //FORM SUBMITTED, DATA PROCESSING
-            $inconflict = false;
-            $stugroupId = 0;
-
-            //clean up wiki content
             require_once("../components/htmLawed.php");
             $htmlawedconfig = array('elements'=>'*-script');
             $wikicontent = htmLawed(stripslashes($wikiData['body']),$htmlawedconfig);
             $wikicontent = str_replace(array("\r","\n"),' ',$wikicontent);
             $wikicontent = preg_replace('/\s+/',' ',$wikicontent);
-            $wikicontent = ('**wver2**'.$wikicontent);
-
             if (strlen($revisiontext)>6 && substr($revisiontext,0,6)=='**wver') {
                 $wikiver = substr($revisiontext,6,strpos($revisiontext,'**',6)-6);
-                $revisiontext = substr($revisiontext,strpos($revisiontext,'**',6)+2);
             } else {
                 $wikiver = 1;
             }
-            if ($wikiver>1) {
-                $wikicontent = '**wver'.$wikiver.'**'.$wikicontent;
-           }
         }
     }
 
@@ -117,8 +109,6 @@ class WikiController extends AppController
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
-
-
         $saveTitle = '';
         if(isset($params['id']))
         {

@@ -1,14 +1,24 @@
 <?php
 use app\components\AppUtility;
-echo $this->render('_toolbar',['course'=> $course]);
+$this->title = $course->name;
 require_once("../filter/filter.php");
 ?>
-
-<div id="wikiName">
-    <h2><?php echo $wiki->name; ?></h2>
-   <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
-   <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
 </div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
+    <div id="wikiName" class="padding-top padding-left">
+        <h2><?php echo $wiki->name; ?></h2>
+       <input type="hidden" class="wiki-id" value="<?php echo $wiki->id;?>">
+       <input type="hidden" class="course-id" value="<?php echo $course->id;?>">
+    </div>
 
 <?php
 if(!empty($revisionTotalData))
@@ -22,38 +32,44 @@ if(!empty($revisionTotalData))
 }
 ?>
 
-<p><span id="revisioninfo">Revision <?php echo count($countOfRevision); ?>
-       <?php if (count($countOfRevision)>0) {
-	echo ".  Last edited by $lasteditedby on $lastedittime.";
-}
-?>
-</span>
+    <p><span id="revisioninfo" class="padding-left">Revision <?php echo count($countOfRevision); ?>
+           <?php if (count($countOfRevision)>0) {
+        echo ".  Last edited by $lasteditedby on $lastedittime.";
+    }
+    ?>
+    </span>
 
-<?php
-if (count($countOfRevision)>1) {
-    $last = count($countOfRevision) - 1;
-    echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
-    echo '<span id="revcontrol" style="display:none;"><br/>Revision history:
-    <a href="#" id="first" onclick="jumpto(1)">First</a>
-    <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
-    echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a>
-    <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a>
-    <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" />';
-}
-?>
-<div class="editor">
-    <span>
-        <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
-           class="btn btn-primary btn-sm">Edit this page</a></span>
-        <?php if(!empty($wikiRevisionData)){
-            foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
-    <textarea id='wikicontent' name='wikicontent' style='width: 100% '>
-                <?php $text = $singleWikiRevision->revision;
-                echo $text;?>
+    <?php
+    if (count($countOfRevision)>1) {
+        $last = count($countOfRevision) - 1;
+        echo '<span id="prevrev"><input type="button" value="Show Revision History" id="show-revision"/></span>';
+        echo '<div class="padding-left"><span id="revcontrol" style="display:none;">Revision history:
+            <a href="#" id="first" onclick="jumpto(1)">First</a>
+            <a id="older" href="#" onclick="seehistory(1); return false;">Older</a> ';
+            echo '<a id="newer" class="grayout" href="#" onclick="seehistory(-1); return false;">Newer</a>
+            <a href="#" class="grayout" id="last" onclick="jumpto(0)">Last</a>
+            <input type="button" id="showrev" value="Show Changes" onclick="showrevisions()" /></div><br>';
 
-    </textarea>
-    <?php }?>
-    <?php }?>
+    }
+    ?>
+    <div class="editor" style="margin-right: 20px; margin-left: 20px">
+        <span>
+            <a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/edit-page?courseId=' .$course->id .'&wikiId=' .$wiki->id ); ?>"
+               class="btn btn-primary btn-sm">Edit this page</a></span>
+            <?php if(!empty($wikiRevisionData)){
+                foreach($wikiRevisionData as $key => $singleWikiRevision) { ?>
+                    <textarea id='wikicontent' name='wikicontent' style='width: 100%'>
+                                <?php $text = $singleWikiRevision->revision;
+                                echo $text;?>
+
+                    </textarea>
+        <?php }?>
+        <?php }?>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
 </div>
 <script>
     var original = null;
@@ -197,52 +213,6 @@ if (count($countOfRevision)>1) {
         }
         wikirendermath();
     }
-
-//    function colorrevisions(content,ver) {
-//
-//        if (ver==wikihistory.length-1) {return content.join(' ');};
-//        current = content.slice();
-//        var diff = wikihistory[ver+1].c;
-//        for (var i=diff.length-1; i>=0; i--) {
-//            deled = null;  insed = null;
-//            if (diff[i][0]==2) {
-//                deled = diff[i][3].join(' ');
-//                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
-//            } else if (diff[i][0]==0) {
-//                deled = diff[i][2].join(' ');
-//            } else if (diff[i][0]==1) {
-//                insed = current.splice(diff[i][1], diff[i][2]).join(' ');
-//            }
-//            if (insed != null) {
-//                if (insed.match(/<p>/)) {
-//                    insed = insed.split('<p>').join('<p><ins>');
-//                }
-//                if (insed.match(/<\/p>/)) {
-//                    insed = insed.split('</p>').join('</ins></p>');
-//                }
-//            }
-//            if (deled != null) {
-//                if (deled.match(/<p>/)) {
-//                    deled = deled.split('<p>').join('<p><del>');
-//                }
-//                if (deled.match(/<\/p>/)) {
-//                    deled = deled.split('</p>').join('</del></p>');
-//                }
-//            }
-//
-//            if (diff[i][0]==2) {  //replace
-//                    alert('in if')
-//                current.splice(diff[i][1], 0, "<del>"+deled+"</del><ins>"+insed+"</ins>");
-//            } else if (diff[i][0]==0) {//insert
-//                alert('in  elsle if')
-//                current.splice(diff[i][1], 0, "<del>"+deled+"</del>");
-//            } else if (diff[i][0]==1) {//delete
-//                alert('in esle')
-//                current.splice(diff[i][1], 0, "<ins>"+insed+"</ins>");
-//            }
-//        }
-//        return current.join(' ');
-//    }
     function colorrevisions(content,ver) {
 
         if (ver==wikihistory.length-1) {return content.join(' ');};

@@ -221,9 +221,9 @@ div.intro {
 	border: 1px solid #00f; 
 }
 div.navbar {
-	background:#e0ffe0;
-	border:1px solid #000;
-	color:#000;
+	background-color:#fafafa;
+    min-height: 500px;
+    border-right: 1px solid #a9a9a9;
 }
 div.navbar a {
 	color: blue;
