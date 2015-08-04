@@ -8,6 +8,7 @@ jQuerySubmit('get-teachers', courseTeacher, 'displayTeacherSuccess');
 function displayTeacherSuccess(response)
     {
         var result = JSON.parse(response);
+        var count = result.data.countTeach;
         if(result.status == 0)
         {
         var teachers = result.data.teachers;
@@ -18,19 +19,23 @@ function displayTeacherSuccess(response)
         });
 
 $.each(teachers, function(index, teacher){
-    displayTeacher(teacher);
+    displayTeacher(teacher,count);
     });
 }
-
 }
 
-
-function displayTeacher(teacher)
+function displayTeacher(teacher,count)
     {
         var firstName = capitalizeFirstLetter(teacher.FirstName);
         var lastName = capitalizeFirstLetter(teacher.LastName);
         var teacherHtml = "";
-        teacherHtml = "<tr><td><input type='checkbox' name='teacher' value='"+teacher.id+"' class='addRemoveTeacherCheckbox removeCheckbox removeTeacherCheckbox-"+teacher.id+"' > </td> <td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'>Remove as Teacher</a></td></tr>";
+        if(count == 1){
+            teacherHtml = "<tr><td> </td><td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'></a></td></tr>";
+        }else{
+            teacherHtml = "<tr><td><input type='checkbox' name='teacher' value='"+teacher.id+"' class='addRemoveTeacherCheckbox removeCheckbox removeTeacherCheckbox-"+teacher.id+"' > </td> <td id='convertToUpper'>"+firstName+' '+lastName+"</td><td><a href='' onclick='removeTeacher("+teacher.id+")' class='addRemoveTeacher removeTeacherLink removeTeacher-"+teacher.id+"'>Remove As Teacher</a></td></tr>";
+        }
+
+
         $('#teach').append(teacherHtml);
         }
 
@@ -51,7 +56,6 @@ function addTeacher(userId)
 
 function addTeacherSuccess(response)
     {
-        console.log(response);
         var result = JSON.parse(response);
         if(result.status == 0)
         {

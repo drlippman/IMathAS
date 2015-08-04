@@ -766,6 +766,10 @@ div.dataTables_wrapper {
     text-decoration: none;
     background-color: #2c38ae;
 }
-.inner-sub-content{
+.inner-sub-content {
     padding: 15px;
+}
+.ui-dialog .ui-dialog-titlebar-close {
+   visibility: hidden;
+
 }

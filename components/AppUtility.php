@@ -2674,7 +2674,7 @@ class AppUtility extends Component
     /*
      * Method for item ordering when the course items are deleted.
      */
-    public static function itemOrder($courseId,$block,$itemId){
+    public static function UpdateitemOrdering($courseId,$block,$itemId){
         $course = Course::getById($courseId);
         $itemOrder = $course['itemorder'];
         $items = unserialize($itemOrder);

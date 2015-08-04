@@ -39,6 +39,8 @@ use app\models\WikiView;
 use app\models\GbCats;
 use Yii;
 use app\controllers\AppController;
+use yii\db\Exception;
+
 
 
 class InstructorController extends AppController
@@ -120,6 +122,7 @@ public $oa = array();
                                     case 'Assessment':
                                         $assessment = Assessments::getByAssessmentId($item->typeid);
                                         $tempItem[$item->itemtype] = $assessment;
+                                        $tempAray['assessment'] = $item;
                                         break;
                                     case 'Calendar':
                                         $tempItem[$item->itemtype] = $itemOrder;
@@ -152,40 +155,35 @@ public $oa = array();
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempAray[$item->itemtype] = $assessment;
                                 $tempAray['assessment'] = $item;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = $itemOrder;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Forum':
                                 $form = Forums::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $form;
                                 $tempAray['forum'] = $item;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $wiki;
                                 $tempAray['wiki'] = $item;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'InlineText':
                                 $inlineText = InlineText::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $inlineText;
                                 $tempAray['inline'] = $item;
-                                array_push($responseData, $tempAray);
                                 break;
                             case 'LinkedText':
                                 $linkedText = Links::getById($item->typeid);
                                 $tempAray[$item->itemtype] = $linkedText;
                                 $tempAray['link'] = $item;
-                                array_push($responseData, $tempAray);
                                 break;
                         }
+                        array_push($responseData, $tempAray);
                     }
                 }
-        }else{
+        }else {
             if (isset($courseData['tb'])) {
                 $filter = $courseData['tb'];
             } else {
@@ -235,26 +233,26 @@ public $oa = array();
             } else {
                 $curBlock =& $sub;
             }
-            $blockLoc = $blockTree[count($blockTree)-AppConstant::NUMERIC_ONE]-AppConstant::NUMERIC_ONE;
+            $blockLoc = $blockTree[count($blockTree) - AppConstant::NUMERIC_ONE]-AppConstant::NUMERIC_ONE;
             if (strpos($toPosition ,'-')!==false) {
-               if ($toPosition [0]=='O') {
-                  $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
-                  array_splice($curBlock,$fromPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE);
+               if ($toPosition [0]=='O') { //out of block
+                  $itemToMove = $curBlock[$fromPosition - AppConstant::NUMERIC_ONE];
+                  array_splice($curBlock,$fromPosition - AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ONE);
                   if (is_array($itemToMove)) {
                      array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($itemToMove));
                   } else {
                       array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
                   }
-                } else {
-                    $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
-                    array_splice($curBlock,$fromPosition -AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE);
-                    $toPosition  = substr($toPosition ,AppConstant::NUMERIC_ONE);
+                } else { // in to block
+                    $itemToMove = $curBlock[$fromPosition - AppConstant::NUMERIC_ONE];
+                    array_splice($curBlock,$fromPosition - AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ONE);
+                    $toPosition  = substr($toPosition ,AppConstant::NUMERIC_TWO);
                     if ($fromPosition <$toPosition ) {
                         $adj=AppConstant::NUMERIC_ONE;
                     } else {
                         $adj=AppConstant::NUMERIC_ZERO;
                     }
-                    array_push($curBlock[$toPosition -AppConstant::NUMERIC_ONE-$adj]['items'],$itemToMove);
+                    array_push($curBlock[$toPosition - AppConstant::NUMERIC_ONE - $adj]['items'],$itemToMove);
                 }
             } else {
                 $itemToMove = $curBlock[$fromPosition -AppConstant::NUMERIC_ONE];
@@ -492,84 +490,92 @@ public $oa = array();
         $block = $params['block'];
         $itemType = $params['itemType'];
         $itemId = $params['id'];
-        switch($itemType){
-            case AppConstant::FORUM:
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                Forums::deleteForum($itemId);
-                ForumSubscriptions::deleteSubscriptionsEntry($itemId);
-                $postId = ForumPosts::getForumPostByFile($itemId);
-                $threadIdArray = ForumThread::findThreadCount($itemId);
-                foreach($threadIdArray as $singleThread){
-                    ForumView::deleteByForumIdThreadId($singleThread['id']);
-                }
-                ForumPosts::deleteForumPost($itemId);
-                Thread::deleteThreadByForumId($itemId);
-                break;
-            case AppConstant::ASSESSMENT:
-                AssessmentSession::deleteByAssessmentId($itemId);
-                Questions::deleteByAssessmentId($itemId);
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-                Assessments::deleteAssessmentById($itemId);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                break;
-            case AppConstant::CALENDAR:
-                $itemDeletedId = Items::deletedCalendar($itemId,$itemType);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                break;
-            case AppConstant::INLINE_TEXT:
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-                InlineText::deleteInlineTextId($itemId);
-                InstrFiles::deleteById($itemId);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                break;
-            case AppConstant::WIKI:
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-                Wiki::deleteById($itemId);
-                WikiRevision::deleteByWikiId($itemId);
-                WikiView::deleteByWikiId($itemId);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                break;
-            case AppConstant::LINK:
-                $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
-                $linkData = Links::getById($itemId);
-                $points = $linkData['points'];
-                if($points > AppConstant::NUMERIC_ZERO){
-                    Grades::deleteByGradeTypeId($itemId);
-                }
-                Links::deleteById($itemId);
-                AppUtility::itemOrder($courseId,$block,$itemDeletedId);
-                break;
-            case AppConstant::BLOCK:
-                $course = Course::getById($courseId);
-                $blockData = unserialize($course['itemorder']);
-                $blockTree = explode('-',$itemId);
-                $blockCnt='';
-                $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
-                $sub =& $blockData;
-                if (count($blockTree)>AppConstant::NUMERIC_ONE)
-                {
-                    for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
-                    {
-                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+        $connection = $this->getDatabase();
+        $transaction = $connection->beginTransaction();
+        try{
+            switch($itemType){
+                case AppConstant::FORUM:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    Forums::deleteForum($itemId);
+                    ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+                    $postId = ForumPosts::getForumPostByFile($itemId);
+                    $threadIdArray = ForumThread::findThreadCount($itemId);
+                    foreach($threadIdArray as $singleThread){
+                        ForumView::deleteByForumIdThreadId($singleThread['id']);
                     }
-                }
-                if (is_array($sub[$blockId])) {
-                    $blockItems = $sub[$blockId]['items'];
-                    $obId = $sub[$blockId]['id'];
-
-                    if (count($blockItems)>AppConstant::NUMERIC_ZERO)
+                    ForumPosts::deleteForumPost($itemId);
+                    Thread::deleteThreadByForumId($itemId);
+                    break;
+                case AppConstant::ASSESSMENT:
+                    AssessmentSession::deleteByAssessmentId($itemId);
+                    Questions::deleteByAssessmentId($itemId);
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    Assessments::deleteAssessmentById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::CALENDAR:
+                    $itemDeletedId = Items::deletedCalendar($itemId,$itemType);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::INLINE_TEXT:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    InlineText::deleteInlineTextId($itemId);
+                    InstrFiles::deleteById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::WIKI:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    Wiki::deleteById($itemId);
+                    WikiRevision::deleteByWikiId($itemId);
+                    WikiView::deleteByWikiId($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::LINK:
+                    $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
+                    $linkData = Links::getById($itemId);
+                    $points = $linkData['points'];
+                    if($points > AppConstant::NUMERIC_ZERO){
+                        Grades::deleteByGradeTypeId($itemId);
+                    }
+                    Links::deleteById($itemId);
+                    AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
+                    break;
+                case AppConstant::BLOCK:
+                    $course = Course::getById($courseId);
+                    $blockData = unserialize($course['itemorder']);
+                    $blockTree = explode('-',$itemId);
+                    $blockCnt='';
+                    $blockId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
+                    $sub =& $blockData;
+                    if (count($blockTree)>AppConstant::NUMERIC_ONE)
                     {
-                        $this->deleteRecursive($blockItems);
-                        array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+                        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++)
+                        {
+                            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+                        }
+                    }
+                    if (is_array($sub[$blockId])) {
+                        $blockItems = $sub[$blockId]['items'];
+                        $obId = $sub[$blockId]['id'];
 
-                    }else
-                    {
+                        if (count($blockItems)>AppConstant::NUMERIC_ZERO)
+                        {
+                            $this->deleteRecursive($blockItems);
                             array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+
+                        }else
+                        {
+                                array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+                        }
                     }
-                }
-                $itemList =(serialize($blockData));
-                Course::setBlockCount($itemList,$blockCnt=null,$courseId);
+                    $itemList =(serialize($blockData));
+                    Course::setBlockCount($itemList,$blockCnt=null,$courseId);
+            }
+            $transaction->commit();
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return false;
         }
         return $this->successResponse();
     }
@@ -661,11 +667,19 @@ public $oa = array();
         $courseData = Course::getById($courseId);
         $blockCount = $courseData['blockcnt'];
         $items = unserialize($courseData['itemorder']);
-        $notImportant = array();
-        $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
-        CopyItemsUtility::copyrubrics();
-        $itemOrder = serialize($items);
-        Course::setBlockCount($itemOrder,$blockCount,$courseId);
+        $connection = $this->getDatabase();
+        $transaction = $connection->beginTransaction();
+        try{
+            $notImportant = array();
+            $this->copyCourseItems($items, AppConstant::NUMERIC_ZERO, false, $notImportant, $copyItemId, $blockCount, $gradeBookCategory, $params);
+            CopyItemsUtility::copyrubrics();
+            $itemOrder = serialize($items);
+            Course::setBlockCount($itemOrder,$blockCount,$courseId);
+            $transaction->commit();
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return false;
+        }
         return $this->successResponse();
     }
 

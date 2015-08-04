@@ -65,6 +65,11 @@ class AppController extends Controller
         \Yii::$app->session->setFlash($type, $message);
     }
 
+    public function getDatabase()
+    {
+       return Yii::$app->getDb();
+    }
+
     function unauthorizedAccessHandler()
     {
         if (!$this->isGuestUser()) {

@@ -4,7 +4,6 @@
 var homePath = $('.home-path').val();
 function moveitem(from,blk) {
     var to = document.getElementById(blk+'-'+from).value;
-
     if (to != from) {
         var toopen = homePath+'&block=' + blk + '&from=' + from + '&to=' + to;
         window.location = toopen;
@@ -47,7 +46,7 @@ function deleteItem(id,type,block,courseId) {
     });
 }
 function responseSuccess(response)
-{
+{console.log(response);
     window.location = homePath;
 }
 
@@ -77,6 +76,6 @@ function copyItem(id,type,block,courseId) {
     });
 }
 function copyResponseSuccess(response)
-{console.log(response);
+{
     window.location = homePath;
 }

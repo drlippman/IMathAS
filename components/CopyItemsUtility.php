@@ -49,16 +49,16 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     if ($itemtype == "InlineText") {
         $inlineTextData = InlineText::getById($typeid);
         $row = array(
-            courseid => $inlineTextData['courseid'],
-            title => $inlineTextData['title'],
-            text => $inlineTextData['text'],
-            startdate => $inlineTextData['startdate'],
-            enddate => $inlineTextData['enddate'],
-            avail => $inlineTextData['avail'],
-            oncal => $inlineTextData['oncal'],
-            caltag => $inlineTextData['caltag'],
-            isplaylist => $inlineTextData['isplaylist'],
-            fileorder => $inlineTextData['fileorder'],
+            'courseid' => $inlineTextData['courseid'],
+            'title' => $inlineTextData['title'],
+            'text' => $inlineTextData['text'],
+            'startdate' => $inlineTextData['startdate'],
+            'enddate' => $inlineTextData['enddate'],
+            'avail' => $inlineTextData['avail'],
+            'oncal' => $inlineTextData['oncal'],
+            'caltag' => $inlineTextData['caltag'],
+            'isplaylist' => $inlineTextData['isplaylist'],
+            'fileorder' => $inlineTextData['fileorder'],
         );
         if ($sethidden) {
             $row['avail'] = 0;
@@ -141,7 +141,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
         $forum = new Forums();
         $newtypeid = $forum->addNewForum($ForumData);
-        if ($_POST['ctc'] != $cid) {
+        if ($params['ctc'] != $cid) {
             $forumtrack[$typeid] = $newtypeid;
         }
         if ($rubric != 0) {

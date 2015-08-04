@@ -414,6 +414,7 @@ class CourseController extends AppController
         $order = AppConstant::ASCENDING;
         $users = User::findAllTeachers($sortBy, $order);
         $teachers = Teacher::getAllTeachers($courseId);
+        $countTeach = count($teachers);
         $nonTeacher = array();
         $teacherIds = array();
         $teacherList = array();
@@ -431,7 +432,7 @@ class CourseController extends AppController
                 }
             }
         }
-        return $this->successResponse(array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher));
+        return $this->successResponse(array('teachers' => $teacherList, 'nonTeachers' => $nonTeacher,'countTeach' =>$countTeach));
     }
 
     public function actionAddTeacherAjax()

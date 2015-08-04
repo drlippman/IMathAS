@@ -47,7 +47,6 @@ class Sessions extends BaseImasSessions {
             $this->tzname = $tzdate;
         }
         $this->sessiondata = $enc;
-//        AppUtility::dump($this);
         $this->save();
     }
 
