@@ -1,5 +1,6 @@
 <?php
 namespace app\models\forms;
+use app\components\AppUtility;
 use Yii;
 use yii\base\Model;
 
@@ -13,10 +14,10 @@ class UploadCommentsForm extends Model{
     public function rules()
     {
         return [
-            [['lastName'],'required','message' => 'Last name field cannot be blank'],
-            [['commentsColumn'],'required', 'message' => 'Enter Comment column.'],
-            [['commentsColumn'],'number', 'message' => 'comments are in columns must be integer value.'],
-            ['file', 'required', 'message' => 'Upload CSV file'],
+            [['lastName'],'required','message' => AppUtility::t('Last name field cannot be blank', false)],
+            [['commentsColumn'],'required', 'message' => AppUtility::t('Enter Comment column.', false)],
+            [['commentsColumn'],'number', 'message' => AppUtility::t('comments are in columns must be integer value.', false)],
+            ['file', 'required', 'message' => AppUtility::t('Upload CSV file', false)],
             ['file', 'safe'],
             [['file'], 'file', 'extensions' => 'csv'],
         ];
@@ -24,10 +25,10 @@ class UploadCommentsForm extends Model{
     public function attributeLabels()
     {
         return [
-            'file' => 'Grade file (CSV)',
-            'fileHeaderRow' => 'File has header row?',
-            'commentsColumn' => 'Comments are in columns',
-            'userIdentity' => 'User is identified by',
+            'file' => AppUtility::t('Grade file (CSV)', false),
+            'fileHeaderRow' => AppUtility::t('File has header row?', false),
+            'commentsColumn' => AppUtility::t('Comments are in columns', false),
+            'userIdentity' => AppUtility::t('User is identified by', false),
         ];
     }
 }

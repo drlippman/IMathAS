@@ -2286,7 +2286,7 @@ class GradebookController extends AppController
             return $this->redirect('gradebook?cid=' . $course['id']);
         }
         $studentsInfo = Student::findStudentsCompleteInfo($course['id']);
-        $this->includeJS(['gradebook/gbComments.js', 'gradebook/gradebook.js']);
+        $this->includeJS(['gradebook/gbComments.js']);
         $responseData = array('course' => $course, 'studentsInfo' => $studentsInfo, 'commentType' => $commentType);
         return $this->renderWithData('gbComments', $responseData);
     }
@@ -2295,6 +2295,7 @@ class GradebookController extends AppController
     public function actionUploadComments()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $course = Course::getById($this->getParamVal('cid'));
         $nowTime = time();
         $commentType = $this->getParamVal('comtype');
@@ -2336,7 +2337,6 @@ class GradebookController extends AppController
                 }
             }
         }
-        $this->includeCSS(['site.css']);
         $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
         return $this->renderWithData('uploadComments', $responseData);
     }

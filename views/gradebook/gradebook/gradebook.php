@@ -48,14 +48,14 @@ $this->params['breadcrumbs'][] = $this->title;
                    href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
                 <ul class="dropdown-menu with-selected">
                     <li><a href="#">
-                            <i class="fa fa-fw fa-print"></i><?php AppUtility::t('Print Report'); ?>
+                            <i class="fa fa-fw fa-print"></i>&nbsp;<?php AppUtility::t('Print Report'); ?>
                         </a>
                     </li>
                     <li>
                         <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid=' . $course->id . '&gradebook=1') ?>" method="post" id="gradebook-email-form">
                             <input type="hidden" id="student-id" name="student-data" value=""/>
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                            <a href="javascript: studentEmail()"><i class="fa fa-at fa-fw"></i><?php AppUtility::t('Email'); ?></a>
+                            <a href="javascript: studentEmail()"><i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
                         </form>
                     </li>
                     <li>
@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type="hidden" id="email-id" name="student-data" value=""/>
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
                             <a class="with-selected-list" href="javascript: studentCopyEmail()"><i
-                                    class="fa fa-clipboard fa-fw"></i><?php AppUtility::t('Copy Emails'); ?></a>
+                                    class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Copy Emails'); ?></a>
                         </form>
                     </li>
                     <li>
@@ -73,11 +73,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type="hidden" id="message-id" name="student-data" value=""/>
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
                             <a class="with-selected-list" href="javascript: studentMessage()"><i
-                                    class="fa fa-envelope-o fa-fw"></i><?php AppUtility::t('Message'); ?></a>
+                                    class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
                         </form>
                     </li>
-                    <li><a id="unenroll-btn" onclick="studentUnenroll()"><i class="fa fa-trash-o fa-fw"></i><?php AppUtility::t('Unenroll'); ?></a></li>
-                    <li><a id="lock-btn"><i class='fa fa-lock fa-fw'></i><?php AppUtility::t('Lock'); ?>
+                    <li><a id="unenroll-btn" onclick="studentUnenroll()"><i class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a></li>
+                    <li><a id="lock-btn"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>
                         </a></li>
                     <li>
                         <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/make-exception?cid=' . $course->id . '&gradebook=1') ?>" id="make-exception-form"
@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             <input type="hidden" id="exception-id" name="student-data" value=""/>
                             <input type="hidden" id="section-name" name="section-data" value=""/>
                             <a class="with-selected-list" href="javascript: teacherMakeException()"><i
-                                    class='fa fa-plus-square fa-fw'></i><?php AppUtility::t('Make Exception'); ?>
+                                    class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
                             </a>
                         </form>
                     </li>

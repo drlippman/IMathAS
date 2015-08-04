@@ -442,7 +442,9 @@ a:focus {
 .back-btn{
     width: 72px;
     height: 35px;
-
+}
+.back-btn-width{
+    width: 72px;
 }
 .msg-notification{
     color: red;
@@ -774,4 +776,7 @@ div.dataTables_wrapper {
 }
 .a:hover{
     color: #0000ff;
+}
+.full-width{
+    width: 100%;
 }

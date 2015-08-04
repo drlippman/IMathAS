@@ -76,7 +76,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <textarea name = "newTutors" id = "tutor-text" rows = "3" cols = "60"></textarea>
 <br><br>
 <a class = "btn btn-primary" id = "update-button"><?php AppUtility::t('Update')?></a>
-<a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
-
+<a class="btn btn-primary back-btn-width" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
 </div>
 </div>
