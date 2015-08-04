@@ -155,9 +155,17 @@ background-color: #12856D;
 .inner-reply-msg-content
 {
     background-color: #f8f8f8;
-    width: 1120px;
+    width: auto;
     height: 600px;
     margin-right: 20px;
     margin-left: 20px;
     margin-bottom: 20px;
 }
+.margin-left
+{
+
+    margin-left: 87px;
+    vertical-align: bottom;
+    margin-top: 20px;
+}
+

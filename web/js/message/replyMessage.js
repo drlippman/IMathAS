@@ -1,5 +1,6 @@
 $(document).ready(function () {
     initEditor();
+
     $("#msg-btn").click(function () {
         tinyMCE.triggerSave();
         var cid = $(".send-msg").val();
@@ -8,9 +9,10 @@ $(document).ready(function () {
         var subject = $(".subject").val();
         var body = $("#message").val();
         var parentId = $(".parent-id").val();
+        var checkedValue = $('.header-checked:checked').val();
         var baseId = $(".base-id").val();
         var isReplied = $(".is-replied").val();
-        var messageDetails = {cid: cid, sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied};
+        var messageDetails = {cid: cid, sender: sender, receiver: receiver, subject: subject, body: body, parentId: parentId, baseId: baseId, isReplied: isReplied,checkedValue :checkedValue };
         jQuerySubmit('reply-message-ajax', messageDetails, 'replyMessage');
     });
 

@@ -261,6 +261,7 @@ class Message extends BaseImasMsgs
         }
         return $hasChild;
     }
+
     public function saveNewMessage($params,$currentUser)
     {
         $now = time();
@@ -272,6 +273,20 @@ class Message extends BaseImasMsgs
         $this->senddate = $now;
         $this->isread = AppConstant::NUMERIC_ZERO;
         $this->save();
+    }
+
+
+    public static function updateIsRead($params)
+    {
+
+        $setIsRead = Message::find()->where(['id' => $params['parentId']])->one();
+       if($setIsRead)
+       {
+            $setIsRead->replied = AppConstant::NUMERIC_ONE;
+           $setIsRead->isread = (($setIsRead->isread)&~1);
+           $setIsRead->save();
+       }
+
     }
 }
 

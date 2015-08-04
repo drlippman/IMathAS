@@ -647,6 +647,7 @@ class ForumController extends AppController
      */
     public function actionReplyPost()
     {
+        $this->layout = 'master';
         $this->guestUserHandler();
         $isPost = $this->getParamVal('listbypost');
         $courseId = $this->getParamVal('courseid');

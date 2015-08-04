@@ -379,4 +379,36 @@ padding-top: 5px;
 .align-title{
     margin-top: 11px;
 }
+.btn-color
+{
+    background-color: #12856D;
+    color:whitesmoke;
+}
+.btn-primary-1 {
+    color: #FFF;
+    background-color: #12856D;
+    color:whitesmoke;
+    text-transform: capitalize;
+    border-radius: 0px;
+}
+.hide-hover > a:hover{
+    text-decoration: none;
+    color: #FFF;
+}
+.inner-reply-msg-content
+{
+    background-color: #f8f8f8;
+    width: auto;
+    height: 600px;
+    margin-right: 20px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.padding-top
+{
+
+    padding-top: 40px;
+}
+
 

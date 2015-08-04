@@ -343,6 +343,7 @@ class MessageController extends AppController
      */
     public function actionReplyMessage()
     {
+        $this->layout = 'master';
         $this->guestUserHandler();
         $userRights = $this->getAuthenticatedUser();
         $baseId = $this->getParamVal('baseid');
@@ -353,6 +354,7 @@ class MessageController extends AppController
             $messages = Message::getByMsgId($msgId, $baseId);
             $fromUser = User::getById($messages->msgfrom);
             $responseData = array('messages' => $messages, 'fromUser' => $fromUser, 'course' => $course, 'userRights' => $userRights);
+            $this->includeCSS(['message.css']);
             $this->includeJS(["editor/tiny_mce.js", "message/replyMessage.js","general.js"]);
             return $this->renderWithData('replyMessage', $responseData);
         }
@@ -397,6 +399,15 @@ class MessageController extends AppController
                 if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                     $message = new Message();
                     $message->createReply($params);
+                    if( $params['parentId']>0)
+                    {
+                        if(isset($params['checkedValue']))
+                        {
+                            $changeIsReadValue = new Message();
+                            $changeIsReadValue ->updateIsRead($params);
+
+                        }
+                    }
                 }
                 $this->setSuccessFlash('Message sent successfully.');
                 return $this->successResponse();

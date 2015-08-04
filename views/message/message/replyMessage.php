@@ -2,69 +2,64 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 use app\components\AppConstant;
-$this->title = 'Reply Message';
-if ($userRights->rights > AppConstant::STUDENT_RIGHT){
-
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-}
-else{
-    $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/course/course/index?cid=' . $course->id]];
-}
-$this->params['breadcrumbs'][] = ['label' => 'Messages', 'url' => ['/message/message/index?cid=' . $course->id]];
+$this->title = AppUtility::t(' Reply Message',false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
-    <?php echo $this->render('../../instructor/instructor/_toolbarTeacher',['course' => $course]); ?>
-    <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-    <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
-<?php } else {?>
-
-    <?php echo $this->render('../../course/course/_toolbar', ['course' => $course]);?>
-    <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
-    <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
-<?php } ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo AppUtility::t('Message:',false);?><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn hide-hover">
+            <a href="#" id="msg-btn" class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send Message</a>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+</div>
+<input type="hidden" class="send-msg" value="<?php echo $messages->courseid ?>">
+<input type="hidden" class="msg-receiver" value="<?php echo $messages->msgto ?>">
+<input type="hidden" class="msg-sender" value="<?php echo $messages->msgfrom ?>">
+<input type="hidden" class="base-id" value="<?php echo $messages->baseid ?>">
+<input type="hidden" class="parent-id" value="<?php echo $messages->id ?>">
+<input type="hidden" class="is-replied" value="<?php echo $messages->replied ?>"
+<input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
+<input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
 <?php if ($messages->message) {
     $message = $messages->message;
     $message = '<p> </p><br/><hr/>In reply to:<br/>'.$message;
 } else {
     $message = '';
 }?>
-<div class="">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-    <h2><b>Reply</h2>
-    <input type="hidden" class="send-msg" value="<?php echo $messages->courseid ?>">
-    <input type="hidden" class="msg-receiver" value="<?php echo $messages->msgto ?>">
-    <input type="hidden" class="msg-sender" value="<?php echo $messages->msgfrom ?>">
-    <input type="hidden" class="base-id" value="<?php echo $messages->baseid ?>">
-    <input type="hidden" class="parent-id" value="<?php echo $messages->id ?>">
-    <input type="hidden" class="is-replied" value="<?php echo $messages->replied ?>">
-
-    <div class="drop-down">
-        <div class="col-md-1"><b>To</b></div>
-        <div class="col-md-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a
-                href="#">email</a>&nbsp;|&nbsp;<a href="#">gradebook</a></div>
-    </div>
-    <br><br>
-
-    <div class="sent-date">
-        <div class="col-md-1"><b>Sent</b></div>
-        <div class="col-md-8"><?php echo date('M d, o g:i a', $messages->senddate) ?></div>
-    </div>
-    <br><br>
-
-    <div>
-        <div class="col-md-1"><b>Subject</b></div>
-        <div class="col-md-8"><input class="textbox subject" type="text" value="Re: <?php echo $messages->title ?>">
+<div class="tab-content shadowBox">
+    <div class="inner-reply-msg-content">
+        <div class="drop-down padding-top col-sm-12">
+            <div class="col-sm-1"><?php echo AppUtility::t('To');?></div>
+            <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a
+                    href="#"><?php echo AppUtility::t('email');?></a>&nbsp;|&nbsp;<a href="#"><?php echo AppUtility::t('gradebook');?></a>
+               <?php echo AppUtility::t('Last Login:'." ".date("F j, Y, g:i a",$fromUser->lastaccess));?>
+            </div>
         </div>
-    </div>
-    <br><br><br>
-
-    <div>
-        <div class="col-md-1"><b>Message</b></div>
-        <?php echo "<div class='left col-md-11'><div class= 'editor'>
-        <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>$message</textarea></div></div><br>"; ?>
-    </div>
-    <div class="col-lg-offset-1 col-md-8">
-        <br>
-        <a class="btn btn-primary" id="msg-btn">Send Message</a>
+        <div class="col-sm-12 padding-top">
+            <div class="col-sm-1"><?php echo AppUtility::t('Subject');?></div>
+            <div class="col-sm-8"><input class="textbox subject" type="text" value="Re: <?php echo $messages->title ?>">
+            </div>
+        </div>
+        <div class="col-sm-12 padding-top">
+            <div class="col-sm-1"><?php echo AppUtility::t('Message');?></div>
+            <?php echo "<div class='left col-sm-11'><div class= 'editor'>
+        <textarea id='message' name='message' style='width: 100%;' rows='12' cols='15'>$message</textarea></div></div><br>"; ?>
+        </div>
+        <div class="checkbox override-hidden col-sm-12">
+            <label class="col-sm-6 margin-left">
+                <input type="checkbox" class="header-checked" name="header-checked" value="1">
+                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                <?php echo AppUtility::t('Mark original message unread');?>
+            </label>
+        </div>
     </div>
 </div>
