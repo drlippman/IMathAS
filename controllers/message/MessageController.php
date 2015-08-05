@@ -420,6 +420,7 @@ class MessageController extends AppController
     public function actionViewConversation()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $userRights = $this->getAuthenticatedUser();
         $course = Course::getById($courseId);
@@ -455,6 +456,7 @@ class MessageController extends AppController
                 $this->messageData[$message['id']] = $tempArray;
             }
             $this->includeJS(["message/viewConversation.js"]);
+            $this->includeCSS(['message.css']);
             $this->createChild($this->children[key($this->children)]);
             $responseData = array('messages' => $this->totalMessages, 'user' => $user, 'messageId' => $messageId, 'course' => $course, 'userRights' => $userRights);
             return $this->renderWithData('viewConversation', $responseData);

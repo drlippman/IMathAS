@@ -15,6 +15,7 @@ use Yii;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumPosts;
 use app\models\_base\BaseImasForumViews;
+use yii\db\Query;
 
 class ForumView extends BaseImasForumViews
 {
@@ -139,16 +140,31 @@ class ForumView extends BaseImasForumViews
 
     }
 
-    public function  updateDataForPostByName($currentUser)
+    public function  updateDataForPostByName($threadId,$userId,$now)
     {
-        $users = ForumView::findAll(['userid' => $currentUser]);
-        if ($users) {
-            foreach ($users as $user) {
-                $lastView = strtotime(date('F d, o g:i a'));
-                $user->lastview = $lastView;
-                $user->save();
-            }
+        $query = new Query();
+        $query ->select('id')
+                ->from('imas_forum_views')
+                ->where(['userid' => $userId])
+                ->andWhere(['threadid' =>$threadId ]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        if(count($data)>0)
+        {
+            $id = $data[0]['id'];
+            $query  = ForumView::findOne(['id' =>$id ]);
+                $query->lastview = $now;
+                $query->save();
 
+        }
+        else
+        {
+            $id = $data[0]['id'];
+            $query  = ForumView::findOne(['id' =>$id ]);
+            $query->userid = $userId;
+            $query->threadid =$id;
+            $query->lastview = $now;
+            $query->save();
         }
     }
 

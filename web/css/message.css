@@ -123,6 +123,8 @@ background-color: #12856D;
     text-transform: capitalize;
     border-radius: 0px;
 }
+
+
 .hide-hover > a:hover{
     text-decoration: none;
     color: #FFF;
@@ -141,6 +143,16 @@ background-color: #12856D;
     border: 1px solid #ccc;
     border-radius: 0px;
 
+}
+button.btn.btn-primary1.btn-color:hover{
+
+    background-color: #12856D;
+    color: #FFF;
+}
+button.btn.btn-primary1.btn-color{
+
+    background-color: #12856D;
+    color: #FFF;
 }
 
 .align-links-dropdwn{
@@ -167,5 +179,18 @@ background-color: #12856D;
     margin-left: 87px;
     vertical-align: bottom;
     margin-top: 20px;
+}
+
+.padding-to-block
+{
+
+    margin-left: 11px;
+    margin-right: 10px;
+}
+.align-buttons
+{
+
+    margin-left: 9px;
+    margin-bottom: 10px;
 }
 

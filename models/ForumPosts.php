@@ -229,4 +229,15 @@ class ForumPosts extends BaseImasForumPosts
         return $this->id;
     }
 
+    public static function MarkAllRead($forumId)
+    {
+          $query = new Query();
+          $query ->select(['DISTINCT(threadid)'])
+                    ->from('imas_forum_posts ')
+                    ->where(['forumid' => $forumId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
 }

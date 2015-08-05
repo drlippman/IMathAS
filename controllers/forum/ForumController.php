@@ -958,18 +958,20 @@ class ForumController extends AppController
         $responseData = array('displayCountData' => $countDataArray);
         return $this->successResponse($responseData);
     }
-
     public function actionMarkAllReadAjax()
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
         $forumId = $params['forumId'];
-//        $unreadThreadId = ForumPosts::
+        $now = time();
         $userId = $this->getAuthenticatedUser()->id;
-        $viewsData = new ForumView();
-        $viewsData->updateDataForPostByName($userId);
+        $readThreadId = ForumPosts::MarkAllRead($forumId);
+        foreach($readThreadId as $data)
+        {
+            $viewsData = new ForumView();
+            $viewsData->updateDataForPostByName($data['threadid'],$userId,$now);
+        }
         return $this->successResponse();
-
     }
 
     public function actionAddForum()

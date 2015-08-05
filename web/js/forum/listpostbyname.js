@@ -1,6 +1,5 @@
 $(document).ready(function ()
 {
-
     var isData =  $('#isData').val();
     if(isData == 0){
         var msg = 'Does not contains any record';
@@ -12,7 +11,6 @@ $(document).ready(function ()
     {
         ExpandOne();
     });
-
     $("a[name=tabs]").on("click", function () {
         var threadid = $(this).attr("data-var");
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
@@ -63,8 +61,6 @@ function collapseall()
     document.getElementById("expand").value = 'Collapse All';
     document.getElementById("expand").onclick = expandall;
 }
-
-
 function expandall()
 {
     var count = $('#count').val();
@@ -78,8 +74,6 @@ function expandall()
     document.getElementById("expand").value = 'Expand All';
     document.getElementById("expand").onclick = collapseall;
 }
-
-
 function toggleshow(inum)
 {
     var node = document.getElementById('item' + inum);
@@ -95,30 +89,22 @@ function toggleshow(inum)
         buti.value = '-';
     }
 }
-
-
 function showall()
 {
     var count = $('#count').val();
     for(var i=0; i< count; i++){
 
         $('.blockitems').show(i);
-
     }
-
 }
-
 function markall(forumId)
 {
     jQuerySubmit('mark-all-read-ajax',{forumId: forumId },'markAllReadSuccess');
 }
-
 function markAllReadSuccess()
 {
-
-//    window.location.reload();
+    window.location.reload();
 }
-
 var  flag =0;
 function changeProfileImage(element,id)
 {
