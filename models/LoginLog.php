@@ -38,4 +38,13 @@ class LoginLog extends BaseImasLoginLog
             $logData->lastaction = $now;
         }
     }
+    public static function deleteCourseLog($toUnEnroll, $courseId)
+    {
+        $query = LoginLog::find()->where(['IN', 'userid', $toUnEnroll])->andWhere(['courseid' => $courseId])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 }

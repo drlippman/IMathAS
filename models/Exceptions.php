@@ -71,4 +71,12 @@ class Exceptions extends BaseImasExceptions
         $data = $command->queryAll();
         return $data;
     }
+    public static function deleteByAssessmentIdAndUid($aidlist, $stulist){
+        $query = Exceptions::find()->where(['IN', 'assessmentid', $aidlist])->andWhere(['IN', 'userid', $stulist])->all();
+        if($query){
+            foreach($query as $exception){
+                $exception->delete();
+            }
+        }
+    }
 } 

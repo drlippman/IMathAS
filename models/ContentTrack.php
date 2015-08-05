@@ -13,5 +13,14 @@ class ContentTrack extends BaseImasContentTrack
     {
         return ContentTrack::find()->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['type' => 'gbviewasid'])->all();
     }
+    public static function deleteUsingCourseAndUid($toUnEnroll, $courseId)
+    {
+        $query = ContentTrack::find()->where(['IN', 'userid', $toUnEnroll])->andWhere(['courseid' => $courseId])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 
 } 

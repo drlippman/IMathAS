@@ -228,7 +228,6 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
         return $this->id;
     }
-
     public static function MarkAllRead($forumId)
     {
           $query = new Query();
@@ -239,5 +238,17 @@ class ForumPosts extends BaseImasForumPosts
         $data = $command->queryAll();
         return $data;
     }
-
+    public static function findByForumId($forumId){
+        return ForumPosts::find()->where(['forumid' => $forumId])->all();
+    }
+    public static function deleteForumRelatedToCurse($forumlist){
+        Yii::$app->db->createCommand("DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid IN ($forumlist)")->queryAll();
+    }
+    public static function selectForumPosts($forumlist){
+        $query = \Yii::$app->db->createCommand("SELECT id FROM imas_forum_posts WHERE forumid IN ($forumlist) AND files<>''")->queryAll();
+        return $query;
+    }
+    public static function deleteForumPostByForumList($forumlist){
+        Yii::$app->db->createCommand("DELETE FROM imas_forum_posts WHERE forumid IN ($forumlist) AND posttype=0")->queryAll();
+    }
 }

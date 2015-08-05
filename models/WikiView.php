@@ -26,4 +26,13 @@ class WikiView extends BaseImasWikiViews
             }
         }
     }
+    public static function deleteWikiRelatedToCourse($wikis, $toUnEnroll)
+    {
+        $query = WikiView::find()->where(['IN', 'wikiid', $wikis])->andWhere(['IN', 'userid', $toUnEnroll])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 } 

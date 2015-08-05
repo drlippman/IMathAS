@@ -24,10 +24,10 @@
     padding-left: 0;
 }
 .ui-dialog-titlebar, .ui-widget-header, .ui-corner-all, .ui-helper-clearfix, .ui-draggable-handle{
-    background-color: #ffffff;
+    background-color: #ffffff !important;
+    border: none;
     /*display: none;*/
 }
-
 .assessment{
     position: absolute;
     top: 20px;

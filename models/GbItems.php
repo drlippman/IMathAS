@@ -125,4 +125,13 @@ class GbItems extends BaseImasGbitems
             $rubricData->save();
         }
     }
+    public static function deleteByCourseId($courseId)
+    {
+        $query = GbItems::find()->where(['courseid' => $courseId])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 }

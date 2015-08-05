@@ -160,4 +160,20 @@ class AssessmentSession extends BaseImasAssessmentSessions
             }
         }
     }
+    public static function deleteSessionByAssessmentId($aidlist, $stulist){
+        $query = AssessmentSession::find()->where(['IN', 'assessmentid', $aidlist])->andWhere(['IN', 'userid', $stulist])->all();
+        if($query){
+            foreach($query as $assessmentSession){
+                $assessmentSession->delete();
+            }
+        }
+    }
+    public static function getSessionDataForUnenroll($searchWhere){
+        $query = \Yii::$app->db->createCommand("SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchWhere")->queryAll();
+        return $query;
+    }
+    public static function getSessionInfoForUnenroll($searchNot, $lookForStr){
+        $query = \Yii::$app->db->createCommand("SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchNot AND ($lookForStr)")->queryAll();
+        return $query;
+    }
 } 

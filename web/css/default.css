@@ -30,7 +30,7 @@ div.editor {
 /*Default block container*/
 div.block, div.blockitems div.blockitems div.block {
     border: 1px solid #a9a9a9;
-	/*background-color: #ddf;*/
+	background-color: #f0f0f0;
 }
 
 /*Default block item container*/

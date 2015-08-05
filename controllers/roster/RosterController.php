@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers\roster;
 
+use app\components\StudentUnenrollUtility;
 use app\models\ActivityLog;
 use app\models\Assessments;
 use app\models\AssessmentSession;
@@ -855,9 +856,39 @@ class RosterController extends AppController
     {
         $this->layout = false;
         $params = $this->getRequestParams();
-        foreach ($params['checkedstudents'] as $students) {
-            Student::deleteStudent($students, $params['courseid']);
+        if($params['uid'] == "selected" )
+        {
+            $tounenroll = $params['checkedstudents'];
+        }elseif($params['uid'] == 'all')
+        {
+            $query = Student::getByCourse($params['courseid']);
+            foreach($query as $student){
+                $tounenroll[] = $student['userid'];
+            }
+        }else{
+            $tounenroll[] = $params['uid'];
         }
+        if (!isset($params['delwikirev'])) {
+            $delwikirev = intval($_POST['delwikirev']);
+        } else {
+            $delwikirev = 0;
+        }
+        if (isset($params['removewithdrawn'])) {
+            $withwithdraw = 'remove';
+        } else if ($params['uid'] == "all") {
+            $withwithdraw = 'unwithdraw';
+        } else {
+            $withwithdraw = false;
+        }
+        /*
+         * transaction is remaining
+         */
+           StudentUnenrollUtility::unenrollstu($params['courseid'],$tounenroll,($params['uid']=="all" || isset($params['delforumposts'])),($params['uid']=="all" && isset($params['removeoffline'])),$withwithdraw,$delwikirev, isset($params['usereplaceby']));
+
+//        foreach ($params['checkedstudents'] as $students) {
+//            Student::deleteStudent($students, $params['courseid']);
+//        }
+
         return $this->successResponse();
     }
 

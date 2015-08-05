@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasQuestions;
 
@@ -85,6 +86,15 @@ class Questions extends BaseImasQuestions
     {
         $query = Questions::find()->select('points,id')->where(['assessmentid' =>$assessmentId])->all();
         return $query;
-
+    }
+    public static function updateWithdrawn($assesses)
+    {
+        $query = Questions::find()->where(['IN', 'assessmentid', $assesses])->all();
+        if($query){
+            foreach($query as $object){
+                $object->withdrawn = AppConstant::NUMERIC_ZERO ;
+                $object->save();
+            }
+        }
     }
 } 

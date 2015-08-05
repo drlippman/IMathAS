@@ -67,5 +67,14 @@ class Grades extends BaseImasGrades
             }
         }
     }
+    public static function deleteGradesUsingType($gradeType, $tools, $toUnEnroll)
+    {
+        $query = Grades::find()->where(['gradetype'=> $gradeType])->andWhere(['IN', 'gradetypeid', $tools])->andWhere(['IN', 'userid', $toUnEnroll])->all();
+        if($query){
+            foreach($query as $grades){
+                $grades->delete();
+            }
+        }
+    }
 }
 

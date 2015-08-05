@@ -211,7 +211,8 @@ function studentUnenroll() {
                             $(this).prop('checked', false);
                         });
                         $(this).dialog("close");
-                        var data = {checkedstudents: markArray, courseid: course_id};
+                        var userIds = "selected";
+                        var data = {checkedstudents: markArray, courseid: course_id, uid: userIds};
                         jQuerySubmit('mark-unenroll-ajax', data, 'markUnenrollSuccess');
                         return true;
                     },
@@ -245,7 +246,7 @@ function studentUnenroll() {
         }
     });
 }
-function markUnenrollSuccess(response) {
+function markUnenrollSuccess(response) {console.log(response);
     location.reload();
 }
 function studentEmail() {

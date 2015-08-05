@@ -54,4 +54,13 @@ class WikiRevision extends BaseImasWikiRevisions
             }
         }
     }
+    public static function deleteWikiRivision($wikilist)
+    {
+        $query = WikiRevision::find()->where(['IN', 'wikiid', $wikilist])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 }

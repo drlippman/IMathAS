@@ -182,5 +182,14 @@ class ForumView extends BaseImasForumViews
         $this->lastview = $forumViewArray['postdate'];
         $this->save();
     }
+    public static function deleteViewRelatedToCourse($threads, $toUnEnroll)
+    {
+        $query = ForumView::find()->where(['IN', 'threadid', $threads])->andWhere(['IN', 'userid', $toUnEnroll])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
+    }
 }
 

@@ -90,4 +90,9 @@ class LinkedText extends BaseImasLinkedtext
         }
         $updaateLink->save();
     }
+    public static function findByCourseId($cid)
+    {
+        $linkData = LinkedText::find()->where(['courseid' => $cid])->andWhere(['>','points',AppConstant::NUMERIC_ZERO])->all()  ;
+        return $linkData;
+    }
 }

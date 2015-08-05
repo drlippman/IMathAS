@@ -147,29 +147,30 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     background-position: center left !important;
 }
 
-.ui-dialog-titlebar-close{
-/*display: none;*/
+.ui-dialog .ui-dialog-titlebar-close{
+    background-color: #ffffff !important;
+    background-image: url("../img/dialog_close%20.png");
+    width: 18px;
+    height: 18px;
+    border: 1px solid #6d6d6d;
 }
 
 
 .ui-widget-header {
-    border: 1px solid #aaaaaa !important;
+    border: none !important;
     background: none !important;
-    background-color: #003366 !important;
+    /*background-color: #003366 !important;*/
     color: #fff !important;
     font-weight: bold !important;
 }
 
-.ui-dialog-buttonset button{
-    color: #fff;
-    background-color: #428bca;
-    border-color: #357ebd;
+.ui-dialog .ui-dialog-buttonset button{
+    color: #000000;
+    background-color: #f0f0f0;
+    border: 1px solid #6d6d6d;
 }
-
-.ui-dialog-buttonset button:hover{
-    color: #fff;
-    background-color: #3071a9;
-    border-color: #285e8e;
+.ui-widget-content {
+     border: 0;
 }
 .addRemoveTable{
     margin-top: 20px;
@@ -772,12 +773,11 @@ div.dataTables_wrapper {
 .inner-sub-content {
     padding: 15px;
 }
-.ui-dialog .ui-dialog-titlebar-close {
-   visibility: hidden;
-}
 .a:hover{
     color: #0000ff;
 }
 .full-width{
     width: 100%;
 }
+
+

@@ -1,4 +1,12 @@
 <?php
+namespace app\components;
+
+use app\components\AppConstant;
+use app\components\AppUtility;
+use app\models\AssessmentSession;
+use Yii;
+use yii\base\Component;
+
 
 @set_time_limit(0);
 ini_set("max_input_time", "600");
@@ -16,6 +24,9 @@ if (isset($GLOBALS['AWSkey'])) {
 	$GLOBALS['filehandertype'] = 'local';	
 }
 
+
+class filehandler extends Component
+{
 function storecontenttofile($content,$key,$sec="private") {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
@@ -317,7 +328,8 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 }
 	
 	
-function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
+public static function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
+
 	if (is_array($val)) {
 		$keylist = "'".implode("','",$val)."'";
 		$searchwhere = "$tosearchby IN ($keylist)";
@@ -341,18 +353,19 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 	if ($lim>0) {
 		$searchwhere .= " LIMIT $lim";
 	}
-	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchwhere";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-	if (mysql_num_rows($result)==0) {return 0;}
-	$todel = array();
-	while ($row = mysql_fetch_row($result)) {
-		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$matches);
-		foreach ($matches[1] as $file) {
-			if (!in_array($file,$todel)) {
-				$todel[] = $file;
-			}
-		}
-	}
+    $query = AssessmentSession::getSessionDataForUnenroll($searchwhere);
+    if($query == "" || $query == null){
+        return 0;
+    }
+    $todel = array();
+	foreach($query as $session){
+        preg_match_all('/@FILE:(.+?)@/',$session['lastanswers'].$session['bestlastanswers'].$session['reviewlastanswers'],$matches);
+        foreach($matches[1] as $file){
+            if (!in_array($file,$todel)) {
+                $todel[] = $file;
+            }
+        }
+    }
 	if (count($todel)==0) {return 0;}
 	$lookfor = array();
 	foreach ($todel as $file) {
@@ -360,16 +373,13 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		$lookfor[] = "lastanswers LIKE '%$file%' OR bestlastanswers LIKE '%$file%' OR reviewlastanswers LIKE '%$file%'";
 	}
 	$lookforstr = implode(' OR ',$lookfor);
-	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+    $query = AssessmentSession::getSessionInfoForUnenroll($searchnot, $lookforstr);
 	$skip = array();
-	while ($row = mysql_fetch_row($result)) {
-		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
-		//remove from todel list all files found in other sessions 
-		$todel = array_diff($todel,$exmatch[1]);
-	}
+    foreach($query as $session){
+        preg_match_all('/@FILE:(.+?)@/',$session['lastanswers'].$session['bestlastanswers'].$session['reviewlastanswers'],$exmatch);
+        $todel = array_diff($todel,$exmatch[1]);
+    }
 	$deled = array();
-	
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		foreach($todel as $file) {
@@ -385,7 +395,7 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 			if (in_array($file,$deled)) { continue;}
 			if (unlink($base.'/adata/'.$file)) {
 				$deled[] = $file;
-				recursiveRmdir(dirname($base.'/adata/'.$file));
+				filehandler::recursiveRmdir(dirname($base.'/adata/'.$file));
 			}
 		}
 	}
@@ -584,7 +594,7 @@ function deletefilebykey($key) {
 	}
 }
 
-function deleteallpostfiles($postid) {
+public static function deleteallpostfiles($postid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -681,13 +691,13 @@ function mkdir_recursive($pathname, $mode=0777)
     is_dir(dirname($pathname)) || mkdir_recursive(dirname($pathname), $mode);
     return is_dir($pathname) || @mkdir($pathname, $mode);
 }
-function recursiveRmdir($dir) {
+public static function recursiveRmdir($dir) {
 	if (basename($dir)=='adata' || basename($dir)=='ufiles' || basename($dir)=='files') { return;}
 	if (@rmdir($dir)) {
 		recursiveRmdir(dirname($dir));
 	}
 }
-function unlinkRecursive($dir, $deleteRootToo) {
+public static function unlinkRecursive($dir, $deleteRootToo) {
     $cnt = 0;
     if(!$dh = @opendir($dir))  {
         return;
@@ -712,5 +722,5 @@ function unlinkRecursive($dir, $deleteRootToo) {
     return $cnt;
 }
 
-
+}
 ?>

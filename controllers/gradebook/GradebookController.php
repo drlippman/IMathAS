@@ -2265,7 +2265,6 @@ class GradebookController extends AppController
         $params = $this->getRequestParams();
         foreach ($params['checkedMsg'] as $gradeId) {
             GbItems::deleteById($gradeId);
-
         }
         return $this->successResponse();
 
