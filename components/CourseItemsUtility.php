@@ -1,630 +1,932 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 9/7/15
- * Time: 12:14 PM
- */
 namespace app\components;
-use app\models\Assessments;
-use app\models\ForumPosts;
-use app\models\Forums;
-use app\models\ForumThread;
-use app\models\ForumView;
-use app\models\GbItems;
-use app\models\InlineText;
-use app\models\InstrFiles;
-use app\models\Items;
-use app\models\LinkedText;
-use app\models\Questions;
-use app\models\Rubrics;
-use app\models\Wiki;
 use \yii\base\Component;
 use app\components\AppUtility;
 use app\components\AppConstant;
 
-class CopyItemsUtility extends Component
+class CourseItemsUtility extends Component
 {
-
-    public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
+////////////////////////////////////////////// ASSESSMENT //////////////////////////////////////////////////////////////////////////////////
+    public $cnt = 0;
+    public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent)
     {
-        global $cid, $reqscoretrack, $assessnewid, $qrubrictrack, $frubrictrack, $copystickyposts, $userid, $exttooltrack, $outcomes, $removewithdrawn, $replacebyarr;
-        global $posttoforumtrack, $forumtrack;
-        if (!isset($copystickyposts)) {
-            $copystickyposts = false;
-        }
-        if ($gbcats === false) {
-            $gbcats = array();
-        }
-        if (!isset($outcomes)) {
-            $outcomes = array();
-        }
-        if (strlen($params['append']) > 0 && $params['append']{0} != ' ') {
-            $params['append'] = ' ' . $params['append'];
-        }
-        $now = time();
-        $query = Items::getByTypeId($itemid);
-        $itemtype = $query['itemtype'];
-        $typeid = $query['typeid'];
-        if ($itemtype == "InlineText") {
-            $inlineTextData = InlineText::getById($typeid);
-            $row = array(
-                'courseid' => $inlineTextData['courseid'],
-                'title' => $inlineTextData['title'],
-                'text' => $inlineTextData['text'],
-                'startdate' => $inlineTextData['startdate'],
-                'enddate' => $inlineTextData['enddate'],
-                'avail' => $inlineTextData['avail'],
-                'oncal' => $inlineTextData['oncal'],
-                'caltag' => $inlineTextData['caltag'],
-                'isplaylist' => $inlineTextData['isplaylist'],
-                'fileorder' => $inlineTextData['fileorder'],
-            );
-            if ($sethidden) {
-                $row['avail'] = 0;
-            }
-            $row['title'] .= stripslashes($params['append']);
-            $fileorder = $row['fileorder'];
-            array_pop($row);
-            $inlineText = new InlineText();
-            $newtypeid = $inlineText->saveChanges($row);
-            $instrFiles = InstrFiles::getAllData($typeid);
-            $addedfiles = array();
-            foreach ($instrFiles as $singleData) {
-                $curid = $singleData['id'];
-                array_pop($singleData);
-                $singleData = "'" . implode("','", AppUtility::addslashes_deep($singleData)) . "'";
-                $instrFile = new InstrFiles();
-                $newInstrFileId = $instrFile->saveFile($singleData, $newtypeid);
-                $addedfiles[$curid] = $newInstrFileId;
-            }
-            if (count($addedfiles) > 0) {
-                $addedfilelist = array();
-                foreach (explode(',', $fileorder) as $fid) {
-                    $addedfilelist[] = $addedfiles[$fid];
-                }
-                $addedfilelist = implode(',', $addedfilelist);
-                InlineText::setFileOrder($newtypeid, $addedfilelist);
-            }
-        } elseif ($itemtype == "LinkedText") {
-            $query = LinkedText::getById($typeid);
-            $istool = (substr($query['text'], 0, 8) == 'exttool:');
-            if ($istool) {
-                $tool = explode('~~', substr($query['text'], 8));
-                if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
-                    $tool[3] = $gbcats[$tool[3]];
-                } else if ($params['ctc'] != $cid) {
-                    $tool[3] = 0;
-                }
-                $query['text'] = 'exttool:' . implode('~~', $tool);
-            }
-            if ($sethidden) {
-                $query['avail'] = 0;
-            }
-            $query['title'] .= stripslashes($params['append']);
-            if ($query['outcomes'] != '') {
-                $curoutcomes = explode(',', $query['outcomes']);
-                $newoutcomes = array();
-                foreach ($curoutcomes as $o) {
-                    if (isset($outcomes[$o])) {
-                        $newoutcomes[] = $outcomes[$o];
-                    }
-                }
-                $query['outcomes'] = implode(',', $newoutcomes);
-            }
-            $linkText = new LinkedText();
-            $newtypeid = $linkText->addLinkedText($query);
-            if ($istool) {
-                $exttooltrack[$newtypeid] = intval($tool[0]);
-            }
-        } elseif ($itemtype == "Forum") {
-            $ForumData = Forums::getById($typeid);
-            if ($sethidden) {
-                $ForumData['avail'] = 0;
-            }
-            if (isset($gbcats[$ForumData['gbcategory']])) {
-                $ForumData['gbcategory'] = $gbcats[$ForumData['gbcategory']];
-            } else if ($params['ctc'] != $cid) {
-                $ForumData['gbcategory'] = 0;
-            }
-            $rubric = $ForumData['rubric'];
-            $ForumData['name'] .= stripslashes($params['append']);
-            if ($ForumData['outcomes'] != '') {
-                $curoutcomes = explode(',', $ForumData['outcomes']);
-                $newoutcomes = array();
-                foreach ($curoutcomes as $o) {
-                    if (isset($outcomes[$o])) {
-                        $newoutcomes[] = $outcomes[$o];
-                    }
-                }
-                $row['outcomes'] = implode(',', $newoutcomes);
-            }
-            $forum = new Forums();
-            $newtypeid = $forum->addNewForum($ForumData);
-            if ($params['ctc'] != $cid) {
-                $forumtrack[$typeid] = $newtypeid;
-            }
-            if ($rubric != 0) {
-                $frubrictrack[$newtypeid] = $rubric;
-            }
-            if ($copystickyposts) {
-                //copy instructor sticky posts
-                $query = ForumPosts::getByForumId($typeid);
-                foreach ($query as $row) {
-                    $forumPostArray = array(
-                        'forumid' => $newtypeid,
-                        'userid' => $userid,
-                        'parent' => AppConstant::NUMERIC_ZERO,
-                        'postdate' => $now,
-                        'subject' => $row['subject'],
-                        'message' => $row['message'],
-                        'posttype' => $row['posttype'],
-                        'isanon' => $row['isanon'],
-                        'replyby' => $row['replyby'],
-                    );
-                    if (is_null($row['replyby']) || trim($row['replyby']) == '') {
-                        $forumPostArray['replyby'] = NULL;
-                    }
-                    $forumPost = new ForumPosts();
-                    $threadid = $forumPost->savePost($forumPostArray);
-                    ForumPosts::setThreadIdById($threadid);
-                    $forumThread = new ForumThread();
-                    $forumThread->addThread($threadid, $forumPostArray);
-                    $forumView = new ForumView();
-                    $forumView->addView($threadid, $forumPostArray);
-                }
-            }
-        } elseif ($itemtype == "Wiki") {
-            $row = Wiki::getById($typeid);
-            if ($sethidden) {
-                $row['avail'] = 0;
-            }
-            $row['name'] .= stripslashes($params['append']);
-            $wiki = new Wiki();
-            $newtypeid = $wiki->addWiki($row);
-        } elseif ($itemtype == "Assessment") {
-            $assessmentData = Assessments::getByAssessmentId($typeid);
-            if ($sethidden) {
-                $assessmentData['avail'] = 0;
-            }
-            if (isset($gbcats[$assessmentData['gbcategory']])) {
-                $assessmentData['gbcategory'] = $gbcats[$assessmentData['gbcategory']];
-            } else if ($params['ctc'] != $params['courseId']) {
-                $assessmentData['gbcategory'] = 0;
-            }
-            if (isset($outcomes[$assessmentData['defoutcome']])) {
-                $assessmentData['defoutcome'] = $outcomes[$assessmentData['defoutcome']];
-            } else {
-                $assessmentData['defoutcome'] = 0;
-            }
-            if ($assessmentData['ancestors'] == '') {
-                $assessmentData['ancestors'] = $typeid;
-            } else {
-                $assessmentData['ancestors'] = $typeid . ',' . $assessmentData['ancestors'];
-            }
-            if ($params['ctc'] != $params['courseId']) {
-                $forumtopostto = $assessmentData['posttoforum'];
-                unset($assessmentData['posttoforum']);
-            }
-            $reqscoreaid = $assessmentData['reqscoreaid'];
-            unset($assessmentData['reqscoreaid']);
-            $assessmentData['name'] .= stripslashes($params['append']);
-            $assessment = new Assessments();
-            $newtypeid = $assessment->copyAssessment($assessmentData);
-            if ($reqscoreaid > 0) {
-                $reqscoretrack[$newtypeid] = $reqscoreaid;
-            }
-            if ($params['ctc'] != $cid && $forumtopostto > 0) {
-                $posttoforumtrack[$newtypeid] = $forumtopostto;
-            }
-            $assessnewid[$typeid] = $newtypeid;
-            $thiswithdrawn = array();
+        $assessment = $item[key($item)];
+        if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
+            ?>
+            <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
+            <div class="title">
+            <b>
+                <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>" class="confirmation-require assessment-link"
+                   id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
+            </b>
+            <div class="floatright">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options">
+                    <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
+                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul>
+            </div>
 
-            $query = Assessments::getByAssessmentId($typeid);
-            if (trim($query['itemorder']) != '') {
-                $itemorder = explode(',', $query['itemorder']);
-                $query = Questions::getByItemOrder($itemorder);
-                $inss = array();
-                $insorder = array();
-                foreach ($query as $singleData) {
-                    if ($singleData['withdrawn'] > 0 && $removewithdrawn) {
-                        $thiswithdrawn[$singleData['id']] = 1;
-                        continue;
-                    }
-                    if (isset($replacebyarr[$singleData['questionsetid']])) {
-                        $singleData['questionsetid'] = $replacebyarr[$singleData['questionsetid']];
-                    }
-                    if (is_numeric($singleData['category'])) {
-                        if (isset($outcomes[$singleData['category']])) {
-                            $singleData['category'] = $outcomes[$singleData['category']];
-                        } else {
-                            $singleData['category'] = 0;
+            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+                   name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
+
+            <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                <BR>Hidden
+            <?php } else { ?>
+                <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                    <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
+
+                <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+                <?php } else { ?>
+                    <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                <?php }
+            } ?>
+            <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+                <span title="Late Passes Allowed">LP</span>
+            <?php
+            } ?>
+        <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
+            ?>
+            <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
+
+            <div class="title">
+            <b>
+                <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+                   class="confirmation-require assessment-link"
+                   id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
+            </b>
+            <div class="floatright">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options">
+                    <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
+                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul>
+            </div>
+
+            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
+                   name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
+            <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                <BR>Hidden
+            <?php } else { ?>
+                <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                    <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
+                <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+                <?php } else { ?>
+                    <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                <?php }
+            } ?>
+            <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+                <span title="Late Passes Allowed">LP</span>
+            <?php
+            } ?>
+
+            <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) { ?>
+                <br>This assessment is in review mode - no scores will be saved
+            <?php }
+        }else if ($assessment->startdate >= 0 || $assessment->enddate == AppConstant::ALWAYS_TIME) {
+            ?>
+            <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
+
+            <div class="title">
+            <b>
+                <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+                   class="confirmation-require assessment-link"
+                   id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
+            </b>
+            <div class="floatright">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options">
+                    <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
+                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul>
+            </div>
+
+            <input type="hidden" class="confirmation-require"
+                   id="time-limit<?php echo $assessment->id ?>" name="urlTimeLimit"
+                   value="<?php echo $assessment->timelimit; ?>">
+            <?php if ($assessment->startdate >= 0 && $assessment->enddate > $currentTime) { ?>
+                <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+
+                    <BR>Hidden
+                <?php } else { ?>
+                    <?php if ($assessment->reviewdate >= AppConstant::NUMERIC_ZERO) { ?>
+                        <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?>.
+                        <!--                                                                                --><?php //}else if (){?>
+                        <!--                                                                                    <br>Available --><?php //echo AppUtility::formatDate($assessment->startdate); ?><!--, until --><?php //echo AppUtility::formatDate($assessment->enddate); ?>
+                    <?php } else { ?>
+                        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                    <?php }
+                }
+            }    else if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime) { ?>
+                <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                    <BR>Hidden
+                <?php } else { ?>
+                    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
+                        <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
+
+                    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <?php if($assessment->startdate == AppConstant::NUMERIC_ZERO){ ?>
+                            <br>Available Always until <?php echo AppUtility::formatDate($assessment->enddate); ?>
+                        <?php }else{ ?>
+                            <br>Available <?php echo AppUtility::formatDate($assessment->startdate);  ?>, <?php echo AppUtility::formatDate($assessment->enddate);  ?>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
+                    <?php }
+                }   } ?>
+
+
+            <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
+                <span title="Late Passes Allowed">LP</span>
+            <?php
+            } ?>
+
+            <?php if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime && $assessment['avail'] != AppConstant::NUMERIC_ZERO && $assessment->reviewdate != AppConstant::NUMERIC_ZERO) { ?>
+
+                <br> This assessment is in review mode - no scores will be saved
+            <?php } ?>
+
+        <?php }   ?>
+        </div>
+        <div class="itemsum">
+            <p><?php echo $assessment->summary ?></p>
+        </div>
+        </div>
+    <?php }
+
+//////////////////////////////////////////////////// FORUM //////////////////////////////////////////////////////////////////////////////////////
+    public static function AddForum($item,$course,$currentTime,$parent)
+    {
+        $forum = $item[key($item)];
+        if ($forum->avail == 2 || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == 1) {?>
+
+            <div class="item">
+                <!--Hide title and icon-->
+                <?php if ($forum->name != '##hidden##') {
+                $endDate = AppUtility::formatDate($forum->enddate);?>
+                <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
+                <div class="title">
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
+                    <div class="floatright">
+                        <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                        <ul class=" select1 dropdown-menu selected-options">
+                            <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?id=' . $forum->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                            <li><a id="delete" href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                            <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                        </ul>
+                    </div>
+                    <br>
+                </div>
+                <div class="itemsum">
+                    <?php } ?>
+
+                    <?php if($forum->avail == 2) { ?>
+                        <?php echo "Showing Always"; ?>
+                    <?php  }
+                    else {
+                        if($forum->startdate == 0 && $forum->enddate == 2000000000 || $forum->startdate != 0 && $forum->enddate == 2000000000)
+                        {
+                            echo "Showing until: Always"; ?>
+                        <?php   }
+                        else{
+                            echo "Showing until: " .$endDate;?>
+                        <?php
                         }
                     }
-                    $rubric[$singleData['id']] = $singleData['rubric'];
-                    $insorder[] = $singleData['id'];
-                    array_push($inss, $singleData);
-                }
-                $idtoorder = array_flip($insorder);
-                if (count($inss) > 0) {
-                    $question = new Questions();
-                    $questionIdArray = array();
-                    foreach ($inss as $in) {
-                        $firstnewid = $question->addQuestions($in);
-                        array_push($questionIdArray, $firstnewid);
+                    $duedates = "";
+                    if ($forum->postby > $currentTime && $forum->postby != 2000000000) {
+                        echo('New Threads due '), AppUtility::formatdate($forum->postby).".";
                     }
-                    $aitems = $itemorder;
-                    $newaitems = array();
-                    foreach ($aitems as $k => $aitem) {
-                        if (strpos($aitem, '~') === FALSE) {
-                            if (isset($thiswithdrawn[$aitem])) {
-                                continue;
-                            }
-                            if ($rubric[$aitem] != 0) {
-                                $qrubrictrack[$firstnewid + $idtoorder[$aitem]] = $rubric[$aitem];
-                            }
-                            $newaitems[] = $firstnewid + $idtoorder[$aitem];
-                        } else {
-                            $sub = explode('~', $aitem);
-                            $newsub = array();
-                            $front = 0;
-                            if (strpos($sub[0], '|') !== false) { //true except for bwards compat
-                                $newsub[] = array_shift($sub);
-                                $front = 1;
-                            }
-                            foreach ($sub as $subi) {
-                                if (isset($thiswithdrawn[$subi])) {
-                                    continue;
-                                }
-                                if ($rubric[$subi] != 0) {
-                                    $qrubrictrack[$firstnewid + $idtoorder[$subi]] = $rubric[$subi];
-                                }
-                                $newsub[] = $firstnewid + $idtoorder[$subi];
-                            }
-                            if (count($newsub) == $front) {
+                    if ($forum->replyby > $currentTime && $forum->replyby != 2000000000) {
+                        echo(' Replies due '), AppUtility::formatdate($forum->replyby).".";
+                    }
+                    ?>
+                    <p><?php echo $forum->description ?></p>
+                </div>
+            </div>
 
-                            } else if (count($newsub) == $front + 1) {
-                                $newaitems[] = $newsub[$front];
-                            } else {
-                                $newaitems[] = implode('~', $newsub);
-                            }
-                        }
-                    }
-                    $newitemorder = implode(',', $newaitems);
-                    Assessments::setItemOrder($newitemorder, $newtypeid);
-                }
-            }
-        } elseif ($itemtype == "Calendar") {
-        }
-        $items = new Items();
-        $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
-        return $newItemId;
-    }
-    public static function copysub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
+        <?php } elseif($forum->avail == 0) { ?>
+            <div class="item">
+                <!--Hide title and icon-->
+                <?php if ($forum->name != '##hidden##') {
+                $endDate = AppUtility::formatDate($forum->enddate);?>
+                <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
+                <div class="title">
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
+                    <div class="floatright">
+                        <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                        <ul class=" select1 dropdown-menu selected-options">
+                            <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-forum?id=' . $forum->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                            <li><a id="delete" href="#" onclick="deleteItem('<?php echo $forum->id; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                            <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                        </ul>
+                    </div>
+                    <br>
+                </div>
+                <div class="itemsum"><p>
+                        <?php
+                        echo 'Hidden'; ?>
+                        <?php
+                        } ?>
+
+                    <p><?php echo $forum->description ?></p>
+                </div>
+            </div>
+        <?php } else{ ?>
+            <div class="item">
+                <?php if ($forum->name != '##hidden##') {
+                $endDate = AppUtility::formatDate($forum->enddate);?>
+                <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>                <div class="title">
+                    <b><a><?php echo ucfirst($forum->name) ?></a></b> <br>
+                </div>
+                <div class="itemsum"><p>
+                        <?php }
+                        $startDate = AppUtility::formatDate($forum->startdate);
+                        $endDate = AppUtility::formatDate($forum->enddate);
+                        echo "Showing " .$startDate. " until " .$endDate; ?>
+                </div>
+
+            </div>
+        <?php }?>
+
+    <?php }
+
+////////////////////////////////////////////////////////////////////// WIKI////////////////////////////////////////////////////////////////////
+
+    public static function AddWiki($item,$course,$parent)
     {
-        global $checked, $blockcnt;
-        foreach ($items as $k => $item) {
-            if (is_array($item)) {
-                if (array_search($parent . '-' . ($k + 1), $checked) !== FALSE) { //copy block
-                    $newblock = array();
-                    $newblock['name'] = $item['name'] . stripslashes($_POST['append']);
-                    $newblock['id'] = $blockcnt;
-                    $blockcnt++;
-                    $newblock['startdate'] = $item['startdate'];
-                    $newblock['enddate'] = $item['enddate'];
-                    $newblock['avail'] = $sethidden ? 0 : $item['avail'];
-                    $newblock['SH'] = $item['SH'];
-                    $newblock['colors'] = $item['colors'];
-                    $newblock['public'] = $item['public'];
-                    $newblock['fixedheight'] = $item['fixedheight'];
-                    $newblock['grouplimit'] = $item['grouplimit'];
-                    $newblock['items'] = array();
-                    if (count($item['items']) > 0) {
-                        copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
-                    }
-                    $addtoarr[] = $newblock;
+        $wikis = $item[key($item)]; ?>
+        <?php $endDateOfWiki = AppUtility::formatDate($wikis['enddate'], 'm/d/y');
+        ?>
+        <?php if ($wikis->avail == AppConstant::NUMERIC_ZERO) { ?>
+
+        <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
+
+            <div class="title">
+                <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
+                        <?php echo ucfirst($wikis->name) ?></a></b>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+
+                <br><span>Hidden</span>
+
+            </div>
+            <div class="itemsum">
+                <p>
+
+                <p>&nbsp;<?php echo $wikis->description ?></p></p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    <?php } elseif ($wikis->avail == AppConstant::NUMERIC_ONE) { ?>
+        <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
+
+            <div class="title">
+                <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
+                        <?php echo ucfirst($wikis->name) ?></a></b>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+                <br><span> Showing until:</span>
+                <?php if ($wikis['enddate'] < AppConstant::ALWAYS_TIME) {
+                    echo $endDateOfWiki;
+                } else { ?>
+                    Always
+                <?php } ?>
+
+                <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
+                    Edits due by <? echo $endDateOfWiki; ?>
+                <?php } ?>
+            </div>
+            <div class="itemsum">
+                <p>
+
+                <p>&nbsp;<?php echo $wikis->description ?></p></p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    <?php } else if ($wikis->avail == AppConstant::NUMERIC_TWO) { ?>
+        <div class="item">
+            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
+            <div class="title">
+                <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
+                        <?php echo ucfirst($wikis->name) ?></a></b>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wikis->id . '&courseId=' . $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $wikis->id; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+                <br><span>Showing Always</span>
+
+                <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
+                    Edits due by <? echo $endDateOfWiki; ?>
+                <?php } ?>
+            </div>
+            <div class="itemsum">
+                <p>
+
+                <p>&nbsp;<?php echo $wikis->description ?></p></p>
+            </div>
+            <div class="clear"></div>
+        </div>
+    <?php } ?>
+
+    <?php }
+
+////////////////////////////////////////////////////////// LINK ////////////////////////////////////////////////////////////////////////////
+
+    public static function AddLink($item,$currentTime,$parent,$course)
+    {
+        $link = $item[key($item)]; ?>
+        <!--                                --><?php //if ($link->avail != 0 && $link->startdate < $currentTime && $link->enddate > $currentTime) { ?>
+        <!--Link type : http-->
+        <?php $text = $link->text; ?>
+        <?php $startDateOfLink = AppUtility::formatDate($link->startdate);
+        $endDateOfLink = AppUtility::formatDate($link->enddate); ?>
+        <?php if ((substr($text, 0, 4) == 'http') && (strpos(trim($text), " ") == false)) { ?>
+        <div class="item">
+            <img alt="link to web" class="floatleft"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/web.png"/>
+
+            <div class="title">
+                <?php if ($link->target == 1) { ?>
+                    <b><a href="<?php echo $text ?>" target="_blank"><?php echo $link->title ?>&nbsp;<img
+                                src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b></a></b>
+                <?php } else { ?>
+                    <b><a href="<?php echo $text ?>"><?php echo ucfirst($link->title); ?></a></b>
+                <?php } ?>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+
+                <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                    <BR>Hidden
+                <?php } else if ($link['avail'] == AppConstant::NUMERIC_TWO) { ?>
+                    <br>Showing Always
+                <?php } else if ($link->enddate >= $currentTime && $link->startdate >= $currentTime || $link->enddate <= $currentTime && $link->startdate <= $currentTime) { ?>
+
+                    <?php if ($link['avail'] == AppConstant::NUMERIC_ONE && $link->startdate != AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing <?php echo $startDateOfLink ?>
+                        <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                            until Always
+                        <? } else { ?>
+                            until <?php echo $endDateOfLink ?>,
+                        <?php }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing Always until <?php echo $endDateOfLink ?>
+                    <?php } ?>
+                <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Showing until:
+                    <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                        Always
+                    <?php } else { ?>
+                        <?php echo $endDateOfLink ?>
+                    <?php }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <br> Showing until:<?php echo $endDateOfLink; ?>
+                <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
+                    <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
+                <?php } ?>
+
+            </div>
+            <div class="itemsum">
+                <p>
+
+                <p><?php echo $link->summary ?>&nbsp;</p></p>
+            </div>
+            <div class="clear"></div>
+        </div>
+
+
+        <!--                        Link type : file-->
+    <?php } elseif ((substr($link->text, 0, 5) == 'file:')) { ?>
+        <div class="item">
+            <img alt="link to doc" class="floatleft"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/doc.png"/>
+
+            <div class="title">
+                <?php if ($link->target != 0) { ?>
+                    <?php
+                    $filename = substr(strip_tags($link->text), 5);
+                    require_once("../components/filehandler.php");
+                    $alink = getcoursefileurl($filename);
+                    echo '<a href="' . $alink . '">' . $link->title . '</a>';
                 } else {
-                    if (count($item['items']) > 0) {
-                        copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbcats, $sethidden);
+                    $filename = substr(strip_tags($link->text), 5);
+                    require_once("../components/filehandler.php");
+                    $alink = getcoursefileurl($filename);
+                    echo '<a href="' . $alink . '">' . ucfirst($link->title) . '</a>';
+                } ?>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+
+                <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                    <BR>Hidden
+                <?php } else if ($link['avail'] == AppConstant::NUMERIC_TWO) { ?>
+                    <br>Showing Always
+                <?php } else if ($link->enddate >= $currentTime && $link->startdate >= $currentTime || $link->enddate <= $currentTime && $link->startdate <= $currentTime) { ?>
+
+                    <?php if ($link['avail'] == AppConstant::NUMERIC_ONE && $link->startdate != AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing <?php echo $startDateOfLink ?>
+                        <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                            until Always
+                        <? } else { ?>
+                            until <?php echo $endDateOfLink ?>,
+                        <?php }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing Always until <?php echo $endDateOfLink ?>
+                    <?php } ?>
+                <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Showing until:
+                    <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                        Always
+                    <?php } else { ?>
+                        <?php echo $endDateOfLink ?>
+
+                    <?php }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <br> Showing until:<?php echo $endDateOfLink; ?>
+                <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
+                    <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
+                <?php } ?>
+
+            </div>
+            <div class="itemsum">
+                <p>
+
+                <p><?php echo $link->summary ?>&nbsp;</p></p>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <!--Link type : external tool-->
+    <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
+        <div class="item">
+            <img alt="link to html" class="floatleft"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+
+            <div class="title">
+                <!--open on new window or on same window-->
+                <?php if ($link->target != 0) { ?>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid . '&id=' . $link->id) ?>"
+                          target="_blank">
+                            <?php echo $link->title ?>&nbsp;<img
+                                src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                <?php } else { ?>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $link->courseid . '&id=' . $link->id) ?>">
+                            <?php echo ucfirst($link->title) ?></a></b>
+                <?php } ?>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+
+                <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                    <BR>Hidden
+                <?php } else if ($link['avail'] == AppConstant::NUMERIC_TWO) { ?>
+                    <br>Showing Always
+                <?php } else if ($link->enddate >= $currentTime && $link->startdate >= $currentTime || $link->enddate <= $currentTime && $link->startdate <= $currentTime) { ?>
+
+                    <?php if ($link['avail'] == AppConstant::NUMERIC_ONE && $link->startdate != AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing <?php echo $startDateOfLink ?>
+                        <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                            until Always
+                        <? } else { ?>
+                            until <?php echo $endDateOfLink ?>,
+                        <?php }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing Always until <?php echo $endDateOfLink ?>
+                    <?php } ?>
+                <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Showing until:
+                    <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                        Always
+                    <?php } else { ?>
+                        <?php echo $endDateOfLink ?>
+                    <?php }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <br> Showing until:<?php echo $endDateOfLink; ?>
+                <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
+                    <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
+                <?php } ?>
+
+            </div>
+            <div class="itemsum"><p>
+
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+    <?php } else { ?>
+        <div class="item">
+            <img alt="link to html" class="floatleft"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+
+            <div class="title">
+                <?php if ($link->target != 0) { ?>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid . '&id=' . $link->id) ?>"
+                          target="_blank">
+                            <?php echo ucfirst($link->title) ?>&nbsp;<img
+                                src="<?php echo AppUtility::getHomeURL() ?>img/extlink.png"/></a></b>
+                <?php } else { ?>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/show-linked-text?cid=' . $link->courseid . '&id=' . $link->id) ?>">
+                            <?php echo $link->title ?></a></b>
+                <?php } ?>
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('forum', 'forum/add-link?id=' . $link->id . '&cid=' . $course->id) ?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+                <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>
+                    <BR>Hidden
+                <?php } else if ($link['avail'] == AppConstant::NUMERIC_TWO) { ?>
+                    <br>Showing Always
+                <?php } else if ($link->enddate >= $currentTime && $link->startdate >= $currentTime || $link->enddate <= $currentTime && $link->startdate <= $currentTime) { ?>
+
+                    <?php if ($link['avail'] == AppConstant::NUMERIC_ONE && $link->startdate != AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing <?php echo $startDateOfLink ?>
+                        <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                            until Always
+                        <? } else { ?>
+                            until <?php echo $endDateOfLink ?>,
+                        <?php }
+                    } else if ($link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                        <br>Showing Always until <?php echo $endDateOfLink ?>
+                    <?php } ?>
+                <?php } else if ($link->enddate == AppConstant::ALWAYS_TIME || $link->startdate == AppConstant::NUMERIC_ZERO) { ?>
+                    <br>Showing until:
+                    <?php if ($link->enddate == AppConstant::ALWAYS_TIME) { ?>
+                        Always
+                    <?php } else { ?>
+                        <?php echo $endDateOfLink ?>
+                    <?php }
+                } else if ($link->startdate <= $currentTime && $link->enddate >= $currentTime) { ?>
+                    <br> Showing until:<?php echo $endDateOfLink; ?>
+                <?php } else if ($link->startdate >= $currentTime && $link->enddate <= $currentTime) { ?>
+                    <br>Showing <?php echo $startDateOfLink; ?> until <?php echo $endDateOfLink; ?>
+                <?php } ?>
+
+            </div>
+            <div class="itemsum"><p>
+
+                <p><?php echo $link->summary ?>&nbsp;</p></p></div>
+            <div class="clear"></div>
+        </div>
+    <?php } ?>
+    <?php }
+
+///////////////////////////////////////////////////////// INLINE TEXT //////////////////////////////////////////////////////////////////////
+
+    public static function AddInlineText($item,$currentTime,$course,$parent)
+    {
+
+        $inline = $item[key($item)];
+        ?>
+        <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">
+        <?php if ($inline->avail != 0 && $inline->avail == 2 || $inline->startdate < $currentTime && $inline->enddate > $currentTime && $inline->avail == 1) { ?> <!--Hide ends and displays show always-->
+        <div class="item">
+            <?php $InlineId = $inline->id;?>
+            <!--Hide title and icon-->
+            <?php if ($inline->title != '##hidden##') {
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+        <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
+            <div class="title">
+                <b><?php echo ucfirst($inline->title)?></b>
+
+                <div class="floatright">
+                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                    <ul class=" select1 dropdown-menu selected-options">
+                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="itemsum">
+                <?php } ?>
+                <?php if($inline->avail == 2) { ?>
+                    <?php echo "Showing Always";
+                }
+                else {
+                    if($inline->startdate == 0 && $inline->enddate == 2000000000 || $inline->startdate != 0 && $inline->enddate == 2000000000)
+                    {
+                        echo "Showing until: Always";
+                    }
+                    else{
+                        echo "Showing until: " .$endDate;
                     }
                 }
-            } else {
-                if (array_search($item, $checked) !== FALSE) {
-                    $addtoarr[] = copyitem($item, $gbcats, $sethidden);
-                }
-            }
-        }
+                ?>
+                <p><?php echo $inline->text ?></p>
+            </div>
+            <?php if($inline->instrFiles!= 0){
+                foreach ($inline->instrFiles as $key => $instrFile) { ?>
+                    <ul class="fileattachlist">
+                        <li>
+                            <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                        </li>
+                    </ul>
+                <?php  }
+            } ?>
 
-    }
 
-    public  static function doaftercopy($sourcecid)
+        </div>
+    <?php } elseif($inline->avail == 0) { ?>
+        <div class="item">
+            <!--Hide title and icon-->
+            <?php if ($inline->title != '##hidden##') {
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+        <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
+
+            <div class="title">
+                <b><?php echo ucfirst($inline->title) ?></b>
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options pull-right">
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul><br>
+            </div>
+            <div class="itemsum"><p>
+                    <?php  }
+                    echo 'Hidden';
+                    ?>
+                <p><?php echo $inline->text ?></p>
+            </div>
+            <?php if($inline->instrFiles!= 0){
+                foreach ($inline->instrFiles as $key => $instrFile) { ?>
+                    <ul class="fileattachlist">
+                        <li>
+                            <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                        </li>
+                    </ul>
+                <?php }
+            } ?>
+        </div>
+        <div class="clear"></div>
+    <?php } else{ ?>
+        <div class="item">
+            <?php if ($inline->title != '##hidden##') {
+            $endDate = AppUtility::formatDate($inline->enddate);?>
+            <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
+
+            <div class="title">
+                <b><?php echo ucfirst($inline->title) ?></b>
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options pull-right">
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul><br>
+            </div>
+            <div class="itemsum"><p>
+                    <?php }
+                    $startDate = AppUtility::formatDate($inline->startdate);
+                    $endDate = AppUtility::formatDate($inline->enddate);
+                    echo "Showing " .$startDate. " until " .$endDate; ?>
+            </div>
+        </div>
+    <?php }?>
+
+    <?php }
+
+////////////////////////////////////////////////////// CALENDAR ////////////////////////////////////////////////////////////////////////////
+
+    public static function  AddCalendar($item,$parent,$course)
     {
-        global $cid, $reqscoretrack, $assessnewid, $forumtrack, $posttoforumtrack;
-        if (intval($cid) == intval($sourcecid)) {
-            $samecourse = true;
-        } else {
-            $samecourse = false;
-        }
-        //update reqscoreaids if possible.
-        if (count($reqscoretrack) > 0) {
-            foreach ($reqscoretrack as $newid => $oldreqaid) {
-                //is old reqscoreaid in copied list?
-                if (isset($assessnewid[$oldreqaid])) {
-                    $query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";
-                    mysql_query($query) or die("Query failed : $query" . mysql_error());
-                } else if (!$samecourse) {
-                    $query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
-                    mysql_query($query) or die("Query failed : $query" . mysql_error());
-                }
-            }
-        }
-        if (count($posttoforumtrack) > 0) {
-            foreach ($posttoforumtrack as $newaid => $oldforumid) {
-                if (isset($forumtrack[$oldforumid])) {
-                    $query = "UPDATE imas_assessments SET posttoforum='{$forumtrack[$oldforumid]}' WHERE id='$newaid'";
-                    mysql_query($query) or die("Query failed : $query" . mysql_error());
-                } else {
-                    $query = "UPDATE imas_assessments SET posttoforum=0 WHERE id='$newaid'";
-                    mysql_query($query) or die("Query failed : $query" . mysql_error());
-                }
-            }
-        }
-        if (!$samecourse) {
-            handleextoolcopy($sourcecid);
-        }
-    }
+        $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
+        ?>
+        <div class="item" style="padding-bottom: 15px; padding-right: 15px">
+                    <pre><a href="#" onclick="deleteItem('<?php echo $item['Calendar']['id'] ;?>','<?php echo AppConstant::CALENDAR ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')">Delete</a> | <a
+                            href="
+                    <?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
+            <!--            <div class='calendar'>-->
+            <!--            </div>-->
+            <div class="col-lg-12 padding-alignment calendar-container">
+                <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
+                    <input type="hidden" class="current-time" value="<?php echo $currentTime?>">
+                    <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
+                    <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">
+                </div>
+                <div class="calendar-day-details-right-side pull-left col-lg-3">
+                    <div class="day-detail-border">
+                        <b>Day Details:</b>
+                    </div>
+                    <div class="calendar-day-details"></div>
+                </div>
+            </div>
+        </div>
+    <?php }
 
-    public  static function copyallsub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
+/////////////////////////////////////////////////// BLOCK //////////////////////////////////////////////////////////////////////////////////
+
+    public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
     {
-        global $blockcnt, $reqscoretrack, $assessnewid;;
-        if (strlen($_POST['append']) > 0 && $_POST['append']{0} != ' ') {
-            $_POST['append'] = ' ' . $_POST['append'];
-        }
-        foreach ($items as $k => $item) {
-            if (is_array($item)) {
-                $newblock = array();
-                $newblock['name'] = $item['name'] . stripslashes($_POST['append']);
-                $newblock['id'] = $blockcnt;
-                $blockcnt++;
-                $newblock['startdate'] = $item['startdate'];
-                $newblock['enddate'] = $item['enddate'];
-                $newblock['avail'] = $sethidden ? 0 : $item['avail'];
-                $newblock['SH'] = $item['SH'];
-                $newblock['colors'] = $item['colors'];
-                $newblock['public'] = $item['public'];
-                $newblock['fixedheight'] = $item['fixedheight'];
-                $newblock['grouplimit'] = $item['grouplimit'];
-                $newblock['items'] = array();
-                if (count($item['items']) > 0) {
-                    copyallsub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
-                }
-                $addtoarr[] = $newblock;
-            } else {
-                if ($item != null && $item != 0) {
-                    $addtoarr[] = copyitem($item, $gbcats, $sethidden);
-                }
-            }
-        }
+        $block = $item[key($item)];
+        $blockId = $block['id'];
+        ?>
+        <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
+        <input type="hidden" id="id" value="<?php echo $block['id']?>" >
+        <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
+        <?php $endDate = AppUtility::formatDate($block['enddate']);?>
 
-    }
-    public  static function getiteminfo($itemid)
+        <div class="block item">
+            <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
+                <span class=left>
+                        <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
+                    </span>
+            <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
+                <span class=left>
+                         <img alt="folder" src="<?php echo AppUtility::getHomeURL() ?>img/folder_tree.png">
+                    </span>
+            <?php } else { ?>
+                <span class=left>
+                         <img alt="expand/collapse" style="cursor:pointer;" id="img<?php echo $block['id']?>" onclick="xyz(this,<?php echo $block['id']?>)" src="<?php echo AppUtility::getHomeURL() ?>img/collapse.gif"/>
+                    </span>
+            <?php } ?>
+            <div class="title">
+                    <span class="pointer" onclick="#">
+                        <b>
+                            <a href="#" onclick="return false;"><?php echo $block['name']?></a>
+                            <?php if($block['newflag'] == 1){?>
+                                <span class="red">New</span>
+                            <?php }?>
+                        </b>
+                    </span>
+                <?php if (($block['avail']) == AppConstant::NUMERIC_ONE || ($block['avail']) == AppConstant::NUMERIC_TWO){  ?>
+                    <span class="instrdates" style="font-family: "Times New Roman", Times, serif">
+                            <?php if($block['SH'] == 'HC'){$title = 'Showing Collapsed';}
+                    else if($block['SH'] == 'HO'){$title = 'Showing Expanded';}
+                    elseif($block['SH'] == 'HF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'HT'){$title = 'Showing as TreeReader';}
+                    elseif($block['SH'] == 'SO'){$title = 'Showing Expanded';}elseif($block['SH'] == 'SC'){$title = 'Showing Collapsed';}
+                    elseif($block['SH'] == 'SF'){$title = 'Showing as Folder';}elseif($block['SH'] == 'ST'){$title = 'Showing as TreeReader';}?>
+                            <?php if ($block['avail'] == 1){  ?>
+                        <?php if($block['startdate'] == AppConstant::NUMERIC_ZERO && $block['enddate'] == AppConstant::ALWAYS_TIME){$StartDate = 'ALways'; $endDate = 'ALways';}?>
+                        <br><?php echo $title?>   <?php echo $StartDate?> until <?php echo $endDate?></span>
+                        <span class="instronly">
+                                         <?php if($block['SH'] == 'HT' ||$block['SH'] == 'ST'){?>
+                                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                                             <ul class=" select1 dropdown-menu selected-options pull-right">
+                                                 <li><a class="modify" href="#"><?php AppUtility::t('Edit Content');?></a></li>
+                                                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify');?></a></li>
+                                                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                                                 <li><a id="copy" href="#" onclick="copyItem('<?php echo $parent.'-'.$cnt; ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                                                 <li><a id="copy" href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>"><?php AppUtility::t('NewFlag');?></a></li>
+                                             </ul><br>
+                                         <?php }else{?>
+                                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                                             <ul class=" select1 dropdown-menu selected-options pull-right">
+                                                 <li><a class="isolate" href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>"><?php AppUtility::t('Isolate');?></a></li>
+                                                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify');?></a></li>
+                                                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                                                 <li><a id="copy" href="#" onclick="copyItem('<?php echo $parent.'-'.$cnt; ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                                                 <li><a id="copy" href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>"><?php AppUtility::t('NewFlag');?></a></li>
+                                             </ul><br>
+                                         <?php }?>
+                                    </span>
+                    <?php }else { ?>
+                        <br><?php echo $title?> Always</span>
+                        <span class="instronly">
+                                          <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                                             <ul class=" select1 dropdown-menu selected-options pull-right">
+                                                 <li><a class="isolate" href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>"><?php AppUtility::t('Isolate');?></a></li>
+                                                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify');?></a></li>
+                                                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                                                 <li><a id="copy" href="#" onclick="copyItem('<?php echo $parent.'-'.$cnt; ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                                                 <li><a id="copy" href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>"><?php AppUtility::t('NewFlag');?></a></li>
+                                             </ul><br>
+                                    </span>
+                    <?php } ?>
+                    <?php } else {  ?>
+                    <input type="hidden" id="isHidden" value="1">
+                    <span class="instrdates">
+                            <br>Hidden</span>
+                    <span class="instronly">
+                            <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                                             <ul class=" select1 dropdown-menu selected-options pull-right">
+                                                 <li><a class="isolate" href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>"><?php AppUtility::t('Isolate');?></a></li>
+                                                 <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify');?></a></li>
+                                                 <li><a id="delete" href="#" onclick="deleteItem('<?php echo $parent.'-'.$cnt ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                                                 <li><a id="copy" href="#" onclick="copyItem('<?php echo $parent.'-'.$cnt; ?>','<?php echo AppConstant::BLOCK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                                                 <li><a id="copy" href="<?php echo AppUtility::getURLFromHome('block','block/new-flag?cid='.$course->id.'&newflag='.$parent.'-'.$cnt)?>"><?php AppUtility::t('NewFlag');?></a></li>
+                                             </ul><br>
+                        </span>
+                <?php } ?>
+            </div>
+        </div>
+        <div class="blockitems block-alignment" id="block5<?php echo $block['id']?>">
+            <?php if (count($item['itemList'])) { ?>
+                <?php $blockList = array();
+                $countCourseDetails = count($item['itemList']);
+                for ($i=0;$i<$countCourseDetails;$i++) {
+                    if ($item['itemList'][$i]['Block']) { //if is a block
+                        $blockList[] = $i+1;
+                    }
+                }
+                ?>
+                <?php foreach ($item['itemList'] as $itemlistKey => $item) {?>
+                    <?php echo AssessmentUtility::createItemOrder($itemlistKey, $countCourseDetails, $parent.'-'.$cnt, $blockList);?>
+                    <?php switch (key($item)):
+                        /*Assessment here*/
+                        case 'Assessment': ?>
+                            <div class="inactivewrapper "
+                                 onmouseout="this.className='inactivewrapper'">
+                                <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt); ?>
+                            </div>
+                            <?php break; ?>
+
+                            <!-- Forum here-->
+                        <?php case 'Forum': ?>
+                            <?php $this->AddForum($item,$course,$currentTime,$parent.'-'.$cnt); ?>
+                            <?php break; ?>
+
+                            <!-- ////////////////// Wiki here //////////////////-->
+                        <?php case 'Wiki': ?>
+                            <?php $this->AddWiki($item,$course,$parent.'-'.$cnt); ?>
+                            <?php break; ?>
+
+                            <!-- ////////////////// Linked text here //////////////////-->
+                        <?php case 'LinkedText': ?>
+                            <?php $this->AddLink($item,$currentTime,$parent.'-'.$cnt,$course);?>
+                            <?php break; ?>
+
+                            <!-- ////////////////// Inline text here //////////////////-->
+                        <?php case 'InlineText': ?>
+                            <?php $this->AddInlineText($item,$currentTime,$course,$parent.'-'.$cnt);?>
+                            <?php break; ?>
+
+                            <!-- Calender Here-->
+                        <?php case 'Calendar': ?>
+                            <?php $this->AddCalendar($item,$parent.'-'.$cnt,$course);?>
+                            <?php break; ?>
+                        <?php case '':?>
+                            <?php
+
+                            //                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
+                            ?>
+                            <?php break; ?>
+                        <?php endswitch; ?>
+                <?php } ?>
+            <?php } ?>
+            <?php $this->AddItemsDropDown();?>
+        </div>
+        <div class="clear"></div>
+    <?php }
+/////////////////////////////////////////////////////////// POP FOR ADDING NEW ITEMS //////////////////////////////////////////////////////
+    public static function AddItemsDropDown()
     {
-        $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-        if (mysql_num_rows($result) == 0) {
-            echo "Uh oh, item #$itemid doesn't appear to exist";
-        }
-        $itemtype = mysql_result($result, 0, 0);
-        $typeid = mysql_result($result, 0, 1);
-        if ($itemtype === 'Calendar') {
-            return array($itemtype, 'Calendar', '');
-        }
-        switch ($itemtype) {
-            case ($itemtype === "InlineText"):
-                $query = "SELECT title,text FROM imas_inlinetext WHERE id=$typeid";
-                break;
-            case ($itemtype === "LinkedText"):
-                $query = "SELECT title,summary FROM imas_linkedtext WHERE id=$typeid";
-                break;
-            case ($itemtype === "Forum"):
-                $query = "SELECT name,description FROM imas_forums WHERE id=$typeid";
-                break;
-            case ($itemtype === "Assessment"):
-                $query = "SELECT name,summary FROM imas_assessments WHERE id=$typeid";
-                break;
-            case ($itemtype === "Wiki"):
-                $query = "SELECT name,description FROM imas_wikis WHERE id=$typeid";
-                break;
-        }
-        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-        $name = mysql_result($result, 0, 0);
-        $summary = mysql_result($result, 0, 1);
-        return array($itemtype, $name, $summary, $typeid);
-    }
-
-    public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false, $spacer = '|&nbsp;&nbsp;')
-    {
-        global $ids, $types, $names, $sums, $parents, $gitypeids, $prespace, $CFG;
-        if (!isset($gitypeids)) {
-            $gitypeids = array();
-        }
-
-        foreach ($items as $k => $item) {
-            if (is_array($item)) {
-                $ids[] = $parent . '-' . ($k + 1);
-                $types[] = "Block";
-                $names[] = stripslashes($item['name']);
-                $prespace[] = $pre;
-                $parents[] = $parent;
-                $gitypeids[] = '';
-                $sums[] = '';
-                if (count($item['items']) > 0) {
-                    getsubinfo($item['items'], $parent . '-' . ($k + 1), $pre . $spacer, $itemtypelimit, $spacer);
-                }
-            } else {
-                if ($item == null || $item == '') {
-                    continue;
-                }
-                $arr = getiteminfo($item);
-                if ($itemtypelimit !== false && $arr[0] != $itemtypelimit) {
-                    continue;
-                }
-                $ids[] = $item;
-                $parents[] = $parent;
-                $types[] = $arr[0];
-                $names[] = $arr[1];
-                $prespace[] = $pre;
-                $gitypeids[] = $arr[3];
-                $arr[2] = strip_tags($arr[2]);
-                if (strlen($arr[2]) > 100) {
-                    $arr[2] = substr($arr[2], 0, 97) . '...';
-                }
-                $sums[] = $arr[2];
-            }
-        }
-    }
-
-    public  static function buildexistblocks($items, $parent, $pre = '')
-    {
-        global $existblocks;
-        foreach ($items as $k => $item) {
-            if (is_array($item)) {
-                $existblocks[$parent . '-' . ($k + 1)] = $pre . $item['name'];
-                if (count($item['items']) > 0) {
-                    buildexistblocks($item['items'], $parent . '-' . ($k + 1), $pre . '&nbsp;&nbsp;');
-                }
-            }
-        }
-    }
-
-    public static function copyrubrics($offlinerubrics = array())
-    {
-        global $userid, $groupid, $qrubrictrack, $frubrictrack;
-        if (count($qrubrictrack) == 0 && count($frubrictrack) == 0 && count($offlinerubrics) == 0) {
-            return;
-        }
-        $list = implode(',', array_merge($qrubrictrack, $frubrictrack, $offlinerubrics));
-
-        //handle rubrics which I already have access to
-        $rubricData = Rubrics::getByUserIdAndGroupId($userid,$groupid,$list);
-        foreach($rubricData as $singleData){
-            $qfound = array_keys($qrubrictrack, $singleData['id']);
-            if (count($qfound) > 0) {
-                foreach ($qfound as $qid) {
-                    Questions::setRubric($qid,$singleData['id']);
-                }
-            }
-            $ofound = array_keys($offlinerubrics, $singleData['id']);
-            if (count($ofound) > 0) {
-                foreach ($ofound as $oid) {
-                    GbItems::setRubric($oid,$singleData['id']);
-                }
-            }
-            $ffound = array_keys($frubrictrack, $singleData['id']);
-            if (count($ffound) > 0) {
-                foreach ($ffound as $fid) {
-                    Forums::setRubric($fid,$singleData['id']);
-                }
-            }
-        }
-
-        //handle rubrics which I don't already have access to - need to copy them
-        $rubricData = Rubrics::getByUserIdAndGroupIdAndList($userid,$groupid,$list);
-        foreach($rubricData as $singleData){
-            //echo "handing {$row[0]} which I don't have access to<br/>";
-            $rubric = Rubrics::getById($singleData['id']);
-            $rubrow = AppUtility::addslashes_deep($rubric);
-            $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubrow[2],$userid,$groupid);
-
-            if ($rubricItems > 0) {
-                $newid = $rubricItems['id'];
-            } else {
-                $rub = "'" . implode("','", $rubrow) . "'";
-                $temp = new Rubrics();
-                $rubricId = $temp->createNewEntry($userid,-1,$rub);
-                $newid = $rubricId;
-            }
-            $qfound = array_keys($qrubrictrack, $singleData['id']);
-            if (count($qfound) > 0) {
-                foreach ($qfound as $qid) {
-                    Questions::setRubric($qid,$newid);
-                }
-            }
-            $ffound = array_keys($frubrictrack, $singleData['id']);
-            if (count($ffound) > 0) {
-                foreach ($ffound as $fid) {
-                    Forums::setRubric($fid,$newid);
-                }
-            }
-            $ofound = array_keys($offlinerubrics, $singleData['id']);
-            if (count($ofound) > 0) {
-                foreach ($ofound as $oid) {
-                    GbItems::setRubric($oid,$newid);
-                }
-            }
-        }
-    }
-
-    public static function handleextoolcopy($sourcecid)
-    {
-        //assumes this is a copy into a different course
-        global $cid, $userid, $groupid, $exttooltrack;
-        if (count($exttooltrack) == 0) {
-            return;
-        }
-        //$exttooltrack is linked text id => tool id
-        $toolmap = array();
-        $query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
-        $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-        if (mysql_num_rows($result) > 0) {
-            $oktocopycoursetools = true;
-        }
-        $toolidlist = implode(',', $exttooltrack);
-        $query = "SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools ";
-        $query .= "WHERE id IN ($toolidlist)";
-        $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-        while ($row = mysql_fetch_row($result)) {
-            $doremap = false;
-            if (!isset($toolmap[$row[0]])) {
-                //try url matching of existing tools in the destination course
-                $query = "SELECT id FROM imas_external_tools WHERE url='" . addslashes($row[4]) . "' AND courseid='$cid'";
-                $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
-                if (mysql_num_rows($res) > 0) {
-                    $toolmap[$row[0]] = mysql_result($res, 0, 0);
-                }
-            }
-            if (isset($toolmap[$row[0]])) {
-                //already have remapped this tool - need to update linkedtext item
-                $doremap = true;
-            } else if ($row[1] > 0 && $oktocopycoursetools) {
-                //do copy
-                $rowsub = array_slice($row, 3);
-                $rowsub = AppUtility::addslashes_deep($rowsub);
-                $rowlist = implode("','", $rowsub);
-                $query = "INSERT INTO imas_external_tools (courseid,groupid,name,url,ltikey,secret,custom,privacy) ";
-                $query .= "VALUES ('$cid','$groupid','$rowlist')";
-                mysql_query($query) or die("Query failed : " . mysql_error());
-                $toolmap[$row[0]] = mysql_insert_id();
-                $doremap = true;
-            } else if ($row[1] == 0 && ($row[2] == 0 || $row[2] == $groupid)) {
-                //no need to copy anything - tool will just work
-            } else {
-                //not OK to copy; must disable tool in linked text item
-                $toupdate = implode(",", array_keys($exttooltrack, $row[0]));
-                $query = "UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)";
-                mysql_query($query) or die("Query failed : " . mysql_error());
-            }
-            if ($doremap) {
-                //update the linkedtext item with the new tool id
-                $toupdate = implode(",", array_keys($exttooltrack, $row[0]));
-                $query = "SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)";
-                $res = mysql_query($query) or die("Query failed : " . mysql_error());
-                while ($r = mysql_fetch_row($res)) {
-                    $text = str_replace('exttool:' . $row[0] . '~~', 'exttool:' . $toolmap[$row[0]] . '~~', $r[1]);
-                    $query = "UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$r[0]}";
-                    mysql_query($query) or die("Query failed : " . mysql_error());
-                }
-            }
-        }
-    }
-}
+        ?>
+        <div class="row add-item">
+            <div class="col-md-1 plus-icon">
+                <i class="fa fa-plus fa-2x"></i>
+            </div>
+            <div class=" col-md-2 add-item-text">
+                <p><?php AppUtility::t('Add An Item...');?></p>
+            </div>
+        </div>
+    <?php }
+}?>
