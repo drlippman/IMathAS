@@ -16,7 +16,7 @@
 	}
 	?>
 <link rel="stylesheet" href="<?php echo $imasroot . "/themes/$coursetheme?v=121713";?>" type="text/css" />
-<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css" media="handheld,only screen and (max-device-width:480px)"/>
+<link rel="stylesheet" href="<?php echo $imasroot;?>/handheld.css" media="only screen and (max-device-width:480px)"/>
 
 <?php } ?>
 <link rel="shortcut icon" href="/favicon.ico" />

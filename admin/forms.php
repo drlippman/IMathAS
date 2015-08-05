@@ -465,8 +465,8 @@ switch($_GET['action']) {
 			echo '<span id="ltiurl" style="display:none;">';
 			if (isset($_GET['id'])) {
 				echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
-				echo 'Key: placein_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
-				echo 'Key: placein_'.$_GET['id'].'_1 (to only allow access through the LMS )';
+				echo 'Key: LTIkey_'.$_GET['id'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
+				echo 'Key: LTIkey_'.$_GET['id'].'_1 (to only allow access through the LMS )';
 			} else {
 				echo 'Course ID not yet set.';
 			}		
@@ -546,7 +546,7 @@ switch($_GET['action']) {
 			}
 			echo '</select><span id="templatepreview"></span>';
 			echo '<span id="termsbox" style="display:none;"><br/>';
-			echo 'This course has additional <a href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>';
+			echo 'This course has additional <a target="_blank" href="" id="termsurl">Terms of Use</a> you must agree to before copying the course.<br/>';
 			echo '<input type="checkbox" name="termsagree" /> I agree to the Terms of Use specified in the link above.</span>';
 			echo '</span><br class="form" />';
 			echo '<script type="text/javascript"> function templatepreviewupdate(el) {';

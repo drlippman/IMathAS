@@ -19,7 +19,7 @@
 	}
 	if (!isset($sessiondata['sessiontestid']) && !isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
 		echo "<html><body>";
-		echo _("You are not authorized to view this page.  If you are trying to reaccess a test you've already started, access it from the course page");
+		echo _("You are not authorized to view this page.  If you are trying to reaccess an assessment you've already started, access it from the course page");
 		echo "</body></html>\n";
 		exit;
 	}
@@ -387,7 +387,7 @@
 	
 	//already started test
 	if (!isset($sessiondata['sessiontestid'])) {
-		echo "<html><body>", _('Error.  Access test from course page'), "</body></html>\n";
+		echo "<html><body>", _('Error.  Access assessment from course page'), "</body></html>\n";
 		exit;
 	}
 	$testid = addslashes($sessiondata['sessiontestid']);
@@ -1166,7 +1166,7 @@ if (!isset($_POST['embedpostback'])) {
 	}
 	
 	if ($testsettings['testtype']=="Practice" && !$isreview) {
-		echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
+		echo "<div class=right><span style=\"color:#f00\">Practice Assessment.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
 	}
 	if (!$isreview && !$superdone) {
 		if ($exceptionduedate > 0) {
@@ -1376,9 +1376,9 @@ if (!isset($_POST['embedpostback'])) {
 				if ($GLOBALS['scoremessages'] != '') {
 					echo '<p>'.$GLOBALS['scoremessages'].'</p>';
 				}
-				echo "<p>", _('Answers saved, but not submitted for grading.  You may continue with the test, or come back to it later. ');
+				echo "<p>", _('Answers saved, but not submitted for grading.  You may continue with the assessment, or come back to it later. ');
 				if ($testsettings['timelimit']>0) {echo _('The timelimit will continue to count down');}
-				echo "</p><p>", _('<a href="showtest.php">Return to test</a> or'), ' ';
+				echo "</p><p>", _('<a href="showtest.php">Return to assessment</a> or'), ' ';
 				leavetestmsg();
 				
 			} else {
@@ -1426,7 +1426,7 @@ if (!isset($_POST['embedpostback'])) {
 					 
 					echo "</p>\n";
 					if (hasreattempts($last)) {
-						echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;reattempt=$last\">", _('Reattempt last question'), "</a>.  ", _('If you do not reattempt now, you will have another chance once you complete the test.'), "</p>\n";
+						echo "<p><a href=\"showtest.php?action=shownext&to=$last&amp;reattempt=$last\">", _('Reattempt last question'), "</a>.  ", _('If you do not reattempt now, you will have another chance once you complete the assessment.'), "</p>\n";
 					}
 				}
 				if ($allowregen && $qi[$questions[$last]]['allowregen']==1) {
@@ -1618,8 +1618,9 @@ if (!isset($_POST['embedpostback'])) {
 					echo "</form>\n";
 					
 				}
-				
-				echo "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+				if ($testsettings['testtype']!="NoScores") {
+					echo "<br/><p>When you are done, <a href=\"showtest.php?action=skip&amp;done=true\">click here to see a summary of your scores</a>.</p>\n";
+				}
 				
 				echo "</div>\n";
 			    }
@@ -1680,7 +1681,7 @@ if (!isset($_POST['embedpostback'])) {
 					if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
 						echo "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">", _('Try another similar question'), "</a></p>\n";
 					}
-					if ($lefttodo == 0) {
+					if ($lefttodo == 0 && $testsettings['testtype']!="NoScores") {
 						echo "<a href=\"showtest.php?action=skip&amp;done=true\">", _('When you are done, click here to see a summary of your score'), "</a>\n";
 					}
 					if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
@@ -1786,7 +1787,11 @@ if (!isset($_POST['embedpostback'])) {
 					$done = true;
 				} 
 				if (!$done) {
-					echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="showtest.php?action=seq&amp;done=true">here</a> to see a summary of your score.'), "</p>\n";
+					if ($testsettings['testtype']!="NoScores") {
+						echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>, or when you are done click <a href="showtest.php?action=seq&amp;done=true">here</a> to see a summary of your score.'), "</p>\n";
+					} else {
+						echo "<p>", _('Question scored. <a href="#curq">Continue with assessment</a>'), "</p>\n";
+					}
 					echo "</div>\n";
 					echo "<hr/>";
 				} else {
@@ -2220,7 +2225,7 @@ if (!isset($_POST['embedpostback'])) {
 			$intro = filter("<div class=\"intro\">{$testsettings['intro']}</div>\n");
 			if ($testsettings['displaymethod'] == "VideoCue") {
 				echo substr(trim($intro),0,-6);
-				if (!$sessiondata['istutorial']) {
+				if (!$sessiondata['istutorial'] && $testsettings['testtype']!="NoScores") {
 					echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 				}
 				echo '</div>';
@@ -2405,7 +2410,7 @@ if (!isset($_POST['embedpostback'])) {
 			
 			
 			echo '</div>'; //ends either inset or formcontents div
-			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue") {
+			if (!$sessiondata['istutorial'] && $testsettings['displaymethod'] != "VideoCue"  && $testsettings['testtype']!="NoScores") {
 				echo "<p><a href=\"showtest.php?action=embeddone\">", _('When you are done, click here to see a summary of your score'), "</a></p>\n";
 			}
 			echo '</form>';
@@ -2910,13 +2915,13 @@ if (!isset($_POST['embedpostback'])) {
 		
 		if (!$superdone) { // $total < $totpossible && 
 			if ($noindivscores) {
-				echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)'), "</p>";
+				echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: where reattempts are allowed, all scores, correct and incorrect, will be cleared)'), "</p>";
 			} else {
 				if (canimproveany()) {
-					echo "<p>", _('<a href="showtest.php?reattempt=canimprove">Reattempt test</a> on questions that can be improved where allowed'), "</p>";
+					echo "<p>", _('<a href="showtest.php?reattempt=canimprove">Reattempt assessment</a> on questions that can be improved where allowed'), "</p>";
 				} 
 				if (hasreattemptsany()) {
-					echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on all questions where allowed'), "</p>";
+					echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on all questions where allowed'), "</p>";
 				}
 			}
 			

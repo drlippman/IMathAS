@@ -319,7 +319,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$x = $xmin + $dx*$i + (($i<$stopat/2)?1E-10:-1E-10) - ($domainlimited?0:5*abs($xmax-$xmin)/$settings[6]);
 				if (in_array($x,$avoid)) { continue;}
 				//echo $func.'<br/>';
-				$y = round($evalfunc($x),$xrnd);//round(eval("return ($func);"),3);
+				$y = round($evalfunc($x),$yrnd);//round(eval("return ($func);"),3);
 				$x = round($x,$xrnd);
 				$alt .= "<tr><td>".($xmin + $dx*$i)."</td><td>$y</td></tr>";
 			}
@@ -1530,7 +1530,11 @@ function makescinot($n,$d=8,$f="x") {
 	$isneg = "";
 	if ($n<0) { $isneg = "-"; $n = abs($n);}
 	$exp = floor(log10($n));
-	$mant = number_format($n/pow(10,$exp),$d);
+	if ($d==-1) {
+		$mant = round($n/pow(10,$exp),8);
+	} else {
+		$mant = number_format($n/pow(10,$exp),$d);
+	}
 	if ($f=="*") {
 		return "$isneg $mant * 10^($exp)";
 	} else if ($f=="E") {

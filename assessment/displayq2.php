@@ -145,7 +145,8 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	$la = $laarr[count($laarr)-1];
 	if ($la=="ReGen") {$la = '';}
 	if ($clearla) {$la = '';}
-
+	if (isset($requestclearla) && !isset($GLOBALS['questionscoreref'])) { $la = ''; $qcolors = array();}
+	
 	//$la = $GLOBALS['lastanswers'][$qnidx];
 	
 	if (isset($choices) && !isset($questions)) {
@@ -506,7 +507,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 
 
 //inputs: Question number, Question id, rand seed, given answer
-function scoreq($qnidx,$qidx,$seed,$givenans,$qnpointval=1) {
+function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 	unset($abstolerance);
 	srand($seed);
 	$GLOBALS['inquestiondisplay'] = false;	
@@ -1171,8 +1172,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		}
 	} else if ($anstype == "matching") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
-			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
+		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'][$qn])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (isset($options['questiontitle'])) {if (is_array($options['questiontitle'])) {$questiontitle = $options['questiontitle'][$qn];} else {$questiontitle = $options['questiontitle'];}}
 		if (isset($options['answertitle'])) {if (is_array($options['answertitle'])) {$answertitle = $options['answertitle'][$qn];} else {$answertitle = $options['answertitle'];}}
 		if (isset($options['matchlist'])) {if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}}
@@ -1184,7 +1185,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		//trim out unshuffled showans
 		$la = explode('$!$',$la);
 		$la = $la[0];
-		
+
 		if (!is_array($questions) || !is_array($answers)) {
 			echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
 			return false;
@@ -1387,6 +1388,8 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$sa = '`'.decimaltofraction($answer,"mixednumber").'`';
 			} else if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats)) {
 				$sa = '`'.decimaltofraction($answer).'`';
+			} else if (in_array("scinot",$ansformats)) {
+				$sa = '`'.makescinot($answer,-1,'*').'`';
 			} else {
 				$sa = $answer;
 			}
@@ -1560,7 +1563,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$variables[$i] = substr($variables[$i],0,strpos($variables[$i],'('));
 			}
 		}
-		
+		if (($v = array_search('E', $variables))!==false) {
+			$variables[$v] = 'varE';
+		}
 		if (count($ovar)==0) {
 			$ovar[] = "x";
 		}
@@ -2727,12 +2732,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 								}
 								
 							} else if (isset($abstolerance)) {
-								if (abs($anans-$givenans) < $abstolerance + (($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;} 	
+								if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$correct += 1; $foundloc = $j; break 2;} 	
 							} else {
 								if ($anans==0) {
 									if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								} else {
-									if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
+									if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+ 1E-12) {$correct += 1; $foundloc = $j; break 2;}
 								}
 							}
 						}
@@ -2896,8 +2901,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		return $score;
 	} else if ($anstype == "matching") {
 		if (is_array($options['questions'][$qn])) {$questions = $options['questions'][$qn];} else {$questions = $options['questions'];}
-		if (isset($options['answers'])) {if (is_array($options['answers'])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
-			else if (isset($options['answer'])) {if (is_array($options['answer'])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
+		if (isset($options['answers'])) {if (is_array($options['answers'][$qn])) {$answers = $options['answers'][$qn];} else {$answers = $options['answers'];}}
+			else if (isset($options['answer'])) {if (is_array($options['answer'][$qn])) {$answers = $options['answer'][$qn];} else {$answers = $options['answer'];}}
 		if (is_array($options['matchlist'])) {$matchlist = $options['matchlist'][$qn];} else {$matchlist = $options['matchlist'];}
 		if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 		
@@ -3475,12 +3480,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 						}*/
 					} else if (is_numeric($givenans)) {
 						if (isset($abstolerance)) {
-							if (abs($anans-$givenans) < $abstolerance+(($anans==0||$anans>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
+							if (abs($anans-$givenans) < $abstolerance+(($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;} 	
 						} else {
 							if ($anans==0) {
 								if (abs($anans - $givenans) < $reltolerance/1000 + 1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
 							} else {
-								if (abs($anans - $givenans)/(abs($anans)+($anans>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
+								if (abs($anans - $givenans)/(abs($anans)+(abs($anans)>1?1E-12:(abs($anans)*1E-12))) < $reltolerance+1E-12) {if ($partformatok) {$correct += 1;}; $foundloc = $j; break 2;}
 							}
 						}
 					}
@@ -3544,6 +3549,10 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$flist = implode("|",$ofunc);
 			$answer = preg_replace('/('.$flist.')\(/',"$1*sin($1+",$answer);
 		}
+		if (($v = array_search('E', $variables))!==false) {
+			$variables[$v] = 'varE';
+			$answer = str_replace('E','varE',$answer);
+		}
 		$vlist = implode("|",$variables);
 		
 		if (isset($domain)) {$fromto = explode(",",$domain);} else {$fromto[0]=-10; $fromto[1]=10;}
@@ -3588,11 +3597,11 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$answer = mathphppre($answer);
 			$answer = makepretty($answer);
 			$answer = mathphp($answer,$vlist);
-			//echo $answer;
+			
 			for($i=0; $i < count($variables); $i++) {
 				$answer = str_replace("(".$variables[$i].")",'($tp['.$i.'])',$answer);
 			}
-	
+			
 			$myans = explode(",",$_POST["qn$qn-vals"]);
 			
 			$cntnan = 0;
@@ -3614,6 +3623,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					$tp[$j] = $tps[$i][$j];
 				}
 				$realans = eval("return ($answer);");
+				
 				//echo "$answer, real: $realans, my: {$myans[$i]},rel: ". (abs($myans[$i]-$realans)/abs($realans))  ."<br/>";
 				if (isNaN($realans)) {$cntnan++; continue;} //avoid NaN problems
 				if ($answerformat=="equation") {  //if equation, store ratios

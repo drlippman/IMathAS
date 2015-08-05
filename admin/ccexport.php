@@ -16,7 +16,13 @@ $loadgraphfilter = 1;
 if (!defined('ENT_XML1')) {
 	define('ENT_XML1',ENT_QUOTES);	
 }
-
+$placeinhead = '<script type="text/javascript">
+ function updatewhichsel(el) {
+   if (el.value=="select") { $("#itemselectwrap").show();}
+   else {$("#itemselectwrap").hide()};
+ }
+ </script>';
+ 
 require("../header.php");
 echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Common Cartridge Export</div>\n";
 
@@ -31,6 +37,14 @@ if (isset($_GET['delete'])) {
 	echo "export file deleted";
 } else if (isset($_GET['create'])) {
 	require("../includes/filehandler.php");
+	$usechecked = ($_POST['whichitems']=='select');
+	if ($usechecked) {
+		$checked = $_POST['checked'];
+	} else {
+		$checked = array();
+	}
+	
+	
 	$linktype = $_GET['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
@@ -97,33 +111,42 @@ if (isset($_GET['delete'])) {
 	
 	function getorg($it,$parent,&$res,$ind) {
 		global $iteminfo,$newdir,$installname,$urlmode,$linktype,$urlmode,$imasroot,$ccnt,$module_meta,$htmldir,$filedir, $toplevelitems, $inmodule;
+		global $usechecked,$checked;
+		
 		$out = '';
 		
 		foreach ($it as $k=>$item) {
 			$canvout = '';
 			if (is_array($item)) {
-				if (strlen($ind)>2) {
-					$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
-					$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
-					$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
-					$ccnt++;
-					$module_meta .= $canvout;
+				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
+					if (strlen($ind)>2) {
+						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
+						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
+						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
+						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
+						$ccnt++;
+						$module_meta .= $canvout;
+					} else {
+						if ($inmodule) {
+							$module_meta .= '</items></module>';
+						}
+						$inmodule = true;
+						$module_meta .= '<module identifier="BLOCK'.$item['id'].'">
+							<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>
+							<items>';
+						}
+					$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
+					$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
+					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
+					$out .= $ind.'</item>'."\n";
 				} else {
-					if ($inmodule) {
-						$module_meta .= '</items></module>';
-					}
-					$inmodule = true;
-					$module_meta .= '<module identifier="BLOCK'.$item['id'].'">
-						<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>
-						<items>';
-					}
-				$out .= $ind.'<item identifier="BLOCK'.$item['id'].'">'."\n";
-				$out .= $ind.'  <title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
-				$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
-				$out .= $ind.'</item>'."\n";
+					$out .= $ind.getorg($item['items'],$parent.'-'.($k+1),$res,$ind.'  ');
+				}
 				
 			} else {
+				if ($usechecked && array_search($item,$checked)===FALSE) {
+					continue;
+				}
 				if ($iteminfo[$item][0]=='InlineText') {
 					$query = "SELECT title,text,fileorder FROM imas_inlinetext WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -179,6 +202,12 @@ if (isset($_GET['delete'])) {
 					$query = "SELECT title,text,summary FROM imas_linkedtext WHERE id='{$iteminfo[$item][1]}'";
 					$r = mysql_query($query) or die("Query failed : " . mysql_error());
 					$row = mysql_fetch_row($r);
+					
+					//if s3 filehandler, do files as weblinks rather than including the file itself
+					if ($GLOBALS['filehandertypecfiles'] == 's3' && substr(strip_tags($row[1]),0,5)=="file:") {
+						$row[1] = getcoursefileurl(trim(substr(strip_tags($row[1]),5)));
+					}
+					
 					if ((substr($row[1],0,4)=="http") && (strpos(trim($row[1])," ")===false)) { //is a web link
 						$alink = trim($row[1]);
 						$fp = fopen($newdir.'/weblink'.$iteminfo[$item][1].'.xml','w');
@@ -596,6 +625,58 @@ if (isset($_GET['delete'])) {
 	echo "<br/><a href=\"$imasroot/course/files/CCEXPORT$cid.imscc\">Download</a><br/>";
 	echo "Once downloaded, keep things clean and <a href=\"ccexport.php?cid=$cid&delete=true\">Delete</a> the export file off the server.";
 } else {
+	
+	function getsubinfo($items,$parent,$pre) {
+		global $ids,$types,$names;
+		foreach($items as $k=>$item) {
+			if (is_array($item)) {
+				$ids[] = $parent.'-'.($k+1);
+				$types[] = $pre."Block";
+				$names[] = stripslashes($item['name']);
+				getsubinfo($item['items'],$parent.'-'.($k+1),$pre.'--');
+			} else {
+				$ids[] = $item;
+				$arr = getiteminfo($item);
+				$types[] = $pre.$arr[0];
+				$names[] = $arr[1];
+			}
+		}
+	}
+	function getiteminfo($itemid) {
+		$query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
+		$result = mysql_query($query) or die("Query failed : " . mysql_error() . " queryString: " . $query);
+		$itemtype = mysql_result($result,0,0);
+		$typeid = mysql_result($result,0,1);
+		switch($itemtype) {
+			case ($itemtype==="InlineText"):
+				$query = "SELECT title FROM imas_inlinetext WHERE id=$typeid";
+				break;
+			case ($itemtype==="LinkedText"):
+				$query = "SELECT title FROM imas_linkedtext WHERE id=$typeid";
+				break;
+			case ($itemtype==="Forum"):
+				$query = "SELECT name FROM imas_forums WHERE id=$typeid";
+				break;
+			case ($itemtype==="Assessment"):
+				$query = "SELECT name FROM imas_assessments WHERE id=$typeid";
+				break;
+		}
+		$result = mysql_query($query) or die("Query failed : " . mysql_error());
+		$name = mysql_result($result,0,0);
+		return array($itemtype,$name);
+	}
+	
+	$query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+	$result = mysql_query($query) or die("Query failed : " . mysql_error());
+
+	$items = unserialize(mysql_result($result,0,0));
+	$ids = array();
+	$types = array();
+	$names = array();
+
+	getsubinfo($items,'0','');
+	
+	
 	echo '<h2>Common Cartridge Export</h2>';
 	echo '<p>This feature will allow you to export a v1.1 compliant IMS Common Cartridge export of your course, which can ';
 	echo 'then be loaded into other Learning Management Systems that support this standard.  Inline text, web links, ';
@@ -613,9 +694,44 @@ if (isset($_GET['delete'])) {
 	if ($enablebasiclti==false) {
 		echo '<p style="color:red">Note: Your system does not currenltly have LTI enabled.  Contact your system administrator</p>';
 	}
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=custom\">Create CC Export</a> with LTI placements as custom fields (works in BlackBoard)</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=url\">Create CC Export</a> with LTI placements in URLs (works in Moodle)</p>";
-	echo "<p><a href=\"ccexport.php?cid=$cid&create=true&type=canvas\">Create CC+custom Export</a> (works in Canvas)</p>";
+	echo '<form id="qform" method="post" action="ccexport.php?cid='.$cid.'&create=true">';
+	?>
+	<input type="hidden" name="whichitems" value="select"/>
+	<p>Items to export: <select name="whichitems" onchange="updatewhichsel(this)">
+		<option value="all">Export entire course</option>
+		<option value="select">Select individual items to export</option>
+		</select>
+		<div id="itemselectwrap" style="display:none;">
+	
+		Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','checked[]',false)">None</a>
+	
+		<table cellpadding=5 class=gb>
+		<thead>
+			<tr><th></th><th>Type</th><th>Title</th></tr>
+		</thead>
+		<tbody>
+<?php
+	$alt=0;
+	for ($i = 0 ; $i<(count($ids)); $i++) {
+		if ($alt==0) {echo "			<tr class=even>"; $alt=1;} else {echo "			<tr class=odd>"; $alt=0;}
+?>		
+				<td>
+				<input type=checkbox name='checked[]' value='<?php echo $ids[$i] ?>'>
+				</td>
+				<td><?php echo $types[$i] ?></td>
+				<td><?php echo $names[$i] ?></td>
+			</tr>
+<?php
+	}
+?>
+		</tbody>
+		</table>
+	</div>
+	<?php
+	echo "<p><button type=\"submit\" name=\"type\" value=\"custom\">Create CC Export with LTI placements as custom fields (works in BlackBoard)</button></p>";
+	echo "<p><button type=\"submit\" name=\"type\" value=\"url\">Create CC Export with LTI placements in URLs (works in Moodle)</button></p>";
+	echo "<p><button type=\"submit\" name=\"type\" value=\"canvas\">Create CC+custom Export (works in Canvas)</button></p>";
+	echo '</form>';
 	
 }
 require("../footer.php");

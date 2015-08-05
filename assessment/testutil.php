@@ -86,15 +86,15 @@ function getquestioninfo($qns,$testsettings) {
 //evals a portion of the control section to extract the $answeights
 //which might be randomizer determined, hence the seed
 function getansweights($qi,$code) {
-	global $seeds,$questions;	
+	global $seeds,$questions,$attempts;	
 	if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
 		return array(1);
 	}
 	$i = array_search($qi,$questions);
-	return sandboxgetweights($code,$seeds[$i]);
+	return sandboxgetweights($code,$seeds[$i],$attempts[$i]);
 }
 
-function sandboxgetweights($code,$seed) {
+function sandboxgetweights($code,$seed,$attemptn) {
 	srand($seed);
 	$code = interpret('control','multipart',$code);
 	if (($p=strrpos($code,'answeights'))!==false) {
@@ -472,7 +472,7 @@ function scorequestion($qn, $rectime=true) {
 	//list($qsetid,$cat) = getqsetid($questions[$qn]);
 	$lastrawscore = $rawscores[$qn];
 	
-	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$qi[$questions[$qn]]['points']);
+	list($unitrawscore,$rawscores[$qn]) = scoreq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],$_POST["qn$qn"],$attempts[$qn],$qi[$questions[$qn]]['points']);
 	
 	$afterpenalty = calcpointsafterpenalty($unitrawscore,$qi[$questions[$qn]],$testsettings,$attempts[$qn]);
 
@@ -962,9 +962,9 @@ function startoftestmessage($perfectscore,$hasreattempts,$allowregen,$noindivsco
 	}
 	if ($hasreattempts) {
 		if ($noindivscores) {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions allowed (note: all scores, correct and incorrect, will be cleared)'), "</p>";
 		} else {
-			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt test</a> on questions missed where allowed'), "</p>";
+			echo "<p>", _('<a href="showtest.php?reattempt=all">Reattempt assessment</a> on questions missed where allowed'), "</p>";
 		}
 	} else {
 		echo "<p>", _('No attempts left on current versions of questions.'), "</p>\n";

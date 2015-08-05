@@ -53,7 +53,7 @@ if ($myrights<20) {
 	$lastanswers = array('');
 
 	if (isset($_POST['seed'])) {
-		list($score,$rawscores) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0']);
+		list($score,$rawscores) = scoreq(0,$_GET['qsetid'],$_POST['seed'],$_POST['qn0'],$attempt-1);
 		$scores[0] = $score;
 		$lastanswers[0] = stripslashes($lastanswers[0]);
 		$page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
