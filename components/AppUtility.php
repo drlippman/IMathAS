@@ -1391,7 +1391,6 @@ class AppUtility extends Component
             $attempts = explode(",",$line['reviewattempts']);
             $lastanswers = explode("~",$line['reviewlastanswers']);
         }
-
         $responseString .= "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
         $responseString .= "<h3>".$testsettings['name']."</h3>\n";
 
