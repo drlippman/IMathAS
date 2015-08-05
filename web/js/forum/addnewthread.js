@@ -5,9 +5,6 @@ $(document).ready(function () {
     });
     $("#addNewThread").click(function()
     {
-        var file_data = $('#newfile-0').prop('files')[0];
-        var form_data = new FormData();
-        form_data.append('file', file_data);
         tinyMCE.triggerSave();
         var forumId = $("#forumId").val();
         var subject = $(".subject").val();
@@ -38,7 +35,7 @@ $(document).ready(function () {
             if(status == true){
                 settings = 1;
             }
-            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings,form_data:form_data };
+            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings };
             jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
         }
     });

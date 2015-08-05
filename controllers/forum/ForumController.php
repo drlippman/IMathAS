@@ -182,6 +182,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
         $course = Course::getById($cid);
+        $unRead = $this->getParamVal('unread');
         $forumId = $this->getParamVal('forumid');
         $page= $this->getParamVal('page');
         $forumData = Forums::getById($forumId);
@@ -189,7 +190,7 @@ class ForumController extends AppController
         $this->setReferrer();
         $this->includeCSS(['dataTables.bootstrap.css', 'forums.css', 'dashboard.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js?ver=012115', 'forum/thread.js?ver=' . time() . '']);
-        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'forumData' => $forumData,'page' => $page);
+        $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'forumData' => $forumData,'page' => $page,'unRead' => $unRead);
         return $this->renderWithData('thread', $responseData);
     }
 
@@ -298,7 +299,13 @@ class ForumController extends AppController
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getByThreadId($thread['threadid']);
+
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
+                     if($lastView){
+                         $lastView1 = date('F d, o g:i a', $lastView[0]['lastview']);
+                     }else{
+                         $lastView1 = 0;
+                     }
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
                     $count = ForumView::uniqueCount($thread['threadid']);
                     $views  = Thread::getByForumIdAndId($forumId,$thread['threadid']);
@@ -320,7 +327,7 @@ class ForumController extends AppController
                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                         'tagged' => $tagged[0]['tagged'],
                         'userright' => $currentUser['rights'],
-                        'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
+                        'lastview' => $lastView1,
                         'postUserId' => $username->id,
                         'currentUserId' => $currentUser['id'],
                         'countArray' => $count,
@@ -916,45 +923,6 @@ class ForumController extends AppController
             return $this->renderWithData('listPostByName', $responseData);
         }
     }
-
-    /*
-     *
-     */
-    function actionReplyPostByName()
-    {
-        $this->guestUserHandler();
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $forumId = $this->getParamVal('forumid');
-        $Id = $this->getParamVal('replyto');
-        $threadId = $this->getParamVal('threadId');
-        $threadData = ForumPosts::getbyidpost($Id);
-        $threadArray = array();
-        foreach ($threadData as $data) {
-            $tempArray = array
-            (
-                'subject' => $data['subject'],
-                'parent' => $data['id'],
-            );
-            array_push($threadArray, $tempArray);
-        }
-        $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypostbyname.js']);
-        $responseData = array('reply' => $threadArray, 'courseId' => $courseId, 'forumId' => $forumId, 'threadId' => $threadId, 'course' => $course);
-        return $this->renderWithData('replyPostByName', $responseData);
-    }
-
-    public function actionReplyListPostAjax()
-    {
-        $this->guestUserHandler();
-        if ($this->isPostMethod()) {
-            $params = $this->getRequestParams();
-            $user = $this->getAuthenticatedUser();
-            $reply = new ForumPosts();
-            $reply->createReply($params, $user);
-            return $this->successResponse();
-        }
-    }
-
     public function actionLikePostAjax()
     {
         $this->guestUserHandler();
@@ -982,7 +950,6 @@ class ForumController extends AppController
         $count = new ForumLike();
         $displayCountData = $count->checkCount($params);
         $countDataArray = array();
-
         foreach ($displayCountData as $data) {
             $user = User::getById($data->userid);
             $tempArray = array('id' => $data->userid, 'userName' => AppUtility::getFullName($user->FirstName, $user->LastName));
@@ -994,8 +961,10 @@ class ForumController extends AppController
 
     public function actionMarkAllReadAjax()
     {
-
         $this->guestUserHandler();
+        $params = $this->getRequestParams();
+        $forumId = $params['forumId'];
+//        $unreadThreadId = ForumPosts::
         $userId = $this->getAuthenticatedUser()->id;
         $viewsData = new ForumView();
         $viewsData->updateDataForPostByName($userId);

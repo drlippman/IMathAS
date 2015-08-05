@@ -70,6 +70,7 @@ $now = $currentTime;
     <input type="hidden" id="courseid" value="<?php echo $course->id ?>">
     <input type="hidden" id="user-id" value="<?php echo $users['id']?>">
     <input type="hidden" id="settings" value="<?php echo $forumData['settings']?>">
+    <input type="hidden" id="un-read" value="<?php echo $unRead ?>">
     <div id="data">
         <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
             <thead>

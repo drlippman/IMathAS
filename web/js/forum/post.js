@@ -110,7 +110,7 @@ function markAsRemoveSuccess(response) {
 
 }
 function changeImage(checkFlagValue, rowId) {
-    //alert(rowId);
+
     var userId = $("#user-id").val();
     if(checkFlagValue == false){
         $('#flag-link').hide();
@@ -133,12 +133,22 @@ function changeImageSuccess(response) {
         window.location = "thread?cid="+courseid+"&forumid="+forumid;
     }
 }
+function changeUnreadSuccess(response) {
+    var forumid = $("#forum-id").val();
+    var courseid = $("#course-id").val();
+    var threadId = $("#thread-id").val();
+    var result = JSON.parse(response);
+    if(result.status == 0)
+    {
+        window.location = "thread?cid="+courseid+"&forumid="+forumid+"&unread="+threadId;
+    }
+}
 function markAsUnreadPost(){
     var threadId = $("#thread-id").val();
     var userId = $("#user-id").val();
     rowId = -1;
     var row = {rowId: rowId,userId:userId,threadId:threadId};
-    jQuerySubmit('change-image-ajax', row, 'changeImageSuccess');
+    jQuerySubmit('change-image-ajax', row, 'changeUnreadSuccess');
 }
 var  flag =0;
 function changeProfileImage(element,id)

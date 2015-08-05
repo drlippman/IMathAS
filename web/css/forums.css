@@ -248,24 +248,30 @@ select > option{
     margin-right: 15px;
 
 }
-input[type=button].new-tag {
+.new-tag {
 
     background-color: #12866E;
     color: #FFF;
     text-align: center;
     border-radius: 0px;
-    border-color: #FFF;
-    font: inherit;
-     height: 22px;
-    margin-left: 8px;
+    width: 40px;
 
 }
+.user-name
+{
+    width:auto;
+}
+.main-name-div{
+    width: 200px;
+}
+
 .btn-primary.flag-btn {
     color: #FFF;
     background-color: #1460AA;
     border-color: #357EBD;
     border-radius:0px;
     width:73px;
+    margin: 0px;
 }
 
 .btn-primary.dropdown-toggle{

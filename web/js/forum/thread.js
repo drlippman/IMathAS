@@ -183,6 +183,7 @@ function threadSuccess(response)
     var fid = $('#forumid').val();
     var courseId = $('#courseid').val();
     var settings = $('#settings').val();
+    var unRead = $('#un-read').val();
     var isModifyThread = ( settings & 2) == 2;
     var isRemoveThread = ( settings & 4) == 4;
     if (response.status == 0) {
@@ -202,20 +203,24 @@ function threadSuccess(response)
                     }
                 });
                 count--;
-                if(thread.parent == 0){
-                    if(thread.isanon == 0){
-                        if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                if(thread.parent == 0)
+                {
+                    if(thread.isanon == 0)
+                    {
+                        if(((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId) || unRead == thread.threadId)
                         {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a><input type='button' class='new-tag' value='New'/><br> "+ thread.name+"</td>";
+
+                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>NEW</div></div><br> "+ thread.name+"</td>";
                             newCount++;
-                        }else{
+                        }else
+                        {
                             html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+"</td>";
                         }
                     }else
-
-                        {if(thread .postdate >= thread.lastview && thread.currentUserId != thread.postUserId)
+                    {
+                        if((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId)
                         {
-                            html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<div class='new-tag'>New</div><br></a>Anonymous </td>";
+                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>NEW</div></div><br>Anonymous </td>";
                             newCount++;
                         }else
                         {

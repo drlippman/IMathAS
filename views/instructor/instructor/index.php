@@ -40,7 +40,31 @@ $now = $currentTime;
         <div class="col-md-2 course-top-menu">
             <a href="#"><?php AppUtility::t('Export Course');?></a>
         </div>
-    </div>
+        <ul class="nav nav-tabs  roster-menu-bar-nav sub-menu col-md-2 pull-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>
+                    <span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu selected-options">
+                    <li>
+                        <a href="#"><?php AppUtility::t('Assessments'); ?></a>
+                    </li>
+                    <li>
+                        <a href="#"><?php AppUtility::t('Forums'); ?></a>
+                    </li>
+                    <li>
+                        <a href="#"><?php AppUtility::t('Blocks'); ?></a>
+                    </li>
+                    <li>
+                        <a href="#"><?php AppUtility::t('Dates'); ?></a>
+                    </li>
+                    <li>
+                        <a href="#"><?php AppUtility::t('Time Shifts'); ?></a>
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+</div>
     <div class="clear-both"></div>
     <div class="row add-item">
         <div class="col-md-1 plus-icon">

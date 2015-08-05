@@ -19,7 +19,7 @@ if($status == AppConstant::NUMERIC_ONE){?>
     <br>
     <div class="midwrapper">
         <input type="button" id="expand" onclick="collapseall()" class="btn btn-primary" value="Expand All">
-        <button  onclick="markall()" class="btn btn-primary">Mark All Read</button>
+        <button  onclick="markall(<?php echo $forumId;?>)" class="btn btn-primary">Mark All Read</button>
         <br><br>
     </div>
     <?$count =0;?>

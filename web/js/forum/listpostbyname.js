@@ -108,15 +108,15 @@ function showall()
 
 }
 
-function markall()
+function markall(forumId)
 {
-    jQuerySubmit('mark-all-read-ajax',{ },'markAllReadSuccess');
+    jQuerySubmit('mark-all-read-ajax',{forumId: forumId },'markAllReadSuccess');
 }
 
 function markAllReadSuccess()
 {
 
-    window.location.reload();
+//    window.location.reload();
 }
 
 var  flag =0;
