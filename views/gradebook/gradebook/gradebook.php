@@ -42,10 +42,47 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php echo $this->render("_toolbarGradebook", ['course' => $course]); ?>
 <div class="tab-content shadowBox"">
 <div class="inner-content-gradebook">
-<div class="button-container">
-        <span>Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a> With Selected:</span>
-    <span class="with-selected col-sm-2 pull-right">
+<div class="button-container col-lg-12 padding-zero">
+
+    <span class="col-lg-6 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a></span>
+    <span class="inner-page-options col-lg-6 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('Color'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu with-selected dropdown-scroll">
+                    <li><a><?php AppUtility::t('None') ?></a></li>
+                    <?php
+                    echo '';
+                    for ($j=50; $j<90; $j+=($j<70 ? 10:5)) {
+                        for ($k = $j+($j<70 ? 10:5); $k<100; $k += ($k<70 ? 10:5)) {
+                            echo "<li";
+                            if ("$j:$k" == $data['colorized']) {
+                                echo 'class = "active" ';
+                            }
+                            echo "><a>$j/$k</a></li>";
+                        }
+                    }
+                    echo '<li';
+                    if ($data['colorized'] == "-1:-1") { echo 'class = "active" ';}
+                    echo '><a>'.AppUtility::t('Active', false).'</a></li>';
+                    ?>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('Category'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu with-selected ">
+                    <?php
+                    echo "<li><a>".AppUtility::t('All', false)."</a></li>";
+                    echo "<li><a>".AppUtility::t('Default', false)."</a></li>";
+                     foreach($data['gbCatsData'] as $category){
+                        echo "<li><a>".$category['name']."</a></li>";
+                    }
+                    echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
+                    ?>
+                </ul>
+            </li>
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>

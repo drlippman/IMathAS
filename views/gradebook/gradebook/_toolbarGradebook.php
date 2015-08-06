@@ -14,11 +14,7 @@ use app\components\AppUtility;
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid=' . $course->id . "&stu=0"); ?>"><?php AppUtility::t('Comments');?></a></li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Filter');?><span class="caret"></span></a>
-            <ul class="dropdown-menu full-width">
-                <li class="dropdown-header"><?php AppUtility::t('Locked Students');?></li>
-                <li><a href="#"><?php AppUtility::t('Show');?></a>
-                <li><a href="#"><?php AppUtility::t('Hide');?></a></li>
-                <li class="divider"></li>
+            <ul class="dropdown-menu full-width dropdown-scroll">
                 <li class="dropdown-header"><?php AppUtility::t('Availability');?></li>
                 <li><a href="#"><?php AppUtility::t('All');?></a>
                 <li><a href="#"><?php AppUtility::t('Past due');?></a></li>
@@ -34,6 +30,11 @@ use app\components\AppUtility;
                 <li class="dropdown-header"><?php AppUtility::t('Links');?></li>
                 <li><a href="#"><?php AppUtility::t('View/Edit');?></a>
                 <li><a href="#"><?php AppUtility::t('Scores');?></a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header"><?php AppUtility::t('Locked Students');?></li>
+                <li><a href="#"><?php AppUtility::t('Show');?></a>
+                <li><a href="#"><?php AppUtility::t('Hide');?></a></li>
+
             </ul>
         </li>
         <li class="dropdown">

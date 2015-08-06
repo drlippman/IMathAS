@@ -125,7 +125,7 @@ class StudentUnenrollUtility extends Component
             foreach($query as $post){
                 filehandler::deleteallpostfiles($post['id']);
             }
-            ForumPosts::deleteForumPostByForumList($forumlist);
+            ForumPosts::deleteForumPostByForumList($forums);
             if (count($tounenroll)>0) {
                 $gradeType='forum';
                 Grades::deleteGradesUsingType($gradeType, $forums, $tounenroll);
@@ -144,9 +144,8 @@ class StudentUnenrollUtility extends Component
         }
         if ($withwithdraw=='remove' || $usereplaceby) {
 
-            /*
-             * updateassess($cid, $withwithdraw=='remove', $usereplaceby);
-             */
+            UpdateAssessUtility::updateassess($cid, $withwithdraw=='remove', $usereplaceby);
+
         }
         if (count($tounenroll)>0) {
             foreach($tounenroll as $studentId){

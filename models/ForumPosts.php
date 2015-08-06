@@ -249,6 +249,11 @@ class ForumPosts extends BaseImasForumPosts
         return $query;
     }
     public static function deleteForumPostByForumList($forumlist){
-        Yii::$app->db->createCommand("DELETE FROM imas_forum_posts WHERE forumid IN ($forumlist) AND posttype=0")->queryAll();
+        $query = ForumPosts::find()->where(['IN', 'forumid', $forumlist])->andWhere(['posttype' => AppConstant::NUMERIC_ZERO])->all();
+        if($query){
+            foreach($query as $object){
+                $object->delete();
+            }
+        }
     }
 }

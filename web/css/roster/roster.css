@@ -48,7 +48,6 @@
 .nav-tabs.nav-justified > .dropdown .selected-options{
     background: #f8f8f8;
     padding: 0;
-    width: 100%;
 }
 .nav-tabs.nav-justified > .dropdown .selected-options > li > a {
     display: block;
@@ -143,7 +142,6 @@ div.dataTables_info {
     border-bottom: none;:
 }
 .nav-tabs .settings-menu{
-    width:100%;
     background: #f5f5f5;
     padding: 0;
 }

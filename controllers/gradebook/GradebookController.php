@@ -1950,9 +1950,10 @@ class GradebookController extends AppController
             'includelastchange' => $includelastchange,
             'studentId' => $stu,
         );
+        $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray);
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray, 'colorized' => $colorized, 'gbCatsData' => $gbCatsData);
         return $responseData;
     }
 
@@ -2397,12 +2398,12 @@ class GradebookController extends AppController
             $failures = array();
             $successes = AppConstant::NUMERIC_ZERO;
             if ($params['userIdType'] == AppConstant::NUMERIC_ZERO) {
-                $usercol = $params['userNameCol'] - AppConstant::NUMERIC_ONE;
+                $userCol = $params['userNameCol'] - AppConstant::NUMERIC_ONE;
             } else if ($params['userIdType'] == AppConstant::NUMERIC_ONE) {
-                $usercol = $params['fullNameCol'] - AppConstant::NUMERIC_ONE;
+                $userCol = $params['fullNameCol'] - AppConstant::NUMERIC_ONE;
             }
-            if ($usercol != AppConstant::NUMERIC_NEGATIVE_ONE) {
-                $scorecol = $params['UploadCommentsForm']['commentsColumn'] - AppConstant::NUMERIC_ONE;
+            if ($userCol != AppConstant::NUMERIC_NEGATIVE_ONE) {
+                $commentColumn = $params['UploadCommentsForm']['commentsColumn'] - AppConstant::NUMERIC_ONE;
                 $handle = fopen($filename, 'r');
                 if ($params['UploadCommentsForm']['fileHeaderRow'] == AppConstant::NUMERIC_ONE) {
                     $data = fgetcsv($handle, 4096, ',');
@@ -2411,19 +2412,19 @@ class GradebookController extends AppController
                     $data = fgetcsv($handle, 4096, ',');
                 }
                 while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
-                    $query = Student::findStudentToUpdateComment($course->id, $params['userIdType'], $data[$usercol]);
+                    $query = Student::findStudentToUpdateComment($course->id, $params['userIdType'], $data[$userCol]);
                     if ($query) {
                         foreach ($query as $result) {
-                            Student::updateGbComments($result['id'], $data[$scorecol], $course->id, $commentType);
+                            Student::updateGbComments($result['id'], $data[$commentColumn], $course->id, $commentType);
                             $successes++;
                         }
                     } else {
-                        $failures[] = $data[$usercol];
+                        $failures[] = $data[$userCol];
                     }
                 }
             }
         }
-        $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
+        $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $userCol);
         return $this->renderWithData('uploadComments', $responseData);
     }
 

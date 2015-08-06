@@ -53,7 +53,7 @@ $this->title = 'About';
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-6\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-3\">{error}</div>",
+            'template' => "{label}\n<div class=\"col-lg-8\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-3\">{error}</div>",
             'labelOptions' => ['class' => 'col-lg-3 control-label'],
         ],
     ]); ?>

@@ -34,6 +34,7 @@ use app\models\forms\ImportStudentForm;
 use yii\web\UploadedFile;
 use app\components\AppConstant;
 use app\models\forms\ChangeUserInfoForm;
+use yii\db\Exception;
 
 
 class RosterController extends AppController
@@ -883,11 +884,15 @@ class RosterController extends AppController
         /*
          * transaction is remaining
          */
-           StudentUnenrollUtility::unenrollstu($params['courseid'],$tounenroll,($params['uid']=="all" || isset($params['delforumposts'])),($params['uid']=="all" && isset($params['removeoffline'])),$withwithdraw,$delwikirev, isset($params['usereplaceby']));
-
-//        foreach ($params['checkedstudents'] as $students) {
-//            Student::deleteStudent($students, $params['courseid']);
-//        }
+        $connection = $this->getDatabase();
+        $transaction = $connection->beginTransaction();
+        try {
+            StudentUnenrollUtility::unenrollstu($params['courseid'], $tounenroll, ($params['uid'] == "all" || isset($params['delforumposts'])), ($params['uid'] == "all" && isset($params['removeoffline'])), $withwithdraw, $delwikirev, isset($params['usereplaceby']));
+            $transaction->commit();
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return false;
+        }
 
         return $this->successResponse();
     }

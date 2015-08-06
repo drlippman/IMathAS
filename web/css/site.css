@@ -776,8 +776,20 @@ div.dataTables_wrapper {
 .a:hover{
     color: #0000ff;
 }
-.full-width{
-    width: 100%;
+.inner-page-options > .nav-tabs.nav-justified > li > a {
+    border: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
 }
-
-
+.inner-page-options{
+    margin-bottom: 12px;
+}
+.nav-tabs.nav-justified > .dropdown .dropdown-menu {
+    top: auto;
+    left: auto;
+    min-width: 100%;
+}
+.dropdown-scroll{
+    height: 300px;
+    max-height: 300px;
+    overflow-y: scroll;
+}
