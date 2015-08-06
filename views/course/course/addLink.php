@@ -10,63 +10,81 @@ use app\components\AppConstant;
 $this->title = $checkboxesValues['saveTitle'];
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<h3><b><?php echo $checkboxesValues['saveTitle']; ?></b>
-</h3>
 <form method=post action="add-link?cid=<?php echo $course['id'];?>" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-    <p></p>
-    <span class=form>Title:</span>
-    <span class=formright><input type=text size=30 name=name
-                                 value="<?php echo str_replace('"', '&quot;', $checkboxesValues['title']); ?>"></span><BR
-        class=form>
-    Summary:<BR>
-
-    <div>
- <?php $summary = $checkboxesValues['summary'];?>
-        <?php echo "<div class='left col-md-11'><div class= 'editor'>
-        <textarea cols=50 rows=15 id=summary name=summary style='width: 100%'>$summary</textarea></div></div><br>"; ?>
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
-    <BR class=form>
-    <BR class=form>
-    <span class=form>Link type: </span>
-    		<span class="formright">
-    		<select id="linktype" name="linktype" onchange="linktypeupdate(this)">
-                <option value="text"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_ZERO); ?>
-                        onclick="document.getElementById('textinput').style.display='block';">Page of text
-                </option>
-                <option value="web"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_ONE); ?>
-                        onclick="document.getElementById('webinput').style.display='block';">Web link
-                </option>
-                <option value="file"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_TWO); ?>
-                        onclick="document.getElementById('fileinput').style.display='block';">File
-                </option>
-                <option value="tool"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_THREE); ?>
-                        onclick="document.getElementById('toolinput').style.display='block';">External Tool
-                </option>
-            </select>
-    		</span><br class="form"/>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+            </div>
+            <div class="pull-left header-btn">
+                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $checkboxesValues['saveButtonTitle']; ?></button>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content shadowBox non-nav-tab-item">
+        <div class="name-of-item">
+            <div class="col-lg-2"><?php AppUtility::t('Name of Link')?></div>
+            <div class="col-lg-10">
+                <input class="input-item-title" type=text size=0 name=name value="<?php echo str_replace('"', '&quot;', $checkboxesValues['title']); ?>">
+            </div>
+        </div>
+     <BR>
+        <div class="editor-summary">
+            <div class="col-lg-2">
+                <?php AppUtility::t('Summary')?>
+            </div>
+            <?php $summary = $checkboxesValues['summary'];?>
+            <?php echo "<div class='col-lg-10'>
+                <div class= 'editor'>
+                    <textarea cols=5 rows=12 id=summary name=summary style='width: 100%'>$summary</textarea>
+                </div>
+                </div><br>"; ?>
+        </div>
+
+    <div class=col-lg-2><?php AppUtility::t('Link type')?></div>
+    		<div class="col-lg-10">
+                <select id="linktype" name="linktype" onchange="linktypeupdate(this)">
+                    <option value="text"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_ZERO); ?>
+                            onclick="document.getElementById('textinput').style.display='block';">Page of text
+                    </option>
+                    <option value="web"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_ONE); ?>
+                            onclick="document.getElementById('webinput').style.display='block';">Web link
+                    </option>
+                    <option value="file"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_TWO); ?>
+                            onclick="document.getElementById('fileinput').style.display='block';">File
+                    </option>
+                    <option value="tool"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_THREE); ?>
+                            onclick="document.getElementById('toolinput').style.display='block';">External Tool
+                    </option>
+                </select>
+    		</div><br>
 
 
     <div id="textinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_ZERO) ? "block" : "none"; ?>">
-        Text<BR>
+       <div class="col-lg-2"><?php AppUtility::t('Text')?></div>
         <?php $text = $checkboxesValues['text'];?>
-        <div class=editor>
-            <textarea cols=80 rows=20 id=text name=text
-                      style="width: 100%"><?php echo htmlentities($line['text']); ?><?php echo $text ?></textarea>
+        <div class="col-lg-10">
+            <div class=editor>
+                <textarea cols=80 rows=20 id=text name=text
+                          style="width: 100%"><?php echo htmlentities($line['text']); ?><?php echo $text ?></textarea>
+            </div>
         </div>
     </div>
     <div id="webinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
-        <span class="form">Weblink (start with http://)</span>
-    			<span class="formright">
+        <div class="col-lg-2"><?php AppUtility::t('Weblink (start with http://)')?></div>
+    			<div class="col-lg-10">
     				<input size="80" name="web" value="<?php echo htmlentities($checkboxesValues['webaddr']); ?>"/>
-    			</span><br class="form">
+    			</div><br>
     </div>
-    <div id="fileinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
-        <span class="form">File</span>
-        <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
-    			<span class="formright">
 
+    <div id="fileinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
+        <div class="col-lg-2"><?php AppUtility::t('File')?></div>
+        <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
+    			<div class="col-lg-10">
     				<?php if ($checkboxesValues['filename'] != '') {
                     require_once("../includes/filehandler.php");
                     echo '<input type="hidden" name="curfile" value="' . $checkboxesValues['filename'] . '"/>';
@@ -77,13 +95,13 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                 }
                 ?>
                     file (Max 10MB)<sup>*</sup>: <input name="userfile" type="file"/>
-    			</span><br class="form">
+    			</div><br class="form">
     </div>
 
    <div id="toolinput""
     <div id="fileinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_THREE) ? "block" : "none"; ?>">
-        <span class="form">External Tool</span>
-    			<span class="formright">
+        <div class="col-lg-2"><?AppUtility::t('External Tool')?></div>
+    			<div class="col-lg-10">
     		<?php
                 $selectedtool = array();
                 array_push($selectedtool,$toollabels);
@@ -98,16 +116,13 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
                     echo '<a href="../admin/externaltools.php?cid=' . $cid . '&amp;ltfrom=' . $_GET['id'] . '">Add or edit an external tool</a>';
                 }
                 ?>
-    			</span><br class="form"/>
-        <span class="form">If this tool returns scores, do you want to record them?</span>
-    			<span class="formright">
-    			<input type=radio name="usegbscore" value="0" <?php if ($checkboxesValues['points'] == 0) {
-                    echo 'checked=1';
-                } ?> onclick="toggleGBdetail(false)"/>No<br/>
-    			<input type=radio name="usegbscore" value="1" <?php if ($checkboxesValues['points'] > 0) {
-                    echo 'checked=1';
-                } ?> onclick="toggleGBdetail(true)"/>Yes
-    			</span><br class="form"/>
+    			</div><br>
+
+        <div class="col-lg-2">If this tool returns scores, do you want to record them?</div>
+    			<div class="col-lg-10">
+                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="usegbscore" value="0" <?php if ($checkboxesValues['points'] == 0) {    echo 'checked=1';} ?> onclick="toggleGBdetail(false)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
+                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="usegbscore" value="1" <?php if ($checkboxesValues['points'] > 0) { echo 'checked=1';} ?> onclick="toggleGBdetail(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
+    			</div><br>
 
         <div id="gbdetail" <?php if ($checkboxesValues['points'] == 0) {
             echo 'style="display:none;"';
@@ -141,16 +156,16 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 			</span><br class="form" />
         </div>
     </div>
-        <span class=form> Open page in:</span>
-            <span class=formright>
+        <div class=col-lg-2><?php AppUtility::t('Open page in')?></div>
+            <div class=col-lg-10>
                 <input type=radio name="open-page-in"
                        value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ZERO); ?>  /> Current window/tab<br/>
                 <input type=radio name="open-page-in"
                        value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ONE); ?>  /> New window/tab<br/>
-            </span><br class="form"/>
+            </div><br>
 
-        <span class=form>Show:</span>
-            <span class=formright>
+        <div class=col-lg-2><?php AppUtility::t('Show')?></div>
+            <div class=col-lg-10>
                 <input type=radio name="avail"
                        value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_ZERO); ?>
                        onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/>Hide<br/>
@@ -160,7 +175,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
             <input type=radio name="avail"
                    value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_TWO); ?>
                    onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='block';"/>Show Always<br/>
-            </span><br class="form"/>
+            </div><br>
 
     <div id="datedivwithcalendar"
         style="display:<?php echo ($assessmentData['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
@@ -267,5 +282,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <br class="form"/>
     <?php } ?>
     </span><br class="form"/>
-    <div class=submit><input class="" type=submit name="submit" value="<?php echo $checkboxesValues['saveButtonTitle'];?>"></div>
+    </div>
 </form>
+

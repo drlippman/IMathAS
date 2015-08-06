@@ -651,8 +651,8 @@ class CourseController extends AppController
             }
         }
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
-        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData);
+        $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js', 'course/addItem.js', 'course/instructor.js']);
+        $returnData = array('course' => $course, 'messageList' => $msgList, 'courseDetail' => $responseData, 'user' => $user);
         return $this->render('blockIsolate', $returnData);
     }
 
@@ -802,6 +802,7 @@ class CourseController extends AppController
     {
         $params = $this->getRequestParams();
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $modifyLinkId = $params['id'];
@@ -1047,6 +1048,7 @@ class CourseController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
         $model = new ChangeUserInfoForm();
+        $this->includeCSS(['course/items.css']);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'modifyLinkId' => $modifyLinkId,
             'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'checkboxesValues' => $checkboxesValues);

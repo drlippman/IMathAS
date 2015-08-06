@@ -579,6 +579,7 @@ class CourseItemsUtility extends Component
                         <li><a id="delete" href="#" onclick="deleteItem('<?php echo $link->id; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
                         <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                     </ul>
+
                 </div>
                 <?php if ($link['avail'] == AppConstant::NUMERIC_ZERO) { ?>
                     <BR>Hidden
@@ -638,7 +639,7 @@ class CourseItemsUtility extends Component
 
                 <div class="floatright">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                    <ul class=" select1 dropdown-menu selected-options">
+                    <ul class=" select1 dropdown-menu selected-options pull-right">
                         <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id)?>"><?php AppUtility::t('Modify');?></a></li>
                         <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
                         <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
@@ -764,19 +765,19 @@ class CourseItemsUtility extends Component
 
 /////////////////////////////////////////////////// BLOCK //////////////////////////////////////////////////////////////////////////////////
 
-    public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
-    {
-        $block = $item[key($item)];
-        $blockId = $block['id'];
-        ?>
-        <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
-        <input type="hidden" id="id" value="<?php echo $block['id']?>" >
-        <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
-        <?php $endDate = AppUtility::formatDate($block['enddate']);?>
+        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
+        {
+            $block = $item[key($item)];
+            $blockId = $block['id'];
+            ?>
+            <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
+            <input type="hidden" id="id" value="<?php echo $block['id']?>" >
+            <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
+            <?php $endDate = AppUtility::formatDate($block['enddate']);?>
 
-        <div class="block item">
-            <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
-                <span class=left>
+            <div class="block item">
+                <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
+                    <span class=left>
                         <img alt="folder"  src="<?php echo AppUtility::getHomeURL() ?>img/folder2.gif">
                     </span>
             <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
@@ -828,9 +829,9 @@ class CourseItemsUtility extends Component
                                              </ul><br>
                                          <?php }?>
                                     </span>
-                    <?php }else { ?>
-                        <br><?php echo $title?> Always</span>
-                        <span class="instronly">
+                            <?php }else { ?>
+                                <br><?php echo $title?> Always</span>
+                                     <span class="instronly">
                                           <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                                              <ul class=" select1 dropdown-menu selected-options pull-right">
                                                  <li><a class="isolate" href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>"><?php AppUtility::t('Isolate');?></a></li>
@@ -842,10 +843,10 @@ class CourseItemsUtility extends Component
                                     </span>
                     <?php } ?>
                     <?php } else {  ?>
-                    <input type="hidden" id="isHidden" value="1">
-                    <span class="instrdates">
+                        <input type="hidden" id="isHidden" value="1">
+                        <span class="instrdates">
                             <br>Hidden</span>
-                    <span class="instronly">
+                        <span class="instronly">
                             <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                                              <ul class=" select1 dropdown-menu selected-options pull-right">
                                                  <li><a class="isolate" href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' .$course->id ."&blockId=" .$blockId) ?>"><?php AppUtility::t('Isolate');?></a></li>
@@ -916,6 +917,7 @@ class CourseItemsUtility extends Component
         </div>
         <div class="clear"></div>
     <?php }
+
 /////////////////////////////////////////////////////////// POP FOR ADDING NEW ITEMS //////////////////////////////////////////////////////
     public static function AddItemsDropDown()
     {
