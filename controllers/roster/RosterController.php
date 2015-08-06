@@ -1014,7 +1014,7 @@ class RosterController extends AppController
             $assessments = Assessments::getByCourseId($courseId);
             $studentList = explode(',', $data['student-data']);
             $studentArray = array();
-            if ($this->isPost()) {
+            if ($this->isPost() || $data['student-data'] != "") {
                 $params = $this->getRequestParams();
                 $section = $params['section-data'];
                 $isActionForException = isset($params['isException']) ? $params['isException'] : AppConstant::NUMERIC_ZERO;

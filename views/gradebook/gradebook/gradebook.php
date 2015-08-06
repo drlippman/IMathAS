@@ -1,8 +1,11 @@
 <?php
 use app\components\AppUtility;
 use app\components\HtmlUtility;
-
-$this->title = AppUtility::t('Gradebook', false);
+if (($course['newflag']&1)==1) {
+    $this->title = AppUtility::t('Gradebook'.' <span class="small" style="color: red;"> New </span>', false);
+}else{
+    $this->title = AppUtility::t('Gradebook', false);
+}
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
@@ -41,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="inner-content-gradebook">
 <div class="button-container">
         <span>Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a> With Selected:</span>
-    <span class="with-selected col-lg-2 pull-right">
+    <span class="with-selected col-sm-2 pull-right">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"

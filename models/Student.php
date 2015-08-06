@@ -335,4 +335,48 @@ class Student extends BaseImasStudents {
     {
         return Student::find()->where(['id' => $studentId])->one();
     }
+    public static function findStudentToUpdateFeedbackAndScore($data,$params,$course,$usercol){
+
+//        $query = "SELECT imas_users.id FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$cid' AND ";
+//        if ($_POST['useridtype']==0) {
+//            $data[$usercol] = str_replace("'","\\'",trim($data[$usercol]));
+//            if ($data[$usercol]=='') {continue;}
+//            $query .= "imas_users.SID='{$data[$usercol]}'";
+//        } else if ($_POST['useridtype']==1) {
+//            if (strpos($data[$usercol],',')===false) { continue;}
+//            list($last,$first) = explode(',',$data[$usercol]);
+//            $first = str_replace("'","\\'",trim($first));
+//            $last = str_replace("'","\\'",trim($last));
+//            $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
+//            //echo $query;
+//        } else {
+//            $query .= "0";
+//        }
+
+        $query = new Query();
+        $query	->select(['imas_users.id', 'imas_users.FirstName', 'imas_users.LastName'])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $course->id])
+            ->orderBy('imas_users.LastName');
+        if ($params['userIdType']==0) {
+            $data[$usercol] = str_replace("'","\\'",trim($data[$usercol]));
+            $query ->andWhere( ['imas_users.SID' => $data[$usercol]]);
+        } else if ($params['userIdType']==1) {
+            list($last,$first) = explode(',',$data[$usercol]);
+            $first = str_replace("'","\\'",trim($first));
+            $last = str_replace("'","\\'",trim($last));
+            $query ->andWhere(['imas_users.FirstName' => $first]);
+            $query ->andWhere(['imas_users.LastName'=>$last]);
+        } else {
+            $query .= "0";
+        }
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
 } 

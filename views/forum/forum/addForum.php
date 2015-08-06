@@ -46,8 +46,12 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-lg-2"><?php AppUtility::t('Description')?></div>
             <div class="col-lg-10">
                 <div class=editor>
-                    <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
-                    </textarea>
+             <?php  $description = AppUtility::t('Enter forum description here',false);
+                         if ($forumData) {
+                             $description = $forumData['description'];
+                    } ?>
+                    <textarea cols="5" rows="12" id="description" name="description" style="width: 100%;">
+                   <?php echo $description; ?></textarea>
                 </div>
             </div>
         </div>
@@ -55,14 +59,14 @@ $this->params['breadcrumbs'][] = $this->title;
         <div>
         <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
         <div class="col-lg-10">
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none'; "/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Hide')?></td></div>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show by Dates')?></td></div>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datediv').style.display='none'; "/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show Always')?></td></div>
+            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['avail'],AppConstant::NUMERIC_ZERO);?> onclick="toggleGBdetail1(false)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Hide')?></td></div>
+            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['avail'],AppConstant::NUMERIC_ONE);?> onclick="toggleGBdetail1(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show by Dates')?></td></div>
+            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValue['avail'], AppConstant::NUMERIC_TWO); ?>onclick="toggleGBdetail1(false)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show Always')?></td></div>
         </div>
         </div>
                 <!--Show by dates-->
-                <div id="datediv" style="display:<?php echo ($forum['avail'] == 1) ? "block" : "none"; ?>">
-                    <?php $startTime = $eTime; ?>
+                    <div id="datediv" <?php if ($defaultValue['avail']!= 1) { echo 'style="display:none;"';}?>>
+
                     <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
                     <div class=col-lg-10>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="available-after" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], '0', AppConstant::NUMERIC_ZERO) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always until end date')?></td></div>
@@ -72,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo DatePicker::widget([
                             'name' => 'sdate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                            'value' => date("m-d-y"),
+                            'value' => $defaultValue['sDate'],
                             'removeButton' => false,
                             'pluginOptions' => [
                                 'autoclose' => true,
@@ -84,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '<div class="pull-left col-lg-4">';
                         echo TimePicker::widget([
                             'name' => 'stime',
-                            'value' => $eTime,
+                            'value' => $defaultValue['sTime'],
                             'pluginOptions' => [
                                 'showSeconds' => false,
                                 'class' => 'time'
@@ -102,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo DatePicker::widget([
                             'name' => 'edate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                            'value' => date("m-d-y"),
+                            'value' => $defaultValue['eDate'],
                             'removeButton' => false,
                             'pluginOptions' => [
                                 'autoclose' => true,
@@ -115,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         echo TimePicker::widget([
                             'name' => 'etime',
-                            'value' => $eTime,
+                            'value' => $defaultValue['eTime'],
                             'pluginOptions' => [
                                 'showSeconds' => false,
                                 'class' => 'time'
@@ -131,8 +135,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class=col-lg-2><?php AppUtility::t('Group forum?')?></div>
                         <div class=col-lg-10>
                              <?php
-                            AssessmentUtility::writeHtmlSelect("groupsetid",$groupNameId,$groupNameLabel,$forumData['groupsetid'],"Not group forum",0);
-                            if ($forumData['groupsetid'] > 0 && $defaultValue['hasGroupThreads']) {
+                            AssessmentUtility::writeHtmlSelect("groupsetid",$groupNameId,$groupNameLabel,$defaultValue['groupSetId'],"Not group forum",0);
+                            if ($defaultValue['groupSetId'] > 0 && $defaultValue['hasGroupThreads']) {
                                 echo '<br/> WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
                             }        ?>
 
@@ -141,27 +145,27 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Allow anonymous posts')?></div>
                             <div class=col-lg-10>
-                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowanon']) { echo "checked=1";}?> ><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
+                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-anonymous-posts" value="1"<?php if ($defaultValue['allowAnonymous']) { echo "checked=1";}?> ><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                             </div>
                     </div><br class=form>
 
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Allow students to modify posts')?></div>
                             <div class=col-lg-10>
-                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowmod']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
+                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-modify-posts" value="2"<?php if ($defaultValue['allowModify']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div>
                     </div><br class=form>
 
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Allow students to delete own posts (if no replies)')?></div>
                             <div class=col-lg-10>
-                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowdel']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
+                                <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="allow-students-to-delete-own-posts" value="4"<?php if ($defaultValue['allowDelete']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div>
                     </div><br class=form>
 
                     <div class=col-lg-2><?php AppUtility::t('Turn on "liking" posts')?></div>
                         <div class=col-lg-10>
-                            <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowlikes']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
+                            <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="like-post" value="8"<?php if ($defaultValue['allowLikes']) { echo "checked=1";}?>><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
                         </div><br class=form>
 
                     <div class="item-alignment">
@@ -202,8 +206,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Students can create new threads')?></div>
                         <div class="col-lg-10">
-                            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="0" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
-                            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="2000000000" <?php if ($defaultValue['postBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
+                            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="0" <?php if ($defaultValue['postBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
+                            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="new-thread" value="2000000000" <?php if ($defaultValue['postBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
                             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="new-thread" class="pull-left " value="1" <?php if ($defaultValue['postBy']<2000000000 && $defaultValue['postBy']>0) { echo "checked=1";}?> ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
                             <?php
                             echo '<label class="end pull-left"> Before:</label>';
@@ -211,7 +215,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo DatePicker::widget([
                                 'name' => 'newThreadDate',
                                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                                'value' => date("m/d/Y"),
+                                'value' => $defaultValue['newThreadDate'],
                                 'removeButton' => false,
                                 'pluginOptions' => [
                                     'autoclose' => true,
@@ -223,7 +227,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo '<div class=" col-lg-6">';
                             echo TimePicker::widget([
                                 'name' => 'newThreadTime',
-                                'value' =>  $eTime,
+                                'value' =>  $defaultValue['replyByTime'],
                                 'pluginOptions' => [
                                     'showSeconds' => false,
                                     'class' => 'time'
@@ -238,8 +242,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="item-alignment">
                             <div class=col-lg-2><?php AppUtility::t('Students can reply to posts')?></div>
                             <div class="col-lg-10">
-                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="0" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
-                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="2000000000" <?php if ($defaultValue['replyBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
+                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="0" <?php if ($defaultValue['replyBy']==0) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
+                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="reply-to-posts" value="2000000000" <?php if ($defaultValue['replyBy']==2000000000) { echo "checked=1";}?>><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
                                 <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="reply-to-posts" class="pull-left "value="1" <?php if ($defaultValue['replyBy']<2000000000 && $defaultValue['replyBy']>0) { echo "checked=1";}?> ><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
                                 <?php
                                 echo '<label class="end pull-left">Before:</label>';
@@ -247,7 +251,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo DatePicker::widget([
                                     'name' => 'replayPostDate',
                                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                                    'value' => date("m/d/Y"),
+                                    'value' => $defaultValue['replayPostDate'],
                                     'removeButton' => false,
                                     'pluginOptions' => [
                                         'autoclose' => true,
@@ -259,7 +263,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo '<div class=" col-lg-6">';
                                 echo TimePicker::widget([
                                     'name' => 'replayPostTime',
-                                    'value' => $eTime,
+                                    'value' => $defaultValue['postByTime'],
                                     'pluginOptions' => [
                                         'showSeconds' => false,
                                         'class' => 'time'
@@ -288,7 +292,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div></div><br class="form"/>
 
                 <div class="item-alignment">
-                    <div id="gbdetail" <?php if ($defaultValue['cntingb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>>
+                    <div id="gbdetail" <?php if ($defaultValue['cntInGb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>>
 
                         <div class=col-lg-2><?php AppUtility::t('Points:')?></div>
                         <div class=col-lg-10>
@@ -306,46 +310,48 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Tutor Access:')?></div>
                         <div class=col-lg-10>
-                            <?php AssessmentUtility::writeHtmlSelect("tutor-edit",$page_tutorSelect['val'],$page_tutorSelect['label'],$forumData['tutoredit']); ?>
+                            <?php AssessmentUtility::writeHtmlSelect("tutor-edit",$page_tutorSelect['val'],$page_tutorSelect['label'],$defaultValue['tutorEdit']); ?>
                         </div><br class=form>
                     </div>
                     <div class="item-alignment">
                         <div class="col-lg-2"><?php AppUtility::t('Use Scoring Rubric')?></div>
                         <div class=col-lg-10>
-                                <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$forumData['rubric'],'None',0); ?>
+                                <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$defaultValue['rubric'],'None',0); ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>">Add new
                                 <?php AppUtility::t('rubric')?></a> | <a
                                 href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>"><?php AppUtility::t('Edit rubrics')?></a>
                           </div>
                           <br class=form>
                     </div>
-                    </div>
                     <div class="item-alignment">
                         <?php if (count($pageOutcomesList) > 0) { ?>
                         <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div><div class="col-lg-10">
                         <?php
-                            $gradeoutcomes = array();
+                        if($forumData['outcomes']){
+                            $gradeoutcomes = explode(',',$forumData['outcomes']);
+                        }
                             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
                             <br class="form"/>
                         <?php } ?>
                         <br class=form>
-                    </div></div>
-
+                    </div>
+                    </div>
+                    </div>
                     <div class="item-alignment">
                        <div class=col-lg-2><?php AppUtility::t('Forum Type')?></div>
                             <div class=col-lg-10>
-                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="0" <?php if ($forumData['forumtype']==0) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Regular forum')?></td></div>
-                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="1" <?php if ($forumData['forumtype']==1) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t(' File sharing forum')?></td></div>
+                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="0" <?php if ($defaultValue['forumType']==0) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Regular forum')?></td></div>
+                                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="forum-type" value="1" <?php if ($defaultValue['forumType']==1) { echo 'checked=1';}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t(' File sharing forum')?></td></div>
                             </div><br class="form"/></div>
 
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Categorize posts?')?></div>
                          <div class=col-lg-10>
-                             <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type=checkbox name="categorize-posts" value="1" <?php if ($forumData['taglist'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
+                             <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type=checkbox name="categorize-posts" value="1" <?php if ($defaultValue['tagList'] != '') {echo "checked=1";} ?>onclick="document.getElementById('tagholder').style.display=this.checked?'':'none';"/><span class="cr"><i class="cr-icon fa fa-check"></i></span></label></div>
 
-                              <span id="tagholder" style="display:<?php echo ($forumData['taglist'] == '') ? "none" : "inline"; ?>">
+                              <span id="tagholder" style="display:<?php echo ($defaultValue['tagList'] == '') ? "none" : "inline"; ?>">
                               <?php AppUtility::t('Enter in format CategoryDescription:category,category,category')?><br/>
-                              <input type="text" size="50" height="20" name="taglist"><?php echo $forumData['taglist']; ?>
+                              <input type="text" size="50" height="20" name="taglist" value="<?php echo $defaultValue['tagList']; ?>"  >
                               </span><br class=form><br class=form>
             </div>
                    </div>

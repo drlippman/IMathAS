@@ -67,13 +67,36 @@ class Grades extends BaseImasGrades
             }
         }
     }
+
     public static function deleteGradesUsingType($gradeType, $tools, $toUnEnroll)
     {
-        $query = Grades::find()->where(['gradetype'=> $gradeType])->andWhere(['IN', 'gradetypeid', $tools])->andWhere(['IN', 'userid', $toUnEnroll])->all();
-        if($query){
-            foreach($query as $grades){
+        $query = Grades::find()->where(['gradetype' => $gradeType])->andWhere(['IN', 'gradetypeid', $tools])->andWhere(['IN', 'userid', $toUnEnroll])->all();
+        if ($query) {
+            foreach ($query as $grades) {
                 $grades->delete();
             }
+        }
+    }
+    public static function getByGradeTypeId($gbItemsId){
+        return Grades::find('userid','score')->where(['gradetypeid' => $gbItemsId])->andWhere(['gradetype' => 'offline'])->all();
+    }
+    public function addGradeToStudent($cuserid,$gbItemsId,$feedback,$score){
+
+                $this->gradetype = 'offline';
+                $this->gradetypeid = $gbItemsId;
+                $this->userid = $cuserid;
+                $this->score = $score;
+                $this->feedback = $feedback;
+                $this->save();
+
+    }
+    public static function updateGradeToStudent($score,$feedback,$cuserid,$gbItemsId){
+
+        $grade = Grades::find()->where(['userid' => $cuserid])->andWhere(['gradetypeid'=> $gbItemsId])->andWhere(['gradetype' => 'offline'])->one();
+        if($grade){
+            $grade->score = $score;
+            $grade->feedback = $feedback;
+            $grade->save();
         }
     }
 }

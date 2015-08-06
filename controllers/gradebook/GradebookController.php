@@ -25,9 +25,11 @@ use app\models\LinkedText;
 use app\models\LoginLog;
 use app\models\loginTime;
 use app\models\Message;
+use app\models\Outcomes;
 use app\models\Rubrics;
 use app\models\Questions;
 use app\models\Student;
+use app\models\StuGroupSet;
 use app\models\Teacher;
 use app\models\Tutor;
 use app\models\User;
@@ -79,7 +81,7 @@ class GradebookController extends AppController
 
     }
 
-    public function gbtable($userId, $courseId,$studentId=null)
+    public function gbtable($userId, $courseId, $studentId = null)
     {
 
         $teacherid = Teacher::getByUserId($userId, $courseId);
@@ -849,7 +851,7 @@ class GradebookController extends AppController
             }
             if ($useweights == 0 && $cats[$cat][5] > -1) { //if scaling cat total to point value
                 if ($catposspast[$cat] > 0) {
-                    $gradebook[0][2][$pos][3] = $cats[  $cat][5]; //score for past
+                    $gradebook[0][2][$pos][3] = $cats[$cat][5]; //score for past
                 } else {
                     $gradebook[0][2][$pos][3] = 0; //fix to 0 if no scores in past yet
                 }
@@ -1978,8 +1980,14 @@ class GradebookController extends AppController
         $courseId = $this->getParamVal('cid');
         $studentData = Student::findByCid($courseId);
         $course = Course::getById($courseId);
-        $rubricsData = Rubrics::getByUserId($currentUser['id']);
         $assessmentData = Assessments::getByCourseId($courseId);
+        $key = 0;
+        foreach ($assessmentData as $assessment) {
+            $assessmentId[$key] = $assessment['id'];
+            $assessmentLabel[$key] = $assessment['name'];
+            $key++;
+        }
+
         $studentArray = array();
         if ($studentData) {
             foreach ($studentData as $student) {
@@ -1991,11 +1999,57 @@ class GradebookController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
-        if ($this->isPost()) {
+
+        $key = AppConstant::NUMERIC_ZERO;
+        $gbcatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbcatsData as $singleGbcatsData) {
+            $gbcatsId[$key] = $singleGbcatsData['id'];
+            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+            $key++;
+        }
+
+        $rubrics = Rubrics::getByUserId($currentUser['id']);
+        foreach ($rubrics as $rubric) {
+            $rubricsId[$key] = $rubric['id'];
+            $rubricsLabel[$key] = $rubric['name'];
+            $key++;
+        }
+
+        $OutcomesData = Outcomes::getByCourse($courseId);
+        $key = AppConstant::NUMERIC_ONE;
+        $pageOutcomes = array();
+        if ($OutcomesData) {
+            foreach ($OutcomesData as $singleData) {
+                $pageOutcomes[$singleData['id']] = $singleData['name'];
+                $key++;
+            }
+        }
+        $pageOutcomesList = array();
+        $query = $course['outcomes'];
+        $outcomeArray = unserialize($query);
+        $result = $this->flatArray($outcomeArray);
+        if ($result) {
+            foreach ($result as $singlePage) {
+                array_push($pageOutcomesList, $singlePage);
+            }
+        }
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
+            if(count($params['outcomes']) > 1){
+                foreach ($params['outcomes'] as $outcomeId) {
+
+                    if (is_numeric($outcomeId) && $outcomeId > 0) {
+                        $outcomes[] = intval($outcomeId);
+                    }
+                }
+                $params['outcomes'] = implode(',',$outcomes);
+
+            }else{
+                $params['outcomes'] = ' ';
+            }
             $gbItems = new GbItems();
             $gbItemsId = $gbItems->createGbItemsByCourseId($courseId, $params);
-            if ($params['AddGradesForm']['UploadGrades'] == AppConstant::NUMERIC_ZERO) {
+            if ($params['uploade-grade'] != AppConstant::NUMERIC_ONE) {
                 if ($params['grade_text'] || $params['feedback_text']) {
 
                     $gradeTextArray = array();
@@ -2018,17 +2072,16 @@ class GradebookController extends AppController
 
                 }
             } else {
-                $model = new AddGradesForm();
-                $this->redirect('upload-grades?gbItems=' . $gbItemsId);
+                $this->redirect('upload-grades?gbItems=' . $gbItemsId.'&cid='.$courseId);
             }
-            $responseData = array('course' => $course, 'user' => $currentUser);
-            return $this->renderWithData('gradebook', $responseData);
-        }
-        $this->includeCSS(['dataTables.bootstrap.css']);
+            $this->redirect('gradebook?cid='.$courseId);
+         }
+        $this->includeCSS(['dataTables.bootstrap.css', 'course/items.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'roster/managelatepasses.js']);
-        $responseData = array('model' => $model, 'studentInformation' => $studentArray, 'course' => $course, 'rubricsData' => $rubricsData, 'assessmentData' => $assessmentData);
+        $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
+        , 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
+            'pageOutcomes' => $pageOutcomes);
         return $this->renderWithData('addGrades', $responseData);
-
     }
 
     public function actionAddRubric()
@@ -2121,40 +2174,74 @@ class GradebookController extends AppController
 
     public function actionUploadGrades()
     {
-        $model = new AddGradesForm();
-        $gbItemsId = $this->getRequestParams();
+        $this->guestUserHandler();
+        $course = Course::getById($this->getParamVal('cid'));
         $nowTime = time();
-        if ($model->load($this->getPostData())) {
+        $model = new AddGradesForm();
+        $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
+            $gbItemsId = $params['gbItems'];
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
                 $filename = AppConstant::UPLOAD_DIRECTORY . $nowTime . '.csv';
                 $model->file->saveAs($filename);
             }
-            $studentRecords = $this->ImportStudentCsv($filename, $params);
-            $gradeTextArray = array();
-            foreach ($studentRecords as $key => $single) {
-                if (count($studentRecords) - 1 > $key) {
-                    if ($params['AddGradesForm']['userIdentifiedBy'] == AppConstant::NUMERIC_ONE) {
-                        $user = User::findByUsername($single[0]);
-                        $userId = $user['id'];
+            $curscores = array();
+            $grades = Grades::getByGradeTypeId($gbItemsId);
+            if($grades){
+              foreach($grades as $grade){
+                    $curscores[$grade['userid']] = $grade['score'];
+                }
+            }
+            $failures = array();
+            $successes = AppConstant::NUMERIC_ZERO;
+            if ($params['userIdType'] == AppConstant::NUMERIC_ZERO) {
+                $usercol = $params['userNameCol'] - AppConstant::NUMERIC_ONE;
+            } else if ($params['userIdType'] == AppConstant::NUMERIC_ONE) {
+                $usercol = $params['fullNameCol'] - AppConstant::NUMERIC_ONE;
+            }
+            if ($usercol != AppConstant::NUMERIC_NEGATIVE_ONE) {
+                $scoreColumn = $params['AddGradesForm']['gradesColumn']- 1;
+                $feedbackColumn = $params['AddGradesForm']['feedbackColumn']-1;
+                $handle = fopen($filename, 'r');
+                if ($params['AddGradesForm']['fileHeaderRow'] == AppConstant::NUMERIC_ONE) {
+                    $data = fgetcsv($handle, 4096, ',');
+                } else if ($params['AddGradesForm']['fileHeaderRow'] == AppConstant::NUMERIC_TWO) {
+                    $data = fgetcsv($handle, 4096, ',');
+                    $data = fgetcsv($handle, 4096, ',');
+                }
+                while (($data = fgetcsv($handle, 4096, ",")) !== FALSE) {
+
+                    $studentData = Student::findStudentToUpdateFeedbackAndScore($data, $params, $course, $usercol);
+                    if ($feedbackColumn == -1) {
+                        $feedback = '';
                     } else {
-                        $user = User::findByUsername($single[0]);
-                        $userId = $user['id'];
+                        $feedback = addslashes($data[$feedbackColumn]);
                     }
-                    $tempArray = array(
-                        'studentId' => $userId,
-                        'gradeText' => $single[1],
-                        'feedbackText' => $single[2],
-                        'fromUploadFile' => '1'
-                    );
-                    $grades = new Grades();
-                    $grades->createGradesByUserId($tempArray, $params['gb-items-id']);
+                    $score = $data[$scoreColumn];
+                    if(!$score){
+                        $score = ' ';
+                    }
+                    if ($studentData) {
+                        $cuserid = $studentData['id'];
+                        if (isset($curscores[$cuserid])) {
+                            Grades::updateGradeToStudent($score,$feedback,$cuserid,$gbItemsId);
+                            $successes++;
+                        } else {
+                            $gradeObject = new Grades();
+                            $gradeObject->addGradeToStudent($cuserid,$gbItemsId,$feedback,$score);
+                            $successes++;
+                        }
+                    } else {
+                        $failures[] = $data[$usercol];
+                    }
                 }
             }
         }
-        $responseData = array('model' => $model, 'gbItemsId' => $gbItemsId['gbItems']);
-        return $this->renderWithData('uploadGrades', $responseData);
+        $this->includeCSS(['site.css']);
+        $responseData = array('course' => $course, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
+         return $this->renderWithData('uploadGrades', $responseData);
     }
 
     public function ImportStudentCsv($fileName, $params)
@@ -2186,7 +2273,7 @@ class GradebookController extends AppController
             $gbcatsLabel[$key] = $singleGbcatsData['name'];
             $key++;
         }
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             $tempArray = array();
             if ($params['grade-name-check']) {
                 $isCheckBoxChecked = false;
@@ -2300,7 +2387,7 @@ class GradebookController extends AppController
         $commentType = $this->getParamVal('comtype');
         $model = new UploadCommentsForm();
         $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
@@ -2347,7 +2434,7 @@ class GradebookController extends AppController
         $course = Course::getById($this->getParamVal('cid'));
         $params = $this->getRequestParams();
 
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             if (isset($params['deleteCatOnSubmit'])) {
                 foreach ($params['deleteCatOnSubmit'] as $i => $catToDel) {
                     $params['deleteCatOnSubmit'][$i] = intval($catToDel);
@@ -2465,7 +2552,7 @@ class GradebookController extends AppController
         $model = new UploadCommentsForm();
         $model->fileHeaderRow = AppConstant::NUMERIC_ZERO;
         $nowTime = time();
-        if ($this->isPost()) {
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
@@ -2485,7 +2572,7 @@ class GradebookController extends AppController
         $course = Course::getById($courseId);
         $currentUser = $this->getAuthenticatedUser();
         $StudentData = Student::getByUserId($userId);
-        $totalData = $this->gbtable($currentUser['id'], $course['id'],$userId);
+        $totalData = $this->gbtable($currentUser['id'], $course['id'], $userId);
         $defaultValuesArray = $totalData['defaultValuesArray'];
         $stugbmode = GbScheme::getByCourseId($courseId);
         $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
@@ -2495,22 +2582,22 @@ class GradebookController extends AppController
         } else {
             $usersort = 1;
         }
-        $allStudentsData = User::studentGradebookData($courseId,$usersort);
+        $allStudentsData = User::studentGradebookData($courseId, $usersort);
         $allStudentsinformation = array();
-        foreach($allStudentsData as $stud){
+        foreach ($allStudentsData as $stud) {
 
             $tempArray[0] = $stud['id'];
             $tempArray[1] = $stud['FirstName'];
             $tempArray[2] = $stud['LastName'];
             $tempArray[3] = $stud['section'];
-            array_push($allStudentsinformation,$tempArray);
+            array_push($allStudentsinformation, $tempArray);
         }
-        if($this->isPostMethod()){
+        if ($this->isPostMethod()) {
 
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css']);
-        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js','gradebookstudentdetail.js']);
-        $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode,'allStudentsinformation' => $allStudentsinformation);
+        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'gradebookstudentdetail.js']);
+        $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
 
     }
@@ -2524,56 +2611,79 @@ class GradebookController extends AppController
         $coueseId = $params['cid'];
         $course = Course::getById($coueseId);
         $receiverInformation = User::getById($userId);
-        if($this->isPostMethod()){
-    $htmlawedconfig = array('elements'=>'*-script');
+        if ($this->isPostMethod()) {
+            $htmlawedconfig = array('elements' => '*-script');
 
-    $msgto = intval($params['sendto']);
-    $error = '';
-    if ($params['sendtype']=='msg') {
-        $newMessage = new Message();
-        $newMessage->saveNewMessage($params,$currentUser);
-        $success = AppUtility::t('Message sent');
-    } else if ($params['sendtype']=='email') {
-        $receiverData = array(
-            '0' => $receiverInformation['FirstName'],
-            '1' => $receiverInformation['LastName'],
-            '2' => $receiverInformation['email'],
-        );
-        $receiverData[2] = trim($receiverData[2]);
-        if ($receiverData[2]!='' && $receiverData[2]!='none@none.com') {
-            $receiver = "{$receiverData[0]} {$receiverData[1]} <{$receiverData[2]}>";
-            $subject = stripslashes($params['subject']);
-            $message = stripslashes($params['message']);
-            $sessiondata['mathdisp']=2;
-            $sessiondata['graphdisp']=2;
-            $headers  = 'MIME-Version: 1.0' . "\r\n";
-            $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-            $senderInformation = User::getById($currentUser['id']);
-            $senderInformation = array(
-                '0' => $senderInformation['FirstName'],
-                '1' => $senderInformation['LastName'],
-                '2' => $senderInformation['email'],
-            );
-            $self = "{$senderInformation[0]} {$senderInformation[1]} <{$senderInformation[2]}>";
-            $headers .= "From: $self\r\n";
-            mail($receiver,$subject,$message,$headers);
-            $success = AppUtility::t('Email sent');
-        } else {
-            $error = AppUtility::t('Unable to send: Invalid email address');
+            $msgto = intval($params['sendto']);
+            $error = '';
+            if ($params['sendtype'] == 'msg') {
+                $newMessage = new Message();
+                $newMessage->saveNewMessage($params, $currentUser);
+                $success = AppUtility::t('Message sent');
+            } else if ($params['sendtype'] == 'email') {
+                $receiverData = array(
+                    '0' => $receiverInformation['FirstName'],
+                    '1' => $receiverInformation['LastName'],
+                    '2' => $receiverInformation['email'],
+                );
+                $receiverData[2] = trim($receiverData[2]);
+                if ($receiverData[2] != '' && $receiverData[2] != 'none@none.com') {
+                    $receiver = "{$receiverData[0]} {$receiverData[1]} <{$receiverData[2]}>";
+                    $subject = stripslashes($params['subject']);
+                    $message = stripslashes($params['message']);
+                    $sessiondata['mathdisp'] = 2;
+                    $sessiondata['graphdisp'] = 2;
+                    $headers = 'MIME-Version: 1.0' . "\r\n";
+                    $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+                    $senderInformation = User::getById($currentUser['id']);
+                    $senderInformation = array(
+                        '0' => $senderInformation['FirstName'],
+                        '1' => $senderInformation['LastName'],
+                        '2' => $senderInformation['email'],
+                    );
+                    $self = "{$senderInformation[0]} {$senderInformation[1]} <{$senderInformation[2]}>";
+                    $headers .= "From: $self\r\n";
+                    mail($receiver, $subject, $message, $headers);
+                    $success = AppUtility::t('Email sent');
+                } else {
+                    $error = AppUtility::t('Unable to send: Invalid email address');
+                }
+            }
+
+            if ($error == '') {
+                echo $success;
+            } else {
+                echo $error;
+            }
+            echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
+
+            exit;
         }
+        $responseData = array('receiverInformation' => $receiverInformation, 'params' => $params, 'course' => $course);
+        return $this->renderWithData('sendMessageModel', $responseData);
     }
 
-    if ($error=='') {
-        echo $success;
-    } else {
-        echo $error;
-    }
-    echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
-
-    exit;
+    public function flatArray($outcomesData)
+    {
+        global $pageOutcomesList;
+        if ($outcomesData) {
+            foreach ($outcomesData as $singleData) {
+                if (is_array($singleData)) { //outcome group
+                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $this->flatArray($singleData['outcomes']);
+                } else {
+                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                }
+            }
         }
-        $responseData = array('receiverInformation' => $receiverInformation,'params' => $params,'course' => $course);
-        return $this->renderWithData('sendMessageModel',$responseData);
+        return $pageOutcomesList;
+    }
+    public function actionNewFlag()
+    {
+            //recording a toggle.  Called via AHAH
+         $courseId = $this->getParamVal('cid');
+          Course::updateNewFlag($courseId);
+        $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$courseId));
     }
 }
 

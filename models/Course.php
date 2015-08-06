@@ -212,5 +212,13 @@ class Course extends BaseImasCourses {
     public static function getByCourseAndUser($cid){
         return Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= $cid AND imas_users.id=imas_courses.ownerid")->queryAll();
     }
+    public static function updateNewFlag($courseId)
+    {
+        $course = Course::find()->where(['id' => $courseId])->one();
+        $newflag = $course['newflag'];
+        $newflag = $newflag ^ AppConstant::NUMERIC_ONE;
+        $course->newflag = $newflag;
+        $course->save();
+    }
 }
 

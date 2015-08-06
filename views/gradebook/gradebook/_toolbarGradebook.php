@@ -41,7 +41,7 @@ use app\components\AppUtility;
             <ul class="dropdown-menu full-width">
                 <li><a href="#"><?php AppUtility::t('Lock Headers');?></a>
                 <li class="divider"></li>
-                <li><a href="#"><?php AppUtility::t('New Flag');?></a>
+                <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/new-flag?cid='.$course->id)?>"><?php AppUtility::t('New Flag');?></a>
                 <li class="divider"></li>
                 <li class="dropdown-header"><?php AppUtility::t('Picture');?></li>
                 <li><a href="#"><?php AppUtility::t('Show');?></a>

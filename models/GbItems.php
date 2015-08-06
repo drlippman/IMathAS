@@ -9,6 +9,7 @@
 
 namespace app\models;
 use app\components\AppConstant;
+use app\components\AssessmentUtility;
 use Yii;
 
 use app\components\AppUtility;
@@ -20,19 +21,20 @@ class GbItems extends BaseImasGbitems
     public function createGbItemsByCourseId($courseId,$params)
     {
         $this->courseid = $courseId;
-        $name = $params['AddGradesForm']['Name'];
+        $name = $params['name'];
         $this->name = isset($name) ? $name : null;
-        $this->points = $params['AddGradesForm']['Points'];
+        $this->points = isset($params['points']) ? $params['points'] : 0;
         $showdate = AppConstant::NUMERIC_ZERO;
-        if($params['AddGradesForm']['ShowGrade'] == AppConstant::NUMERIC_TWO)
+        if($params['sdate-type'] == AppConstant::NUMERIC_ONE)
         {
-            $showdate = strtotime(date('F d, o g:i a'));
+            $showdate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
         }
         $this->showdate = $showdate;
-        $this->gbcategory = $params['AddGradesForm']['GradeBookCategory'];
+        $this->gbcategory = $params['gradebook-category'];
         $this ->rubric = $params['rubric'];
-        $this->cntingb = $params['AddGradesForm']['Count'];
-        $this->tutoredit = $params['AddGradesForm']['TutorAccess'];
+        $this->cntingb = $params['cntingb'];
+        $this->tutoredit = $params['tutoredit'];
+        $this->outcomes = isset($params['outcomes']) ? $params['outcomes']:null ;
         $this->save();
         return $this->id;
     }

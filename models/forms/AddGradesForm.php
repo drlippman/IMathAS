@@ -17,11 +17,13 @@ class AddGradesForm extends Model
     public $AddReplaceGrades;
     public $AssessmentToSnapshot;
     public $Gradetype;
-    public $userIdentifiedBy;
     public $header;
     public $file;
     public $gradesColumn;
     public $feedbackColumn;
+    public $fileHeaderRow;
+    public $commentsColumn;
+    public $userIdentity;
 
     public function attributeLabels()
     {
@@ -34,13 +36,16 @@ class AddGradesForm extends Model
             'feedbackColumn' => 'Feedback is in column (0 if none):',
             'header' => 'File has header row?',
             'file' => 'Grade file (CSV):',
-            'userIdentifiedBy' => 'User is identified by:'
+            'fileHeaderRow' => 'File has header row?',
+            'commentsColumn' => 'Comments are in columns',
+            'userIdentity' => 'User is identified by',
 
         ];
     }
     public function rules()
     {
         return [
+            [['lastName'],'required','message' => 'Last name field cannot be blank'],
             ['file', 'required', 'message' => 'Upload the CSV file'],
             ['file', 'safe'],
             [['file'], 'file', 'extensions' => 'csv'],

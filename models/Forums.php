@@ -99,6 +99,7 @@ class Forums extends BaseImasForums {
         $this->rubric = isset($params['rubric']) ? $params['rubric'] : null;
         $this->outcomes = isset($params['outcomes']) ? $params['outcomes'] : null;
         $this->save();
+
         return $this->id;
     }
     public static function deleteForum($itemId)
@@ -110,16 +111,14 @@ class Forums extends BaseImasForums {
     }
     public function updateForum($params)
     {
-
         $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
         $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
         $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
-
         $updateForumData = Forums::findOne(['id' => $params['modifyFid']]);
-        $updateForumData->name = trim($params['title']);
-
+        $updateForumData->name = trim($params['name']);
+        AppUtility::dump($params);
         if(empty($params['forum-description']))
         {
             $params['forum-description'] = ' ';
@@ -158,8 +157,8 @@ class Forums extends BaseImasForums {
         }else{
             $updateForumData->replyby = $params['new-thread'];
         }
+        $updateForumData->groupsetid = $params['groupsetid'];
 
-        $updateForumData->groupsetid = $params['group-forum'];
         $updateForumData->cntingb = $params['count-in-gradebook'];
         $updateForumData->avail = $params['avail'];
         $updateForumData->forumtype = $params['forum-type'];
@@ -173,7 +172,7 @@ class Forums extends BaseImasForums {
         $updateForumData->points = $params['points'];
         $updateForumData->tutoredit = $params['tutor-access'];
         $updateForumData->rubric = $params['rubric'];
-        $updateForumData->outcomes = $params['associate-outcomes'];
+        $updateForumData->outcomes = $params['outcomes'];
         $updateForumData->save();
     }
     public static function updateGbCat($catList){

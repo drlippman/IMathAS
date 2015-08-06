@@ -153,10 +153,10 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
    <div style="clear:both;display:inline-block" class="cpmid secondary">
     <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email"><?php AppUtility::t('Email')?></a> |
     <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message"><?php AppUtility::t('Message')?></a> |
-    <a href="gradebook.php?cid={$_GET['cid']}&uid=$stu&massexception=1\"><?AppUtility::t('Make Exception')?></a> |
-    <a href="listusers.php?cid={$_GET['cid']}&chgstuinfo=true&uid=$stu\"><?php AppUtility::t('Change Info')?></a> |
-    <a href="viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\"><?php AppUtility::t('Login Log')?></a> |
-    <a href="viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\"><?php AppUtility::t('Activity Log')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$studentId.'&section-data='.$stusection)?>"><?AppUtility::t('Make Exception')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$studentId)?>"><?php AppUtility::t('Change Info')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId)?>"><?php AppUtility::t('Login Log')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId)?>"><?php AppUtility::t('Activity Log')?></a> |
     <a href="#" onclick="makeofflineeditable(this); return false;"><?php AppUtility::t('Edit Offline Scores')?></a>
     </div>
 <?php } else if ($istutor) {
@@ -199,9 +199,9 @@ echo $lpmsg;
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
     echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
-    <table id="myTable" class="gb table table-bordered table-striped table-hover data-table" style="position:relative;">
+    <table id="myTable" class="table table-bordered table-striped table-hover data-table" style="position:relative;">
     <?php
-        echo '<thead><tr>';
+        echo '<thead>';
             $sarr = array();
             if ($studentId>0 && $isteacher) {
             echo '<th></th>';
@@ -231,7 +231,7 @@ echo $lpmsg;
 Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedback'), '</a></th>';
             $sarr .= ",'N'";
             }
-            echo '</tr></thead><tbody>';
+            echo '</thead><tbody>';
         if ($catfilter>-2) {
         for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
         if (!$isteacher && !$istutor && $gradebook[0][1][$i][4]==0) { //skip if hidden
@@ -417,8 +417,7 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
 
     $show =  $stugbmode['stugbmode'];
 
-    echo '<table class="gb"><thead>';
-        echo '<tr>';
+    echo '<table class="table table-bordered table-striped table-hover data-table"><thead>';
             echo '<th >',AppUtility::t('Totals'), '</th>';
             if (($show&1)==1) {
             echo '<th>',AppUtility::t('Past Due'), '</th>';
@@ -432,7 +431,6 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
             if (($show&8)==8) {
             echo '<th>',AppUtility::t('All'), '</th>';
             }
-            echo '</tr>';
         echo '</thead><tbody>';
 
          if (count($gradebook[0][2])>1 || $catfilter!=-1) { //want to show cat headers?
