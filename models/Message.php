@@ -288,5 +288,22 @@ class Message extends BaseImasMsgs
        }
 
     }
+
+    /*qUERY FOR TOTAL COUNT OF MESSAGAE ON DASHBOARD*/
+    public static function getMessageCount($userId)
+    {
+        $query  = new Query();
+        $query  ->select(['courseid','COUNT(id)'])
+                ->from('imas_msgs ')
+                ->where(['msgto' => $userId])
+                ->andWhere(['LIKE','isread','0'])
+                ->orWhere(['LIKE','isread','4']);
+                $query->groupBy('courseid');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+
+    }
 }
 

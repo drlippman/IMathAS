@@ -19,18 +19,29 @@ echo '<div class="dropdown dropdown-class">
         <span class="caret"></span></button>
       </div>';
 echo Nav::widget([
-    'options' => ['class' => 'navbar-nav notification navbar-right'],
+    'options' =>['class' => 'navbar-nav notification navbar-right'],
+    'encodeLabels' => false,
     'items' => [
         Yii::$app->user->isGuest ?
-            ['label' => 'Notifications', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
+            ['label' => 'Notifications ', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ['label' => 'Notifications',
-                'items' => [
-                    ['label' => 'Message' , 'url' => '../../message/message/index?cid=9' ],
+            ($totalCount >0 ?['label' =>'Notifications'.'('.$totalCount.')',
+                'items' =>
+                [
+                    ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
-                    ['label' => 'Forum', 'url' => '#'],
+                    ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
                 ],
-                'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']],
+                'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']] :
+
+                ['label' =>'Notifications',
+                'items' =>
+                    [
+                        ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
+                        '<li class="divider"></li>',
+                        ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                    ],
+                'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']] ),
 
         Yii::$app->user->isGuest ?
             ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
@@ -47,8 +58,5 @@ NavBar::end();
 </header>
 </div>
 <script>
-
-
-
 </script>
 

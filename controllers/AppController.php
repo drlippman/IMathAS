@@ -697,4 +697,7 @@ function generaterandstring() {
         return $session['sessiondata'];
     }
 
+    public function setSessionData($key,$value){
+        return Yii::$app->session->set($key,$value);
+    }
 }

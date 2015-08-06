@@ -54,10 +54,21 @@ class CourseController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $courseId = $this->getParamVal('cid');
+        $this->setSessionData('courseId',$courseId);
         $this->checkSession($params);
         $user = $this->getAuthenticatedUser();
+        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
+        $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
+        $msgList = array();
+        if ($message) {
+            foreach ($message as $singleMessage) {
+                if (in_array($singleMessage->isread, $isReadArray))
+                    array_push($msgList, $singleMessage);
+            }
+        }
+        $this->setSessionData('messageCount',count($msgList));
         $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
         $this->userAuthentication($user, $courseId);
         $userId = $user->id;
         $id = $this->getParamVal('id');

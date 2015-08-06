@@ -129,10 +129,5 @@ class Thread extends BaseImasForumThreads
 //                $command = $query->createCommand();
 //                $data = $command->queryAll();
         return $data;
-
-
-
-
-
     }
 } 

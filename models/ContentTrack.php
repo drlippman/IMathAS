@@ -2,6 +2,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasCalitems;
 use app\models\_base\BaseImasContentTrack;
@@ -21,6 +22,33 @@ class ContentTrack extends BaseImasContentTrack
                 $object->delete();
             }
         }
+    }
+
+    public function insertForumData($currentUserId,$courseId,$forumId,$threadId,$threadIdOfPost,$type)
+    {
+        $now = time();
+        $this->userid =  $currentUserId;
+        $this->courseid = $courseId;
+        if($type == AppConstant::NUMERIC_TWO)
+        {
+            $this->type = 'Forummod';
+        }elseif($type == AppConstant::NUMERIC_ONE)
+        {
+            $this->type = 'Forumreply';
+        }elseif($type == AppConstant::NUMERIC_ZERO)
+        {
+            $this->type = 'Forumpost';
+        }
+        $this->typeid = $threadId;
+        $this->viewtime = $now;
+        if($type == AppConstant::NUMERIC_ZERO)
+        {
+            $this->info = $forumId;
+        }else
+        {
+            $this->info = $forumId.';'.$threadIdOfPost;
+        }
+        $this->save();
     }
 
 } 

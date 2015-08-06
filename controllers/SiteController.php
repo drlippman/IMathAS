@@ -113,7 +113,6 @@ class SiteController extends AppController
     {
         $model = new RegistrationForm();
         if ($model->load($this->getPostData())) {
-
             $params = $this->getRequestParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];

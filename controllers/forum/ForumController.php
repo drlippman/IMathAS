@@ -3,6 +3,7 @@ namespace app\controllers\forum;
 
 use app\components\AppConstant;
 use app\components\AssessmentUtility;
+use app\models\ContentTrack;
 use app\models\Course;
 use app\models\ExternalTools;
 use app\models\forms\ChangeUserInfoForm;
@@ -195,7 +196,7 @@ class ForumController extends AppController
     }
 
     /*
-    * Controller Action To Display The Thraeds Present In That Particular Forum
+    * Controller Action To Display The Threads Present In That Particular Forum
     */
     public function actionGetThreadAjax()
     {
@@ -459,7 +460,12 @@ class ForumController extends AppController
         {
             $params = $this->getRequestParams();
             if(strlen(trim($params['subject'])) > 0) {
-                ForumPosts::modifyPost($params);
+                $threadIdOfPost = ForumPosts::modifyPost($params);
+                $contentTrackRecord  = new ContentTrack();
+                if($currentUser->rights == AppConstant::STUDENT_RIGHT)
+                {
+                    $contentTrackRecord->insertForumData($currentUser->id,$courseId,$forumId,$threadId,$threadIdOfPost,$type=AppConstant::NUMERIC_TWO);
+                }
                 $this->redirect('thread?cid='.$courseId.'&forumid='.$forumId);
             }else{
                 $this->setSuccessFlash("Subject cannot be blank");
@@ -663,7 +669,13 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumid');
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
+        $userData = $this->getAuthenticatedUser();
         $threadData = ForumPosts::getbyidpost($Id);
+        $contentTrackRecord = new ContentTrack();
+        if($userData->rights == AppConstant::STUDENT_RIGHT)
+        {
+            $contentTrackRecord->insertForumData($userData->id,$courseId,$forumId,$Id,$threadId,$type=AppConstant::NUMERIC_ONE);
+        }
         foreach ($threadData as $data) {
             $tempArray = array
             (
@@ -735,6 +747,11 @@ class ForumController extends AppController
             $newThread->createThread($params, $userId, $threadId);
             $views = new ForumView();
             $views->createThread($userId, $threadId);
+            $contentTrackRecord = new ContentTrack();
+            if($this->getAuthenticatedUser()->rights == AppConstant::STUDENT_RIGHT)
+            {
+                 $contentTrackRecord->insertForumData($this->getAuthenticatedUser()->id,$params['courseId'],$params['forumId'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
+            }
             return $this->successResponse();
     }
 

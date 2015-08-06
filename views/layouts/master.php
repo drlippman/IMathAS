@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use app\assets\AppAsset;
 use app\components\AppUtility;
+use app\controllers\AppController;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -22,11 +23,14 @@ AppAsset::register($this);
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href='<?php echo AppUtility::getHomeURL(); ?>css/master.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
 </head>
-
+<?php $courseId = Yii::$app->session->get('courseId'); ?>
+<?php $messageCount = Yii::$app->session->get('messageCount');
+      $postCount = Yii::$app->session->get('postCount');
+      $totalCount = $messageCount + $postCount ?>
 <body>
 <?php $this->beginBody() ?>
 <div class="header-content">
-    <?php echo $this->render('_header'); ?>
+    <?php  echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount]); ?>
 </div>
 <div class="clear-both"></div>
 <div class="master-wrap">

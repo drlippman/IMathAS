@@ -14,15 +14,21 @@ $now = $currentTime;
     <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">
     <input type="hidden" class="msg-type" value="<?php echo $isNewMessage ?>">
     <?php if ($userRights->rights > AppConstant::STUDENT_RIGHT) { ?>
+        <input type="hidden" class="msg-id" value="<?php echo $messages['id'] ?>">
 <!--        Condition for toolbar-->
     <?php } else {?>
 
 <?php } ?>
-</div>
-<input type="hidden" class="msg-id" value="<?php echo $messages['id'] ?>">
-<div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithButton",['item_name'=>'Message', 'link_title'=>'Home', 'link_url' => AppUtility::getHomeURL().'site/index', 'page_title' => $this->title]); ?>
-</div>
+    <div class="item-detail-header">
+            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+    </div>
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
 <div class="item-detail-content">
 
 </div>

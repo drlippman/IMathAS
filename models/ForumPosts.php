@@ -65,6 +65,7 @@ class ForumPosts extends BaseImasForumPosts
             $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
             $threadPost->save();
+        return $threadPost->threadid;
     }
 
     public static function removeThread($threadId, $parentId)

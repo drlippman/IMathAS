@@ -8,6 +8,7 @@ $(document).ready(function () {
         tinyMCE.triggerSave();
         var forumId = $("#forumId").val();
         var subject = $(".subject").val();
+        var courseId =$("#courseId").val();
         if(!subject.length > 0)
         {
             $('#flash-message').show();
@@ -35,7 +36,7 @@ $(document).ready(function () {
             if(status == true){
                 settings = 1;
             }
-            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings };
+            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings,courseId :courseId };
             jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
         }
     });
@@ -66,7 +67,6 @@ function newThreadSuccess(response)
     if (response.status == 0)
     {
         document.getElementById("addNewThread").disabled = 'false';
-
         window.location = "thread?cid="+courseId+"&forumid="+forumId;
     }
 }
