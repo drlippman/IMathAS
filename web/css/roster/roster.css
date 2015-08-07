@@ -164,6 +164,9 @@ div.dataTables_info {
     vertical-align: middle;
     width: 100%;
 }
+.btn-group.settings {
+    display: inline-flex;
+}
 .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -245,4 +248,8 @@ span.form.select-text-margin{
 }
 .radio label.padding-left-zero, .checkbox label.padding-left-zero{
     padding-left: 0;
+}
+.roster-table {
+    width: 100%;
+    overflow: auto;
 }

@@ -68,6 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
             {?>
                  <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" width="150" alt="<?php echo AppUtility::t('file not found')?>" /></br>
                  <div class="update-checkbox">
+
                   <?php echo $form->field($model, 'remove')->checkbox() ?>
             </div>
            <?php }?>
