@@ -614,6 +614,7 @@ class CourseController extends AppController
                         $tempItemList = array();
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
+                                AppUtility::dump($blockItem);
                                 $tempItem = array();
                                 $item = Items::getById($blockItem);
                                 switch ($item->itemtype) {
