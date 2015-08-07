@@ -132,7 +132,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <BR class=form>
                 </div>
 
-                <div style="margin-top: 20px">
                     <div class=col-lg-2><?php AppUtility::t('Group forum?')?></div>
                         <div class=col-lg-10>
                              <?php
@@ -141,7 +140,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo '<br/> WARNING: <span style="font-size: 80%">Group threads exist.  Changing the group set will set all existing threads to be non-group-specific threads</span>';
                             }        ?>
 
-                </div></div><br class=form>
+                </div><br class=form>
 
                     <div class="item-alignment">
                         <div class=col-lg-2><?php AppUtility::t('Allow anonymous posts')?></div>

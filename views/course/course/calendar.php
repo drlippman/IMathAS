@@ -7,7 +7,7 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 ?>
 
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'course/course/index?cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 
 <div class = "title-container">

@@ -21,8 +21,9 @@ class BlockController extends AppController
 
     public function actionAddBlock()
     {
-
         $this->guestUserHandler();
+        $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $courseName = $course['name'];
@@ -110,6 +111,7 @@ class BlockController extends AppController
             $page_sectionListVal[] = 's-'.$data->section;
             $page_sectionListLabel[] = 'Section '.$data->section;
         }
+        $this->includeCSS(['course/items.css']);
         return $this->render('addBlock',['page_sectionListVal' => $page_sectionListVal,'page_sectionListLabel' =>$page_sectionListLabel,'defaultBlockData' =>$defaultBlockData,'courseId' => $courseId,'toTb' => $toTb,'block' => $block,'id' => $modifyId,'courseName' => $courseName]);
     }
 

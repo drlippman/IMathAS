@@ -656,6 +656,5 @@ $now = $currentTime;
         <a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $course->id) ?>">Back</a>
 <?php }?>
 </div>
-</div>
  <?php }
 }?>

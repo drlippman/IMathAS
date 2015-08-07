@@ -614,8 +614,8 @@ img.small-icon{
 }
 .btn-primary {
     color: #FFF;
-    background-color: #2C368E;
-    border-color: #2C368E;
+    background-color: #104E87;
+    border-color: #104E87;
     border-radius: 0px;
     text-transform: capitalize;
 }
@@ -643,7 +643,7 @@ img.small-icon{
 }
 .btn.btn-primary.page-settings{
     color: #FFF;
-    background-color: #2C368E;
+    background-color: #104E87;
     text-transform: capitalize;
 }
 .input-group-addon {
@@ -653,13 +653,13 @@ img.small-icon{
     line-height: 1;
     text-align: center;
     border-radius: 0px;
-    background-color: #2C368E;
+    background-color: #104E87;
     color: white;
     border: 1px solid #101A66;
 }
 input[type="submit"], input[type="button"], button, a.abutton {
     color: #ffffff;
-    background-color: #2C368E;
+    background-color: #104E87;
     border-radius: 0px;
     border: 1px solid #285E8E;
     font: inherit;
@@ -668,7 +668,7 @@ input[type="submit"], input[type="button"], button, a.abutton {
     margin: 0;
 }
 input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:hover, input[type="submit"]:hover, button:hover, input[type="button"]:hover, a.abutton:hover{
-    background-color: #2C368E;
+    background-color: #104E87;
 }
 .table-striped > tbody > tr:nth-child(odd) > td, .table-striped > tbody > tr:nth-child(odd) > th {
     background-color: #ddd;
@@ -689,7 +689,7 @@ table.student-data-table > .form-inline .radio, .form-inline .checkbox {
     top: 2px;
 }
 .datepicker table tr td.active:hover, .datepicker table tr td.active:hover:hover, .datepicker table tr td.active.disabled:hover, .datepicker table tr td.active.disabled:hover:hover, .datepicker table tr td.active:focus, .datepicker table tr td.active:hover:focus, .datepicker table tr td.active.disabled:focus, .datepicker table tr td.active.disabled:hover:focus, .datepicker table tr td.active:active, .datepicker table tr td.active:hover:active, .datepicker table tr td.active.disabled:active, .datepicker table tr td.active.disabled:hover:active, .datepicker table tr td.active.active, .datepicker table tr td.active:hover.active, .datepicker table tr td.active.disabled.active, .datepicker table tr td.active.disabled:hover.active, .open .dropdown-toggle.datepicker table tr td.active, .open .dropdown-toggle.datepicker table tr td.active:hover, .open .dropdown-toggle.datepicker table tr td.active.disabled, .open .dropdown-toggle.datepicker table tr td.active.disabled:hover{
-    background-color:#2C368E ;
+    background-color:#104E87 ;
 }
 .radio, .checkbox {
     margin-top: 0;

@@ -332,7 +332,6 @@ class CourseController extends AppController
         }
         $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
-
     /**
      * @return string
      */
@@ -1059,7 +1058,7 @@ class CourseController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
         $model = new ChangeUserInfoForm();
-        $this->includeCSS(['course/items.css']);
+        $this->includeCSS(["course/items.css"]);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'modifyLinkId' => $modifyLinkId,
             'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'checkboxesValues' => $checkboxesValues);

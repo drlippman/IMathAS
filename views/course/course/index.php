@@ -478,7 +478,7 @@ $now = $currentTime;
                             <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class="blockitems student-block-alignment" id="block5<?php echo $block['id']?>">
+                    <div class="blockitems student-block" id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):
@@ -928,7 +928,7 @@ $now = $currentTime;
                                                 <b><a href="#" onclick="return false;"><?php echo ucfirst($block['name']); ?></a></b>
                         </div>
                     </div>
-                    <div class="blockitems student-block-alignment" id="block5<?php echo $block['id']?>">
+                    <div class="blockitems student-block" id="block5<?php echo $block['id']?>">
                         <?php if(count($item['itemList'])) {?>
                             <?php foreach($item['itemList'] as $itemlistKey => $item) { ?>
                                 <?php switch(key($item)):
@@ -1379,9 +1379,8 @@ $now = $currentTime;
         {
             var node = document.getElementById('block5' + id);
             var img = document.getElementById('img' + id);
-            if (node.className == 'blockitems')
+            if (node.className == 'blockitems student-block')
             {
-                alert("sdsdf");
                 node.className = 'hidden';
                 img.src = '../../img/expand.gif'
             }
@@ -1391,14 +1390,14 @@ $now = $currentTime;
     {
         var node = document.getElementById('block5' + id);
         var img = document.getElementById('img' + id);
-        if (node.className == 'blockitems')
+        if (node.className == 'blockitems student-block')
         {
             node.className = 'hidden';
             img.src = '../../img/expand.gif'
         }
         else
         {
-            node.className = 'blockitems';
+            node.className = 'blockitems student-block';
             img.src = '../../img/collapse.gif'
         }
     }

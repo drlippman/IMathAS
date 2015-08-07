@@ -193,7 +193,6 @@ class SiteController extends AppController
                 $param = $this->getRequestParams();
                 $username = $param['ForgotPasswordForm']['username'];
                 $user = User::findByUsername($username);
-
             if($user)
             {
                 $code = AppUtility::generateRandomString();
@@ -201,7 +200,6 @@ class SiteController extends AppController
                 $user->save();
                 $toEmail = $user->email;
                 $id = $user->id;
-
                 $message = "<p>Welcome to OpenMath</p> ";
                 $message .= "<p>Hi ".AppUtility::getFullName($user->FirstName, $user->LastName).",</p> ";
                 $message .= "<p>We received a request to reset the password associated with this e-mail address. If you made this request, please follow the instructions below.</p> ";
@@ -230,7 +228,6 @@ class SiteController extends AppController
         if ($model->load($this->getPostData())) {
             $param = $this->getRequestParams();
             $toEmail = $param['ForgotUsernameForm']['email'];
-
             $user = User::findByEmail($toEmail);
             if ($user) {
                 $message = "<p>Welcome to OpenMath</p> ";
@@ -254,7 +251,6 @@ class SiteController extends AppController
     public function actionCheckBrowser()
     {
         return $this->renderWithData('checkBrowser');
-
     }
 
     public function actionResetPassword()
@@ -276,7 +272,6 @@ class SiteController extends AppController
                 $user->save();
                 $this->setSuccessFlash('Your password is changed successfully.');
                 return $this->redirect("login");
-
             }
         }else{
             $this->setErrorFlash('Reset Link has been expired.');
@@ -337,7 +332,6 @@ class SiteController extends AppController
                 return $this->renderWithData('dashboard', $userData);
             }
         }
-
         $this->setErrorFlash(AppConstant::LOGIN_FIRST);
         return $this->redirect('login');
     }
@@ -461,6 +455,4 @@ class SiteController extends AppController
         $this->includeCSS(['docs.css']);
         return $this->renderWithData('instructorDocument');
     }
-
-
 }
