@@ -14,7 +14,11 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
 
 <h2><?php echo $pageTitle ?></h2>
 <?php echo $page_isTakenMsg ?>
-<form method=post action="add-assessment?cid=<?php echo $course->id ?>&id=<?php echo $assessmentData['id'];?>">
+<?php if ($assessmentData['id']){ ?>
+<!--<form method=post action="add-assessment?cid=--><?php //echo $course->id ?><!--&id=--><?php //echo $assessmentData['id'];?><!--">-->
+    <?php }else{ ?>
+    <form method=post action="add-assessment?cid=<?php echo $course->id ?>">
+    <?php } ?>
     <p></p>
 <span class=form>Assessment Name:</span>
 <span class=formright><input type=text size=30 name=name value="<?php echo str_replace('"','&quot;',$assessmentData['name']);?>"></span><BR class=form>
