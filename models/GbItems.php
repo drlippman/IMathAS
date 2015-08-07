@@ -68,8 +68,10 @@ class GbItems extends BaseImasGbitems
     }
     public static function deleteById($gradeId)
     {
-        $grade = GbItems::findOne($gradeId);
-        $grade->delete();
+        $grade = GbItems::find()->where(['id' => $gradeId])->one();
+        if($grade) {
+            $grade->delete();
+        }
     }
     public static function updateGrade($gradeId,$AssignValue,$temp)
     {

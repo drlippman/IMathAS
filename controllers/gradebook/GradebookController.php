@@ -205,9 +205,8 @@ class GradebookController extends AppController
             $includeduedate = false;
             $includelastchange = false;
         }
-
         if ($canviewall && $studentId) {
-            $stu = $studentId;
+        $stu = $studentId;
         } else {
             $stu = 0;
         }
@@ -2350,12 +2349,13 @@ class GradebookController extends AppController
 
     public function actionGradeDeleteAjax()
     {
+        $gradeType = 'offline';
         $params = $this->getRequestParams();
-        foreach ($params['checkedMsg'] as $gradeId) {
+           foreach ($params['checkedMsg'] as $gradeId) {
             GbItems::deleteById($gradeId);
-        }
+            Grades::deleteByGradeTypeIdAndGradeType($gradeId,$gradeType);
+           }
         return $this->successResponse();
-
     }
 
 //Controller method for gradebook comment
@@ -2568,6 +2568,7 @@ class GradebookController extends AppController
     public function actionGradeBookStudentDetail()
     {
         $params = $this->getRequestParams();
+        $this->layout = "master";
         $courseId = $params['cid'];
         $userId = $params['studentId'];
         $course = Course::getById($courseId);
@@ -2581,7 +2582,7 @@ class GradebookController extends AppController
         if ($totalData['gradebook'][1][0][1] != '') {
             $usersort = $stugbmode['usersort'];
         } else {
-            $usersort = 1;
+            $usersort = AppConstant::NUMERIC_ONE;
         }
         $allStudentsData = User::studentGradebookData($courseId, $usersort);
         $allStudentsinformation = array();
@@ -2594,15 +2595,17 @@ class GradebookController extends AppController
             array_push($allStudentsinformation, $tempArray);
         }
         if ($this->isPostMethod()) {
-
+            if (isset($params['user-comments']) && $userId > AppConstant::NUMERIC_ZERO) {
+                $commentType = 'null';
+                Student::updateGbComments($userId,$params['user-comments'], $courseId, $commentType);
+            }
+            $this->redirect('grade-book-student-detail?cid='.$courseId.'&studentId='.$userId);
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css']);
         $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'gradebookstudentdetail.js']);
         $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
-
     }
-
     public function actionSendMessageModel()
     {
         $params = $this->getRequestParams();

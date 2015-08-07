@@ -32,7 +32,9 @@ $this->params['breadcrumbs'][] = $this->title;
     $model->ShowGrade = AppUtility::getStringVal(AppConstant::NUMERIC_TWO);
     $model->Count = AppUtility::getStringVal(AppConstant::NUMERIC_ONE);
     $model->Gradetype = AppUtility::getStringVal(AppConstant::NUMERIC_ONE);
-    ?>
+
+    if($gradeNames){    ?>
+
     <div style="border: 1px solid #000000"><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">Upload multiple offline grades</a></div>
     <br class=form>
     Check: <a name="check-all-box" class="check-all" href="#">All</a>/<a name="uncheck-all-box" class="uncheck-all"
@@ -148,6 +150,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <br class=form>
     </div>
+  <?php  }else{ ?>
+        No offline grades.<a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id); ?>"> Add one </a> or <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">Upload multiple offline grades</a>
+   <?php } ?>
 </fieldset>
 <?php ActiveForm::end(); ?>
 

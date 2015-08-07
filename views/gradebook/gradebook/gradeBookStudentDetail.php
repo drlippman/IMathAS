@@ -8,17 +8,15 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AssessmentUtility;
 
-if($studentId > 0){
-
-    $this->title = 'Grade Book Student Detail';
-     ?><legend xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">Grade Book Student Detail</legend> <?php
+if($defaultValuesArray['studentId'] > 0){
+    $this->title = AppUtility::t('Grade Book Student Detail', false);
 }else{
-    $this->title = 'Grade Book Averages';
-?><legend xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">Grade Book Averages</legend><?php
+    $this->title = AppUtility::t('Grade Book Averages', false);
 }
 
 //$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 //$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid=' . $course->id]];
+
 $this->params['breadcrumbs'][] = $this->title;
    //show student view
 $gradebook = $totalData['gradebook'];
@@ -43,8 +41,21 @@ $istutor = false;
 if($totalData['isTutor']){
     $istutor = true;
     $canviewall = true;
-}
-if ($canviewall) { ?>
+}?>
+<div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class = "row">
+        <div class = "pull-left page-heading">
+            <div class = "vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php  echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook']);?>
+</div>
+<?php if ($canviewall) { ?>
     <div class=cpmid>
     <?php AppUtility::t('Save Changes')?>('Category'), ': <select id="filtersel" onchange="chgfilter()">';
     <option value="-1"
@@ -165,12 +176,11 @@ echo '<div style="clear:both;display:inline-block" class="cpmid">';
     echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
     echo '</div>';
 }
-
 if (trim($gbcomment)!='' || $isteacher) {
 if ($isteacher) { ?>
- <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
+ <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
      Gradebook Comment: <input type=submit value="Update Comment"><br/><br/>
-  <textarea name="usrcomments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
+  <textarea name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
      </form>
     <?php
 } else { ?>

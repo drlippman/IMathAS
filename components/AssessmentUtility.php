@@ -11,7 +11,7 @@ use yii\base\Component;
 class AssessmentUtility extends Component
 {
    public static  function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
-        echo "<select name=\"$name\" id=\"$name\" ";
+        echo "<select class='form-control' name=\"$name\" id=\"$name\" ";
         echo (isset($actions)) ? $actions : "" ;
         echo ">\n";
         if (isset($defaultLabel) && isset($defaultVal)) {
@@ -28,7 +28,7 @@ class AssessmentUtility extends Component
     }
 
     public static function writeHtmlMultiSelect($name,$valList,$labelList,$selectedVals=array(),$defaultLabel=null) {
-        echo "<div class=\"multisel\"><select name=\"{$name}[]\" id=\"$name\">";
+        echo "<div class=\"multisel\"><select class='form-control' name=\"{$name}[]\" id=\"$name\">";
         if (isset($defaultLabel)) {
             echo " <option value=\"null\" selected=\"selected\">$defaultLabel</option>\n";
         }
@@ -51,7 +51,7 @@ class AssessmentUtility extends Component
                 echo "	<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
             }
         }
-        echo '</select><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
+        echo '</select><br><input type="button" value="Add Another" onclick="addmultiselect(this,\''.$name.'\')"/>';
         if (count($selectedVals)>0) {
             foreach ($selectedVals as $v) {
                 echo '<div class="multiselitem"><span class="right"><a href="#" onclick="removemultiselect(this);return false;">Remove</a></span>';

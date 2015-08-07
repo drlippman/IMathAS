@@ -11,6 +11,7 @@ namespace app\models;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\components\AssessmentUtility;
 use app\models\_base\BaseImasForums;
 use yii\db\Query;
 
@@ -111,14 +112,14 @@ class Forums extends BaseImasForums {
     }
     public function updateForum($params)
     {
-        $endDate =   AppUtility::parsedatetime($params['edate'],$params['etime']);
-        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
-        $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
-        $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
+
+        $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
+        $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
+        $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
+        $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
         $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
         $updateForumData = Forums::findOne(['id' => $params['modifyFid']]);
         $updateForumData->name = trim($params['name']);
-        AppUtility::dump($params);
         if(empty($params['forum-description']))
         {
             $params['forum-description'] = ' ';
@@ -142,21 +143,23 @@ class Forums extends BaseImasForums {
             $updateForumData->startdate = AppConstant::NUMERIC_ZERO;
             $updateForumData->enddate = AppConstant::ALWAYS_TIME;
         }
+
         $updateForumData->sortby = $params['sort-thread'];
         $updateForumData->defdisplay = $params['default-display'];
-        if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
+        if($params['post'] == AppConstant::NUMERIC_ONE){
 
-            $updateForumData->postby = $replayPostDate;
+            $updateForumData->postby = $postDate;
         }else{
-            $updateForumData->postby = $params['reply-to-posts'];
+            $updateForumData->postby = $params['post'];
         }
 
-        if($params['new-thread'] == AppConstant::NUMERIC_ONE){
+        if($params['reply'] == AppConstant::NUMERIC_ONE){
 
-            $updateForumData->replyby = $newThreadDate;
+            $updateForumData->replyby = $replyByDate;
         }else{
-            $updateForumData->replyby = $params['new-thread'];
+            $updateForumData->replyby = $params['reply'];
         }
+
         $updateForumData->groupsetid = $params['groupsetid'];
 
         $updateForumData->cntingb = $params['count-in-gradebook'];

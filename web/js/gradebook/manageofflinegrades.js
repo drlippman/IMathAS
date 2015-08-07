@@ -46,9 +46,7 @@ function deleteGrade() {
                             $(this).closest('tr').remove();
                         });
                         $(this).dialog("close");
-
                         var readMsg = {checkedMsg: markArray};
-                        //console.log(markArray);
                         jQuerySubmit('grade-delete-ajax', readMsg,'gradeDeleteSuccess');
                         return true;
                     }

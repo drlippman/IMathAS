@@ -1062,12 +1062,14 @@ class ForumController extends AppController
             'sTime' => time(),
             'eDate' => date("m-d-Y",strtotime("+1 week")),
             'eTime' => time(),
-             'replayPostDate' => date("m-d-Y",strtotime("+1 week")),
-            'newThreadDate' => date("m-d-Y",strtotime("+1 week")),
+             'postDate' => date("m-d-Y",strtotime("+1 week")),
+            'replyByDate' => date("m-d-Y",strtotime("+1 week")),
             'avail' => AppConstant::NUMERIC_ZERO,
             'defDisplay' => AppConstant::NUMERIC_ZERO,
             'replyByTime' => time(),
-            'postByTime' => time()
+            'postTime' => time(),
+            'replyBy' => AppConstant::NUMERIC_ZERO,
+            'postBy' => AppConstant::NUMERIC_ZERO
         );
         if ($modifyForumId) {
             $pageTitle = 'Modify Forum';
@@ -1083,29 +1085,21 @@ class ForumController extends AppController
             }
             $startDate = $forumData['startdate'];
             $endDate = $forumData['enddate'];
-            $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_THOUSAND;
-            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
-            $minutes = $courseDefTime % AppConstant::SECONDS;
-            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
-            $defTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
-            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
-            $minutes = $courseDefTime % AppConstant::SECONDS;
-            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
-            $defStartTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
-
             if ($startDate != AppConstant::NUMERIC_ZERO) {
                 $sDate = AppUtility::tzdate("m/d/Y", $startDate);
                 $sTime = AppUtility::tzdate("g:i a", $startDate);
+                $startDate =AppConstant::NUMERIC_ONE;
             } else {
-                $sDate = AppUtility::tzdate("m/d/Y", time());
-                $sTime = $defStartTime;
+                $sDate = date('m-d-Y');
+                $sTime = time();
             }
             if ($endDate != AppConstant::ALWAYS_TIME) {
                 $eDate = AppUtility::tzdate("m/d/Y", $endDate);
                 $eTime = AppUtility::tzdate("g:i a", $endDate);
+                $endDate = AppConstant::NUMERIC_ONE;
             } else {
-                $eDate = AppUtility::tzdate("m/d/Y", time() + AppConstant::WEEK_TIME);
-                $eTime = $defTime;
+                $eDate = date("m-d-Y",strtotime("+1 week"));
+                $eTime = time();
             }
             $allNon = (($forumData['settings'] & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE);
             if(!$allNon){
@@ -1131,10 +1125,26 @@ class ForumController extends AppController
             if (count($subscriptionsData) > AppConstant::NUMERIC_ZERO) {
                 $hasSubScrip = true;
             }
-            $forumData['replyby'] = AppUtility::tzdate("m/d/Y", $forumData['replyby']);
-            $forumData['postby'] = AppUtility::tzdate("m/d/Y", $forumData['postby']);
-            $replyBy = AppUtility::tzdate("g:i a", $forumData['replyby']);
-            $postBy = AppUtility::tzdate("g:i a", $forumData['postby']);
+
+            if($forumData['replyby'] > AppConstant::NUMERIC_ZERO && $forumData['replyby'] < AppConstant::ALWAYS_TIME){
+                $replyBy =  AppConstant::NUMERIC_ONE;
+                $forumData['replyby'] = AppUtility::tzdate("m/d/Y", $forumData['replyby']);
+                $replyByTime = AppUtility::tzdate("g:i a", $forumData['replyby']);
+            }else{
+                $replyBy =  $forumData['replyby'];
+                $forumData['replyby'] = date("m-d-Y",strtotime("+1 week"));
+                $replyByTime = time();
+            }
+            if($forumData['postby'] > AppConstant::NUMERIC_ZERO && $forumData['postby'] < AppConstant::ALWAYS_TIME){
+                $postBy  =  AppConstant::NUMERIC_ONE;
+                $forumData['postby'] = AppUtility::tzdate("m/d/Y", $forumData['postby']);
+                $postByTime = AppUtility::tzdate("g:i a", $forumData['postby']);
+            }else{
+                $postBy =  $forumData['postby'];
+                $forumData['postby'] = date("m-d-Y",strtotime("+1 week"));
+                $postByTime = time();
+            }
+
             list($postTag, $replyTag) = explode('--', $forumData['caltag']);
             $defaultValue = array(
                 'allowAnonymous' => $allNon,
@@ -1163,27 +1173,29 @@ class ForumController extends AppController
                 'tagList' => $forumData['taglist'],
                 'tutorEdit' => $forumData['tutoredit'],
                 'avail' => $forumData['avail'],
-                'replayPostDate' => $forumData['replyby'],
-                'newThreadDate' => $forumData['postby'],
-                'replyByTime' => $replyBy,
-                'postByTime' => $postBy
+                'postDate' =>$forumData['postby'],
+                'replyByDate' =>  $forumData['replyby'],
+                'replyByTime' => $replyByTime,
+                'postByTime' => $postByTime,
+                'replyBy' => $replyBy,
+                'postBy' => $postBy
             );
         }
         if ($this->isPostMethod()) {
              if ($params['modifyFid']) {
                  if(count($params['outcomes']) > AppConstant::NUMERIC_ONE){
                      foreach ($params['outcomes'] as $outcomeId) {
-
                          if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                              $outcomes[] = intval($outcomeId);
                          }
                      }
                      $params['outcomes'] = implode(',',$outcomes);
                      $params['outcomes'] = $params['outcomes'];
+                 }else{
+                     $params['outcomes'] = ' ';
                  }
-
                  $updateForum = new Forums();
-                $updateForum->UpdateForum($params);
+                 $updateForum->UpdateForum($params);
                  if(isset($params['Get-email-notify-of-new-posts'])){
                  $subscriptionEntry = new ForumSubscriptions();
                  $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);
@@ -1193,8 +1205,8 @@ class ForumController extends AppController
             } else {
                 $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
                 $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
-                $replayPostDate = AppUtility::parsedatetime($params['replayPostDate'],$params['replayPostTime']);
-                $newThreadDate = AppUtility::parsedatetime($params['newThreadDate'],$params['newThreadTime']);
+                $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
+                $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
                 $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
                 $finalArray['name'] = trim($params['name']);
                 if(empty($params['forum-description']))
@@ -1226,17 +1238,18 @@ class ForumController extends AppController
 
                 $finalArray['sortby'] = $params['sort-thread'];
                 $finalArray['defdisplay'] = $params['default-display'];
-                if($params['reply-to-posts'] == AppConstant::NUMERIC_ONE){
-                    $finalArray['postby'] = $replayPostDate;
+
+                if($params['post'] == AppConstant::NUMERIC_ONE){
+                    $finalArray['postby'] = $postDate;
                 }else{
-                    $finalArray['postby'] = $params['reply-to-posts'];
+                    $finalArray['postby'] = $params['post'];
                 }
 
-                if($params['new-thread'] == AppConstant::NUMERIC_ONE){
+                if($params['reply'] == AppConstant::NUMERIC_ONE){
 
-                    $finalArray['replyby'] = $newThreadDate;
+                    $finalArray['replyby'] = $replyByDate;
                 }else{
-                    $finalArray['replyby'] = $params['new-thread'];
+                    $finalArray['replyby'] = $params['reply'];
                 }
                 if($params['count-in-gradebook'] != AppConstant::NUMERIC_ZERO){
                     $finalArray['gbcategory'] = $params['gradebook-category'];
@@ -1252,7 +1265,6 @@ class ForumController extends AppController
                             }
                         }
                         $params['outcomes'] = implode(',',$outcomes);
-
                     }
                     $finalArray['outcomes'] = $params['outcomes'];
                 }else{

@@ -773,9 +773,13 @@ div.dataTables_wrapper {
 .inner-sub-content {
     padding: 15px;
 }
+.ui-dialog .ui-dialog-titlebar-close {
+   visibility: hidden;
+}
 .a:hover{
     color: #0000ff;
 }
+
 .inner-page-options > .nav-tabs.nav-justified > li > a {
     border: 1px solid #ddd;
     border-radius: 4px 4px 0 0;
@@ -792,4 +796,11 @@ div.dataTables_wrapper {
     height: 300px;
     max-height: 300px;
     overflow-y: scroll;
+}
+
+.full-width {
+    width: 100%;
+}
+ #GB_window {
+    margin-top: 90px;
 }

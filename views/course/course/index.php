@@ -26,7 +26,7 @@ $now = $currentTime;
 </div>
 
 <div class="item-detail-content">
-    <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course']);?>
+    <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students]);?>
 </div>
 
 <!-- ////////////////// Assessment here //////////////////-->

@@ -99,5 +99,15 @@ class Grades extends BaseImasGrades
             $grade->save();
         }
     }
+    public static function deleteByGradeTypeIdAndGradeType($gradeId,$gradeType){
+        $grades = Grades::find()->where(['gradetype' => $gradeType])->andWhere(['gradetypeid' => $gradeId])->all();
+        if($grades){
+            foreach($grades as $grade){
+                $grade->delete();
+            }
+        }
+
+    }
+
 }
 

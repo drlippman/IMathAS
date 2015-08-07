@@ -2,8 +2,8 @@ $(document).ready(function () {
     createDataTable('student-data');
     $('.student-data').DataTable();
     togglefeedbackTextFields(-1);
-    //checkAssessmentSnapshot();
-
+    checkAssessmentSnapshot();
+    quickSearchAjax();
 });
 function appendPrependReplaceText(value) {
     var feedback_txt = document.getElementById("feedback_txt").value;
@@ -57,27 +57,27 @@ function togglequickadd(el) {
     }
 }
 
-//function checkAssessmentSnapshot() {
-//
-//    $(".assessment_snapshot").change(function () {
-//        if ($(".assessment_snapshot:checked").val()) {
-//            $(".change-assessment-snapshot-content").show();
-//            $(".change-non-assessment-snapshot-content").hide();
-//        } else {
-//            $(".change-assessment-snapshot-content").hide();
-//            $(".change-non-assessment-snapshot-content").show();
-//        }
-//    });
-//
-//    if ($("#assessment_snapshot:checked").val() == undefined) {
-//        $(".change-assessment-snapshot-content").hide();
-//        $(".change-non-assessment-snapshot-content").show();
-//    }
-//    else {
-//        $(".change-assessment-snapshot-content").show();
-//        $(".change-non-assessment-snapshot-content").hide();
-//    }
-//}
+function checkAssessmentSnapshot() {
+
+    $(".assessment_snapshot").change(function () {
+        if ($(".assessment_snapshot:checked").val()) {
+            $(".change-assessment-snapshot-content").show();
+            $(".change-non-assessment-snapshot-content").hide();
+        } else {
+            $(".change-assessment-snapshot-content").hide();
+            $(".change-non-assessment-snapshot-content").show();
+        }
+    });
+
+    if ($("#assessment_snapshot:checked").val() == undefined) {
+        $(".change-assessment-snapshot-content").hide();
+        $(".change-non-assessment-snapshot-content").show();
+    }
+    else {
+        $(".change-assessment-snapshot-content").show();
+        $(".change-non-assessment-snapshot-content").hide();
+    }
+}
 
 studentDetails = [];
 var courseId = $('#course-id').val();
