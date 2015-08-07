@@ -439,15 +439,15 @@ class CourseItemsUtility extends Component
             <div class="title">
                 <?php if ($link->target != 0) { ?>
                     <?php
-                    $filename = substr(strip_tags($link->text), 5);
+                    /*$filename = substr(strip_tags($link->text), 5);
                     require_once("../components/filehandler.php");
                     $alink = getcoursefileurl($filename);
-                    echo '<a href="' . $alink . '">' . $link->title . '</a>';
+                    echo '<a href="' . $alink . '">' . $link->title . '</a>'; */
                 } else {
-                    $filename = substr(strip_tags($link->text), 5);
+                   /* $filename = substr(strip_tags($link->text), 5);
                     require_once("../components/filehandler.php");
                     $alink = getcoursefileurl($filename);
-                    echo '<a href="' . $alink . '">' . ucfirst($link->title) . '</a>';
+                    echo '<a href="' . $alink . '">' . ucfirst($link->title) . '</a>'; */
                 } ?>
                 <div class="floatright">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>

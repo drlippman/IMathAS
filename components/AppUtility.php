@@ -1260,7 +1260,7 @@ class AppUtility extends Component
         $allowedmacros = array();
         $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
         $allowedmacros = $mathfuncs;
-        $userfullname = "";
+        $userfullname = AppUtility::getFullName($user->FirstName, $user->LastName);
 
         $responseString = "";
         $isteacher = (isset($teacherid) || $isteacher==true);
@@ -1335,7 +1335,6 @@ class AppUtility extends Component
             $lastanswers = explode("~",$line['bestlastanswers']);
             $questions = $bestquestions;
         }
-
         $timesontask = explode("~",$line['timeontask']);
 
         if ($isteacher) {
@@ -1352,8 +1351,6 @@ class AppUtility extends Component
         list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
 
         $qi = getquestioninfo($questions,$testsettings);
-
-
 
         $now = time();
         $isreview = false;
@@ -1394,7 +1391,6 @@ class AppUtility extends Component
         $responseString .= "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
         $responseString .= "<h3>".$testsettings['name']."</h3>\n";
 
-
         $allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
         $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
         $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
@@ -1423,8 +1419,6 @@ class AppUtility extends Component
                 $intropieces[$p[0]] = $introsplit[$i+1];
             }
         }
-
-
         $responseString .= '<div class=intro>'.$testsettings['intro'].'</div>';
         if ($isteacher && !$scoredview) {
             $responseString .= '<p>'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
