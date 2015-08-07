@@ -44,6 +44,11 @@ class ForumController extends AppController
         $this->layout = "master";
         $this->guestUserHandler();
         $cid = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $countPost = $this->getNotificationDataForum($cid,$user);
+        $msgList = $this->getNotificationDataMessage($cid,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $forum = Forums::getByCourseId($cid);
         $course = Course::getById($cid);
         $user = $this->getAuthenticatedUser();
@@ -882,6 +887,7 @@ class ForumController extends AppController
     public function actionListPostByName()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $userRights = $this->getAuthenticatedUser()->rights;
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');

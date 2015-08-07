@@ -413,8 +413,24 @@ padding-top: 5px;
 
 .padding-top
 {
-
     padding-top: 40px;
 }
+.Align-buttons-post
+{
+    padding-top: 50px;
+    margin-left: 20px;
+}
 
+.Align-link-post
+{
+    margin-left: 20px;
+}
 
+.Align-block{
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.padding-five
+{
+    padding-bottom:5px;
+}

@@ -70,6 +70,10 @@
 .small{
     color: #12866E;
 }
+.message-body.a:hover{
+    color: #12866E;
+}
+
 .message-reply
 {
     margin-left: 15px;
@@ -193,4 +197,3 @@ button.btn.btn-primary1.btn-color{
     margin-left: 9px;
     margin-bottom: 10px;
 }
-

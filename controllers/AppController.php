@@ -22,6 +22,8 @@ use app\models\User;
 use yii\web\Controller;
 use app\models\Teacher;
 use yii\web\Session;
+use app\models\Message;
+use app\models\Thread;
 use Yii;
 
 class AppController extends Controller
@@ -699,5 +701,30 @@ function generaterandstring() {
 
     public function setSessionData($key,$value){
         return Yii::$app->session->set($key,$value);
+    }
+
+    public function getNotificationDataMessage($courseId,$user)
+    {
+        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
+        $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
+        $msgList = array();
+        if ($message) {
+            foreach ($message as $singleMessage) {
+                if (in_array($singleMessage->isread, $isReadArray))
+                    array_push($msgList, $singleMessage);
+            }
+        }
+        return count($msgList);
+    }
+
+    public function getNotificationDataForum($courseId,$user)
+    {
+        $NewPostCounts = Thread::findNewPostCnt($courseId,$user);
+        $countPost  = AppConstant::NUMERIC_ZERO;
+        foreach($NewPostCounts as $count)
+        {
+            $countPost = $countPost +$count['COUNT(imas_forum_threads.id)'];
+        }
+        return $countPost ;
     }
 }

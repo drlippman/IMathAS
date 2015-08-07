@@ -50,10 +50,10 @@ AppUtility::includeJS('general.js'); ?>
             </div>
             <?php } ?>
             <div class="align-buttons">
-            <button onclick="expandall()" class="btn btn-primary1 btn-color">Expand All</button>
-            <button onclick="collapseall()" class="btn btn-primary1 btn-color ">Collapse All</button>
-            <button onclick="showall()" class="btn btn-primary1 btn-color ">Show All</button>
-            <button onclick="hideall()" class="btn btn-primary1 btn-color ">Hide All</button>
+            <button onclick="expandall()" class="btn btn-primary1 btn-color"><?php echo AppUtility::t('Expand All')?></button>
+            <button onclick="collapseall()" class="btn btn-primary1 btn-color "><?php echo AppUtility::t('Collapse All')?></button>
+            <button onclick="showall()" class="btn btn-primary1 btn-color "><?php echo AppUtility::t('Show All')?></button>
+            <button onclick="hideall()" class="btn btn-primary1 btn-color "><?php echo AppUtility::t('Hide All')?></button>
             </div>
             <?php
             $DivCount = AppConstant::ZERO_VALUE;
@@ -85,15 +85,15 @@ AppUtility::includeJS('general.js'); ?>
             <span class=right>
                  <?php if ($user['id'] != $message['senderId']) { ?>
                      <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'] . '&cid=' . $course->id); ?>">
-                         Reply</a>
+                         <?php echo AppUtility::t('Reply');?></a>
                  <?php } ?>
                 <button class="btn btn-primary1 btn-color" id="buti<?php echo $index ?>"
-                       onClick="toggleitem(<?php echo $index ?>)">Hide</button>
+                       onClick="toggleitem(<?php echo $index ?>)"><?php echo AppUtility::t('Hide');?></button>
                 </span>
-                <b><?php echo $message['title'] ?></b><br/>Posted by: <a
+                <b><?php echo $message['title'] ?></b><br/><?php echo AppUtility::t('Posted by:');?><a
                     href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
 
-                <span style="color:red;">New</span>
+                <span style="color:red;"><?php echo AppUtility::t('New');?></span>
             </div>
             <div class="blockitems" id="item<?php echo $index ?>"><p><?php
                     if (($p = strpos($message['message'],'<hr'))!==false) {

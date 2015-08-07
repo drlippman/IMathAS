@@ -70,6 +70,10 @@ class GradebookController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
         $gradebookData = $this->gbtable($user->id, $courseId);
         $this->includeCSS(['jquery.dataTables.css']);

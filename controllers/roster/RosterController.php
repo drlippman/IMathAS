@@ -47,6 +47,11 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $isShowPic = $this->getParamVal('showpic');
         $course = Course::getById($courseId);
         if($isShowPic == 0){

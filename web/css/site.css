@@ -801,8 +801,6 @@ div.dataTables_wrapper {
  #GB_window {
     margin-top: 90px;
 }
-
-
 input[type="checkbox"] {
     margin: 0px 0 0;
     -webkit-appearance: none;
@@ -889,3 +887,13 @@ input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focu
     outline: 0px auto -webkit-focus-ring-color;
     outline-offset: -2px;
 }
+
+span.circle{
+    width: 35px!important;
+    height: 35px!important;
+    color: white;
+    background: #104E88;
+    border-radius: 100%;
+    text-align: center;
+}
+

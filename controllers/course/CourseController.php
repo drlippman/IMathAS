@@ -58,16 +58,10 @@ class CourseController extends AppController
         $this->setSessionData('courseId',$courseId);
         $this->checkSession($params);
         $user = $this->getAuthenticatedUser();
-        $message = Message::getByCourseIdAndUserId($courseId, $user->id);
-        $isReadArray = array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR, AppConstant::NUMERIC_EIGHT, AppConstant::NUMERIC_TWELVE);
-        $msgList = array();
-        if ($message) {
-            foreach ($message as $singleMessage) {
-                if (in_array($singleMessage->isread, $isReadArray))
-                    array_push($msgList, $singleMessage);
-            }
-        }
-        $this->setSessionData('messageCount',count($msgList));
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $this->layout = 'master';
         $this->userAuthentication($user, $courseId);
         $userId = $user->id;
@@ -674,6 +668,10 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js']);
