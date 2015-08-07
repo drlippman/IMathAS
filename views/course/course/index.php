@@ -249,16 +249,16 @@ $now = $currentTime;
                             <div class="title">
                                 <?php if($link->target != 0) {?>
                                     <?php
-                                    $filename = substr(strip_tags($link->text),5);
+                                   /* $filename = substr(strip_tags($link->text),5);
                                     require_once("../components/filehandler.php");
                                     $alink = getcoursefileurl($filename);
-                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                 } else
                                 {
-                                    $filename = substr(strip_tags($link->text),5);
+                                   /* $filename = substr(strip_tags($link->text),5);
                                     require_once("../components/filehandler.php");
                                     $alink = getcoursefileurl($filename);
-                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                 }?>
 
                             </div>
@@ -328,16 +328,16 @@ $now = $currentTime;
                             <div class="title">
                                 <?php if($link->target != 0) {?>
                                     <?php
-                                    $filename = substr(strip_tags($link->text),5);
+                                  /*  $filename = substr(strip_tags($link->text),5);
                                     require_once("../components/filehandler.php");
                                     $alink = getcoursefileurl($filename);
-                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                 } else
                                 {
-                                    $filename = substr(strip_tags($link->text),5);
+                                   /* $filename = substr(strip_tags($link->text),5);
                                     require_once("../components/filehandler.php");
                                     $alink = getcoursefileurl($filename);
-                                    echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                    echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                 }?>
                             </div>
                             <div class="itemsum">
@@ -700,16 +700,16 @@ $now = $currentTime;
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
                                                             <?php
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                          /*  $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         } else
                                                         {
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                           /* $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         }?>
 
                                                     </div>
@@ -779,7 +779,7 @@ $now = $currentTime;
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
                                                             <?php
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                           /* $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
                                                             echo '<a href="'.$alink.'">'.$link->title.'</a>';
@@ -788,7 +788,7 @@ $now = $currentTime;
                                                             $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         }?>
                                                     </div>
                                                     <div class="itemsum">
@@ -1153,16 +1153,16 @@ $now = $currentTime;
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
                                                             <?php
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                            /*$filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         } else
                                                         {
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                          /*  $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         }?>
 
                                                     </div>
@@ -1232,16 +1232,16 @@ $now = $currentTime;
                                                     <div class="title">
                                                         <?php if($link->target != 0) {?>
                                                             <?php
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                           /* $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         } else
                                                         {
-                                                            $filename = substr(strip_tags($link->text),5);
+                                                          /*  $filename = substr(strip_tags($link->text),5);
                                                             require_once("../components/filehandler.php");
                                                             $alink = getcoursefileurl($filename);
-                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>';
+                                                            echo '<a href="'.$alink.'">'.$link->title.'</a>'; */
                                                         }?>
                                                     </div>
                                                     <div class="itemsum">
