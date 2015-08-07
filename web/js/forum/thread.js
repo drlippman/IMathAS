@@ -454,6 +454,13 @@ function limitToTagShow() {
         jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
 
     });
+    $('#markRead').click(function(){
+        var isValue = 3;
+        var forumid= $('#forumid').val();
+        $('.forum-table').DataTable().destroy();
+        var thread = {forumid: forumid , isValue: isValue};
+        jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+    });
 
 
 }

@@ -5,6 +5,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 
 $basePath = '/site/';
+$imgPath = \app\components\AppUtility::getAssetURL();
 NavBar::begin([
     'brandLabel' => 'OpenMath',
     'brandUrl' => Yii::$app->homeUrl.'site/login',
@@ -25,7 +26,7 @@ echo Nav::widget([
         Yii::$app->user->isGuest ?
             ['label' => 'Notifications ', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ($totalCount >0 ?['label' =>'Notifications'.'('.$totalCount.')',
+            ($totalCount >0 ?['label' =>'<img class="" scr="'.$imgPath.'img/cc.png">&nbsp;Notifications'.'('.$totalCount.')',
                 'items' =>
                 [
                     ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),

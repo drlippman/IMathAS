@@ -154,7 +154,7 @@ function forumsSuccess(response) {
                     html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
                 }
 
-                html += "<td>&nbsp;&nbsp;<a>Modify</a></td>";
+                html += "<td>&nbsp;&nbsp;<a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
                 html += "<td>&nbsp;&nbsp;&nbsp;" + forum.threads + "</td>";
                 html += "<td>&nbsp;&nbsp;&nbsp;" + forum.posts + "</td>";
                 html += "<td>&nbsp;&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
@@ -168,7 +168,7 @@ function forumsSuccess(response) {
                     }else{
                         html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
                     }
-                    html += "<td>&nbsp;&nbsp;<a>Modify</a></td>";
+                    html += "<td>&nbsp;&nbsp;<a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
                     html += "<td>&nbsp;&nbsp;" + forum.threads + "</td>";
                     html += "<td>&nbsp;&nbsp;" + forum.posts + "</td>";
                     html += "<td>&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
