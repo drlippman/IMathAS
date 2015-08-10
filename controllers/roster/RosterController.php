@@ -90,7 +90,8 @@ class RosterController extends AppController
         $courseId = $params['cid'];
         $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
         $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
-        $loginLogs = LoginGrid::getById($courseId, $newStartDate, $newEndDate);
+        $newEndDate1 = strtotime($params['newEndDate']. " ".date('g:i a'));
+        $loginLogs = LoginGrid::getById($courseId, $newStartDate, $newEndDate1);
         $headsArray = array();
         $headsArray[] = 'Name';
         for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {
@@ -132,6 +133,7 @@ class RosterController extends AppController
             $stuLogs[$key]['name'] = $nameHash[$key];
             $stuLogs[$key]['row'] = $field;
         }
+         
         $retJSON = new \stdClass();
         $retJSON->header = $headsArray;
         $retJSON->rows = $stuLogs;
