@@ -96,7 +96,9 @@ class GradebookController extends AppController
         $sections = array();
         if ($sectionQuery) {
             foreach ($sectionQuery as $item) {
-                array_push($sections, $item->section);
+                if($item->section !="" && $item->section != null){
+                    array_push($sections, $item->section);
+                }
             }
         }
         if (isset($teacherid)) {
@@ -911,7 +913,7 @@ class GradebookController extends AppController
                 $cattotcurec[$ln] = array();
                 $cattotfutureec[$ln] = array();
                 //Student ID info
-                $gradebook[$ln][0][0] = "{$student['LastName']},&nbsp;{$student['FirstName']}";
+                $gradebook[$ln][0][0] = "{$student['LastName']}, {$student['FirstName']}";
                 $gradebook[$ln][4][0] = $student['id'];
                 $gradebook[$ln][4][1] = $student['locked'];
                 $gradebook[$ln][4][2] = $student['hasuserimg'];
@@ -2743,6 +2745,11 @@ class GradebookController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js']);
         $responseData = array('gbItems' => $gbItems,'finalStudentArray' => $finalStudentArray,'params' => $params,'gradeData' => $gradeData,'rubricData' => $rubricData,'hassection' => $hassection,'sortorder' =>$sortorder);
         return $this->renderWithData('manageAddGrades',$responseData);
+    }
+    public function  actionFetchGradebookDataAjax(){
+        $params = $this->getRequestParams();
+        $responseData = $this->gbtable($params['userId'], $params['courseId']);
+        return $this->successResponse($responseData);
     }
 }
 

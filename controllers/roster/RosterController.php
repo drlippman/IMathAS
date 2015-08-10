@@ -437,7 +437,9 @@ class RosterController extends AppController
         $sectionArray = array();
         if ($sections) {
             foreach ($sections as $section) {
-                array_push($sectionArray, $section->section);
+                if($section->section !="" && $section->section != null){
+                    array_push($sectionArray, $section->section);
+                }
             }
         }
         $this->includeCSS(['roster/roster.css', 'dataTables.bootstrap.css']);
@@ -857,6 +859,30 @@ class RosterController extends AppController
             AppUtility::sendMail($subject, $message, $singleStudent['emailId']);
         }
     }
+    public function actionUnenroll(){
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $studentData = explode(',',$params['student-data']);
+        $students = array();
+        foreach($studentData as $student){
+            $query = User::findAllById($student);
+            array_push($students, $query[0]);
+        }
+        $sort_by = array_column($students, 'LastName');
+        array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $students);
+        $users = Student::findByCid($courseId);
+        if(count($students) == count($users)){
+            $studentId = 'all';
+        }else{
+            $studentId = 'selected';
+        }
+        $responseData = array('students' => $students, 'studentId' => $studentId, 'course' => $course);
+        $this->includeCSS(['roster/roster.css']);
+        return $this->renderWithData('unenroll', $responseData);
+    }
 
     public function actionMarkUnenrollAjax()
     {
@@ -1227,6 +1253,7 @@ class RosterController extends AppController
     {
         if ($this->isPost()) {
             $this->guestUserHandler();
+            $this->layout = "master";
             $selectedStudents = $this->getRequestParams();
             $isGradebook = $selectedStudents['gradebook'];
             $selectedStudentId = explode(',', $selectedStudents['student-data']);
@@ -1246,6 +1273,7 @@ class RosterController extends AppController
             $studentList = implode($studentData);
             $responseData = array('studentData' => $studentList, 'course' => $course, 'gradebook' => $isGradebook);
             $this->includeJS(['general.js']);
+            $this->includeCSS(['roster/roster.css']);
             return $this->renderWithData('copyStudentEmail', $responseData);
         } else {
             $courseId = $this->getParamVal('cid');

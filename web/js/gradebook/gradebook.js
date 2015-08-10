@@ -9,9 +9,16 @@ $(document).ready(function () {
         "paginate": false,
         "ordering":false
     } );
+    var data = {courseId: courseId, userId: userId};
+    jQuerySubmit('fetch-gradebook-data-ajax', data, 'fetchDataSuccess');
 });
 var data;
 var showPics = 0;
+var GradebookData;
+function fetchDataSuccess(response){
+    var result = JSON.parse(response);
+    GradebookData = result.data.gradebook;
+}
 function chgtoggle(){
     showPics = $('#toggle4').val();
     $('.gradebook-table').remove();
@@ -46,7 +53,12 @@ function studentLock() {
         var dataArray = [];
         $('.gradebook-table input[name = "checked"]:checked').each(function () {
             markArray.push($(this).val());
-            dataArray.push($(this).parent().text());
+            for(var i=1;i < GradebookData.length-1;i++){
+                if(GradebookData[i][4][0] == $(this).val())
+                {
+                    dataArray.push(GradebookData[i][0][0]);
+                }
+            }
         });
 
         if (markArray.length != 0) {
@@ -100,7 +112,12 @@ function studentUnenroll() {
         var dataArray = [];
         $('.gradebook-table input[name = "checked"]:checked').each(function () {
             markArray.push($(this).val());
-            dataArray.push($(this).parent().text());
+            for(var i=1;i < GradebookData.length-1;i++){
+                if(GradebookData[i][4][0] == $(this).val())
+                {
+                    dataArray.push(GradebookData[i][0][0]);
+                }
+            }
         });
         if (markArray.length != 0) {
 

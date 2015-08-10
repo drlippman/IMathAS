@@ -66,8 +66,15 @@ $this->params['breadcrumbs'][] = $this->title;
                                     class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
                         </form>
                     </li>
-                    <li><a id="un-enroll-link" href="#"><i
-                                class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a></li>
+                    <li>
+                        <form action="unenroll?cid=<?php echo $course->id ?>" id="un-enroll-form"
+                              method="post">
+                            <input type="hidden" id="checked-student" name="student-data" value=""/>
+                            <a class="with-selected-list" href="javascript: studentUnEnroll()"><i
+                                    class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a>
+                            </a>
+                        </form>
+                    </li>
                     <li><a id="lock-btn" href="#"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>
                         </a></li>
                     <li>

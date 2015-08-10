@@ -13,11 +13,9 @@ echo '<div class="item-detail-header">';
 $this->params['breadcrumbs'][] = ['label' => ucfirst($course->name), 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
 if($commentType == "instr") {
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Instructor Notes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . '/gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . '/gradebook/gradebook/gb-comments?cid=' . $course->id.'&comtype=instr']]);
-//    $this->params['breadcrumbs'][] = ['label' => 'Instructor Notes ', 'url' => ['/gradebook/gradebook/gb-comments?cid=' . $course->id.'&comtype=instr']];
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Instructor Notes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id.'&comtype=instr']]);
 }else{
-    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Gradebook Comments', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . '/gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . '/gradebook/gradebook/gb-comments?cid=' . $course->id]]);
-//    $this->params['breadcrumbs'][] = ['label' => 'Gradebook Comments', 'url' => ['/gradebook/gradebook/gb-comments?cid=' . $course->id]];
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false), AppUtility::t('Gradebook Comments', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gb-comments?cid=' . $course->id]]);
 } ?>
 </div>
 <div class="title-container">
