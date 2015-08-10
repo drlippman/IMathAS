@@ -65,7 +65,9 @@ $now = $currentTime;
                 <thead>
                 <tr>
                     <th><?php echo AppUtility::t('Forum Name')?></th>
+                    <?php if($users->rights > AppConstant::STUDENT_RIGHT){?>
                     <th><?php echo AppUtility::t('Modify')?></th>
+                    <?php }?>
                     <th><?php echo AppUtility::t('Threads')?></th>
                     <th><?php echo AppUtility::t('Posts')?></th>
                     <th><?php echo AppUtility::t('Last Post Date')?></th>

@@ -75,7 +75,7 @@ class MessageController extends AppController
                 foreach($students as $student){
                     array_push($users,$student);
                 }
-            $userId = $this->getUserId();
+            $uId = $this->getUserId();
             $this->includeCSS(["message.css"]);
             $this->includeJS(['message/sendMessage.js', "editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js']);
             $responseData = array('course' => $course, 'teachers' => $teacher, 'users' => $users, 'loginid' => $userId , 'userRights' => $userRights,'newTo' =>  $newTo,'username' => $userName);

@@ -38,11 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="inner-reply-msg-content">
         <div class="drop-down col-sm-12 padding-top">
             <span class="col-sm-1"><?php echo AppUtility::t('To')?></span>
-            <?php if($newTo){?>
-
-            <span class="col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
-
-                <?php }else
+            <?php if($newTo)
+            {?>
+                    <input type="hidden" id="newTo" value="1">
+                    <input type="hidden" id="newUserId" value="<?php echo $loginid?>">
+                    <span class="col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
+        <?php }else
                 {?>
                 <span class="col-sm-4">
                 <select name="seluid" class="dropdown form-control" id="seluid">

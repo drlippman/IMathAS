@@ -9,6 +9,7 @@ $this->title = AppUtility::t($forumData['name'],false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
+
 ?>
 <?php if($page){?>
     <input type="hidden" id="page" value="<?php echo $page;?>">
@@ -40,7 +41,7 @@ $now = $currentTime;
         <div class="view-drop-down  pull-left">
         <span class=""><?php echo AppUtility::t('View Options',false)?></span>
             <select name="seluid" class="form-control-forum select_option " id="">
-                <option value="-1"><?php echo AppUtility::t('Select')?></option>
+                <option value="-1" selected="selected"><?php echo AppUtility::t('Select')?></option>
                 <option value="0"><?php echo AppUtility::t('List Post by Name')?></option>
                 <option value="1"><?php echo AppUtility::t('Limit to Flagged ')?></option>
                 <option value="2"><?php echo AppUtility::t('Limit to New ')?></option>

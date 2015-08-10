@@ -5,10 +5,18 @@ $(document).ready(function () {
     {
         tinyMCE.triggerSave();
         var cid = $(".send-msg").val();
-        var receiver = $("#seluid").val();
+        var newTo = $("#newTo").val();
+        if(newTo)
+        {
+            var receiver = $("#newUserId").val();
+        }else
+        {
+            var receiver = $("#seluid").val();
+        }
         var subject = $(".subject").val();
         var body = $("#message").val();
-        if(receiver != 0){
+        if(receiver != 0)
+        {
             if(subject != '')
             {
                         $('#subjecttext').hide();

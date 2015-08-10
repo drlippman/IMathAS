@@ -1,8 +1,10 @@
 $(document).ready(function ()
 {
+
     var forumid= $('#forumid').val();
     var isValue = -1;
     var courseid = $("#courseid").val();
+    $('.select_option').val(-1);
     $("#show-all-link").hide();
     var page = $('#page').val();
     $('#result').hide();
@@ -58,6 +60,7 @@ $(document).ready(function ()
             var thread = {forumid: forumid , isValue: isValue};
             jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
         }
+        selected.network.selectedIndex = -1;
     });
 
 
