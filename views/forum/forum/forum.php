@@ -48,15 +48,13 @@ $now = $currentTime;
                </span>
               <span class="search-dropdown">
                     <select name="seluid" class="form-control-forum select_option " id="">
-                        <option value="-1"><?php echo AppUtility::t('Select')?></option>
                             <option value="0"><?php echo AppUtility::t('All Thread Subject')?></option>
                             <option value="1"><?php echo AppUtility::t('All Post')?></option>
                     </select>
               </span>
-                 <span class="message-reply">
-                         <a
-                           id="forum_search" class="btn1  "><i class="fa fa-search"></i>&nbsp;&nbsp;<?php echo AppUtility::t('Search')?></a>
-                    </span>
+              <span class="Search-btn-forum margin-left-ten">
+                  <button type="button" class="btn btn-primary search-button" id="forum_search"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></button>
+              </span>
          </div>
  </div>
         <div class="main-div">
@@ -80,13 +78,10 @@ $now = $currentTime;
         <div id="search-thread">
             <table id="forum-search-table display-forum" class="forum-search-table table table-bordered table-striped table-hover data-table" bPaginate="false">
                 <thead>
-
                 <th><?php echo AppUtility::t('Topic')?></th>
                 <th><?php echo AppUtility::t('Replies')?></th>
                 <th><?php echo AppUtility::t('Views')?></th>
                 <th><?php echo AppUtility::t('Last Post Date')?></th>
-
-
                 </thead>
                 <tbody class="forum-search-table-body">
                 </tbody>

@@ -81,7 +81,7 @@ $now = $currentTime;
             <?php } ?>
             <th><?php echo AppUtility::t('Replies')?></th>
             <th><?php echo AppUtility::t('Views(Unique)')?></th>
-            <th><?php echo AppUtility::t('Last Post Date')?></th>
+            <th><?php echo AppUtility::t('Last Post')?></th>
             <th><?php echo AppUtility::t('Action')?></th>
             </thead>
             <tbody class="forum-table-body">

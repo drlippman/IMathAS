@@ -92,7 +92,7 @@ class ForumController extends AppController
                 );
                 array_push($searchThread, $tempArray);
             }
-            $this->includeJS(['forum/forum.js']);
+            $this->includeJS(['forum/forum.js','forum/thread.js']);
             return $this->successResponse($searchThread);
 
         } else {

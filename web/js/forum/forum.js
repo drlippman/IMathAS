@@ -149,28 +149,28 @@ function forumsSuccess(response) {
             {
                 if(forum.countId == 0)
                 {
-                    html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
+                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
                 }else{
-                    html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
+                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
                 }
 
-                html += "<td>&nbsp;&nbsp;<a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
-                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.threads + "</td>";
-                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.posts + "</td>";
-                html += "<td>&nbsp;&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
+                html += "<td><a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
+                html += "<td>" + forum.threads + "</td>";
+                html += "<td>" + forum.posts + "</td>";
+                html += "<td>" + forum.lastPostDate + "</td>";
             }
             else if(forum.avail == 2 || forum.avail == 1 && forum.startDate < forum.currentTime && forum.endDate > forum.currentTime )
             {
                     if(forum.countId == 0)
                     {
-                        html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
+                        html += "<tr><td><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
                     }else{
-                        html += "<tr><td>&nbsp;&nbsp;<a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
+                        html += "<tr><td><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
                     }
 //                    html += "<td>&nbsp;&nbsp;<a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
-                    html += "<td>&nbsp;&nbsp;" + forum.threads + "</td>";
-                    html += "<td>&nbsp;&nbsp;" + forum.posts + "</td>";
-                    html += "<td>&nbsp;&nbsp;" + forum.lastPostDate + "</td>";
+                    html += "<td>" + forum.threads + "</td>";
+                    html += "<td>" + forum.posts + "</td>";
+                    html += "<td>" + forum.lastPostDate + "</td>";
             }
         });
         $(".forum-table-body tr").remove();

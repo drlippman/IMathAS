@@ -145,9 +145,10 @@ table.dataTable thead th, table.dataTable thead td {
 #search_text
 {
 
-    height: 32px;
+    height: 35px;
     text-align: center;
     width: auto;
+    margin-right: 10px;
 }
 
 .search-dropdown
@@ -175,13 +176,13 @@ table.dataTable thead th, table.dataTable thead td {
     height: 60px;
     margin-right: 12px;
 }
-#forum_search{
-    background-color: #1460AA;
-    color: white;
-    border-radius: 0px;
-    height: 34px;
-    width: 9%;
-}
+/*#forum_search{*/
+    /*background-color: #1460AA;*/
+    /*color: white;*/
+    /*border-radius: 0px;*/
+    /*height: 34px;*/
+    /*width: 9%;*/
+/*}*/
 .btn1{
     display: inline-block;
     padding: 6px 12px;
@@ -255,7 +256,9 @@ select > option{
     text-align: center;
     border-radius: 0px;
     width: 40px;
-
+    font-size: x-small;
+    padding: 4px;
+    font-weight: bolder;
 }
 .user-name
 {
@@ -433,4 +436,20 @@ padding-top: 5px;
 .padding-five
 {
     padding-bottom:5px;
+}
+.margin-left-ten{
+    margin-left: 10px;
+}
+
+.center{
+    text-align: center;
+}
+
+.right{
+    text-align: center;
+}
+
+.btn.btn-primary.search-button
+{
+    margin-bottom: 3px;
 }

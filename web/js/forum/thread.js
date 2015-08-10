@@ -60,7 +60,6 @@ $(document).ready(function ()
             var thread = {forumid: forumid , isValue: isValue};
             jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
         }
-        selected.network.selectedIndex = -1;
     });
 
 
@@ -213,7 +212,7 @@ function threadSuccess(response)
                         if(((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId) || unRead == thread.threadId)
                         {
 
-                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>NEW</div></div><br> "+ thread.name+"</td>";
+                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br> "+ thread.name+"</td>";
                             newCount++;
                         }else
                         {
@@ -223,7 +222,7 @@ function threadSuccess(response)
                     {
                         if((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId)
                         {
-                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>NEW</div></div><br>Anonymous </td>";
+                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br>Anonymous </td>";
                             newCount++;
                         }else
                         {
