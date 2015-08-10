@@ -93,7 +93,7 @@ function showMessage(messageData, status) {
             }
             if (msg.isread < 7) {
 
-                html += "<td class='flag-bg-color'> <img class='flag-alignment' src='../../img/flag.png' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
+                html += "<td class='flag-bg-color'> <img class='' src='../../img/flagempty.gif' onclick='changeImage(this," + false + "," + rowid + ")'/></td>";
             }
             else {
 

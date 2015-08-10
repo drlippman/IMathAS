@@ -325,9 +325,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php if (count($pageOutcomesList) > 0) { ?>
                         <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div><div class="col-lg-10">
                         <?php
-                        if($forumData['outcomes']){
-                            $gradeoutcomes = explode(',',$forumData['outcomes']);
+
+                        if($defaultValue['outcomes'] != ' '){
+                            $gradeoutcomes = explode(',',$defaultValue['outcomes']);
                         }
+
                             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
                             <br class="form"/>
                         <?php } ?>

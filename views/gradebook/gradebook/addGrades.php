@@ -182,8 +182,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <br>
 
-                <div><label>Add/Replace to all feedback:</label><input type="text" id="feedback_txt"
-                                                                       class="col-lg-offset-1"/>
+                <div><label>Add/Replace to all feedback:</label>
+<!--                    <input type="text" id="feedback_txt"-->
+<!--                                                                       class="col-lg-offset-1"/>-->
+                    <input type="text" onkeyup="autocomplet()" id="quick-search">
                     <input type="button" value="Append" class="btn btn-primary" onclick="appendPrependReplaceText(1)"/>
                     <input type="button" value="Prepend" class="btn btn-primary" onclick="appendPrependReplaceText(3)"/>
                     <input type="button" value="Replace" class="btn btn-primary" onclick="appendPrependReplaceText(2)"/>
@@ -204,10 +206,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tbody>
 
                     <tr id="quickadd" style="display:none;">
-                        <td><input type="text" id="project"/></td>
+<!--                        <td><input type="text" onkeyup="autocomplet()" id="quick-search"/></td>-->
                         <td></td>
 
-                        <td><input type="text" id="project-id" size="3" onblur="this.value = doonblur(this.value);"
+                        <td><input type="text"   id="project-id" size="3" onblur="this.value = doonblur(this.value);"
                                    onkeydown="return qaonenter(event,this);"/></td>
                         <td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
                             <input type="button" value="Next" onfocus="addsuggest()"/></td>
@@ -240,3 +242,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     </form>
 </fieldset>
+
+<script>
+</script>

@@ -168,7 +168,7 @@ function markSentDelete()
         }
         else
         {
-            var msg ="Select atleast one message to delete";
+            var msg ="Select atleast one message to Remove";
             CommonPopUp(msg);
         }
 
@@ -306,7 +306,7 @@ function markUnsend()
         }
         else
         {
-            var msg ="Select atleast one message to delete";
+            var msg ="Select atleast one message to Unsend";
             CommonPopUp(msg);
         }
 

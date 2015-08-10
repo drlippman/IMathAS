@@ -1075,9 +1075,11 @@ class ForumController extends AppController
             'replyByTime' => time(),
             'postTime' => time(),
             'replyBy' => AppConstant::NUMERIC_ZERO,
-            'postBy' => AppConstant::NUMERIC_ZERO
+            'postBy' => AppConstant::NUMERIC_ZERO,
+            'outcomes' => ' ',
         );
         if ($modifyForumId) {
+
             $pageTitle = 'Modify Forum';
             $saveTitle = AppConstant::SAVE_BUTTON;
             $forumData = Forums::getById($modifyForumId);
@@ -1184,7 +1186,8 @@ class ForumController extends AppController
                 'replyByTime' => $replyByTime,
                 'postByTime' => $postByTime,
                 'replyBy' => $replyBy,
-                'postBy' => $postBy
+                'postBy' => $postBy,
+                    'outcomes' => $forumData['outcomes'],
             );
         }
         if ($this->isPostMethod()) {
@@ -1262,8 +1265,8 @@ class ForumController extends AppController
                     $finalArray['points'] = $params['points'];
                     $finalArray['tutoredit'] = $params['tutor-edit'];
                     $finalArray['rubric'] = $params['rubric'];
+                    if(count($params['outcomes']) > AppConstant::NUMERIC_ONE){
 
-                    if($params['outcomes']){
                         foreach ($params['outcomes'] as $outcomeId) {
 
                             if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
@@ -1271,6 +1274,8 @@ class ForumController extends AppController
                             }
                         }
                         $params['outcomes'] = implode(',',$outcomes);
+                    }else{
+                        $params['outcomes'] = ' ';
                     }
                     $finalArray['outcomes'] = $params['outcomes'];
                 }else{

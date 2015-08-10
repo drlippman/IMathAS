@@ -271,4 +271,26 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryAll();
         return $data;
     }
+
+    Public static function getByUserName($keyword)
+    {
+        $likeData = User::find()->select('FirstName')->where(['like','FirstName',$keyword])->all();
+        return $likeData ;
+    }
+    public static function getByUserIdAndStudentId($courseId)
+    {
+         $query = new Query();
+        $query
+            ->from('imas_users')
+
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId]);
+         $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
 }

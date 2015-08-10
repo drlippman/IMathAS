@@ -138,4 +138,9 @@ class GbItems extends BaseImasGbitems
             }
         }
     }
+    public static function getById($gbItem){
+//        $query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
+     return GbItems::find()->where(['id' => $gbItem])->one();
+    }
+
 }

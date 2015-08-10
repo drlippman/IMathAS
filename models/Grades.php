@@ -108,6 +108,10 @@ class Grades extends BaseImasGrades
         }
 
     }
+    public static function getByGradeTypeIdAndUserId($gbitemId,$grades)
+    {
+        return Grades::find('userid','score')->where(['gradetypeid' => $gbitemId])->andWhere(['gradetype' => 'offline'])->andWhere(['userid' => $grades])->all();
+    }
 
 }
 

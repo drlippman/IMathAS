@@ -210,7 +210,7 @@ class GradebookController extends AppController
             $includelastchange = false;
         }
         if ($canviewall && $studentId) {
-        $stu = $studentId;
+            $stu = $studentId;
         } else {
             $stu = 0;
         }
@@ -2039,16 +2039,16 @@ class GradebookController extends AppController
         }
         if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
-            if(count($params['outcomes']) > 1){
+            if (count($params['outcomes']) > 1) {
                 foreach ($params['outcomes'] as $outcomeId) {
 
                     if (is_numeric($outcomeId) && $outcomeId > 0) {
                         $outcomes[] = intval($outcomeId);
                     }
                 }
-                $params['outcomes'] = implode(',',$outcomes);
+                $params['outcomes'] = implode(',', $outcomes);
 
-            }else{
+            } else {
                 $params['outcomes'] = ' ';
             }
             $gbItems = new GbItems();
@@ -2076,10 +2076,10 @@ class GradebookController extends AppController
 
                 }
             } else {
-                $this->redirect('upload-grades?gbItems=' . $gbItemsId.'&cid='.$courseId);
+                $this->redirect('upload-grades?gbItems=' . $gbItemsId . '&cid=' . $courseId);
             }
-            $this->redirect('gradebook?cid='.$courseId);
-         }
+            $this->redirect('gradebook?cid=' . $courseId);
+        }
         $this->includeCSS(['dataTables.bootstrap.css', 'course/items.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'roster/managelatepasses.js']);
         $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
@@ -2156,24 +2156,16 @@ class GradebookController extends AppController
     public function actionQuickSearchAjax()
     {
         $courseId = $this->getRequestParams();
-        $studentInformation = Student::findByCid($courseId);
-        $studentDetails = array();
-        foreach ($studentInformation as $singleStudentInformation) {
-            $tempArray = array(
-                'value' => $singleStudentInformation->id,
-                'userId' => $singleStudentInformation->user->id,
-                'section' => $singleStudentInformation->section,
-                'label' => ucfirst($singleStudentInformation->user->FirstName) . '' . ucfirst($singleStudentInformation->user->LastName),
+        $params = $this->getRequestParams();
 
-//                'grade' => $singleStudentInformation->grades->score,
-//                'feedback' => $singleStudentInformation->grade->feedback,
-
-            );
-//            $studentData = User::findByCidAndName($text,$singleStudentInformation['userid']);
-            array_push($studentDetails, $tempArray);
+        $likeStudentName= User::getByUserName($params['keyword']);
+        $finalArray = array();
+        foreach($likeStudentName as $like){
+            array_push($finalArray,$like['FirstName']);
         }
-        $responseData = $studentDetails;
+        $responseData = $finalArray;
         return $this->successResponse($responseData);
+
     }
 
     public function actionUploadGrades()
@@ -2193,8 +2185,8 @@ class GradebookController extends AppController
             }
             $curscores = array();
             $grades = Grades::getByGradeTypeId($gbItemsId);
-            if($grades){
-              foreach($grades as $grade){
+            if ($grades) {
+                foreach ($grades as $grade) {
                     $curscores[$grade['userid']] = $grade['score'];
                 }
             }
@@ -2206,8 +2198,8 @@ class GradebookController extends AppController
                 $usercol = $params['fullNameCol'] - AppConstant::NUMERIC_ONE;
             }
             if ($usercol != AppConstant::NUMERIC_NEGATIVE_ONE) {
-                $scoreColumn = $params['AddGradesForm']['gradesColumn']- 1;
-                $feedbackColumn = $params['AddGradesForm']['feedbackColumn']-1;
+                $scoreColumn = $params['AddGradesForm']['gradesColumn'] - 1;
+                $feedbackColumn = $params['AddGradesForm']['feedbackColumn'] - 1;
                 $handle = fopen($filename, 'r');
                 if ($params['AddGradesForm']['fileHeaderRow'] == AppConstant::NUMERIC_ONE) {
                     $data = fgetcsv($handle, 4096, ',');
@@ -2224,17 +2216,17 @@ class GradebookController extends AppController
                         $feedback = addslashes($data[$feedbackColumn]);
                     }
                     $score = $data[$scoreColumn];
-                    if(!$score){
+                    if (!$score) {
                         $score = ' ';
                     }
                     if ($studentData) {
                         $cuserid = $studentData['id'];
                         if (isset($curscores[$cuserid])) {
-                            Grades::updateGradeToStudent($score,$feedback,$cuserid,$gbItemsId);
+                            Grades::updateGradeToStudent($score, $feedback, $cuserid, $gbItemsId);
                             $successes++;
                         } else {
                             $gradeObject = new Grades();
-                            $gradeObject->addGradeToStudent($cuserid,$gbItemsId,$feedback,$score);
+                            $gradeObject->addGradeToStudent($cuserid, $gbItemsId, $feedback, $score);
                             $successes++;
                         }
                     } else {
@@ -2245,7 +2237,7 @@ class GradebookController extends AppController
         }
         $this->includeCSS(['site.css']);
         $responseData = array('course' => $course, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $usercol);
-         return $this->renderWithData('uploadGrades', $responseData);
+        return $this->renderWithData('uploadGrades', $responseData);
     }
 
     public function ImportStudentCsv($fileName, $params)
@@ -2355,10 +2347,10 @@ class GradebookController extends AppController
     {
         $gradeType = 'offline';
         $params = $this->getRequestParams();
-           foreach ($params['checkedMsg'] as $gradeId) {
+        foreach ($params['checkedMsg'] as $gradeId) {
             GbItems::deleteById($gradeId);
-            Grades::deleteByGradeTypeIdAndGradeType($gradeId,$gradeType);
-           }
+            Grades::deleteByGradeTypeIdAndGradeType($gradeId, $gradeType);
+        }
         return $this->successResponse();
     }
 
@@ -2601,15 +2593,16 @@ class GradebookController extends AppController
         if ($this->isPostMethod()) {
             if (isset($params['user-comments']) && $userId > AppConstant::NUMERIC_ZERO) {
                 $commentType = 'null';
-                Student::updateGbComments($userId,$params['user-comments'], $courseId, $commentType);
+                Student::updateGbComments($userId, $params['user-comments'], $courseId, $commentType);
             }
-            $this->redirect('grade-book-student-detail?cid='.$courseId.'&studentId='.$userId);
+            $this->redirect('grade-book-student-detail?cid=' . $courseId . '&studentId=' . $userId);
         }
         $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css']);
         $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'gradebookstudentdetail.js']);
         $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
+
     public function actionSendMessageModel()
     {
         $params = $this->getRequestParams();
@@ -2686,12 +2679,70 @@ class GradebookController extends AppController
         }
         return $pageOutcomesList;
     }
+
     public function actionNewFlag()
     {
-            //recording a toggle.  Called via AHAH
-         $courseId = $this->getParamVal('cid');
-          Course::updateNewFlag($courseId);
-        $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$courseId));
+        //recording a toggle.  Called via AHAH
+        $courseId = $this->getParamVal('cid');
+        Course::updateNewFlag($courseId);
+        $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid=' . $courseId));
+    }
+
+    public function actionManageAddGrades()
+    {
+        $params = $this->getRequestParams();
+        $gbItems = GbItems::getById($params['gbitem']);
+
+        if ($gbItems['rubric'] != 0) {
+
+            $rubricsData = Rubrics::getById($gbItems['rubric']);
+
+            $rubricData = array(
+                '0' => $rubricsData['id'],
+            '1' => $rubricsData['rubrictype'],
+            '2' => $rubricsData['rubric'],
+            );
+
+        }
+        $count = 0;
+        $hassection = false;
+       $studentsDataForHasSection = User::getByUserIdAndStudentId($params['cid']);
+        foreach($studentsDataForHasSection as $student){
+            if($student['section'] != null){
+                $count++;
+                $hassection = true;
+            }
+        }
+        if ($hassection) {
+            $gbSchemeData = GbScheme::getByCourseId($params['cid']);
+            if ($gbSchemeData['usersort']==0) {
+                $sortorder = "sec";
+            } else {
+                $sortorder = "name";
+            }
+        } else {
+            $sortorder = "name";
+        }
+
+       $gradeData = Grades::getByGradeTypeIdAndUserId($params['gbitem'],$params['grades']);
+        $studentsData = Student::getByCourseAndGrades($params['cid'],$params['grades'],$hassection,$sortorder);
+        foreach($studentsData as $singleStudent){
+            $finalStudentArray= array(
+                '0' => $singleStudent['id'],
+                '1' => $singleStudent['LastName'],
+                '2' => $singleStudent['FirstName'],
+                '3' => $singleStudent['section'],
+                '4' => $singleStudent['locked'],
+            );
+
+        }
+        if($this->isPostMethod()){
+
+        }
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js']);
+        $responseData = array('gbItems' => $gbItems,'finalStudentArray' => $finalStudentArray,'params' => $params,'gradeData' => $gradeData,'rubricData' => $rubricData,'hassection' => $hassection,'sortorder' =>$sortorder);
+        return $this->renderWithData('manageAddGrades',$responseData);
     }
 }
 

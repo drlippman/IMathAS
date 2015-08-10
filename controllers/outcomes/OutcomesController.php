@@ -36,7 +36,7 @@ class OutcomesController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['courseId'];
         $outcomeArray = $params['outcomeArray'];
-        AppUtility::dump($outcomeArray);
+
         $courseOutcomeData = Course::getById($courseId);
         $courseOutcome = unserialize($courseOutcomeData['outcomes']);
         $outcomeId = array();

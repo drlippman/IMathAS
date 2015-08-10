@@ -330,9 +330,9 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
                         echo "<a href=\"addgrades.php?stu=$studentId&cid=$cid&grades=all&gbitem={$gradebook[0][1][$i][7]}\">";
                             $haslink = true;
                             }
-                            } else {
-                            echo "<a href=\"addgrades.php?stu=$studentId&cid=$cid&grades={$gradebook[1][4][0]}&gbitem={$gradebook[0][1][$i][7]}\">";
-                                $haslink = true;
+                            } else { ?>
+                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/manage-add-grades?stu='.$studentId.'&cid='.$cid.'&grades='.$gradebook[1][4][0].'&gbitem='.$gradebook[0][1][$i][7])?> ">
+                            <?php    $haslink = true;
                                 }
                                 }
                                 } else if ($gradebook[0][1][$i][6]==2) {//discuss
