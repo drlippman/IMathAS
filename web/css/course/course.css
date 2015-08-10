@@ -129,7 +129,6 @@ div.dialog-items{
     font-size: 20px;
     font-weight: bold;
     padding-left: 10px;
-;
 }
 .arrow{
     color: #ffffff;
@@ -205,4 +204,13 @@ div.dialog-items{
 .student-block{
     margin-right: 20px;
     margin-left: 20px;
+}
+.inside-mvsel{
+    width: 50px !important;
+    float: left!important;
+    background-color: #2C78B2;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    padding-left: 10px;
 }

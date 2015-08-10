@@ -45,8 +45,8 @@ $(document).ready(function(){
                             '</div></a>' +
                         '</div>';
             $('<div class="dialog-items" id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true,width: '397px',height: '419px',
-                closeText: "hide",
+                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true,width: '397px',height: '419px', title: 'Add an Item...',
+                closeText: "show",
                 close: function (event, ui) {
                     $(this).remove();
                 }
