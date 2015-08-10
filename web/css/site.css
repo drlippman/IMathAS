@@ -153,6 +153,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     width: 18px;
     height: 18px;
     border: 1px solid #6d6d6d;
+    margin-right: 7px;
 }
 
 
@@ -894,12 +895,14 @@ input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focu
     outline-offset: -2px;
 }
 span.circle{
-    width: 35px!important;
-    height: 35px!important;
-    color: white;
-    background: #104E88;
+    width: 20px!important;
+    height: 20px!important;
+    color: #008000;
+    background: #ffffff;
     border-radius: 100%;
     text-align: center;
+    display: inline-flex;
+    padding-left: 6px
 }
 
 .copy-text{
@@ -912,4 +915,10 @@ span.circle{
 input[type=submit].secondarybtn, input[type=button].secondarybtn, button.secondarybtn {
      background-color: #104E87;
 }
-
+.ui-dialog .ui-dialog-title{
+    color: #4a4a4a;
+    text-align: center;
+    padding-left: 45px;
+    font-size: 18px;
+    width: 95%;
+}

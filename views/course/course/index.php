@@ -1371,10 +1371,8 @@ $now = $currentTime;
 <script>
     $(document).ready(function ()
     {
-
         var SH = $('#SH').val();
         var id = $('#id').val();
-//        var isHidden = ('#isHidden').val();
         if(SH == 'HC')
         {
             var node = document.getElementById('block5' + id);
