@@ -17,7 +17,7 @@ use app\components\AppUtility;
 		$AS = new AStoIMG;
 	}
 global $AS, $AMT, $imasroot;
-$imasroot = '/openmath';
+$imasroot = AppUtility::getHomeURL();
 include($filterdir."/graph/asciisvgimg.php");
 $AS = new AStoIMG;
 

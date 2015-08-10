@@ -2,7 +2,8 @@
 <head>
 <?php
 	$dbsetup = true; //prevents connection to database
-	include("config.php");
+//	include("config.php");
+$installname = 'OpenMath';
 ?>
 <title><?php echo $installname;?> Help</title>
 <style type="text/css">

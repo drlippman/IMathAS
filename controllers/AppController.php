@@ -653,7 +653,7 @@ function tzdate($string,$time) {
 }
 
 function writesessiondata($sessionData,$sessionId) {
-    global $sessionData,$sessionId;
+//    global $sessionData,$sessionId;
     $sessionContent = base64_encode(serialize($sessionData));
     Sessions::setSessionId($sessionId,$sessionContent);
 }
@@ -696,7 +696,7 @@ function generaterandstring() {
 
     public function getSessionData($sessionId){
         $session = Sessions::getById($sessionId);
-        return $session['sessiondata'];
+        return unserialize(base64_decode($session['sessiondata']));
     }
 
     public function setSessionData($key,$value){
@@ -719,12 +719,16 @@ function generaterandstring() {
 
     public function getNotificationDataForum($courseId,$user)
     {
-        $NewPostCounts = Thread::findNewPostCnt($courseId,$user);
-        $countPost  = AppConstant::NUMERIC_ZERO;
-        foreach($NewPostCounts as $count)
-        {
-            $countPost = $countPost +$count['COUNT(imas_forum_threads.id)'];
+        $NewPostCounts = Thread::findNewPostCnt($courseId, $user);
+        $countPost = AppConstant::NUMERIC_ZERO;
+        foreach ($NewPostCounts as $count) {
+            $countPost = $countPost + $count['COUNT(imas_forum_threads.id)'];
         }
-        return $countPost ;
+        return $countPost;
+    }
+
+    public function isTeacher($userId, $courseId){
+        $teacher = Teacher::getByUserId($userId,$courseId);
+        return $teacher['id'];
     }
 }

@@ -431,7 +431,7 @@ class AssessmentController extends AppController
                     }
                     $itemList = serialize($items);
                     Course::setItemOrder($itemList,$courseId);
-                    return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+                    return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?&cid=' .$course->id.'&aid='.$newAssessmentId));
                 }
             }else {
                 if (isset($params['id'])) {//page load in modify mode

@@ -117,7 +117,6 @@ class Assessments extends BaseImasAssessments
         $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
         $this->istutorial = isset($params['istutorial']) ? $params['istutorial'] : null;
         $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
-//        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }
@@ -265,5 +264,18 @@ class Assessments extends BaseImasAssessments
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+
+    public static function setVidData($itemOrder,$viddata,$aid){
+        $assessmentData = Assessments::findOne(['id' => $aid]);
+        if($assessmentData){
+            $assessmentData->itemorder = $itemOrder;
+            $assessmentData->viddata = $viddata;
+            $assessmentData->save();
+        }
+    }
+
+    public static function getByAssessmentIds($assessmentIdList){
+        return Assessments::find()->where('IN','id',$assessmentIdList)->all();
     }
 }

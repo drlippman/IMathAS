@@ -71,4 +71,11 @@ class Items extends BaseImasItems
         }
         return $itemId;
     }
+
+    public static function getByAssessmentId($cid,$aid){
+        $query = "SELECT ii.id AS itemid,ia.id,ia.name,ia.summary FROM imas_items AS ii JOIN imas_assessments AS ia ";
+        $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

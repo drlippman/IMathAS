@@ -153,7 +153,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
     }
 
     public static function deleteByAssessmentId($assessmentId){
-        $assessmentData = AssessmentSession::findAll(['assessmentid' => $assessmentId]);
+        $assessmentData = AssessmentSession::getByAssessmentId($assessmentId);
         if($assessmentData){
             foreach ($assessmentData as $singleAssessment){
                 $singleAssessment->delete();
@@ -175,5 +175,26 @@ class AssessmentSession extends BaseImasAssessmentSessions
     public static function getSessionInfoForUnenroll($searchNot, $lookForStr){
         $query = \Yii::$app->db->createCommand("SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchNot AND ($lookForStr)")->queryAll();
         return $query;
+    }
+
+    public static function getByAssessmentId($assessmentId){
+        return AssessmentSession::findAll(['assessmentid' => $assessmentId]);
+    }
+
+    public static function setBestScore($bestScore, $id){
+        $assessmentSessionData = AssessmentSession::getById($id);
+        if ($assessmentSessionData){
+            $assessmentSessionData->bestscores = $bestScore;
+            $assessmentSessionData->save();
+        }
+    }
+
+    public static function getByAssessmentSessionIdJoin($assessmentId,$courseId){
+        $query = new Query();
+        $query->select(['imas_assessment_sessions.id'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
+            ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId])->limit(1);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
     }
 } 
