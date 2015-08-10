@@ -130,6 +130,7 @@ class AssessmentController extends AppController
 
     public function actionAddAssessment(){
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $params = $this->getRequestParams();
         $courseId =$this->getParamVal('cid');
         $block = $this->getParamVal('block');
@@ -336,6 +337,7 @@ class AssessmentController extends AppController
                     if ($params['summary']==AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
                         $params['summary'] = '';
                     } else {
+                        $params['summary'] = '';
                         /*
                          * HtmLawed in progress
                          */
@@ -343,6 +345,7 @@ class AssessmentController extends AppController
                     if ($params['intro']==AppConstant::DEFAULT_ASSESSMENT_INTRO) {
                         $params['intro'] = '';
                     } else {
+
                         /*
                          * HtmLawed in progress
                          */
@@ -642,6 +645,7 @@ class AssessmentController extends AppController
                 }
             }
         }
+        $this->includeCSS(['course/items.css']);
         $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js","assessment/addAssessment.js"]);
         return $this->renderWithData('addAssessment',['course' => $course,'assessmentData' => $assessmentData,
         'saveTitle'=>$saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,

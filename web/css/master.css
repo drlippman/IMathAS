@@ -221,11 +221,11 @@ body {
     margin-right: 5px;
 }
 .calendar-alignment{
-    width: 76%;
+    /*width: 76%;*/
     position: relative;
 }
 .calendar-day-details-right-side{
-    width: 24%;
+    /*width: 24%;*/
     position: relative;
     padding: 15px;
     padding-right: 0;
@@ -302,3 +302,20 @@ body {
 i.fa-home{
     font-size: 1.7em;
 }
+.fc-toolbar .fc-state-hover:hover{
+    z-index: 5;
+    background: none;
+}
+.fc-state-active  {
+    z-index: 5;
+    background: #104E87;
+    color: #ffffff;
+}
+.fc-toolbar .fc-state-hover, .fc-toolbar .ui-state-hover {
+    z-index: 2;
+    background: none;
+}
+.fc-month-button.fc-button.fc-state-default.fc-corner-left .fc-state-active{
+    background-color: #104E87;
+}
+

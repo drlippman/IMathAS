@@ -32,7 +32,6 @@ $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
                     href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/manage-events?cid=' . $course->id); ?>">Manage Events</a></pre>
             <?php }?>
             <div class ='calendar padding-alignment calendar-alignment col-lg-9 pull-left'>
-
                 <input type="hidden" class="current-time" value="<?php echo $currentDate?>">
                 <div id="demo" style="display:table-cell; vertical-align:middle;"></div>
                 <input type="hidden" class="calender-course-id" value="<?php echo $course->id ?>">

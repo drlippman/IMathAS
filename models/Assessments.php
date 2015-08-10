@@ -117,6 +117,7 @@ class Assessments extends BaseImasAssessments
         $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
         $this->istutorial = isset($params['istutorial']) ? $params['istutorial'] : null;
         $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
+//        AppUtility::dump($this);
         $this->save();
         return $this->id;
     }
