@@ -168,7 +168,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 .ui-dialog .ui-dialog-buttonset button{
     color: #000000;
     background-color: #f0f0f0;
-    border: 1px solid #6d6d6d;
+    border: 1px solid #d3d3d3;
 }
 .ui-widget-content {
      border: 0;
@@ -894,15 +894,20 @@ input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focu
     outline: 0px auto -webkit-focus-ring-color;
     outline-offset: -2px;
 }
-span.circle{
-    width: 20px!important;
-    height: 20px!important;
-    color: #008000;
-    background: #ffffff;
-    border-radius: 100%;
+div.circle {
+    display: inline-block;
+    background: white;
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 50px;
+    color: black;
     text-align: center;
-    display: inline-flex;
-    padding-left: 6px
+    font-size: 13px;
+    vertical-align: middle;
+    margin-top: 0;
+}
+span.notification{
+    vertical-align: text-top;    
 }
 
 .copy-text{
@@ -918,7 +923,6 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
 .ui-dialog .ui-dialog-title{
     color: #4a4a4a;
     text-align: center;
-    padding-left: 45px;
     font-size: 18px;
-    width: 95%;
+    width: 100%;
 }

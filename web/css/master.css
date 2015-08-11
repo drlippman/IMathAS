@@ -261,7 +261,7 @@ body {
     padding-top: 10px;
 }
 .nav-tabs-non-shadow{
-    box-shadow: 0px -3px 13px -2px #6d6d6d;
+    box-shadow: 0px -3px 13px -7px #6d6d6d;
 }
 .calendar-container{
     padding-top: 15px;
@@ -317,5 +317,15 @@ i.fa-home{
 }
 .fc-month-button.fc-button.fc-state-default.fc-corner-left .fc-state-active{
     background-color: #104E87;
+}
+.nav-tabs.aligned > li {
+    float: left;
+    width: 20%;
+    margin-bottom: -1px;
+}
+.nav-tabs > li > a{
+    margin-right: 0;
+     border-radius:0; ;
+    text-align: center;
 }
 

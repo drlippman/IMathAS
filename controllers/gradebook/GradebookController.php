@@ -2501,9 +2501,7 @@ class GradebookController extends AppController
             }
             $stuGbMode = $_POST['stugbmode1'] + $_POST['stugbmode2'] + $_POST['stugbmode4'] + $_POST['stugbmode8'];
             GbScheme::updateGbScheme($useWeights, $orderBy, $userSort, $defaultCat, $defGbMode, $stuGbMode, $params['colorize'], $course['id']);
-            if (isset($params['submit'])) {
-                $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid=' . $course['id'] . '&refreshdef=true'));
-            }
+            $this->redirect(AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid=' . $course['id'] . '&refreshdef=true'));
         }
 
         $gbScheme = GbScheme::getByCourseId($course['id']);

@@ -26,7 +26,7 @@ echo Nav::widget([
         Yii::$app->user->isGuest ?
             ['label' => 'Notifications ', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ($totalCount >0 ?['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications&nbsp;'.'<span class="circle">'.$totalCount.'</span>',
+            ($totalCount >0 ?['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><span class="notification">'.$totalCount.'</span></div>',
                 'items' =>
                 [
                     ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),

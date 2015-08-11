@@ -122,7 +122,7 @@ $this->params['breadcrumbs'][] = $this->title;
         } else {
             $row['calctype'] = $row['dropn']==0?0:1;
         }
-        echo "<table class='gb table table-bordered table-striped table-hover data-table'><thead>";
+        echo "<table class='table table-bordered table-striped table-hover data-table'><thead>";
         echo "<tr><th>Category Name</th><th>Display<sup>*</sup></th><th>Scale (optional)</th><th>Drops &amp; Category total</th><th id=weighthdr>";
         if ($useWeights==0) {
             echo "Fixed Category Point Total (optional)<br/>Blank to use point sum";
@@ -137,7 +137,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "</tbody></table>";
         echo '<p><input type="button" class ="btn btn-primary" value="'.AppUtility::t('Add New Category', false).'" onclick="addCat()" /></p>';
         echo '</fieldset>';
-        echo '<div class="submit"><input class ="btn btn-primary" type=submit name=submit value="'.AppUtility::t('Save Changes', false).'"/></div>';
+        echo '<div class="submit"><input class ="btn btn-primary save-btn" id="save-btn" type=submit name=submit value="'.AppUtility::t('Save Changes', false).'"/></div>';
         echo "</form>";
         echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
         echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';

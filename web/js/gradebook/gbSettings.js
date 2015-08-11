@@ -1,5 +1,10 @@
 $(document).ready(function () {
     $("#viewfield").hide();
+    $('#theform').one('submit', function(){
+        $(this).find('input[type="submit"]').attr('disabled', 'disabled');
+    });
+
+
 });
 var addrowcnt = 0;
 function toggleAdv(el) {

@@ -2,7 +2,7 @@
 use app\components\AppUtility;
 ?>
 <div class="roster-nav-tab">
-    <ul class="nav nav-tabs nav-justified sub-menu-bar-nav">
+    <ul class="nav nav-tabs aligned sub-menu-bar-nav">
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Offline Grades');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">

@@ -45,10 +45,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
-                <ul class="dropdown-menu selected-options">
+                <ul class="dropdown-menu with-selected">
                     <li><a class="non-locked" href="#"><i
                                 class="fa fa-unlock-alt fa-fw"></i>&nbsp;<?php AppUtility::t('Select non-locked'); ?>
-                        </a></li>
+                        </a>
+                    </li>
                     <li>
                         <form action="roster-email?cid=<?php echo $course->id ?>" method="post" id="roster-email-form">
                             <input type="hidden" id="student-id" name="student-data" value=""/>
