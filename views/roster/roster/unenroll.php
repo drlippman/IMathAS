@@ -31,16 +31,21 @@ if($gradebook != AppConstant::NUMERIC_ONE) {
 ?>
 <div class="padding15">
     <?php
+    if($gradebook == AppConstant::NUMERIC_ONE) {
+        echo "<form method=post action=\"unenroll?cid={$course->id}&uid={$studentId}&confirmed=true&gradebook=1\">";
+    } else{
+        echo "<form method=post action=\"unenroll?cid={$course->id}&uid={$studentId}&confirmed=true\">";
+    }
             if($studentId == 'all'){
     ?>
                 <p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
                     If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
                 <p>Are you SURE you want to unenroll ALL students?</p>
-    <?php }?>
     <ul>
         <?php
         foreach ($students as $student) {
             echo " <li>".ucfirst($student['LastName']).", ".ucfirst($student['FirstName'])." (".$student['SID'].")</li>";
+            $arr[] = $student['id'];
         }
         ?>
     </ul>
@@ -57,16 +62,42 @@ if($gradebook != AppConstant::NUMERIC_ONE) {
     <p>Also remove wiki revisions: <input type="radio" name="delwikirev" value="1" />All wikis,
         <input  type="radio" name="delwikirev" value="2" checked="checked" />Group wikis only
     </p>
+            <?php }else if($studentId == 'selected'){?>
+                <p><b style="color:red">Warning!</b>: This will delete ALL course data about these students.  This action <b>cannot be undone</b>.
+                    If you have a student who isn't attending but may return, use the Lock Out of course option instead of unenrolling them.</p>
+                <p>Are you SURE you want to unenroll the selected students?</p>
+                <ul>
+                    <?php
+                    foreach ($students as $student) {
+                        echo " <li>".ucfirst($student['LastName']).", ".ucfirst($student['FirstName'])." (".$student['SID'].")</li>";
+                        $arr[] = $student['id'];
+                    }
+                    ?>
+                </ul>
+                <?php if($delForumMsg == 1){?>
+                    <p>Also delete <b style="color:red;">ALL</b> forum posts by ALL students (not just the selected ones)? <input type=checkbox name="delforumposts"/></p>
+                <?php }?>
+                <?php if($delWikiMsg == 1){?>
+                    <p>Also delete <b style="color:red;">ALL</b> wiki revisions:
+                        <input type="radio" name="delwikirev" value="0" checked="checked" />No,
+                        <input type="radio" name="delwikirev" value="1" />Yes, from all wikis,
+                        <input type="radio" name="delwikirev" value="2" />Yes, from group wikis only</p>
+                        <?php }
+                ?>
+            <?php } ?>
     <p>
+        <?php $studentData = implode(',', $arr); ?>
+        <input type="hidden" name="studentData" value="<?php echo $studentData ?>"/>
         <input type=submit class="secondarybtn" value="Unenroll">
         <input type=submit name="lockinstead" value="Lock Students Out Instead">
         <?php
-//        if ($calledfrom=='lu') {
-            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='listusers.php?cid=$cid'\">";
-//        } else if ($calledfrom=='gb') {
-//            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='gradebook.php?cid=$cid&gbmode={$_GET['gbmode']}'\">";
-//        }
+        if($gradebook == AppConstant::NUMERIC_ONE) {
+            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."gradebook/gradebook/gradebook?cid=$course->id'\">";
+    }else{
+            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='".AppUtility::getHomeURL()."roster/roster/student-roster?cid=$course->id'\">";
+        }
         ?>
     </p>
+    </form>
 </div>
 </div>

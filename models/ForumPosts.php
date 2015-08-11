@@ -9,6 +9,7 @@ use app\models\_base\BaseImasForumPosts;
 use app\models\forms\ForumForm;
 use Yii;
 use yii\db\Query;
+use yii\db\Exception;
 
 
 class ForumPosts extends BaseImasForumPosts
@@ -243,7 +244,12 @@ class ForumPosts extends BaseImasForumPosts
         return ForumPosts::find()->where(['forumid' => $forumId])->all();
     }
     public static function deleteForumRelatedToCurse($forumlist){
-        Yii::$app->db->createCommand("DELETE imas_forum_threads FROM imas_forum_posts JOIN imas_forum_threads ON imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0 WHERE imas_forum_threads.forumid IN ($forumlist)")->queryAll();
+        $query = ForumPosts::find()->join('INNER JOIN', 'imas_forum_threads', 'imas_forum_posts.threadid=imas_forum_threads.id AND imas_forum_posts.posttype=0')->where(['IN', 'imas_forum_threads.forumid', $forumlist])->all();
+        if($query){
+            foreach($query as $forums){
+                ForumThread::removeThread($forums['threadid']);
+            }
+        }
     }
     public static function selectForumPosts($forumlist){
         $query = \Yii::$app->db->createCommand("SELECT id FROM imas_forum_posts WHERE forumid IN ($forumlist) AND files<>''")->queryAll();

@@ -116,8 +116,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                     class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
                         </form>
                     </li>
-                    <li><a id="unenroll-btn" onclick="studentUnenroll()"><i class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a></li>
-                    <li><a id="lock-btn"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>
+                    <li>
+                        <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/unenroll?cid=' . $course->id . '&gradebook=1') ?>" id="un-enroll-form"
+                              method="post">
+                            <input type="hidden" id="checked-student" name="student-data" value=""/>
+                            <a class="with-selected-list" href="javascript: studentUnEnroll()"><i
+                                    class="fa fa-trash-o fa-fw"></i>&nbsp;<?php AppUtility::t('Unenroll'); ?></a>
+                            </a>
+                        </form>
+                    </li>
+                    <li><a id="lock-btn" href="#"><i class='fa fa-lock fa-fw'></i>&nbsp;<?php AppUtility::t('Lock'); ?>
                         </a></li>
                     <li>
                         <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/make-exception?cid=' . $course->id . '&gradebook=1') ?>" id="make-exception-form"

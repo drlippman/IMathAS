@@ -176,6 +176,8 @@ class RosterController extends AppController
                 array_push($studentArray, $tempArray);
             }
         }
+        $sort_by = array_column($studentArray, 'lastname');
+        array_multisort($sort_by, SORT_ASC | SORT_NATURAL | SORT_FLAG_CASE, $studentArray);
         $responseData = array('query' => $studentArray, 'isCode' => $isCodePresent, 'isSection' => $isSectionPresent, 'isImageColumnPresent' => $isImageColumnPresent);
         return $this->successResponse($responseData);
     }
@@ -865,10 +867,38 @@ class RosterController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $params = $this->getRequestParams();
+        if(isset($params['lockinstead'])){
+            $toLock = explode(',', $params['studentData']);
+            foreach ($toLock as $student) {
+                Student::updateLocked($student, $params['cid']);
+            }
+            if(isset($params['gradebook'])){
+                return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$params['cid']));
+            }else{
+                return $this->redirect(AppUtility::getURLFromHome('roster', 'roster/student-roster?cid='.$params['cid']));
+            }
+        }else if(isset($params['confirmed'])){
+            $connection = $this->getDatabase();
+            $transaction = $connection->beginTransaction();
+            try {
+            StudentUnenrollUtility::unenrollStudent($params);
+                $transaction->commit();
+            }catch (Exception $e){
+                $transaction->rollBack();
+                return false;
+            }
+            if(isset($params['gradebook'])){
+                return $this->redirect(AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid='.$params['cid']));
+            }else{
+                return $this->redirect(AppUtility::getURLFromHome('roster', 'roster/student-roster?cid='.$params['cid']));
+            }
+        }
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $studentData = explode(',',$params['student-data']);
         $students = array();
+        $delForumMsg = 0;
+        $delWikiMsg = 0;
         foreach($studentData as $student){
             $query = User::findAllById($student);
             array_push($students, $query[0]);
@@ -881,55 +911,23 @@ class RosterController extends AppController
         }else{
             $studentId = 'selected';
         }
-        $responseData = array('students' => $students, 'studentId' => $studentId, 'course' => $course);
+        if($studentId == 'selected'){
+            if(count($studentData) > floor(count($users)/2)){
+                $delForumMsg = 1;
+                $delWikiMsg = 1;
+            }else{
+                $delForumMsg = 0;
+                $delWikiMsg = 0;
+            }
+        }
+        $gradebook = 0;
+        if(isset($params['gradebook'])){
+            $gradebook = 1;
+        }
+        $responseData = array('students' => $students, 'studentId' => $studentId, 'course' => $course, 'delForumMsg' => $delForumMsg, 'delWikiMsg' =>  $delWikiMsg, 'gradebook' => $gradebook);
         $this->includeCSS(['roster/roster.css']);
         return $this->renderWithData('unenroll', $responseData);
     }
-
-    public function actionMarkUnenrollAjax()
-    {
-        $this->layout = false;
-        $params = $this->getRequestParams();
-        if($params['uid'] == "selected" )
-        {
-            $tounenroll = $params['checkedstudents'];
-        }elseif($params['uid'] == 'all')
-        {
-            $query = Student::getByCourse($params['courseid']);
-            foreach($query as $student){
-                $tounenroll[] = $student['userid'];
-            }
-        }else{
-            $tounenroll[] = $params['uid'];
-        }
-        if (!isset($params['delwikirev'])) {
-            $delwikirev = intval($_POST['delwikirev']);
-        } else {
-            $delwikirev = 0;
-        }
-        if (isset($params['removewithdrawn'])) {
-            $withwithdraw = 'remove';
-        } else if ($params['uid'] == "all") {
-            $withwithdraw = 'unwithdraw';
-        } else {
-            $withwithdraw = false;
-        }
-        /*
-         * transaction is remaining
-         */
-        $connection = $this->getDatabase();
-        $transaction = $connection->beginTransaction();
-        try {
-            StudentUnenrollUtility::unenrollstu($params['courseid'], $tounenroll, ($params['uid'] == "all" || isset($params['delforumposts'])), ($params['uid'] == "all" && isset($params['removeoffline'])), $withwithdraw, $delwikirev, isset($params['usereplaceby']));
-            $transaction->commit();
-        }catch (Exception $e){
-            $transaction->rollBack();
-            return false;
-        }
-
-        return $this->successResponse();
-    }
-
     public function actionRosterMessage()
     {
         if ($this->isPost()) {

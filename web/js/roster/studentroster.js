@@ -187,9 +187,7 @@ function studentUnEnroll() {
         CommonPopUp(msg);
     }
 }
-function markUnenrollSuccess(response) {console.log(response);
-    location.reload();
-}
+
 function studentEmail() {
     var markArray = createStudentList();
     if (markArray.length != 0) {

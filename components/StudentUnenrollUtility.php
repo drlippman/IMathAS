@@ -33,6 +33,34 @@ use yii\base\Component;
 
 class StudentUnenrollUtility extends Component
 {
+    public static function unenrollStudent($params)
+    {
+        if($params['uid'] == "selected" )
+        {
+            $tounenroll = explode(',', $params['studentData']);
+        }elseif($params['uid'] == 'all')
+        {
+            $query = Student::getByCourse($params['cid']);
+            foreach($query as $student){
+                $tounenroll[] = $student['userid'];
+            }
+        }else{
+            $tounenroll[] = $params['uid'];
+        }
+        if (!isset($params['delwikirev'])) {
+            $delwikirev = intval($_POST['delwikirev']);
+        } else {
+            $delwikirev = 0;
+        }
+        if (isset($params['removewithdrawn'])) {
+            $withwithdraw = 'remove';
+        } else if ($params['uid'] == "all") {
+            $withwithdraw = 'unwithdraw';
+        } else {
+            $withwithdraw = false;
+        }
+            StudentUnenrollUtility::unenrollstu($params['cid'], $tounenroll, ($params['uid'] == "all" || isset($params['delforumposts'])), ($params['uid'] == "all" && isset($params['removeoffline'])), $withwithdraw, $delwikirev, isset($params['usereplaceby']));
+    }
 
     public static function unenrollstu($cid,$tounenroll,$delforum=false,$deloffline=false,$withwithdraw=false,$delwikirev=false,$usereplaceby=false) {
         $forums = array();
@@ -120,7 +148,7 @@ class StudentUnenrollUtility extends Component
             }
         }
         if ($delforum && count($forums)>0) {
-            ForumPosts::deleteForumRelatedToCurse($forumlist);
+            ForumPosts::deleteForumRelatedToCurse($forums);
             $query = ForumPosts::selectForumPosts($forumlist);
             foreach($query as $post){
                 filehandler::deleteallpostfiles($post['id']);
@@ -143,9 +171,7 @@ class StudentUnenrollUtility extends Component
             Questions::updateWithdrawn($assesses);
         }
         if ($withwithdraw=='remove' || $usereplaceby) {
-
             UpdateAssessUtility::updateassess($cid, $withwithdraw=='remove', $usereplaceby);
-
         }
         if (count($tounenroll)>0) {
             foreach($tounenroll as $studentId){
