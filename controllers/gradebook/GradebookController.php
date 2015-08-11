@@ -160,12 +160,10 @@ class GradebookController extends AppController
         }
         if ($canviewall) {
             $sessionId = $this->getSessionId();
-            $session = $this->getSessionData($sessionId);
-            $sessionData = unserialize(base64_decode($session));
+            $sessionData = $this->getSessionData($sessionId);
             if (isset($_GET['gbmode']) && $_GET['gbmode'] != '') {
                 $gbmode = $_GET['gbmode'];
                 $sessionData['gbmode'] = $gbmode;
-                writesessiondata();
             } else if (isset($sessionData['gbmode'])) {
 
                 $gbmode = $sessionData['gbmode'];
@@ -184,7 +182,7 @@ class GradebookController extends AppController
 //            }
             $overridecollapse = array();
 
-            //Gbmode : Links NC Dates
+            //Gbmode : Links NC Dates.
 
             $showpics = floor($gbmode / 10000) % 10; //0 none, 1 small, 2 big
             $totonleft = ((floor($gbmode / 1000) % 10) & 1); //0 right, 1 left
