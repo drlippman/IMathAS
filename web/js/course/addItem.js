@@ -7,14 +7,14 @@ $(document).ready(function(){
             var tb = 't';
 
             var html = '<div class="">' +
-                            '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'">' +
+                            '<a href="#">' +
                              '<div class="assessment itemLink" >' +
                                 '<img class="icon-center icon-size" id=\"addtype$parent-$tb\" onclick= \"additem(1, t)" src="../../img/iconAssessment.png">' +
                                 '<div class="item-name">Assessment</div>'+
                             '</div>' +
                             '</a>' +
 
-                            '<a href="../../course/course/modify-inline-text?courseId=' + courseId+'"><div class="inline-text itemLink">' +
+                            '<a href="#"><div class="inline-text itemLink">' +
                                 '<img class="icon-center icon-size" src="../../img/inlineText.png">' +
                                 '<div class="item-name">Inline Text</div>'+
                             '</div></a>' +
@@ -41,14 +41,19 @@ $(document).ready(function(){
 
                             '<a href="../../block/block/add-block?courseId='+ courseId+'&block='+block+'&tb='+tb+'"><div class="block-item itemLink">' +
                                 '<img class="icon-center icon-size" src="../../img/block.png">' +
-                                '<div class="item-name-small">Block</div>'+
+                                '<div class="item-name-small block-name-alignment">Block</div>'+
                             '</div></a>' +
                         '</div>';
             $('<div class="dialog-items" id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true,width: '397px',height: '419px', title: 'Add an Item...',
+                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '397px',height: '419px', title: 'Add an Item...',
                 closeText: "show",
                 close: function (event, ui) {
                     $(this).remove();
+                },
+                open: function(){
+                    jQuery('.ui-widget-overlay').bind('click',function(){
+                        jQuery('#dialog').dialog('close');
+                    })
                 }
             });
         });

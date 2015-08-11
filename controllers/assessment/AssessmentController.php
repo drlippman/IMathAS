@@ -645,7 +645,7 @@ class AssessmentController extends AppController
                 }
             }
         }
-        $this->includeCSS(['course/items.css']);
+        $this->includeCSS(['course/items.css', 'course/course.css']);
         $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js","assessment/addAssessment.js"]);
         return $this->renderWithData('addAssessment',['course' => $course,'assessmentData' => $assessmentData,
         'saveTitle'=>$saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,

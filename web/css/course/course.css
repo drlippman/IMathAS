@@ -4,6 +4,7 @@
     padding: 12px 22px;
 }
 .course-top-menu{
+    padding-top: 11px;
     padding-right: 0;
     padding-left: 0;
 }
@@ -16,6 +17,7 @@
 }
 
 .add-item-text{
+    padding-top: 5px;
     padding-right: 0;
     padding-left: 0;
 }
@@ -30,7 +32,7 @@
 }
 .assessment{
     position: absolute;
-    top: 20px;
+    top: 24px;
     left:10px;
     width: 110px;
     height:100px;
@@ -48,8 +50,9 @@
     margin-bottom: 10px;
 }
 .item-name{
-    margin-top:14px;
+    margin-top:16px;
     text-align: center;
+    font-size: 12px;
 }
 .inline-text{
     position: absolute;
@@ -116,9 +119,10 @@ div.dialog-items{
     min-height: 380px !important;
 }
 .item-name-small{
-    margin-top:14px;
+    margin-top:16px;
     text-align: center;
     margin-right: 0;
+    font-size: 12px;
 }
 
 .mvsel{
@@ -163,8 +167,8 @@ div.dialog-items{
     background-color: #f0f0f0;
 }
 .icon-size{
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
 }
 .item-icon-alignment{
     padding-top: 2px;
@@ -198,8 +202,9 @@ div.dialog-items{
     margin-right: 20px;
 }
 .add-item-icon{
+    padding-top: 9px;
     width: 24px;
-    height: 24px;
+    height: 30px;
 }
 .student-block{
     margin-right: 20px;
@@ -213,4 +218,7 @@ div.dialog-items{
     font-size: 20px;
     font-weight: bold;
     padding-left: 10px;
+}
+.block-name-alignment{
+    padding-right: 6px;
 }

@@ -149,10 +149,10 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 
 .ui-dialog .ui-dialog-titlebar-close{
     background-color: #ffffff !important;
-    background-image: url("../img/dialog_close.png");
-    width: 18px;
-    height: 18px;
-    border: 1px solid #6d6d6d;
+    background-image: url("../img/addItemClose.png");
+    width: 50px;
+    /*height: 18px;*/
+    border: 1px solid #ffffff;
     margin-right: 7px;
 }
 
@@ -378,7 +378,9 @@ a:focus {
 }
 
 .btn-primary {
-    color: #fff; background-color: #428bca; border-color: #2C368E;
+    color: #fff;
+    background-color: #428bca;
+    border-color: #2C368E;
     text-transform: capitalize;
 
 }
@@ -659,12 +661,12 @@ img.small-icon{
     border: 1px solid #101A66;
 }
 input[type="submit"], input[type="button"], button, a.abutton {
-    color: #ffffff;
-    background-color: #104E87;
-    border-radius: 0px;
-    border: 1px solid #285E8E;
+    /*color: #ffffff;*/
+    /*background-color: #104E87;*/
+    /*border-radius: 0px;*/
+    /*border: 1px solid #285E8E;*/
     font: inherit;
-    height: 2.5em;
+    /*height: 2.5em;*/
     padding: 0px 8px;
     margin: 0;
 }
@@ -923,6 +925,10 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
 .ui-dialog .ui-dialog-title{
     color: #4a4a4a;
     text-align: center;
+    padding-left: 10px;
     font-size: 18px;
     width: 100%;
+}
+.non-bold{
+    font-weight:normal;
 }
