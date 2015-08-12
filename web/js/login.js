@@ -7,10 +7,10 @@ document.getElementById("tzname").value = tz.name();
 function updateloginarea() {
     setnode = document.getElementById("settings");
     var html = "";
-    html += '<div class="form-group"><label class="col-lg-3 control-label">Accessibility</label> <div class="col-lg-6"><select name="access" class="form-control"><option value="0">Use defaults</option>';
+    html += '<div class="form-group"><label class="col-lg-4 control-label">Accessibility</label> <div class="col-lg-8"><select name="access" class="form-control"><option value="0">Use defaults</option>';
     html += '<option value="3">Force image-based display</option>';
     html += '<option value="1">Use text-based display</option></select> </div>';
-    html += "<div class='col-lg-1 help-link select-text-margin'><a href='#' onClick=\"window.open('helper-guide?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left=150')\">Help</a> </div></div>";
+//    html += "<div class='help-link select-text-margin'><a href='#' onClick=\"window.open('helper-guide?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left=150')\">Help</a> </div></div>";
 
     if (!MathJaxCompatible) {
         html += '<input type=hidden name="mathdisp" value="0">';

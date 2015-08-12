@@ -92,6 +92,7 @@ class SiteController extends AppController
             }
         }
         $challenge = AppUtility::getChallenge();
+        $this->includeCSS(['login.css']);
         $this->includeJS(['jstz_min.js', 'login.js']);
         $responseData = array('model' => $model, 'challenge' => $challenge,);
         return $this->renderWithData('login', $responseData);
@@ -147,6 +148,7 @@ class SiteController extends AppController
     public function actionStudentRegister()
     {
         $flashMsg ='';
+        $this->layout = 'nonLoggedUser';
         $model = new StudentRegisterForm();
         if ($model->load($this->getPostData())) {
             $params = $this->getRequestParams();
@@ -167,6 +169,7 @@ class SiteController extends AppController
             }
             $this->setErrorFlash('User already exist.');
         }
+        $this->includeCSS(['studentRegister.css']); 
         $responseData = array('model' => $model,);
         return $this->renderWithData('studentRegister', $responseData);
     }

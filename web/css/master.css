@@ -151,12 +151,15 @@ body {
 }
 
 .help-icon {
-    width: 35px;
-    height: 35px;
+    width: 24px;
+    height: 24px;
     color: white;
     background: #104E88;
     border-radius: 100%;
     text-align: center;
+    padding-top: 4px;
+    font-size: 15px;
+    margin-left: 10px;
     /*padding: 20%;*/
 }
 
@@ -328,4 +331,11 @@ i.fa-home{
      border-radius:0; ;
     text-align: center;
 }
+.icon-remove:before {
+    content: "\f00d";
+}
 
+.title-page > i
+{
+ margin-top: 2px;
+}
