@@ -9,8 +9,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div><h3>Course Outcomes</h3></div>
 <div class="cpmid">
-<a href="#">View Outcomes Map</a> |
-<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-report?cid='.$courseId)?>">View Outcomes Report</a>
+<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-map?cid='.$courseId)?>">View Outcomes Map</a> |
+<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-report?cid='.$courseId.'&report=0')?>">View Outcomes Report</a>
 </div>
 <div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups.
 <input type="button" class="btn btn-primary" id="Save-changes"  value="Save Changes">

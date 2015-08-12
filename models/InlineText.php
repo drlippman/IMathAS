@@ -12,6 +12,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasInlinetext;
+use yii\db\Query;
 
 class InlineText extends BaseImasInlinetext
 {
@@ -108,7 +109,6 @@ class InlineText extends BaseImasInlinetext
     {
         return InlineText::find()->select('title,text,startdate,enddate,avail,oncal,caltag,isplaylist,fileorder')->where(['id' => $id])->one();
     }
-
     public static function setStartDate($shift, $typeId)
     {
         $date = InlineText::find()->where(['id' => $typeId])->andWhere(['>', 'startdate', '0'])->one();
@@ -129,5 +129,17 @@ class InlineText extends BaseImasInlinetext
         }
     }
 
+    public static function getInlineTextForOutcomeMap($courseId)
+    {
 
-}
+        $query = new Query();
+        $query->select(['id','title','outcomes'])
+            ->from('imas_inlinetext')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['NOT LIKE','outcomes','']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+} 
+

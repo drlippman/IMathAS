@@ -78,4 +78,16 @@ class GbCats extends BaseImasGbcats
         $data = $command->queryAll();
         return $data;
     }
+    public static function getGbCatsForOutcomeMap($catList)
+    {
+        $query = new Query();
+        $query->select(['id', 'name'])
+            ->from('imas_gbcats')
+            ->where(['IN','id', $catList]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
+
 }

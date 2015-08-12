@@ -4,7 +4,7 @@ use app\components\AssessmentUtility;
 use app\components\CourseItemsUtility;
 use app\components\AppConstant;
 
-$this->title = AppUtility::t('Message',false );
+$this->title = AppUtility::t('View Message',false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
@@ -20,7 +20,7 @@ $now = $currentTime;
 
 <?php } ?>
     <div class="item-detail-header">
-            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
     </div>
     <div class = "title-container">
         <div class="row">
@@ -75,7 +75,15 @@ $now = $currentTime;
                      <span class="message-reply">
                          <a href="<?php echo AppUtility::getURLFromHome('message', 'message/view-conversation?id=' . $messages->id . '&message=' . $sent . '&baseid=' . $messages->baseid.'&cid='.$course->id); ?>" class="btn1  reply-button "><i class="fa fa-twitch"></i>&nbsp;&nbsp;<?php echo AppUtility::t('View Conversation')?></a>
                     </span>
+             <span class="pull-right col-sm-1 margin-right-ten btn-hover">
+                 <?php if(($messages['isread']) < AppConstant::NUMERIC_SEVEN){?>
+                      <a href="#" onclick='changeImage(this,false,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagempty.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>
+                 <?php }else{?>
+                     <a href="#"  onclick='changeImage(this,true,<?php echo $messages['id'];?>)' class="btn1 flag-button"><img class="small-icon" src="<?php echo AppUtility::getAssetURL()?>img/flagfilled.gif">&nbsp;&nbsp;<?php echo AppUtility::t('Flag')?></a>
+                 <?php }?>
+              </span>
          </div>
+
 </div>
     <br>
  </div>

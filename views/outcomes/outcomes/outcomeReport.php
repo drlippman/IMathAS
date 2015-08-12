@@ -7,102 +7,158 @@ $this->title = 'Outcome Report';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div><h3>Outcomes  Report</h3></div>
-<div class="cpmid">
-   <b>Show for scores</b> <select class=''>
-        <option value='1'>Past Due scores</option>
-        <option value='2' selected="selected">Past Due and Attempted scores</option></select>
-</div>
+    <?php
+    $typeSel = 'Show for scores: '.'<select id="typeSel" onchange="chgtype()">';
+    $typeSel .= '<option value="0" '.($type== 0?'selected="selected"':'').'>'.'Past Due scores'.'</option>';
+    $typeSel.= '<option value="1" '.($type== 1?'selected="selected"':'').'>'.'Past Due and Attempted scores'.'</option>';
+    $typeSel.= '</select>';?>
+
 <input type="hidden" id="course-id" value="<?php echo $courseId?>">
-<div class="outcomeReport-div"></div>
+<?php
+    if($report == AppConstant::NUMERIC_ZERO)
+    {
+        if($headerData && $outc)
+        {
+            echo '<div class="cpmid">'.$typeSel.'</div>';
+            echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><th>'.$finalData[0][0][0] .'</th>';
+             $arr = '"S"';
+            foreach($outc as $data)
+            {
+            ?>
+            <?php
+                if(isset($type))
+                {
+                    $url =  AppUtility::getURLFromHome("outcomes","outcomes/outcome-report?cid=".$courseId."&report=1".'&selectedOutcome='.$data.'&type='.$type);
+                }else
+                {
+                    $url =  AppUtility::getURLFromHome("outcomes","outcomes/outcome-report?cid=".$courseId."&report=1".'&selectedOutcome='.$data);
+                 }
+                ?>
+                <th><?php echo $headerData[$data]?><br/><a class="small" href="<?php echo $url?>">[Details]</a></th>
+            <?php  $arr .= ',"N"';
+            }
+            echo '</tr><tbody>';
+            for($i=1;$i< count($finalData);$i++)
+            {
+                echo'<tr class="'.($i%2==0?'even':'odd').'">';
+                if(isset($type)){
+                    $url =  AppUtility::getURLFromHome("outcomes","outcomes/outcome-report?cid=".$courseId."&report=2".'&stud='.$finalData[$i][0][1].'&type='.$type);
+                }else{
+                    $url =  AppUtility::getURLFromHome("outcomes","outcomes/outcome-report?cid=".$courseId."&report=2".'&stud='.$finalData[$i][0][1]);
+                }
+                echo'<td><a href=" '.$url.'">'.$finalData[$i][0][0].'</a></td>';
+                foreach($outc as $data)
+                {
+                    if(isset($finalData[$i][3][$type]) && isset($finalData[$i][3][$type][$data]))
+                    {
+                        echo '<td>'.round(100*$finalData[$i][3][$type][$data],1).'%</td>';
+                    }
+                    else
+                    {
+                        echo '<td>-</td>';
+                    }
+                }
+                echo '</tr>';
+
+            }
+            echo '</tbody></table>';
+//            echo "<script>initSortTable('myTable',Array($arr),true,false);</script>\n";
+            echo '<p>'._('Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores').'</p>';
+
+        }
+    }else if($report == AppConstant::NUMERIC_ONE)
+    {
+
+        echo '<div class="cpmid">'.$typeSel.'</div>';
+        echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><th>'."Name".'</th><th>'."Total".'</th>';
+        $arr = '"S","N"';
+        $catsToList = array();
+        $itemsToList = array();
+        for ($i=1;$i<count($finalData);$i++)
+        {
+            for ($j=0;$j<count($finalData[$i][1]);$j++){
+                if(isset($itemsToList[$j])){continue;}
+                if ($type==0 && $finalData[0][1][$j][2]==1) {continue;}
+                if (isset($finalData[$i][1][$j][1][$selectedOutcome]))
+                {
+                    $itemsToList[$j] = 1;
+                }
+            }
+            for ($j=0;$j<count($finalData[$i][2]);$j++)
+            {
+                if (isset($finalData[$i][2][$j][2*$type+1][$selectedOutcome]) && $finalData[$i][2][$j][2*$type+1][$selectedOutcome]>0)
+                {
+                    $catsToList[$j] = 1;
+                }
+            }
+
+        }
+        $catsToList = array_keys($catsToList);
+        $itemsToList = array_keys($itemsToList);
+        foreach ($catsToList as $cat)
+        {
+            echo '<th class="cat'.$finalData[0][2][$cat][1].'"><span class="cattothdr">'.$finalData[0][2][$cat][0].'</span></th>';
+            $arr .= ',"N"';
+        }
+        foreach ($itemsToList as $col)
+        {
+            echo '<th class="cat'.$finalData[0][1][$col][1].'">'.$finalData[0][1][$col][0].'</th>';
+            $arr .= ',"N"';
+        }
+        echo '</tr></thead><tbody>';
+        for ($i=1;$i<count($finalData);$i++)
+        {
+            echo '<tr class="'.($i%2==0?'even':'odd').'">';
+            echo '<td>'.$finalData[$i][0][0].'</td>';
+
+            if (isset($finalData[$i][3][$type]) && isset($finalData[$i][3][$type][$selectedOutcome]))
+            {
+                echo '<td>'.round(100*$finalData[$i][3][$type][$selectedOutcome],1).'%</td>';
+            } else
+            {
+                echo '<td>-</td>';
+            }
+            foreach ($catsToList as $col)
+            {
+                if (isset($finalData[$i][2][$col]) && isset($finalData[$i][2][$col][2*$type][$selectedOutcome]) && $finalData[$i][2][$col][2*$type+1][$selectedOutcome]>0) {
+                    echo '<td>'.round(100*$finalData[$i][2][$col][2*$type][$selectedOutcome]/$finalData[$i][2][$col][2*$type+1][$selectedOutcome],1).'%</td>';
+                } else
+                {
+                    echo '<td>-</td>';
+                }
+            }
+            foreach ($itemsToList as $col) {
+                if (isset($finalData[$i][1][$col]) && isset($finalData[$i][1][$col][0][$selectedOutcome])) {
+                    echo '<td>'.round(100*$finalData[$i][1][$col][0][$selectedOutcome]/$finalData[$i][1][$col][1][$selectedOutcome],1).'%</td>';
+                } else {
+                    echo '<td>-</td>';
+                }
+            }
+            echo '</tr>';
+        }
+        echo '</tbody></table>';
+//        echo "<script>initSortTable('myTable',Array($arr),true,false);</script>\n";
+    }else if($report == AppConstant::NUMERIC_TWO)
+    {
+        echo '<div class="cpmid">'.$typeSel.'</div>';
+        echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'.'Outcome'.'</th><th>'.'ToTal'.'</th>';
+        $n = AppConstant::NUMERIC_TWO;
+        for ($i=0;$i<count($finalData[0][2]);$i++) {
+            echo '<th class="cat'.$finalData[0][2][$i][1].'"><span class="cattothdr">'.$finalData[0][2][$i][0].'</span></th>';
+            $n++;
+        }
+        echo '</tr></thead><tbody>';
+        $cnt = AppConstant::NUMERIC_ZERO;
+        $print = new AppUtility();
+        $print->printOutcomes($outcomesData,AppConstant::NUMERIC_ZERO,$finalData,$cnt,$n,$type,$headerData);
+        echo '</table>';
+    }?>
 
 <script>
-    $(document).ready(function ()
-    {
+    function chgtype()
+   {
         var courseId = $('#course-id').val();
-        jQuerySubmit('get-outcome-report-ajax',{courseId:courseId},'outcomeReportResponse');
-    });
-
-     var type = 1;
-    function outcomeReportResponse(response)
-    {
-        response = JSON.parse(response);
-
-
-        var html="";
-//         console.log(response);
-        if(response.status == 0)
-        {
-            var headerData = response.data.outcomeInfo;
-            var finalData = response.data.finalData;
-            var report = response.data.report;
-            var outc = response.data.outCome;
-            if(headerData && outc)
-            {
-                 html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
-                var arr = '"S"';
-                $.each(outc, function(index,data)
-                {
-                     html +='<th>'+headerData[data]+'<br/><a class="small" href="#">[Details]</a></th>';
-                    arr += ',"N"';
-                });
-                html += '</tr><tbody>';
-
-
-                for(var i=1;i<finalData.length;i++)
-                {
-                    html +='<tr class="'+(i%2==0?'even':'odd')+'">';
-                    html +='<td><a href="#">'+finalData[i][0][0]+'</a></td>';
-                    $.each(outc, function(index,data)
-                    {
-                        if(isKeyPresent(finalData[i][3],type))
-                        {
-                                if((finalData[i][3][type]) && (finalData[i][3][type][data]))
-                                {
-                                    html += '<td align="center">'+Math.round(100*finalData[i][3][type][data],1)+'%</td>';
-                                }
-                                else
-                                {
-                                    html += '<td align="center">-</td>';
-                                }
-                        }
-                        else
-                        {
-                            html += '<td align="center">-</td>';
-                        }
-
-                    });
-                    html += '</tr>';
-                }
-                html +='</tbody></table>';
-//                html += initSortTable('myTable',Array(sarr),true,false);
-                $('.outcomeReport-div').append(html);
-                html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
-            }
-            else
-            {
-                html +='<table id="myTable" class="gb"><thead><tr><th>'+finalData[0][0][0] +'</th>';
-                html += '</tr><tbody>';
-                for(var i=1;i<finalData.length;i++)
-                {
-                    html +='<tr class="'+(i%2==0?'even':'odd')+'">';
-                    html +='<td><a href="#">'+finalData[i][0][0]+'</a></td>';
-                }
-                html +='</tbody></table>';
-                html +=' <p>Note:  The outcome performance in each gradebook category is weighted based on gradebook weights to produce these overview scores</p>';
-                $('.outcomeReport-div').append(html);
-
-            }
-        }
-        else
-        {
-
-
-        }
- }
-
-    function createTableHeader()
-    {
-
+        var type = document.getElementById("typeSel").value;
+        window.location = "outcome-report?cid="+courseId+"&type="+type;
     }
-
 </script>

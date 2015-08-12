@@ -2684,4 +2684,44 @@ class AppUtility extends Component
         $itemList = serialize($items);
         Course::setItemOrder($itemList,$courseId);
     }
+
+    public function printOutcomes($arr,$individual,$finalData=null,$cnt=null,$n=null,$type=null,$outcomeInfo=null)
+    {
+        foreach ($arr as $oi)
+        {
+            if ($cnt%2==0) {
+                $class = "even";
+            } else {
+                $class = "odd";
+            }
+            $cnt++;
+            if (is_array($oi)) { //is outcome group
+                echo '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$individual.'"><b>'.$oi['name'].'</b></span></td></tr>';
+                $this->printOutcomes($oi['outcomes'],$individual+1);
+            }else {
+                echo '<tr class="'.$class.'">';
+                echo '<td><span class="ind'.$individual.'">'.$outcomeInfo[$oi].'</span></td>';
+                if (isset($finalData[1][3][$type]) && isset($finalData[1][3][$type][$oi])) {
+                    echo '<td>'.round(100*$finalData[1][3][$type][$oi],1).'%</td>';
+                } else {
+                    echo '<td>-</td>';
+                }
+                for ($i=0;$i<count($finalData[0][2]);$i++) {
+                    if (isset($finalData[1][2][$i]) && isset($finalData[1][2][$i][2*$type+1][$oi])) {
+                        if ($finalData[1][2][$i][2*$type+1][$oi]>0) {
+                            echo '<td>'.round(100*$finalData[1][2][$i][2*$type][$oi]/$finalData[1][2][$i][2*$type+1][$oi],1).'%</td>';
+                        } else {
+                            echo '<td>0%</td>';
+                        }
+                    } else {
+                        echo '<td>-</td>';
+                    }
+                }
+                echo '</tr>';
+            }
+
+            }
+
+        }
+
 }

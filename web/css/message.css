@@ -197,3 +197,18 @@ button.btn.btn-primary1.btn-color{
     margin-left: 9px;
     margin-bottom: 10px;
 }
+
+.margin-right-ten
+{
+    margin-right: 10px;
+}
+
+.flag-button{
+    background-color: #104E8c;
+    color:whitesmoke;
+}
+
+.btn-hover > a:hover{
+    color:white;
+    text-decoration: none;
+}

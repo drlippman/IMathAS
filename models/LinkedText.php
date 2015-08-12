@@ -107,6 +107,19 @@ class LinkedText extends BaseImasLinkedtext
             $date->enddate = $date->enddate + $shift;
             $date->save();
         }
+    }
+
+
+    public static function getLinkedTextForOutcomeMap($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','title','outcomes'])
+            ->from('imas_linkedtext')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['NOT LIKE','outcomes','']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
 
     }
 }

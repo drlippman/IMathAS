@@ -11,6 +11,8 @@ use app\models\GbCats;
 use app\models\GbItems;
 use app\models\GbScheme;
 use app\models\Grades;
+use app\models\InlineText;
+use app\models\LinkedText;
 use app\models\Outcomes;
 use app\models\Questions;
 use app\models\Student;
@@ -110,16 +112,23 @@ class OutcomesController extends AppController
     {
         $this->guestUserHandler();
         $courseId = $this->getParamVal('cid');
-        $this->includeCSS(['dataTables.bootstrap.css']);
-        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
-        return $this->render('outcomeReport',['courseId' => $courseId]);
-    }
-
-    public function actionGetOutcomeReportAjax()
-    {
-        $courseId = $this->getRequestParams('courseId');
+        $report = $this->getParamVal('report');
+        $studentsOutcome = $this->getParamVal('stud');
+        $typeSelected = $this->getParamVal('type');
         $outcomeData = Outcomes::getByCourseId($courseId);
-        $finalData = $this->outcomeTable($courseId);
+        if($studentsOutcome){
+            $finalData = $this->outcomeTable($courseId,$studentsOutcome);
+        }else
+        {
+            $finalData = $this->outcomeTable($courseId);
+        }
+        if (isset($typeSelected))
+        {
+            $type = $typeSelected;
+        } else {
+            $type = AppConstant::NUMERIC_ONE;
+        }
+        $selectedOutcome = $this->getParamVal('selectedOutcome');
         $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
         if(($courseOutcomeData[0]['outcomes']) == '')
         {
@@ -136,13 +145,173 @@ class OutcomesController extends AppController
         }
         $outc = array();
         $outc =$this->flattenout($outcomes);
-        $report = 'overview';
         $this->includeJS('tablesorter.js');
-        $responseData = array('finalData' => $finalData,'outCome' => $outc,'report' => $report,'outcomeInfo' => $outcomeInfo);
-        return $this->successResponse($responseData);
+        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
+        return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type]);
     }
 
-    function flattenout($arr)
+    public function actionOutcomeMap()
+    {
+        $this->guestUserHandler();
+        $courseId = $this->getParamVal('cid');
+        $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
+        if(($courseOutcomeData[0]['outcomes']) == '')
+        {
+            $outcomes = array();
+        }
+        else
+        {
+            $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
+        }
+        $outcomeData = Outcomes::getByCourseId($courseId);
+        $outcomeInfo = array();
+        foreach($outcomeData as $data)
+        {
+            $outcomeInfo[$data['id']] = $data['name'];
+        }
+        $outcomeLinks = 0;
+        $outcomeAssoc = array();
+        $assessGbCat = array();
+        $assessNames = array();
+        $assessQCnt = array();
+        $assessmentData = Assessments::assessmentDataForOutcomes($courseId);
+        foreach($assessmentData as $singleData)
+        {
+            if (!is_numeric($singleData['category'])) {continue;}
+            if ($singleData['category']==0) {
+                $outC = $singleData['defoutcome'];
+            } else {
+                $outC = $singleData['category'];
+            }
+            if (!isset($assessQCnt[$singleData['id']])) {
+                $assessQCnt[$singleData['id']] = array();
+            }
+            if (!isset($assessQCnt[$singleData['id']][$outC])) {
+                $assessQCnt[$singleData['id']][$outC] = 1;
+            } else {
+                $assessQCnt[$singleData['id']][$outC]++;
+            }
+            $assessGbCat[$singleData['id']] = $singleData['gbcategory'];
+            $assessNames[$singleData['id']] = $singleData['name'];
+            $outcomeLinks++;
+        }
+        foreach ($assessQCnt as $id=>$os) {
+            foreach ($os as $o=>$cnt) {
+                if (!isset($outcomeAssoc[$o])) {
+                    $outcomeAssoc[$o] = array();
+                }
+                if (!isset($outcomeAssoc[$o][$assessGbCat[$id]])) {
+                    $outcomeAssoc [$o][$assessGbCat[$id]] = array();
+                }
+                $outcomeAssoc[$o][$assessGbCat[$id]][] = array('assess',$id);
+            }
+        }
+        $offGbCat = array();
+        $offNames = array();
+        $getGbItems = GbItems::getGbItemsForOutcomeMap($courseId);
+        foreach($getGbItems as $gbItems)
+        {
+            $oc = explode(',',$gbItems['outcomes']);
+            foreach ($oc as $o) {
+                if (!isset($outcomeAssoc[$o])) {
+                    $outcomeAssoc[$o] = array();
+                }
+                if (!isset($outcomeAssoc[$o][$gbItems['gbcategory']])) {
+                    $outcomeAssoc[$o][$gbItems['gbcategory']] = array();
+                }
+
+                $outcomeAssoc[$o][$gbItems['gbcategory']][] = array('offline',$gbItems['id']);
+                $outcomeLinks++;
+            }
+            $offGbCat[$gbItems['id']] = $gbItems['gbcategory'];
+            $offNames[$gbItems['id']] = $gbItems['name'];
+        }
+        $forumGbCat = array();
+        $forumNames = array();
+        $getForums = Forums::getForumsForOutcomeMap($courseId);
+        foreach($getForums as $singleForumData)
+        {
+
+            $oc = explode(',',$singleForumData['outcomes']);
+            if ($singleForumData['cntingb']!=0) {
+                $forumGbCat[$singleForumData['id']] = $singleForumData['gbcategory'];
+            } else {
+                $singleForumData['gbcategory'] = 'UG';
+            }
+            foreach ($oc as $o) {
+                if (!isset($outcomeAssoc[$o])) {
+                    $outcomeAssoc[$o] = array();
+                }
+                if (!isset($outcomeAssoc[$o][$singleForumData['gbcategory']])) {
+                    $outcomeAssoc[$o][$singleForumData['gbcategory']] = array();
+                }
+
+                $outcomeAssoc[$o][$singleForumData['gbcategory']][] = array('forum',$singleForumData['id']);
+                $outcomeLinks++;
+            }
+
+            $forumNames[$singleForumData['id']] = $singleForumData['name'];
+        }
+        $linkNames = array();
+        $getLinkText = LinkedText::getLinkedTextForOutcomeMap($courseId);
+
+        foreach($getLinkText as $singleLinkTextData)
+        {
+
+            $oc = explode(',',$singleLinkTextData['outcomes']);
+            foreach ($oc as $o) {
+                if (!isset($outcomeAssoc[$o])) {
+                    $outcomeAssoc[$o] = array();
+                }
+                if (!isset($outcomeAssoc[$o]['UG'])) {
+                    $outcomeAssoc[$o]['UG'] = array();
+                }
+
+                $outcomeAssoc[$o]['UG'][] = array('link',$singleLinkTextData['id']);
+                $outcomeLinks++;
+            }
+            $linkNames[$singleLinkTextData['id']] = $singleLinkTextData['title'];
+        }
+        $inlineNames = array();
+        $getInlineText = InlineText::getInlineTextForOutcomeMap($courseId);
+        foreach($getInlineText as $singleInlineTextData)
+        {
+            $oc = explode(',',$singleInlineTextData['outcomes']);
+            foreach ($oc as $o) {
+                if (!isset($outcomeAssoc[$o])) {
+                    $outcomeAssoc[$o] = array();
+                }
+                if (!isset($outcomeAssoc[$o]['UG'])) {
+                    $outcomeAssoc[$o]['UG'] = array();
+                }
+
+                $outcomeAssoc[$o]['UG'][] = array('inline',$singleInlineTextData['id']);
+                $outcomeLinks++;
+            }
+            $inlineNames[$singleInlineTextData['id']] = $singleInlineTextData['title'];
+        }
+        $cats = array_unique(array_merge($offGbCat,$forumGbCat,$assessGbCat));
+        $catNames = array();
+
+        if (in_array(0, $cats))
+        {
+            $catNames[0] = 'Default';
+        }
+        if (count($cats)>0)
+        {
+            $catList = implode(',',$cats);
+            $query = GbCats::getGbCatsForOutcomeMap($cats);
+            foreach($query as $data){
+                $catNames[$data['id']] = $data['name'];
+            }
+
+        }
+        natsort($catNames);
+        return $this->render('outcomeMap',['outcomeLinks' => $outcomeLinks,'catNames' => $catNames,'assessNames' => $assessNames,'forumNames' => $forumNames,'offNames' => $offNames,'linkNames' => $linkNames,'inlineNames' => $inlineNames,'outcomeInfo' => $outcomeInfo,'outcomeAssoc' => $outcomeAssoc,'outcomes' => $outcomes]);
+    }
+
+ function flattenout($arr)
     {
 
         global $outc;
@@ -184,62 +353,21 @@ class OutcomesController extends AppController
 
      function outcomeTable($courseId)
      {
-        /***
-        format of output
-
-        row[0] header
-
-        row[0][0] biographical
-        row[0][0][0] = "Name"
-
-        Will only included items that are counted in gradebook.  No EC. No PT
-        row[0][1] scores
-        row[0][1][#][0] = name
-        row[0][1][#][1] = category color number
-        row[0][1][#][2] = 0 past, 1 current
-        row[0][1][#][3] = 1 count, 2 EC
-        row[0][1][#][4] = 0 online, 1 offline, 2 discussion
-        row[0][1][#][5] = assessmentid, gbitems.id, forumid
-
-        row[0][2] category totals
-        row[0][2][#][0] = "Category Name"
-        row[0][2][#][1] = category color number
-
-        row[1] first student data row
-        row[1][0] biographical
-        row[1][0][0] = "Name"
-        row[1][0][1] = userid
-        row[1][0][2] = locked?
-
-        row[1][1] scores (all types - type is determined from header row)
-
-        row[1][1][#][0][outc#] = score on outcome
-        row[1][1][#][1][outc#] = poss score on outcome
-        row[1][1][#][2] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
-        row[1][1][#][3] = asid or 'new', gradeid, or blank for discussions
-
-        row[1][2] category totals
-        row[1][2][#][0][outc#] = cat total past on outcome
-        row[1][2][#][1][outc#] = cat poss past on outcome
-        row[1][2][#][2][outc#] = cat total attempted on outcome
-        row[1][2][#][3][outc#] = cat poss attempted on outcome
-
-        row[1][3] total totals
-        row[1][3][0][outc#] = % past on outcome
-        row[1][3][1][outc#] = % attempted on outcome
-         ***/
         global $cid,$isteacher,$istutor,$tutorid,$userid,$catfilter,$secfilter,$timefilter,$lnfilter,$isdiag,$sel1name,$sel2name,$canviewall,$hidelocked;
         $canviewall = true;
         $catfilter = -1;
         $secfilter = -1;
-        if ($canviewall && func_num_args()>1) {
-            $limuser = func_get_arg(0);
-        } else if (!$canviewall) {
+         if($canviewall && func_num_args()>1)
+         {
+            $limuser = func_get_arg(1);
+
+        }else if (!$canviewall)
+        {
             $limuser = $userid;
-        } else {
+        }else
+        {
             $limuser = 0;
         }
-
         $category = array();
         $outc = array();
         $gb = array();

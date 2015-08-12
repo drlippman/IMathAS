@@ -19,23 +19,18 @@ $(document).ready(function () {
         {
             if(subject != '')
             {
-                        $('#subjecttext').hide();
-                        $('#to').hide();
-                        jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
-            }
-            else
-            {
-                    changeColorSub();
-                    $('#to').css('color','white');
-
-
+                    jQuerySubmit('confirm-message',{cid: cid , receiver: receiver, subject: subject, body: body},'sendMessage');
             }
         }
         else
         {
-            changeColorTo();
-            $('#subjecttext').css('color','white');
+            $('#seluid').css('border-color','red');
         }
+    });
+
+    $('#seluid').click(function()
+    {
+        $('#seluid').css('border-color','grey');
     });
 });
 
@@ -47,12 +42,4 @@ function sendMessage(response)
         {
             window.location = "index?cid="+cid;
         }
-}
-function changeColorTo(){
-
-    $('#to').css('color','red');
-}
-function changeColorSub(){
-
-    $('#subjecttext').css('color','red');
 }

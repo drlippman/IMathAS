@@ -57,7 +57,7 @@ $now = $currentTime;
                         <?php
 
                         if( $thread['forumIdData'] == $forumId && $thread['threadId'] != $threadId && $thread['parent'] == AppConstant::NUMERIC_ZERO ) { ?>
-                            <?php echo "<tr><div class='radio student-enroll'><label class='checkbox-size'><td><input type='radio' name='thread-name' id='{$thread['threadId']}' value='{$thread['threadId']}'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$thread['subject']}</td></div></tr>";?>
+                            <?php echo "<tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td><input type='radio' name='thread-name' id='{$thread['threadId']}' value='{$thread['threadId']}'><span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td>"." " ."<td>{$thread['subject']}</td></div></tr>";?>
                         <?php }
                     } ?>
                 </div>

@@ -352,8 +352,9 @@ function markAsDelete() {
 
 }
 
-function changeImage(element, temp, rowId) {
-
+function changeImage(element, temp, rowId)
+{
+alert(rowId)
     if(temp == false){
         element.src = element.bln ? "../../img/flagempty.gif" : "../../img/flagfilled.gif";
         element.bln = !element.bln;

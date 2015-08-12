@@ -70,3 +70,15 @@ function showtrimmedcontent(el) {
         el.innerHTML = "[Show trimmed content]";
     }
 }
+
+function changeImage(element, temp, rowId)
+{
+
+    var row = {rowId: rowId};
+    jQuerySubmit('change-image-ajax', row,'responseOfUpdateFlag');
+}
+
+function responseOfUpdateFlag()
+{
+    window.location.reload();
+}

@@ -265,7 +265,6 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryAll();
         return $data;
     }
-
     public static function setVidData($itemOrder,$viddata,$aid){
         $assessmentData = Assessments::findOne(['id' => $aid]);
         if($assessmentData){
@@ -277,6 +276,7 @@ class Assessments extends BaseImasAssessments
 
     public static function getByAssessmentIds($assessmentIdList)
     {
+
         return Assessments::find()->where(['IN', 'id', $assessmentIdList])->all();
     }
 
@@ -303,8 +303,26 @@ class Assessments extends BaseImasAssessments
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-    public static function UpdateItemOrder($newitemlist, $id){
+    public static function UpdateItemOrder($newitemlist, $id)
+    {
         $query = "UPDATE imas_assessments SET itemorder='$newitemlist' WHERE id={$id}";
         \Yii::$app->db->createCommand($query)->query();
     }
+    public static  function assessmentDataForOutcomes($courseId)
+    {
+        $query = new Query();
+        $query->select(['ia.name', 'ia.gbcategory','ia.defoutcome', 'ia.id', 'iq.category'])
+            ->from('imas_assessments AS ia')
+            ->join('JOIN','imas_questions AS iq',
+                'ia.id=iq.assessmentid')
+            ->where(['ia.courseid' => $courseId])
+            ->andWhere(['>','ia.defoutcome','0'])
+            ->orWhere(['NOT LIKE','iq.category','0']);
+
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
+
 }

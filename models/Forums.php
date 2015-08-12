@@ -216,4 +216,17 @@ class Forums extends BaseImasForums {
         }
     }
 
+
+    public static function getForumsForOutcomeMap($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','name','gbcategory','outcomes','cntingb'])
+            ->from('imas_forums')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['NOT LIKE','outcomes','']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
 }

@@ -139,8 +139,20 @@ class GbItems extends BaseImasGbitems
         }
     }
     public static function getById($gbItem){
-//        $query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
      return GbItems::find()->where(['id' => $gbItem])->one();
+    }
+
+    public static function getGbItemsForOutcomeMap($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','name','gbcategory','outcomes'])
+               ->from('imas_gbitems ')
+                ->where(['courseid' => $courseId])
+                ->andWhere(['NOT LIKE','outcomes','']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
     }
 
 }
