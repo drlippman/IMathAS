@@ -49,4 +49,16 @@ class CalItem extends BaseImasCalitems
     {
         return CalItem::findOne(['id' => $id, 'courseid' => $courseId]);
     }
-} 
+
+    public static function setDateByCourseId($shift,$courseId)
+    {
+
+        $date = CalItem::find()->where(['id' => $courseId])->one();
+       if($date) {
+           $date->date = $date->date + $shift;
+           $date->save();
+       }
+
+    }
+
+}

@@ -56,10 +56,10 @@ $now = $currentTime;
                         <a href="#"><?php AppUtility::t('Blocks'); ?></a>
                     </li>
                     <li>
-                        <a href="#"><?php AppUtility::t('Dates'); ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/mass-change-dates?cid=' . $course->id)?>"><?php AppUtility::t('Dates'); ?></a>
                     </li>
                     <li>
-                        <a href="<?php echo AppUtility::getURLFromHome('course', 'course/time-shift?cid=' . $course->id)?>"><?php AppUtility::t('Time Shifts'); ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/time-shift?cid=' . $course->id)?>"><?php AppUtility::t('Time Shifts'); ?></a>
                     </li>
 
                 </ul>

@@ -140,4 +140,26 @@ class Wiki extends BaseImasWikis
         return $this->id;
     }
 
+    public  static function setStartDate($shift,$typeId)
+    {
+
+        $date = Wiki::find()->where(['id'=>$typeId])->andWhere(['>','startdate','0'])->one();
+        $date->startdate = $date['startdate']+$shift;
+        if($date){
+            $date->startdate = $date['startdate']+$shift;
+            $date->save();
+
+        }
+
+    }
+
+    public static function setEndDate($shift,$typeId)
+    {
+        $date = Wiki::find()->where(['id'=>$typeId])->andWhere(['<','enddate','2000000000'])->one();
+        if($date){
+            $date->enddate = $date['enddate']+$shift;
+            $date->save();
+        }
+
+    }
 } 

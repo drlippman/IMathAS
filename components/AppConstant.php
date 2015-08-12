@@ -155,4 +155,5 @@ class AppConstant
     const NO_ACCESS_RIGHTS = "You don't have the authority for this action";
     const ADD_INLINE_TEXT = "Add Inline Text";
     const CREATE_ITEM = "Create Item";
+    const NO_TEACHER_RIGHTS = "You need to log in as a teacher to access this page";
 }

@@ -120,5 +120,6 @@ return [
     '{n} MB' => '{n} Mo',
     '{n} PB' => '{n} Po',
     '{n} TB' => '{n} To',
+    'Change Dates' => 'changements',
 
 ];

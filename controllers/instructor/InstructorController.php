@@ -13,6 +13,7 @@ use app\models\ForumThread;
 use app\models\ForumView;
 use app\models\Grades;
 use app\models\InstrFiles;
+use app\models\LinkedText;
 use app\models\Message;
 use app\models\AssessmentSession;
 use app\models\Blocks;
@@ -90,10 +91,6 @@ public $oa = array();
             }
         $courseData = $this->getRequestParams();
         $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
-//        if (!($teacherId)) {
-//            $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
-//            return $this->goBack();
-//        }
         $id = $this->getParamVal('id');
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $courseId = $this->getParamVal('cid');
@@ -737,9 +734,94 @@ public $oa = array();
         }
     }
 
+    public function actionTimeShift()
+    {
+        $this->guestUserHandler();
+         $user = $this->getAuthenticatedUser();
+        $this->layout = "master";
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $assessments = Assessments::getByCourseId($courseId);
+            if (isset($params['sdate'])) {
+                $assessment = Assessments::getByAssessmentId($params['aid']);
+                if (($params['base'] == 0)) {
+                    $basedate = $assessment['startdate'];
+                } else {
+                    $basedate = $assessment['enddate'];
+                }
+                preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $params['sdate'], $dmatches);
+                $newstamp = mktime(date('G', $basedate), date('i', $basedate), 0, $dmatches[1], $dmatches[2], $dmatches[3]);
+                $shift = $newstamp - $basedate;
+
+                $items = unserialize($course['itemorder']);
+                $this->shiftsub($items);
+                $itemorder = serialize($items);
+                Course::setItemOrder($itemorder, $courseId);
+                $itemsData = Items::getByCourseId($courseId);
+                foreach ($itemsData as $item) {
+                    if ($item['itemtype'] == "InlineText") {
+                        InlineText::setStartDate($shift, $item['typeid']);
+                        InlineText::setEndDate($shift, $item['typeid']);
+                    } else if ($item['itemtype'] == "LinkedText") {
+                        LinkedText::setStartDate($shift, $item['typeid']);
+                        LinkedText::setStartDate($shift, $item['typeid']);
+                    } else if ($item['itemtype'] == "Forum") {
+                        Forums::setStartDate($shift, $item['typeid']);
+                        Forums::setEndDate($shift, $item['typeid']);
+                    } else if ($item['itemtype'] == "Assessment") {
+                        Assessments::setStartDate($shift, $item['typeid']);
+                        Assessments::setEndDate($shift, $item['typeid']);
+                    } else if ($item['itemtype'] == "Calendar") {
+                        continue;
+                    } else if ($item['itemtype'] == "Wiki") {
+                        Wiki::setStartDate($shift, $item['typeid']);
+                        Wiki::setEndDate($shift, $item['typeid']);
+                    }
+                    CalItem::setDateByCourseId($shift, $courseId);
+                }
+                return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
+            }else { //DEFAULT DATA MANIPULATION
+            $sdate = AppUtility::tzdate("m/d/Y",time());
+            $i=0;
+            foreach($assessments as $singleData){
+                $page_assessmentList['val'][$i] = $singleData['id'];
+                $page_assessmentList['label'][$i] = $singleData['name'];
+                $i++;
+            }
+        }
+        $responseData = array('course' => $course, 'assessments' =>$assessments,'pageAssessmentList' => $page_assessmentList, 'date' => $sdate);
+        return $this->renderWithData('timeShift', $responseData);
+    }
+
+    public function shiftsub($itema) {
+        global $shift;
+        if($itema){
+            foreach ($itema as $k=>$item) {
+                if (is_array($item)) {
+                    if ($itema[$k]['startdate'] > AppConstant::NUMERIC_ZERO) {
+                        $itema[$k]['startdate'] += $shift;
+                    }
+                    if ($itema[$k]['enddate'] < AppConstant::ALWAYS_TIME) {
+                        $itema[$k]['enddate'] += $shift;
+                    }
+                    $this->shiftsub($itema[$k]['items']);
+                }
+            }
+        }
+    }
+
+    public function actionMassChangeDates(){
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = "master";
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $teacherId = $this->isTeacher($user['id'],$courseId);
+        $this->includeJS(['general.js']);
+        $this->includeJS(['masschgdates.js']);
+        $responseData = array('course' => $course);
+        return $this->renderWithData('massChangeDates', $responseData);
+    }
 }
-
-
-
-
-

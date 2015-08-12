@@ -24,12 +24,7 @@ class LinkedText extends BaseImasLinkedtext
         if (!$canviewall) {
             $query->andWhere(['<','startdate', $now]);
         }
-        /*if ($istutor) {
-            $query->andWhere(['<','tutoredit', 2]);
-        }
-        if ($catfilter>-1) {
-            $query->andWhere(['gbcategory' => $catfilter]);
-        }*/
+
         $query->orderBy('enddate, startdate');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -94,5 +89,24 @@ class LinkedText extends BaseImasLinkedtext
     {
         $linkData = LinkedText::find()->where(['courseid' => $cid])->andWhere(['>','points',AppConstant::NUMERIC_ZERO])->all()  ;
         return $linkData;
+    }
+
+    public static function setStartDate($shift,$typeId)
+    {
+        $date = LinkedText::find()->where(['id'=>$typeId])->andWhere(['>','startdate','0'])->one();
+        if($date) {
+            $date->startdate = $date->startdate + $shift;
+            $date->save();
+        }
+    }
+
+    public static function setEndDate($shift,$typeId)
+    {
+        $date = LinkedText::find()->Where(['id'=>$typeId])->andWhere(['<','enddate','2000000000'])->one();
+        if($date) {
+            $date->enddate = $date->enddate + $shift;
+            $date->save();
+        }
+
     }
 }

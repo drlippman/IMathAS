@@ -255,7 +255,7 @@ class Assessments extends BaseImasAssessments
             $query->andWhere(['<', 'tutoredit', 2]);
         }
         if(!$isteacher){
-//            $query->andWhere(['<', 'startdate', $time]);
+//           $query->andWhere(['<', 'startdate', $time]);
         }
         if($catfilter > -1){
             $query->andWhere(['gbcategory' => $catfilter]);
@@ -275,8 +275,28 @@ class Assessments extends BaseImasAssessments
         }
     }
 
-    public static function getByAssessmentIds($assessmentIdList){
-        return Assessments::find()->where('IN','id',$assessmentIdList)->all();
+    public static function getByAssessmentIds($assessmentIdList)
+    {
+        return Assessments::find()->where(['IN', 'id', $assessmentIdList])->all();
+    }
+
+    public static function setStartDate($shift,$typeId)
+    {
+        $date = Assessments::find()->where(['id'=>$typeId])->andWhere(['>','startdate','0'])->one();
+        if($date) {
+            $date->startdate = $date->startdate + $shift;
+            $date->save();
+        }
+
+    }
+
+    public static function setEndDate($shift,$typeId)
+    {
+        $date = Assessments::find()->where(['id'=>$typeId])->andWhere(['<','enddate','2000000000'])->one();
+        if($date) {
+            $date->enddate = $date->enddate + $shift;
+            $date->save();
+        }
     }
     public static function selectItemOrder($todoaid){
         $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
