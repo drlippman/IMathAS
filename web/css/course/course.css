@@ -33,7 +33,7 @@
 }
 .assessment{
     position: absolute;
-    top: 20px;
+    top: 5px;
     left:10px;
     width: 110px;
     height:100px;
@@ -46,7 +46,7 @@
 .icon-center{
     position: relative;
     top: 15px;
-    margin-left: 35px;
+    margin-left: 37px;
     margin-right: 20px;
     margin-bottom: 10px;
 }
@@ -57,7 +57,7 @@
 }
 .inline-text{
     position: absolute;
-    top: 20px;
+    top: 5px;
     left:140px;
     width: 110px;
     height:100px;
@@ -69,7 +69,7 @@
 }
 .link{
     position: absolute;
-    top: 20px;
+    top: 5px;
     left:270px;
     width: 110px;
     height:100px;
@@ -81,7 +81,7 @@
 }
 .forum{
     position: absolute;
-    top: 140px;
+    top: 125px;
     left:10px;
     width: 110px;
     height:100px;
@@ -93,7 +93,7 @@
 }
 .wiki{
     position: absolute;
-    top: 140px;
+    top: 125px;
     left:140px;
     width: 110px;
     height:100px;
@@ -105,7 +105,7 @@
 }
 .calendar-pop-up{
     position: absolute;
-    top: 140px;
+    top: 125px;
     left:270px;
     width: 110px;
     height:100px;
@@ -117,7 +117,7 @@
 }
 
 div.dialog-items{
-    min-height: 380px !important;
+    min-height: 362px !important;
 }
 .item-name-small{
     margin-top:16px;
@@ -157,7 +157,7 @@ div.dialog-items{
 }
 .block-item{
     position: absolute;
-    top: 260px;
+    top: 245px;
     left:140px;
     width: 110px;
     height:100px;

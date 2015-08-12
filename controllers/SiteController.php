@@ -78,6 +78,7 @@ class SiteController extends AppController
     public function actionLogin()
     {
         $this->unauthorizedAccessHandler();
+        $this->layout = 'nonLoggedUser';
         $params = $this->getRequestParams();
         $model = new LoginForm();
         if ($model->load($this->isPostMethod())) {

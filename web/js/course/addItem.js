@@ -7,7 +7,7 @@ $(document).ready(function(){
             var tb = 't';
 
             var html = '<div class="">' +
-                            '<a href="#">' +
+                            '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'">' +
                              '<div class="assessment itemLink" >' +
                                 '<img class="icon-center icon-size" id=\"addtype$parent-$tb\" onclick= \"additem(1, t)" src="../../img/iconAssessment.png">' +
                                 '<div class="item-name">Assessment</div>'+
@@ -45,7 +45,7 @@ $(document).ready(function(){
                             '</div></a>' +
                         '</div>';
             $('<div class="dialog-items close-box" id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '397px',height: '419px', title: 'Add an Item...',
+                modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '410px',height: '419px', title: 'Add an Item...',
                 closeText: "show",
                 close: function (event, ui) {
                     $(this).remove();
