@@ -130,7 +130,7 @@ function showMessageSuccess(response) {
     showMessage(filteredArray, response.status);
 }
 
-function selectCheckBox() {
+function selectCheckBox(){
     $('.message-table input[name = "header-checked"]').live("click", function(){
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
@@ -193,13 +193,8 @@ function markAsUnreadSuccess(response) {
 }
 
 function markAsRead() {
-
-
     var markArray = [];
-
-
-
-    $('.message-table-body input[name="msg-check"]:checked').each(function () {
+ $('.message-table-body input[name="msg-check"]:checked').each(function () {
         markArray.push($(this).val());
         $(this).closest('tr').css('font-weight', 'normal');
         $(this).prop('checked', false);
@@ -207,19 +202,12 @@ function markAsRead() {
     if( markArray.length !=0){
         var readMsg = {checkedMsg: markArray};
         jQuerySubmit('mark-as-read-ajax', readMsg,{ });
-
-
     }
     else {
-
         var msg ="Select atleast one message to read";
         CommonPopUp(msg);
     }
-
-
-
 }
-
 function filterByCourse() {
     $('#course-id').on('change', function () {
         var filteredArray = [];
@@ -352,9 +340,7 @@ function markAsDelete() {
 
 }
 
-function changeImage(element, temp, rowId)
-{
-alert(rowId)
+function changeImage(element, temp, rowId) {
     if(temp == false){
         element.src = element.bln ? "../../img/flagempty.gif" : "../../img/flagfilled.gif";
         element.bln = !element.bln;

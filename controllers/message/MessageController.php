@@ -167,7 +167,7 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $userRights);
             $this->includeCSS(['dataTables.bootstrap.css',"message.css"]);
-            $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
+            $this->includeJS(['jquery.min.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js']);
             return $this->renderWithData('sentMessage', $responseData);
         }
     }

@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 $isCourseHidden = false;
+
 ?>
 <div id="homefullwidth">
     <div class="block">

@@ -26,11 +26,13 @@ AppAsset::register($this);
 <?php $courseId = Yii::$app->session->get('courseId'); ?>
 <?php $messageCount = Yii::$app->session->get('messageCount');
       $postCount = Yii::$app->session->get('postCount');
-      $totalCount = $messageCount + $postCount ?>
+      $totalCount = $messageCount + $postCount;
+       $user = Yii::$app->session->get('user');
+?>
 <body>
 <?php $this->beginBody() ?>
 <div class="header-content">
-    <?php  echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount]); ?>
+    <?php  echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount,'user' => $user]); ?>
 </div>
 <div class="clear-both"></div>
 <div class="master-wrap">

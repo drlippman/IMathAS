@@ -220,5 +220,18 @@ class Course extends BaseImasCourses {
         $course->newflag = $newflag;
         $course->save();
     }
+    public static  function getGetMyClasses($userId)
+    {
+        $items = [];
+        $myClasses = Course::find()->where(['ownerid' => $userId])->all();
+        foreach($myClasses as $singleClass)
+        {
+            $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
+
+        }
+        return $items;
+    }
+
+
 }
 

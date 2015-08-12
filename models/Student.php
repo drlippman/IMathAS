@@ -384,4 +384,15 @@ class Student extends BaseImasStudents {
 
     }
 
+    public static function  getMyClassesForStudent($userId)
+    {
+        $items = [];
+        $Students =  static::findAll(['userid' => $userId]);
+        foreach($Students as $singleStudent)
+        {
+            $items[] = ['label' => $singleStudent->course['name'], 'url' => '#'];
+        }
+        return $items;
+    }
+
 } 

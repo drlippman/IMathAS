@@ -938,3 +938,62 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
 .margin-top-zero{
     margin-top: 0px;
 }
+
+
+.inner-content-change-password
+{
+    height: 30%;
+    width: auto;
+    background-color: #F8f8f8;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+
+.old-password
+{
+
+    margin-left: 30%;
+}
+.Submit-btn-change-password{
+    margin-left: 48.5%;
+    margin-bottom: 20px;
+        margin-top: 10px;
+}
+button#change-button.btn.btn-primary
+{
+    width: 233px;
+}
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu >ul> li > a {
+    color: #ffffff;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    right: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    background-color: #104E87;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    right: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+
+}

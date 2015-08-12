@@ -34,7 +34,7 @@ var selectedCourseId;
 function createTableHeader()
 {
     var html = "<table id='message-table-show display-message-table' class='message-table-show display-message-table table table-bordered table-striped table-hover data-table'>";
-    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>"
+    html += "<thead><tr><th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked' value=''><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th><th>Message</th><th>To</th><th>Read</th><th>Sent</th></tr></thead>";
     html += "<tbody class='message-table-body'></tbody></table>";
     $('.message-div').append(html);
 }
@@ -85,21 +85,24 @@ function showMessage(messageData, status)
     $(".message-table-body").append(html);
     $('.display-message-table').DataTable({"bPaginate": false});
 }
-function selectCheckBox(){
-    $('.check-all').click(function(){
-        $('.message-table-body input:checkbox').each(function(){
+function selectCheckBox()
+{
+    $('.message-table input[name = "header-checked"]').live("click", function(){
+        if($(this).prop("checked") == true){
+            $('.message-table-body input:checkbox').each(function(){
             $(this).prop('checked',true);
         })
-    });
-
-    $('.uncheck-all').click(function(){
-        $('.message-table-body input:checkbox').each(function(){
+        }
+        else if($(this).prop("checked") == false){
+            $('.message-table-body input:checkbox').each(function(){
             $(this).prop('checked',false);
         })
+        }
     });
 }
 
-function getCourseSuccess(response) {
+function getCourseSuccess(response)
+{
     var result = JSON.parse(response);
     if (result.status == 0) {
         var courseData = result.data;

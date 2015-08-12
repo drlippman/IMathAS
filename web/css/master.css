@@ -331,6 +331,7 @@ i.fa-home{
      border-radius:0; ;
     text-align: center;
 }
+
 .icon-remove:before {
     content: "\f00d";
 }
@@ -338,4 +339,26 @@ i.fa-home{
 .title-page > i
 {
  margin-top: 2px;
+}
+.margin-left
+{
+    margin-left: 55px;
+    background-color: #104E87;
+}
+
+.navbar-inverse .myclasses > .open > a, .navbar-inverse .myclasses > .open > a:hover, .navbar-inverse .myclasses > .open > a:focus
+{
+    color: #fff;
+    background-color: #104E87;
+    /*border: ;*/
+}
+
+.myclasses > li >ul
+{
+    background-color: #104E87;
+}
+.myclasses > li > ul> li >a
+{
+    color: #ffffff;
+
 }

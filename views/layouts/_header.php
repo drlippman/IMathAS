@@ -1,9 +1,8 @@
 <header class="header-wraper">
-
 <?php
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-
+use app\models\Student;
 $basePath = '/site/';
 $imgPath = \app\components\AppUtility::getAssetURL().'img/';
 NavBar::begin([
@@ -14,11 +13,37 @@ NavBar::begin([
     ],
 ]);
 
-echo '<div class="dropdown dropdown-class">
-        <img src="../../img/class.png">
-        <button class="btn btn-primary dropdown-toggle" type="submit" data-toggle="dropdown">My Classes
-        <span class="caret"></span></button>
-      </div>';
+echo Nav::widget([
+    'options' =>['class' => 'navbar-nav myclasses navbar-right'],
+    'encodeLabels' => false,
+    'items' => [
+        Yii::$app->user->isGuest ?
+            ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
+        Yii::$app->user->isGuest ?
+            ['label' => ''] :
+            ['label' => '<img class="small-icon" src="../../img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
+                'items' =>
+                    [
+                        ['label' => 'Account Setting',
+                            array('class' => 'dropdown-submenu'),
+                            'items' =>
+                                [
+                                    ['label' => 'Change Password', 'url' => ['/site/change-password']],
+                                    ['label' => 'Change UserInfo', 'url' => ['/site/change-user-info']],
+                                ],
+                        ],
+                        ['label' => 'Help', 'url' => '#'],
+                        ['label' => 'Logout', 'url' => ['/site/logout'],'linkOptions' => ['data-method' => 'post'], 'class' => 'user-alignment'],
+                     ],
+                'url' => ['#'],
+                'linkOptions' => [''], 'class' => 'user-alignment'
+            ],
+
+
+    ],
+]);
+
+
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav notification navbar-right'],
     'encodeLabels' => false,
@@ -44,15 +69,22 @@ echo Nav::widget([
                     ],
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => 'notification-alignment']] ),
 
-        Yii::$app->user->isGuest ?
-            ['label' => 'Diagnostics', 'url' => [$basePath.'diagnostics']]:'',
-        Yii::$app->user->isGuest ?
-            ['label' => ''] :
-            ['label' => (ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
-                'url' => ['/site/logout'],
-                'linkOptions' => ['data-method' => 'post'], 'class' => 'user-alignment'],
+         ],
+]);
 
-    ],
+echo Nav::widget([
+    'options' =>['class' => 'navbar-nav myclasses margin-left'],
+    'encodeLabels' => false,
+
+    'items' => [
+        Yii::$app->user->isGuest ?
+            ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
+            ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
+
+                'items' => \app\models\Course::getGetMyClasses($user->id),
+//                'items' =>\app\models\Student::getMyClassesForStudent($user->id),
+                'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
+            ],
 ]);
 NavBar::end();
 ?>

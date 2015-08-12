@@ -58,6 +58,7 @@ class CourseController extends AppController
         $this->setSessionData('courseId',$courseId);
         $this->checkSession($params);
         $user = $this->getAuthenticatedUser();
+        $this->setSessionData('user',$user);
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $this->setSessionData('messageCount',$msgList);

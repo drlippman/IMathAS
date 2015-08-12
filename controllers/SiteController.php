@@ -343,6 +343,7 @@ class SiteController extends AppController
     public function actionChangePassword()
     {
         $this->guestUserHandler();
+        $this->layout = 'nonLoggedUser';
         $model = new ChangePasswordForm();
         if ($model->load($this->getPostData())) {
             $param = $this->getRequestParams();

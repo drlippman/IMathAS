@@ -6,40 +6,49 @@ use app\components\AppUtility;
 $this->title = 'Change Password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!--<div class="item-detail-header">-->
-<!--    --><?php //echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
-<!--</div>-->
-<!--<div class = "title-container">-->
-<!--    <div class="row">-->
-<!--        <div class="pull-left page-heading">-->
-<!--            <div class="vertical-align title-page">--><?php //echo $this->title ?><!--</div>-->
-<!--        </div>-->
-<!--        <div class="pull-left header-btn">-->
-<!--            --><?php //echo Html::submitButton('<i class="fa fa-share header-right-btn"></i>Save', ['class' => 'btn btn-primary pull-right page-settings', 'name' => 'Submit']) ?>
-<!--        </div>-->
-<!--    </div>-->
-<!--</div>-->
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="item-detail-header">
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+
+</div>
+<div class="tab-content shadowBox">
+    <br>
+    <p></p>
+    <div class="inner-content-change-password">
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-2'],
+            'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-lg-8 col-lg-offset-3\">{error}</div>",
+            'labelOptions' => ['class' => 'col-sm-3'],
         ],
     ]); ?>
-
-    <?= $form->field($model, 'oldPassword')->passwordInput() ?>
-    <?= $form->field($model, 'newPassword')->passwordInput() ?>
-    <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
-
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('Submit', ['id'=> 'change-button' ,'class' => 'btn btn-primary', 'name' => 'changepassword-button']) ?>
+        <div class="old-password">
+            <br>
+            <?php echo $form->field($model, 'oldPassword')->passwordInput() ?>
         </div>
-    </div>
 
+        <div class="old-password">
+            <br>
+            <?php echo $form->field($model, 'newPassword')->passwordInput() ?>
+        </div>
+        <div class="old-password">
+            <br>
+            <?php echo $form->field($model, 'confirmPassword')->passwordInput() ?>
+
+        </div>
+        <div class="Submit-btn-change-password">
+                <?= Html::submitButton('Submit', ['id'=> 'change-button' ,'class' => 'btn btn-primary submit-btn1', 'name' => 'changepassword-button']) ?>
+            </div>
+
+</div>
     <?php ActiveForm::end(); ?>
-
 </div>

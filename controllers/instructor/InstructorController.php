@@ -60,6 +60,7 @@ public $oa = array();
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $this->setSessionData('courseId',$courseId);
+        $this->setSessionData('user',$user);
         $this->setSessionData('messageCount',$msgList);
         $this->setSessionData('postCount',$countPost);
         $this->layout = "master";
