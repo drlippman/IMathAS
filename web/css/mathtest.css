@@ -58,7 +58,7 @@ div.question {
 	font-size: medium;
 	background-color: #ddf; 
 	border: 1px solid #00f; 
-	margin-top: 60px;
+	/*margin-top: 60px;*/
 	margin-bottom: 5px;
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -163,6 +163,7 @@ div.inset {
 	margin-right: 10px;
 	padding-left: 20px;
 	overflow: hidden;
+    margin-top: 60px;
 }
 
 div.right {

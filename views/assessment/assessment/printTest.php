@@ -3,12 +3,13 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 ?>
 
+
 <script type="text/javascript">var AMTcgiloc = "http://www.imathas.com/cgi-bin/mimetex.cgi";</script>
 <?php
 AppUtility::includeJS('ASCIIMathTeXImg_min.js');
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course, $assessmentName], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id, AppUtility::getHomeURL().'assessment/assessment/show-assessment?id='.$assessmentId.'&cid='.$course->id], 'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -34,6 +35,7 @@ AppUtility::includeJS('ASCIIMathTeXImg_min.js');
     AppUtility::includeJS('drawing.js');
     ?>
     <style type="text/css">span.MathJax { font-size: 105%;}</style>
-
-    <?php print_r($response); ?>
+    <div style="padding: 20px;">
+        <?php print_r($response); ?>
+    </div>
 </div>

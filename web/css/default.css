@@ -234,3 +234,9 @@ span.current {
 span.done {
 	text-decoration: line-through;
 }
+div.breadcrumbPrintVersion {
+    border: 1px solid #000;
+    background-color: #ddddff;
+    height: 30px;
+    padding-top: 5px;
+}

@@ -1388,15 +1388,14 @@ class AppUtility extends Component
             $attempts = explode(",",$line['reviewattempts']);
             $lastanswers = explode("~",$line['reviewlastanswers']);
         }
-        $responseString .= "<h4 style=\"float:right;\">Name: $userfullname </h4>\n";
-        $responseString .= "<h3>".$testsettings['name']."</h3>\n";
+        $responseString .= "<h4 class='padding-zero' style=\"float:right;\"><b>Name:</b> $userfullname </h4>";
+        $responseString .= "<h3 class='margin-top-zero'>".$testsettings['name']."</h3>";
 
         $allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
         $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
         $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
         $GLOBALS['useeditor']='reviewifneeded';
-        $responseString .= "<div class=breadcrumb>Print Ready Version</div>";
-
+        $responseString .= "<div class=breadcrumbPrintVersion>Print Ready Version</div><br>";
         $endtext = '';  $intropieces = array();
         if (strpos($testsettings['intro'], '[QUESTION')!==false) {
             //embedded type

@@ -44,7 +44,7 @@ $(document).ready(function(){
                                 '<div class="item-name-small block-name-alignment">Block</div>'+
                             '</div></a>' +
                         '</div>';
-            $('<div class="dialog-items" id="dialog"></div>').appendTo('body').html(html).dialog({
+            $('<div class="dialog-items close-box" id="dialog"></div>').appendTo('body').html(html).dialog({
                 modal: true, message: 'Add An Item', zIndex: 10000, autoOpen: true, width: '397px',height: '419px', title: 'Add an Item...',
                 closeText: "show",
                 close: function (event, ui) {

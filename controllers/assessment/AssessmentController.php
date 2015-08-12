@@ -114,6 +114,8 @@ class AssessmentController extends AppController
             $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
             if($assessmentSession){
                 $courseId = $assessmentSession->assessment->course->id;
+                $assessmentName = $assessmentSession->assessment->name;
+                $assessmentId = $assessmentSession->assessment->id;
                 $course = $assessmentSession->assessment->course->name;
                 $teacher = Teacher::getByUserId($user->id, $courseId);
                 if($teacher){
@@ -122,7 +124,7 @@ class AssessmentController extends AppController
                 }
                 $printData = AppUtility::printTest($teacherId, $isTeacher, $assessmentSession->id, $user, $course);
                 $this->includeCSS(['showAssessment.css', 'mathtest.css', 'print.css']);
-                $responseData = array('response' => $printData);
+                $responseData = array('response' => $printData, 'course' => $course, 'assessmentName' => $assessmentName, 'assessmentId' => $assessmentId);
                 return $this->renderWithData('printTest', $responseData);
             }
         }
