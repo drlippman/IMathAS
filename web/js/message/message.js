@@ -131,7 +131,7 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox() {
-    $('.message-table input[name = "header-checked"]').click(function(){
+    $('.message-table input[name = "header-checked"]').live("click", function(){
         if($(this).prop("checked") == true){
             $('.message-table-body input:checkbox').each(function () {
                 $(this).prop('checked', true);

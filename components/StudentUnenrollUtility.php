@@ -171,7 +171,7 @@ class StudentUnenrollUtility extends Component
             Questions::updateWithdrawn($assesses);
         }
         if ($withwithdraw=='remove' || $usereplaceby) {
-            UpdateAssessUtility::updateassess($cid, $withwithdraw=='remove', $usereplaceby);
+            $msg = UpdateAssessUtility::updateassess($cid, $withwithdraw=='remove', $usereplaceby);
         }
         if (count($tounenroll)>0) {
             foreach($tounenroll as $studentId){

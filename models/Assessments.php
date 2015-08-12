@@ -278,4 +278,13 @@ class Assessments extends BaseImasAssessments
     public static function getByAssessmentIds($assessmentIdList){
         return Assessments::find()->where('IN','id',$assessmentIdList)->all();
     }
+    public static function selectItemOrder($todoaid){
+        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function UpdateItemOrder($newitemlist, $id){
+        $query = "UPDATE imas_assessments SET itemorder='$newitemlist' WHERE id={$id}";
+        \Yii::$app->db->createCommand($query)->query();
+    }
 }

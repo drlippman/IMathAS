@@ -144,4 +144,32 @@ class Questions extends BaseImasQuestions
     public static function getQuestionCount($id){
         return $data = \Yii::$app->db->createCommand("SELECT COUNT(id) FROM imas_questions WHERE questionsetid='{$id}'")->queryAll();
 }
+    public static function updateQuestionSetId($aidarr){
+        $query = "UPDATE imas_questions AS iq JOIN imas_questionset AS iqs ON iq.questionsetid=iqs.id ";
+        if (!is_array($aidarr)) {
+            $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
+        }
+        $query .= "SET iq.questionsetid=iqs.replaceby WHERE iqs.replaceby>0 ";
+        if (is_array($aidarr)) {
+            $query .= " AND iq.assessmentid IN (".implode(',',$aidarr).")";
+        } else {
+            $query .= " AND ia.courseid='$aidarr'";
+        }
+        \Yii::$app->db->createCommand($query)->query();
+    }
+
+    public static function FindAssessmentAndWithdrawn($aidarr){
+        $query = "SELECT iq.assessmentid,iq.id,iq.withdrawn FROM imas_questions AS iq ";
+        if (!is_array($aidarr)) {
+            $query .= "JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
+        }
+        $query .= "WHERE iq.withdrawn>0";
+
+        if (is_array($aidarr)) {
+            $query .= " AND iq.assessmentid IN (".implode(',',$aidarr).")";
+        } else {
+            $query .= " AND ia.courseid='$aidarr'";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
