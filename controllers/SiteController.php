@@ -113,6 +113,7 @@ class SiteController extends AppController
      */
     public function actionRegistration()
     {
+        $this->layout = 'nonLoggedUser';
         $model = new RegistrationForm();
         if ($model->load($this->getPostData())) {
             $params = $this->getRequestParams();

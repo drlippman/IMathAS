@@ -41,7 +41,7 @@ $nologo = true;
                 <a href="http://www.dessci.com/en/dl/MathPlayerSetup.asp">MathPlayer</a>,
                 <a href="http://download.adobe.com/pub/adobe/magic/svgviewer/win/3.x/3.03/en/SVGView.exe">AdobeSVGViewer</a></p>
 
-            <h3>Math Display</h3>
+            <h3><?php AppUtility::t('Math Display')?></h3>
             <p>A formula: `sqrt(x^2-3)/5`</p>
             <p>You should see a mathematical formula displayed above, like you'd see in a textbook. If the
                 formula looks like \`sqrt(x^2-3)/5\`, you need to install

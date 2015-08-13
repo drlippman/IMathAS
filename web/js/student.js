@@ -209,9 +209,9 @@ function calendar() {
             else if(event.reviewMode == false)
             {
                 $(".calendar-day-details").empty();
-                var title = "<a class=''style='color: #0000ff' href='../../assessment/assessment/show-assessment?id="+event.assessmentId+"&cid="+event.courseId+" '>"+event.title+"</a>";
+                var title = "<a class=''style='color: #0000ff;font-size: 16px' href='../../assessment/assessment/show-assessment?id="+event.assessmentId+"&cid="+event.courseId+" '>"+event.title+"</a>";
                 var dateH = "Due " +event.startDat+" "+event.dueTime+"";
-                var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
+                var assessmentLogo = "<p style='padding-right: 5px'><img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/></p>";
                 $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
 //                $("#demo").dialog({ modal: true, title: event.message, width:350,
 //                    buttons: {
@@ -280,17 +280,21 @@ function calendar() {
             $(".calendar-day-details").empty();
             $.each(calendarEvents[0], function (index, selectedDate) {
                 if(selectedDate.start == selectedDay){
-                    var title = "<a style='color: #0000ff' href='#'>"+selectedDate.title+"</a>";
+                    var title = "<a style='color: #0000ff;font-size: 16px' href='#'>"+selectedDate.title+"</a>";
                     if(currentDate == formattedSelectedDay){
                         var dateH = "Due " +selectedDate.dueTime+"";
 
                     }else{
                         var dateH = "Due " +selectedDate.start+" "+selectedDate.dueTime+"";
                     }
-                    if(selectedDate.color == "blue"){
+                    if(selectedDate.reviewMode == false || selectedDate.reviewMode == false){
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
-                    }else{
+                    }else if(selectedDate.calLinkItem == true){
+                        var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/link.png'/>";
+                    }else if(selectedDate.calInlineTextItem == true){
                         var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
+                    }else if(selectedDate.calItem == true){
+                        var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' src=''>";
                     }
                     $(".calendar-day-details").append("<div class='day-detail-border single-event'> "+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
                 }
@@ -305,12 +309,16 @@ function displayCalEvents(events){
     $.each(events, function (index, dateEvent) {
         var selectedDate = formatDate(dateEvent.start);
         if(selectedDate == now ){
-                var title = "<a href='#'>"+dateEvent.title+"</a>";
+                var title = "<a style='font-size: 16px' href='#'>"+dateEvent.title+"</a>";
                 var dateH = "Due " +dateEvent.dueTime+"";
-                if(dateEvent.color == "blue"){
+                if(dateEvent.reviewMode == false){
                     var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/iconAssessment.png'/>";
-                }else{
+                }else if(dateEvent.calLinkItem == true){
+                    var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/link.png'/>";
+                } else if(dateEvent.calInlineTextItem == true){
                     var assessmentLogo = "<img alt='assess' class='floatleft item-icon-alignment' src='../../img/inlineText.png'/>";
+                }else if(dateEvent.calItem == true){
+                    var assessmentLogo = "<img alt='' class='floatleft item-icon-alignment' src=''>";
                 }
                 $(".calendar-day-details").append("<div class='day-detail-border single-event'>"+assessmentLogo+" "+title+"<br>"+dateH+"</div>");
       }

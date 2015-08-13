@@ -232,7 +232,7 @@ body {
     position: relative;
     padding: 15px;
     padding-right: 0;
-    padding-top: 47px;
+    padding-top: 58px;
 }
 .left-side-content {
     padding-left: 1%;
@@ -258,9 +258,10 @@ body {
 }
 .day-detail-border{
     border-bottom: #d3d3d3 solid 1px;
+    padding-bottom: 10px;
 }
 .single-event{
-    height: 90px;
+    height: auto;
     padding-top: 10px;
 }
 .nav-tabs-non-shadow{
@@ -361,4 +362,7 @@ i.fa-home{
 {
     color: #ffffff;
 
+}
+.fc-toolbar .fc-left{
+    padding-bottom: 15px;
 }
