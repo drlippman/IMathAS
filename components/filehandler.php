@@ -556,7 +556,7 @@ function deletecoursefile($file) {
 		}
 	}
 }
-function deleteqimage($file) {
+public static function deleteqimage($file) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "qimages/$file";

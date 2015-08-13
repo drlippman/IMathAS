@@ -8,10 +8,56 @@ class CourseItemsUtility extends Component
 {
 ////////////////////////////////////////////// ASSESSMENT //////////////////////////////////////////////////////////////////////////////////
     public $cnt = 0;
-    public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent)
+    public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll)
     {
         $assessment = $item[key($item)];
-        if ($assessment->enddate >= $currentTime && $assessment->startdate >= $currentTime) {
+        $notHidden = $item['nothidden'];
+        $hasstats = true;
+        if (strpos($assessment['summary'],'<p ')!==0 && strpos($assessment['summary'],'<ul')!==0 && strpos($assessment['summary'],'<ol')!==0) {
+            $assessment['summary'] = '<p>'.$assessment['summary'].'</p>';
+            if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$assessment['summary'])) {
+                $assessment['summary'] = '';
+            }
+        }
+        if ($assessment['startdate']==0) {
+            $startDate = _('Always');
+        } else {
+            $startDate = AppUtility::formatdate($assessment['startdate']);
+        }
+        if ($assessment['enddate']==2000000000) {
+            $endDate =  _('Always');
+        } else {
+            $endDate =AppUtility::formatdate($assessment['enddate']);
+        }
+        if ($assessment['reviewdate']==2000000000) {
+            $reviewDate = _('Always');
+        } else {
+            $reviewDate = AppUtility::formatdate($assessment['reviewdate']);
+        }
+        if ($assessment->avail == 1 && $assessment->enddate > $currentTime && $assessment->startdate < $currentTime && $notHidden) {
+             if(substr($assessment->deffeedback,0,8) == 'Practice'){
+                 $endName = 'Available until';
+             }else{
+                 $endName = 'Due';
+             }
+            if($assessment->enddate != AppConstant::ALWAYS_TIME){
+                $message = "$endName $endDate";
+            }
+        }else if($assessment->avail == 1 && $assessment->enddate < $currentTime && $assessment->reviewdate > $currentTime){
+            $message = sprintf(AppConstant::PAST_DUE_DATE, $endDate);
+            if ($assessment->reviewdate != AppConstant::ALWAYS_TIME) {
+                $message .= " until $reviewDate. ";
+            }
+        }else if($viewAll) {
+            if ($assessment->avail == AppConstant::NUMERIC_ZERO) {
+                $message = "Hidden";
+            } else {
+                $message = sprintf(AppConstant::AVAILABLE_UNTIL, $startDate, $endDate);
+                if ($assessment['reviewdate'] > AppConstant::NUMERIC_ZERO && $assessment['enddate'] != AppConstant::ALWAYS_TIME) {
+                    $message .= sprintf(_(', Review until %s'), $reviewDate);
+                }
+            }
+        }
             ?>
             <div class="item">
             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
@@ -27,137 +73,20 @@ class CourseItemsUtility extends Component
                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
                     <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                    <li><a id="grades" href="#"><?php AppUtility::t('Grades');?></a></li>
+                   <?php if (isset($hasstats['a'.$assessment->id])) { ?>
+                        <li><a id="stats" href="#"><?php AppUtility::t('Stats');?></a></li>
+                   <?php }?>
                 </ul>
             </div>
 
             <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
                    name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
-
-            <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-                <BR>Hidden
-            <?php } else { ?>
-                <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                    <BR>    Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>, Review until Always
-
-                <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                    <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-                <?php } else { ?>
-                    <br> Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?> Review until <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-                <?php }
-            } ?>
+       <?php echo $message;?>
             <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
                 <span title="Late Passes Allowed">LP</span>
             <?php
             } ?>
-        <?php  } else if ($assessment->enddate <= $currentTime && $assessment->startdate <= $currentTime && $assessment->startdate != 0) {
-            ?>
-            <div class="item">
-            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
-
-            <div class="title">
-            <b>
-                <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-                   class="confirmation-require assessment-link"
-                   id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
-            </b>
-            <div class="floatright">
-                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                <ul class=" select1 dropdown-menu selected-options">
-                    <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
-                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
-                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                </ul>
-            </div>
-
-            <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id ?>"
-                   name="urlTimeLimit" value="<?php echo $assessment->timelimit; ?>">
-            <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-                <BR>Hidden
-            <?php } else { ?>
-                <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                    <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
-                <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                    <br>Available <?php echo AppUtility::formatDate($assessment->startdate); ?>, until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-                <?php } else { ?>
-                    <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-                <?php }
-            } ?>
-            <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
-                <span title="Late Passes Allowed">LP</span>
-            <?php
-            } ?>
-
-            <?php if ($assessment->reviewdate > AppConstant::NUMERIC_ZERO) { ?>
-                <br>This assessment is in review mode - no scores will be saved
-            <?php }
-        }else if ($assessment->startdate >= 0 || $assessment->enddate == AppConstant::ALWAYS_TIME) {
-            ?>
-            <div class="item">
-            <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
-
-            <div class="title">
-            <b>
-                <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
-                   class="confirmation-require assessment-link"
-                   id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
-            </b>
-            <div class="floatright">
-                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                <ul class=" select1 dropdown-menu selected-options">
-                    <li><a class="question" href="#"><?php AppUtility::t('Questions');?></a></li>
-                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting');?></a></li>
-                    <li><a id="delete" href="#" onclick="deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                    <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                </ul>
-            </div>
-
-            <input type="hidden" class="confirmation-require"
-                   id="time-limit<?php echo $assessment->id ?>" name="urlTimeLimit"
-                   value="<?php echo $assessment->timelimit; ?>">
-            <?php if ($assessment->startdate >= 0 && $assessment->enddate > $currentTime) { ?>
-                <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-
-                    <BR>Hidden
-                <?php } else { ?>
-                    <?php if ($assessment->reviewdate >= AppConstant::NUMERIC_ZERO) { ?>
-                        <BR> Due <?php echo AppUtility::formatDate($assessment->enddate); ?>.
-                        <!--                                                                                --><?php //}else if (){?>
-                        <!--                                                                                    <br>Available --><?php //echo AppUtility::formatDate($assessment->startdate); ?><!--, until --><?php //echo AppUtility::formatDate($assessment->enddate); ?>
-                    <?php } else { ?>
-                        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-                    <?php }
-                }
-            }    else if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime) { ?>
-                <?php if ($assessment['avail'] == AppConstant::NUMERIC_ZERO) { ?>
-                    <BR>Hidden
-                <?php } else { ?>
-                    <?php if ($assessment->reviewdate == AppConstant::ALWAYS_TIME) { ?>
-                        <BR>    Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>. Showing as Review.
-
-                    <?php } else if ($assessment->reviewdate == AppConstant::NUMERIC_ZERO) { ?>
-                        <?php if($assessment->startdate == AppConstant::NUMERIC_ZERO){ ?>
-                            <br>Available Always until <?php echo AppUtility::formatDate($assessment->enddate); ?>
-                        <?php }else{ ?>
-                            <br>Available <?php echo AppUtility::formatDate($assessment->startdate);  ?>, <?php echo AppUtility::formatDate($assessment->enddate);  ?>
-                        <?php } ?>
-                    <?php } else { ?>
-                        <br> Past Due Date of <?php echo AppUtility::formatDate($assessment->enddate); ?>,  Showing as Review.untill <?php echo AppUtility::formatDate($assessment->reviewdate); ?>
-                    <?php }
-                }   } ?>
-
-
-            <?php if ($assessment->allowlate != AppConstant::NUMERIC_ZERO) { ?>
-                <span title="Late Passes Allowed">LP</span>
-            <?php
-            } ?>
-
-            <?php if ($assessment->startdate >= 0 && $assessment->enddate < $currentTime && $assessment['avail'] != AppConstant::NUMERIC_ZERO && $assessment->reviewdate != AppConstant::NUMERIC_ZERO) { ?>
-
-                <br> This assessment is in review mode - no scores will be saved
-            <?php } ?>
-
-        <?php }   ?>
         </div>
         <div class="itemsum">
             <p><?php echo $assessment->summary ?></p>
@@ -765,7 +694,7 @@ class CourseItemsUtility extends Component
 
 /////////////////////////////////////////////////// BLOCK //////////////////////////////////////////////////////////////////////////////////
 
-        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt)
+        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll)
         {
             $block = $item[key($item)];
             $blockId = $block['id'];
@@ -876,7 +805,7 @@ class CourseItemsUtility extends Component
                         case 'Assessment': ?>
                             <div class="inactivewrapper "
                                  onmouseout="this.className='inactivewrapper'">
-                                <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt); ?>
+                                <?php $this->AddAssessment($assessment,$item,$course,$currentTime,$parent.'-'.$cnt,$canEdit,$viewAll); ?>
                             </div>
                             <?php break; ?>
 

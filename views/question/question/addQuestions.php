@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         var curlibs = '<?php echo $searchlibs;?>';
     </script>
 
-    <div class="breadcrumb"><?php echo $curBreadcrumb ?></div>
+    <div class="breadcrumb"></div>
     <div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions
             <img src="<?php echo AppUtility::getAssetURL(); ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo AppUtility::getAssetURL() ?>docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
         </h2></div>
@@ -194,8 +194,7 @@ if ($noSearchResults) {
             for ($j=0; $j<count($pageLibstouse); $j++) {
 
                 if ($searchall==0) {
-                    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                    echo '<td></td>';
+                    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;} echo '<td></td>';
                     echo '<td>';
                     echo '<b>'.$lnamesarr[$pageLibstouse[$j]].'</b>';
                     echo '</td>';

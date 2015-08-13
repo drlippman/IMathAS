@@ -59,15 +59,18 @@ class AppUtility extends Component
         return Yii::$app->homeUrl;
     }
 
-    public static function includeCSS($cssFile){
-        echo "<link rel='stylesheet' type='text/css' href='" . AppUtility::getHomeURL()."css/" .$cssFile . "?ver=".AppConstant::VERSION_NUMBER."'/>";
+    public static function includeCSS($cssFile)
+    {
+        echo "<link rel='stylesheet' type='text/css' href='" . AppUtility::getHomeURL() . "css/" . $cssFile . "?ver=" . AppConstant::VERSION_NUMBER . "'/>";
     }
 
-    public static function includeJS($jsFile){
-        echo "<script type='text/javascript' src='" . AppUtility::getHomeURL()."js/" .$jsFile . "?ver=".AppConstant::VERSION_NUMBER."'></script>";
+    public static function includeJS($jsFile)
+    {
+        echo "<script type='text/javascript' src='" . AppUtility::getHomeURL() . "js/" . $jsFile . "?ver=" . AppConstant::VERSION_NUMBER . "'></script>";
     }
 
-    public static function getAssetURL(){
+    public static function getAssetURL()
+    {
         return self::getHomeURL();
     }
 
@@ -137,20 +140,25 @@ class AppUtility extends Component
         return false;
     }
 
-    public static function getFormattedDate($dateStr, $format = 'Y-m-d'){
+    public static function getFormattedDate($dateStr, $format = 'Y-m-d')
+    {
         return date($format, $dateStr);
     }
-    public static function getFormattedDateCalendar($dateStr, $format = 'm-d-yy'){
+
+    public static function getFormattedDateCalendar($dateStr, $format = 'm-d-yy')
+    {
         return date($format, $dateStr);
     }
 
 
-    public static function getFormattedTime($dateStr, $format = 'h:i A'){
+    public static function getFormattedTime($dateStr, $format = 'h:i A')
+    {
         return date($format, $dateStr);
     }
 
-    public static function getFullName($first, $last){
-        return trim(ucfirst($first).' '.ucfirst($last));
+    public static function getFullName($first, $last)
+    {
+        return trim(ucfirst($first) . ' ' . ucfirst($last));
     }
 
     public static function passwordHash($password)
@@ -614,7 +622,9 @@ class AppUtility extends Component
         }
         return array('title' => $title, 'level' => $n);
     }
-    public static function addslashes_deep($value) {
+
+    public static function addslashes_deep($value)
+    {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
     }
 
@@ -622,7 +632,7 @@ class AppUtility extends Component
     {
         global $allowedmacros, $mathfuncs;
         $allowedmacros = array();
-        $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+        $mathfuncs = array("sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan", "arcsinh", "arccosh", "sqrt", "ceil", "floor", "round", "log", "ln", "abs", "max", "min", "count");
         $allowedmacros = $mathfuncs;
         $introdividers = array();
 
@@ -630,8 +640,7 @@ class AppUtility extends Component
         include("testutil.php");
         include("asidutil.php");
         $isTeacher = false;
-        if($teacher)
-        {
+        if ($teacher) {
             $isTeacher = true;
         }
 
@@ -639,9 +648,8 @@ class AppUtility extends Component
         $superdone = false;
         $isreview = false;
         $testid = $assessmentSession->id;
-        if($assessmentSession)
-        {
-            if (strpos($assessmentSession->questions,';') === false) {
+        if ($assessmentSession) {
+            if (strpos($assessmentSession->questions, ';') === false) {
                 $questions = explode(",", $assessmentSession->questions);
                 $bestquestions = $questions;
             } else {
@@ -651,21 +659,21 @@ class AppUtility extends Component
             }
 
             $seeds = explode(",", $assessmentSession->seeds);
-            if (strpos($assessmentSession->scores,';')===false) {
+            if (strpos($assessmentSession->scores, ';') === false) {
                 $scores = explode(",", $assessmentSession->scores);
                 $noraw = true;
                 $rawscores = $scores;
             } else {
-                $sp = explode(';',$assessmentSession->scores);
+                $sp = explode(';', $assessmentSession->scores);
                 $scores = explode(',', $sp[0]);
                 $rawscores = explode(',', $sp[1]);
                 $noraw = false;
             }
 
             $attempts = explode(",", $assessmentSession->attempts);
-            $lastanswers = explode("~",$assessmentSession->lastanswers);
+            $lastanswers = explode("~", $assessmentSession->lastanswers);
             if ($assessmentSession->timeontask == '') {
-                $timesontask = array_fill(0,count($questions), '');
+                $timesontask = array_fill(0, count($questions), '');
             } else {
                 $timesontask = explode(',', $assessmentSession->timeontask);
             }
@@ -693,25 +701,23 @@ class AppUtility extends Component
             $starttime = $assessmentSession->starttime;
 
 
-            if($starttime == 0)
-            {
+            if ($starttime == 0) {
                 $assessmentSession->starttime = time();
                 $assessmentSession->save();
             }
 
-            if($assessment)
-            {
+            if ($assessment) {
                 $testsettings = $assessment->attributes;
 
-                if ($testsettings['displaymethod'] == 'VideoCue' && $testsettings['viddata']=='') {
+                if ($testsettings['displaymethod'] == 'VideoCue' && $testsettings['viddata'] == '') {
                     $testsettings['displaymethod'] = 'Embed';
                 }
-                if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/',$testsettings['intro'],$matches) == 1) {
+                if (preg_match('/ImportFrom:\s*([a-zA-Z]+)(\d+)/', $testsettings['intro'], $matches) == 1) {
                     if (strtolower($matches[1]) == 'link') {
                         $linkedText = Links::getById(intval($matches[2]));
                         $vals = $linkedText->text;
                         $testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
-                    } else if (strtolower($matches[1])=='assessment') {
+                    } else if (strtolower($matches[1]) == 'assessment') {
                         $importAssessment = Assessments::getByAssessmentId(intval($matches[2]));
                         $vals = $importAssessment->intro;
                         $testsettings['intro'] = str_replace($matches[0], $vals[0], $testsettings['intro']);
@@ -721,15 +727,16 @@ class AppUtility extends Component
 
             if (!$isTeacher) {
                 $rec = "data-base=\"assessintro-{$assessmentSession->assessmentid}\" ";
-                $testsettings['intro'] = str_replace('<a ','<a '.$rec, $testsettings['intro']);
+                $testsettings['intro'] = str_replace('<a ', '<a ' . $rec, $testsettings['intro']);
             }
 
             list($testsettings['testtype'], $testsettings['showans']) = explode('-', $testsettings['deffeedback']);
 
             $now = time();
 
-            if ($testsettings['avail']==0 && !$isTeacher) {
-                echo 'Assessment is closed';die;
+            if ($testsettings['avail'] == 0 && !$isTeacher) {
+                echo 'Assessment is closed';
+                die;
                 //    leavetestmsg();
             }
 
@@ -744,7 +751,8 @@ class AppUtility extends Component
                             $isreview = true;
                         } else {
                             if (!$isTeacher) {
-                                echo 'Assessment is closed';die;
+                                echo 'Assessment is closed';
+                                die;
                                 //leavetestmsg();
                             }
                         }
@@ -756,11 +764,12 @@ class AppUtility extends Component
                     $exceptionduedate = $row->enddate;
                 } else { //has no exception
                     if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
-                        if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+                        if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                             $isreview = true;
                         } else {
                             if (!$isTeacher) {
-                                echo 'Assessment is closed';die;
+                                echo 'Assessment is closed';
+                                die;
                                 // leavetestmsg();
                             }
                         }
@@ -779,28 +788,28 @@ class AppUtility extends Component
             }
 
             //global $showtips;
-            $allowregen = (!$superdone && ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework"));
-            $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-            $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && is_numeric($testsettings['showans']));
-            $showansafterlast = ($testsettings['showans']==='F' || $testsettings['showans']==='J');
-            $noindivscores = ($testsettings['testtype']=="EndScore" || $testsettings['testtype']=="NoScores");
-            $reviewatend = ($testsettings['testtype']=="EndReview");
-            $showhints = ($testsettings['showhints']==1);
+            $allowregen = (!$superdone && ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework"));
+            $showeachscore = ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "AsGo" || $testsettings['testtype'] == "Homework");
+            $showansduring = (($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework") && is_numeric($testsettings['showans']));
+            $showansafterlast = ($testsettings['showans'] === 'F' || $testsettings['showans'] === 'J');
+            $noindivscores = ($testsettings['testtype'] == "EndScore" || $testsettings['testtype'] == "NoScores");
+            $reviewatend = ($testsettings['testtype'] == "EndReview");
+            $showhints = ($testsettings['showhints'] == 1);
             $showtips = $testsettings['showtips'];
-            $regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
+            $regenonreattempt = (($testsettings['shuffle'] & 8) == 8 && !$allowregen);
             if ($regenonreattempt) {
                 $nocolormark = true;
             }
 
 
-            if ($testsettings['eqnhelper']==1 || $testsettings['eqnhelper']==2) {
-                $placeinhead = "<script type='text/javascript'>var eetype='".$testsettings['eqnhelper']."</script>";
-                $placeinhead .= "<script type='text/javascript' src = '".AppUtility::getHomeURL()."js/eqnhelper.js?v=030112'></script>";
+            if ($testsettings['eqnhelper'] == 1 || $testsettings['eqnhelper'] == 2) {
+                $placeinhead = "<script type='text/javascript'>var eetype='" . $testsettings['eqnhelper'] . "</script>";
+                $placeinhead .= "<script type='text/javascript' src = '" . AppUtility::getHomeURL() . "js/eqnhelper.js?v=030112'></script>";
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
-            } else if ($testsettings['eqnhelper']==3 || $testsettings['eqnhelper']==4) {
-                $placeinhead = "<link rel='stylesheet' href='".AppUtility::getHomeURL()."/assessment/mathquill.css?v=102113' type='text/css' />";
-                if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
+            } else if ($testsettings['eqnhelper'] == 3 || $testsettings['eqnhelper'] == 4) {
+                $placeinhead = "<link rel='stylesheet' href='" . AppUtility::getHomeURL() . "/assessment/mathquill.css?v=102113' type='text/css' />";
+                if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false) {
                     $placeinhead .= '<!--[if lte IE 7]><style style="text/css">
 				.mathquill-editable.empty { width: 0.5em; }
 				.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
@@ -809,9 +818,9 @@ class AppUtility extends Component
 				.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
 				</style><![endif]-->';
                 }
-                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."js/mathquill_min.js?v=102113'></script>";
-                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."js/mathquilled.js?v=070214'></script>";
-                $placeinhead .= "<script type='text/javascript' src='".AppUtility::getHomeURL()."javascript/AMtoMQ.js?v=102113'></script>";
+                $placeinhead .= "<script type='text/javascript' src='" . AppUtility::getHomeURL() . "js/mathquill_min.js?v=102113'></script>";
+                $placeinhead .= "<script type='text/javascript' src='" . AppUtility::getHomeURL() . "js/mathquilled.js?v=070214'></script>";
+                $placeinhead .= "<script type='text/javascript' src='" . AppUtility::getHomeURL() . "javascript/AMtoMQ.js?v=102113'></script>";
                 $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
             }
@@ -821,7 +830,7 @@ class AppUtility extends Component
             $responseString .= '<div id="headershowtest" class="pagetitle">';
 //            $responseString .= "<h2>{$testsettings['name']}</h2></div>\n";
             $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'><b>Time Expired</b></span> </div>\n";
-            if ($testsettings['testtype']=="Practice" && !$isreview) {
+            if ($testsettings['testtype'] == "Practice" && !$isreview) {
                 echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
             }
 
@@ -833,46 +842,46 @@ class AppUtility extends Component
                 }
                 if ($timebeforedue < 0) {
                     $duetimenote = _('Past due');
-                } else if ($timebeforedue < 24*3600) { //due within 24 hours
+                } else if ($timebeforedue < 24 * 3600) { //due within 24 hours
                     if ($timebeforedue < 300) {
                         $duetimenote = '<span style="color:#f00;">' . _('Due in under ');
                     } else {
                         $duetimenote = '<span>' . _('Due in ');
                     }
-                    if ($timebeforedue>3599) {
-                        $duetimenote .= floor($timebeforedue/3600). " " . _('hours') . ", ";
+                    if ($timebeforedue > 3599) {
+                        $duetimenote .= floor($timebeforedue / 3600) . " " . _('hours') . ", ";
                     }
-                    $duetimenote .= ceil(($timebeforedue%3600)/60). " " . _('minutes');
+                    $duetimenote .= ceil(($timebeforedue % 3600) / 60) . " " . _('minutes');
                     $duetimenote .= '. ';
                     if ($exceptionduedate > 0) {
-                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a',$exceptionduedate);
+                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a', $exceptionduedate);
                     } else {
-                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+                        $duetimenote .= _('Due') . " " . self::tzdate('D m/d/Y g:i a', $testsettings['enddate']);
                     }
                 } else {
-                    if ($testsettings['enddate']==2000000000) {
+                    if ($testsettings['enddate'] == 2000000000) {
                         $duetimenote = '';
                     } else if ($exceptionduedate > 0) {
-                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a',$exceptionduedate);
+                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a', $exceptionduedate);
                     } else {
-                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a',$testsettings['enddate']);
+                        $duetimenote = _('Due') . " " . self::tzdate('D m/d/Y g:i a', $testsettings['enddate']);
                     }
                 }
             }
 
             $restrictedtimelimit = false;
 
-            $responseString .= '<div class="right margin-right-inset"><a href="#" onclick="togglemainintroshow(this);return false;">'._("Show Intro/Instructions").'</a></div>';
+            $responseString .= '<div class="right margin-right-inset"><a href="#" onclick="togglemainintroshow(this);return false;">' . _("Show Intro/Instructions") . '</a></div>';
 
             if (isset($_GET['score'])) { //score a problem
                 $qn = $_GET['score'];
 
-                if ($_POST['verattempts']!=$attempts[$qn]) {
+                if ($_POST['verattempts'] != $attempts[$qn]) {
                     $responseString .= "<p>This question has been submittted since you viewed it, and that grade is shown below.  Your answer just submitted was not scored or recorded.</p>";
                 } else {
                     if (isset($_POST['disptime']) && !$isreview) {
                         $used = $now - intval($_POST['disptime']);
-                        $timesontask[$qn] .= (($timesontask[$qn]=='')?'':'~').$used;
+                        $timesontask[$qn] .= (($timesontask[$qn] == '') ? '' : '~') . $used;
                     }
                     $GLOBALS['scoremessages'] = '';
                     $GLOBALS['questionmanualgrade'] = false;
@@ -883,8 +892,8 @@ class AppUtility extends Component
 
                     if (!$superdone && $showeachscore && hasreattempts($qn)) {
 
-                        if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen']==0) || $qi[$questions[$toclear]]['regen']==1)) {
-                            if (!in_array($qn,$reattempting)) {
+                        if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen'] == 0) || $qi[$questions[$toclear]]['regen'] == 1)) {
+                            if (!in_array($qn, $reattempting)) {
                                 //$reattempting[] = $qn;
                                 $immediatereattempt = true;
                             }
@@ -895,27 +904,27 @@ class AppUtility extends Component
                 }
                 if (!$superdone) {
                     $responseString .= filter("<div id=intro class=hidden>{$testsettings['intro']}</div>\n");
-                    $lefttodo = self::shownavbar($questions,$scores,$qn,$testsettings['showcat'], $courseId, $assessmentId);
+                    $lefttodo = self::shownavbar($questions, $scores, $qn, $testsettings['showcat'], $courseId, $assessmentId);
 
                     $responseString .= "<div class=inset>\n";
                     $responseString .= "<a name=\"beginquestions\"></a>\n";
                     if ($GLOBALS['scoremessages'] != '') {
-                        $responseString .= '<p>'.$GLOBALS['scoremessages'].'</p>';
+                        $responseString .= '<p>' . $GLOBALS['scoremessages'] . '</p>';
                     }
 
                     if ($showeachscore) {
                         $possible = $qi[$questions[$qn]]['points'];
-                        if (getpts($rawscore)!=getpts($scores[$qn])) {
+                        if (getpts($rawscore) != getpts($scores[$qn])) {
                             $responseString .= "<p>Score before penalty on last attempt: ";
-                            $responseString .= printscore($rawscore,$qn);
+                            $responseString .= printscore($rawscore, $qn);
                             $responseString .= "</p>";
                         }
                         $responseString .= "<p>";
                         $responseString .= 'Score on last attempt: ';
-                        $responseString .= printscore($scores[$qn],$qn);
+                        $responseString .= printscore($scores[$qn], $qn);
                         $responseString .= "</p>\n";
                         $responseString .= "<p>Score in gradebook: ";
-                        $responseString .= printscore($bestscores[$qn],$qn);
+                        $responseString .= printscore($bestscores[$qn], $qn);
                         $responseString .= "</p>";
                         if ($GLOBALS['questionmanualgrade'] == true) {
                             $responseString .= '<p><strong>Note: </strong> This question contains parts that can not be auto-graded.  Those parts will count as a score of 0 until they are graded by your instructor</p>';
@@ -931,7 +940,7 @@ class AppUtility extends Component
                         $reattemptsremain = true;
                     }
 
-                    if ($allowregen && $qi[$questions[$qn]]['allowregen']==1) {
+                    if ($allowregen && $qi[$questions[$qn]]['allowregen'] == 1) {
                         $responseString .= '<p>';
                         if ($reattemptsremain && !$immediatereattempt) {
                             $responseString .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>, ";
@@ -946,21 +955,21 @@ class AppUtility extends Component
                     } else if ($reattemptsremain && !$immediatereattempt) {
                         $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>";
                         if ($lefttodo > 0) {
-                            $responseString .=  _(", or select another question");
+                            $responseString .= _(", or select another question");
                         }
                         $responseString .= '</p>';
                     } else if ($lefttodo > 0) {
-                        $responseString .= "<p>"._('Select another question').'</p>';
+                        $responseString .= "<p>" . _('Select another question') . '</p>';
                     }
 
-                    if ($reattemptsremain == false && $showeachscore && $testsettings['showans']!='N') {
+                    if ($reattemptsremain == false && $showeachscore && $testsettings['showans'] != 'N') {
                         //TODO i18n
 
                         $responseString .= "<p>This question, with your last answer";
-                        if (($showansafterlast && $qi[$questions[$qn]]['showans']=='0') || $qi[$questions[$qn]]['showans']=='F' || $qi[$questions[$qn]]['showans']=='J') {
+                        if (($showansafterlast && $qi[$questions[$qn]]['showans'] == '0') || $qi[$questions[$qn]]['showans'] == 'F' || $qi[$questions[$qn]]['showans'] == 'J') {
                             $responseString .= " and correct answer";
                             $showcorrectnow = true;
-                        } else if ($showansduring && $qi[$questions[$qn]]['showans']=='0' && $qi[$questions[$qn]]['showans']=='0' && $testsettings['showans']==$attempts[$qn]) {
+                        } else if ($showansduring && $qi[$questions[$qn]]['showans'] == '0' && $qi[$questions[$qn]]['showans'] == '0' && $testsettings['showans'] == $attempts[$qn]) {
                             $responseString .= " and correct answer";
                             $showcorrectnow = true;
                         } else {
@@ -970,8 +979,8 @@ class AppUtility extends Component
                         $responseString .= ', is displayed below</p>';
                         if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
                             //$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
-                            if (strpos($rawscores[$qn],'~')!==false) {
-                                $colors = explode('~',$rawscores[$qn]);
+                            if (strpos($rawscores[$qn], '~') !== false) {
+                                $colors = explode('~', $rawscores[$qn]);
                             } else {
                                 $colors = array($rawscores[$qn]);
                             }
@@ -979,26 +988,26 @@ class AppUtility extends Component
                             $colors = array();
                         }
                         if ($showcorrectnow) {
-                            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],2,false,$attempts[$qn],false,false,false,$colors);
+                            displayq($qn, $qi[$questions[$qn]]['questionsetid'], $seeds[$qn], 2, false, $attempts[$qn], false, false, false, $colors);
                         } else {
-                            displayq($qn,$qi[$questions[$qn]]['questionsetid'],$seeds[$qn],false,false,$attempts[$qn],false,false,false,$colors);
+                            displayq($qn, $qi[$questions[$qn]]['questionsetid'], $seeds[$qn], false, false, $attempts[$qn], false, false, false, $colors);
                         }
                         $contactlinks = showquestioncontactlinks($qn);
-                        if ($contactlinks!='' && !$sessiondata['istutorial']) {
-                            $responseString .= '<div class="review">'.$contactlinks.'</div>';
+                        if ($contactlinks != '' && !$sessiondata['istutorial']) {
+                            $responseString .= '<div class="review">' . $contactlinks . '</div>';
                         }
 
                     } else if ($immediatereattempt) {
                         $next = $qn;
                         if (isset($intropieces)) {
-                            foreach ($introdividers as $k=>$v) {
-                                if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
-                                    if ($next+1==$v[1]) {
-                                        $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Hide Question Information</a></div>';
-                                        $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                            foreach ($introdividers as $k => $v) {
+                                if ($v[1] <= $next + 1 && $next + 1 <= $v[2]) {//right divider
+                                    if ($next + 1 == $v[1]) {
+                                        $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;">Hide Question Information</a></div>';
+                                        $responseString .= '<div class="intro" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
                                     } else {
-                                        $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
-                                        $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                        $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;">Show Question Information</a></div>';
+                                        $responseString .= '<div class="intro" style="display:none;" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
                                     }
                                     break;
                                 }
@@ -1006,14 +1015,14 @@ class AppUtility extends Component
                         }
                         $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"showtest.php?action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
                         $responseString .= "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
-                        $responseString .= '<input type="hidden" name="disptime" value="'.time().'" />';
-                        $responseString .= "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
+                        $responseString .= '<input type="hidden" name="disptime" value="' . time() . '" />';
+                        $responseString .= "<input type=\"hidden\" name=\"isreview\" value=\"" . ($isreview ? 1 : 0) . "\" />";
                         $responseString .= "<a name=\"beginquestions\"></a>\n";
                         basicshowq($next);
-                        showqinfobar($next,true,true);
-                        $responseString .= '<input type="submit" class="btn" value="'. _('Submit'). '" />';
-                        if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
-                            $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(If you jump to the answer, you must generate a new version to earn credit))) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                        showqinfobar($next, true, true);
+                        $responseString .= '<input type="submit" class="btn" value="' . _('Submit') . '" />';
+                        if (($testsettings['showans'] == 'J' && $qi[$questions[$next]]['showans'] == '0') || $qi[$questions[$next]]['showans'] == 'J') {
+                            $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(If you jump to the answer, you must generate a new version to earn credit))) {window.location = \'showtest.php?action=skip&amp;jumptoans=' . $next . '&amp;to=' . $next . '\'}"/>';
                         }
                         $responseString .= "</form>\n";
 
@@ -1023,7 +1032,7 @@ class AppUtility extends Component
 
                     $responseString .= "</div>\n";
                 }
-            }else{
+            } else {
                 $responseString .= filter("<div id=intro class='hidden margin-right-inset'>{$testsettings['intro']}</div>\n");
 
                 $lefttodo = self::shownavbar($questions, $scores, $next, $testsettings['showcat'], $courseId, $assessmentId);
@@ -1031,21 +1040,21 @@ class AppUtility extends Component
                 if (unans($scores[$next]) || amreattempting($next)) {
                     $responseString .= "<div class=inset>\n";
                     if (isset($intropieces)) {
-                        foreach ($introdividers as $k=>$v) {
-                            if ($v[1]<=$next+1 && $next+1<=$v[2]) {//right divider
-                                if ($next+1==$v[1]) {
-                                    $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;"> Hide Question Information</a></div>';
-                                    $responseString .= '<div class="intro" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                        foreach ($introdividers as $k => $v) {
+                            if ($v[1] <= $next + 1 && $next + 1 <= $v[2]) {//right divider
+                                if ($next + 1 == $v[1]) {
+                                    $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;"> Hide Question Information</a></div>';
+                                    $responseString .= '<div class="intro" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
                                 } else {
-                                    $responseString .= '<div><a href="#" id="introtoggle'.$k.'" onclick="toggleintroshow('.$k.'); return false;">Show Question Information</a></div>';
-                                    $responseString .= '<div class="intro" style="display:none;" id="intropiece'.$k.'">'.filter($intropieces[$k]).'</div>';
+                                    $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;">Show Question Information</a></div>';
+                                    $responseString .= '<div class="intro" style="display:none;" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
                                 }
                                 break;
                             }
                         }
                     }
 
-                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=".$assessmentId."&amp;cid=".$courseId."&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=" . $assessmentId . "&amp;cid=" . $courseId . "&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 //                echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 //                echo '<input type="hidden" name="disptime" value="'.time().'" />';
 //                echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -1053,14 +1062,14 @@ class AppUtility extends Component
                     $responseString .= "<a name=\"beginquestions\"></a>\n";
                     basicshowq($next);
                     showqinfobar($next, true, true);
-                    $responseString .= '<input type="submit" class="btn btn-primary" value="'. _('Submit'). '" />';
-                    if (($testsettings['showans']=='J' && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='J') {
-                        $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans='.$next.'&amp;to='.$next.'\'}"/>';
+                    $responseString .= '<input type="submit" class="btn btn-primary" value="' . _('Submit') . '" />';
+                    if (($testsettings['showans'] == 'J' && $qi[$questions[$next]]['showans'] == '0') || $qi[$questions[$next]]['showans'] == 'J') {
+                        $responseString .= ' <input type="button" class="btn" value="Jump to Answer" onclick="if (confirm(\'If you jump to the answer, you must generate a new version to earn credit\')) {window.location = \'showtest.php?action=skip&amp;jumptoans=' . $next . '&amp;to=' . $next . '\'}"/>';
                     }
                     $responseString .= "</form>\n";
                     $responseString .= "</div>\n";
 
-                }else {
+                } else {
                     $responseString .= "<div class=inset>\n";
                     $responseString .= "<a name=\"beginquestions\"></a>\n";
                     $responseString .= "You've already done this problem.\n";
@@ -1068,10 +1077,10 @@ class AppUtility extends Component
                     if ($showeachscore) {
                         $possible = $qi[$questions[$next]]['points'];
                         $responseString .= "<p>Score on last attempt: ";
-                        $responseString .= printscore($scores[$next],$next);
+                        $responseString .= printscore($scores[$next], $next);
                         $responseString .= "</p>\n";
                         $responseString .= "<p>Score in gradebook: ";
-                        $responseString .= printscore($bestscores[$next],$next);
+                        $responseString .= printscore($bestscores[$next], $next);
                         $responseString .= "</p>";
                     }
                     if (hasreattempts($next)) {
@@ -1080,34 +1089,34 @@ class AppUtility extends Component
                         //}
                         $reattemptsremain = true;
                     }
-                    if ($allowregen && $qi[$questions[$next]]['allowregen']==1) {
+                    if ($allowregen && $qi[$questions[$next]]['allowregen'] == 1) {
                         $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$next&amp;regen=$next\">Try another similar question</a></p>\n";
                     }
                     if ($lefttodo == 0) {
                         $responseString .= "<a href=\"showtest.php?action=skip&amp;done=true\">When you are done, click here to see a summary of your score</a>\n";
                     }
-                    if (!$reattemptsremain && $testsettings['showans']!='N') {// && $showeachscore) {
+                    if (!$reattemptsremain && $testsettings['showans'] != 'N') {// && $showeachscore) {
                         $responseString .= "<p>Question with last attempt is displayed for your review only</p>";
 
                         if (!$noraw && $showeachscore) {
                             //$colors = scorestocolors($rawscores[$next], '', $qi[$questions[$next]]['answeights'], $noraw);
-                            if (strpos($rawscores[$next],'~')!==false) {
-                                $colors = explode('~',$rawscores[$next]);
+                            if (strpos($rawscores[$next], '~') !== false) {
+                                $colors = explode('~', $rawscores[$next]);
                             } else {
                                 $colors = array($rawscores[$next]);
                             }
                         } else {
                             $colors = array();
                         }
-                        $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans']=='0') || $qi[$questions[$next]]['showans']=='F' || $qi[$questions[$next]]['showans']=='J') || ($showansduring && $qi[$questions[$next]]['showans']=='0' && $attempts[$next]>=$testsettings['showans']));
+                        $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans'] == '0') || $qi[$questions[$next]]['showans'] == 'F' || $qi[$questions[$next]]['showans'] == 'J') || ($showansduring && $qi[$questions[$next]]['showans'] == '0' && $attempts[$next] >= $testsettings['showans']));
                         if ($qshowans) {
-                            displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],2,false,$attempts[$next],false,false,false,$colors);
+                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], 2, false, $attempts[$next], false, false, false, $colors);
                         } else {
-                            displayq($next,$qi[$questions[$next]]['questionsetid'],$seeds[$next],false,false,$attempts[$next],false,false,false,$colors);
+                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], false, false, $attempts[$next], false, false, false, $colors);
                         }
                         $contactlinks = showquestioncontactlinks($next);
-                        if ($contactlinks!='') {
-                            $responseString .= '<div class="review">'.$contactlinks.'</div>';
+                        if ($contactlinks != '') {
+                            $responseString .= '<div class="review">' . $contactlinks . '</div>';
                         }
                     }
                     $responseString .= "</div>\n";
@@ -1120,20 +1129,22 @@ class AppUtility extends Component
     }
 
 
-
-    static function shownavbar($questions,$scores,$current,$showcat,$courseId,$assessmentId) {
-        global $responseString, $isdiag,$testsettings,$attempts,$qi,$allowregen,$bestscores,$isreview,$showeachscore,$noindivscores;
+    static function shownavbar($questions, $scores, $current, $showcat, $courseId, $assessmentId)
+    {
+        global $responseString, $isdiag, $testsettings, $attempts, $qi, $allowregen, $bestscores, $isreview, $showeachscore, $noindivscores;
         $showeachscore = 1;
         $todo = 0;
         $earned = 0;
         $poss = 0;
-        $responseString .= "<a href='#beginquestions'><img class=skipnav src='".AppUtility::getHomeURL()."img/blank.gif' alt='Skip Navigation')'/></a>\n";
+        $responseString .= "<a href='#beginquestions'><img class=skipnav src='" . AppUtility::getHomeURL() . "img/blank.gif' alt='Skip Navigation')'/></a>\n";
         $responseString .= "<div class=navbar>";
         $responseString .= "<h4>Questions List</h4>\n";
         $responseString .= "<ul class=qlist>\n";
         for ($i = 0; $i < count($questions); $i++) {
             $responseString .= "<li>";
-            if ($current == $i) { $responseString .= "<span class=current>";}
+            if ($current == $i) {
+                $responseString .= "<span class=current>";
+            }
             if (unans($scores[$i]) || amreattempting($i)) {
                 $todo++;
             }
@@ -1143,40 +1154,40 @@ class AppUtility extends Component
                 $thisscore = getpts($bestscores[$i]);
             }
 
-            if ((unans($scores[$i]) && $attempts[$i]==0) || ($noindivscores && amreattempting($i))) {
-                $responseString .= "<img alt='untried' src='".AppUtility::getHomeURL()."img/te_blue_arrow.png'/> ";
+            if ((unans($scores[$i]) && $attempts[$i] == 0) || ($noindivscores && amreattempting($i))) {
+                $responseString .= "<img alt='untried' src='" . AppUtility::getHomeURL() . "img/te_blue_arrow.png'/> ";
             } else if (canimprove($i) && !$noindivscores) {
-                if ($thisscore==0 || $noindivscores) {
-                    $responseString .= "<img alt=\"incorrect - can retry\" src='".AppUtility::getHomeURL()."img/te_red_redo.png'/> ";
+                if ($thisscore == 0 || $noindivscores) {
+                    $responseString .= "<img alt=\"incorrect - can retry\" src='" . AppUtility::getHomeURL() . "img/te_red_redo.png'/> ";
                 } else {
-                    $responseString .= "<img alt=\"partially correct - can retry\" src='".AppUtility::getHomeURL()."img/{te_yellow_redo.png'/> ";
+                    $responseString .= "<img alt=\"partially correct - can retry\" src='" . AppUtility::getHomeURL() . "img/{te_yellow_redo.png'/> ";
                 }
             } else {
                 if (!$showeachscore) {
-                    $responseString .= "<img alt=\"cannot retry\" src='".AppUtility::getHomeURL()."img/te_blank.gif'/> ";
+                    $responseString .= "<img alt=\"cannot retry\" src='" . AppUtility::getHomeURL() . "img/te_blank.gif'/> ";
                 } else {
                     if ($thisscore == $qi[$questions[$i]]['points']) {
-                        $responseString .= "<img alt=\"correct\" src='".AppUtility::getHomeURL()."img/te_green_check.png'/> ";
-                    } else if ($thisscore==0) {
-                        $responseString .= "<img alt=\"incorrect - cannot retry\" src='".AppUtility::getHomeURL()."img/te_red_ex.png'/> ";
+                        $responseString .= "<img alt=\"correct\" src='" . AppUtility::getHomeURL() . "img/te_green_check.png'/> ";
+                    } else if ($thisscore == 0) {
+                        $responseString .= "<img alt=\"incorrect - cannot retry\" src='" . AppUtility::getHomeURL() . "img/te_red_ex.png'/> ";
                     } else {
-                        $responseString .= "<img alt=\"partially correct - cannot retry\" src='".AppUtility::getHomeURL()."img/te_yellow_check.png'/> ";
+                        $responseString .= "<img alt=\"partially correct - cannot retry\" src='" . AppUtility::getHomeURL() . "img/te_yellow_check.png'/> ";
                     }
                 }
             }
 
 
-            if ($showcat > 1 && $qi[$questions[$i]]['category']!='0') {
-                if ($qi[$questions[$i]]['withdrawn']==1) {
-                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</span></a>";
+            if ($showcat > 1 && $qi[$questions[$i]]['category'] != '0') {
+                if ($qi[$questions[$i]]['withdrawn'] == 1) {
+                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">" . ($i + 1) . ") {$qi[$questions[$i]]['category']}</span></a>";
                 } else {
-                    $responseString .= "<a href=\"showtest.php?to=$i\">". ($i+1) . ") {$qi[$questions[$i]]['category']}</a>";
+                    $responseString .= "<a href=\"showtest.php?to=$i\">" . ($i + 1) . ") {$qi[$questions[$i]]['category']}</a>";
                 }
             } else {
-                if ($qi[$questions[$i]]['withdrawn']==1) {
-                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">Question ". ($i+1) . "</span></a>";
+                if ($qi[$questions[$i]]['withdrawn'] == 1) {
+                    $responseString .= "<a href=\"showtest.php?to=$i\"><span class=\"withdrawn\">Question " . ($i + 1) . "</span></a>";
                 } else {
-                    $responseString .= "<a href=\"show-assessment?id=$assessmentId&amp;cid=$courseId&amp;to=$i\">Question ". ($i+1) . "</a>";
+                    $responseString .= "<a href=\"show-assessment?id=$assessmentId&amp;cid=$courseId&amp;to=$i\">Question " . ($i + 1) . "</a>";
                 }
             }
             if ($showeachscore) {
@@ -1196,7 +1207,7 @@ class AppUtility extends Component
                     $responseString .= $thisscore;
                     $earned += $thisscore;
                 }
-                $responseString .= '/'.$qi[$questions[$i]]['points'];
+                $responseString .= '/' . $qi[$questions[$i]]['points'];
                 $poss += $qi[$questions[$i]]['points'];
                 if (($isreview && canimprove($i)) || (!$isreview && canimprovebest($i))) {
                     $responseString .= ')';
@@ -1205,7 +1216,9 @@ class AppUtility extends Component
                 }
             }
 
-            if ($current == $i) { $responseString .= "</span>";}
+            if ($current == $i) {
+                $responseString .= "</span>";
+            }
 
             $responseString .= "</li>\n";
         }
@@ -1216,10 +1229,10 @@ class AppUtility extends Component
             } else {
                 $responseString .= "<p>Grade: ";
             }
-            $responseString .= $earned."/".$poss."</p>";
+            $responseString .= $earned . "/" . $poss . "</p>";
         }
-        if (!$isdiag && $testsettings['noprint']==0) {
-            $responseString .= "<p><a href='#' onclick=\"window.open('".AppUtility::getHomeURL()."assessment/assessment/print-test?aid=".$assessmentId."','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
+        if (!$isdiag && $testsettings['noprint'] == 0) {
+            $responseString .= "<p><a href='#' onclick=\"window.open('" . AppUtility::getHomeURL() . "assessment/assessment/print-test?aid=" . $assessmentId . "','printver','width=400,height=300,toolbar=1,menubar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));return false;\">Print Version</a></p> ";
         }
 
         $responseString .= "</div>\n";
@@ -1227,13 +1240,13 @@ class AppUtility extends Component
         return $todo;
     }
 
-    public static function getRefererUri($refere){
+    public static function getRefererUri($refere)
+    {
         $home = self::getHomeURL();
         $hostInfo = Yii::$app->request->hostInfo;
         $absUrl = str_replace($hostInfo, '', $refere);
         $refereUri = $absUrl;
-        if(strpos($hostInfo, 'localhost') != false)
-        {
+        if (strpos($hostInfo, 'localhost') != false) {
             $refereUri = str_replace($home, '', $absUrl);
         }
         return $refereUri;
@@ -1258,12 +1271,12 @@ class AppUtility extends Component
     {
         global $allowedmacros, $mathfuncs, $questions, $seeds, $responseString;
         $allowedmacros = array();
-        $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+        $mathfuncs = array("sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan", "arcsinh", "arccosh", "sqrt", "ceil", "floor", "round", "log", "ln", "abs", "max", "min", "count");
         $allowedmacros = $mathfuncs;
         $userfullname = AppUtility::getFullName($user->FirstName, $user->LastName);
 
         $responseString = "";
-        $isteacher = (isset($teacherid) || $isteacher==true);
+        $isteacher = (isset($teacherid) || $isteacher == true);
 
         if (!isset($assessmentSessionId) && !$isteacher) {
             echo "<html><body>Error. </body></html>\n";
@@ -1311,56 +1324,56 @@ class AppUtility extends Component
         $connection = Yii::$app->getDb();
         $query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
         $line = $connection->createCommand($query)->queryOne();
-        if (strpos($line['questions'],';')===false) {
-            $questions = explode(",",$line['questions']);
+        if (strpos($line['questions'], ';') === false) {
+            $questions = explode(",", $line['questions']);
             $bestquestions = $questions;
         } else {
-            list($questions,$bestquestions) = explode(";",$line['questions']);
-            $questions = explode(",",$questions);
-            $bestquestions = explode(",",$bestquestions);
+            list($questions, $bestquestions) = explode(";", $line['questions']);
+            $questions = explode(",", $questions);
+            $bestquestions = explode(",", $bestquestions);
         }
-        if ($scoredtype=='last') {
-            $seeds = explode(",",$line['seeds']);
-            $sp = explode(';',$line['scores']);
-            $scores = explode(",",$sp[0]);
+        if ($scoredtype == 'last') {
+            $seeds = explode(",", $line['seeds']);
+            $sp = explode(';', $line['scores']);
+            $scores = explode(",", $sp[0]);
             $rawscores = explode(',', $sp[1]);
-            $attempts = explode(",",$line['attempts']);
-            $lastanswers = explode("~",$line['lastanswers']);
+            $attempts = explode(",", $line['attempts']);
+            $lastanswers = explode("~", $line['lastanswers']);
         } else {
-            $seeds = explode(",",$line['bestseeds']);
-            $sp = explode(';',$line['bestscores']);
-            $scores = explode(",",$sp[0]);
+            $seeds = explode(",", $line['bestseeds']);
+            $sp = explode(';', $line['bestscores']);
+            $scores = explode(",", $sp[0]);
             $rawscores = explode(',', $sp[1]);
-            $attempts = explode(",",$line['bestattempts']);
-            $lastanswers = explode("~",$line['bestlastanswers']);
+            $attempts = explode(",", $line['bestattempts']);
+            $lastanswers = explode("~", $line['bestlastanswers']);
             $questions = $bestquestions;
         }
-        $timesontask = explode("~",$line['timeontask']);
+        $timesontask = explode("~", $line['timeontask']);
 
         if ($isteacher) {
             if ($line['userid'] != $user->id) {
                 $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
                 $row = $connection->createCommand($query)->queryOne();
-                $userfullname = $row[1]." ".$row[0];
+                $userfullname = $row[1] . " " . $row[0];
             }
-            $userid= $line['userid'];
+            $userid = $line['userid'];
         }
 
         $query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
         $testsettings = $connection->createCommand($query)->queryOne();
-        list($testsettings['testtype'],$testsettings['showans']) = explode('-',$testsettings['deffeedback']);
+        list($testsettings['testtype'], $testsettings['showans']) = explode('-', $testsettings['deffeedback']);
 
-        $qi = getquestioninfo($questions,$testsettings);
+        $qi = getquestioninfo($questions, $testsettings);
 
         $now = time();
         $isreview = false;
-        if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate']<$now)) { //outside normal range for test
+        if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now)) { //outside normal range for test
             $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
 
             $row = $connection->createCommand($query)->queryOne();
-            if ($row!=null) {
-                if ($now<$row[0] || $row[1]<$now) { //outside exception dates
-                    if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+            if ($row != null) {
+                if ($now < $row[0] || $row[1] < $now) { //outside exception dates
+                    if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                         $isreview = true;
                     } else {
                         if (!$isteacher) {
@@ -1371,7 +1384,7 @@ class AppUtility extends Component
                     }
                 }
             } else { //no exception
-                if ($now > $testsettings['startdate'] && $now<$testsettings['reviewdate']) {
+                if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                     $isreview = true;
                 } else {
                     if (!$isteacher) {
@@ -1383,10 +1396,10 @@ class AppUtility extends Component
             }
         }
         if ($isreview) {
-            $seeds = explode(",",$line['reviewseeds']);
-            $scores = explode(",",$line['reviewscores']);
-            $attempts = explode(",",$line['reviewattempts']);
-            $lastanswers = explode("~",$line['reviewlastanswers']);
+            $seeds = explode(",", $line['reviewseeds']);
+            $scores = explode(",", $line['reviewscores']);
+            $attempts = explode(",", $line['reviewattempts']);
+            $lastanswers = explode("~", $line['reviewlastanswers']);
         }
         $responseString .= "<h4 class='padding-zero' style=\"float:right;\"><b>Name:</b> $userfullname </h4>";
         $responseString .= "<h3 class='margin-top-zero'>".$testsettings['name']."</h3>";
@@ -1399,38 +1412,38 @@ class AppUtility extends Component
         $endtext = '';  $intropieces = array();
         if (strpos($testsettings['intro'], '[QUESTION')!==false) {
             //embedded type
-            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[QUESTION $3]',$testsettings['intro']);
+            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/', '[QUESTION $3]', $testsettings['intro']);
             $introsplit = preg_split('/\[QUESTION\s+(\d+)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-            for ($i=1;$i<count($introsplit);$i+=2) {
-                $intropieces[$introsplit[$i]] = $introsplit[$i-1];
+            for ($i = 1; $i < count($introsplit); $i += 2) {
+                $intropieces[$introsplit[$i]] = $introsplit[$i - 1];
             }
             //no specific start text - will just go before first question
             $testsettings['intro'] = '';
-            $endtext = $introsplit[count($introsplit)-1];
-        } else if (strpos($testsettings['intro'], '[Q ')!==false) {
+            $endtext = $introsplit[count($introsplit) - 1];
+        } else if (strpos($testsettings['intro'], '[Q ') !== false) {
             //question info type
-            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/','[Q $3]',$testsettings['intro']);
+            $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[Q\s+(\d+(\-(\d+))?)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/', '[Q $3]', $testsettings['intro']);
             $introsplit = preg_split('/\[Q\s+(.*?)\]/', $intro, -1, PREG_SPLIT_DELIM_CAPTURE);
             $testsettings['intro'] = $introsplit[0];
-            for ($i=1;$i<count($introsplit);$i+=2) {
-                $p = explode('-',$introsplit[$i]);
-                $intropieces[$p[0]] = $introsplit[$i+1];
+            for ($i = 1; $i < count($introsplit); $i += 2) {
+                $p = explode('-', $introsplit[$i]);
+                $intropieces[$p[0]] = $introsplit[$i + 1];
             }
         }
-        $responseString .= '<div class=intro>'.$testsettings['intro'].'</div>';
+        $responseString .= '<div class=intro>' . $testsettings['intro'] . '</div>';
         if ($isteacher && !$scoredview) {
-            $responseString .= '<p>'._('Showing Current Versions').'<br/><button type="button" class="btn" onclick="rendersa()">'._("Show Answers").'</button> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a> <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+            $responseString .= '<p>' . _('Showing Current Versions') . '<br/><button type="button" class="btn" onclick="rendersa()">' . _("Show Answers") . '</button> <a href="print-test?cid=' . $cid . '&asid=' . $testid . '&scored=best">' . _('Show Scored View') . '</a> <a href="print-test?cid=' . $cid . '&asid=' . $testid . '&scored=last">' . _('Show Last Attempts') . '</a></p>';
         } else if ($isteacher) {
-            if ($scoredtype=='last') {
-                $responseString .= '<p>'._('Showing Last Attempts').' <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=best">'._('Show Scored View').'</a></p>';
+            if ($scoredtype == 'last') {
+                $responseString .= '<p>' . _('Showing Last Attempts') . ' <a href="print-test?cid=' . $cid . '&asid=' . $testid . '&scored=best">' . _('Show Scored View') . '</a></p>';
             } else {
-                $responseString .= '<p>'._('Showing Scored View').' <a href="print-test?cid='.$cid.'&asid='.$testid.'&scored=last">'._('Show Last Attempts').'</a></p>';
+                $responseString .= '<p>' . _('Showing Scored View') . ' <a href="print-test?cid=' . $cid . '&asid=' . $testid . '&scored=last">' . _('Show Last Attempts') . '</a></p>';
             }
 
         }
-        if ($testsettings['showans']=='N') {
-            $lastanswers = array_fill(0,count($questions),'');
+        if ($testsettings['showans'] == 'N') {
+            $lastanswers = array_fill(0, count($questions), '');
         }
         for ($i = 0; $i < count($questions); $i++) {
             //list($qsetid,$cat) = getqsetid($questions[$i]);
@@ -1438,102 +1451,102 @@ class AppUtility extends Component
             $cat = $qi[$questions[$i]]['category'];
 
             $showa = $isteacher;
-            if (isset($intropieces[$i+1])) {
-                $responseString .= '<div class="intro">'.$intropieces[$i+1].'</div>';
+            if (isset($intropieces[$i + 1])) {
+                $responseString .= '<div class="intro">' . $intropieces[$i + 1] . '</div>';
             }
             $responseString .= '<div class="nobreak">';
             if (isset($_GET['descr'])) {
                 $query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
                 $result = $connection->createCommand($query)->queryOne();
-                $responseString .= '<div>ID:'.$qsetid.', '.mysql_result($result,0,0).'</div>';
+                $responseString .= '<div>ID:' . $qsetid . ', ' . mysql_result($result, 0, 0) . '</div>';
             } else {
                 //list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
                 $points = $qi[$questions[$i]]['points'];
                 $qattempts = $qi[$questions[$i]]['attempts'];
                 if ($scoredview) {
-                    $responseString .= "<div>#".($i+1)." ";
+                    $responseString .= "<div>#" . ($i + 1) . " ";
                     $responseString .= printscore($scores[$i], $i);
                     $responseString .= "</div>";
                 } else {
-                    $responseString .= "<div>#".($i+1)." Points possible: $points.  Total attempts: $qattempts</div>";
+                    $responseString .= "<div>#" . ($i + 1) . " Points possible: $points.  Total attempts: $qattempts</div>";
                 }
             }
             if ($scoredview) {
                 //$col = scorestocolors($scores[$i], $qi[$questions[$i]]['points'], $qi[$questions[$i]]['answeights']);
                 if (isset($rawscores[$i])) {
                     //$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
-                    if (strpos($rawscores[$i],'~')!==false) {
-                        $colors = explode('~',$rawscores[$i]);
+                    if (strpos($rawscores[$i], '~') !== false) {
+                        $colors = explode('~', $rawscores[$i]);
                     } else {
                         $colors = array($rawscores[$i]);
                     }
                 } else {
                     $colors = array();
                 }
-                displayq($i, $qsetid,$seeds[$i],2,false,$attempts[$i],false,false,false,$colors);
+                displayq($i, $qsetid, $seeds[$i], 2, false, $attempts[$i], false, false, false, $colors);
 
                 $responseString .= '<div class="review">';
-                $laarr = explode('##',$lastanswers[$i]);
+                $laarr = explode('##', $lastanswers[$i]);
 
-                if (count($laarr)>1) {
+                if (count($laarr) > 1) {
                     $responseString .= "Previous Attempts:";
-                    $cnt =1;
-                    for ($k=0;$k<count($laarr)-1;$k++) {
-                        if ($laarr[$k]=="ReGen") {
+                    $cnt = 1;
+                    for ($k = 0; $k < count($laarr) - 1; $k++) {
+                        if ($laarr[$k] == "ReGen") {
                             $responseString .= ' ReGen ';
                         } else {
-                            $responseString .= "  <b>$cnt:</b> " ;
-                            if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
+                            $responseString .= "  <b>$cnt:</b> ";
+                            if (preg_match('/@FILE:(.+?)@/', $laarr[$k], $match)) {
                                 $url = getasidfileurl($match[1]);
-                                $responseString .= "<a href=\"$url\" target=\"_new\">".basename($match[1])."</a>";
+                                $responseString .= "<a href=\"$url\" target=\"_new\">" . basename($match[1]) . "</a>";
                             } else {
-                                if (strpos($laarr[$k],'$f$')) {
-                                    if (strpos($laarr[$k],'&')) { //is multipart q
-                                        $laparr = explode('&',$laarr[$k]);
-                                        foreach ($laparr as $lk=>$v) {
-                                            if (strpos($v,'$f$')) {
-                                                $tmp = explode('$f$',$v);
+                                if (strpos($laarr[$k], '$f$')) {
+                                    if (strpos($laarr[$k], '&')) { //is multipart q
+                                        $laparr = explode('&', $laarr[$k]);
+                                        foreach ($laparr as $lk => $v) {
+                                            if (strpos($v, '$f$')) {
+                                                $tmp = explode('$f$', $v);
                                                 $laparr[$lk] = $tmp[0];
                                             }
                                         }
-                                        $laarr[$k] = implode('&',$laparr);
+                                        $laarr[$k] = implode('&', $laparr);
                                     } else {
-                                        $tmp = explode('$f$',$laarr[$k]);
+                                        $tmp = explode('$f$', $laarr[$k]);
                                         $laarr[$k] = $tmp[0];
                                     }
                                 }
-                                if (strpos($laarr[$k],'$!$')) {
-                                    if (strpos($laarr[$k],'&')) { //is multipart q
-                                        $laparr = explode('&',$laarr[$k]);
-                                        foreach ($laparr as $lk=>$v) {
-                                            if (strpos($v,'$!$')) {
-                                                $tmp = explode('$!$',$v);
+                                if (strpos($laarr[$k], '$!$')) {
+                                    if (strpos($laarr[$k], '&')) { //is multipart q
+                                        $laparr = explode('&', $laarr[$k]);
+                                        foreach ($laparr as $lk => $v) {
+                                            if (strpos($v, '$!$')) {
+                                                $tmp = explode('$!$', $v);
                                                 $laparr[$lk] = $tmp[0];
                                             }
                                         }
-                                        $laarr[$k] = implode('&',$laparr);
+                                        $laarr[$k] = implode('&', $laparr);
                                     } else {
-                                        $tmp = explode('$!$',$laarr[$k]);
+                                        $tmp = explode('$!$', $laarr[$k]);
                                         $laarr[$k] = $tmp[0];
                                     }
                                 }
-                                if (strpos($laarr[$k],'$#$')) {
-                                    if (strpos($laarr[$k],'&')) { //is multipart q
-                                        $laparr = explode('&',$laarr[$k]);
-                                        foreach ($laparr as $lk=>$v) {
-                                            if (strpos($v,'$#$')) {
-                                                $tmp = explode('$#$',$v);
+                                if (strpos($laarr[$k], '$#$')) {
+                                    if (strpos($laarr[$k], '&')) { //is multipart q
+                                        $laparr = explode('&', $laarr[$k]);
+                                        foreach ($laparr as $lk => $v) {
+                                            if (strpos($v, '$#$')) {
+                                                $tmp = explode('$#$', $v);
                                                 $laparr[$lk] = $tmp[0];
                                             }
                                         }
-                                        $laarr[$k] = implode('&',$laparr);
+                                        $laarr[$k] = implode('&', $laparr);
                                     } else {
-                                        $tmp = explode('$#$',$laarr[$k]);
+                                        $tmp = explode('$#$', $laarr[$k]);
                                         $laarr[$k] = $tmp[0];
                                     }
                                 }
 
-                                $responseString .= str_replace(array('&','%nbsp;'),array('; ','&nbsp;'),strip_tags($laarr[$k]));
+                                $responseString .= str_replace(array('&', '%nbsp;'), array('; ', '&nbsp;'), strip_tags($laarr[$k]));
                             }
                             $cnt++;
                         }
@@ -1541,33 +1554,34 @@ class AppUtility extends Component
                     }
                     $responseString .= '. ';
                 }
-                if ($timesontask[$i]!='') {
+                if ($timesontask[$i] != '') {
                     $responseString .= 'Average time per submission: ';
-                    $timesarr = explode('~',$timesontask[$i]);
-                    $avgtime = array_sum($timesarr)/count($timesarr);
-                    if ($avgtime<60) {
-                        $responseString .= round($avgtime,1) . ' seconds ';
+                    $timesarr = explode('~', $timesontask[$i]);
+                    $avgtime = array_sum($timesarr) / count($timesarr);
+                    if ($avgtime < 60) {
+                        $responseString .= round($avgtime, 1) . ' seconds ';
                     } else {
-                        $responseString .= round($avgtime/60,1) . ' minutes ';
+                        $responseString .= round($avgtime / 60, 1) . ' minutes ';
                     }
                     $responseString .= '<br/>';
                 }
                 $responseString .= '</div>';
 
             } else {
-                displayq($i,$qsetid,$seeds[$i],$showa,($testsettings['showhints']==1),$attempts[$i]);
+                displayq($i, $qsetid, $seeds[$i], $showa, ($testsettings['showhints'] == 1), $attempts[$i]);
             }
             $responseString .= "<hr />";
             $responseString .= '</div>';
 
         }
         if ($endtext != '') {
-            $responseString .= '<div class="intro">'.$endtext.'</div>';
+            $responseString .= '<div class="intro">' . $endtext . '</div>';
         }
         return $responseString;
     }
 
-    public static function htmLawed($t, $C = 1, $S = array()) {
+    public static function htmLawed($t, $C = 1, $S = array())
+    {
         $C = is_array($C) ? $C : array();
         if (!empty($C['valid_xhtml'])) {
             $C['elements'] = empty($C['elements']) ? '*-center-dir-font-isindex-menu-s-strike-u' : $C['elements'];
@@ -1600,7 +1614,7 @@ class AppUtility extends Component
                 }
             }
         }
-        $C['elements'] = & $e;
+        $C['elements'] = &$e;
 // config attrs
         $x = !empty($C['deny_attribute']) ? str_replace(array("\n", "\r", "\t", ' '), '', $C['deny_attribute']) : '';
         $x = array_flip((isset($x[0]) && $x[0] == '*') ? explode('-', $x) : explode(',', $x . (!empty($C['safe']) ? ',on*' : '')));
@@ -1626,14 +1640,14 @@ class AppUtility extends Component
             $C['schemes']['style'] = array('!' => 1);
         }
         $C['abs_url'] = isset($C['abs_url']) ? $C['abs_url'] : 0;
-        if (!isset($C['base_url']) or ! preg_match('`^[a-zA-Z\d.+\-]+://[^/]+/(.+?/)?$`', $C['base_url'])) {
+        if (!isset($C['base_url']) or !preg_match('`^[a-zA-Z\d.+\-]+://[^/]+/(.+?/)?$`', $C['base_url'])) {
             $C['base_url'] = $C['abs_url'] = 0;
         }
 // config rest
         $C['and_mark'] = empty($C['and_mark']) ? 0 : 1;
         $C['anti_link_spam'] = (isset($C['anti_link_spam']) && is_array($C['anti_link_spam']) && count($C['anti_link_spam']) == 2 && (empty($C['anti_link_spam'][0]) or hl_regex($C['anti_link_spam'][0])) && (empty($C['anti_link_spam'][1]) or hl_regex($C['anti_link_spam'][1]))) ? $C['anti_link_spam'] : 0;
         $C['anti_mail_spam'] = isset($C['anti_mail_spam']) ? $C['anti_mail_spam'] : 0;
-        $C['balance'] = isset($C['balance']) ? (bool) $C['balance'] : 1;
+        $C['balance'] = isset($C['balance']) ? (bool)$C['balance'] : 1;
         $C['cdata'] = isset($C['cdata']) ? $C['cdata'] : (empty($C['safe']) ? 3 : 0);
         $C['clean_ms_char'] = empty($C['clean_ms_char']) ? 0 : $C['clean_ms_char'];
         $C['comment'] = isset($C['comment']) ? $C['comment'] : (empty($C['safe']) ? 3 : 0);
@@ -1643,9 +1657,9 @@ class AppUtility extends Component
         $C['hook'] = (!empty($C['hook']) && function_exists($C['hook'])) ? $C['hook'] : 0;
         $C['hook_tag'] = (!empty($C['hook_tag']) && function_exists($C['hook_tag'])) ? $C['hook_tag'] : 0;
         $C['keep_bad'] = isset($C['keep_bad']) ? $C['keep_bad'] : 6;
-        $C['lc_std_val'] = isset($C['lc_std_val']) ? (bool) $C['lc_std_val'] : 1;
+        $C['lc_std_val'] = isset($C['lc_std_val']) ? (bool)$C['lc_std_val'] : 1;
         $C['make_tag_strict'] = isset($C['make_tag_strict']) ? $C['make_tag_strict'] : 1;
-        $C['named_entity'] = isset($C['named_entity']) ? (bool) $C['named_entity'] : 1;
+        $C['named_entity'] = isset($C['named_entity']) ? (bool)$C['named_entity'] : 1;
         $C['no_deprecated_attr'] = isset($C['no_deprecated_attr']) ? $C['no_deprecated_attr'] : 1;
         $C['parent'] = isset($C['parent'][0]) ? strtolower($C['parent']) : 'body';
         $C['show_setting'] = !empty($C['show_setting']) ? $C['show_setting'] : 0;
@@ -1699,35 +1713,42 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_attrval($t, $p) {
+    public static function hl_attrval($t, $p)
+    {
 // check attr val against $S
         $o = 1;
         $l = strlen($t);
         foreach ($p as $k => $v) {
             switch ($k) {
-                case 'maxlen':if ($l > $v) {
-                    $o = 0;
-                }
+                case 'maxlen':
+                    if ($l > $v) {
+                        $o = 0;
+                    }
                     break;
-                case 'minlen': if ($l < $v) {
-                    $o = 0;
-                }
+                case 'minlen':
+                    if ($l < $v) {
+                        $o = 0;
+                    }
                     break;
-                case 'maxval': if ((float) ($t) > $v) {
-                    $o = 0;
-                }
+                case 'maxval':
+                    if ((float)($t) > $v) {
+                        $o = 0;
+                    }
                     break;
-                case 'minval': if ((float) ($t) < $v) {
-                    $o = 0;
-                }
+                case 'minval':
+                    if ((float)($t) < $v) {
+                        $o = 0;
+                    }
                     break;
-                case 'match': if (!preg_match($v, $t)) {
-                    $o = 0;
-                }
+                case 'match':
+                    if (!preg_match($v, $t)) {
+                        $o = 0;
+                    }
                     break;
-                case 'nomatch': if (preg_match($v, $t)) {
-                    $o = 0;
-                }
+                case 'nomatch':
+                    if (preg_match($v, $t)) {
+                        $o = 0;
+                    }
                     break;
                 case 'oneof':
                     $m = 0;
@@ -1760,7 +1781,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_bal($t, $do = 1, $in = 'div') {
+    public static function hl_bal($t, $do = 1, $in = 'div')
+    {
 // balance tags
 // by content
         $cB = array('blockquote' => 1, 'form' => 1, 'map' => 1, 'noscript' => 1); // Block
@@ -1841,17 +1863,17 @@ class AppUtility extends Component
                 unset($cI['del'], $cI['ins']);
             }
             // bad tags, & ele content
-            if (isset($e) && ($do == 1 or ( isset($ok['#pcdata']) && ($do == 3 or $do == 5)))) {
+            if (isset($e) && ($do == 1 or (isset($ok['#pcdata']) && ($do == 3 or $do == 5)))) {
                 echo '&lt;', $s, $e, $a, '&gt;';
             }
             if (isset($x[0])) {
-                if (strlen(trim($x)) && (($ql && isset($cB[$p])) or ( isset($cB[$in]) && !$ql))) {
+                if (strlen(trim($x)) && (($ql && isset($cB[$p])) or (isset($cB[$in]) && !$ql))) {
                     echo '<div>', $x, '</div>';
                 } elseif ($do < 3 or isset($ok['#pcdata'])) {
                     echo $x;
                 } elseif (strpos($x, "\x02\x04")) {
                     foreach (preg_split('`(\x01\x02[^\x01\x02]+\x02\x01)`', $x, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY) as $v) {
-                        echo (substr($v, 0, 2) == "\x01\x02" ? $v : ($do > 4 ? preg_replace('`\S`', '', $v) : ''));
+                        echo(substr($v, 0, 2) == "\x01\x02" ? $v : ($do > 4 ? preg_replace('`\S`', '', $v) : ''));
                     }
                 } elseif ($do > 4) {
                     echo preg_replace('`\S`', '', $x);
@@ -1869,7 +1891,7 @@ class AppUtility extends Component
             list($all, $s, $e, $a, $x) = $r;
             // close tag
             if ($s) {
-                if (isset($cE[$e]) or ! in_array($e, $q)) {
+                if (isset($cE[$e]) or !in_array($e, $q)) {
                     continue;
                 } // Empty/unopen
                 if ($p == $e) {
@@ -1900,7 +1922,7 @@ class AppUtility extends Component
                 --$i;
                 continue;
             }
-            if ((($ql && isset($cB[$p])) or ( isset($cB[$in]) && !$ql)) && !isset($eB[$e]) && !isset($ok[$e])) {
+            if ((($ql && isset($cB[$p])) or (isset($cB[$in]) && !$ql)) && !isset($eB[$e]) && !isset($ok[$e])) {
                 array_splice($t, $i, 0, 'div>');
                 unset($e, $x);
                 ++$ci;
@@ -1908,7 +1930,7 @@ class AppUtility extends Component
                 continue;
             }
             // if no open ele, $in = parent; mostly immediate parent-child relation should hold
-            if (!$ql or ! isset($eN[$e]) or ! array_intersect($q, $cN2)) {
+            if (!$ql or !isset($eN[$e]) or !array_intersect($q, $cN2)) {
                 if (!isset($ok[$e])) {
                     if ($ql && isset($cT[$p])) {
                         echo '</', array_pop($q), '>';
@@ -1955,7 +1977,7 @@ class AppUtility extends Component
                         continue 2;
                     }
                     $add = "</{$d}>";
-                    for (;  ++$k < $kc;) {
+                    for (; ++$k < $kc;) {
                         $add = "</{$q[$k]}>{$add}";
                     }
                     break;
@@ -1999,17 +2021,17 @@ class AppUtility extends Component
             $ok = $inOk;
             unset($cI['del'], $cI['ins']);
         }
-        if (isset($e) && ($do == 1 or ( isset($ok['#pcdata']) && ($do == 3 or $do == 5)))) {
+        if (isset($e) && ($do == 1 or (isset($ok['#pcdata']) && ($do == 3 or $do == 5)))) {
             echo '&lt;', $s, $e, $a, '&gt;';
         }
         if (isset($x[0])) {
-            if (strlen(trim($x)) && (($ql && isset($cB[$p])) or ( isset($cB[$in]) && !$ql))) {
+            if (strlen(trim($x)) && (($ql && isset($cB[$p])) or (isset($cB[$in]) && !$ql))) {
                 echo '<div>', $x, '</div>';
             } elseif ($do < 3 or isset($ok['#pcdata'])) {
                 echo $x;
             } elseif (strpos($x, "\x02\x04")) {
                 foreach (preg_split('`(\x01\x02[^\x01\x02]+\x02\x01)`', $x, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY) as $v) {
-                    echo (substr($v, 0, 2) == "\x01\x02" ? $v : ($do > 4 ? preg_replace('`\S`', '', $v) : ''));
+                    echo(substr($v, 0, 2) == "\x01\x02" ? $v : ($do > 4 ? preg_replace('`\S`', '', $v) : ''));
                 }
             } elseif ($do > 4) {
                 echo preg_replace('`\S`', '', $x);
@@ -2024,7 +2046,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_cmtcd($t) {
+    public static function hl_cmtcd($t)
+    {
 // comment/CDATA sec handler
         $t = $t[0];
         global $C;
@@ -2046,7 +2069,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_ent($t) {
+    public static function hl_ent($t)
+    {
 // entitity handler
         global $C;
         $t = $t[1];
@@ -2055,14 +2079,15 @@ class AppUtility extends Component
         if ($t[0] != '#') {
             return ($C['and_mark'] ? "\x06" : '&') . (isset($U[$t]) ? $t : (isset($N[$t]) ? (!$C['named_entity'] ? '#' . ($C['hexdec_entity'] > 1 ? 'x' . dechex($N[$t]) : $N[$t]) : $t) : 'amp;' . $t)) . ';';
         }
-        if (($n = ctype_digit($t = substr($t, 1)) ? intval($t) : hexdec(substr($t, 1))) < 9 or ( $n > 13 && $n < 32) or $n == 11 or $n == 12 or ( $n > 126 && $n < 160 && $n != 133) or ( $n > 55295 && ($n < 57344 or ( $n > 64975 && $n < 64992) or $n == 65534 or $n == 65535 or $n > 1114111))) {
+        if (($n = ctype_digit($t = substr($t, 1)) ? intval($t) : hexdec(substr($t, 1))) < 9 or ($n > 13 && $n < 32) or $n == 11 or $n == 12 or ($n > 126 && $n < 160 && $n != 133) or ($n > 55295 && ($n < 57344 or ($n > 64975 && $n < 64992) or $n == 65534 or $n == 65535 or $n > 1114111))) {
             return ($C['and_mark'] ? "\x06" : '&') . "amp;#{$t};";
         }
-        return ($C['and_mark'] ? "\x06" : '&') . '#' . (((ctype_digit($t) && $C['hexdec_entity'] < 2) or ! $C['hexdec_entity']) ? $n : 'x' . dechex($n)) . ';';
+        return ($C['and_mark'] ? "\x06" : '&') . '#' . (((ctype_digit($t) && $C['hexdec_entity'] < 2) or !$C['hexdec_entity']) ? $n : 'x' . dechex($n)) . ';';
 // eof
     }
 
-    public static function hl_prot($p, $c = null) {
+    public static function hl_prot($p, $c = null)
+    {
 // check URL scheme
         global $C;
         $b = $a = '';
@@ -2077,7 +2102,7 @@ class AppUtility extends Component
         if (isset($c['!']) && substr($p, 0, 7) != $d) {
             $p = "$d$p";
         }
-        if (isset($c['*']) or ! strcspn($p, '#?;') or ( substr($p, 0, 7) == $d)) {
+        if (isset($c['*']) or !strcspn($p, '#?;') or (substr($p, 0, 7) == $d)) {
             return "{$b}{$p}{$a}";
         } // All ok, frag, query, param
         if (preg_match('`^([^:?[@!$()*,=/\'\]]+?)(:|&#(58|x3a);|%3a|\\\\0{0,4}3a).`i', $p, $m) && !isset($c[strtolower($m[1])])) { // Denied prot
@@ -2107,7 +2132,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_regex($p) {
+    public static function hl_regex($p)
+    {
 // ?regex
         if (empty($p)) {
             return 0;
@@ -2135,13 +2161,14 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_spec($t) {
+    public static function hl_spec($t)
+    {
 // final $spec
         $s = array();
         $t = str_replace(array("\t", "\r", "\n", ' '), '', preg_replace_callback('/"(?>(`.|[^"])*)"/sm', create_function('$m', 'return substr(str_replace(array(";", "|", "~", " ", ",", "/", "(", ")", \'`"\'), array("\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\""), $m[0]), 1, -1);'), trim($t)));
         for ($i = count(($t = explode(';', $t))); --$i >= 0;) {
             $w = $t[$i];
-            if (empty($w) or ( $e = strpos($w, '=')) === false or ! strlen(($a = substr($w, $e + 1)))) {
+            if (empty($w) or ($e = strpos($w, '=')) === false or !strlen(($a = substr($w, $e + 1)))) {
                 continue;
             }
             $y = $n = array();
@@ -2162,7 +2189,7 @@ class AppUtility extends Component
                     continue;
                 }
                 foreach (explode('/', $m[2]) as $m) {
-                    if (empty($m) or ( $p = strpos($m, '=')) == 0 or $p < 5) {
+                    if (empty($m) or ($p = strpos($m, '=')) == 0 or $p < 5) {
                         $y[$x] = 1;
                         continue;
                     }
@@ -2470,7 +2497,8 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_tag2(&$e, &$a, $t = 1) {
+    public static function hl_tag2(&$e, &$a, $t = 1)
+    {
 // transform tag
         if ($e == 'center') {
             $e = 'div';
@@ -2511,23 +2539,26 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function get_meta_keys(){
+    public static function get_meta_keys()
+    {
         $keys = array();
         $keys[] = 'settings';
 
         // key value json
     }
 
-    public static function t($key, $echo = true){
+    public static function t($key, $echo = true)
+    {
         $val = Yii::t('yii', $key);
-        if($echo){
+        if ($echo) {
             echo $val;
-        } else{
+        } else {
             return $val;
         }
     }
 
-    public static function hl_tidy($t, $w, $p) {
+    public static function hl_tidy($t, $w, $p)
+    {
 // Tidy/compact HTM
         if (strpos(' pre,script,textarea', "$p,")) {
             return $t;
@@ -2602,13 +2633,15 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function hl_version() {
+    public static function hl_version()
+    {
 // rel
         return '1.1.18';
 // eof
     }
 
-    public static function kses($t, $h, $p = array('http', 'https', 'ftp', 'news', 'nntp', 'telnet', 'gopher', 'mailto')) {
+    public static function kses($t, $h, $p = array('http', 'https', 'ftp', 'news', 'nntp', 'telnet', 'gopher', 'mailto'))
+    {
 // kses compat
         foreach ($h as $k => $v) {
             $h[$k]['n']['*'] = 1;
@@ -2622,32 +2655,35 @@ class AppUtility extends Component
 // eof
     }
 
-    public static function kses_hook($t, &$C, &$S) {
+    public static function kses_hook($t, &$C, &$S)
+    {
 // kses compat
         return $t;
 // eof
     }
 
-    public static function dateMatch($date){
-        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/',$date,$dmatches);
-        $date = mktime(12,0,0,$dmatches[1],$dmatches[2],$dmatches[3]);
+    public static function dateMatch($date)
+    {
+        preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $date, $dmatches);
+        $date = mktime(12, 0, 0, $dmatches[1], $dmatches[2], $dmatches[3]);
         return $date;
     }
 
-    public static function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
+    public static function writeHtmlSelect($name, $valList, $labelList, $selectedVal = null, $defaultLabel = null, $defaultVal = null, $actions = null)
+    {
         //$name is the html name for the select list
         //$valList is an array of strings for the html value tag
         //$labelList is an array of strings that are displayed as the select list
         //$selectVal is optional, if passed the item in $valList that matches will be output as selected
 
         echo "<select class=form-control name=\"$name\" ";
-        echo (isset($actions)) ? $actions : "" ;
+        echo (isset($actions)) ? $actions : "";
         echo ">\n";
         if (isset($defaultLabel) && isset($defaultVal)) {
             echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
         }
-        for ($i=0;$i<count($valList);$i++) {
-            if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+        for ($i = 0; $i < count($valList); $i++) {
+            if ((isset($selectedVal)) && ($valList[$i] == $selectedVal)) {
                 echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
             } else {
                 echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
@@ -2656,33 +2692,51 @@ class AppUtility extends Component
         echo "</select>\n";
     }
 
-    public static function writeHtmlChecked ($var,$test,$notEqual=null) {
-        if ((isset($notEqual)) && ($notEqual==1)) {
-            if ($var!=$test) {
+    public static function writeHtmlChecked($var, $test, $notEqual = null)
+    {
+        if ((isset($notEqual)) && ($notEqual == 1)) {
+            if ($var != $test) {
                 echo "checked ";
             }
         } else {
-            if ($var==$test) {
+            if ($var == $test) {
                 echo "checked ";
             }
         }
     }
+
     /*
      * Method for item ordering when the course items are deleted.
      */
-    public static function UpdateitemOrdering($courseId,$block,$itemId){
+    public static function UpdateitemOrdering($courseId, $block, $itemId)
+    {
         $course = Course::getById($courseId);
         $itemOrder = $course['itemorder'];
         $items = unserialize($itemOrder);
-        $blockTree = explode('-',$block);
+        $blockTree = explode('-', $block);
         $sub =& $items;
-        for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-            $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
+        for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
+            $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
         }
-        $key = array_search($itemId,$sub);
-        array_splice($sub,$key,AppConstant::NUMERIC_ONE);
+        $key = array_search($itemId, $sub);
+        array_splice($sub, $key, AppConstant::NUMERIC_ONE);
         $itemList = serialize($items);
-        Course::setItemOrder($itemList,$courseId);
+        Course::setItemOrder($itemList, $courseId);
+    }
+
+    public static function setshow($id)
+    {
+        global $parents, $base, $expand;
+        array_unshift($expand, $id);
+        if (isset($base)) {
+            if (isset($parents[$id]) && $parents[$id] != $base) {
+                setshow($parents[$id]);
+            }
+        } else {
+            if (isset($parents[$id]) && $parents[$id] != 0) {
+                setshow($parents[$id]);
+            }
+        }
     }
 
     public function printOutcomes($arr,$individual,$finalData=null,$cnt=null,$n=null,$type=null,$outcomeInfo=null)

@@ -17,7 +17,7 @@ class Exceptions extends BaseImasExceptions
 {
     public static function getByAssessmentId($assessmentId)
     {
-        return static::findOne(['assessmentid' => $assessmentId]);
+        return Exceptions::findAll(['assessmentid' => $assessmentId]);
     }
 
     public function create($param)

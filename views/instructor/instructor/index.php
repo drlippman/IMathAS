@@ -97,7 +97,7 @@ $now = $currentTime;
                 switch (key($item)):
                     case 'Assessment': ?>
                         <?php  $cnt++; ?>
-                        <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent);?>
+                        <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll);?>
                         <input type="hidden" class="assessment-link" value="<?php echo $assessment->id?>">
                         <?php break; ?>
                         <!-- ///////////////////////////// Forum here /////////////////////// -->,
@@ -130,7 +130,7 @@ $now = $currentTime;
                 <?php case  'Block': ?>
                     <?php  $cnt++; ?>
                     <?php $displayBlock = new CourseItemsUtility();
-                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt);
+                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll);
                     ?>
                     <?php break; ?>
                 <?php endswitch;

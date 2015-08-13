@@ -156,4 +156,7 @@ class AppConstant
     const ADD_INLINE_TEXT = "Add Inline Text";
     const CREATE_ITEM = "Create Item";
     const NO_TEACHER_RIGHTS = "You need to log in as a teacher to access this page";
+    const REQUIRED_ADMIN_ACCESS = "You need to log in as an admin to access this page";
+    const PAST_DUE_DATE = 'Past Due Date of %s. Showing as Review';
+    const AVAILABLE_UNTIL = 'Available %1$s until %2$s';
 }

@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\models\_base\BaseImasQuestionset;
 use yii\db\Query;
 
@@ -60,5 +61,83 @@ class QuestionSet extends BaseImasQuestionset
 						WHERE a.questionsetid NOT IN ($existingqlist)
 						GROUP BY a.questionsetid ORDER BY qcnt DESC LIMIT 100")->queryAll();
         return $query;
+    }
+
+    public static function getByGroupId($id,$groupId){
+        $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupId' OR iq.userights>2)";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getByUserIdGroupId($id,$userId,$groupId){
+        $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+        $query .= "WHERE iq.id='$id' AND iq.ownerid=imas_users.id AND (iq.ownerid='$userId' OR (iq.userights=3 AND imas_users.groupid='$groupId') OR iq.userights>3)";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function updateQuestionSet($params,$now,$extref,$replaceby,$solutionopts){
+        $questionSet = QuestionSet::findOne(['id' => $params['id']]);
+        if($questionSet){
+            $questionSet->description = isset($params['description']) ? $params['description'] : null;
+            $questionSet->author = isset($params['author']) ? $params['author'] : null;
+            $questionSet->userights = isset($params['userights']) ? $params['userights'] : null;
+            $questionSet->license = isset($params['license']) ? $params['license'] : null;
+            $questionSet->otherattribution = isset($params['addattr']) ? $params['addattr'] : null;
+            $questionSet->qtype = isset($params['qtype']) ? $params['qtype'] : null;
+            $questionSet->control = isset($params['control']) ? $params['control'] : null;
+            $questionSet->qcontrol = isset($params['qcontrol']) ? $params['qcontrol'] : null;
+            $questionSet->solution = isset($params['solution']) ? $params['solution'] : null;
+            $questionSet->qtext = isset($params['qtext']) ? $params['qtext'] : null;
+            $questionSet->answer = isset($params['answer']) ? $params['answer'] : null;
+            $questionSet->lastmoddate = $now;
+            $questionSet->extref = $extref;
+            $questionSet->replaceby = $replaceby;
+            $questionSet->solutionopts = $solutionopts;
+            if (isset($params['undelete'])) {
+            $questionSet->deleted = AppConstant::NUMERIC_ZERO;
+            }
+            $questionSet->save();
+        }
+        return $questionSet;
+    }
+
+    public static function getQuestionDataById($id){
+         return QuestionSet::findOne(['id' => $id]);
+    }
+
+    public static function setHasImage($id){
+        $data = QuestionSet::getQuestionDataById($id);
+        if($data){
+            $data->hasimg = AppConstant::NUMERIC_ZERO;
+            $data->save();
+        }
+    }
+
+    public function createQuestionSet($params){
+        $this->uniqueid = isset($params['uniqueid']) ? $params['uniqueid'] : null;
+        $this->adddate = isset($params['adddate']) ? $params['adddate'] : null;
+        $this->lastmoddate = isset($params['lastmoddate']) ? $params['lastmoddate'] : null;
+        $this->description = isset($params['description']) ? $params['description'] : null;
+        $this->ownerid = isset($params['ownerid']) ? $params['ownerid'] : null;
+        $this->author = isset($params['author']) ? $params['author'] : null;
+        $this->userights = isset($params['userights']) ? $params['userights'] : null;
+        $this->license = isset($params['license']) ? $params['license'] : null;
+        $this->otherattribution = isset($params['otherattribution']) ? $params['otherattribution'] : null;
+        $this->qtype = isset($params['qtype']) ? $params['qtype'] : null;
+        $this->control = isset($params['control']) ? $params['control'] : null;
+        $this->qcontrol = isset($params['qcontrol']) ? $params['qcontrol'] : null;
+        $this->qtext = isset($params['qtext']) ? $params['qtext'] : null;
+        $this->answer = isset($params['answer']) ? $params['answer'] : null;
+        $this->hasimg = isset($params['hasimg']) ? $params['hasimg'] : null;
+        $this->ancestors = isset($params['ancestors']) ? $params['ancestors'] : null;
+        $this->ancestorauthors = isset($params['ancestorauthors']) ? $params['ancestorauthors'] : null;
+        $this->extref = isset($params['extref']) ? $params['extref'] : null;
+        $this->replaceby = isset($params['replaceby']) ? $params['replaceby'] : null;
+        $this->solution = isset($params['solution']) ? $params['solution'] : null;
+        $this->solutionopts = isset($params['solutionopts']) ? $params['solutionopts'] : null;
+        $this->save();
+        return $this->id;
     }
 } 

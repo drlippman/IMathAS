@@ -728,7 +728,20 @@ function generaterandstring() {
     }
 
     public function isTeacher($userId, $courseId){
+        $isTeacher = false;
         $teacher = Teacher::getByUserId($userId,$courseId);
-        return $teacher['id'];
+        if($teacher){
+            $isTeacher = true;
+        }
+        return $isTeacher ;
+    }
+
+    public function isTutor($userId, $courseId){
+        $isTutor = false;
+        $tutor = Tutor::getByUserId($userId,$courseId);
+        if($tutor){
+            $isTutor = true;
+        }
+        return $isTutor ;
     }
 }

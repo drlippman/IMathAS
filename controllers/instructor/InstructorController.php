@@ -57,6 +57,18 @@ public $oa = array();
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
+        if ($isTeacher) {
+            $canEdit = true;
+            $viewAll = true;
+        } else if ($isTutor) {
+            $canEdit = false;
+            $viewAll = true;
+        } else {
+            $canEdit = false;
+            $viewAll = false;
+        }
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $countPost = $this->getNotificationDataForum($courseId,$user);
         $this->setSessionData('courseId',$courseId);
@@ -160,8 +172,27 @@ public $oa = array();
                         switch ($item->itemtype) {
                             case 'Assessment':
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
+                                $exceptionData = Exceptions::getByAssessmentId($item->typeid);
+                                $exceptions = array();
+                                foreach ($exceptionData as $data) {
+                                    $exceptions[$data['userid']] = array($data['enddate'],$data['islatepass']);
+                                }
+                                $nothidden = true;
+                                if ($assessment['reqscore']>0 && $assessment['reqscoreaid']>0 && !$viewAll && $assessment['enddate']>time()) {
+                                    $bestScore = AssessmentSession::getAssessmentSession($user['id'], $assessment['reqscoreaid']);
+                                    if (count($bestScore['bestscores']) == 0) {
+                                        $nothidden = false;
+                                    } else {
+                                        $scores = explode(';', $bestScore['bestscores']);
+                                        if (round($this->getpts($scores[0]), 1) + .02 < $assessment['reqscore']) {
+                                            $nothidden = false;
+                                        }
+                                    }
+                                }
                                 $tempAray[$item->itemtype] = $assessment;
                                 $tempAray['assessment'] = $item;
+                                $tempAray['nothidden'] = $nothidden;
+                                $tempAray['exceptions'] = $exceptions;
                                 break;
                             case 'Calendar':
                                 $tempAray[$item->itemtype] = $item;
@@ -277,7 +308,8 @@ public $oa = array();
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
-        $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData, 'course' => $course, 'students' => $student,'assessmentSession' => $assessmentSession);
+        $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData,
+            'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll);
         return $this->renderWithData('index', $returnData);
     }
     /**
@@ -754,7 +786,6 @@ public $oa = array();
                 preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $params['sdate'], $dmatches);
                 $newstamp = mktime(date('G', $basedate), date('i', $basedate), 0, $dmatches[1], $dmatches[2], $dmatches[3]);
                 $shift = $newstamp - $basedate;
-
                 $items = unserialize($course['itemorder']);
                 $this->shiftsub($items);
                 $itemorder = serialize($items);
@@ -825,4 +856,24 @@ public $oa = array();
         $responseData = array('course' => $course);
         return $this->renderWithData('massChangeDates', $responseData);
     }
+
+    public function getpts($sc) {
+        if (strpos($sc,'~')===false) {
+            if ($sc>0) {
+                return $sc;
+            } else {
+                return 0;
+            }
+        } else {
+            $sc = explode('~',$sc);
+            $tot = 0;
+            foreach ($sc as $s) {
+                if ($s>0) {
+                    $tot+=$s;
+                }
+            }
+            return round($tot,1);
+        }
+    }
 }
+
