@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="available-after" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '1', 1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Now')?></td></div>
                     <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="available-after" class="pull-left" value="sdate" <?php echo AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
                     <?php
-                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo '<div class = "pull-left col-lg-4 time-input" style="padding-left: 0">';
                     echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="available-until" class="pull-left"  value="edate" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
 
                     <?php
-                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo '<div class = "pull-left col-lg-4 time-input" style="padding-left: 0">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -129,7 +129,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <input type="text" name="fixedheight" size="4" value="<?php if ($defaultBlockData['fixedHeight']>0) {echo $defaultBlockData['fixedHeight'];};?>" />pixels (blank for no limit)
      </div></div><br class="form" />
 
-        <fieldset>
         <div class="item-alignment">
             <div class=col-lg-2><?php AppUtility::t('Restrict access to students in section')?></div>
                 <div class=col-lg-10>
