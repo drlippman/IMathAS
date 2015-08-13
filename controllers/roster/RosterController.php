@@ -932,6 +932,7 @@ class RosterController extends AppController
     {
         if ($this->isPost()) {
             $this->guestUserHandler();
+            $this->layout = "master";
             $selectedStudents = $this->getRequestParams();
             $isGradebook = $selectedStudents['gradebook'];
             $isActionForMessage = isset($selectedStudents['isMessage']) ? $selectedStudents['isMessage'] : AppConstant::NUMERIC_ZERO;
@@ -946,6 +947,7 @@ class RosterController extends AppController
                         $student = User::getById($studentId);
                         array_push($studentArray, $student->attributes);
                     }
+                    $this->includeCSS(['roster/roster.css']);
                     $this->includeJS(['roster/rosterMessage.js', 'editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'editor/plugins/asciimath/editor_plugin.js', 'editor/themes/advanced/editor_template.js']);
                     $responseData = array('assessments' => $assessments, 'studentDetails' => serialize($studentArray), 'course' => $course, 'gradebook' => $isGradebook);
                     return $this->renderWithData('rosterMessage', $responseData);

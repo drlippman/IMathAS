@@ -3,32 +3,44 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 use app\components\AppConstant;
 
-$this->title = 'Send Mass Message';
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
-if($gradebook == AppConstant::NUMERIC_ONE){
-    $this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
-}else{
-    $this->params['breadcrumbs'][] = ['label' => 'Roster', 'url' => ['/roster/roster/student-roster?cid='.$course->id]];
-}
+$this->title = AppUtility::t('Send Mass Message', false);
 $this->params['breadcrumbs'][] = $this->title;
-echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $course]);
 ?>
-<form name="myForm" action="roster-message" method="post" id="roster-form">
-<div class="student-roster-message">
-    <input type="hidden" name="isMessage" value="1"/>
-    <input type="hidden" name="gradebook" value="<?php echo $gradebook ?>"/>
-    <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
-    <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
-    <h2><b>Send Mass Message</b></h2>
-    <div>
-        <span class="col-md-2"><b>Subject</b></span>
-        <span class="col-md-8"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></span>
+<div class="item-detail-header">
+    <?php
+    if($gradebook == AppConstant::NUMERIC_ONE){
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id]]);
+    } else {
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Roster', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'roster/roster/student-roster?cid='.$course->id]]);
+    }
+    ?>
+</div>
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
     </div>
-    <br><br>
-    <div class="gb">
-        <span class="col-md-2"><b>Message</b></span>
-        <?php echo "<span class='left col-md-10'><div class= 'editor'>
-        <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>"; echo "</textarea></div></span><br>"; ?>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
+</div>
+<div class="tab-content inner-sub-content shadowBox"">
+<form name="myForm" action="roster-message" method="post" id="roster-form">
+    <div class="student-roster-message">
+        <input type="hidden" name="isMessage" value="1"/>
+        <input type="hidden" name="gradebook" value="<?php echo $gradebook ?>"/>
+        <input type="hidden" name="courseid" value="<?php echo $course->id ?>"/>
+        <input type="hidden" name="studentInformation" value='<?php echo $studentDetails ?>'/>
+        <div>
+            <div class="col-md-2 form-content"><b><?php AppUtility::t('Subject')?></b></div>
+            <div class="col-md-8 form-content"><?php echo '<input class="textbox subject form-control" type="text" name="subject">'; ?></div>
+        </div>
+        <div class="col-md-12 form-content">
+            <div class="col-md-2 form-content"><b><?php AppUtility::t('Message')?></b></div>
+            <?php echo "<div class='left col-md-10 form-content'><div class= 'editor'>
+        <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>"; echo "</textarea></div></div><br>"; ?>
+        </div>
     </div>
     <p class="col-md-2"></p>
     <p class="col-md-10"><i><br>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each student's first/last name</p>
@@ -44,7 +56,7 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
         <span class="col-md-10 select-text-margin"><input type="checkbox" name="isChecked" id="save-sent-message" checked="true"></span>
     </div>
     <div>
-    <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
+        <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
     <span class="roster-assessment ">
 	 <p class="col-md-3">To students who haven't completed</p>
 	  <select name="roster-assessment-data" id="roster-data" class="col-md-4 select-text-margin">
@@ -59,9 +71,9 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
     <div class=" col-lg-offset-2 col-md-10"><br>
         <input type="submit" class="btn btn-primary " id="message-button" value="Send Message" style="margin-left: 0px">
         <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
-        <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
         <?php }else {?>
-        <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
         <?php } ?>
     </div>
     <div>
@@ -71,5 +83,6 @@ echo $this->render('../../instructor/instructor/_toolbarTeacher', ['course' => $
            <?php } ?>
         </span>
     </div>
-</div>
 </form>
+</div>
+
