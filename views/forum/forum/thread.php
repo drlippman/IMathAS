@@ -50,7 +50,7 @@ $now = $currentTime;
         </div>
 
         <div class="mark-as-read-link pull-left col-lg-4 pull-left">
-            <a href="#" id="markRead"><?php echo AppUtility::t('Mark as Read')?></a>
+            <a href="#" id="markRead"><?php echo AppUtility::t('Mark All Read')?></a>
         </div>
         <div class="pull-right view-drop-down">
             <button class="btn btn-primary search-button" id="change-button"><i class="fa fa-search"></i>&nbsp;<b><?php echo AppUtility::t('Search')?></b></button>
@@ -80,9 +80,9 @@ $now = $currentTime;
                 <th><?php echo AppUtility::t('Groups')?></th>
             <?php } ?>
             <th><?php echo AppUtility::t('Replies')?></th>
-            <th><?php echo AppUtility::t('Views(Unique)')?></th>
+            <th><?php echo AppUtility::t('Views (Unique)')?></th>
             <th><?php echo AppUtility::t('Last Post')?></th>
-            <th><?php echo AppUtility::t('Action')?></th>
+            <th><?php echo AppUtility::t('Actions')?></th>
             </thead>
             <tbody class="forum-table-body">
             </tbody>

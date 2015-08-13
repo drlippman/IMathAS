@@ -170,6 +170,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
     background-color: #f0f0f0;
     border: 1px solid #d3d3d3;
     outline: none;
+    height: 31px;
 }
 .ui-widget-content {
      border: 0;
@@ -959,7 +960,7 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
     margin-bottom: 20px;
         margin-top: 10px;
 }
-button#change-button.btn.btn-primary
+button#change-password-button.btn.btn-primary
 {
     width: 233px;
 }

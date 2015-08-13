@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div>
         <div class="Submit-btn-change-password">
-                <?= Html::submitButton('Submit', ['id'=> 'change-button' ,'class' => 'btn btn-primary submit-btn1', 'name' => 'changepassword-button']) ?>
+                <?= Html::submitButton('Submit', ['id'=> 'change-password-button' ,'class' => 'btn btn-primary submit-btn1', 'name' => 'changepassword-button']) ?>
             </div>
 
 </div>

@@ -30,7 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="tab-content shadowBox">
 
-    <div class="inner-reply-msg-content">
+        <p></p>
+        <br>
         <div class="col-sm-12 padding-top">
             <div class="col-sm-1"><?php echo AppUtility::t('Subject')?></div>
             <div class="col-sm-11"><input class="text-box subject" type="text" value="Re: <?php echo $reply[0]['subject'] ?>">
@@ -51,11 +52,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <span class="right">
                 </span>
                 <b  style="font-family: "Times New Roman", Times, serif"><?php echo $reply[0]['subject']?></b>
-                <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;<?php echo $reply[0]['userName']?>,<?php echo $reply[0]['postDate']?></h5>
+                <h5><b><?php echo AppUtility::t('Posted by'); ?></b>&nbsp;<?php echo $reply[0]['userName']?>,&nbsp;<?php echo $reply[0]['postDate']?></h5>
             </div>
             <div class="blockitems col-sm-12" id="item1">
                 <h5><?php echo $reply[0]['message']?></h5></div>
         </div>
 
-    </div>
+
 </div>

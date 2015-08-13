@@ -131,18 +131,18 @@ function showMessageSuccess(response) {
 }
 
 function selectCheckBox(){
-    $('.message-table input[name = "header-checked"]').live("click", function(){
-        if($(this).prop("checked") == true){
-            $('.message-table-body input:checkbox').each(function () {
-                $(this).prop('checked', true);
-            })
-        }
-        else if($(this).prop("checked") == false){
-            $('.message-table-body input:checkbox').each(function () {
-                $(this).prop('checked', false);
-            })
-        }
-    });
+//    $('.message-table input[name = "header-checked"]').live("click", function(){
+//        if($(this).prop("checked") == true){
+//            $('.message-table-body input:checkbox').each(function () {
+//                $(this).prop('checked', true);
+//            })
+//        }
+//        else if($(this).prop("checked") == false){
+//            $('.message-table-body input:checkbox').each(function () {
+//                $(this).prop('checked', false);
+//            })
+//        }
+//    });
 }
 
 function getCourseSuccess(response) {

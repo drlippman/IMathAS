@@ -54,10 +54,9 @@ function init() {
 
 function CommonPopUp(message)
 {
-
     var html = '<div><p>'+message+'</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+        modal: true, title: '', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
         closeText: "hide",
         buttons: {

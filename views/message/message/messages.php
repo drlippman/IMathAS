@@ -50,6 +50,7 @@ $now = $currentTime;
             <span class="pull-left message-second-level" >With Selected :</span>
             <span class="col-sm-2 with-selected-dropdown">
                 <select  class="form-control with-selected" >
+                    <option value="-1" id="Select">Select</option>
                      <option value="0" id="mark-as-unread">Mark as Unread</option>
                     <option value="1" id="mark-read">Mark as Read</option>
                     <option value="2" id="mark-delete">Delete</option>
@@ -71,5 +72,3 @@ $now = $currentTime;
     <div class="message-div">
     </div>
 </div>
-
-<script type="text/javascript" src="<?php echo AppUtility::getHomeURL()?>js/message/message.js" ></script>

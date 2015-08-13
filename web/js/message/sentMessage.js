@@ -274,7 +274,7 @@ function markUnsend()
             markArray.push($(this).val());
         });
         if(markArray.length!=0) {
-            var html = '<div><p>Are you sure ? you want to Unsend. </p></div>';
+            var html = '<div><p>Are you sure ? you want to Delete. </p></div>';
 
             var cancelUrl = $(this).attr('href');
             e.preventDefault;
@@ -309,7 +309,7 @@ function markUnsend()
         }
         else
         {
-            var msg ="Select atleast one message to Unsend";
+            var msg ="Select atleast one message to Delete";
             CommonPopUp(msg);
         }
 

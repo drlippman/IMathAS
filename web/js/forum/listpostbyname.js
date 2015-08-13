@@ -15,7 +15,7 @@ $(document).ready(function ()
         var threadid = $(this).attr("data-var");
         var html = '<div><p>Are you sure? This will remove your thread.</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            modal: true, title: 'List Post By Name', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
             closeText: "hide",
             buttons: {
