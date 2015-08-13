@@ -441,7 +441,7 @@ $now = $currentTime;
                     </div>
                     <div class="calendar-day-details-right-side pull-left col-lg-3">
                         <div class="day-detail-border">
-                            <b>Day Details:</b>
+                            <b style="font-size: 18px">Day Details:</b>
                         </div>
                         <div class="calendar-day-details"></div>
                     </div>
@@ -892,7 +892,7 @@ $now = $currentTime;
                                             </div>
                                             <div class="calendar-day-details-right-side pull-left col-lg-3">
                                                 <div class="day-detail-border">
-                                                    <b>Day Details:</b>
+                                                    <b style="font-size: 18px">Day Details:</b>
                                                 </div>
                                                 <div class="calendar-day-details"></div>
                                             </div>
@@ -1346,7 +1346,7 @@ $now = $currentTime;
                                             </div>
                                             <div class="calendar-day-details-right-side pull-left col-lg-3">
                                                 <div class="day-detail-border">
-                                                    <b>Day Details:</b>
+                                                    <b style="font-size: 18px">Day Details:</b>
                                                 </div>
                                                 <div class="calendar-day-details"></div>
                                             </div>
