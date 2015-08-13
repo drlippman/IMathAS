@@ -1,36 +1,55 @@
 <?php
 use app\components\AppUtility;
 use app\assets\AppAsset;
-$this->title = 'Settings';
-$this->params['breadcrumbs'][] = ['label' => ucfirst($course->name), 'url' => ['/instructor/instructor/index?cid=' .$course->id]];
-$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid='.$course->id]];
+$this->title = AppUtility::t('Gradebook Settings', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-<div id="headergbsettings" class="pagetitle">
-    <h2>Grade Book Settings <img src="<?php echo AppUtility::getAssetURL()?>img/help.gif" alt="Help" onclick="window.open('<?php echo AppUtility::getURLFromHome('site', 'helper-guide?section=gbSettings'); ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"></h2>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 </div>
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?>
+                <a href='#' onClick="window.open('<?php echo AppUtility::getURLFromHome('site', 'helper-guide?section=gbSettings'); ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
+</div>
+<div class="tab-content shadowBox"">
+<div class="inner-content-gradebook">
+
 <form id="theform" method=post action="gb-settings?cid=<?php echo $course->id;?>" onsubmit="prepForSubmit()">
-    <span class=form>Calculate total using:</span>
-    <span class=formright>
-		<input type=radio name=useweights value="0" id="usew0" <?php AppUtility::writeHtmlChecked($useWeights,0);?> onclick="swapWeightHdr(0)"/><label for="usew0">points earned / possible</label><br/>
-		<input type=radio name=useweights value="1" id="usew1" <?php AppUtility::writeHtmlChecked($useWeights,1);?> onclick="swapWeightHdr(1)"/><label for="usew1">category weights</label>
-	</span><br class=form />
-    <p><a href="#" onclick="toggleAdv(this);return false">Edit view settings</a></p>
+    <div>
+        <div class="col-md-3 padding-zero"><?php AppUtility::t('Calculate total using')?>:</div>
+        <div class="col-md-9 padding-zero">
+            <input type=radio name=useweights value="0" id="usew0" <?php AppUtility::writeHtmlChecked($useWeights,0);?> onclick="swapWeightHdr(0)"/><label for="usew0">&nbsp;<?php AppUtility::t(' points earned / possible')?></label><br/>
+            <input type=radio name=useweights value="1" id="usew1" <?php AppUtility::writeHtmlChecked($useWeights,1);?> onclick="swapWeightHdr(1)"/><label for="usew1">&nbsp;<?php AppUtility::t(' category weights')?></label>
+        </div>
+    </div>
+    <br>
+    <p><a href="#" onclick="toggleAdv(this);return false"><?php AppUtility::t('Edit view settings')?></a></p>
 
-    <fieldset id="viewfield"><legend>Default gradebook view:</legend>
+    <fieldset id="viewfield"><legend><?php AppUtility::t('Default gradebook view')?></legend>
 
-        <span class="form">Gradebook display:</span>
-	<span class="formright">
-        <?php
-        $orderVal = array(0,4,6,8,2,10,12);
-        $orderLabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
-        echo 'Order: ';
-        AppUtility::writeHtmlSelect("orderby", $orderVal, $orderLabel, $gbScheme['orderby']&~1);
-        ?>
-        <br/>
-		<input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php AppUtility::writeHtmlChecked($gbScheme['orderby']&1, 1);?>/><label for="grouporderby">Group by category first</label>
-	</span><br class="form">
+        <span class="col-md-3"><?php AppUtility::t('Gradebook display')?></span>
+	    <span class="col-md-1">
+            <?php
+            $orderVal = array(0,4,6,8,2,10,12);
+            $orderLabel = array('by end date, old to new', 'by end date, new to old', 'by start date, old to new', 'start date, new to old', 'alphabetically', 'by course page order, offline at end', 'by course page order reversed, offline at start');
+            AppUtility::t('Order: ')
+            ?>
+            </span><span class="col-md-4">
+            <?php
+            AppUtility::writeHtmlSelect("orderby", $orderVal, $orderLabel, $gbScheme['orderby']&~1);
+            ?>
+            <br/>
+            <input type="checkbox" name="grouporderby" value="1" id="grouporderby" <?php AppUtility::writeHtmlChecked($gbScheme['orderby']&1, 1);?>/><label for="grouporderby">Group by category first</label>
+        </span>
+        <br class="form">
         <span class=form>Default user order:</span>
 	<span class=formright>
 		<?php
@@ -136,15 +155,17 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         echo "</tbody></table>";
         echo '<p><input type="button" class ="btn btn-primary" value="'.AppUtility::t('Add New Category', false).'" onclick="addCat()" /></p>';
-        echo '</fieldset>';
-        echo '<div class="submit"><input class ="btn btn-primary save-btn" id="save-btn" type=submit name=submit value="'.AppUtility::t('Save Changes', false).'"/></div>';
-        echo "</form>";
-        echo '<p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/> ';
-        echo 'When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>';
-        echo 'When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>';
-        echo '<p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible ';
-        echo 'scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>';
+        ?>
+    </fieldset>
 
+        <div class="submit"><input class ="btn btn-primary save-btn" id="save-btn" type=submit name=submit value="<?php AppUtility::t('Save Changes')?>"/></div>
+        </form>
+        <p class="small"><sup>*</sup>When a category is set to Expanded, both the category total and all items in the category are displayed.<br/>
+        When a category is set to Collapsed, only the category total is displayed, but all the items are still counted normally.<br/>
+        When a category is set to Hidden, nothing is displayed, and no items from the category are counted in the grade total. </p>
+        <p class="small"><sup>*</sup>If you drop any items, a calc type of "average percents" is required. If you are using a points earned / possible
+        scoring system and use the "average percents" method in a category, the points for the category may be a somewhat arbitrary value.</p>
+<?php
     function disprow($id,$row, $hideLabel, $hideVal) {
 
         //name,scale,scaletype,chop,drop,weight
@@ -220,3 +241,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ?>
 
+</div>
+</div>

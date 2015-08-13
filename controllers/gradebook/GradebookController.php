@@ -2538,6 +2538,7 @@ if($params['gbitem'] > 0){
     public function actionGbSettings()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $course = Course::getById($this->getParamVal('cid'));
         $params = $this->getRequestParams();
 

@@ -42,46 +42,54 @@ $this->params['breadcrumbs'][] = $this->title;
         <textarea id='message' name='message' style='width: 100%;' rows='20' cols='200'>"; echo "</textarea></div></div><br>"; ?>
         </div>
     </div>
-    <p class="col-md-2"></p>
-    <p class="col-md-10"><i><br>Note:</i> <b>FirstName</b> and <b>LastName</b> can be used as form-mail fields that will autofill with each student's first/last name</p>
     <div>
-        <span class="col-md-2"><b>Send copy to</b></span>
-        <span class="col-md-10">
-            <input type="radio" name="messageCopyToSend" id="self" value="onlyStudents"> Only Students<br>
-            <input type="radio" name="messageCopyToSend" id="self" value="selfAndStudents" checked="checked"> Students and you<br>
-            <input type="radio" name="messageCopyToSend" id="self" value="teachersAndStudents"> Students and all instructors of this course</span>
-    </div>
-    <div >
-        <span class="col-md-2 select-text-margin"><b>Save sent messages?</b></span>
-        <span class="col-md-10 select-text-margin"><input type="checkbox" name="isChecked" id="save-sent-message" checked="true"></span>
+        <p class="col-md-10 col-md-offset-2 form-content"><i><?php AppUtility::t('Note:')?></i> &nbsp;<b><?php AppUtility::t('FirstName')?></b>&nbsp;<?php AppUtility::t('and')?> <b>&nbsp;<?php AppUtility::t('LastName')?></b>&nbsp;<?php AppUtility::t('can be used as form-mail fields that will autofill with each student\'s first/last name')?>
+        </p>
     </div>
     <div>
-        <span class="col-md-2 select-text-margin"><b>Limit send </b></span>
-    <span class="roster-assessment ">
-	 <p class="col-md-3">To students who haven't completed</p>
-	  <select name="roster-assessment-data" id="roster-data" class="col-md-4 select-text-margin">
-          <option value='0'>Don't limit - send to all</option>;
-          <?php foreach ($assessments as $assessment) { ?>
-          <option value="<?php echo $assessment->id ?>">
-              <?php echo ucfirst($assessment->name);?>
-              </option><?php } ?>
-      </select>
-    </span>
+        <div class="col-md-2 form-content"><b><?php AppUtility::t('Send copy to')?></b>
+        </div>
+        <div class="col-md-10 form-content">
+            <input type="radio" name="messageCopyToSend" id="self" value="onlyStudents"> <?php AppUtility::t('Only Students')?><br>
+            <input type="radio" name="messageCopyToSend" id="self" value="selfAndStudents" checked="checked"> <?php AppUtility::t('Students and you')?><br>
+            <input type="radio" name="messageCopyToSend" id="self" value="teachersAndStudents"> <?php AppUtility::t('Students and all instructors of this course')?>
+        </div>
     </div>
-    <div class=" col-lg-offset-2 col-md-10"><br>
-        <input type="submit" class="btn btn-primary " id="message-button" value="Send Message" style="margin-left: 0px">
+    <div>
+        <div class="col-md-2 form-content"><b><?php AppUtility::t('Save sent messages?')?></b></div>
+        <div class="col-md-10 form-content"><input type="checkbox" name="isChecked" id="save-sent-message" checked="true"></div>
+    </div>
+    <div>
+        <div class="col-md-2 form-content"><b><?php AppUtility::t('Limit send ')?></b></div>
+        <div class="roster-assessment form-content">
+            <p class="col-md-3 form-content"><?php AppUtility::t('To students who haven\'t completed')?></p>
+            <p class="form-content col-md-4">
+                <select name="roster-assessment-data" id="roster-data" class="form-control">
+                    <option value='0'><?php AppUtility::t('Don\'t limit - send to all')?>
+                    </option>;
+                    <?php foreach ($assessments as $assessment) { ?>
+                    <option value="<?php echo $assessment->id ?>">
+                        <?php echo ucfirst($assessment->name);?>
+                    </option>
+                        <?php } ?>
+                </select>
+            </p>
+        </div>
+    </div>
+    <div class="col-md-offset-2 col-md-10 padding-zero"><br>
+        <input type="submit" class="btn btn-primary " id="message-button" value="<?php AppUtility::t('Send Message')?>">
         <?php if($gradebook == AppConstant::NUMERIC_ONE){?>
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('gradebook/gradebook', 'gradebook?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
         <?php }else {?>
-            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>">Back</a>
+            <a class="btn btn-primary back-btn" href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$course->id)  ?>"><?php AppUtility::t('Back')?></a>
         <?php } ?>
     </div>
     <div>
-        <span><p class="col-md-3"><br>Unless limited, message will be sent to:</p></span>
-       <span class="col-md-12"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
+        <div><p class="col-md-12 form-content"><?php AppUtility::t('Unless limited, message will be sent to:')?></p></div>
+        <div class="col-md-11 col-md-offset-1 form-content list"><?php foreach (unserialize($studentDetails) as $studentDetail) { ?>
                <?php echo "<li>".ucfirst($studentDetail['LastName']).", ". ucfirst($studentDetail['FirstName'])." (". ($studentDetail['SID']).")</li>" ?>
            <?php } ?>
-        </span>
+        </div>
     </div>
 </form>
 </div>

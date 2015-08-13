@@ -351,7 +351,6 @@ i.fa-home{
 {
     color: #fff;
     background-color: #104E87;
-    /*border: ;*/
 }
 
 .myclasses > li >ul
@@ -361,8 +360,16 @@ i.fa-home{
 .myclasses > li > ul> li >a
 {
     color: #ffffff;
-
 }
 .fc-toolbar .fc-left{
     padding-bottom: 15px;
+}
+.nav.myclasses .open > a, .nav.myclasses .open > a:hover, .nav.myclasses .open > a:focus , .nav.notification .open > a, .nav.notification .open > a:hover, .nav.notification .open > a:focus {
+    border: 0;
+}
+.myclasses > li > a{
+    min-height: 53px;
+}
+.dropdown-menu{
+    min-width: 100%;
 }
