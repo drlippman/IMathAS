@@ -31,7 +31,7 @@ class BaseImasQimages extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['qsetid', 'var', 'filename', 'alttext'], 'required'],
+//            [['qsetid', 'var', 'filename', 'alttext'], 'required'],
             [['qsetid'], 'integer'],
             [['var'], 'string', 'max' => 50],
             [['filename'], 'string', 'max' => 100],

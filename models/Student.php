@@ -363,15 +363,23 @@ class Student extends BaseImasStudents {
         return $data;
     }
     public static function getByCourseAndGrades($courseId,$grades,$hassection,$sortorder){
-         $query = new Query();
+
+        $query = new Query();
         $query	->select(['imas_users.id','imas_users.LastName','imas_users.FirstName','imas_students.section','imas_students.locked' ])
             ->from('imas_users')
             ->join(	'INNER JOIN',
                 'imas_students',
                 'imas_users.id = imas_students.userid'
-            )
-            ->where(['imas_students.courseid' => $courseId])
-             ->andWhere(['imas_users.id'=>$grades]);
+            );
+
+            if ($grades !='all') {
+                $query->where(['imas_students.courseid' => $courseId])
+                ->andWhere(['imas_users.id'=>$grades]);
+        } else {
+
+                $query->where(['imas_students.courseid' => $courseId]);
+        }
+
         if ($hassection && $sortorder=="sec") {
             $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName');
 
@@ -395,4 +403,25 @@ class Student extends BaseImasStudents {
         return $items;
     }
 
-} 
+    public static function getByCourseAndGradesToAllStudents($courseId,$grades,$hassection,$sortorder)
+    {
+        $query = new Query();
+        $query	->select(['imas_users.id','imas_users.LastName','imas_users.FirstName','imas_students.section','imas_students.locked' ])
+            ->from('imas_users')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+             ->where(['imas_students.courseid' => $courseId]);
+        if ($hassection && $sortorder=="sec") {
+            $query->orderBy('imas_students.section,imas_users.LastName,imas_users.FirstName');
+
+        } else {
+            $query->orderBy('imas_users.LastName,imas_users.FirstName');
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+}
+

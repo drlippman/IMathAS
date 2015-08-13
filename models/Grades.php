@@ -29,18 +29,10 @@ class Grades extends BaseImasGrades
     }
 
     public static function GetOtherGrades($gradetypeselects, $limuser){
-        $query = new Query();
-        $query->select(['*'])
-            ->from('imas_grades');
-        foreach($gradetypeselects as $gradeSelect){
-            $query->orWhere(["gradetype" => $gradeSelect['gradetype']])
-                    ->andWhere(['IN', 'gradetypeid', $gradeSelect['gradetypeid']]);
-        }
-        if ($limuser > 0) {
-            $query->andWhere(["userid" => $limuser]);
-        }
-        $command = $query->createCommand();
-        $data = $command->queryAll();
+            $sel = implode(' OR ',$gradetypeselects);
+            $query = "SELECT * FROM imas_grades WHERE ($sel)";
+            if ($limuser>0) { $query .= " AND userid='$limuser' ";}
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
     public static function outcomeGrades($sel,$limuser)
@@ -110,8 +102,24 @@ class Grades extends BaseImasGrades
     }
     public static function getByGradeTypeIdAndUserId($gbitemId,$grades)
     {
-        return Grades::find('userid','score')->where(['gradetypeid' => $gbitemId])->andWhere(['gradetype' => 'offline'])->andWhere(['userid' => $grades])->all();
+        $query = new Query();
+        $query	->select(['userid','score','feedback'])
+            ->from('imas_grades')
+            ->where(['imas_grades.gradetype' => 'offline'])
+            ->andWhere(['imas_grades.gradetypeid' => $gbitemId]);
+        if($grades != 'all'){
+            $query->where(['imas_grades.userid' => $grades]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
+    public static function updateScoreTostudnt($score,$feedback,$studentId,$gbitem){
+        $grade = Grades::find()->where(['userid' => $studentId])->andWhere(['gradetype' => 'offline'])->andWhere(['gradetypeid' => $gbitem])->one();
+        $grade->score = $score;
+        $grade->feedback = $feedback;
+        $grade->save();
+}
 
 }
 

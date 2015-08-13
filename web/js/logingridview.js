@@ -102,6 +102,11 @@ function previousWeekHandler(){
         }
         else
         {
+
+            //alert(startDate);alert(endDate);
+            //var course_id = $("#course-id").val();
+            //var transferData = {newStartDate: startDate, newEndDate: endDate, cid: course_id};
+            //jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
             $('#flash-message').hide();
             finalDate = toggleDate('w0', daysInAWeek, 'deduct');
             $( "#w0").val(finalDate);
