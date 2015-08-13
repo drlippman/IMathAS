@@ -525,6 +525,7 @@ class CourseController extends AppController
     public function actionGetAssessmentDataAjax()
     {
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $cid = $params['cid'];
         $currentDate = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
@@ -585,7 +586,7 @@ class CourseController extends AppController
                 'calTag' => ucfirst($calendarInlineTextItem['caltag'])
             );
         }
-        $responseData = array('assessmentArray' => $assessmentArray, 'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
+        $responseData = array('user' => $user,'assessmentArray' => $assessmentArray, 'calendarArray' => $calendarArray, 'calendarLinkArray' => $calendarLinkArray, 'calendarInlineTextArray' => $calendarInlineTextArray, 'currentDate' => $currentDate);
         return $this->successResponse($responseData);
     }
 
