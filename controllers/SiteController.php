@@ -192,6 +192,7 @@ class SiteController extends AppController
 
     public function actionForgotPassword()
     {
+        $this->layout = 'nonLoggedUser';
         $model = new ForgotPasswordForm();
         if ($model->load($this->getPostData())) {
                 $param = $this->getRequestParams();
@@ -228,6 +229,7 @@ class SiteController extends AppController
 
     public function actionForgotUsername()
     {
+        $this->layout = 'nonLoggedUser';
         $model = new ForgotUsernameForm();
         if ($model->load($this->getPostData())) {
             $param = $this->getRequestParams();
@@ -254,6 +256,7 @@ class SiteController extends AppController
 
     public function actionCheckBrowser()
     {
+        $this->layout = 'nonLoggedUser';
         return $this->renderWithData('checkBrowser');
     }
 

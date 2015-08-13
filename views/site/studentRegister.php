@@ -11,10 +11,19 @@ $this->title = 'Student Registration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <h1 style="color: #ffffff"><?php echo Html::encode($this->title) ?></h1>
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
 </div>
-<div class="tab-content shadowBox">
-<div style="margin: 30px; background-color: #fafafa">
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
+    <br>
+    <p style="padding-top:0"></p>
+<div style="margin-right:30px; margin-left: 30px;margin-bottom: 30px; background-color: #fafafa">
     <div class="site-login" style="padding-top: 30px">
         <p style="padding-left: 315px; border-bottom: 2px solid #a9a9a9">Please fill out the following fields to <b>SignUp</b></p><br>
 
@@ -50,6 +59,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
         <?php ActiveForm::end(); ?>
+        <br>
+        <br>
     </div>
     </div>
 </div>
