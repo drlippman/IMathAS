@@ -663,12 +663,12 @@ img.small-icon{
     border: 1px solid #101A66;
 }
 input[type="submit"], input[type="button"], button, a.abutton {
-    /*color: #ffffff;*/
-    /*background-color: #104E87;*/
-    /*border-radius: 0px;*/
-    /*border: 1px solid #285E8E;*/
+    color: #ffffff;
+    background-color: #104E87;
+    border-radius: 0px;
+    border: 1px solid #285E8E;
     font: inherit;
-    /*height: 2.5em;*/
+    height: 2.5em;
     padding: 0px 8px;
     margin: 0;
 }
@@ -855,6 +855,7 @@ input[type="radio"] {
     padding: 7px;
     border-radius: 50px;
     display: inline-block;
+    vertical-align: middle;
     position: relative;
 }
 
@@ -938,8 +939,6 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
 .margin-top-zero{
     margin-top: 0px;
 }
-
-
 .inner-content-change-password
 {
     height: 30%;
@@ -997,3 +996,14 @@ button#change-button.btn.btn-primary
     -moz-border-radius: 6px 0 6px 6px;
 
 }
+.form-content{
+    padding: 0;
+    padding-top: 10px;
+}
+.list{
+    padding-left: 15px;
+}
+div.msg-count{
+    padding-top: 2px;
+}
+
