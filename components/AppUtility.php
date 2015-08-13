@@ -2724,4 +2724,61 @@ class AppUtility extends Component
 
         }
 
+   public function printItems($items,$assessNames,$forumNames,$offNames,$linkNames,$inlineNames)
+   {
+       foreach ($items as $i=>$item)
+       {
+           if ($i!=0) { echo '<br/>';}
+           if ($item[0]=='link') {
+               echo '<span class="icon iconlink" >L</span> '.$linkNames[$item[1]];
+           } else if ($item[0]=='inline') {
+               echo '<span class="icon iconinline" >I</span> '.$inlineNames[$item[1]];
+           }else if ($item[0]=='assess') {
+               echo '<span class="icon iconassess" >A</span> '.$assessNames[$item[1]];
+           } else if ($item[0]=='forum') {
+               echo '<span class="icon iconforum" >F</span> '.$forumNames[$item[1]];
+           } else if ($item[0]=='offline') {
+               echo '<span class="icon iconoffline" >O</span> '.$offNames[$item[1]];
+           }
+
+       }
+
+
+   }
+
+    public function printOutcomesForMap($arr,$ind,$outcomeAssoc=null,$outcomeInfo=null,$catNames=null,$n=null,$cnt=null,$items=null,$assessNames=null,$forumNames=null,$offNames=null,$linkNames=null,$inlineNames=null)
+    {
+
+        foreach ($arr as $oi)
+        {
+            if ($cnt%2==0) {
+                $class = "even";
+            } else {
+                $class = "odd";
+            }
+            $cnt++;
+            if (is_array($oi)) { //is outcome group
+                echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
+                $this->printOutcomesForMap($oi['outcomes'],$ind+1);
+            }else {
+                echo '<tr class="'.$class.'">';
+                echo '<td><span class="ind'.$ind.'">'.$outcomeInfo[$oi].'</span></td><td>';
+                if (isset($outcomeAssoc[$oi]['UG'])) {
+                    $this->printItems($outcomeAssoc[$oi]['UG'],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+                }
+                echo '</td>';
+                foreach ($catNames as $id=>$cn) {
+                    echo '<td>';
+                    if (isset($outcomeAssoc[$oi][$id])) {
+                        $this->printItems($outcomeAssoc[$oi][$id],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+                    }
+                    echo '</td>';
+                }
+                echo '</tr>';
+            }
+
+        }
+
+    }
+
 }

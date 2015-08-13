@@ -377,6 +377,7 @@ class SiteController extends AppController
     public function actionChangeUserInfo()
     {
         $this->guestUserHandler();
+        $this->layout = 'nonLoggedUser';
         $tzname = AppUtility::getTimezoneName();
         $userid = $this->getUserId();
         $user = User::findByUserId($userid);

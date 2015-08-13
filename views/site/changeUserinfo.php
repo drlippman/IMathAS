@@ -3,87 +3,99 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use yii\widgets\FileInput;
 use app\components\AppUtility;
-
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\changeUserInfoForm */
-
 $this->title = 'Profile Settings';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-<div class="site-login">
-
+<div class="item-detail-header">
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content"></div>
+<div class="tab-content shadowBox">
+    <br>
+    <p></p>
     <?php
     $model->FirstName = AppUtility::getStringVal($user['FirstName']);
     $model->LastName = AppUtility::getStringVal($user['LastName']);
     $model->email = AppUtility::getStringVal($user['email']);
     ?>
-
     <fieldset>
-        <legend>Profile Settings</legend>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => '',
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-2\">{error}</div>",
-                'labelOptions' => ['class' => 'col-lg-2'],
+                'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-sm-4 col-lg-offset-3\">{error}</div>",
+                'labelOptions' => ['class' => 'col-sm-3'],
             ],
         ]); ?>
-
-        <?= $form->field($model, 'FirstName')->textInput(); ?>
-
-        <?= $form->field($model, 'LastName')->textInput() ?>
-
-        <div class="row password_checkbox">
-            <?= $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
+        <div class="old-password">
+            <br>
+            <?php echo $form->field($model, 'FirstName')->textInput(); ?>
         </div>
-
-        <div class="change-password-content">
-
-            <?= $form->field($model, 'oldPassword')->passwordInput() ?>
-
-            <?= $form->field($model, 'password')->passwordInput() ?>
-
-            <?= $form->field($model, 'rePassword')->passwordInput() ?>
+        <div class="old-password">
+            <br>
+             <?php echo  $form->field($model, 'LastName')->textInput() ?>
         </div>
-        <?= $form->field($model, 'email') ?>
+        <div class="password_checkbox">
 
-        <div class="notify_checkbox">
+            <?php echo $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
+        </div>
+        <div class="toggle-password">
+            <div class="old-password">
+                <br>
+                <div class="margin-left-3">
+                <?php echo $form->field($model, 'oldPassword')->passwordInput() ?>
+                </div>
+                <br>
+                <?php echo $form->field($model, 'password')->passwordInput() ?>
+                <br>
+                <?php echo $form->field($model, 'rePassword')->passwordInput() ?>
+            </div>
+        </div>
+        <br>
+        <div class="password_checkbox">
             <?= $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage')->checkbox() ?>
         </div>
         <br>
-
-        <div class="col-lg-10 col-lg-offset-2 user-image">
-
-        <?php
+        <div class="alignuserpicture">
+            <?php
             if($user['hasuserimg']==0)
             {?>
                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg" class = "image" alt="file not found" /><br><br>
-               <?php
+                <?php
                 echo "Upload profile picture";
             }
             else
             {?>
-                 <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" class = "image" alt="file not found" /></br>
-                 <div class="update-checkbox">
-                <?= $form->field($model, 'remove')->checkbox() ?>
-            </div>
-           <?php }?>
+                <img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $user['id'] ?>.jpg?ver=<?php echo time()?>" class = "image" alt="file not found" />
+                </br></br>
+                <div class="update-checkbox">
+                    <?= $form->field($model, 'remove')->checkbox() ?>
+                </div>
+            <?php }?>
         </div >
 
-        <?= $form->field($model, 'file')->fileInput() ?>
+        <div class="old-password">
+            <?php echo $form->field($model, 'file')->fileInput() ?>
+            <?php echo $form->field($model, 'message')->dropDownList(array(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) ?>
+            <?php echo $form->field($model, 'homepage')->checkboxList(['NewMessagesWidget' => 'New Messages Widget', 'NewForumPostsWidget' => 'New Forum Posts Widget', 'NewMessagesNotesOnCourseList' => 'New Messages Notes On Course List', 'NewPostsNotesOnCourseList' => 'New Posts Notes On Course List']) ?>
 
-        <?= $form->field($model, 'message')->dropDownList(array(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) ?>
-
-        <?= $form->field($model, 'homepage')->checkboxList(['NewMessagesWidget' => 'New Messages Widget', 'NewForumPostsWidget' => 'New Forum Posts Widget', 'NewMessagesNotesOnCourseList' => 'New Messages Notes On Course List', 'NewPostsNotesOnCourseList' => 'New Posts Notes On Course List']) ?>
-
+        </div>
     </fieldset>
-
-    <fieldset>
-        <legend>Timezone</legend>
-
+    <div class="Timezone">
+        <br>
+        <div style="margin: 10px">
+        <h4>TimeZone</h4>
         <p>Due Dates and other times are being shown to you correct for the <b><?php echo $tzname; ?></b> timezone.</p>
 
         <p>You may change the timezone the dates display based on if you would like. This change will only last until
@@ -96,13 +108,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<option value="' . $tz . '" ' . ($tz == $tzname ? 'selected' : '') . '>' . $tz . '</option>';
                 } ?>
             </select>
-    </fieldset>
-    <div class="form-group">
-        <div class=" col-lg-8 display_field">
-            <?= Html::submitButton('Save', ['class' => 'btn btn-primary col-lg-offset-3','id' => 'update-btn', 'name' => 'login-button']) ?>
+            <div class="submit-button-change-user-info">
+                <?php echo Html::submitButton('Save', ['class' => 'btn btn-primary','id' => 'update-btn', 'name' => 'login-button']) ?>
+           </div>
+            <br>
         </div>
+
     </div>
 
-    <?php ActiveForm::end(); ?>
 
+
+    <?php ActiveForm::end(); ?>
 </div>

@@ -220,10 +220,10 @@ class Forums extends BaseImasForums {
     public static function getForumsForOutcomeMap($courseId)
     {
         $query = new Query();
-        $query->select(['id','name','gbcategory','outcomes','cntingb'])
+        $query->select(['id','cntingb','name','gbcategory','outcomes'])
             ->from('imas_forums')
             ->where(['courseid' => $courseId])
-            ->andWhere(['NOT LIKE','outcomes','']);
+            ->andWhere(['<>','outcomes','']);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

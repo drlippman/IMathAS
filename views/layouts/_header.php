@@ -14,7 +14,7 @@ NavBar::begin([
 ]);
 
 echo Nav::widget([
-    'options' =>['class' => 'navbar-nav myclasses navbar-right'],
+    'options' =>['class' => 'navbar-nav user-menu navbar-right'],
     'encodeLabels' => false,
     'items' => [
         Yii::$app->user->isGuest ?
@@ -28,7 +28,6 @@ echo Nav::widget([
                             array('class' => 'dropdown-submenu'),
                             'items' =>
                                 [
-                                    ['label' => 'Change Password', 'url' => ['/site/change-password']],
                                     ['label' => 'Change UserInfo', 'url' => ['/site/change-user-info']],
                                 ],
                         ],
@@ -72,6 +71,7 @@ echo Nav::widget([
          ],
 ]);
 
+if($user->rights == \app\components\AppConstant::ADMIN_RIGHT){
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav myclasses margin-left'],
     'encodeLabels' => false,
@@ -82,10 +82,25 @@ echo Nav::widget([
             ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
 
                 'items' => \app\models\Course::getGetMyClasses($user->id),
-//                'items' =>\app\models\Student::getMyClassesForStudent($user->id),
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
             ],
 ]);
+}elseif($user->rights == \app\components\AppConstant::STUDENT_RIGHT)
+{
+    echo Nav::widget([
+        'options' =>['class' => 'navbar-nav myclasses margin-left'],
+        'encodeLabels' => false,
+
+        'items' => [
+            Yii::$app->user->isGuest ?
+                ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
+                ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
+                'items' =>\app\models\Student::getMyClassesForStudent($user->id),
+                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
+        ],
+    ]);
+
+}
 NavBar::end();
 ?>
 </header>

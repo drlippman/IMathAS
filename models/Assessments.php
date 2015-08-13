@@ -317,7 +317,7 @@ class Assessments extends BaseImasAssessments
                 'ia.id=iq.assessmentid')
             ->where(['ia.courseid' => $courseId])
             ->andWhere(['>','ia.defoutcome','0'])
-            ->orWhere(['NOT LIKE','iq.category','0']);
+            ->orWhere(['<>','iq.category','0']);
 
         $command = $query->createCommand();
         $data = $command->queryAll();

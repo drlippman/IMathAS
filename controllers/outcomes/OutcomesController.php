@@ -31,7 +31,6 @@ class OutcomesController extends AppController
         $this->includeCSS(['outcomes.css']);
         return $this->render('addOutcomes',['courseId' => $courseId]);
     }
-
     public function actionGetOutcomeAjax()
     {
         $this->guestUserHandler();
@@ -150,11 +149,12 @@ class OutcomesController extends AppController
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js','general.js' ]);
         return $this->render('outcomeReport',['courseId' => $courseId,'finalData' => $finalData,'outc' => $outc,'headerData' => $outcomeInfo,'report' => $report,'report' => $report,'selectedOutcome' => $selectedOutcome,'outcomesData' => $outcomes,'type' => $type]);
     }
-
     public function actionOutcomeMap()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
         $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
         if(($courseOutcomeData[0]['outcomes']) == '')
         {
@@ -175,6 +175,7 @@ class OutcomesController extends AppController
         $assessGbCat = array();
         $assessNames = array();
         $assessQCnt = array();
+
         $assessmentData = Assessments::assessmentDataForOutcomes($courseId);
         foreach($assessmentData as $singleData)
         {
@@ -305,13 +306,11 @@ class OutcomesController extends AppController
             foreach($query as $data){
                 $catNames[$data['id']] = $data['name'];
             }
-
         }
         natsort($catNames);
-        return $this->render('outcomeMap',['outcomeLinks' => $outcomeLinks,'catNames' => $catNames,'assessNames' => $assessNames,'forumNames' => $forumNames,'offNames' => $offNames,'linkNames' => $linkNames,'inlineNames' => $inlineNames,'outcomeInfo' => $outcomeInfo,'outcomeAssoc' => $outcomeAssoc,'outcomes' => $outcomes]);
+        return $this->render('outcomeMap',['course'=> $course ,'outcomeLinks' => $outcomeLinks,'catNames' => $catNames,'assessNames' => $assessNames,'forumNames' => $forumNames,'offNames' => $offNames,'linkNames' => $linkNames,'inlineNames' => $inlineNames,'outcomeInfo' => $outcomeInfo,'outcomeAssoc' => $outcomeAssoc,'outcomes' => $outcomes]);
     }
-
- function flattenout($arr)
+    function flattenout($arr)
     {
 
         global $outc;
@@ -329,9 +328,7 @@ class OutcomesController extends AppController
         }
         return $outc;
     }
-
-
-    public function getpts($sc)
+   public function getpts($sc)
     {
         if (strpos($sc,'~')===false) {
             if ($sc>0) {

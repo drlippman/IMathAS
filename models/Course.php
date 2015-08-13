@@ -224,10 +224,15 @@ class Course extends BaseImasCourses {
     {
         $items = [];
         $myClasses = Course::find()->where(['ownerid' => $userId])->all();
-        foreach($myClasses as $singleClass)
+        foreach($myClasses as $key => $singleClass)
         {
             $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
-
+            if(count($myClasses) == $key+1)
+            {
+                            array_push($items,'<li class="divider"></li>');
+                            array_push($items,['label' => 'Manage Questions', 'url' => '#']);
+                            array_push($items,['label' => 'Questions Libraries', 'url' => '#']);
+            }
         }
         return $items;
     }

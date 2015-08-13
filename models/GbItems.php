@@ -148,7 +148,7 @@ class GbItems extends BaseImasGbitems
         $query->select(['id','name','gbcategory','outcomes'])
                ->from('imas_gbitems ')
                 ->where(['courseid' => $courseId])
-                ->andWhere(['NOT LIKE','outcomes','']);
+                ->andWhere(['<>','outcomes','']);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

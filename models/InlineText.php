@@ -136,7 +136,7 @@ class InlineText extends BaseImasInlinetext
         $query->select(['id','title','outcomes'])
             ->from('imas_inlinetext')
             ->where(['courseid' => $courseId])
-            ->andWhere(['NOT LIKE','outcomes','']);
+            ->andWhere(['<>','outcomes','']);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

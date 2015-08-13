@@ -3,20 +3,21 @@ $(document).ready(function(){
 
 });
 
-function checkConfirmPassword(){
+function checkConfirmPassword()
+{
     $("#pwd").change(function(){
         if($("#pwd:checked").val()){
-            $(".change-password-content").show();
+            $(".toggle-password").slideDown();
         }else{
-            $(".change-password-content").hide();
+            $(".toggle-password").slideUp();
         }
     });
 
     if($("#pwd:checked").val() == undefined)
     {
-        $(".change-password-content").hide();
+        $(".toggle-password").hide();
     }
     else{
-        $(".change-password-content").show();
+        $(".toggle-password").show();
     }
 }
