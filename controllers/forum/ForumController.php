@@ -408,14 +408,17 @@ class ForumController extends AppController
                 $thread_Id = $params['threadId'];
 
                 if ($moveType == AppConstant::NUMERIC_ONE) {
-                    $moveThreadId = $params['thread-name'];
-                    ForumPosts::updatePostMoveThread($thread_Id, $moveThreadId);
-                    Thread::deleteThreadById($thread_Id);
+                     if(isset($params['thread-name'])){
+                         $moveThreadId = $params['thread-name'];
+                         ForumPosts::updatePostMoveThread($thread_Id, $moveThreadId);
+                         Thread::deleteThreadById($thread_Id);
+                     }
                 } else {
-
-                    $forum_Id = $params['forum-name'];
-                    Thread::moveAndUpdateThread($forum_Id, $thread_Id);
-                    ForumPosts::updateMoveThread($forum_Id, $thread_Id);
+                    if($params['forum-name']){
+                        $forum_Id = $params['forum-name'];
+                        Thread::moveAndUpdateThread($forum_Id, $thread_Id);
+                        ForumPosts::updateMoveThread($forum_Id, $thread_Id);
+                    }
                 }
                 $this->includeCSS(['forums.css']);
                 $this->includeJS(['forum/thread.js?ver=' . time() . '']);
@@ -593,15 +596,19 @@ class ForumController extends AppController
         $likeCount = $Count->findCOunt($threadId);
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
+
         foreach($this->totalPosts as $key=>$threadArray){
             if($threadArray){
                 foreach($this->totalPosts as $singleThread) {
                     if($threadArray['parent'] == $singleThread['id'])
                     {
-
-                        if(substr($threadArray['subject'],0,2) === 'Re') {
+                        if(substr($threadArray['subject'],0,2) !== 'Re') {
+                            $moveThreadSubject = $threadArray['id'];
                             $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
                         }
+                            if( $threadArray['parent']  == $moveThreadSubject){
+                                $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
+                            }
                     }
                 }
             }
@@ -1077,6 +1084,7 @@ class ForumController extends AppController
             'replyBy' => AppConstant::NUMERIC_ZERO,
             'postBy' => AppConstant::NUMERIC_ZERO,
             'outcomes' => ' ',
+            'isOutcomes' => $course['outcomes'],
         );
         if ($modifyForumId) {
 
@@ -1152,7 +1160,12 @@ class ForumController extends AppController
                 $forumData['postby'] = date("m-d-Y",strtotime("+1 week"));
                 $postByTime = time();
             }
-
+             if($forumData['outcomes'])
+             {
+                 $outcomes = $forumData['outcomes'];
+             }else{
+                 $outcomes = ' ';
+             }
             list($postTag, $replyTag) = explode('--', $forumData['caltag']);
             $defaultValue = array(
                 'allowAnonymous' => $allNon,
@@ -1187,21 +1200,26 @@ class ForumController extends AppController
                 'postByTime' => $postByTime,
                 'replyBy' => $replyBy,
                 'postBy' => $postBy,
-                    'outcomes' => $forumData['outcomes'],
-            );
+                'outcomes' => $outcomes,
+                'isOutcomes' => $course['outcomes'],
+                );
         }
         if ($this->isPostMethod()) {
              if ($params['modifyFid']) {
-                 if(count($params['outcomes']) > AppConstant::NUMERIC_ONE){
+                 if(isset($params['outcomes'])){
                      foreach ($params['outcomes'] as $outcomeId) {
+
                          if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                              $outcomes[] = intval($outcomeId);
                          }
                      }
-                     $params['outcomes'] = implode(',',$outcomes);
-                     $params['outcomes'] = $params['outcomes'];
+                     if($outcomes != null){
+                         $params['outcomes'] = implode(',',$outcomes);
+                     }else{
+                         $params['outcomes'] = " ";
+                     }
                  }else{
-                     $params['outcomes'] = ' ';
+                     $params['outcomes'] = " ";
                  }
                  $updateForum = new Forums();
                  $updateForum->UpdateForum($params);
@@ -1265,17 +1283,20 @@ class ForumController extends AppController
                     $finalArray['points'] = $params['points'];
                     $finalArray['tutoredit'] = $params['tutor-edit'];
                     $finalArray['rubric'] = $params['rubric'];
-                    if(count($params['outcomes']) > AppConstant::NUMERIC_ONE){
-
+                    if(isset($params['outcomes'])){
                         foreach ($params['outcomes'] as $outcomeId) {
 
                             if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                                 $outcomes[] = intval($outcomeId);
                             }
                         }
-                        $params['outcomes'] = implode(',',$outcomes);
+                        if($outcomes != null){
+                            $params['outcomes'] = implode(',',$outcomes);
+                        }else{
+                            $params['outcomes'] = " ";
+                        }
                     }else{
-                        $params['outcomes'] = ' ';
+                        $params['outcomes'] = " ";
                     }
                     $finalArray['outcomes'] = $params['outcomes'];
                 }else{
@@ -1283,11 +1304,12 @@ class ForumController extends AppController
                     $finalArray['points'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['tutoredit'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['rubric'] = AppConstant::NUMERIC_ZERO;
-                    $finalArray['outcomes'] = '';
+                    $finalArray['outcomes'] = " ";
                 }
+
                 $finalArray['groupsetid'] = $params['groupsetid'];
                 $finalArray['cntingb'] = $params['count-in-gradebook'];
-                $finalArray['avail'] = $params['avail'];
+                 $finalArray['avail'] = $params['avail'];
                 $finalArray['forumtype'] = $params['forum-type'];
                 $finalArray['caltag'] = $params['calendar-icon-text1'].'--'.$params['calendar-icon-text2'];
                 $tagList = '';
@@ -1317,7 +1339,7 @@ class ForumController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-            $this->includeJS(["forum/addforum.js","editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+            $this->includeJS(["forum/addforum.js","editor/tiny_mce.js",'assessment/addAssessment.js', 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
             $this->includeCSS(['course/items.css']);
             $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
             'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,

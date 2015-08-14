@@ -97,10 +97,9 @@ class Forums extends BaseImasForums {
         $this->gbcategory = isset($params['gbcategory']) ? $params['gbcategory'] : null;
         $this->points = isset($params['points']) ? $params['points'] : null;
         $this->tutoredit = isset($params['tutoredit']) ? $params['tutoredit'] : null;
-        $this->rubric = isset($params['rubric']) ? $params['rubric'] : null;
+        $this->rubric = $params['rubric'] ? $params['rubric'] : 0;
         $this->outcomes = isset($params['outcomes']) ? $params['outcomes'] : null;
         $this->save();
-
         return $this->id;
     }
     public static function deleteForum($itemId)
@@ -161,7 +160,6 @@ class Forums extends BaseImasForums {
         }
 
         $updateForumData->groupsetid = $params['groupsetid'];
-
         $updateForumData->cntingb = $params['count-in-gradebook'];
         $updateForumData->avail = $params['avail'];
         $updateForumData->forumtype = $params['forum-type'];

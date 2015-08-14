@@ -279,7 +279,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php AppUtility::t('Replies')?> <input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2">
                             </div><br class=form>
                     </div>
-
                  <div class="item-alignment">
                     <div class=col-lg-2><?php AppUtility::t('Count in gradebook?')?></div>
                     <div class=col-lg-10>
@@ -288,7 +287,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="count-in-gradebook" value="4" <?php if ($defaultValue['cntInGb'] == 4 && $defaultValue['points'] > 0) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes, but hide from students for now')?></td></div>
                         <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="count-in-gradebook" value="2" <?php if ($defaultValue['cntInGb'] == 2) { echo 'checked=1';}?> onclick="toggleGBdetail(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes, as extra credit')?></td></div>
                 </div></div><br class="form"/>
-
                 <div class="item-alignment">
                     <div id="gbdetail" <?php if ($defaultValue['cntInGb']==0 && $defaultValue['points']==0) { echo 'style="display:none;"';}?>>
 
@@ -321,15 +319,15 @@ $this->params['breadcrumbs'][] = $this->title;
                           </div>
                           <br class=form>
                     </div>
+
                     <div class="item-alignment">
-                        <?php if (count($pageOutcomesList) > 0) { ?>
+                        <?php if ($defaultValue['isOutcomes'] != null) { ?>
                         <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div><div class="col-lg-10">
                         <?php
 
-                        if($defaultValue['outcomes'] != ' '){
+                        if($defaultValue['outcomes'] != " "){
                             $gradeoutcomes = explode(',',$defaultValue['outcomes']);
                         }
-
                             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
                             <br class="form"/>
                         <?php } ?>

@@ -224,11 +224,21 @@ class Questions extends BaseImasQuestions
             $query .= " AND ia.courseid='$aidarr'";
         }
         $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
     }
-
-    public static function setQuestionSetId($qsetid,$replaceby){
+    public static function setQuestionSetId($qsetid,$replaceby)
+    {
         $query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
         $query .= "SET imas_questions.questionsetid='$replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid='$qsetid'";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function numberOfQuestionByIdAndCategory($assessmentid)
+    {
+        $query = new Query();
+        $query -> select(['id'])->from('imas_questions')->where(['assessmentid' =>  $assessmentid])->andWhere(['<>','category','0']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return count($data);
     }
 }

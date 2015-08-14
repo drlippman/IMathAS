@@ -769,7 +769,7 @@ class CourseController extends AppController
             $inlineTextData = InlineText::getById($inlineTextId);
             $startDate = $inlineTextData['startdate'];
             $endDate = $inlineTextData['enddate'];
-            $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_THOUSAND;
+            $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_TEN_THOUSAND;
             $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
             $minutes = $courseDefTime % AppConstant::SECONDS;
             $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;

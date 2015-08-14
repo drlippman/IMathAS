@@ -194,7 +194,7 @@ class AssessmentController extends AppController
                         $shuffle += AppConstant::NUMERIC_EIGHT;
                     }
                     if ($params['minscoretype']==AppConstant::NUMERIC_ONE && trim($params['minscore'])!='' && $params['minscore']>AppConstant::NUMERIC_ZERO) {
-                        $params['minscore'] = intval($params['minscore'])+AppConstant::NUMERIC_THOUSAND;
+                        $params['minscore'] = intval($params['minscore'])+AppConstant::NUMERIC_TEN_THOUSAND;
                     }
                     $isGroup = $params['isgroup'];
                     if (isset($params['showhints'])) {
@@ -517,13 +517,13 @@ class AssessmentController extends AppController
                     $assessmentSessionData = false;
                     $saveTitle = AppConstant::CREATE_BUTTON;
                 }
-                if ($assessmentData['minscore']>AppConstant::NUMERIC_THOUSAND) {
-                    $assessmentData['minscore'] -= AppConstant::NUMERIC_THOUSAND;
+                if ($assessmentData['minscore']>AppConstant::NUMERIC_TEN_THOUSAND) {
+                    $assessmentData['minscore'] -= AppConstant::NUMERIC_TEN_THOUSAND;
                     $minScoreType = AppConstant::NUMERIC_ONE; //pct;
                 } else {
                     $minScoreType = AppConstant::NUMERIC_ZERO; //points;
                 }
-                    $courseDefTime = $course['deftime']%AppConstant::NUMERIC_THOUSAND;
+                    $courseDefTime = $course['deftime']%AppConstant::NUMERIC_TEN_THOUSAND;
                     $hour = floor($courseDefTime/AppConstant::SECONDS)%AppConstant::NUMERIC_TWELVE;
                     $minutes = $courseDefTime%AppConstant::SECONDS;
                     $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?AppConstant::AM:AppConstant::PM;

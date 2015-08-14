@@ -1019,14 +1019,20 @@ fieldset{
     padding: .35em .625em .75em;
     border: 1px solid #c0c0c0;
 }
-fieldset legend{
+fieldset legend {
     width: auto;
     border-bottom: 0;
 }
-
 .margin-left-3
 {
  margin-left: 3px;
 }
-
+div.review {
+    /*background-color: #e0ffe0;*/
+    border: 1px solid #00f;
+    margin-top: -4px;
+    margin-bottom: 20px;
+    padding: 5px;
+    /*width: 99%;*/
+}
 

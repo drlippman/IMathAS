@@ -60,7 +60,7 @@ class AppConstant
     const NUMERIC_THIRTEEN = 13;
     const NUMERIC_FOURTEEN = 14;
     const NUMERIC_FIFTEEN = 15;
-    const NUMERIC_THOUSAND = 10000;
+    const NUMERIC_TEN_THOUSAND = 10000;
     const NUMERIC_NEGATIVE_ONE = -1;
     const NUMERIC_SIXTY_ONE = 61;
     const NUMERIC_THIRTY_TWO = 32;
@@ -159,4 +159,10 @@ class AppConstant
     const REQUIRED_ADMIN_ACCESS = "You need to log in as an admin to access this page";
     const PAST_DUE_DATE = 'Past Due Date of %s. Showing as Review';
     const AVAILABLE_UNTIL = 'Available %1$s until %2$s';
+    const NUMERIC_HUNDREAD = 100;
+    const NUMERIC_THOUSAND = 1000;
+    const NUMERIC_TWO_THOUSAND = 2000;
+    const NUMERIC_TRIPLE_NINE =999;
+    const QUARTER_NINE = 9999;
+
 }
