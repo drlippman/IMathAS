@@ -22,13 +22,12 @@ $model->courseAsTemplate = $selectionList['isTemplate'];
 $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
 ?>
     <div class="site-login">
-        <fieldset>
             <?php $form = ActiveForm::begin([
                 'id' => 'login-form',
                 'options' => ['class' => 'form-horizontal'],
                 'action' => '',
                 'fieldConfig' => [
-                    'template' => "{label}\n<div class=\"col-sm-10\">{input}</div>\n<div class=\"col-sm-10 clear-both col-sm-offset-2\">{error}</div>",
+                    'template' => "{label}\n<div class=\"col-sm-10\">{input}</div>\n<div class=\"col-sm-10 col-sm-offset-2\">{error}</div>",
                     'labelOptions' => ['class' => 'col-sm-2  text-align-left'],
                 ],
             ]); ?>
@@ -46,7 +45,8 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                 </div>
             </div>
             <div class="tab-content shadowBox non-nav-tab-item">
-                <div class="form-label-alignment" style="margin:0 20px">
+                <br><br><div style="margin-top: -10px"></div>
+                <div class="form-label-alignment" style="margin:0 30px">
 
                     <?php echo $form->field($model, 'courseName')->textInput(); ?>
                     <?php echo $form->field($model, 'enrollmentKey')->textInput() ?>
@@ -77,7 +77,6 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                         echo '</div>';?>
                     </div>
 
-                    <div style="clear: both"></div>
                     <?php echo $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
                     <?php echo $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default', 'angelish.css' => 'Angelish', 'angelishmore.css' => 'Angelishmore'], ['prompt' => 'Default']) ?>
                     <?php echo $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
@@ -85,12 +84,6 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                     <?php echo $form->field($model, 'navigationLink')->checkboxList([AppConstant::NUMERIC_ONE => 'Calender', AppConstant::NUMERIC_TWO => 'Forum List', AppConstant::NUMERIC_FOUR => 'Show']) ?>
                     <?php echo $form->field($model, 'latePasses')->textInput(); ?>
                     <?php echo $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
-        </fieldset>
-
-        <div class="form-group">
-
-        </div>
     </div>
     </div>
-
 <?php ActiveForm::end(); ?>

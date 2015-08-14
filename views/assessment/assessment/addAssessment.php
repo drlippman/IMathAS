@@ -97,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class=col-lg-2 ><?php AppUtility::t('Available After')?></div>
                 <div class=col-lg-10>
                     <label class="pull-left non-bold"><input type=radio name="sdatetype" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
-                   <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
+                    <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
