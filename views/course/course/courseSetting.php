@@ -45,8 +45,8 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                 </div>
             </div>
             <div class="tab-content shadowBox non-nav-tab-item">
-                <br><br><div style="margin-top: -10px"></div>
-                <div class="form-label-alignment" style="margin:0 30px">
+                <br><br>
+                <div class="form-label-alignment" style="margin:0 40px">
 
                     <?php echo $form->field($model, 'courseName')->textInput(); ?>
                     <?php echo $form->field($model, 'enrollmentKey')->textInput() ?>
