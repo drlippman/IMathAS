@@ -6,7 +6,8 @@ $this->title = $pageTitle;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
- <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>">
+<form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>"
+      xmlns="http://www.w3.org/1999/html">
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
     </div>
@@ -48,26 +49,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     </textarea>
                 </div>
             </div>
-        </div>
+        </div><BR class=form>
 
         <div class="visibility-item">
-            <div class="col-lg-2">Visibility</div>
+            <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
             <div class="col-lg-10">
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility'><td><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($line['avail'],0);?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Hide')?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility'><td><input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show by Dates')?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility'><td><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Show Always')?></td></div>
+                <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($line['avail'],0);?>/><span class='padding-left'><?php AppUtility::t('Hide')?></span></label>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/><span class='padding-left'><?php AppUtility::t('Show Always')?></span></label>
             </div>
-
-
             <div>
-                <div id="datediv" style="display:<?php echo ($wiki['avail']==1)?"block":"none"; ?>">
+                <div id="datediv" style="display:<?php echo ($wiki['avail']==1)?"block":"none"; ?>"><BR class=form><br>
                     <div class="col-lg-2"><?php AppUtility::t('Available After')?></div>
                 <div class=col-lg-10>
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size visibility'><td><input type=radio name="sdatetype" class="pull-left" value="0" <?php AppUtility::writeHtmlChecked($startdate,'0',0) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always until end date')?></td></div>
-
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size visibility pull-left'><td><input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AppUtility::writeHtmlChecked($startdate,'0',1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
+                    <input type=radio name="sdatetype" class="pull-left" value="0" <?php AppUtility::writeHtmlChecked($startdate,'0',0) ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
+                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AppUtility::writeHtmlChecked($startdate,'0',1) ?>/></label>
                     <?php
-                    echo '<div class = "col-lg-4 time-input" style="padding:0">';
+                    echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
                         'name' => 'StartDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -79,9 +77,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end col-lg-1" style="padding-left: 20px">at</label>';
+                    echo '<label class="end pull-left non-bold">at</label>';
                     echo '<div class="pull-left col-lg-4">';
-
                     echo TimePicker::widget([
                         'name' => 'start_end_time',
                         'value' => time(),
@@ -91,14 +88,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]
                     ]);
                     echo '</div>';?>
-                </div></div><BR class=form>
+                </div><BR class=form><br>
 
                  <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
                 <div class=col-lg-10>
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size visibility'><td><input type=radio name="edatetype" class="pull-left" value="2000000000" <?php AppUtility::writeHtmlChecked($enddate,'2000000000',0) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always after start date')?></td></div>
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size visibility pull-left'><td><input type=radio name="edatetype" class="pull-left" value="edate"  <?php AppUtility::writeHtmlChecked($enddate,'2000000000',1) ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
+                    <label class="pull-left non-bold"><input type=radio name="edatetype" class="pull-left" value="2000000000" <?php AppUtility::writeHtmlChecked($enddate,'2000000000',0) ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
+                    <label class="pull-left" style="padding-left: 34px"><input type=radio name="edatetype" class="pull-left" value="edate"  <?php AppUtility::writeHtmlChecked($enddate,'2000000000',1) ?>/></label>
                     <?php
-                    echo '<div class = "col-lg-4 time-input" style="padding: 0">';
+                    echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
                         'name' => 'EndDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -110,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                     <?php
-                    echo '<label class="end col-lg-1" style="padding-left: 20px"> at </label>';
+                    echo '<label class="end pull-left non-bold"> at </label>';
                     echo '<div class="pull-left col-lg-4">';
 
                     echo TimePicker::widget([
@@ -123,13 +120,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>';?>
                 </div>
-                </div>
 </div>
 <BR class=form>
         </div>
             <div class="group-wiki">
         <div class="col-lg-2"><?php AppUtility::t('Group wiki?')?></div>
-        <div class="col-lg-10 dropdown">
+        <div class="col-lg-4 dropdown">
 <?php
 if ($started) {
     AppUtility::writeHtmlSelect("ignoregroupsetid",$page_groupSelect['val'],$page_groupSelect['label'],$line['groupsetid'],"Not group wiki",0,$started?'disabled="disabled"':'');
@@ -140,13 +136,13 @@ if ($started) {
 ?>
         </div>
     </div>
-  <br class="form"/>
+  <br class="form"/><br class="form"/>
 
         <div class=col-lg-2><?php AppUtility::t('Students can edit')?></div>
 		<div class=col-lg-10>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility'><td><input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Always')?></td></div>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility'><td><input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Never')?></td></div>
-            <div class='radio student-enroll visibility pull-left override-hidden'><label class='checkbox-size label-visibility pull-left'><td><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Before')?></td></div>
+            <input type=radio name="rdatetype" value="Always" <?php if ($revisedate==2000000000) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Always')?></span><br>
+            <input type=radio name="rdatetype" value="Never" <?php if ($revisedate==0) { echo "checked=1";}?>/><span class="padding-left"><?php AppUtility::t('Never')?></span><br>
+            <label class="pull-left non-bold"><input type=radio name="rdatetype" value="Date" <?php if ($revisedate<2000000000 && $revisedate>0) { echo "checked=1";}?>/><span class='padding-left'><?php AppUtility::t('Before')?></span></label>
             <?php
             echo '<div class = "col-lg-4 time-input">';
             echo DatePicker::widget([
@@ -160,7 +156,7 @@ if ($started) {
             ]);
             echo '</div>';?>
             <?php
-            echo '<label class="end col-lg-1"> at </label>';
+            echo '<label class="end col-lg-1 non-bold"> at </label>';
             echo '<div class="pull-left col-lg-4">';
 
             echo TimePicker::widget([
@@ -173,5 +169,5 @@ if ($started) {
             ]);
             echo '</div>';?>
 		</div><br class="form" />
-    </form><br><br>
+    </form><br>
 </div>

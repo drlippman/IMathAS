@@ -43,11 +43,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <textarea cols=5 rows=12 id=summary name=summary style='width: 100%'>$summary</textarea>
                 </div>
                 </div><br>"; ?>
-        </div><br/>
+        </div><BR class=form><br>
         <div>
             <div class=col-lg-2><?php AppUtility::t('Link type')?> </div>
-                <div class="col-lg-10">
-                    <select id="linktype" name="linktype" onchange="linktypeupdate(this)">
+                <div class="col-lg-4">
+                    <select id="linktype" class="form-control" name="linktype" onchange="linktypeupdate(this)">
                         <option value="text"<?php AssessmentUtility::writeHtmlChecked($a, AppConstant::NUMERIC_ZERO); ?>
                                 onclick="document.getElementById('textinput').style.display='block';">Page of text
                         </option>
@@ -62,18 +62,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         </option>
                     </select>
                 </div>
-        </div><br/>
+        </div><BR class=form>
 
-    <div style="padding-top: 20px">
-    <div id="textinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_ZERO) ? "block" : "none"; ?>">
-        <div class="col-lg-2">Text</div>
+    <div id="textinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_ZERO) ? "block" : "none"; ?>"><br>
+        <div class="col-lg-2"><?php AppUtility::t('Text')?></div>
         <?php $text = $checkboxesValues['text'];?>
         <div class="col-lg-10">
             <div class=editor>
                 <textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']); ?><?php echo $text ?></textarea>
             </div>
         </div>
-    </div></div>
+    </div><BR class=form>
 
     <div id="webinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
         <div class="col-lg-2"><?php AppUtility::t('Weblink (start with http://)')?></div>
@@ -102,81 +101,83 @@ $this->params['breadcrumbs'][] = $this->title;
    <div id="toolinput""
     <div id="fileinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_THREE) ? "block" : "none"; ?>">
         <div class="col-lg-2"><?php AppUtility::t('External Tool')?></div>
-    			<div class="col-lg-10">
+    			<div class="col-lg-4">
     		<?php
                 $selectedtool = array();
                 array_push($selectedtool,$toollabels);
                 if (count($toolvals) > 0) {
                     AssessmentUtility::writeHtmlSelect('tool', $toolvals, $toollabels, $selectedtool);
-                    echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="' . htmlentities($toolcustom) . '" /><br/>';
+                    echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="' . htmlentities($toolcustom) . '" /><br/><br>';
                     echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="' . htmlentities($toolcustomurl) . '" /><br/>';
                 } else {
-                    echo 'No Tools defined yet<br/>';
+                    echo 'No Tools defined yet<br/><br>';
                 }
                 if (!isset($CFG['GEN']['noInstrExternalTools'])) {
                     echo '<a href="../admin/externaltools.php?cid=' . $cid . '&amp;ltfrom=' . $_GET['id'] . '">Add or edit an external tool</a>';
                 }
                 ?>
-    			</div><br class="form"/>
+    			</div><br class="form"/><br>
         <div class="col-lg-2"><?php AppUtility::t('If this tool returns scores, do you want to record them?')?></div>
     			<div class="col-lg-10">
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="usegbscore" value="0" <?php if ($checkboxesValues['points'] == 0) {  echo 'checked=1'; } ?> onclick="toggleGBdetail(false)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
-                    <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="usegbscore" value="1" <?php if ($checkboxesValues['points'] > 0) { echo 'checked=1';} ?> onclick="toggleGBdetail(true)"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes')?></td></div>
-    			</div><br class="form"/>
+                    <input type=radio name="usegbscore" value="0" <?php if ($checkboxesValues['points'] == 0) {  echo 'checked=1'; } ?> onclick="toggleGBdetail(false)"/><span class="padding-left"><?php AppUtility::t('No')?></span><br>
+                    <input type=radio name="usegbscore" value="1" <?php if ($checkboxesValues['points'] > 0) { echo 'checked=1';} ?> onclick="toggleGBdetail(true)"/><span class="padding-left"><?php AppUtility::t('Yes')?></span>
+    			</div><br class="form"/><br>
 
         <div id="gbdetail" <?php if ($checkboxesValues['points'] == 0) {
             echo 'style="display:none;"';
         } ?>>
             <div class="col-lg-2"><?php AppUtility::t('Points')?></div>
     			<div class="col-lg-10">
-    				<input type=text size=4 name="points" value="<?php echo $checkboxesValues['points'];?>"/><?php AppUtility::t('points')?>     			</div><br class="form"/>
+    				<input type=text size=4 name="points" value="<?php echo $checkboxesValues['points'];?>"/><span class="padding-left"><?php AppUtility::t('points')?></span>
+                </div><br class="form"/><br>
 
             <div class=col-lg-2><?php AppUtility::t('Gradebook Category')?></div>
-                    <div class=col-lg-10>
+                    <div class=col-lg-4>
                         <?php AssessmentUtility::writeHtmlSelect("gbcat",$gbcatsId,$gbcatsLabel,$valuesOfcheckBoxes['gbcat'],"Default",0); ?>
-                    </div><br class=form>
+                    </div><br class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Count')?> </div>
 			<div class="col-lg-10">
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="cntingb" value="1"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],1,0); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Count in Gradebook')?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="cntingb" value="0"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],0,0); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Don't count in grade total and hide from students")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="cntingb" value="3"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],3,0); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Don't count in grade total")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="cntingb" value="2"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],2,0); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Count as Extra Credit")?></td></div>
-			</div><br class=form>
+                <input type=radio name="cntingb" value="1"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],1,0); ?>/><span class="padding-left"><?php AppUtility::t('Count in Gradebook')?></span><br>
+                <input type=radio name="cntingb" value="0"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],0,0); ?>/><span class="padding-left"><?php AppUtility::t("Don't count in grade total and hide from students")?></span><br>
+                <input type=radio name="cntingb" value="3"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],3,0); ?>/><span class="padding-left"><?php AppUtility::t("Don't count in grade total")?></span><br>
+                <input type=radio name="cntingb" value="2"<?php AssessmentUtility::writeHtmlChecked($checkboxesValues['cntingb'],2,0); ?>/><span class="padding-left"><?php AppUtility::t("Count as Extra Credit")?></span>
+			</div><br class=form><br>
+
             <?php $page_tutorSelect['label'] = array("No access to scores","View Scores","View and Edit Scores");
             $page_tutorSelect['val'] = array(2,0,1); ?>
 
             <div class="col-lg-2"><?php AppUtility::t('Tutor Access')?></div>
-				<div class="col-lg-10">
+				<div class="col-lg-4">
                     <?php
                     AssessmentUtility::writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],$checkboxesValues['tutoredit']);
                     echo '<input type="hidden" name="gradesecret" value="'.$checkboxesValues['gradesecret'].'"/>';
                     ?>
 			</div><br class="form" />
         </div>
-    </div>
+    </div><br class="form"/>
         <div class=col-lg-2><?php AppUtility::t('Open page in')?> </div>
             <div class=col-lg-10>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="open-page-in" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ZERO); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Current window/tab")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="open-page-in" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ONE); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("New window/tab")?></td></div>
-            </div><br class="form"/>
+                <input type=radio name="open-page-in" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t("Current window/tab")?></span><br>
+                <input type=radio name="open-page-in" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['open-page-in'], AppConstant::NUMERIC_ONE); ?>  /><span class="padding-left"><?php AppUtility::t("New window/tab")?></span>
+            </div><br class="form"/><br class="form"/>
 
         <div class=col-lg-2><?php AppUtility::t('Visibility')?></div>
             <div class=col-lg-10>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Hide")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datedivwithcalendar').style.display='block';document.getElementById('datediv').style.display='none';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Show by Dates")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="avail"  value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='block';"/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Show Always")?></td></div>
-            </div><br class="form"/>
+                <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_ONE); ?>onclick="document.getElementById('datedivwithcalendar').style.display='block';document.getElementById('datediv').style.display='none';"/><span class="padding-left"><?php AppUtility::t("Show by Dates")?></span>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_ZERO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='none';"/><span class="padding-left"><?php AppUtility::t("Hide")?></span></label>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail"  value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['avail'], AppConstant::NUMERIC_TWO); ?> onclick="document.getElementById('datedivwithcalendar').style.display='none';document.getElementById('datediv').style.display='block';"/><span class="padding-left"><?php AppUtility::t("Show Always")?></span>
+            </div><br class="form"/><br>
 
     <div id="datedivwithcalendar"
         style="display:<?php echo ($assessmentData['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
         <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
 
 			<div class=col-lg-10>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="available-after" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Always until end date")?></td></div>
-                <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
+                <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/><span class="pull-left padding-left"><?php AppUtility::t("Always until end date")?></span>
+                <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
-                    echo '<div class = "pull-left col-lg-4 time-input">';
+                    echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -188,8 +189,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>'; ?>
                     <?php
-                    echo '<label class="end pull-left col-lg-1"> at </label>';
-                    echo '<div class="pull-left col-lg-6">';
+                    echo '<label class="end pull-left non-bold"> at </label>';
+                    echo '<div class="pull-left col-lg-4">';
 
                     echo TimePicker::widget([
                         'name' => 'stime',
@@ -201,15 +202,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]);
                     echo '</div>'; ?>
                 </div>
-        	</div><BR class=form>
+        	<BR class=form><br>
 
         <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
 		  <div class=col-lg-10>
-              <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td> <input type=radio name="available-until" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 0); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t("Always after start date")?></td></div>
-              <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible pull-left'><td> <input type=radio name="available-until" class="pull-left" value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 1); ?>/><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td>
-
+              <label class="pull-left non-bold"><input type=radio name="available-until" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 0); ?>/><span class="padding-left"><?php AppUtility::t("Always after start date")?></span></label>
+              <label class="pull-left" style="padding-left: 32px"><input type=radio name="available-until" class="pull-left" value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate, "2000000000", 1); ?>/></label>
                 <?php
-                echo '<div class = "pull-left col-lg-4 time-input">';
+                echo '<div class = "time-input pull-left col-lg-4">';
                 echo DatePicker::widget([
                     'name' => 'edate',
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -221,8 +221,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]);
                 echo '</div>'; ?>
                 <?php
-                echo '<label class="end pull-left col-lg-1"> at </label>';
-                echo '<div class="pull-left col-lg-6">';
+                echo '<label class="end pull-left non-bold"> at </label>';
+                echo '<div class="pull-left col-lg-4">';
 
                 echo TimePicker::widget([
                     'name' => 'etime',
@@ -234,24 +234,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]);
                 echo '</div>'; ?>
               </div>
-		  </div><BR class=form>
+		  <BR class=form>
 
         <div class=col-lg-2><?php AppUtility::t('Place on Calendar?')?></div>
 		 <div class=col-lg-10>
-             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'],AppConstant::NUMERIC_ZERO); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
-             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ONE); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></td></div>
-             <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar"  value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ZERO); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t(' Yes, on Available until date')?></td></div>
-             <br><?php AppUtility::t('With tag')?><input type="text" size="3" value="!" name="tag">
-         </div><br class="form"/>
+             <input type=radio name="place-on-calendar" value="0" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'],AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
+             <input type=radio name="place-on-calendar" value="1" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ONE); ?>  /><span class="padding-left"><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></span><br>
+             <input type=radio name="place-on-calendar"  value="2" <?php AssessmentUtility::writeHtmlChecked($forumData['altoncal'], AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t(' Yes, on Available until date')?></span>
+             <br><?php AppUtility::t('With tag')?><span class="padding-left"><input type="text" size="3" value="!" name="tag"></span>
+         </div><br class="form"/><br>
     </div>
     <div id="datediv" style="display:<?php echo ($assessmentData['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
         <div class=col-lg-2><?php AppUtility::t('Place on Calendar?')?></div>
 		<div class=col-lg-10>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar" value="0" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'],AppConstant::NUMERIC_ZERO); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('No')?></td></div>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar" value="1" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'], AppConstant::NUMERIC_ONE); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></td></div>
-            <div class='radio student-enroll visibility override-hidden'><label class='checkbox-size label-visibility label-visible'><td><input type=radio name="place-on-calendar" value="2" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'] , AppConstant::NUMERIC_ZERO); ?>  /><span class='cr'><i class='cr-icon fa fa-check'></i></span></label></td><td><?php AppUtility::t('Yes, on Available until date')?></td></div>
-            <br><?php AppUtility::t('With tag')?><input type="text" size="3" value="!" name="tag">
-        </div><br class="form"/>
+            <input type=radio name="place-on-calendar" value="0" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'],AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
+            <input type=radio name="place-on-calendar" value="1" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'], AppConstant::NUMERIC_ONE); ?>  /><span class="padding-left"><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></span><br>
+            <input type=radio name="place-on-calendar" value="2" <?php AssessmentUtility::writeHtmlChecked($checkboxesValues['altoncal'] , AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t('Yes, on Available until date')?></span>
+            <br><?php AppUtility::t('With tag')?><span class="padding-left"><input type="text" size="3" value="!" name="tag"></span>
+        </div><br class="form"/><br>
     </div>
 
     <?php if (count($pageOutcomesList) > 0) { ?>
