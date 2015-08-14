@@ -107,10 +107,10 @@ class QuestionSet extends BaseImasQuestionset
          return QuestionSet::findOne(['id' => $id]);
     }
 
-    public static function setHasImage($id){
+    public static function setHasImage($id,$no){
         $data = QuestionSet::getQuestionDataById($id);
         if($data){
-            $data->hasimg = AppConstant::NUMERIC_ZERO;
+            $data->hasimg = $no;
             $data->save();
         }
     }
@@ -139,5 +139,12 @@ class QuestionSet extends BaseImasQuestionset
         $this->solutionopts = isset($params['solutionopts']) ? $params['solutionopts'] : null;
         $this->save();
         return $this->id;
+    }
+
+    public static function getByQSetIdJoin($id){
+        $query = "SELECT imas_questionset.*,imas_users.groupid FROM imas_questionset,imas_users WHERE ";
+        $query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$id";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
     }
 } 

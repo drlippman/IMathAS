@@ -179,7 +179,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 		}
 	}
 }
-function storeuploadedqimage($id,$key,$sec="public-read") {
+public static function storeuploadedqimage($id,$key,$sec="public-read") {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";

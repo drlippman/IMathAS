@@ -16,14 +16,14 @@ use yii\db\Query;
 
 class Questions extends BaseImasQuestions
 {
-    public static function getByAssessmentId($id)
+    public static function getByAssessmentId($aid)
     {
-        return static::findAll(['assessmentid' => $id]);
+        return static::findAll(['assessmentid' => $aid]);
     }
 
     public static function getById($id)
     {
-        return static::findAll(['id' => $id]);
+        return static::findOne(['id' => $id]);
     }
 
     public static function findQuestionForOuctome($dataId)
@@ -241,4 +241,21 @@ class Questions extends BaseImasQuestions
         $data = $command->queryAll();
         return count($data);
     }
+
+    public static function setQuestionSetIdById($qSetId, $id){
+        $data = Questions::getById($id);
+        if($data){
+            $data->questionsetid = $qSetId;
+            $data->save();
+        }
+    }
+
+    public static function getQidCount($userId,$qSetId){
+        $query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='$qSetId' AND imas_courses.ownerid<>'$userId'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+
 }

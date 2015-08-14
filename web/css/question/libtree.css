@@ -1,0 +1,67 @@
+ul.base {
+	margin-left: 20px;
+	list-style-type: none;
+	border-left: 1px dashed #00f;
+	padding-left: 5px;
+}
+
+ul.base ul {
+	margin-left: 20px;
+	border-left: 1px dashed #06f;
+	list-style-type: none;
+	padding-left: 5px;
+}
+ul.base ul ul {
+	border-left: 1px dashed #0bf;
+}
+ul.base ul ul ul {
+	border-left: 1px dashed #0cc;
+}
+ul.base ul ul ul ul {
+	border-left: 1px dashed #0c6;
+}
+ul.show {
+	display: list-item;
+}
+ul.hide {
+	display: none;
+}
+ul.base {
+	margin-top: 0px;
+	margin-left: 20px;
+}
+span.hdr {
+	cursor: pointer;
+}
+span.btn {
+	font-family: monospace;
+	font-size: 9px;
+	margin-left: 4px;
+	color: blue;
+	padding-left: 2px;
+	padding-right: 2px;
+	border: 1px solid;
+}
+span.dd {
+	font-family: monospace;
+	color: blue;
+}
+span.r0 {
+	color: #c00;
+}
+span.r1 {
+	color: #6c6;
+}
+span.r2 {
+	color: #0c0;
+}
+span.r4 {
+	color: #999;
+}
+span.r5 {
+	color: #060;
+}
+span.r8 {
+	color: #000;
+}
+		

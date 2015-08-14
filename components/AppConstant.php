@@ -164,5 +164,9 @@ class AppConstant
     const NUMERIC_TWO_THOUSAND = 2000;
     const NUMERIC_TRIPLE_NINE =999;
     const QUARTER_NINE = 9999;
-
+    const Question_OUTPUT_MSG1 = " Local copy of Question Created ";
+    const Question_OUTPUT_MSG2 = " Question Added to QuestionSet. ";
+    const IMAGE_FILE_ERROR1 = "<p>Need to specify variable for image to be referenced by</p>";
+    const IMAGE_FILE_ERROR2 = "is not an allowed variable name";
+    const QUESTION_DESCRIPTION = "Enter description here";
 }

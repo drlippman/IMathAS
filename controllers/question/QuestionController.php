@@ -20,7 +20,7 @@ use app\models\LibraryItems;
 use app\models\Outcomes;
 use app\models\QImages;
 use app\models\Questions;
-
+use app\models\User;
 use app\models\QuestionSet;
 use app\models\SetPassword;
 use app\models\Student;
@@ -28,6 +28,8 @@ use app\models\StuGroupSet;
 use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
+//use app\models\User;
+
 class QuestionController extends AppController
 {
     public function actionAddQuestions()
@@ -842,7 +844,9 @@ class QuestionController extends AppController
     public function actionModDataSet(){
         $user = $this->getAuthenticatedUser();
         $myRights = $user['rights'];
+        $userFullName = $user['FirstName'] . ' ' . $user['LastName'];
         $groupId = $user['groupid'];
+        $userdeflib = $user['deflib'];
         $params = $this->getRequestParams();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
@@ -1010,7 +1014,7 @@ class QuestionController extends AppController
                         QImages::deleteById($row['id']);
                         $imgcnt--;
                         if ($imgcnt == AppConstant::NUMERIC_ZERO) {
-                            QuestionSet::setHasImage($params['id']);
+                            QuestionSet::setHasImage($params['id'], AppConstant::NUMERIC_ZERO);
                         }
                     } else if ($row['var']!=$params['imgvar-'.$row['id']] || $row['alttext']!=$params['imgalt-'.$row['id']]) {
                         $newvar = str_replace('$','',$params['imgvar-'.$row['id']]);
@@ -1077,9 +1081,278 @@ class QuestionController extends AppController
                 $qsetid = $questionSet->createQuestionSet($questionSetArray);
                 $params['id'] = $qsetid;
 
+                if (isset($params['templateid'])) {
+                    $query = QImages::getByQuestionSetId($params['templateid']);
+                    foreach ($query as $row) {
+                        if (!isset($params['delimg-'.$row['id']])) {
+                            $qImage = new QImages();
+                            $qImage->createQImages($qsetid,$row);
+                        }
+                    }
+                }
+
+                if (isset($params['makelocal'])) {
+                    Questions::setQuestionSetIdById($qsetid, $params['makelocal']);
+                    $outputmsg .= AppConstant::Question_OUTPUT_MSG1;
+                    $frompot = AppConstant::NUMERIC_ZERO;
+                } else {
+                    $outputmsg .= AppConstant::Question_OUTPUT_MSG2;
+                    $frompot = AppConstant::NUMERIC_ONE;
+                }
+            }
+            //upload image files if attached
+            if ($_FILES['imgfile']['name']!='') {
+                $disallowedvar = array('link','qidx','qnidx','seed','qdata','toevalqtxt','la','GLOBALS','laparts','anstype','kidx','iidx','tips','options','partla','partnum','score');
+                if (trim($params['newimgvar'])=='') {
+                    $errmsg .= AppConstant::IMAGE_FILE_ERROR1;
+                } else if (in_array($params['newimgvar'],$disallowedvar)) {
+                    $errmsg .= $newvar. AppConstant::IMAGE_FILE_ERROR2 ;
+                } else {
+                    $uploaddir = AppConstant::UPLOAD_DIRECTORY.'/qimages/';
+                    $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['imgfile']['name']));
+                    $filename = $userfilename;
+
+                    $result_array = getimagesize($_FILES['imgfile']['tmp_name']);
+                    if ($result_array === false) {
+                        $errmsg .= "<p>File is not image file</p>";
+                    } else {
+                        if (($filename= filehandler::storeuploadedqimage('imgfile',$filename))!==false) {
+                            $params['newimgvar'] = str_replace('$','',$params['newimgvar']);
+                            $filename = addslashes($filename);
+                            $questImageData  = array();
+                            $questionSetArray['var'] = $params['newimgvar'];
+                            $questionSetArray['filename'] = $filename;
+                            $questionSetArray['alttext'] = $params['newimgalt'];
+                            $qImage = new QImages();
+                            $qImage->createQImages($qsetid,$questImageData);
+                            QuestionSet::setHasImage($qsetid, AppConstant::NUMERIC_ONE);
+                        } else {
+                            echo "<p>Error uploading image file!</p>\n";
+                            exit;
+                        }
+                    }
+                }
+            }
+            //update libraries
+            $newlibs = explode(",",$params['libs']);
+
+            if (in_array(AppConstant::ZERO_VALUE,$newlibs) && count($newlibs)> AppConstant::NUMERIC_ONE) {
+                array_shift($newlibs);
+            }
+
+            if ($params['libs']=='') {
+                $newlibs = array();
+            }
+            $libraryData = LibraryItems::getByGroupId($groupId, $qsetid,$user['id'],$isGrpAdmin,$isAdmin);
+            $existing = array();
+            foreach($libraryData as $row) {
+                $existing[] = $row['libid'];
+            }
+
+            $toadd = array_values(array_diff($newlibs,$existing));
+            $toremove = array_values(array_diff($existing,$newlibs));
+
+            while(count($toremove)>AppConstant::NUMERIC_ZERO && count($toadd)>AppConstant::NUMERIC_ZERO) {
+                $tochange = array_shift($toremove);
+                $torep = array_shift($toadd);
+                LibraryItems::setLibId($torep,$qsetid,$tochange);
+            }
+            if (count($toadd)>AppConstant::NUMERIC_ZERO) {
+                foreach($toadd as $libid) {
+                    $libArray = array();
+                    $libArray['libid'] = $libid;
+                    $libArray['qsetid'] = $qsetid;
+                    $libArray['ownerid'] = $user['id'];
+                    $lib = new LibraryItems();
+                    $lib->createLibraryItems($libArray);
+                }
+            } else if (count($toremove)>AppConstant::NUMERIC_ZERO) {
+                foreach($toremove as $libid) {
+                    LibraryItems::deleteLibraryItems($libid,$qsetid);
+                }
+            }
+            if (count($newlibs)==AppConstant::NUMERIC_ZERO) {
+                $query = LibraryItems::getByQid($qsetid);
+                if (count($query)==AppConstant::NUMERIC_ZERO) {
+                    $libArray = array();
+                    $libArray['libid'] = AppConstant::NUMERIC_ZERO;
+                    $libArray['qsetid'] = $qsetid;
+                    $libArray['ownerid'] = $user['id'];
+                    $lib = new LibraryItems();
+                    $lib->createLibraryItems($libArray);
+                }
+            }
+            if (!isset($params['aid'])) {
+                $outputmsg .= "<a href=".AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId).">Return to Question Set Management</a>\n";
+            } else {
+                if ($frompot==AppConstant::NUMERIC_ONE) {
+                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid.'&cid='.$courseId.'&aid='.$params['aid'].'&process=true&usedef=true').">Add Question to Assessment using Defaults</a> | \n";
+                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid.'&cid='.$courseId.'&aid='.$params['aid']).">Add Question to Assessment</a> | \n";
+                }
+                $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']).">Return to Assessment</a>\n";
+            }
+            if ($params['test']=="Save and Test Question") {
+                $outputmsg .= "<script>addr = '".AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId.'&qsetid='.$params['id'])."';";
+                $outputmsg .= "previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));\n";
+                $outputmsg .= "previewpop.focus();";
+                $outputmsg .= "</script>";
+            } else {
+                if ($errmsg == '' && !isset($params['aid'])) {
+                    AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId);
+                } else if ($errmsg == '' && $frompot==AppConstant::NUMERIC_ZERO) {
+                    AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']);
+                } else {
+                    echo $errmsg;
+                    echo $outputmsg;
+                }
+                exit;
             }
         }
-        return  $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
+        $myname = $user['LastName'].','.$user['FirstName'];
+        if (isset($params['id'])) {
+            $line = QuestionSet::getByQSetIdJoin($params['id']);
+            $myq = ($line['ownerid']==$user['id']);
+            if ($isAdmin || ($isGrpAdmin && $line['groupid']==$groupId) || ($line['userights']==AppConstant::NUMERIC_THREE && $line['groupid']==$groupId) || $line['userights']>AppConstant::NUMERIC_THREE) {
+                $myq = true;
+            }
+            $namelist = explode(", mb ",$line['author']);
+            if ($myq && !in_array($myname,$namelist)) {
+                $namelist[] = $myname;
+            }
+            if (isset($params['template'])) {
+                $author = $myname;
+                $myq = true;
+            } else {
+                $author = implode(", mb ",$namelist);
+            }
+            foreach ($line as $k=>$v) {
+                $line[$k] = str_replace('&','&amp;',$v);
+            }
+
+            $inlibs = array();
+            if($line['extref']!='') {
+                $extref = explode('~~',$line['extref']);
+            } else {
+                $extref = array();
+            }
+            $images = array();
+            $images['vars'] = array();
+            $images['files'] = array();
+            $images['alttext'] = array();
+            if ($line['hasimg']>AppConstant::NUMERIC_ZERO) {
+                $query = QImages::getByQuestionSetId($params['id']);
+                foreach ($query as $row) {
+                    $images['vars'][$row['id']] = $row['var'];
+                    $images['files'][$row['id']] = $row['filename'];
+                    $images['alttext'][$row['id']] = $row['alttext'];
+                }
+            }
+            if (isset($params['template'])) {
+                $deflib = $user['deflib'];
+                $usedeflib = $user['usedeflib'];
+
+                if (isset($params['makelocal'])) {
+                    $inlibs[] = $deflib;
+                    $line['description'] .= " (local for $userFullName)";
+                } else {
+                    $line['description'] .= " (copy by $userFullName)";
+                    if ($usedeflib==AppConstant::NUMERIC_ONE) {
+                        $inlibs[] = $deflib;
+                    } else {
+                        $query = Libraries::getByQSetId($params['id']);
+                        foreach ($query as $row) {
+                            if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$user['id']) {
+                                $inlibs[] = $row['id'];
+                            }
+                        }
+                    }
+                }
+                $locklibs = array();
+                $addmod = "Add";
+                $line['userights'] = $user['qrightsdef'];
+
+            } else {
+                $query = LibraryItems::getDestinctLibIdByIdAndOwner($groupId,$params['id'],$user['id'],$isGrpAdmin,$isAdmin);
+                foreach ($query as $row) {
+                    $inlibs[] = $row['libid'];
+                }
+
+                $locklibs = array();
+                if (!$isAdmin) {
+                    $query = LibraryItems::getLibIdByQidAndOwner($groupId,$params['id'],$user['id'],$isGrpAdmin,$isAdmin);
+                    foreach ($query as $row) {
+                        $locklibs[] = $row['libid'];
+                    }
+                }
+                $addmod = "Modify";
+                $inusecnt = Questions::getQidCount($user['id'],$params['id']);
+            }
+
+            if (count($inlibs)==AppConstant::NUMERIC_ZERO && count($locklibs)==AppConstant::NUMERIC_ZERO) {
+                $inlibs = array(AppConstant::NUMERIC_ZERO);
+            }
+            $inlibs = implode(",",$inlibs);
+            $locklibs = implode(",",$locklibs);
+
+            $twobx = ($line['qcontrol']=='' && $line['answer']=='');
+
+            $line['qtext'] = preg_replace('/<span class="AM">(.*?)<\/span>/','$1',$line['qtext']);
+        } else {
+            $myq = true;
+            $twobx = true;
+            $line['description'] = AppConstant::QUESTION_DESCRIPTION;
+            $line['userights'] = $user['qrightsdef'];
+            $line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
+            $line['qtype'] = "number";
+            $line['control'] = '';
+            $line['qcontrol'] = '';
+            $line['qtext'] = '';
+            $line['answer'] = '';
+            $line['solution'] = '';
+            $line['solutionopts'] = AppConstant::NUMERIC_SIX;
+            $line['hasimg'] = AppConstant::NUMERIC_ZERO;
+            $line['deleted'] = AppConstant::NUMERIC_ZERO;
+            $line['replaceby'] = AppConstant::NUMERIC_ZERO;
+            if (isset($params['aid']) && isset($sessiondata['lastsearchlibs'.$params['aid']])) {
+                $inlibs = $sessiondata['lastsearchlibs'.$params['aid']];
+            } else if (isset($sessiondata['lastsearchlibs'.$courseId])) {
+                $inlibs = $sessiondata['lastsearchlibs'.$courseId];
+            } else {
+                $inlibs = $userdeflib;
+            }
+            $locklibs='';
+            $images = array();
+            $extref = array();
+            $author = $myname;
+            $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
+            if (!isset($params['id']) || isset($params['template'])) {
+                $query = Libraries::getByIdList($inlibssafe);
+                foreach ($query as $row) {
+                    if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$user['id']) {
+                        $oklibs[] = $row['id'];
+                    }
+                }
+                if (count($oklibs)>AppConstant::NUMERIC_ZERO) {
+                    $inlibs = implode(",",$oklibs);
+                } else {$inlibs = AppConstant::ZERO_VALUE;}
+            }
+            $addmod = "Add";
+        }
+        $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
+
+        $lnames = array();
+        if (substr($inlibs,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE)===AppConstant::ZERO_VALUE) {
+            $lnames[] = "Unassigned";
+        }
+        $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
+        $query = Libraries::getByIdList($inlibssafe);
+        foreach ($query as $row) {
+            $lnames[] = $row['name'];
+        }
+        $lnames = implode(", ",$lnames);
+        $this->includeJS(['editor/tiny_mce.js','ASCIIMathTeXImg_min.js']);
+        $renderData = array('course' => $course,'addMode'=>$addmod);
+        return  $this->renderWithData('modDataSet',$renderData);
     }
 
     public function stripsmartquotes($text) {
@@ -1087,12 +1360,6 @@ class QuestionController extends AppController
             array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
             array("'", "'", '"', '"', '-', '--', '...'),
             $text);
-        // Next, replace their Windows-1252 equivalents.
-        //removed - was messing with unicode
-        /*$text = str_replace(
-            array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
-            array("'", "'", '"', '"', '-', '--', '...'),
-            $text);*/
         return $text;
     }
 
@@ -1120,5 +1387,9 @@ class QuestionController extends AppController
             $vidid = str_replace(array(" ","\n","\r","\t"),'',$vidid);
         }
         return $vidid;
+    }
+
+    public function actionModTutorialQuestion(){
+
     }
 }
