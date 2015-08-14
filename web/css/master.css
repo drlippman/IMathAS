@@ -241,7 +241,10 @@ body {
     padding-left: 1%;
 }
 .back-arrow{
-    padding-top: 0;
+    width:24px;
+    height: 24px;
+    margin-right: 10px;
+    margin-top: 5px;
 }
 .back-text{
     padding-top: 0;

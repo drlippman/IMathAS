@@ -51,6 +51,7 @@ class ForumController extends AppController
         $this->setSessionData('postCount',$countPost);
         $forum = Forums::getByCourseId($cid);
         $course = Course::getById($cid);
+        $IsNewPost = $this->getParamVal('newpost');
         $user = $this->getAuthenticatedUser();
         $model = new ForumForm();
         $model->thread = 'subject';
@@ -58,7 +59,7 @@ class ForumController extends AppController
         $this->includeJS(['forum/forum.js', 'general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $this->setReferrer();
         $this->includeCSS(['course/course.css']);
-        $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user, 'course' => $course);
+        $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user, 'course' => $course,'IsNewPost' => $IsNewPost);
         return $this->renderWithData('forum', $responseData);
     }
 
@@ -107,76 +108,123 @@ class ForumController extends AppController
     {
         $this->guestUserHandler();
         $currentTime = time();
+        $currentUser = $this->getAuthenticatedUser();
         $param = $this->getRequestParams();
         $cid = $param['cid'];
+        $newPost = $param['newPost'];
         $sort = AppConstant::DESCENDING;
         $orderBy = 'id';
+        $threadArray = array();
         $forums = Forums::getByCourseIdOrdered($cid, $sort, $orderBy);
         $user = $this->getAuthenticatedUser();
         $NewPostCounts = Thread::findNewPostCnt($cid,$user);
-        if ($forums)
+        if($newPost)
         {
-           $forumArray = array();
-            foreach ($forums as $key => $forum)
+            foreach($NewPostCounts as $newPost)
             {
-                $threadCount = ForumThread::findThreadCount($forum['id']);
-                $postCount = count($forum->imasForumPosts);
-                $lastObject = '';
-                if ($postCount > AppConstant::NUMERIC_ZERO) {
-                    $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
-                }
-                $flag = 0;
-                foreach($NewPostCounts as $count)
+                $threads = ThreadForm::thread($newPost['forumid']);
+                foreach($threads as $thread)
                 {
-                    if($count['forumid'] == $forum['id'] ){
-                        $tempArray = array
+                    $username = User::getById($thread['userid']);
+                    $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
+                    if ($thread['postdate'] >= $lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id)
+                    {
+                        $temparray = array
                         (
-                            'forumId' => $forum['id'],
-                            'forumName' => $forum['name'],
-                            'threads' => count($threadCount),
-                            'posts' => $postCount,
-                            'currentTime' => $currentTime,
-                            'endDate' => $forum['enddate'],
-                            'rights' => $user['rights'],
-                            'avail' => $forum['avail'],
-                            'startDate' => $forum['startdate'],
-                            'countId' => $count['forumid'],
-                            'count' =>$count['COUNT(imas_forum_threads.id)'],
-                            'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                            'parent' => $thread['parent'],
+                            'threadId' => $thread['threadid'],
+                            'forumiddata' => $thread['forumid'],
+                            'subject' => $thread['subject'],
+                            'replyby' => $thread['replyby'],
+                            'postdate' => date('F d, o g:i a', $thread['postdate']),
+                            'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
+                            'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
+                            'userright' => $currentUser['rights'],
+                            'postUserId' => $username->id,
+                            'currentUserId' => $currentUser['id'],
+                            'posttype' => $thread['posttype'],
+                            'isanon' => $thread['isanon'],
+
                         );
-                        $flag = 1;
-                        array_push($forumArray, $tempArray);
+
+                        array_push($threadArray, $temparray);
                     }
 
-             }
-             if($flag == 0){
-
-                $tempArray = array
-                (
-                    'forumId' => $forum['id'],
-                    'forumName' => $forum['name'],
-                    'threads' => count($threadCount),
-                    'posts' => $postCount,
-                    'currentTime' => $currentTime,
-                    'endDate' => $forum['enddate'],
-                    'rights' => $user['rights'],
-                    'avail' => $forum['avail'],
-                    'startDate' => $forum['startdate'],
-                    'countId' => AppConstant::NUMERIC_ZERO,
-                    'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
-                );
-                 array_push($forumArray, $tempArray);
+                }
             }
-        }
-            $this->includeCSS(['forums.css']);
-            $this->includeJS(['forum/forum.js']);
-            return $this->successResponse($forumArray);
-
+            $this->redirect(array('new-post', 'courseId' => $cid, 'threadArray' => $threadArray));
         }
         else
         {
-            return $this->terminateResponse('No data');
+            if ($forums)
+            {
+               $forumArray = array();
+                foreach ($forums as $key => $forum)
+                {
+                    $threadCount = ForumThread::findThreadCount($forum['id']);
+                    $postCount = count($forum->imasForumPosts);
+                    $lastObject = '';
+                    if ($postCount > AppConstant::NUMERIC_ZERO) {
+                        $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
+                    }
+                    $flag = 0;
+                    foreach($NewPostCounts as $count)
+                    {
+                        if($count['forumid'] == $forum['id'] ){
+                            $tempArray = array
+                            (
+                                'forumId' => $forum['id'],
+                                'forumName' => $forum['name'],
+                                'threads' => count($threadCount),
+                                'posts' => $postCount,
+                                'currentTime' => $currentTime,
+                                'endDate' => $forum['enddate'],
+                                'rights' => $user['rights'],
+                                'avail' => $forum['avail'],
+                                'startDate' => $forum['startdate'],
+                                'countId' => $count['forumid'],
+                                'count' =>$count['COUNT(imas_forum_threads.id)'],
+                                'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                            );
+                            $flag = 1;
+                            array_push($forumArray, $tempArray);
+                        }
+                 }
+                 if($flag == 0){
+
+                    $tempArray = array
+                    (
+                        'forumId' => $forum['id'],
+                        'forumName' => $forum['name'],
+                        'threads' => count($threadCount),
+                        'posts' => $postCount,
+                        'currentTime' => $currentTime,
+                        'endDate' => $forum['enddate'],
+                        'rights' => $user['rights'],
+                        'avail' => $forum['avail'],
+                        'startDate' => $forum['startdate'],
+                        'countId' => AppConstant::NUMERIC_ZERO,
+                        'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                    );
+                     array_push($forumArray, $tempArray);
+                }
+            }
+                $this->includeCSS(['forums.css']);
+                $this->includeJS(['forum/forum.js']);
+                    return $this->successResponse($forumArray);
+            }
         }
+    }
+
+    public function actionNewPost()
+    {
+        $this->guestUserHandler();
+        $this->layout = 'master';
+        $user = $this->getAuthenticatedUser();
+        $newPostData = $this->getRequestParams();
+        $course = Course::getById($newPostData['courseId']);
+        $this->includeCSS(['forums.css']);
+        return $this->renderWithData('newPost',['threadArray' => $newPostData['threadArray'],'course' => $course,'users' => $user]);
     }
 
     /*
@@ -269,7 +317,8 @@ class ForumController extends AppController
                     {
                         $isReplies = AppConstant::NUMERIC_ONE;
                     }
-                    if ($thread['postdate'] >= $lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id) {
+                    if ($thread['postdate'] >= $lastView[AppConstant::NUMERIC_ZERO]['lastview'] && $currentUser['id'] != $username->id)
+                    {
                         $temparray = array
                         (
                             'parent' => $thread['parent'],

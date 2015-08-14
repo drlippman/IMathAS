@@ -32,6 +32,7 @@ $now = $currentTime;
     }?>
 </div>
 <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
+<input type="hidden" id="new-post" value="<?php echo $IsNewPost ?>">
 <div class="tab-content shadowBox ">
         <div class="forum-background">
         <?php $form = ActiveForm::begin([

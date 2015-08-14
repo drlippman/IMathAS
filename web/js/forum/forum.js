@@ -5,7 +5,8 @@ $('.search-dropdown').click(function(){
 });
 $(document).ready(function ()
 {  var courseId = $('.courseId').val();
-    jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
+    var newPost = $('#new-post').val();
+    jQuerySubmit('get-forums-ajax', {cid: courseId,newPost:newPost}, 'forumsSuccess');
     $('#search-thread').hide();
     $('#search-post').hide();
     $('#result').hide();

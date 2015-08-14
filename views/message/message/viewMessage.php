@@ -20,13 +20,13 @@ $now = $currentTime;
 
 <?php } ?>
     <div class="item-detail-header">
-            <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+            <?php echo $this->render("../../itemHeader/_indexWithBackArrowButton", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
 
     </div>
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+                <div class="vertical-align title-page page-title-back-arrow"><span style="font-size: 10px">Back</span>&nbsp;&nbsp;<?php echo $this->title ?></div>
             </div>
         </div>
     </div>
