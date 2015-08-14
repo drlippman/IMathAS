@@ -955,7 +955,6 @@ input[type=submit].secondarybtn, input[type=button].secondarybtn, button.seconda
 
 .old-password
 {
-
     margin-left: 30%;
 }
 .Submit-btn-change-password{
@@ -1024,3 +1023,10 @@ fieldset legend{
     width: auto;
     border-bottom: 0;
 }
+
+.margin-left-3
+{
+ margin-left: 3px;
+}
+
+

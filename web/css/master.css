@@ -213,6 +213,8 @@ body {
 .notification-alignment{
     background-color: #008E71;
     text-decoration-color: #ffffff;
+    margin-right: 0px;
+    height: 53px;
 }
 .common-navbar #nav .active > a {
     color: #ffffff;
@@ -287,7 +289,7 @@ body {
 
 .navbar-inverse .notification > .open > a, .navbar-inverse .notification > .open > a:hover, .navbar-inverse .notification > .open > a:focus {
     color: #fff;
-    background-color: #008E43;
+    background-color: #008E71;
 }
 .nav-course-icon{
     height: 24px;
@@ -364,12 +366,37 @@ i.fa-home{
 .fc-toolbar .fc-left{
     padding-bottom: 15px;
 }
+
 .nav.myclasses .open > a, .nav.myclasses .open > a:hover, .nav.myclasses .open > a:focus , .nav.notification .open > a, .nav.notification .open > a:hover, .nav.notification .open > a:focus {
     border: 0;
 }
 .myclasses > li > a{
     min-height: 53px;
 }
-.dropdown-menu{
+.dropdown-menu
+{
     min-width: 100%;
 }
+.user-menu{
+    color: #fff;
+    background-color: #1460AA;
+    margin-right: 40px;
+    height: 53px;
+}
+.navbar-inverse .user-menu> .open > a, .navbar-inverse .user-menu > .open > a:hover, .navbar-inverse .user-menu > .open > a:focus
+{
+    color: #fff;
+    background-color: #104E87;
+    /*border: ;*/
+}
+
+.user-menu > li >ul
+{
+    background-color: #104E87;
+}
+.user-menu > li > ul> li >a
+{
+    color: #ffffff;
+
+}
+

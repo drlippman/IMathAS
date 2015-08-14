@@ -21,6 +21,7 @@ $now = $currentTime;
 <?php } ?>
     <div class="item-detail-header">
             <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Message',false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'message/message/index?cid=' . $course->id]]); ?>
+
     </div>
     <div class = "title-container">
         <div class="row">
@@ -38,7 +39,7 @@ $now = $currentTime;
          <div class="row">
 
                  <div class=" col-sm-6 message-title">
-                     <h4><?php echo $messages->title ?></h4>
+                     <h4><b><?php echo $messages->title ?></b></h4>
                   </div>
                  <div class="pull right col-sm-6 message-title ">
                      <?php echo date('M d, o g:i a', $messages->senddate) ?>
@@ -54,7 +55,7 @@ $now = $currentTime;
                  <a href="#" id="mark-delete"><?php echo AppUtility::t('Delete Message')?></a>
              </div>
              <div class="col-sm-2 pull right">
-                <a  href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark Unread ')?></a>
+                <a  href="#" id="mark-as-unread"><?php echo AppUtility::t('Mark As Unread ')?></a>
              </div>
              <?php }?>
          </div>

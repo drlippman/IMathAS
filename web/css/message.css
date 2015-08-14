@@ -118,7 +118,6 @@ background-color: #12856D;
 .btn-color
 {
     background-color: #12856D;
-    color:whitesmoke;
 }
 .btn-primary-1 {
     color: #FFF;
@@ -177,7 +176,7 @@ button.btn.btn-primary1.btn-color{
     margin-left: 20px;
     margin-bottom: 20px;
 }
-.margin-left
+.margin-left-message
 {
 
     margin-left: 87px;

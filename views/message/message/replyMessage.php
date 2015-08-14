@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <textarea id='message' name='message' style='width: 100%;' rows='12' cols='15'>$message</textarea></div></div><br>"; ?>
         </div>
         <div class="checkbox override-hidden col-sm-12">
-            <label class="col-sm-6 margin-left">
+            <label class="col-sm-6 margin-left-message">
                 <input type="checkbox" class="header-checked" name="header-checked" value="1">
                 <span class="cr"><i class="cr-icon fa fa-check"></i></span>
                 <?php echo AppUtility::t('Mark original message unread');?>

@@ -9,7 +9,8 @@ function toggleshow(bnum) {
         butn.src = '../../img/collapse.gif';
     }
 }
-function toggleitem(inum) {
+function toggleitem(inum)
+{
     var node = document.getElementById('item' + inum);
     var butn = document.getElementById('buti' + inum);
     if (node.className == 'blockitems') {

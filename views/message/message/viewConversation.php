@@ -87,8 +87,7 @@ AppUtility::includeJS('general.js'); ?>
                      <a href="<?php echo AppUtility::getURLFromHome('message', 'message/reply-message?id=' . $message['id'] . '&cid=' . $course->id); ?>">
                          <?php echo AppUtility::t('Reply');?></a>
                  <?php } ?>
-                <button class="btn btn-primary1 btn-color" id="buti<?php echo $index ?>"
-                       onClick="toggleitem(<?php echo $index ?>)"><?php echo AppUtility::t('Hide');?></button>
+                <input type=button class="btn btn-primary1 btn-color" id="buti<?php echo $index ?>" value="Hide" onClick="toggleitem(<?php echo $index ?>)">
                 </span>
                 <b><?php echo $message['title'] ?></b><br/><?php echo AppUtility::t('Posted by:');?><a
                     href="mailto:<?php echo '#' ?>"><?php echo $message['senderName'] ?></a>, <?php echo date('M d, o g:i a', $message['msgDate']) ?>
