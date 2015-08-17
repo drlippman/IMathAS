@@ -55,7 +55,7 @@ echo Nav::widget([
                 [
                     ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
-                    ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?newpost=1&cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                    ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 

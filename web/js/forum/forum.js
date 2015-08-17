@@ -5,8 +5,7 @@ $('.search-dropdown').click(function(){
 });
 $(document).ready(function ()
 {  var courseId = $('.courseId').val();
-    var newPost = $('#new-post').val();
-    jQuerySubmit('get-forums-ajax', {cid: courseId,newPost:newPost}, 'forumsSuccess');
+    jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
     $('#search-thread').hide();
     $('#search-post').hide();
     $('#result').hide();
@@ -134,11 +133,10 @@ function forumsSuccess(response) {
     if (response.status == 0)
     {
         var forums = response.data;
+        showForumTable(forums);
 
     }
-    showForumTable(forums);
 }
-
     function showForumTable(forums)
     {
         var courseId = $('.courseId').val();
@@ -152,7 +150,7 @@ function forumsSuccess(response) {
                 {
                     html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>"+capitalizeFirstLetter(forum.forumName)+ "</a></td>+ <a href='Modify'> ";
                 }else{
-                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br>&nbsp;<a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'> Post("+forum.count+")</span></a>";
+                    html += "<tr><td ><a  href='thread?cid="+courseId+"&forumid="+forum.forumId+"'>" +capitalizeFirstLetter(forum.forumName) +"</a><br><a href='thread?cid="+courseId+"&forumid="+forum.forumId+"&page=1'<span class='new-post'>Post("+forum.count+")</span></a>";
                 }
 
                 html += "<td><a href='add-forum?id="+forum.forumId+"&cid="+courseId+"&fromForum=1'>Modify</a></td>";
