@@ -8,7 +8,6 @@
 
 namespace app\controllers\block;
 
-
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
@@ -18,7 +17,6 @@ use app\models\Student;
 
 class BlockController extends AppController
 {
-
     public function actionAddBlock()
     {
         $this->guestUserHandler();
@@ -44,9 +42,9 @@ class BlockController extends AppController
            $blockTree = explode('-',$modifyId);
             $existingId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
             $blockItems = $blockData;
-            if (count($blockTree)>1) {
-                for ($i=1;$i<count($blockTree);$i++) {
-                    $blockItems = $blockItems[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+            if (count($blockTree)>AppConstant::NUMERIC_ONE) {
+                for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                    $blockItems = $blockItems[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                 }
             }
             $title = stripslashes($blockItems[$existingId]['name']);
@@ -56,15 +54,15 @@ class BlockController extends AppController
             if (isset($blockItems[$existingId]['avail'])) { //backwards compat
                 $avail = $blockItems[$existingId]['avail'];
             } else {
-                $avail = 1;
+                $avail = AppConstant::NUMERIC_ONE;
             }
             if (isset($blockItems[$existingId]['public'])) { //backwards compat
                 $public = $blockItems[$existingId]['public'];
             } else {
-                $public = 0;
+                $public = AppConstant::NUMERIC_ZERO;
             }
             $showHide = $blockItems[$existingId]['SH'][0];
-            if (strlen($blockItems[$existingId]['SH'])==1) {
+            if (strlen($blockItems[$existingId]['SH'])==AppConstant::NUMERIC_ONE) {
                 $availBeh = 'O';
             } else {
                 $availBeh = $blockItems[$existingId]['SH'][1];
@@ -90,17 +88,16 @@ class BlockController extends AppController
         $groupLimit = array();
         $defaultBlockData = array(
         'title' => 'Enter Block name here',
-        'startDate' => time() + 60*60,
-        'endDate' => time() + 7*24*60*60,
+        'startDate' => time() + AppConstant::MINUTES,
+        'endDate' => time() + AppConstant::WEEK_TIME,
         'availBeh' => 'O',
         'showHide' => 'H',
-        'avail' => 1,
-        'public' => 0,
-        'fixedHeight' => 0,
+        'avail' => AppConstant::NUMERIC_ONE,
+        'public' => AppConstant::NUMERIC_ZERO,
+        'fixedHeight' => AppConstant::NUMERIC_ZERO,
         'groupLimit' => $groupLimit,
          'saveTitle' => AppConstant::CREATE_BLOCK,
          'pageTitle' => AppConstant::ADD_BLOCK,
-
         );
         }
         $page_sectionListVal = array("none");
@@ -124,15 +121,14 @@ class BlockController extends AppController
         if (isset($params['block']))
         {
             $blockTree = explode('-',$params['block']);
-        }else
-        {
+        }else {
             $blockTree = explode('-',$params['id']);
-            $existingId = array_pop($blockTree) - 1;
+            $existingId = array_pop($blockTree) - AppConstant::NUMERIC_ONE;
         }
         $sub =& $blockData;
-        if (count($blockTree)>1) {
-            for ($i=1;$i<count($blockTree);$i++) {
-                $sub =& $sub[$blockTree[$i]-1]['items'];
+        if (count($blockTree)>AppConstant::NUMERIC_ONE) {
+            for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
             }
         }
         $groupLimit = array();
@@ -155,27 +151,26 @@ class BlockController extends AppController
         }
         if ($params['avail']==AppConstant::NUMERIC_ONE)
         {
-            if ($params['available-after']=='0') {
+            if ($params['available-after']==AppConstant::ZERO_VALUE) {
                 $startDate = AppConstant::NUMERIC_ZERO;
-            } else if ($params['available-after']=='1') {
+            } else if ($params['available-after']==AppConstant::ONE_VALUE) {
                 $startDate = time()-AppConstant::NUMERIC_TWO;
             } else {
                 $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
             }
-            if ($params['available-until']=='2000000000') {
-                $endDate = 2000000000;
+            if ($params['available-until']==AppConstant::AlWAYS_TIME_VALUE) {
+                $endDate = AppConstant::ALWAYS_TIME;
             } else {
                 $endDate = AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
             }
         }else
         {
             $startDate = AppConstant::NUMERIC_ZERO;
-            $endDate = 2000000000;
+            $endDate = AppConstant::ALWAYS_TIME;
         }
 
         if(isset($existingId))
         {
-
             $sub[$existingId]['name'] = htmlentities(stripslashes($params['title']));
             $sub[$existingId]['id'] = strval($blockCnt);
             $sub[$existingId]['startdate'] =  $startDate;
@@ -186,7 +181,6 @@ class BlockController extends AppController
             $sub[$existingId]['public'] = $public ;
             $sub[$existingId]['fixedheight'] = $fixedHeight;
             $sub[$existingId]['grouplimit'] = $groupLimit;
-
         }
         else{
             $blockItems = array();
@@ -224,22 +218,21 @@ class BlockController extends AppController
             $sub =& $blockData;
         }
         $blockTree = explode('-',$newFlag);
-        if (count($blockTree)>1) {
-            for ($i=1;$i<count($blockTree)-1;$i++) {
-                $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+        if (count($blockTree)>AppConstant::NUMERIC_ONE) {
+            for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree)-AppConstant::NUMERIC_ONE;$i++) {
+                $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
             }
         }
-        $sub =& $sub[$blockTree[$i]-1];
-        if (!isset($sub['newflag']) || $sub['newflag']==0) {
-            $sub['newflag']=1;
+        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE];
+        if (!isset($sub['newflag']) || $sub['newflag']==AppConstant::NUMERIC_ZERO) {
+            $sub['newflag']=AppConstant::NUMERIC_ONE;
         } else {
 
-            $sub['newflag']=0;
+            $sub['newflag']=AppConstant::NUMERIC_ZERO;
         }
         $finalBlockItems =(serialize($blockData));
         Course::UpdateItemOrder($finalBlockItems,$courseId,$blockCnt=null);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
-
     }
     public function actionEditContent()
     {
@@ -248,27 +241,22 @@ class BlockController extends AppController
         $courseId = $this->getParam('cid');
         $course = Course::getById($courseId);
         $blockData = unserialize($course['itemorder']);
-
         $folder = $this->getParamVal('Folder');
-        if ($folder!='0') {
-
+        if ($folder!=AppConstant::ZERO_VALUE) {
             $now = time() + $previewShift ;
             $blockTree = explode('-',$folder);
             $backtrack = array();
-
-            for ($i=1;$i<count($blockTree);$i++) {
-                $backtrack[] = array($blockData[$blockTree[$i]-1]['name'],implode('-',array_slice($blockTree,0,$i+1)));
-                if (!isset($teacherid) && !isset($tutorid) && $blockData[$blockTree[$i]-1]['avail']<2 && $blockData[$blockTree[$i]-1]['SH'][0]!='S' &&($now< $blockData[$blockTree[$i]-1]['startdate'] || $now>$blockData[$blockTree[$i]-1]['enddate'] || $blockData[$blockTree[$i]-1]['avail']=='0')) {
-                    $folder = 0;
+            for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
+                $backtrack[] = array($blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['name'],implode('-',array_slice($blockTree,AppConstant::NUMERIC_ZERO,$i+AppConstant::NUMERIC_ONE)));
+                if (!isset($teacherid) && !isset($tutorid) && $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['avail']<AppConstant::NUMERIC_TWO && $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['SH'][0]!='S' &&($now< $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['startdate'] || $now>$blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['enddate'] || $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['avail']==AppConstant::ONE_VALUE)) {
+                    $folder = AppConstant::NUMERIC_ZERO;
                     unset($backtrack);
                     unset($blockTree);
                     break;
                 }
-
-                $blockData = $blockData[$blockTree[$i]-1]['items'];
+                $blockData = $blockData[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
             }
         }
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
     }
-
 }

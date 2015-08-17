@@ -7,6 +7,9 @@ class AppConstant
     const VERSION_NUMBER = 3;
     const REMEMBER_ME_TIME = 2592000; //Time in second
     const ZERO_VALUE = '0';
+    const ONE_VALUE = '1';
+    const NINE_VALUE = '9';
+    const AlWAYS_TIME_VALUE = '2000000000';
     const INVALID_USERNAME_PASSWORD = 'Invalid username or password.';
     const MAX_SESSION_TIME = 86400;
     const GIVE_OLD_SESSION_TIME = 90000;
@@ -64,6 +67,8 @@ class AppConstant
     const NUMERIC_NEGATIVE_ONE = -1;
     const NUMERIC_SIXTY_ONE = 61;
     const NUMERIC_THIRTY_TWO = 32;
+    const TRIPLE_SEVEN = 0777;
+    const POINT_ZERO_TWO = .02;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;

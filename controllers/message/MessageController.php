@@ -47,7 +47,6 @@ class MessageController extends AppController
             $teacher = Teacher::getTeachersById($courseId);
             $this->includeCSS(['dataTables.bootstrap.css', 'message.css']);
             $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/message.js']);
-//            $this->includeJS(['jquery.min.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js','message/message.js']);
             $responseData = array('model' => $model, 'course' => $course, 'users' => $users, 'teachers' => $teacher, 'userRights' => $rights, 'isNewMessage' => $isNewMessage, 'isImportant' => $isImportant, 'userId' => $user->id);
             return $this->renderWithData('messages', $responseData);
         }
@@ -404,7 +403,7 @@ class MessageController extends AppController
                 if ($params['receiver'] != AppConstant::ZERO_VALUE && $params['cid'] != null) {
                     $message = new Message();
                     $message->createReply($params);
-                    if( $params['parentId']>0)
+                    if( $params['parentId']>AppConstant::NUMERIC_ZERO)
                     {
                         if(isset($params['checkedValue']))
                         {

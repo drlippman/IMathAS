@@ -78,30 +78,30 @@ public $oa = array();
         $this->layout = "master";
         $this->userAuthentication($user,$courseId);
         $type = $this->getParamVal('type');
-            switch ($type) {
-                case 'assessment':
-                     return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
-                     break;
-                case 'inlinetext':
-                     return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
-                    break;
-                case 'linkedtext':
-                     return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
-                    break;
-                case 'forum':
-                     return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
-                    break;
-                case 'wiki':
-                     return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
-                    break;
-                case 'block':
-                     return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&block=0&tb=t'));
-                    break;
-                case 'calendar':
-                    break;
-                case '':
-                    break;
-            }
+        switch ($type) {
+            case 'assessment':
+                 return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId));
+                 break;
+            case 'inlinetext':
+                 return $this->redirect(AppUtility::getURLFromHome('course','course/modify-inline-text?courseId=' .$courseId));
+                break;
+            case 'linkedtext':
+                 return $this->redirect(AppUtility::getURLFromHome('course','course/add-link?cid='.$courseId));
+                break;
+            case 'forum':
+                 return $this->redirect(AppUtility::getURLFromHome('forum','forum/add-forum?cid='.$courseId));
+                break;
+            case 'wiki':
+                 return $this->redirect(AppUtility::getURLFromHome('wiki','wiki/add-wiki?courseId='.$courseId));
+                break;
+            case 'block':
+                 return $this->redirect(AppUtility::getURLFromHome('block','block/add-block?courseId='.$courseId.'&block=0&tb=t'));
+                break;
+            case 'calendar':
+                break;
+            case '':
+                break;
+        }
         $courseData = $this->getRequestParams();
         $teacherId = Teacher::getByUserId($user['id'], $courseData['cid']);
         $id = $this->getParamVal('id');
@@ -123,104 +123,104 @@ public $oa = array();
          * Display Items
          */
         if ($course && ($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
-                foreach ($itemOrders as $key => $itemOrder) {
-                    $tempAray = array();
-                    if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
-                    {
-                        $tempAray['Block'] = $itemOrder;
-                        $blockItems = $itemOrder['items'];
-                        $tempItemList = array();
-                            foreach ($blockItems as $blockKey => $blockItem) {
-                                $tempItem = array();
-                                $item = Items::getById($blockItem);
-                                switch ($item->itemtype) {
-                                    case 'Assessment':
-                                        $assessment = Assessments::getByAssessmentId($item->typeid);
-                                        $tempItem[$item->itemtype] = $assessment;
-                                        $tempItem['assessment'] = $item;
-                                        break;
-                                    case 'Calendar':
-                                        $tempItem[$item->itemtype] = $item;
-                                        break;
-                                    case 'Forum':
-                                        $form = Forums::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $form;
-                                        $tempItem['forum'] = $item;
-                                        break;
-                                    case 'Wiki':
-                                        $wiki = Wiki::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $wiki;
-                                        $tempItem['wiki'] = $item;
-                                        break;
-                                    case 'LinkedText':
-                                        $linkedText = Links::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $linkedText;
-                                        $tempItem['link'] = $item;
-                                        break;
-                                    case 'InlineText':
-                                        $inlineText = InlineText::getById($item->typeid);
-                                        $tempItem[$item->itemtype] = $inlineText;
-                                        $tempItem['inline'] = $item;
-                                        break;
-                                }
-                                array_push($tempItemList, $tempItem);
+            foreach ($itemOrders as $key => $itemOrder) {
+                $tempAray = array();
+                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
+                {
+                    $tempAray['Block'] = $itemOrder;
+                    $blockItems = $itemOrder['items'];
+                    $tempItemList = array();
+                        foreach ($blockItems as $blockKey => $blockItem) {
+                            $tempItem = array();
+                            $item = Items::getById($blockItem);
+                            switch ($item->itemtype) {
+                                case 'Assessment':
+                                    $assessment = Assessments::getByAssessmentId($item->typeid);
+                                    $tempItem[$item->itemtype] = $assessment;
+                                    $tempItem['assessment'] = $item;
+                                    break;
+                                case 'Calendar':
+                                    $tempItem[$item->itemtype] = $item;
+                                    break;
+                                case 'Forum':
+                                    $form = Forums::getById($item->typeid);
+                                    $tempItem[$item->itemtype] = $form;
+                                    $tempItem['forum'] = $item;
+                                    break;
+                                case 'Wiki':
+                                    $wiki = Wiki::getById($item->typeid);
+                                    $tempItem[$item->itemtype] = $wiki;
+                                    $tempItem['wiki'] = $item;
+                                    break;
+                                case 'LinkedText':
+                                    $linkedText = Links::getById($item->typeid);
+                                    $tempItem[$item->itemtype] = $linkedText;
+                                    $tempItem['link'] = $item;
+                                    break;
+                                case 'InlineText':
+                                    $inlineText = InlineText::getById($item->typeid);
+                                    $tempItem[$item->itemtype] = $inlineText;
+                                    $tempItem['inline'] = $item;
+                                    break;
                             }
-                        $tempAray['itemList'] = $tempItemList;
-                        array_push($responseData, $tempAray);
-                    } else {
-                        $item = Items::getById($itemOrder);
-                        switch ($item->itemtype) {
-                            case 'Assessment':
-                                $assessment = Assessments::getByAssessmentId($item->typeid);
-                                $exceptionData = Exceptions::getByAssessmentId($item->typeid);
-                                $exceptions = array();
-                                foreach ($exceptionData as $data) {
-                                    $exceptions[$data['userid']] = array($data['enddate'],$data['islatepass']);
-                                }
-                                $nothidden = true;
-                                if ($assessment['reqscore']>0 && $assessment['reqscoreaid']>0 && !$viewAll && $assessment['enddate']>time()) {
-                                    $bestScore = AssessmentSession::getAssessmentSession($user['id'], $assessment['reqscoreaid']);
-                                    if (count($bestScore['bestscores']) == 0) {
+                            array_push($tempItemList, $tempItem);
+                        }
+                    $tempAray['itemList'] = $tempItemList;
+                    array_push($responseData, $tempAray);
+                } else {
+                    $item = Items::getById($itemOrder);
+                    switch ($item->itemtype) {
+                        case 'Assessment':
+                            $assessment = Assessments::getByAssessmentId($item->typeid);
+                            $exceptionData = Exceptions::getByAssessmentId($item->typeid);
+                            $exceptions = array();
+                            foreach ($exceptionData as $data) {
+                                $exceptions[$data['userid']] = array($data['enddate'],$data['islatepass']);
+                            }
+                            $nothidden = true;
+                            if ($assessment['reqscore']>AppConstant::NUMERIC_ZERO && $assessment['reqscoreaid']>AppConstant::NUMERIC_ZERO && !$viewAll && $assessment['enddate']>time()) {
+                                $bestScore = AssessmentSession::getAssessmentSession($user['id'], $assessment['reqscoreaid']);
+                                if (count($bestScore['bestscores']) == AppConstant::NUMERIC_ZERO) {
+                                    $nothidden = false;
+                                } else {
+                                    $scores = explode(';', $bestScore['bestscores']);
+                                    if (round($this->getpts($scores[0]), AppConstant::NUMERIC_ONE) + AppConstant::POINT_ZERO_TWO < $assessment['reqscore']) {
                                         $nothidden = false;
-                                    } else {
-                                        $scores = explode(';', $bestScore['bestscores']);
-                                        if (round($this->getpts($scores[0]), 1) + .02 < $assessment['reqscore']) {
-                                            $nothidden = false;
-                                        }
                                     }
                                 }
-                                $tempAray[$item->itemtype] = $assessment;
-                                $tempAray['assessment'] = $item;
-                                $tempAray['nothidden'] = $nothidden;
-                                $tempAray['exceptions'] = $exceptions;
-                                break;
-                            case 'Calendar':
-                                $tempAray[$item->itemtype] = $item;
-                                break;
-                            case 'Forum':
-                                $form = Forums::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $form;
-                                $tempAray['forum'] = $item;
-                                break;
-                            case 'Wiki':
-                                $wiki = Wiki::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $wiki;
-                                $tempAray['wiki'] = $item;
-                                break;
-                            case 'InlineText':
-                                $inlineText = InlineText::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $inlineText;
-                                $tempAray['inline'] = $item;
-                                break;
-                            case 'LinkedText':
-                                $linkedText = Links::getById($item->typeid);
-                                $tempAray[$item->itemtype] = $linkedText;
-                                $tempAray['link'] = $item;
-                                break;
-                        }
-                        array_push($responseData, $tempAray);
+                            }
+                            $tempAray[$item->itemtype] = $assessment;
+                            $tempAray['assessment'] = $item;
+                            $tempAray['nothidden'] = $nothidden;
+                            $tempAray['exceptions'] = $exceptions;
+                            break;
+                        case 'Calendar':
+                            $tempAray[$item->itemtype] = $item;
+                            break;
+                        case 'Forum':
+                            $form = Forums::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $form;
+                            $tempAray['forum'] = $item;
+                            break;
+                        case 'Wiki':
+                            $wiki = Wiki::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $wiki;
+                            $tempAray['wiki'] = $item;
+                            break;
+                        case 'InlineText':
+                            $inlineText = InlineText::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $inlineText;
+                            $tempAray['inline'] = $item;
+                            break;
+                        case 'LinkedText':
+                            $linkedText = Links::getById($item->typeid);
+                            $tempAray[$item->itemtype] = $linkedText;
+                            $tempAray['link'] = $item;
+                            break;
                     }
+                    array_push($responseData, $tempAray);
                 }
+            }
         }else {
             if (isset($courseData['tb'])) {
                 $filter = $courseData['tb'];
@@ -273,15 +273,15 @@ public $oa = array();
             }
             $blockLoc = $blockTree[count($blockTree) - AppConstant::NUMERIC_ONE]-AppConstant::NUMERIC_ONE;
             if (strpos($toPosition ,'-')!==false) {
-               if ($toPosition [0]=='O') { //out of block
-                  $itemToMove = $curBlock[$fromPosition - AppConstant::NUMERIC_ONE];
-                  array_splice($curBlock,$fromPosition - AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ONE);
-                  if (is_array($itemToMove)) {
-                     array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($itemToMove));
-                  } else {
-                      array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
-                  }
-                } else { // in to block
+                if ($toPosition [0]=='O') { //out of block
+                    $itemToMove = $curBlock[$fromPosition - AppConstant::NUMERIC_ONE];
+                    array_splice($curBlock,$fromPosition - AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ONE);
+                    if (is_array($itemToMove)) {
+                        array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,array($itemToMove));
+                    } else {
+                        array_splice($sub,$blockLoc+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$itemToMove);
+                    }
+               } else { // in to block
                     $itemToMove = $curBlock[$fromPosition - AppConstant::NUMERIC_ONE];
                     array_splice($curBlock,$fromPosition - AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ONE);
                     $toPosition  = substr($toPosition ,AppConstant::NUMERIC_TWO);
@@ -309,7 +309,7 @@ public $oa = array();
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
         $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData,
-            'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll);
+        'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll);
         return $this->renderWithData('index', $returnData);
     }
     /**
@@ -408,7 +408,6 @@ public $oa = array();
                 'courseId' => $assessment['courseid']
             );
         }
-
         $calendarArray = array();
         foreach ($calendarItems as $calendarItem)
         {
@@ -424,7 +423,7 @@ public $oa = array();
         foreach ($calendarLinkItems as $calendarLinkItem)
         {
             $calendarLinkArray[] = array(
-       'courseId' => $calendarLinkItem['courseid'],
+                'courseId' => $calendarLinkItem['courseid'],
                 'title' => ucfirst($calendarLinkItem['title']),
                 'startDate' => AppUtility::getFormattedDate($calendarLinkItem['startdate']),
                 'endDate' => AppUtility::getFormattedDate($calendarLinkItem['enddate']),
@@ -597,12 +596,10 @@ public $oa = array();
                     if (is_array($sub[$blockId])) {
                         $blockItems = $sub[$blockId]['items'];
                         $obId = $sub[$blockId]['id'];
-
                         if (count($blockItems)>AppConstant::NUMERIC_ZERO)
                         {
                             $this->deleteRecursive($blockItems);
                             array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
-
                         }else
                         {
                                 array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
@@ -778,13 +775,13 @@ public $oa = array();
         $assessments = Assessments::getByCourseId($courseId);
             if (isset($params['sdate'])) {
                 $assessment = Assessments::getByAssessmentId($params['aid']);
-                if (($params['base'] == 0)) {
+                if (($params['base'] == AppConstant::NUMERIC_ZERO)) {
                     $basedate = $assessment['startdate'];
                 } else {
                     $basedate = $assessment['enddate'];
                 }
                 preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $params['sdate'], $dmatches);
-                $newstamp = mktime(date('G', $basedate), date('i', $basedate), 0, $dmatches[1], $dmatches[2], $dmatches[3]);
+                $newstamp = mktime(date('G', $basedate), date('i', $basedate), AppConstant::NUMERIC_ZERO, $dmatches[1], $dmatches[2], $dmatches[3]);
                 $shift = $newstamp - $basedate;
                 $items = unserialize($course['itemorder']);
                 $this->shiftsub($items);
@@ -815,7 +812,7 @@ public $oa = array();
                 return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
             }else { //DEFAULT DATA MANIPULATION
             $sdate = AppUtility::tzdate("m/d/Y",time());
-            $i=0;
+            $i=AppConstant::NUMERIC_ZERO;
             foreach($assessments as $singleData){
                 $page_assessmentList['val'][$i] = $singleData['id'];
                 $page_assessmentList['label'][$i] = $singleData['name'];
@@ -859,21 +856,20 @@ public $oa = array();
 
     public function getpts($sc) {
         if (strpos($sc,'~')===false) {
-            if ($sc>0) {
+            if ($sc>AppConstant::NUMERIC_ZERO) {
                 return $sc;
             } else {
-                return 0;
+                return AppConstant::NUMERIC_ZERO;
             }
         } else {
             $sc = explode('~',$sc);
-            $tot = 0;
+            $tot = AppConstant::NUMERIC_ZERO;
             foreach ($sc as $s) {
-                if ($s>0) {
+                if ($s>AppConstant::NUMERIC_ZERO) {
                     $tot+=$s;
                 }
             }
-            return round($tot,1);
+            return round($tot,AppConstant::NUMERIC_ONE);
         }
     }
 }
-

@@ -173,7 +173,6 @@ class CourseController extends AppController
         $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
         return $this->render('index', $returnData);
     }
-
     /**
      * Display assessment details
      */
@@ -193,7 +192,6 @@ class CourseController extends AppController
         $returnData = array('cid' => $course, 'assessments' => $assessment, 'questions' => $questionRecords, 'questionSets' => $questionSet, 'assessmentSession' => $assessmentSession, 'now' => time());
         return $this->render('ShowAssessment', $returnData);
     }
-
     /**
      * Show late passes of assessment.
      */
@@ -267,7 +265,6 @@ class CourseController extends AppController
         $returnData = array('model' => $model);
         return $this->renderWithData('addNewCourse', $returnData);
     }
-
     /**
      * Setting in created course.
      */
@@ -306,7 +303,6 @@ class CourseController extends AppController
         }
         return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
     }
-
     /**
      * To delete existing course.
      */
@@ -356,17 +352,16 @@ class CourseController extends AppController
             $row = Course::setOwner($params, $user);
             if ($user->rights == AppConstant::GROUP_ADMIN_RIGHT) {
                 $courseitem = Course::getByCourseAndGroupId($params, $user);
-                if ($courseitem > 0) {
+                if ($courseitem > AppConstant::NUMERIC_ZERO) {
                     $row = Course::setOwner($params, $user);
                     $exec = true;
                 }
             } else {
                 $exec = true;
             }
-
-            if ($exec && $row > 0) {
+            if ($exec && $row > AppConstant::NUMERIC_ZERO) {
                 $teacher = Teacher::getByUserId($user->id, $params['cid']);
-                if ($teacher == 0) {
+                if ($teacher == AppConstant::NUMERIC_ZERO) {
                     $newTeacher = new Teacher();
                     $newTeacher->create($params['newOwner'], $params['cid']);
                 }
@@ -503,7 +498,6 @@ class CourseController extends AppController
         $assessmentSession->attributes = $param;
         $assessmentSession->save();
     }
-
     /**
      * Display linked text on course page
      */
@@ -518,7 +512,6 @@ class CourseController extends AppController
         $returnData = array('course' => $course, 'links' => $link);
         return $this->renderWithData('showLinkedText', $returnData);
     }
-
     /**
      * To handle event on calendar.
      */
@@ -610,7 +603,6 @@ class CourseController extends AppController
                         $tempItemList = array();
                         if (count($blockItems)) {
                             foreach ($blockItems as $blockKey => $blockItem) {
-
                                 $tempItem = array();
                                 $item = Items::getById($blockItem);
                                 switch ($item->itemtype) {
@@ -680,7 +672,6 @@ class CourseController extends AppController
         $responseData = array('course' => $course, 'user' => $user);
         return $this->render('calendar', $responseData);
     }
-
     /**
      * Modify inline text: Teacher
      */
@@ -696,7 +687,6 @@ class CourseController extends AppController
         $inlineText = InlineText::getById($inlineId);
         $inlineTextId = $params['id'];
         $saveTitle = '';
-
         $pageTitle = AppConstant::ADD_INLINE_TEXT;
         $saveTitle = AppConstant::CREATE_ITEM;
         $defaultValue = array(
@@ -707,9 +697,7 @@ class CourseController extends AppController
             'eTime' => date("g:i A"),
         );
         if ($this->isPost()) {
-
             $params = $this->getRequestParams();
-
             if ($inlineTextId) {
                 $updateForum = new InlineText();
                 $updateForum->updateChanges($params, $inlineTextId);
@@ -722,10 +710,8 @@ class CourseController extends AppController
                 }
                 $finalArray['text'] = trim($params['text']);
                 $finalArray['courseid'] = $params['cid'];
-
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
                     if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
-
                         $startDate = AppConstant::NUMERIC_ZERO;
                     }
                     if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
@@ -734,7 +720,6 @@ class CourseController extends AppController
                     $finalArray['startdate'] = $startDate;
                     $finalArray['enddate'] = $endDate;
                 } else {
-
                     $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
                 }
@@ -751,7 +736,7 @@ class CourseController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blockTree = array(0);
+                $blockTree = array(AppConstant::NUMERIC_ZERO);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
@@ -803,7 +788,6 @@ class CourseController extends AppController
             );
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
-
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course, 'saveTitle' => $saveTitle, 'inlineText' => $inlineText, 'pageTitle' => $pageTitle, 'defaultValue' => $defaultValue);
         return $this->renderWithData('modifyInlineText', $responseData);
@@ -858,7 +842,6 @@ class CourseController extends AppController
         $key = AppConstant::NUMERIC_ONE;
         foreach ($toolsData as $tool) {
             $toollabels[$key++] = $tool['name'];
-
         }
         if ($params['id']) {
             $linkData = LinkedText::getById($params['id']);
@@ -866,7 +849,6 @@ class CourseController extends AppController
             $cntingb = AppConstant::NUMERIC_ONE;
             $tutoredit = AppConstant::NUMERIC_ZERO;
             $gradesecret = uniqid();
-
             if ($linkData['avail'] == AppConstant::NUMERIC_TWO && $linkData['startdate'] > AppConstant::NUMERIC_ZERO) {
                 $altoncal = AppConstant::NUMERIC_ONE;
             } else {
@@ -876,11 +858,11 @@ class CourseController extends AppController
                 $type = 'web';
                 $webaddr = $linkData['text'];
                 $linkData['text'] = "<p>Enter text here</p>";
-            } else if (substr($linkData['text'], 0, 5) == 'file:') {
+            } else if (substr($linkData['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FIVE) == 'file:') {
                 $type = 'file';
-                $filename = substr($linkData['text'], 5);
+                $filename = substr($linkData['text'], AppConstant::NUMERIC_FIVE);
                 $line['text'] = "<p>Enter text here</p>";
-            } else if (substr($linkData['text'], 0, 8) == 'exttool:') {
+            } else if (substr($linkData['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_EIGHT) == 'exttool:') {
                 $type = 'tool';
                 $points = $linkData['points'];
                 $toolParts = explode('~~', substr($linkData['text'], AppConstant::NUMERIC_EIGHT));
@@ -904,7 +886,6 @@ class CourseController extends AppController
             }
             if ($linkData['outcomes'] != '') {
                 $gradeoutcomes = explode(',', $linkData['outcomes']);
-
             } else {
                 $gradeoutcomes = array();
             }
@@ -977,12 +958,10 @@ class CourseController extends AppController
                         $params['text'] = $filename;
                     }
                 } else if ($params['linktype'] == 'web') {
-
                     $params['text'] = trim(strip_tags($params['web']));
-                    if (substr($params['text'], 0, 4) != 'http') {
+                    if (substr($params['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR) != 'http') {
                         $this->setSuccessFlash('Web link should start with http://');
                     }
-
                 } else if ($params['linktype'] == 'tool') {
                     if ($params['tool'] == AppConstant::NUMERIC_ZERO) {
                         $this->setSuccessFlash('Select external Tool');
@@ -994,7 +973,6 @@ class CourseController extends AppController
                             $params['text'] .= '~~' . $params['gbcat'] . '~~' . $params['cntingb'] . '~~' . $params['tutoredit'] . '~~' . $params['gradesecret'];
                             $points = intval($params['points']);
                         }
-
                     }
                 }
                 if ($params['linktype'] == 'tool') {
@@ -1045,7 +1023,7 @@ class CourseController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blocktree = array(0);
+                $blocktree = array(AppConstant::NUMERIC_ZERO);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blocktree); $i++) {
                     $sub =& $sub[$blocktree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
@@ -1066,7 +1044,7 @@ class CourseController extends AppController
         return $this->renderWithData('addLink', $responseData);
     }
 
-    function mkdir_recursive($pathname, $mode = 0777)
+    function mkdir_recursive($pathname, $mode = AppConstant::TRIPLE_SEVEN)
     {
         is_dir(dirname($pathname)) || $this->mkdir_recursive(dirname($pathname), $mode);
         return is_dir($pathname) || @mkdir($pathname, $mode);
@@ -1108,13 +1086,4 @@ class CourseController extends AppController
         }
         return $pageOutcomesList;
     }
-
-
-
-
-
-
-
-
-
 }

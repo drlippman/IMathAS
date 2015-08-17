@@ -34,7 +34,7 @@ class ForumController extends AppController
     public $postData = array();
     public $totalPosts = array();
     public $children = array();
-    public $threadLevel = 1;
+    public $threadLevel = AppConstant::NUMERIC_ONE;
 
     /*
     * Controller Action To Redirect To Search Forum Page
@@ -62,7 +62,6 @@ class ForumController extends AppController
         $responseData = array('model' => $model, 'forum' => $forum, 'cid' => $cid, 'users' => $user, 'course' => $course,'IsNewPost' => $IsNewPost);
         return $this->renderWithData('forum', $responseData);
     }
-
     /*
     * Controller Action To Search All threads By Subject
     */
@@ -95,12 +94,10 @@ class ForumController extends AppController
             }
             $this->includeJS(['forum/forum.js','forum/thread.js']);
             return $this->successResponse($searchThread);
-
         } else {
             return $this->terminateResponse("No data Found");
         }
     }
-
     /*
     * Controller Action To Display All The Forums
     */
@@ -144,12 +141,9 @@ class ForumController extends AppController
                             'currentUserId' => $currentUser['id'],
                             'posttype' => $thread['posttype'],
                             'isanon' => $thread['isanon'],
-
                         );
-
                         array_push($threadArray, $temparray);
                     }
-
                 }
             }
             $this->redirect(array('new-post', 'courseId' => $cid, 'threadArray' => $threadArray));
@@ -167,7 +161,7 @@ class ForumController extends AppController
                     if ($postCount > AppConstant::NUMERIC_ZERO) {
                         $lastObject = $forum->imasForumPosts[$postCount - AppConstant::NUMERIC_ONE];
                     }
-                    $flag = 0;
+                    $flag = AppConstant::NUMERIC_ZERO;
                     foreach($NewPostCounts as $count)
                     {
                         if($count['forumid'] == $forum['id'] ){
@@ -186,32 +180,31 @@ class ForumController extends AppController
                                 'count' =>$count['COUNT(imas_forum_threads.id)'],
                                 'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
                             );
-                            $flag = 1;
+                            $flag = AppConstant::NUMERIC_ONE;
                             array_push($forumArray, $tempArray);
                         }
-                 }
-                 if($flag == 0){
-
-                    $tempArray = array
-                    (
-                        'forumId' => $forum['id'],
-                        'forumName' => $forum['name'],
-                        'threads' => count($threadCount),
-                        'posts' => $postCount,
-                        'currentTime' => $currentTime,
-                        'endDate' => $forum['enddate'],
-                        'rights' => $user['rights'],
-                        'avail' => $forum['avail'],
-                        'startDate' => $forum['startdate'],
-                        'countId' => AppConstant::NUMERIC_ZERO,
-                        'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
-                    );
-                     array_push($forumArray, $tempArray);
+                    }
+                    if($flag == AppConstant::NUMERIC_ZERO){
+                        $tempArray = array
+                        (
+                            'forumId' => $forum['id'],
+                            'forumName' => $forum['name'],
+                            'threads' => count($threadCount),
+                            'posts' => $postCount,
+                            'currentTime' => $currentTime,
+                            'endDate' => $forum['enddate'],
+                            'rights' => $user['rights'],
+                            'avail' => $forum['avail'],
+                            'startDate' => $forum['startdate'],
+                            'countId' => AppConstant::NUMERIC_ZERO,
+                            'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                        );
+                         array_push($forumArray, $tempArray);
+                    }
                 }
-            }
                 $this->includeCSS(['forums.css']);
                 $this->includeJS(['forum/forum.js']);
-                    return $this->successResponse($forumArray);
+                return $this->successResponse($forumArray);
             }
         }
     }
@@ -226,7 +219,6 @@ class ForumController extends AppController
         $this->includeCSS(['forums.css']);
         return $this->renderWithData('newPost',['threadArray' => $newPostData['threadArray'],'course' => $course,'users' => $user]);
     }
-
     /*
      * Controller Action To Redirect To Thread Page
      */
@@ -247,7 +239,6 @@ class ForumController extends AppController
         $responseData = array('cid' => $cid, 'users' => $users, 'forumid' => $forumId, 'course' => $course,'forumData' => $forumData,'page' => $page,'unRead' => $unRead);
         return $this->renderWithData('thread', $responseData);
     }
-
     /*
     * Controller Action To Display The Threads Present In That Particular Forum
     */
@@ -354,12 +345,11 @@ class ForumController extends AppController
                 foreach ($threads as $thread) {
                     $username = User::getById($thread['userid']);
                     $uniquesData = ForumView::getByThreadId($thread['threadid']);
-
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                      if($lastView){
                          $lastView1 = date('F d, o g:i a', $lastView[0]['lastview']);
                      }else{
-                         $lastView1 = 0;
+                         $lastView1 = AppConstant::NUMERIC_ZERO;
                      }
                     $tagged = ForumView::forumViews($thread['threadid'], $currentUser['id']);
                     $count = ForumView::uniqueCount($thread['threadid']);
@@ -410,13 +400,11 @@ class ForumController extends AppController
         } else
         {
             return $this->terminateResponse('');
-
         }
         $this->includeJS(['forum/forum.js']);
         $responseData = array('threadArray' => $threadArray, 'uniquesDataArray' => $FinalUniquesData, 'isValue' => $isValue);
         return $this->successResponse($responseData);
     }
-
     /*
      * controller method for redirect to Move Thread page,This method is used to store moved thread data in database.
      */
@@ -455,7 +443,6 @@ class ForumController extends AppController
                 $params = $this->getRequestParams();
                 $moveType = $params['movetype'];
                 $thread_Id = $params['threadId'];
-
                 if ($moveType == AppConstant::NUMERIC_ONE) {
                      if(isset($params['thread-name'])){
                          $moveThreadId = $params['thread-name'];
@@ -480,11 +467,9 @@ class ForumController extends AppController
             return $this->renderWithData('moveThread', $responseData);
         }
     }
-
     /*
-    * controller method for redirect to modify post page with selected thread data and fetch modified thread from Modify page and store in database.
-     *
-    */
+     * controller method for redirect to modify post page with selected thread data and fetch modified thread from Modify page and store in database.
+     */
     public function actionModifyPost()
     {
         $this->layout = 'master';
@@ -516,7 +501,7 @@ class ForumController extends AppController
         if($this->isPostMethod())
         {
             $params = $this->getRequestParams();
-            if(strlen(trim($params['subject'])) > 0) {
+            if(strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO) {
                 $threadIdOfPost = ForumPosts::modifyPost($params);
                 $contentTrackRecord  = new ContentTrack();
                 if($currentUser->rights == AppConstant::STUDENT_RIGHT)
@@ -551,7 +536,7 @@ class ForumController extends AppController
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
              foreach($FullThread as $singleThreadArray){
-                 if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $singleThreadArray['parent'] == 0 && $singleThreadArray['posttype'] == AppConstant::NUMERIC_THREE){
+                 if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $singleThreadArray['parent'] == AppConstant::NUMERIC_ZERO && $singleThreadArray['posttype'] == AppConstant::NUMERIC_THREE){
                      $data = array();
                      array_push($data, $singleThreadArray);
                      $forumPostData = ForumPosts::getByThreadIdAndUserID($threadId, $currentUser['id']);
@@ -565,13 +550,13 @@ class ForumController extends AppController
                                  array_push($data, $single);
                              }
                          }
-                 }
-              break;
+                    }
+                break;
              }else{
                      array_push($data, $singleThreadArray);
-                 }
+                  }
              }
-         $titleCountArray = array();
+        $titleCountArray = array();
         foreach ($data as $postData) {
             $this->children[$postData['parent']][] = $postData['id'];
             $username = User::getById($postData['userid']);
@@ -601,7 +586,7 @@ class ForumController extends AppController
                     'teacherCount' => $teacherCount,
                 );
             }
-            if($postData['parent'] == 0)
+            if($postData['parent'] == AppConstant::NUMERIC_ZERO)
             {
                 $replyBy = $postData['replyby'];
             }
@@ -629,7 +614,7 @@ class ForumController extends AppController
             $tempArray['parent'] = $postData['parent'];
             $tempArray['isReplies'] = $isReplies;
             if($postData['parent'] != AppConstant::NUMERIC_ZERO){
-                if(substr($postData['subject'],0,4) !== 'Re: '){
+                if(substr($postData['subject'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FOUR) !== 'Re: '){
                     $this->threadLevel = AppConstant::NUMERIC_ONE;
                     $this->calculatePostLevel($postData);
                     $tempArray['level'] = $this->threadLevel;
@@ -645,19 +630,18 @@ class ForumController extends AppController
         $likeCount = $Count->findCOunt($threadId);
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
-
         foreach($this->totalPosts as $key=>$threadArray){
             if($threadArray){
                 foreach($this->totalPosts as $singleThread) {
                     if($threadArray['parent'] == $singleThread['id'])
                     {
-                        if(substr($threadArray['subject'],0,2) !== 'Re') {
+                        if(substr($threadArray['subject'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_TWO) !== 'Re') {
                             $moveThreadSubject = $threadArray['id'];
                             $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
                         }
-                            if( $threadArray['parent']  == $moveThreadSubject){
-                                $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
-                            }
+                        if( $threadArray['parent']  == $moveThreadSubject){
+                            $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
+                        }
                     }
                 }
             }
@@ -668,12 +652,13 @@ class ForumController extends AppController
         $responseData = array('postdata' => $FinalPostArray, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
         return $this->render('post', $responseData);
     }
+
     public function calculatePostLevel($data)
     {
         $parentData = ForumPosts::getParentDataByParentId($data['parent']);
-        if($parentData['parent'] == 0)
+        if($parentData['parent'] == AppConstant::NUMERIC_ZERO)
         {
-            return 0;
+            return AppConstant::NUMERIC_ZERO;
         }else
         {
             $this->threadLevel++;
@@ -697,7 +682,6 @@ class ForumController extends AppController
             $this->createChild($this->children[key($this->children)], key($this->children));
         }
     }
-
     /*
      * controller ajax method for fetch select as remove thread from Thread page and remove from database.
      */
@@ -714,7 +698,7 @@ class ForumController extends AppController
         }else{
             ForumPosts::updateParentId($threadId,$deleteThreadData['parent']);
         }
-          return $this->successResponse($parentId);
+        return $this->successResponse($parentId);
     }
     /*
      * Controller Action To Reply To A Post
@@ -765,7 +749,6 @@ class ForumController extends AppController
             return $this->successResponse($isPost);
         }
     }
-
     /*
      * Controller Action To Redirect To New Thread Page
      */
@@ -813,7 +796,7 @@ class ForumController extends AppController
             {
                  $contentTrackRecord->insertForumData($this->getAuthenticatedUser()->id,$params['courseId'],$params['forumId'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
             }
-            return $this->successResponse();
+        return $this->successResponse();
     }
 
     /*Controller Action To Toggle The Flag Image On Click*/
@@ -822,7 +805,7 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $rowId = $params['rowId'];
         $userId = $params['userId'];
-        if ($rowId == -1) {
+        if ($rowId == AppConstant::NUMERIC_NEGATIVE_ONE) {
             $threadId = $params['threadId'];
             ForumView::deleteByUserIdAndThreadId($threadId, $userId);
         } else {
@@ -831,7 +814,6 @@ class ForumController extends AppController
         }
         return $this->successResponse();
     }
-
     /*
      * Controller Action To Search All Post In A Forum
      */
@@ -897,7 +879,6 @@ class ForumController extends AppController
             return $this->terminateResponse('No data');
         }
     }
-
     /*
      * Controller Action To Search Post Of That Forum
      */
@@ -936,7 +917,6 @@ class ForumController extends AppController
             return $this->terminateResponse('No Data');
         }
     }
-
     /*
      *
      */
@@ -1002,6 +982,7 @@ class ForumController extends AppController
             return $this->renderWithData('listPostByName', $responseData);
         }
     }
+
     public function actionLikePostAjax()
     {
         $this->guestUserHandler();
@@ -1009,11 +990,9 @@ class ForumController extends AppController
         $params = $this->getRequestParams();
         $like = $params['like'];
         if ($this->isPostMethod()) {
-
             if ($like == AppConstant::NUMERIC_ZERO) {
                 $like = new ForumLike();
                 $like->InsertLike($params, $userId);
-
             } elseif ($like == AppConstant::NUMERIC_ONE) {
                 $like = new ForumLike();
                 $like->DeleteLike($params, $userId);
@@ -1190,7 +1169,6 @@ class ForumController extends AppController
             if (count($subscriptionsData) > AppConstant::NUMERIC_ZERO) {
                 $hasSubScrip = true;
             }
-
             if($forumData['replyby'] > AppConstant::NUMERIC_ZERO && $forumData['replyby'] < AppConstant::ALWAYS_TIME){
                 $replyBy =  AppConstant::NUMERIC_ONE;
                 $forumData['replyby'] = AppUtility::tzdate("m/d/Y", $forumData['replyby']);
@@ -1209,12 +1187,12 @@ class ForumController extends AppController
                 $forumData['postby'] = date("m-d-Y",strtotime("+1 week"));
                 $postByTime = time();
             }
-             if($forumData['outcomes'])
-             {
-                 $outcomes = $forumData['outcomes'];
-             }else{
-                 $outcomes = ' ';
-             }
+            if($forumData['outcomes'])
+            {
+                $outcomes = $forumData['outcomes'];
+            }else{
+                $outcomes = ' ';
+            }
             list($postTag, $replyTag) = explode('--', $forumData['caltag']);
             $defaultValue = array(
                 'allowAnonymous' => $allNon,
@@ -1257,7 +1235,6 @@ class ForumController extends AppController
              if ($params['modifyFid']) {
                  if(isset($params['outcomes'])){
                      foreach ($params['outcomes'] as $outcomeId) {
-
                          if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                              $outcomes[] = intval($outcomeId);
                          }
@@ -1291,13 +1268,10 @@ class ForumController extends AppController
                 }
                 $finalArray['description'] = trim($params['forum-description']);
                 $finalArray['courseid'] = $params['cid'];
-
                 $finalArray['settings'] = $settingValue;
-
                 if($params['avail'] == AppConstant::NUMERIC_ONE)
                 {
                     if($params['available-after'] == AppConstant::NUMERIC_ZERO){
-
                         $startDate = AppConstant::NUMERIC_ZERO;
                     }
                     if($params['available-until'] == AppConstant::ALWAYS_TIME){
@@ -1305,24 +1279,18 @@ class ForumController extends AppController
                     }
                     $finalArray['startdate'] = $startDate;
                     $finalArray['enddate'] = $endDate;
-                }else
-                {
-
+                }else{
                     $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
                 }
-
                 $finalArray['sortby'] = $params['sort-thread'];
                 $finalArray['defdisplay'] = $params['default-display'];
-
                 if($params['post'] == AppConstant::NUMERIC_ONE){
                     $finalArray['postby'] = $postDate;
                 }else{
                     $finalArray['postby'] = $params['post'];
                 }
-
                 if($params['reply'] == AppConstant::NUMERIC_ONE){
-
                     $finalArray['replyby'] = $replyByDate;
                 }else{
                     $finalArray['replyby'] = $params['reply'];
@@ -1334,7 +1302,6 @@ class ForumController extends AppController
                     $finalArray['rubric'] = $params['rubric'];
                     if(isset($params['outcomes'])){
                         foreach ($params['outcomes'] as $outcomeId) {
-
                             if (is_numeric($outcomeId) && $outcomeId > AppConstant::NUMERIC_ZERO) {
                                 $outcomes[] = intval($outcomeId);
                             }
@@ -1355,7 +1322,6 @@ class ForumController extends AppController
                     $finalArray['rubric'] = AppConstant::NUMERIC_ZERO;
                     $finalArray['outcomes'] = " ";
                 }
-
                 $finalArray['groupsetid'] = $params['groupsetid'];
                 $finalArray['cntingb'] = $params['count-in-gradebook'];
                  $finalArray['avail'] = $params['avail'];
@@ -1376,7 +1342,7 @@ class ForumController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blockTree = array(0);
+                $blockTree = array(AppConstant::NUMERIC_ZERO);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
@@ -1388,13 +1354,14 @@ class ForumController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-            $this->includeJS(["forum/addforum.js","editor/tiny_mce.js",'assessment/addAssessment.js', 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
-            $this->includeCSS(['course/items.css']);
-            $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
-            'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
-                'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);
-            return $this->renderWithData('addForum', $responseData);
+        $this->includeJS(["forum/addforum.js","editor/tiny_mce.js",'assessment/addAssessment.js', 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $this->includeCSS(['course/items.css']);
+        $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
+        'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
+        'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);
+        return $this->renderWithData('addForum', $responseData);
     }
+
     public function flatArray($outcomesData)
     {
         global $pageOutcomesList;

@@ -620,7 +620,7 @@ class AssessmentController extends AppController
                 }
                 $pageGroupSets['val'][0] = AppConstant::NUMERIC_ZERO;
                 $pageGroupSets['label'][0] = AppConstant::GROUP_SET;
-                    $key = 1;
+                    $key = AppConstant::NUMERIC_ONE;
                 foreach ($query as $singleData) {
                     $pageGroupSets['val'][$key] = $singleData['id'];
                     $pageGroupSets['label'][$key] = $singleData['name'];
