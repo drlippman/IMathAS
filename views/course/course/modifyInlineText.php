@@ -69,7 +69,7 @@ include_once('../components/filehandler.php');
     <div class="youtube-video">
         <div class="col-lg-2"><?php AppUtility::t('List of YouTube videos')?></div>
         <div class="col-lg-10">
-            <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="isplaylist" value="1" <?php AppUtility::writeHtmlChecked($inlineText['isplaylist'],1);?>/><span class="cr"><i class="cr-icon fa fa-check"></i></span></label><td><?php AppUtility::t('Show as embedded playlist')?></td></div>
+            <div class="checkbox override-hidden"><label class="inline-checkbox label-visible"><input type="checkbox" name="isplaylist" value="1" <?php AppUtility::writeHtmlChecked($inlineText['isplaylist'],1);?> checked/><span class="cr"><i class="cr-icon fa fa-check"></i></span></label><td><?php AppUtility::t('Show as embedded playlist')?></td></div>
         </div>
     </div>
     <!--Show-->

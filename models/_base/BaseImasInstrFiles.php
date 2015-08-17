@@ -30,10 +30,10 @@ class BaseImasInstrFiles extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description', 'filename', 'itemid'], 'required'],
+            [['filename', 'itemid'], 'required'],
             [['itemid'], 'integer'],
             [['description'], 'string', 'max' => 254],
-            [['filename'], 'string', 'max' => 100]
+            [['filename'], 'string', 'max' => 1000]
         ];
     }
 
