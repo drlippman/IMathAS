@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use app\components\AppUtility;
 use app\components\AppConstant;
 $this->title = ucfirst($course->name);
+
 ?>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print' />
 <!--Get current time-->
@@ -24,7 +25,6 @@ $now = $currentTime;
         </div>
     </div>
 </div>
-
 <div class="item-detail-content">
     <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students]);?>
 </div>
@@ -32,10 +32,12 @@ $now = $currentTime;
 <!-- ////////////////// Assessment here //////////////////-->
 <div class="tab-content shadowBox student-no-second-level-nav">
     <?php if(count($courseDetail)){
+        AppUtility::dump($courseDetail);
         foreach($courseDetail as $key => $item){
 
             switch(key($item)):
                 case 'Assessment': ?>
+
                     <?php $assessment = $item[key($item)];
 
                     if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
@@ -401,7 +403,7 @@ $now = $currentTime;
                         <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
                             <ul class="fileattachlist">
                                 <li>
-                                    <a href="/open-math/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                                    <a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                                 </li>
                             </ul>
                         <?php } ?>
@@ -421,7 +423,7 @@ $now = $currentTime;
                         </div>
                         <?php foreach ($inline->instrFiles as $key => $instrFile) { ?>
                             <ul class="fileattachlist">
-                                <li><a href="/open-math/files/<?php echo $instrFile->filename ?>"
+                                <li><a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"
                                        target="_blank"><?php echo $instrFile->filename ?></a></li>
                             </ul>
                         <?php } ?>

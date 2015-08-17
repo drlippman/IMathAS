@@ -48,7 +48,7 @@ class Wiki extends BaseImasWikis
 
         if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            if($params['available-after'] == 0){
+            if($params['available-after'] == AppConstant::NUMERIC_ONE){
                 $startDate = 0;
             }
             if($params['available-until'] == AppConstant::ALWAYS_TIME){
@@ -90,8 +90,8 @@ class Wiki extends BaseImasWikis
 
             if($params['avail'] == AppConstant::NUMERIC_ONE)
             {
-                if($params['available-after'] == 0){
-                    $startDate = 0;
+                if($params['available-after'] == AppConstant::NUMERIC_ZERO){
+                    $startDate = AppConstant::NUMERIC_ZERO;
                 }
                 if($params['available-until'] == AppConstant::ALWAYS_TIME){
                     $endDate = AppConstant::ALWAYS_TIME;
@@ -103,13 +103,14 @@ class Wiki extends BaseImasWikis
                 $updateId->startdate = AppConstant::NUMERIC_ZERO;
                 $updateId->enddate = AppConstant::ALWAYS_TIME;
             }
-            $updateId->settings = 0;
+            $updateId->settings = AppConstant::NUMERIC_ZERO;
 
             if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
                 $tag = $params['rdatetype'];
             }
             $updateId->editbydate = $tag;
             $updateId->groupsetid = $params['group-wiki'];
+//                    AppUtility::dump($updateId);
             $updateId->save();
         }
     }

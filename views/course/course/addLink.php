@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
             <div class="pull-left header-btn">
                 <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $checkboxesValues['saveButtonTitle']; ?></button>

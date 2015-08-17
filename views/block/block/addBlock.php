@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
-                <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+                <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=blocks','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
             </div>
             <div class="pull-left header-btn">
                 <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultBlockData['saveTitle'] ?></button>
@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
 		        <div class=col-lg-10>
                     <label class="pull-left non-bold"><input type=radio name="available-after" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 0) ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
-                    <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio  class="pull-left" name="available-after" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '1', 1) ?>/><span style="padding-left: 15px"><?php AppUtility::t('Now')?></span></label><br><br>
+                    <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio  class="pull-left" name="available-after" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '1', 1) ?>/><span class="padding-left"><?php AppUtility::t('Now')?></span></label><br><br>
                     <label class="pull-left"><input type=radio name="available-after" class="pull-left" value="sdate" <?php echo AssessmentUtility::writeHtmlChecked($defaultBlockData['startDate'], '0', 1) ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
 		        <div class=col-lg-10>
                     <label class='pull-left non-bold'><input type=radio name="available-until" value="2000000000" <?php echo AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 0) ?>/><span style="padding-left: 15px"><?php AppUtility::t('Always after start date')?></span></label>
-                    <label class='pull-left non-bold' style="padding-left: 33px"><input type=radio name="available-until" class="pull-left"  value="edate" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 1) ?>/></label>
+                    <label class='pull-left non-bold' style="padding-left: 30px"><input type=radio name="available-until" class="pull-left"  value="edate" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['endDate'], '2000000000', 1) ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
@@ -106,17 +106,17 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="item-alignment">
         <div class=col-lg-2><?php AppUtility::t('When available')?></div>
         <div class=col-lg-10>
-            <input type=radio name=availBeh value="O" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'O')?> /><span style="padding-left: 15px"><?php AppUtility::t('Show Expanded')?></span><br>
-            <input type=radio name=availBeh value="C" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'C')?> /><span style="padding-left: 15px"><?php AppUtility::t('Show Collapsed')?></span><br>
-            <input type=radio name=availBeh value="F" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'F')?> /><span style="padding-left: 15px"><?php AppUtility::t('Show as Folder')?></span><br>
-            <input type=radio name=availBeh value="T" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'T')?> /><span style="padding-left: 15px"><?php AppUtility::t('Show as TreeReader')?></span>
+            <input type=radio name=availBeh value="O" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'O')?> /><span class="padding-left"><?php AppUtility::t('Show Expanded')?></span><br>
+            <input type=radio name=availBeh value="C" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'C')?> /><span class="padding-left"><?php AppUtility::t('Show Collapsed')?></span><br>
+            <input type=radio name=availBeh value="F" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'F')?> /><span class="padding-left"><?php AppUtility::t('Show as Folder')?></span><br>
+            <input type=radio name=availBeh value="T" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['availBeh'],'T')?> /><span class="padding-left"><?php AppUtility::t('Show as TreeReader')?></span>
         </div></div> <br class=form />
 
     <div class="item-alignment">
         <div class=col-lg-2><?php AppUtility::t('When not available')?></div>
             <div class=col-lg-10>
-                <input type=radio name=showhide value="H" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['showHide'],'H') ?> /><span style="padding-left: 15px"><?php AppUtility::t('Hide from Students')?></span><br>
-                <input type=radio name=showhide value="S" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['showHide'],'S') ?> /><span style="padding-left: 15px"><?php AppUtility::t('Show Collapsed/as folder')?></span>
+                <input type=radio name=showhide value="H" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['showHide'],'H') ?> /><span class="padding-left"><?php AppUtility::t('Hide from Students')?></span><br>
+                <input type=radio name=showhide value="S" <?php AssessmentUtility::writeHtmlChecked($defaultBlockData['showHide'],'S') ?> /><span class="padding-left"><?php AppUtility::t('Show Collapsed/as folder')?></span>
 
     </div></div><br class=form />
 

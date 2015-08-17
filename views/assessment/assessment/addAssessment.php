@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?><i class="fa fa-question help-icon"></i></div>
+            <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
         <div class="pull-left header-btn">
             <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
@@ -194,11 +194,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <span class=form></span>
     <br class=form>
-    <div class="clickme" style="padding: 20px; background-color:#f0f0f0; margin-bottom: 20px">
-        <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png"><?php AppUtility::t('Core Options')?>
+
+    <div class="clickme row add-item1" onclick="xyz()">
+        <div class="col-md-1 plus-icon" style="padding-right: 0">
+            <img class="assessment-add-item-icon" id="img"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
+        </div>
+        <div class="col-md-2 add-item-text" style="padding-left: 0">
+            <p><?php AppUtility::t('Core Options');?></p>
+        </div>
     </div>
-        <div id="customoptions" class="core-options" style="background-color: #fafafa">
-        <fieldset>
+        <div id="customoptions" class="core-options">
             <div class=col-lg-2><?php AppUtility::t('Require Password (blank for none)')?></div>
             <div class=col-lg-10>
                 <input type="password" name="assmpassword" id="assmpassword" value="<?php echo $assessmentData['password'];?>" autocomplete="off"> <a href="#" onclick="apwshowhide(this);return false;"><?php AppUtility::t('Show')?></a>
@@ -210,8 +215,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <input type="checkbox" name="timelimitkickout" <?php if ($timeLimit<0) echo 'checked="checked"';?> /> Kick student out at timelimit
                     </div><BR class=form><br>
             <div class=col-lg-2><?php AppUtility::t('Display method:')?></div>
-            <div class=col-lg-10>
-                <select name="displaymethod">
+            <div class=col-lg-9>
+                <select name="displaymethod" class="form-control">
                     <option value="AllAtOnce" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"AllAtOnce",AppConstant::NUMERIC_ZERO) ?>>Full test at once</option>
                     <option value="OneByOne" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"OneByOne",AppConstant::NUMERIC_ZERO) ?>>One question at a time</option>
                     <option value="Seq" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"Seq",AppConstant::NUMERIC_ZERO) ?>>Full test, submit one at time</option>
@@ -234,9 +239,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><BR class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Default penalty')?></div>
-                    <div class=col-lg-10>
-                        <input type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>%
-                        <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
+                    <div class=col-lg-2>
+                        <input type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>> %
+                        <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';} ?> class="form-control">
                             <option value="0" <?php if ($skipPenalty==AppConstant::NUMERIC_ZERO) {echo "selected=1";} ?>>per missed attempt</option>
                             <option value="1" <?php if ($skipPenalty==AppConstant::NUMERIC_ONE) {echo "selected=1";} ?>>per missed attempt, after 1</option>
                             <option value="2" <?php if ($skipPenalty==AppConstant::NUMERIC_TWO) {echo "selected=1";} ?>>per missed attempt, after 2</option>
@@ -249,8 +254,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><BR class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Feedback method')?></div>
-                    <div class=col-lg-10>
-                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" >
+                    <div class=col-lg-9>
+                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" class="form-control">
                             <option value="NoScores" <?php if ($testType=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
                             <option value="EndScore" <?php if ($testType=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
                             <option value="EachAtEnd" <?php if ($testType=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
@@ -263,9 +268,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><BR class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Show Answers')?></div>
-                    <div class=col-lg-10>
+                    <div class=col-lg-9>
                         <span id="showanspracspan" class="<?php if ($testType=="Practice" || $testType=="Homework") {echo "show";} else {echo "hidden";} ?>">
-                        <select name="showansprac">
+                        <select name="showansprac" class="form-control">
                             <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
                             <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
                             <option value="F" <?php if ($showAnswer=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
@@ -279,7 +284,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </select>
                         </span>
                         <span id="showansspan" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?>">
-                        <select name="showans">
+                        <select name="showans" class="form-control">
                             <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
                             <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
                             <option value="I" <?php if ($showAnswer=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
@@ -289,8 +294,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         </span>
                     </div><br class=form><br>
             <div class="col-lg-2"><?php AppUtility::t('Use equation helper?')?></div>
-                    <div class="col-lg-10">
-                        <select name="eqnhelper">
+                    <div class="col-lg-9">
+                        <select name="eqnhelper" class="form-control">
                             <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                             <?php
                             //start phasing these out; don't show as option if not used.
@@ -311,14 +316,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><br class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Show "ask question" links?')?></div>
-                    <div class=col-lg-10>
+                    <div class=col-lg-9>
                         <input type="checkbox" name="msgtoinstr" <?php AssessmentUtility::writeHtmlChecked($assessmentData['msgtoinstr'],AppConstant::NUMERIC_ONE); ?>/><span class="padding-left non-bold"><?php AppUtility::t('Show "Message instructor about this question" links')?></span><br>
                         <input type="checkbox" name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($assessmentData['posttoforum'],AppConstant::NUMERIC_ZERO,true); ?>/><span class="padding-left non-bold">Show "Post this question to forum" links, to forum <?php AssessmentUtility::writeHtmlSelect("posttoforum",$pageForumSelect['val'],$pageForumSelect['label'],$assessmentData['posttoforum']); ?></span>
                     </div><br class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Show answer entry tips?')?></div>
-                    <div class=col-lg-10>
-                        <select name="showtips">
+                    <div class=col-lg-9>
+                        <select name="showtips" class="form-control">
                             <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                             <option value="1" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ONE) ?>>Yes, after question</option>
                             <option value="2" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_TWO) ?>>Yes, under answerbox</option>
@@ -326,7 +331,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><br class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Allow use of LatePasses?')?></div>
-                    <div class=col-lg-10>
+                    <div class=col-lg-9>
                         <?php
                         AssessmentUtility::writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN);'<br>'
                         ?>
@@ -345,7 +350,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div><BR class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Gradebook Category')?></div>
-                    <div class=col-lg-10>
+                    <div class=col-lg-9>
 
         <?php
         AssessmentUtility::writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCategorySelect['label'],$gradebookCategory,"Default",AppConstant::NUMERIC_ZERO);
@@ -361,12 +366,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     <span <?php if ($testType!="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="praccntingb">
                         <input type=radio name="pcntingb" value="0" <?php AssessmentUtility::writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?> /><span class="padding-left">Don't count in grade total and hide from students</span><br/>
                         <input type=radio name="pcntingb" value="3" <?php AssessmentUtility::writeHtmlChecked($pointCountInGradebook,AppConstant::NUMERIC_THREE,AppConstant::NUMERIC_ZERO); ?> /><span class="padding-left">Don't count in grade total</span><br/>
-                    </div></span><br class=form />
+                    </div></span><br class=form /><BR class=form>
             <?php
             if (!isset($CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) {
         //        ?>
                 <div class="col-lg-2">Tutor Access:</div>
-                <div class="col-lg-10">
+                <div class="col-lg-9">
                     <?php
                     AssessmentUtility::writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$assessmentData['tutoredit']);
                     ?>
@@ -380,31 +385,35 @@ $this->params['breadcrumbs'][] = $this->title;
                         Review: <input name="caltagrev" type=text size=4 value="<?php echo $assessmentData['calrtag'];?>"/>
                     </div><br class="form" /><br>
 
-        </fieldset></div>
+        </div>
 
-    <div class="clickmegreen" style="padding: 20px; background-color:#f0f0f0;">
-        <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png"><?php AppUtility::t('Advanced Options')?>
+    <div class="clickmegreen row add-item1" style="margin-top: 10px" onclick="xyz1()">
+        <div class="col-md-1 plus-icon">
+            <img class="assessment-add-item-icon" id="img1"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
+        </div>
+        <div class="col-md-2 add-item-text">
+            <p><?php AppUtility::t('Advance Options');?></p>
+        </div>
     </div>
         <div id="customoptions" class="advance-options" style="background-color: #fafafa">
-        <fieldset>
             <br><div class=col-lg-2><?php AppUtility::t('Minimum score to receive credit')?></div>
                     <div class=col-lg-10>
                         <input type=text size=4 name=minscore value="<?php echo $assessmentData['minscore'];?>">
-                        <input type="radio" name="minscoretype" value="0" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>> Points
-                        <label style="padding-left: 90px"><input type="radio" name="minscoretype" value="1" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ONE);?>>Percent</label>
+                        <input type="radio" name="minscoretype" value="0" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>><span class="padding-left">Points</span>
+                        <label class="non-bold" style="padding-left: 90px"><input type="radio" name="minscoretype" value="1" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ONE);?>><span class="padding-left">Percent</span></label>
                     </div><BR class=form><br>
 
             <div class=col-lg-2><?php AppUtility::t('Show based on another assessment')?></div>
-                    <div class=col-lg-10><?php AppUtility::t('Show only after a score of')?>
+                    <div class=col-lg-9><?php AppUtility::t('Show only after a score of')?>
                         <input type=text size=4 name=reqscore value="<?php echo $assessmentData['reqscore'];?>">
-                       <?php AppUtility::t('points is obtained on')?>
+                       <?php AppUtility::t('points is obtained on')?><br /><br/>
                         <?php
                         AssessmentUtility::writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null);
                         ?>
                     </div><br class=form><br>
             <div class="col-lg-2"><?php AppUtility::t('Default Feedback Text')?></div>
                     <div class="col-lg-10">
-                        Use? <input type="checkbox" name="usedeffb" <?php AssessmentUtility::writeHtmlChecked($useDefFeedback,true); ?>><br/>
+                        Use? <input type="checkbox" name="usedeffb" <?php AssessmentUtility::writeHtmlChecked($useDefFeedback,true); ?>><br/><br/>
                         Text: <input type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$defFeedback);?>" />
                     </div><br class="form" /><br>
             <div class=col-lg-2>All items same random seed: </div>
@@ -423,10 +432,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class=col-lg-2>Group assessment: </div>
                     <div class=col-lg-10>
-                        <input type="radio" name="isgroup" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> />Not a group assessment<br/>
-                        <input type="radio" name="isgroup" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ONE); ?> />Students can add members with login passwords<br/>
-                        <input type="radio" name="isgroup" value="2" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_TWO); ?> />Students can add members without passwords<br/>
-                        <input type="radio" name="isgroup" value="3" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_THREE); ?> />Students cannot add members, and can't start the assessment until you add them to a group
+                        <input type="radio" name="isgroup" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> /><span class="padding-left">Not a group assessment</span><br/>
+                        <input type="radio" name="isgroup" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ONE); ?> /><span class="padding-left">Students can add members with login passwords</span><br/>
+                        <input type="radio" name="isgroup" value="2" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_TWO); ?> /><span class="padding-left">Students can add members without passwords</span><br/>
+                        <input type="radio" name="isgroup" value="3" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_THREE); ?> /><span class="padding-left">Students cannot add members, and can't start the assessment until you add them to a group</span>
                     </div><br class="form" /><br>
             <div class=col-lg-2>Max group members (if group assessment): </div>
                     <div class=col-lg-10>
@@ -441,13 +450,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo '<br/>Cannot change group set after the assessment has started';
                             }
                         }?></div>
-                    <div class="col-lg-10">
+                    <div class="col-lg-9">
                         <?php AssessmentUtility::writeHtmlSelect("groupsetid",$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],"Not group forum",0); ?>
         <!--				--><?php //AssessmentUtility::writeHtmlSelect('groupsetid',$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],null,null,($assessmentSessionData && $assessmentData['isgroup']>AppConstant::NUMERIC_ZERO)?'disabled="disabled"':''); ?>
                     </div><br class="form" /><br>
 
             <div class="col-lg-2">Default Outcome:</div>
-                    <div class="col-lg-10"><select name="defoutcome">
+                    <div class="col-lg-9"><select name="defoutcome" class="form-control">
                             <?php
                             $inGroup = false;
                             $isSelected = false;
@@ -469,17 +478,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class=col-lg-2>Show question categories:</div>
                     <div class=col-lg-10>
-                        <input name="showqcat" type="radio" value="0" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"0"); ?>>No <br />
-                        <input name="showqcat" type="radio" value="1" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"1"); ?>>In Points Possible bar <br />
-                        <input name="showqcat" type="radio" value="2" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"2"); ?>>In navigation bar (Skip-Around only)
+                        <input name="showqcat" type="radio" value="0" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"0"); ?>><span class="padding-left">No</span> <br />
+                        <input name="showqcat" type="radio" value="1" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"1"); ?>><span class="padding-left">In Points Possible bar</span> <br />
+                        <input name="showqcat" type="radio" value="2" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"2"); ?>><span class="padding-left">In navigation bar (Skip-Around only)</span>
                     </div><br class="form" /><br>
 
             <div class=col-lg-2>Display for tutorial-style questions: </div>
                     <div class=col-lg-10>
                         <input type="checkbox" name="istutorial" <?php AssessmentUtility::writeHtmlChecked($assessmentData['istutorial'],AppConstant::NUMERIC_ONE); ?>>
                     </div><BR class=form><br>
-
-        </fieldset>
         </div>
 
 </div></form>
@@ -488,15 +495,46 @@ $this->params['breadcrumbs'][] = $this->title;
     $(document).ready(function(){
         $('.core-options').hide();
         $('.advance-options').hide();
-
-        $('.clickme').click(function()
-        {
-            $('.core-options').toggle();
-        });
-        $('.clickmegreen').click(function(){
-
-            $('.advance-options').toggle();
-        })
+        var img = document.getElementById('img');
+        var img1 = document.getElementById('img1');
     });
+        var cnt=0;
+        var cnt1 = 0;
+    function xyz()
+    {
+        var img = document.getElementById('img');
+        $('.core-options').toggle();
+        if(cnt == 0)
+        {
+            $('.clickme').css('background-color','#fafafa');
+            $('.core-options').css('background-color','#fafafa');
+            img.src= '../../img/assessMinusIcon.png';
+            cnt++;
+        }else if(cnt > 0)
+        {
+            $('.clickme').css('background-color','#f0f0f0');
+            img.src= '../../img/assessAddIcon.png';
+            cnt = 0;
+        }
+
+    }
+
+    function xyz1()
+    {
+        var img1 = document.getElementById('img1');
+        $('.advance-options').toggle();
+        if(cnt1 == 0)
+        {
+            $('.clickmegreen').css('background-color','#fafafa');
+            $('.advance-options').css('background-color','#fafafa');
+            img1.src= '../../img/assessMinusIcon.png';
+            cnt1++;
+        }else if(cnt1 > 0)
+        {
+            $('.clickmegreen').css('background-color','#f0f0f0');
+            img1.src= '../../img/assessAddIcon.png';
+            cnt1 = 0;
+        }
+    }
 
 </script>

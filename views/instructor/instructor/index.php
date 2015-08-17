@@ -42,7 +42,7 @@ $now = $currentTime;
             <a href="#"><?php AppUtility::t('Export Course');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
-            <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('outcomes');?></a>
+            <a href="<?php echo AppUtility::getURLFromHome('Outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('outcomes');?></a>
         </div>
         <ul class="nav nav-tabs  roster-menu-bar-nav sub-menu col-md-2 pull-right">
             <li class="dropdown">
@@ -74,7 +74,7 @@ $now = $currentTime;
         <div class="col-md-1 plus-icon">
             <img class="add-item-icon" src="<?php echo AppUtility::getAssetURL()?>img/addItem.png">
         </div>
-        <div class=" col-md-2 add-item-text">
+        <div class="col-md-2 add-item-text">
             <p><?php AppUtility::t('Add An Item...');?></p>
         </div>
     </div>

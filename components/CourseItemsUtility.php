@@ -597,13 +597,11 @@ class CourseItemsUtility extends Component
                 foreach ($inline->instrFiles as $key => $instrFile) { ?>
                     <ul class="fileattachlist">
                         <li>
-                            <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                            <a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                         </li>
                     </ul>
                 <?php  }
             } ?>
-
-
         </div>
     <?php } elseif($inline->avail == 0) { ?>
         <div class="item">
@@ -614,7 +612,7 @@ class CourseItemsUtility extends Component
 
             <div class="title">
                 <b><?php echo ucfirst($inline->title) ?></b>
-                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <a class="dropdown-toggle grey-color-link select_button1" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                 <ul class=" select1 dropdown-menu selected-options pull-right">
                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course', 'course/modify-inline-text?id=' . $inline->id.'&courseId=' .$course->id)?>"><?php AppUtility::t('Modify');?></a></li>
                     <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
@@ -631,7 +629,7 @@ class CourseItemsUtility extends Component
                 foreach ($inline->instrFiles as $key => $instrFile) { ?>
                     <ul class="fileattachlist">
                         <li>
-                            <a href="/openmath/files/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
+                            <a href="/math/web/Uploads/<?php echo $instrFile->filename ?>"><?php echo $instrFile->filename ?></a>
                         </li>
                     </ul>
                 <?php }

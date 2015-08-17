@@ -681,10 +681,10 @@ function copyqimage($key,$dest) {
 
 function getuserfileurl($key) {
 	global $urlmode,$imasroot;
-		return "localhost/openmath/web/Uploads/$key";
+		return "localhost/math/web/Uploads/$key";
 }
 function getcoursefileurl($key) {
-		return "localhost/openmath/web/Uploads/$key";
+		return "localhost/math/web/Uploads/$key";
 	}
 function mkdir_recursive($pathname, $mode=0777)
 {

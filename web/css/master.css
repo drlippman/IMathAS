@@ -404,3 +404,9 @@ i.fa-home{
 
 }
 
+.help-img{
+    width: 32px;
+    height: 34px;
+    margin-left: 10px;
+    cursor: pointer;
+}
