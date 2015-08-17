@@ -134,19 +134,10 @@ table.dataTable thead th, table.dataTable thead td {
 .main-div{
     padding: 15px;
 }
-/*#forum_search{*/
-    /*background-color: #1460AA;*/
-    /*color: white;*/
-    /*border-radius: 0px;*/
-    /*height: 36px;*/
-    /*width: 9%;*/
-/*}*/
-
 #search_text
 {
 
     height: 35px;
-    text-align: center;
     width: auto;
     margin-right: 10px;
 }
@@ -166,15 +157,12 @@ table.dataTable thead th, table.dataTable thead td {
     color: #555;
     background-color: #fff;
     background-image: none;
-
-
 }
 .forum-background
 {
     background-color: #f8f8f8;
     padding: 15px;
     height: 60px;
-    margin-right: 12px;
 }
 /*#forum_search{*/
     /*background-color: #1460AA;*/
@@ -203,8 +191,7 @@ table.dataTable thead th, table.dataTable thead td {
 
 .second-level-div
 {
-
-    margin-right: 3px;
+    margin-right: 16px;
 }
 .new-post{
 

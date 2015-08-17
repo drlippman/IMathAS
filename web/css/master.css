@@ -362,6 +362,10 @@ i.fa-home{
 .myclasses > li >ul
 {
     background-color: #104E87;
+    overflow-y: scroll;
+    height: auto;
+    max-height: 300px;
+    max-width: 300px;
 }
 .myclasses > li > ul> li >a
 {

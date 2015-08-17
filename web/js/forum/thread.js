@@ -30,9 +30,6 @@ $(document).ready(function ()
         {
 
             $('.forum-table').DataTable().destroy();
-            $("#limit-to-tag-link").hide();
-            $('#limit-to-new-link').hide();
-            $("#show-all-link").show();
             var isValue = 1;
             var forumid= $('#forumid').val();
             var thread = {forumid: forumid , isValue: isValue};
@@ -43,9 +40,6 @@ $(document).ready(function ()
         {
 
             $('.forum-table').DataTable().destroy();
-            $("#limit-to-tag-link").hide();
-            $('#limit-to-new-link').hide();
-            $("#show-all-link").show();
             var isValue = 2;
             var forumid= $('#forumid').val();
             var thread = {forumid: forumid , isValue: isValue};
@@ -54,16 +48,9 @@ $(document).ready(function ()
         }
         else if(selected == 3)
         {
-            var isValue = 3;
-            var forumid= $('#forumid').val();
-            $('.forum-table').DataTable().destroy();
-            var thread = {forumid: forumid , isValue: isValue};
-            jQuerySubmit('get-thread-ajax',thread,'threadSuccess');
+            window.location.reload();
         }
     });
-
-
-
     $('#change-button').click(function(){
         var searchText = $('#search_text').val();
         var courseid = $('#courseid').val();
