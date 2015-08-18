@@ -410,20 +410,31 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 		$r2 = mysql_query($query) or die("Query failed : " . mysql_error());
 		while ($row = mysql_fetch_row($r2)) {
 			if ($GLOBALS['filehandertypecfiles'] == 's3') {
-				copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
+				if (!file_exists("../assessment/qimages".DIRECTORY_SEPARATOR.trim($row[0]))) {
+					copyqimage($row[0], realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]));
+				}
 			}
 			$imgfiles[] = realpath("../assessment/qimages").DIRECTORY_SEPARATOR. trim($row[0]);
 		}
 	}
 	// need to work on
-	include("../includes/tar.class.php");
+	/*include("../includes/tar.class.php");
 	if (file_exists("../course/files/qimages.tar.gz")) {
 		unlink("../course/files/qimages.tar.gz");
 	}
 	$tar = new tar();
 	$tar->addFiles($imgfiles);
 	$tar->toTar("../course/files/qimages.tar.gz",TRUE);
-	
+	*/
+	if (class_exists('ZipArchive')) {
+		$zip = new ZipArchive();
+		if ($zip->open("../course/files/qimages.zip", ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE )===TRUE) {
+			foreach ($imgfiles as $file) {
+				$zip->addFile($file,basename($file));
+			}
+		} 
+		$zip->close();
+	}
 	
 	if (class_exists('ZipArchive')) {
 		$zip = new ZipArchive();
@@ -500,7 +511,7 @@ if ($overwriteBody==1) {
 		</table>
 		<p><input type=submit name="export" value="Export Items"></p>
 	</form>
-	<p>Once exported, <a href="../course/files/qimages.tar.gz">download image files</a> to be put in assessment/qimages</p>
+	<p>Once exported, <a href="../course/files/qimages.zip">download image files</a> to be put in assessment/qimages</p>
 	<?php
 	if (class_exists('ZipArchive')) {
 		echo '<p>Once exported, <a href="../course/files/coursefilepack'.$cid.'.zip">download course files</a> to be put in course/files/</p>';

@@ -45,7 +45,7 @@ if (isset($_GET['delete'])) {
 	}
 	
 	
-	$linktype = $_GET['type'];
+	$linktype = $_POST['type'];
 	$iteminfo = array();
 	$query = "SELECT id,itemtype,typeid FROM imas_items WHERE courseid=$cid";
 	$r = mysql_query($query) or die("Query failed : " . mysql_error());
