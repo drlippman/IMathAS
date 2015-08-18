@@ -1,0 +1,13 @@
+.btn-color
+{
+    background-color: #12856D;
+    color: #FFF;
+}
+.btn-primary-1
+{
+    color: #FFF;
+    background-color: #12856D;
+    color:whitesmoke;
+    text-transform: capitalize;
+    border-radius: 0px;
+}

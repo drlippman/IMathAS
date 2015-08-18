@@ -33,7 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
     var isArray;
     var outcome;
     var html = "";
-    function addOutcomeGrp(){
+    function addOutcomeGrp()
+    {
         var html = '<li class="blockli" id="newgrp"><span class=icon style="background-color:#66f">G</span>';
         html += '<input class="outcomeGrp" type="text" size="60" id="newgrp'+cnt+'" > ';
         html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
@@ -126,7 +127,6 @@ function printOutcomes(outcomeGrp){
     {
         if(group.length == undefined)
         {
-
             html += '<li class="blockli" id="newgrp'+cnt+'">';
             html +='<span class=icon style="background-color:#66f">G</span>';
             html += '<input class="outcomeGrp" type="text" size="60" id="g'+cnt+'" value="'+group['name']+'" > ';
@@ -142,13 +142,11 @@ function printOutcomes(outcomeGrp){
         }
         else
         {
-
             html += '<li id="'+group+'">';
             html +='<span class=icon style="background-color:#0f0">O</span>';
             html += '<input class="outcome" type="text" size="60" id="new" value="'+outcome[group]+'">';
             html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
         }
-
     });
     return html;
 }

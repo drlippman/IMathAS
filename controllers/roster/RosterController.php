@@ -1286,6 +1286,7 @@ class RosterController extends AppController
     public function actionLoginLog()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('uid');
         $userData = User::getById($userId);
@@ -1302,6 +1303,7 @@ class RosterController extends AppController
             );
             array_push($loginLogData, $tempArray);
         }
+        $this->includeCSS(['roster/roster.css']);
         $responseData = array('course' => $course, 'userFullName' => $userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId);
         return $this->renderWithData('loginLog', $responseData);
     }
@@ -1309,6 +1311,7 @@ class RosterController extends AppController
     public function actionActivityLog()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('uid');
         $userData = User::getById($userId);
@@ -1385,6 +1388,7 @@ class RosterController extends AppController
                 $forumName[$query['id']] = $query['name'];
             }
         }
+        $this->includeCSS(['roster/roster.css']);
         $responseData = array('course' => $course, 'userFullName' => $userFullName, 'userId' => $userId, 'exnames' => $exnames, 'forumPostName' => $forumPostName,
             'actions' => $actions, 'assessmentName' => $assessmentName, 'inlineTextName' => $inlineTextName, 'linkName' => $linkName, 'wikiName' => $wikiName, 'forumName' => $forumName);
         return $this->renderWithData('activityLog', $responseData);

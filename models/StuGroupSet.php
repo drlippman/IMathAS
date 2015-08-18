@@ -30,4 +30,40 @@ class StuGroupSet extends BaseImasStugroupset {
         return $this->id;
     }
 
+    public static  function findGroupData($courseId)
+    {
+        $query = new Query();
+        $query	->select(['id','name'])
+            ->from('imas_stugroupset')
+            ->where(['courseid' => $courseId])
+            ->orderBy('name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function InsertGroupData($groupName,$courseId)
+    {
+        $this->name = $groupName;
+        $this->courseid = $courseId;
+        $this->save();
+    }
+
+    public  static function getByGrpSetId($renameGrpSetId)
+    {
+        return StuGroupSet::find('name')->where(['id' => $renameGrpSetId])->one();
+
+    }
+
+    public function UpdateGrpSet($modifiedGrpName,$renameGrpSetId)
+    {
+     $query = StuGroupSet::find('name')->where(['id' => $renameGrpSetId])->one();
+     if($query)
+     {
+        $query->name = $modifiedGrpName;
+        $query->save();
+
+     }
+  }
+
 }
