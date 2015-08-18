@@ -208,7 +208,7 @@ public static function storeuploadedqimage($id,$key,$sec="public-read") {
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
-				mkdir_recursive($dir);
+				filehandler::mkdir_recursive($dir);
 			} 
 			$t=0; $tfn = $fn;
 			while(file_exists($dir.'/'.$fn)){
@@ -686,15 +686,15 @@ function getuserfileurl($key) {
 function getcoursefileurl($key) {
 		return "localhost/math/web/Uploads/$key";
 	}
-function mkdir_recursive($pathname, $mode=0777)
+public static function mkdir_recursive($pathname, $mode=0777)
 {
-    is_dir(dirname($pathname)) || mkdir_recursive(dirname($pathname), $mode);
+    is_dir(dirname($pathname)) || filehandler::mkdir_recursive(dirname($pathname), $mode);
     return is_dir($pathname) || @mkdir($pathname, $mode);
 }
 public static function recursiveRmdir($dir) {
 	if (basename($dir)=='adata' || basename($dir)=='ufiles' || basename($dir)=='files') { return;}
 	if (@rmdir($dir)) {
-		recursiveRmdir(dirname($dir));
+		filehandler::recursiveRmdir(dirname($dir));
 	}
 }
 public static function unlinkRecursive($dir, $deleteRootToo) {

@@ -92,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <label class="non-bold" style="padding-left: 79px"><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none';"/><span class="padding-left"><?php AppUtility::t('Hide')?></span></label><br>
             </div><br class="form"/>
 
-        <div id="datediv" style="padding-top:20px; display:<?php echo ($assessmentData['avail']==AppConstant::NUMERIC_ONE)?"block":"none"; ?>">
+        <div id="datediv" style="padding-top:20px; display:<?php echo ($assessmentData['avail']==AppConstant::NUMERIC_ONE)?'block':'none'; ?>">
 
             <div class=col-lg-2 ><?php AppUtility::t('Available After')?></div>
                 <div class=col-lg-10>

@@ -1,0 +1,66 @@
+<html><body>
+<h1>Macro Library crypto</h1>
+Cryptography functions, Nov 2, 2012
+<BR><ul>
+<li><a href="#chunktext">chunktext</a></li>
+<li><a href="#randfiveletterword">randfiveletterword</a></li>
+<li><a href="#randmilphrase">randmilphrase</a></li>
+<li><a href="#shiftcipher">shiftcipher</a></li>
+<li><a href="#randsubmap">randsubmap</a></li>
+<li><a href="#subcipher">subcipher</a></li>
+<li><a href="#transcipher">transcipher</a></li>
+<li><a href="#modularexponent">modularexponent</a></li>
+<li><a href="#cryptorsakeys">cryptorsakeys</a></li>
+</ul>
+<h3><a name="chunktext">chunktext</a></h3>
+chunktext(text, size)
+<BR>adds spaces between chunks of text of the given size
+<BR><h3><a name="randfiveletterword">randfiveletterword</a></h3>
+randfiveletterword()
+<BR>returns a random five-letter word
+<BR><h3><a name="randmilphrase">randmilphrase</a></h3>
+randmilphrase([removespaces],[pad])
+<BR>returns a random military-ish phrase like "at noon march towards target"
+<BR>if removespaces is set to true, all spaces will be removed
+<BR>if pad is set to a number N, then the phrase will be padded with random characters
+<BR>for a transposition cipher with N columns.
+<BR><h3><a name="shiftcipher">shiftcipher</a></h3>
+shiftcipher(message, shift, [alpha] [rotate]) 
+<BR>encrypts the message using a basic Caesar shift substitution cipher.
+<BR>shift can be numeric value (e.g., 3 means A encrypts as D), or can be a letter
+<BR>  indicating what A encrypts as
+<BR>alpha should be "alpha" for A-Z or "alphanum" for A-Z0-9.  Defaults to "alpha"
+<BR>if rotate is set to true, then the shift will be increased after each letter
+<BR>  is encrypted.  Can set to a number to shift by more 1 after each letter.
+<BR><h3><a name="randsubmap">randsubmap</a></h3>
+randsubmap([charset])
+<BR>generates a random substitution mapping
+<BR>by default uses A-Z.  Set charset="alphanum" or A-Z0-9
+<BR><h3><a name="subcipher">subcipher</a></h3>
+subcipher(message, submap, [alpha] [rotate]) 
+<BR>encrypts the message using a general substitution cipher.
+<BR>submap is a string consisting of all characters of the character set in 
+<BR> desired mapping order
+<BR>alpha should be "alpha" for A-Z or "alphanum" for A-Z0-9.  Defaults to "alpha"
+<BR>if rotate is set to true, then the shift will be increased after each letter
+<BR>  is encrypted.  Can set to a number to shift by more 1 after each letter.
+<BR><h3><a name="transcipher">transcipher</a></h3>
+transcipher(message, columns, [order])
+<BR>encrypts a message using a basic transposition cipher, writing the message
+<BR>in rows, each with the given number of columns.  The encrypted message is
+<BR>then formed by reading down the columns.
+<BR>message is padded if needed with A's.
+<BR>by default, the columns are read from left to right.  If an array of numbers (0 to cols-1)
+<BR>are provided for order, they will specify the order to read.  If a word is
+<BR>fed in for order, it will serve as the the code-word, and columsn will be read
+<BR>in the alphabetic order of the letters in the word (e.g. day would mean 2 1 3
+<BR>since a is the first of the letters in the alphabet, d is 2nd, etc)
+<BR>
+<BR><h3><a name="modularexponent">modularexponent</a></h3>
+modularexponent(base, exponent, modulus)
+<BR>calculates base^exponent mod modulus
+<BR><h3><a name="cryptorsakeys">cryptorsakeys</a></h3>
+cryptorsakeys(p, q) 
+<BR>given two primes, p and q, returns array(n, e, d)
+<BR>where n and e form the public key, and d is the private key
+<BR>

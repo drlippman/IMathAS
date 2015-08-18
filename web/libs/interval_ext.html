@@ -1,0 +1,18 @@
+<html><body>
+<h1>Macro Library interval_ext</h1>
+Interval functions extension. Version 1.0 November 4, 2014
+<BR><ul>
+<li><a href="#canonicInterval">canonicInterval</a></li>
+<li><a href="#intersection">intersection</a></li>
+</ul>
+<h3><a name="canonicInterval">canonicInterval</a></h3>
+canonicInterval(IntervalString)
+<BR>Forms a canonic interval string, consisting of a union of connected intervalls sorted by order
+<BR>IntervalString: Union of intervals as string
+<BR>Example: canonicInterval("[2,2^2) U (-1,3]")="(-1,2^2)"
+<BR><h3><a name="intersection">intersection</a></h3>
+intersection(arrayOfIntervals)
+<BR>Forms the intersection of unions of intervals in an array
+<BR>arrayOfIntervals: array of strings in interval notation, ex: [2,5)
+<BR>Example: intersection(array("(-2,0) U (0,2)","[-1,1)"))="[-1,0) U (0,1)"
+<BR>

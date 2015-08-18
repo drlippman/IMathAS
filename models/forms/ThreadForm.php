@@ -14,6 +14,23 @@ use yii\base\Model;
 use Yii;
 class ThreadForm extends Model
 {
+    public $file;
+
+    public function rules()
+    {
+        return [
+            ['file','safe'],
+            [['file'], 'file'],
+        ];
+    }
+    public function attributeLabels()
+    {
+        return
+            [
+                'file' => ' '
+            ];
+    }
+
     public static  function thread($forumid){
         $sortBy = AppConstant::DESCENDING;
         $thread = ForumPosts::find()->where(['forumid' => $forumid])->orderBy(['posttype'=> $sortBy ,'id' => $sortBy])->all();

@@ -47,7 +47,7 @@ if (isset($params['selectrights'])) {
 $allsrights = 2+3*$selectrights;
 
 $rights = array();
-$sortorder = array();
+$sortorder = array();AppUtility::dump('hi');
 foreach ($libraryData as $line)  {
     $id = $line['id'];
     $name = addslashes($line['name']);

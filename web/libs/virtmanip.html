@@ -1,0 +1,120 @@
+<html><body>
+<h1>Macro Library virtmanip</h1>
+Virtual Manipulatives
+<BR>Functions for displaying and scoring virtual manipulatives.  
+<BR>
+<BR>Some of these can be used an exploration/calculation aid in a question without
+<BR>being scored.  Most have the ability to score the interaction with the manipulative.
+<BR>
+<BR>When being scored, use the String question type.  For most of these, you must
+<BR>manually implement the scoring, usually by defining a wrong $answer, then changing
+<BR>it to match the value from $stuanswers if the values are correct.  
+<BR>A typical pattern would look like:
+<BR>
+<BR>loadlibrary("virtmanip")
+<BR>$listener = vmgetlistener($thisq)
+<BR>$stua = $stuanswers[$thisq]
+<BR>$vm = vmsetupnumberline($stua,$thisq)
+<BR>$showanswer = "Answers will vary"
+<BR>$answer = "wrong".$stua
+<BR>if ($stua != null) {
+<BR>&nbsp;&nbsp;$scale,$val = vmnumberlinegetvals($stua)
+<BR>&nbsp;&nbsp;$answer = $stua if ($val==$correctval)
+<BR>}
+<BR>
+<BR>Then $vm and $listener would get placed in the question text.
+<BR>To hide the answerbox, wrap it in something like this:
+<BR>&lt;div style="position:absolute;left:0;right:0;visibility:hidden"&gt;$answerbox&lt;/div&gt;
+<BR>
+<BR>Ver 1.0 by David Lippman and Bill Meacham, May 2014
+<BR><ul>
+<li><a href="#vmgetlistener">vmgetlistener</a></li>
+<li><a href="#vmsetupchipmodel">vmsetupchipmodel</a></li>
+<li><a href="#vmchipmodelgetcount">vmchipmodelgetcount</a></li>
+<li><a href="#vmsetupnumbertiles">vmsetupnumbertiles</a></li>
+<li><a href="#vmnumbertilesgetcount">vmnumbertilesgetcount</a></li>
+<li><a href="#vmsetupitemsort">vmsetupitemsort</a></li>
+<li><a href="#vmitemsortgetcontainers">vmitemsortgetcontainers</a></li>
+<li><a href="#vmsetupnumberlineaddition">vmsetupnumberlineaddition</a></li>
+<li><a href="#vmnumberlineadditiongetvals">vmnumberlineadditiongetvals</a></li>
+<li><a href="#vmsetupnumberline">vmsetupnumberline</a></li>
+<li><a href="#vmnumberlinegetvals">vmnumberlinegetvals</a></li>
+<li><a href="#vmsetupnumberlineinterval">vmsetupnumberlineinterval</a></li>
+<li><a href="#vmnumberlineintervalgetvals">vmnumberlineintervalgetvals</a></li>
+<li><a href="#vmsetupfractionline">vmsetupfractionline</a></li>
+<li><a href="#vmgetfractionlinevals">vmgetfractionlinevals</a></li>
+<li><a href="#vmsetupfractioncompare">vmsetupfractioncompare</a></li>
+<li><a href="#vmgetfractioncompareval">vmgetfractioncompareval</a></li>
+<li><a href="#vmsetupfractionmult">vmsetupfractionmult</a></li>
+<li><a href="#vmgetfractionmultvals">vmgetfractionmultvals</a></li>
+</ul>
+<h3><a name="vmgetlistener">vmgetlistener</a></h3>
+vmgetlistener(qn,[part])
+<BR>Generates a listener to receive values from virtual manipulatives.
+<BR>this needs to be generated and included in the question text if the manipulative
+<BR>is to be scored
+<BR><h3><a name="vmsetupchipmodel">vmsetupchipmodel</a></h3>
+vmsetupchipmodel(stuans,qn,[part])
+<BR>Set up a chip model manipulative
+<BR><h3><a name="vmchipmodelgetcount">vmchipmodelgetcount</a></h3>
+vmchipmodelgetcount(stuans) 
+<BR>return an array array(poscount,negcount) of the count of positive and 
+<BR>negative chips in the drop region.  
+<BR><h3><a name="vmsetupnumbertiles">vmsetupnumbertiles</a></h3>
+vmsetupnumbertiles(stuans,qn,[part])
+<BR>Set up a number tiles manipulative
+<BR><h3><a name="vmnumbertilesgetcount">vmnumbertilesgetcount</a></h3>
+vmnumbertilesgetcount(stuans) 
+<BR>return an array array(hundredcount,tencount,onecount) of the count of 
+<BR>hundred blocks, ten blocks, and ones blocks in the drop area
+<BR><h3><a name="vmsetupitemsort">vmsetupitemsort</a></h3>
+vmsetupitemsort(tosort,cats,stuans,qn,[part])
+<BR>Set up an item sort manipulative, where students sort items into 2 categories
+<BR>tosort = array of items to sort
+<BR>cats = array of titles for the two drop areas
+<BR><h3><a name="vmitemsortgetcontainers">vmitemsortgetcontainers</a></h3>
+vmitemsortgetcontainers(stuans, tosort)
+<BR>tosort = array of items to sort
+<BR>returns an array of container values
+<BR>&nbsp;out[i] gives the container that item tosort[i] was sorted into
+<BR>&nbsp;out[i] = -1 means unsorted; = 0 is first container, = 1 is second container
+<BR><h3><a name="vmsetupnumberlineaddition">vmsetupnumberlineaddition</a></h3>
+vmsetupnumberlineaddition(stuans,qn,[part])
+<BR>Set up a number line addition manipulative
+<BR><h3><a name="vmnumberlineadditiongetvals">vmnumberlineadditiongetvals</a></h3>
+vmnumberlineadditiongetvals(stuans)
+<BR>return array(value of first dot, value of sum)
+<BR><h3><a name="vmsetupnumberline">vmsetupnumberline</a></h3>
+vmsetupnumberline(stuans,qn,[part,snap])
+<BR>Set up a number line manipulative, with a changeable scale
+<BR>&nbsp;set snap="false" to allow values in between grid markers
+<BR>&nbsp;to set snap without setting part, use null for part
+<BR><h3><a name="vmnumberlinegetvals">vmnumberlinegetvals</a></h3>
+vmnumberlinegetvals(stuans)
+<BR>return array(scale, value of dot)
+<BR><h3><a name="vmsetupnumberlineinterval">vmsetupnumberlineinterval</a></h3>
+vmsetupnumberlineinterval(stuans,qn,[part])
+<BR>Set up a number line interval manipulative, with a changeable scale
+<BR><h3><a name="vmnumberlineintervalgetvals">vmnumberlineintervalgetvals</a></h3>
+vmnumberlineintervalgetvals(stuans)
+<BR>return array(scale, left endpoint value, right endpoint value, left type, right type)
+<BR>types are 1 = arrow, 2 = paren, 3 = square bracket, 4 = none
+<BR><h3><a name="vmsetupfractionline">vmsetupfractionline</a></h3>
+vmsetupfractionline([stuans,qn,part])
+<BR>Set up a fraction number line manipulative, with a single line
+<BR><h3><a name="vmgetfractionlinevals">vmgetfractionlinevals</a></h3>
+vmgetfractionlineval(stuans)
+<BR>return array(numerator, denominator)
+<BR><h3><a name="vmsetupfractioncompare">vmsetupfractioncompare</a></h3>
+vmsetupfractioncompare([stuans,qn,part])
+<BR>Set up a fraction number line comparison manipulative, with two lines
+<BR><h3><a name="vmgetfractioncompareval">vmgetfractioncompareval</a></h3>
+vmgetfractioncompareval(stuans)
+<BR>return array(numerator, denominator)
+<BR><h3><a name="vmsetupfractionmult">vmsetupfractionmult</a></h3>
+vmsetupfractionmult([stuans,qn,part])
+<BR>Set up a fraction multiplication manipulative, with a single line
+<BR><h3><a name="vmgetfractionmultvals">vmgetfractionmultvals</a></h3>
+vmgetfractionmultvals(stuans)
+<BR>return array(horiz numerator, horiz denominator, vert num, vert denom)
+<BR>

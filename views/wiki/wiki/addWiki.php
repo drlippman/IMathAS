@@ -96,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <label class="pull-left non-bold"><input type=radio name="edatetype" class="pull-left" value="2000000000" <?php AppUtility::writeHtmlChecked($enddate,'2000000000',0) ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
                     <label class="pull-left" style="padding-left: 34px"><input type=radio name="edatetype" class="pull-left" value="edate"  <?php AppUtility::writeHtmlChecked($enddate,'2000000000',1) ?>/></label>
                     <?php
-                    echo '<div class = "time-input pull-left col-lg-4">';
+                    echo '<div class = "time-input  col-lg-4">';
                     echo DatePicker::widget([
                         'name' => 'EndDate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,

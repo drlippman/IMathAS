@@ -36,13 +36,13 @@ class QuestionController extends AppController
     {
         $user = $this->getAuthenticatedUser();
         $groupid = $user['groupid'];
+        $userId = $user['id'];
         $params = $this->getRequestParams();
-//        AppUtility::dump($params);
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
-        $teacherId = $this->isTeacher($user['id'],$courseId);
+        $teacherId = $this->isTeacher($userId,$courseId);
         if ($user['rights']==100) {
-            $teacherId = $user['id'];
+            $teacherId = $userId;
             $adminasteacher = true;
         }
         $overwriteBody=0;
@@ -352,14 +352,13 @@ class QuestionController extends AppController
                 }
                 for ($j=0;$j<count($subs);$j++) {
                     $line = Questions::getQuestionData($subs[$j]);
-                    $line .= "";
                     $existingq[] = $line['questionsetid'];
                     if ($j>0) {
                         $jsarr .= ',';
                     }
                     //output item array
                     $jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
-                    if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$user['id'] || $adminasteacher) { //can edit without template?
+                    if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userId || $adminasteacher) { //can edit without template?
                         $jsarr .= '1';
                     } else {
                         $jsarr .= '0';
@@ -539,10 +538,10 @@ class QuestionController extends AppController
                     $page_libRowHeader = ($searchall==1) ? "<th>Library</th>" : "";
 
                     if (isset($search)) {
-                        $result = QuestionSet::getByUserIdJoin($searchall,$user['id'],$llist,$searchmine,$searchlikes);
+                        $result = QuestionSet::getByUserIdJoin($searchall,$userId,$llist,$searchmine,$searchlikes);
                         if ($search=='recommend' && count($existingq)>0) {
                             $existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-                            $result = QuestionSet::getByUserId($aid,$user['id'],$existingqlist);
+                            $result = QuestionSet::getByUserId($aid,$userId,$existingqlist);
                         }
                         if ($result==0) {
                             $noSearchResults = true;
@@ -628,7 +627,7 @@ class QuestionController extends AppController
                                 }
                                 $page_questionTable[$i]['times'] = 0;
 
-                                if ($line['ownerid']==$user['id']) {
+                                if ($line['ownerid']==$userId) {
                                     if ($line['userights']==0) {
                                         $page_questionTable[$i]['mine'] = "Private";
                                     } else {
@@ -641,13 +640,13 @@ class QuestionController extends AppController
 
                                 $page_questionTable[$i]['add'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$aid.'&cid='.$cid).">Add</a>";
 
-                                if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$user['id']) {
-                                    $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-dataset?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>";
+                                if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userId) {
+                                    $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>";
                                 } else {
                                     $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$line['id'].'&aid='.$aid.'&cid='.$cid).">View</a>";
                                 }
 
-                                $page_questionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-dataset?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&template='.true).">Template</a>";
+                                $page_questionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&template='.true).">Template</a>";
                                 //$i++;
                                 $ln++;
 
@@ -736,9 +735,9 @@ class QuestionController extends AppController
                             $page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
                             $page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
                             $page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
-                            $page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$user['id']) ? "Yes" : "" ;
+                            $page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userId) ? "Yes" : "" ;
                             $page_assessmentQuestions[$x]['add'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid).">Add</a>";
-                            $page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$user['id']) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-dataset?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid).">View</a>" ;
+                            $page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>3 || ($userights[$qid]==3 && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userId) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid).">View</a>" ;
                             $page_assessmentQuestions[$x]['templ'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid.'&template=true').">Template</a>";
                             $page_assessmentQuestions[$x]['extref'][$y] = '';
                             $page_assessmentQuestions[$x]['cap'][$y] = 0;
@@ -844,26 +843,27 @@ class QuestionController extends AppController
     public function actionModDataSet(){
         $user = $this->getAuthenticatedUser();
         $myRights = $user['rights'];
+        $userId = $user['id'];
         $userFullName = $user['FirstName'] . ' ' . $user['LastName'];
         $groupId = $user['groupid'];
         $userdeflib = $user['deflib'];
         $params = $this->getRequestParams();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
-        $teacherId = $this->isTeacher($user['id'],$courseId);
+        $sessionData = $this->getSessionData($this->getSessionId());
+        $teacherId = $this->isTeacher($userId,$courseId);
         if ($myRights < AppConstant::TEACHER_RIGHT) {
             echo AppConstant::NO_TEACHER_RIGHTS;
             exit;
         }
-
         $isAdmin = false;
         $isGrpAdmin = false;
 
         if ($myRights == AppConstant::ADMIN_RIGHT) {
-            $teacherId = $user['id'];
+            $teacherId = $userId;
             $adminAsTeacher = true;
         }
-
+//AppUtility::dump($params);
         if ($params['cid'] == 'admin') {
             if ($myRights == AppConstant::ADMIN_RIGHT) {
                 $isAdmin = true;
@@ -890,9 +890,8 @@ class QuestionController extends AppController
         $errmsg = '';
 
         $course = Course::getById($courseId);
-
         if (isset($params['qtext'])) {
-            require("../includes/filehandler.php");
+//            require("../includes/filehandler.php");
             $now = time();
             $params['qtext'] = $this->stripsmartquotes(stripslashes($params['qtext']));
             $params['control'] = addslashes($this->stripsmartquotes(stripslashes($params['control'])));
@@ -985,7 +984,7 @@ class QuestionController extends AppController
                     }
                 }
                 if (!$isAdmin && !$isGrpAdmin) {  //check is owner or is allowed to modify
-                    $query = QuestionSet::getByUserIdGroupId($params['id'],$user['id'],$groupId);
+                    $query = QuestionSet::getByUserIdGroupId($params['id'],$userId,$groupId);
                     if (count($query) == AppConstant::NUMERIC_ZERO) {
                         $isok = false;
                     }
@@ -1060,7 +1059,7 @@ class QuestionController extends AppController
                 $questionSetArray['adddate'] = $now;
                 $questionSetArray['lastmoddate'] = $now;
                 $questionSetArray['description'] = $params['description'];
-                $questionSetArray['ownerid'] = $user['id'];
+                $questionSetArray['ownerid'] = $userId;
                 $questionSetArray['author'] = $params['author'];
                 $questionSetArray['userights'] = $params['userights'];
                 $questionSetArray['license'] = $params['license'];
@@ -1143,7 +1142,7 @@ class QuestionController extends AppController
             if ($params['libs']=='') {
                 $newlibs = array();
             }
-            $libraryData = LibraryItems::getByGroupId($groupId, $qsetid,$user['id'],$isGrpAdmin,$isAdmin);
+            $libraryData = LibraryItems::getByGroupId($groupId, $qsetid,$userId,$isGrpAdmin,$isAdmin);
             $existing = array();
             foreach($libraryData as $row) {
                 $existing[] = $row['libid'];
@@ -1162,7 +1161,7 @@ class QuestionController extends AppController
                     $libArray = array();
                     $libArray['libid'] = $libid;
                     $libArray['qsetid'] = $qsetid;
-                    $libArray['ownerid'] = $user['id'];
+                    $libArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
                     $lib->createLibraryItems($libArray);
                 }
@@ -1177,7 +1176,7 @@ class QuestionController extends AppController
                     $libArray = array();
                     $libArray['libid'] = AppConstant::NUMERIC_ZERO;
                     $libArray['qsetid'] = $qsetid;
-                    $libArray['ownerid'] = $user['id'];
+                    $libArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
                     $lib->createLibraryItems($libArray);
                 }
@@ -1211,7 +1210,7 @@ class QuestionController extends AppController
         $myname = $user['LastName'].','.$user['FirstName'];
         if (isset($params['id'])) {
             $line = QuestionSet::getByQSetIdJoin($params['id']);
-            $myq = ($line['ownerid']==$user['id']);
+            $myq = ($line['ownerid']==$userId);
             if ($isAdmin || ($isGrpAdmin && $line['groupid']==$groupId) || ($line['userights']==AppConstant::NUMERIC_THREE && $line['groupid']==$groupId) || $line['userights']>AppConstant::NUMERIC_THREE) {
                 $myq = true;
             }
@@ -1261,7 +1260,7 @@ class QuestionController extends AppController
                     } else {
                         $query = Libraries::getByQSetId($params['id']);
                         foreach ($query as $row) {
-                            if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$user['id']) {
+                            if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$userId) {
                                 $inlibs[] = $row['id'];
                             }
                         }
@@ -1272,20 +1271,20 @@ class QuestionController extends AppController
                 $line['userights'] = $user['qrightsdef'];
 
             } else {
-                $query = LibraryItems::getDestinctLibIdByIdAndOwner($groupId,$params['id'],$user['id'],$isGrpAdmin,$isAdmin);
+                $query = LibraryItems::getDestinctLibIdByIdAndOwner($groupId,$params['id'],$userId,$isGrpAdmin,$isAdmin);
                 foreach ($query as $row) {
                     $inlibs[] = $row['libid'];
                 }
 
                 $locklibs = array();
                 if (!$isAdmin) {
-                    $query = LibraryItems::getLibIdByQidAndOwner($groupId,$params['id'],$user['id'],$isGrpAdmin,$isAdmin);
+                    $query = LibraryItems::getLibIdByQidAndOwner($groupId,$params['id'],$userId,$isGrpAdmin,$isAdmin);
                     foreach ($query as $row) {
                         $locklibs[] = $row['libid'];
                     }
                 }
                 $addmod = "Modify";
-                $inusecnt = Questions::getQidCount($user['id'],$params['id']);
+                $inusecnt = Questions::getQidCount($userId,$params['id']);
             }
 
             if (count($inlibs)==AppConstant::NUMERIC_ZERO && count($locklibs)==AppConstant::NUMERIC_ZERO) {
@@ -1302,7 +1301,7 @@ class QuestionController extends AppController
             $twobx = true;
             $line['description'] = AppConstant::QUESTION_DESCRIPTION;
             $line['userights'] = $user['qrightsdef'];
-            $line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:1;
+            $line['license'] = isset($CFG['GEN']['deflicense'])?$CFG['GEN']['deflicense']:AppConstant::NUMERIC_ONE;
             $line['qtype'] = "number";
             $line['control'] = '';
             $line['qcontrol'] = '';
@@ -1328,7 +1327,7 @@ class QuestionController extends AppController
             if (!isset($params['id']) || isset($params['template'])) {
                 $query = Libraries::getByIdList($inlibssafe);
                 foreach ($query as $row) {
-                    if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$user['id']) {
+                    if ($row['userights'] == AppConstant::NUMERIC_EIGHT || ($row['groupid']==$groupId && ($row['userights']%AppConstant::NUMERIC_THREE==AppConstant::NUMERIC_TWO)) || $row['ownerid']==$userId) {
                         $oklibs[] = $row['id'];
                     }
                 }
@@ -1351,7 +1350,10 @@ class QuestionController extends AppController
         }
         $lnames = implode(", ",$lnames);
         $this->includeJS(['editor/tiny_mce.js','ASCIIMathTeXImg_min.js']);
-        $renderData = array('course' => $course,'addMode'=>$addmod);
+        $renderData = array('course' => $course, 'addMode' => $addmod, 'params' => $params,'inusecnt' => $inusecnt, 'line'=> $line, 'myq' => $myq,
+            'frompot' => $frompot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
+            'inlibs' => $inlibs, 'locklibs' => $locklibs, 'lnames' => $lnames, 'twobx' => $twobx, 'images'=> $images, 'extref' => $extref,
+            'myRights' => $myRights, 'sessionData' => $sessionData);
         return  $this->renderWithData('modDataSet',$renderData);
     }
 

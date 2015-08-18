@@ -1,0 +1,24 @@
+<html><body>
+<h1>Macro Library ineq</h1>
+Inequality graphing functions.  Version 1.0, Oct 30, 2006
+<BR><ul>
+<li><a href="#ineqplot">ineqplot</a></li>
+<li><a href="#ineqbetweenplot">ineqbetweenplot</a></li>
+</ul>
+<h3><a name="ineqplot">ineqplot</a></h3>
+ineqplot("funcstring",[xmin,xmax,ymin,ymax,labels,grid,width,height])
+<BR>graphs a set of functions, shading above or below each graph as specified
+<BR>
+<BR>funcstring format: (function and filltype are required) - one string or array
+<BR>  function of x,filltype,fillcolor,linecolor,dash,strokewidth
+<BR>  
+<BR>filltypes: above, below, abovediag, belowdiag  - last two draw perp to slope 
+<BR>  of curve at (xmin+xmax)/2)
+<BR><h3><a name="ineqbetweenplot">ineqbetweenplot</a></h3>
+ineqbetweenplot("funcstring",[xmin,xmax,ymin,ymax,labels,grid,width,height])
+<BR>graphs a set of functions, shading the area satisfying all above or below
+<BR>  specifications.
+<BR>
+<BR>funcstring format: (function and filltype are required) - one string or array
+<BR>  function of x,above or below,linecolor,dash,strokewidth
+<BR>

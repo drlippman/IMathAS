@@ -1,0 +1,108 @@
+<html><body>
+<h1>Macro Library chemistry</h1>
+A collection of chemistry routines
+<BR>
+<BR>Version 0.2 April 16, 2014
+<BR><ul>
+<li><a href="#chem_disp">chem_disp</a></li>
+<li><a href="#chem_mathdisp">chem_mathdisp</a></li>
+<li><a href="#chem_isotopedisp">chem_isotopedisp</a></li>
+<li><a href="#chem_getsymbol">chem_getsymbol</a></li>
+<li><a href="#chem_getnumber">chem_getnumber</a></li>
+<li><a href="#chem_getname">chem_getname</a></li>
+<li><a href="#chem_getweight">chem_getweight</a></li>
+<li><a href="#chem_getmeltingpoint">chem_getmeltingpoint</a></li>
+<li><a href="#chem_getboilingpoint">chem_getboilingpoint</a></li>
+<li><a href="#chem_getfamily">chem_getfamily</a></li>
+<li><a href="#chem_randelementbyfamily">chem_randelementbyfamily</a></li>
+<li><a href="#chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></li>
+<li><a href="#chem_getrandcompound">chem_getrandcompound</a></li>
+<li><a href="#chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></li>
+<li><a href="#chem_decomposecompound">chem_decomposecompound</a></li>
+<li><a href="#chem_getcompoundmolmass">chem_getcompoundmolmass</a></li>
+<li><a href="#chem_randcation">chem_randcation</a></li>
+<li><a href="#chem_randanion">chem_randanion</a></li>
+<li><a href="#chem_makeioniccompound">chem_makeioniccompound</a></li>
+</ul>
+<h3><a name="chem_disp">chem_disp</a></h3>
+chem_disp(compound) 
+<BR>formats a compound for display in as HTML
+<BR><h3><a name="chem_mathdisp">chem_mathdisp</a></h3>
+chem_mathdisp(compound) 
+<BR>formats a compound for better display in math mode
+<BR><h3><a name="chem_isotopedisp">chem_isotopedisp</a></h3>
+chem_isotopedisp(element,super,sub,[noitalic])
+<BR>formats a math display string for an isotope with the given element,
+<BR>&nbsp;superscript, and subscript. Set noitalic to true to un-italic element.
+<BR><h3><a name="chem_getsymbol">chem_getsymbol</a></h3>
+chem_getsymbol(atomic number)
+<BR>returns the chemical symbol given the atomic number
+<BR><h3><a name="chem_getnumber">chem_getnumber</a></h3>
+chem_getnumber(symbol)
+<BR>returns the atomic number given the chemical symbol 
+<BR><h3><a name="chem_getname">chem_getname</a></h3>
+chem_getname(atomic number)
+<BR>returns the chemical name given the atomic number
+<BR><h3><a name="chem_getweight">chem_getweight</a></h3>
+chem_getweight(atomic number)
+<BR>returns the chemical standard atomic weight given the atomic number
+<BR><h3><a name="chem_getmeltingpoint">chem_getmeltingpoint</a></h3>
+chem_getmeltingpoint(atomic number)
+<BR>returns the melting point given the atomic number
+<BR>beware: some elements return weird non-numeric values
+<BR><h3><a name="chem_getboilingpoint">chem_getboilingpoint</a></h3>
+chem_getboilingpoint(atomic number)
+<BR>returns the boiling point given the atomic number
+<BR>beware: some elements return weird non-numeric values
+<BR><h3><a name="chem_getfamily">chem_getfamily</a></h3>
+chem_getfamily(atomic number)
+<BR>returns the family given the atomic number
+<BR>Values may be:  "", "Noble gas", "Alkaline", "Alkaline Earth", "Halogen", 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Transition Metal", "Lanthanide",  or "Actinide"
+<BR><h3><a name="chem_randelementbyfamily">chem_randelementbyfamily</a></h3>
+chem_randelementbyfamily(family)
+<BR>returns the atomic number of a random element from a family
+<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR><h3><a name="chem_diffrandelementsbyfamily">chem_diffrandelementsbyfamily</a></h3>
+chem_diffrandelementsbyfamily(family, n)
+<BR>returns an array of n atomic numbers for random elements from a family
+<BR>Valid families are: "Other", "Noble gas", "Alkaline", "Alkaline Earth", 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;"Halogen", "Transition Metal", "Lanthanide", or "Actinide"
+<BR><h3><a name="chem_getrandcompound">chem_getrandcompound</a></h3>
+chem_getrandcompound(type)
+<BR>returns an array of (compound name, compound formula)
+<BR>valid types are: twobasic, twosub, threeplus, parens
+<BR>if type is not supplied, compound is chosen randomly from all
+<BR><h3><a name="chem_getdiffrandcompounds">chem_getdiffrandcompounds</a></h3>
+chem_getdiffrandcompounds(n,type)
+<BR>returns an array n arrays of (compound name, compound formula)
+<BR>valid types are: twobasic, twosub, threeplus, parens
+<BR>if type is not supplied, compound is chosen randomly from all
+<BR><h3><a name="chem_decomposecompound">chem_decomposecompound</a></h3>
+chem_decomposecompound(compound)
+<BR>breaks a compound into an array of elements and an array of atom counts
+<BR><h3><a name="chem_getcompoundmolmass">chem_getcompoundmolmass</a></h3>
+chem_getcompoundmolmass(compound, [round])
+<BR>gets the molecular mass of the given compound
+<BR>&nbsp;round: decimals to round the individual atoms' molecular mass to during calculuations
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;default: no additional rounding (4 decimal place accuracy)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;special value: .5.  Rounds all values to whole numbers, except Cl and Cu to nearest .5 
+<BR><h3><a name="chem_randcation">chem_randcation</a></h3>
+chem_randcation([group,name type,include uncommon])
+<BR>group name:  simple, basic (simple + NH_4), polyvalent, or all. Default = all
+<BR>name type: "common" (iron (II)) or "alternate" (ferrous)  default = common
+<BR>include uncommon: set true to include francium, radium, cadmium, etc.
+<BR>returns array(symbol, charge, name)
+<BR><h3><a name="chem_randanion">chem_randanion</a></h3>
+chem_randanion([group,name type,include uncommon])
+<BR>group name:  simple, polyatomic, or all. Default = all
+<BR>name type: "common" (bicarbonate) or "alternate" (hydrogen carbonate)  default = common
+<BR>include uncommon: set true to include selenide, peroxide
+<BR>returns array(symbol, charge, name)
+<BR><h3><a name="chem_makeioniccompound">chem_makeioniccompound</a></h3>
+chem_makeioniccompound(cation, anion)
+<BR>takes a cation and anion
+<BR>&nbsp;&nbsp;these are the array returned by chem_randcation and chem_randanion
+<BR>returns array(formula, name)
+<BR>

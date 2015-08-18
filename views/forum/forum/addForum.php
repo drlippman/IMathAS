@@ -52,10 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     } ?>
                     <textarea cols="5" rows="12" id="description" name="description" style="width: 100%;">
                    <?php echo $description; ?></textarea>
-
                 </div>
             </div>
-        </div><BR class=form><BR class=form>
+        </div>
             <!--Show-->
         <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
         <div class="col-lg-10">
@@ -95,10 +94,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]);
                         echo '</div>'; ?>
                     </div><BR class=form><BR class=form>
-
                     <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
                     <div class=col-lg-10>
-                        <input type=radio name="available-until" class="pull-left" value="2000000000"  <?php if($defaultValue['endDate'] == 2000000000 ){ echo "checked=1"; }?>/><span class="pull-left padding-left"><?php AppUtility::t('Always after start date')?></span>
+                        <input type=radio name="available-until" class="pull-left" value="2000000000"  <?php if($defaultValue['endDate'] == AppConstant::ALWAYS_TIME ){ echo "checked=1"; }?>/><span class="pull-left padding-left"><?php AppUtility::t('Always after start date')?></span>
                         <label class="pull-left non-bold" style="padding-left: 34px"><input type=radio name="available-until" class="pull-left" value="1" <?php if($defaultValue['endDate'] == 1 ){ echo "checked=1"; }?>/></label>
                         <?php
                         echo '<div class = "time-input pull-left col-lg-4">';
@@ -310,12 +308,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?php AppUtility::t('rubric')?></a> | <a
                                 href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>"><?php AppUtility::t('Edit rubrics')?></a>
                           </div>
-
+                          <br class=form>
                     </div>
-
-                    <div class="item-alignment">
                         <?php if ($defaultValue['isOutcomes'] != null) { ?>
-                        <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div><div class="col-lg-10">
+                    <div class="item-alignment">
+                        <br>
+
+                        <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div>
+                        <div class="col-lg-10">
                         <?php
 
                         if($defaultValue['outcomes'] != " "){
@@ -323,10 +323,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                             AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
                             <br class="form"/>
-                        <?php } ?>
+
                         <br class=form>
                     </div>
                     </div>
+                        <?php } ?>
+                        </div>
                         <div class="item-alignment">
                        <div class=col-lg-2><?php AppUtility::t('Forum Type')?></div>
                             <div class=col-lg-10>
