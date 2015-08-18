@@ -139,8 +139,11 @@ class Questions extends BaseImasQuestions
 
     public static function getQuestionData($id)
     {
-        $query = \Yii::$app->db->createCommand("SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users WHERE imas_questions.id='$id AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ")->queryAll();
-        return $query;
+        $query = "SELECT imas_questions.questionsetid,imas_questionset.description,imas_questionset.userights,imas_questionset.ownerid,imas_questionset.qtype,";
+        $query .= "imas_questions.points,imas_questions.withdrawn,imas_questionset.extref,imas_users.groupid,imas_questions.showhints,imas_questionset.solution,";
+        $query .= "imas_questionset.solutionopts FROM imas_questions,imas_questionset,imas_users WHERE imas_questions.id='$id' AND imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id ";
+        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        return $data;
     }
 
     public static function getByQuestionSetId($allusedqids)

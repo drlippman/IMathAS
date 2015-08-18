@@ -1,0 +1,31 @@
+<html><body>
+<h1>Macro Library geogebra</h1>
+Geogebra integration functions, Version 3.0, Oct 4, 2014
+<BR><ul>
+<li><a href="#addGeogebra">addGeogebra</a></li>
+<li><a href="#addGeogebraJava">addGeogebraJava</a></li>
+</ul>
+<h3><a name="addGeogebra">addGeogebra</a></h3>
+addGeogebra(url,[width,height,commands,params,callbacks,qn,part]) 
+<BR>place a geogebra HTML5 applet.  Either include the base64ggb (grab by pressing
+<BR>&nbsp;Ctrl+Shift+B), or include the "Material ID" after uploading to Geogebratube
+<BR>if commands array is provided, execute these javascript commands
+<BR>&nbsp;&nbsp;(see http://wiki.geogebra.org/en/Reference:JavaScript
+<BR>&nbsp;&nbsp;for available commands)
+<BR>params should be key=>value array of parameters, like 
+<BR>&nbsp;&nbsp;array('framePossible'=>'true','showToolBar'=>'true')
+<BR>&nbsp;&nbsp;(see http://wiki.geogebra.org/en/Reference:Applet_Parameters for options)
+<BR>if you want to pull values from Geogebra on submit, provide an array of 
+<BR>&nbsp;&nbsp;geogebra commands to callback with and provide question number 
+<BR>&nbsp;&nbsp;(1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
+<BR><h3><a name="addGeogebraJava">addGeogebraJava</a></h3>
+addGeogebraJava(url,[width,height,commands,params,callbacks,qn,part]) 
+<BR>place a geogebra Java applet, calling .ggb file specified in URL
+<BR>if commands array is provided, execute these javascript commands
+<BR>(see http://www.geogebra.org/en/wiki/index.php/GeoGebra_JavaScript_Methods
+<BR>for available commands)
+<BR>params should be key=>value array of parameters, like array('framePossible'=>'true','showToolBar'=>'true')
+<BR>(see http://www.geogebra.org/en/wiki/index.php/GeoGebra_Applet_Parameters for options)
+<BR>if you want to pull values from Geogebra on submit, provide an array of geogebra commands to callback with
+<BR>and provide question number (1-indexed - usually use $thisq) and if multipart, part number (0-indexed)
+<BR>

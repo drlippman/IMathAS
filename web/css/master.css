@@ -383,7 +383,7 @@ i.fa-home{
 }
 .dropdown-menu
 {
-    min-width: 100%;
+    /*min-width: 100%;*/
 }
 .user-menu{
     color: #fff;

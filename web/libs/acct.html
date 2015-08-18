@@ -1,0 +1,116 @@
+<html><body>
+<h1>Macro Library acct</h1>
+A collection of accounting macros
+<BR>
+<BR>June 2013
+<BR><ul>
+<li><a href="#makestatement">makestatement</a></li>
+<li><a href="#scorestatement">scorestatement</a></li>
+<li><a href="#makejournal">makejournal</a></li>
+<li><a href="#scorejournal">scorejournal</a></li>
+<li><a href="#makeaccttable">makeaccttable</a></li>
+<li><a href="#makeaccttable2">makeaccttable2</a></li>
+<li><a href="#makeTchartsfromjournal">makeTchartsfromjournal</a></li>
+<li><a href="#scoreTchartsfromjournal">scoreTchartsfromjournal</a></li>
+<li><a href="#makeTchart">makeTchart</a></li>
+<li><a href="#scoreTchart">scoreTchart</a></li>
+<li><a href="#makeledgerfromjournal">makeledgerfromjournal</a></li>
+<li><a href="#scoreinventory">scoreinventory</a></li>
+<li><a href="#makeinventory">makeinventory</a></li>
+<li><a href="#maketrialbalancefromjournal">maketrialbalancefromjournal</a></li>
+<li><a href="#maketrialbalance">maketrialbalance</a></li>
+<li><a href="#scoretrialbalance">scoretrialbalance</a></li>
+</ul>
+<h3><a name="makestatement">makestatement</a></h3>
+makestatement(statement array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
+<BR>statement array form:
+<BR>$statement[0]['bigtitle'] = "Title for whole table"
+<BR>$statement[#]['header'] = "title", or array ("title", value) if fixed value is associated
+<BR>$statement[#]['headerops'] = array of options for header.  If not set, header is fixed.  Can't use with header with value.
+<BR>$statement[#]['elements'] = array("Title",amount,"title",amount)
+<BR>$statement[#]['explanation'] = array(explanation for each line of elements)
+<BR>$statement[#]['indent'] = number of indent for elements group.  If >0, then header and tottitle will be indented one less
+<BR>$statement[#]['fixed'] = array(index into elements to have fixed - first col only)
+<BR>$statement[#]['totrows'] = total number of entry rows to show. optional, defaults to number of elements
+<BR>$statement[#]['tottitle'] = title for total row
+<BR>$statement[#]['tottitleops'] = array of options for tottitle.  If not set, tottitle is fixed
+<BR>$statement[#]['tottitleline'] = -1 for on last line of elements, not set or 0 for own line.  Only works if indent>0
+<BR>$statement[#]['totneg'] = set to make total negative
+<BR>$statement[#]['totsigns'] = array of 1,-1,etc to indicate signs for totaling
+<BR>$statement[#]['totaltotal'] = array("title", statement #, statement #)  Totals across multiple statement groups.  Neg to subtract
+<BR>$statement[#]['totaltotalops'] = array of options for totaltotal.  If not set, totaltotal title is fixed
+<BR>$statement[#]['totalindent'] = number of indent for totaltotal entry.  0 if not set
+<BR>$statement[#]['dblunder'] = true if double-underline under the totaltotal entry
+<BR><h3><a name="scorestatement">scorestatement</a></h3>
+scorestatement($stuanswers[$thisq], $answer, $statement array, start number)
+<BR>Call with $stuanswers, and $answer array
+<BR>and statement array and the multipart starting number for this statement
+<BR>returns a new $answer array
+<BR><h3><a name="makejournal">makejournal</a></h3>
+makejournal(journal array, start number, options, $anstypes, $questions, $answer, $showanswer, $displayformat, $answerboxsize)
+<BR>
+<BR>journal array should be an array in the form
+<BR>$journal[0]['date'] = '5/13/14'
+<BR>$journal[0]['debits'] = array("Bonds payable",357.14,"Expense payable",345.13)
+<BR>$journal[0]['credits'] = array("Expense due",15.34)
+<BR>$journal[0]['note'] = 'to accrue interest'
+<BR>
+<BR>start number is the starting multipart value for this journal set.
+<BR>options is an array of type-ahead values for the descriptions 
+<BR>
+<BR>for $anstypes through $displayformat, just pass the variable through.
+<BR><h3><a name="scorejournal">scorejournal</a></h3>
+scorejournal($stuanswers[$thisq], $answer, $journal, start number)
+<BR>Call with $stuanswers, and $answer array
+<BR>and journal array and the multipart starting number for this journal
+<BR>returns a new $answer array
+<BR><h3><a name="makeaccttable">makeaccttable</a></h3>
+makeaccttable(headers, $rows, $anshead, $ansarray, start number, &$anstypes, &$answer, &$showanswer, &$displayformat, &$answerboxsize)
+<BR>rowhead:  array of column headers
+<BR>rows:  an array of column arrays.  These are the fixed-value columns
+<BR>ansarray:  an array of column arrays.  These are the answers to the to-be-filled-in columns
+<BR>start number: starting value for multipart
+<BR><h3><a name="makeaccttable2">makeaccttable2</a></h3>
+makeaccttable2(headers, $coltypes, $fixedrows, $cols, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerformat, $answerboxsize)
+<BR>headers:  array(title, colspan, title, colspan,...) or array(title,title,title) or array of these for multiple headers
+<BR>coltypes: array(true if scores, false if fixed), one for each column
+<BR>fixedrows: array(title, colspan, title, colspan,...), ignores coltypes
+<BR>columsn: an array for each column of fixed values or answer values
+<BR><h3><a name="makeTchartsfromjournal">makeTchartsfromjournal</a></h3>
+makeTchartsfromjournal($j, $order, $sn, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize)
+<BR><h3><a name="scoreTchartsfromjournal">scoreTchartsfromjournal</a></h3>
+ scoreTchartsfromjournal($stua,$answer,$j,$order,$sn)
+<BR><h3><a name="makeTchart">makeTchart</a></h3>
+makeTchart(title,numrows,leftentries,rightentries, start number, $anstypes, $answer, $showanswer, $displayformat, $answerboxsize, [dofloat, showtotal])
+<BR>num rows, leftentries, and rightentries should not include the total - that will be automatically added
+<BR><h3><a name="scoreTchart">scoreTchart</a></h3>
+function scoreTchart($stua,$answer,$numrows,$leftentries,$rightentries, $sn)
+<BR>returns a new answer array
+<BR><h3><a name="makeledgerfromjournal">makeledgerfromjournal</a></h3>
+types:  1 if debits add to balance, -1 if debits subtract from balance
+<BR>start: starting balance
+<BR>makeledgerfromjournal($j, $start, $order, $types, $sn, $anstypes, $answer, $questions, $showanswer, $displayformat, $answerboxsize)
+<BR><h3><a name="scoreinventory">scoreinventory</a></h3>
+scoreinventory($stua, $answer, $invs, $rowper, $sn)
+<BR><h3><a name="makeinventory">makeinventory</a></h3>
+makeinventory($invs, $type, $rowper, $sn, &$anstypes, $questions, &$answer, &$showanswer, &$displayformat, &$answerformat, &$answerboxsize, $get) {
+<BR>invs has form array(array('type','date',quantity, value)), where type is 'init','purch',or 'sale'
+<BR>get can be set to 'journal' or 'totals', but defaults to 'rec', which generates a perpetual inventory record
+<BR>'journal' returns array(journal record, journal display)
+<BR>type is FIFO, LIFO, or WA, or SPEC
+<BR>if SPEC, then the form of $invs changes for sales, and should be 'sale','date',array(quantity, purchase#, quantity, purchase #, ...)) where
+<BR>init is purchase #0.
+<BR>rowsper sets the number of rows for each date.  Will get extended for a particular date if needed
+<BR><h3><a name="maketrialbalancefromjournal">maketrialbalancefromjournal</a></h3>
+maketrialbalancefromjournal($j, $groups, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions,  &$showanswer, &$displayformat, &$answerboxsize)
+<BR>j is journal
+<BR>groups is array(array of assets, liab, equity, revenue, expenses)
+<BR><h3><a name="maketrialbalance">maketrialbalance</a></h3>
+maketrialbalance($data, $sn, $numrows, $ops, $bigtitle, &$anstypes, &$answer, &$questions, &$showanswer, &$displayformat, &$answerboxsize) {
+<BR>$data['assets'] = array(account, value, account, value)
+<BR>['liabilities'], [equity],[revenue],[expenses]
+<BR><h3><a name="scoretrialbalance">scoretrialbalance</a></h3>
+scoretrialbalance($stua, $answer, $data, $numrows, $sn)
+<BR>$data['assets'] = array(account, value, account, value)
+<BR>['liabilities'], [equity],[revenue],[expenses]
+<BR>

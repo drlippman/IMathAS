@@ -1,0 +1,49 @@
+<html><body>
+<h1>Macro Library polys2</h1>
+Polynomial functions with two variables, like 2x^2+3xy+4y^2.  Version 1.0, Jan 21, 2010
+<BR><ul>
+<li><a href="#formpoly2">formpoly2</a></li>
+<li><a href="#writepoly2">writepoly2</a></li>
+<li><a href="#addpolys2">addpolys2</a></li>
+<li><a href="#subtpolys2">subtpolys2</a></li>
+<li><a href="#multpolys2">multpolys2</a></li>
+<li><a href="#scalepoly2">scalepoly2</a></li>
+<li><a href="#polypower2">polypower2</a></li>
+<li><a href="#getcoef2">getcoef2</a></li>
+</ul>
+<h3><a name="formpoly2">formpoly2</a></h3>
+formpoly2(coefficients,powers,powers2)
+<BR>Creates a polynomial object with two variables
+<BR>Use writepoly to create a display form of the polynomial
+<BR>coefficients: list/array of coefficients
+<BR>powers : list/array of powers for first variable
+<BR>power2: list/array of power for the second variable
+<BR><h3><a name="writepoly2">writepoly2</a></h3>
+writepoly2(poly,[var,var2,showzeros])
+<BR>Creates a display form for polynomial object
+<BR>poly: polynomial object, created with formpoly
+<BR>var: first variable, defaults to x
+<BR>var2: second variable, defaults to y
+<BR>showzeros:  optional, defaults to false.  If true, shows zero coefficients
+<BR><h3><a name="addpolys2">addpolys2</a></h3>
+addpolys2(poly1,poly2)
+<BR>Adds polynomials, arranging terms from highest to lowest powers
+<BR><h3><a name="subtpolys2">subtpolys2</a></h3>
+subtpolys2(poly1,poly2)
+<BR>Subtracts polynomials: poly1-poly2, arranging terms from highest to lowest powers
+<BR><h3><a name="multpolys2">multpolys2</a></h3>
+multpolys2(poly1,poly2)
+<BR>Multiplies polynomials
+<BR><h3><a name="scalepoly2">scalepoly2</a></h3>
+scalepoly2(poly,c)
+<BR>Multiplies each term of poly by constant c
+<BR><h3><a name="polypower2">polypower2</a></h3>
+polypower2(poly,power)
+<BR>Calculates poly^power
+<BR><h3><a name="getcoef2">getcoef2</a></h3>
+getcoef2(poly,degree,degree)
+<BR>Gets the coefficient corresponding to the degree specified
+<BR>if no such term is defined, 0 is returned (since that is the coefficient!)
+<BR>poly: polynomial object, created with formpoly
+<BR>degree: degree of term to get coefficient of
+<BR>
