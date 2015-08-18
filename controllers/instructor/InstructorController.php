@@ -457,6 +457,7 @@ public $oa = array();
     public function actionManageEvents()
     {
         $this->guestUserHandler();
+        $this->layout = "master";
         $user = $this->getAuthenticatedUser();
         $eventData = $this->getRequestParams();
         $courseId = $eventData['cid'];
@@ -514,7 +515,7 @@ public $oa = array();
         $course = Course::getById($courseId);
         $eventItems = CalItem::getByCourse($courseId);
         $returnData = array('course' => $course, 'eventItems'=> $eventItems, 'model' => $model);
-        $this->includeCSS(['dataTables.bootstrap.css']);
+//        $this->includeCSS(['dataTables.bootstrap.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('manageEvent',$returnData);
     }

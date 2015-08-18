@@ -50,7 +50,7 @@ $this->title = 'About Us';
 <?php $this->title = 'Login'; ?>
 
     <div class="site-login col-lg-4" style="border: 1px solid #a9a9a9; margin-bottom: 40px;padding-bottom: 10px">
-        <h3 style="margin-top: 10px"><?php echo Html::encode($this->title) ?><a href='#' onClick=\"window.open('helper-guide?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left=150')\"><i class="fa fa-question fa-fw help-icon"></i></a></h3>
+        <h3 style="margin-top: 10px"><?php echo Html::encode($this->title) ?><a href='#' onClick="window.open('<?php echo AppUtility::getAssetURL() ?>docs/help.php?section=loggingin','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></h3>
 
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',

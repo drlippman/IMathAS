@@ -3,14 +3,16 @@ $(document).ready(function () {
     var userId = $(".user-info").val();
     selectCheckBox();
     studentLock();
-    $('.gradebook-table').dataTable( {
+    $('.gradebook-table').DataTable( {
         "scrollX": true,
         "paginate": false,
         "ordering":false
     } );
+
     var data = {courseId: courseId, userId: userId};
     jQuerySubmit('fetch-gradebook-data-ajax', data, 'fetchDataSuccess');
 });
+
 var data;
 var showPics = 0;
 var GradebookData;
