@@ -7,7 +7,7 @@ use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
 
-$this->title = $checkboxesValues['saveTitle'];
+$this->title = 'Add Link';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -18,9 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'action' => 'add-link?cid='.$course['id'].'&modifyLinkId='.$linkData['id'],
 ]);
 ?>
-<!--    <form method=post action="add-link?cid=--><?php //echo $course['id'];?><!--&modifyLinkId=--><?php //echo $linkData['id']; ?><!--" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">-->
     <?php }else{ ?>
-<!--        <form method=post action="add-link?cid=--><?php //echo $course['id'];?><!--" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">-->
         <?php $form = ActiveForm::begin([
             'validateOnSubmit' => false,
             'options' => ['enctype'=>'multipart/form-data'],
@@ -28,18 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
         ]);
         ?>
         <?php } ?>
-<!--    <div class="item-detail-header">-->
-<!--        <form method=post action="add-link?cid=--><?php //echo $course['id'];?><!--" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">-->
-<!--    </div>-->
-
-
+    <div class="item-detail-header">
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+    </div>
     <div class = "title-container">
         <div class="row">
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
             <div class="pull-left header-btn">
-<!--                --><?php //echo Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
                 <button class="btn btn-primary pull-right page-settings" type="submit"  value="Submit">
                     <i class="fa fa-share header-right-btn"></i><?php echo $defaultValues['saveButtonTitle']; ?></button>
             </div>
@@ -67,21 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div>
             <div class=col-lg-2><?php AppUtility::t('Link type')?> </div>
                 <div class="col-lg-4">
-<!--                    <select id="linktype" class="form-control" name="linktype" onchange="linktypeupdate(this)">-->
-<!--                        <option value="text"--><?php //AssessmentUtility::writeHtmlChecked($defaultValues['type'], AppConstant::NUMERIC_ZERO); ?>
-<!--                                onclick="document.getElementById('textinput').style.display='block';">Page of text-->
-<!--                        </option>-->
-<!--                        <option value="web"--><?php //AssessmentUtility::writeHtmlChecked($defaultValues['type'], AppConstant::NUMERIC_ONE); ?>
-<!--                                onclick="document.getElementById('webinput').style.display='block';">Web link-->
-<!--                        </option>-->
-<!--                        <option value="file"--><?php //AssessmentUtility::writeHtmlChecked($defaultValues['type'], AppConstant::NUMERIC_TWO); ?>
-<!--                                onclick="document.getElementById('fileinput').style.display='block';">File-->
-<!--                        </option>-->
-<!--                        <option value="tool" --><?php //AssessmentUtility::writeHtmlSelected($defaultValues['type'],'tool');?>
-<!--                                onchange="document.getElementById('toolinput').style.display='block';">External Tool-->
-<!--                        </option>-->
-<!--                    </select>-->
-                    <select id="linktype" name="linktype" onchange="linktypeupdate(this)">
+                     <select class="form-control" id="linktype" name="linktype" onchange="linktypeupdate(this)">
                         <option value="text" <?php AssessmentUtility::writeHtmlSelected($defaultValues['type'],'text');?>>Page of text</option>
                         <option value="web" <?php AssessmentUtility::writeHtmlSelected($defaultValues['type'],'web');?>>Web link</option>
                         <option value="file" <?php AssessmentUtility::writeHtmlSelected($defaultValues['type'],'file');?>>File</option>
@@ -111,15 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-lg-2"><?php AppUtility::t('File')?></div>
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
     			<div class="col-lg-10">
-
-<!--    				--><?php //if ($defaultValues['filename'] != '') {
-//                    require_once("../includes/filehandler.php");
-//                    echo '<input type="hidden" name="curfile" value="' . $defaultValues['filename'] . '"/>';
-//                    $alink = getcoursefileurl($defaultValues['filename']);
-//                    echo 'Current file: <a href="' . $alink . '">' . basename($defaultValues['filename']) . '</a><br/>Replace ';
-//                } else {
-//                    echo 'Attach ';
-//                }
+                    <?php
                      echo $form->field($model, 'file')->fileInput();
                     ?>
 
@@ -140,9 +113,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 } else {
                     echo 'No Tools defined yet<br/><br>';
                 }
-                if (!isset($CFG['GEN']['noInstrExternalTools'])) {
-                    echo '<a href="../admin/externaltools.php?cid=' . $cid . '&amp;ltfrom=' . $_GET['id'] . '">Add or edit an external tool</a>';
-                }
+                if (!isset($CFG['GEN']['noInstrExternalTools'])) { ?>
+                     <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='.$course->id)?>" >Add or edit an external tool</a>
+               <?php }
                 ?>
     			</div><br class="form"/><br>
         <div class="col-lg-2"><?php AppUtility::t('If this tool returns scores, do you want to record them?')?></div>
@@ -307,5 +280,4 @@ $this->params['breadcrumbs'][] = $this->title;
     <br>
     <br>
     </div>
-<!--</form>-->
 <?php ActiveForm::end(); ?>

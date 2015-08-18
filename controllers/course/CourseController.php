@@ -693,9 +693,9 @@ class CourseController extends AppController
         $saveTitle = AppConstant::CREATE_ITEM;
         $defaultValue = array(
             'startDate' => time(),
-            'sDate' => date("m-d-y"),
+            'sDate' => date("m/d/y"),
             'sTime' => date("g:i A"),
-            'eDate' => date("m-d-y"),
+            'eDate' => date("m/d/y"),
             'eTime' => date("g:i A"),
         );
         if ($this->isPost()) {
@@ -942,7 +942,7 @@ class CourseController extends AppController
                 $sTime = AppUtility::tzdate("g:i a", $startDate);
                 $startDate =AppConstant::NUMERIC_ONE;
             } else {
-                $sDate = date('m-d-Y');
+                $sDate = date('m/d/Y');
                 $sTime = time();
             }
             if ($endDate != AppConstant::ALWAYS_TIME) {
@@ -950,7 +950,7 @@ class CourseController extends AppController
                 $eTime = AppUtility::tzdate("g:i a", $endDate);
                 $endDate = AppConstant::NUMERIC_ONE;
             } else {
-                $eDate = date("m-d-Y",strtotime("+1 week"));
+                $eDate = date("m/d/Y",strtotime("+1 week"));
                 $eTime = time();
             }
             $saveTitle = "Modify Link";
@@ -996,9 +996,9 @@ class CourseController extends AppController
                 'summary' => "Enter summary here (displays on course page)",
                 'text' => "Enter text here",
                 'points' => AppConstant::NUMERIC_ZERO,
-                'sDate' => date("m-d-Y"),
+                'sDate' => date("m/d/Y"),
                 'sTime' => time(),
-                'eDate' => date("m-d-Y",strtotime("+1 week")),
+                'eDate' => date("m/d/Y",strtotime("+1 week")),
                 'eTime' => time(),
                 'calendar' => AppConstant::NUMERIC_ZERO,
                 'avail' => AppConstant::NUMERIC_ONE,

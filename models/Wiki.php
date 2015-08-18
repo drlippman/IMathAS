@@ -110,7 +110,6 @@ class Wiki extends BaseImasWikis
             }
             $updateId->editbydate = $tag;
             $updateId->groupsetid = $params['group-wiki'];
-//                    AppUtility::dump($updateId);
             $updateId->save();
         }
     }

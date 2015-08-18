@@ -123,7 +123,7 @@ class Forums extends BaseImasForums {
         {
             $params['forum-description'] = ' ';
         }
-        $updateForumData->description = $params['forum-description'];
+        $updateForumData->description = trim($params['description']);
         $updateForumData->courseid = $params['cid'];
         $updateForumData->settings = $settingValue;
 

@@ -77,7 +77,6 @@ class Thread extends BaseImasForumThreads
     }
     public static function getAllThread($forumId)
     {
-
         $forumData = Thread::findAll(['forumid'=> $forumId]);
         $allThreadId = array();
         foreach($forumData as $key=>$singleForum){
@@ -88,17 +87,20 @@ class Thread extends BaseImasForumThreads
     public static function getByForumIdAndId($forumId,$threadId)
     {
         $thread = Thread::find()->where(['id' => $threadId])->andWhere(['forumid' => $forumId])->one();
-        return $thread['views'];
+        if($thread){
+            return $thread['views'];
+        }
     }
     public static function saveViews($threadid)
     {
         $views = Thread::find(['views'])->where(['id' => $threadid])->one();
+        if($views){
         $views->views++;
         $views->save();
+        }
     }
     public static function  findNewPostCnt($cid,$user)
     {
-
         $query = "SELECT imas_forum_threads.forumid,COUNT(imas_forum_threads.id) FROM imas_forum_threads ";
         $query .= "JOIN imas_forums ON imas_forum_threads.forumid=imas_forums.id AND imas_forums.courseid='$cid' ";
         $query .= "LEFT JOIN imas_forum_views as mfv ON mfv.threadid=imas_forum_threads.id AND mfv.userid='$user->id' ";

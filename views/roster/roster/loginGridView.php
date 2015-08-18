@@ -39,10 +39,10 @@ $this->params['breadcrumbs'][] = $this->title;
             echo DatePicker::widget([
                 'name' => 'First_Date_Picker',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m-d-Y",strtotime("-1 week +1 day")),
+                'value' => date("m/d/Y",strtotime("-1 week +1 day")),
                 'pluginOptions' => [
                     'autoclose' => true,
-                    'format' => 'mm-dd-yyyy'
+                    'format' => 'mm/dd/yyyy'
                 ]
             ]);
             ?>
@@ -53,10 +53,10 @@ $this->params['breadcrumbs'][] = $this->title;
             echo DatePicker::widget([
                 'name' => 'Second_Date_Picker',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m-d-Y"),
+                'value' => date("m/d/Y"),
                 'pluginOptions' => [
                     'autoclose' => true,
-                    'format' => 'mm-dd-yyyy' ]
+                    'format' => 'mm/dd/yyyy' ]
             ]);
             ?>
         </div>

@@ -13,37 +13,38 @@ $( document ).ready(function() {
     var course_id = $("#course-id").val();
     var transferData = {newStartDate: startDate, newEndDate: endDate, cid: course_id};
     jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
-    $("#go-button").click(function () {
-        var startDate = $( "#datepicker-id input" ).val();
-        var endDate = $( "#datepicker-id1 input" ).val();
-        if(endDate < todaysdate)
-        {
-            $('#following-link').show();
-        }
-        $("#first-date-label").text(startDate);
-        $('#last-date-label').text(endDate);
-        $('#flash-message').hide();
-        var course_id =  $( "#course-id" ).val();
-        var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
-
-
-        if (endDate=="" || startDate== ""){
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>Date field can not be blank.</div>");
-        }
-        else if ((startDate > endDate) || startDate== ""){
-            $('#flash-message').show();
-            $('#flash-message').html("<div class='alert alert-danger'>First date can not be greater then last date.</div>");
-        }
-        else
-        {
-            $('#flash-message').hide();
-            jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
-
-        }
-    });
     previousWeekHandler();
     nextWeekHandler();
+});
+
+$("#go-button").click(function () {
+    var startDate = $( "#datepicker-id input" ).val();
+    var endDate = $( "#datepicker-id1 input" ).val();
+    if(endDate < todaysdate)
+    {
+        $('#following-link').show();
+    }
+    $("#first-date-label").text(startDate);
+    $('#last-date-label').text(endDate);
+    $('#flash-message').hide();
+    var course_id =  $( "#course-id" ).val();
+    var transferData = {newStartDate: startDate,newEndDate: endDate,cid: course_id};
+
+
+    if (endDate=="" || startDate== ""){
+        $('#flash-message').show();
+        $('#flash-message').html("<div class='alert alert-danger'>Date field can not be blank.</div>");
+    }
+    else if ((startDate > endDate) || startDate== ""){
+        $('#flash-message').show();
+        $('#flash-message').html("<div class='alert alert-danger'>First date can not be greater then last date.</div>");
+    }
+    else
+    {
+        $('#flash-message').hide();
+        jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
+
+    }
 });
 
 function pad(number, length) {
@@ -57,7 +58,7 @@ function pad(number, length) {
 
 function toggleDate(selector, dayDiff, adjustment) {
     inputString = $("#"+selector).val();
-    var dString = inputString.split('-');
+    var dString = inputString.split('/');
     var dt = new Date(dString[2], dString[0] - 1, dString[1]);
 
     dayDiff = parseInt(dayDiff);
@@ -67,11 +68,11 @@ function toggleDate(selector, dayDiff, adjustment) {
         dt.setDate(dt.getDate()-dayDiff);
     }
 
-    var finalDate = pad(dt.getMonth()+1,2) + "-" + pad(dt.getDate(),2) + "-" + dt.getFullYear();
+    var finalDate = pad(dt.getMonth()+1,2) + "/" + pad(dt.getDate(),2) + "/" + dt.getFullYear();
     return finalDate;
 }
 function lastDate(inputString, dayDiff, adjustment) {
-    var dString = inputString.split('-');
+    var dString = inputString.split('/');
     var dt = new Date(dString[2], dString[0] - 1, dString[1]);
 
     dayDiff = parseInt(dayDiff);
@@ -80,7 +81,7 @@ function lastDate(inputString, dayDiff, adjustment) {
     } else{
         dt.setDate(dt.getDate()+dayDiff);
     }
-    var finalDate = pad(dt.getMonth()+1,2) + "-" + pad(dt.getDate(),2) + "-" + dt.getFullYear();
+    var finalDate = pad(dt.getMonth()+1,2) + "/" + pad(dt.getDate(),2) + "/" + dt.getFullYear();
     return finalDate;
 }
 
@@ -161,23 +162,33 @@ function loginGridViewSuccess(response) {
     data = data.data;
     var tableString = '';
     headerArray = data.header;
+    totalColumns = headerArray.length;
+    console.log(totalColumns);
     rows = data.rows;
     tableString = "<table class='login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
-    for(i=0; i<headerArray.length; i++){
+    for(i=0; i<headerArray.length && i < 15; i++){
         tableString = tableString + "<th>" + headerArray[i]+"</th>";
+        lastColumnHeader = headerArray[i];
     }
     tableString = tableString+ "</thead><tbody>";
     $.each( rows, function(id, studata){
-        name = studata.name;
-        rows = studata.row;
-        tableString = tableString+ "<tr>";
-        tableString = tableString + "<td>" + name + "</td>";
-        for(i=1; i<headerArray.length; i++) {
-            var headerVal = headerArray[i];
-            tableString = tableString + "<td>" + rows[headerVal] + "</td>";
-        }
-        tableString = tableString+ "</tr>";
+            name = studata.name;
+            rows = studata.row;
+            tableString = tableString + "<tr>";
+            tableString = tableString + "<td>" + name + "</td>";
+            for (i = 1; i < headerArray.length; i++) {
+                var headerVal = headerArray[i];
+                if(lastColumnHeader >= headerVal){
+                tableString = tableString + "<td>" + rows[headerVal] + "</td>";
+                }
+            }
+            tableString = tableString + "</tr>";
+
     });
+    if(totalColumns > 16){
+        $('#flash-message').show();
+        $('#flash-message').html("<div class='alert alert-danger'>Display only 2 week data</div>");
+    }
     tableString = tableString + "</tbody></table>";
     $('#table_placeholder').html(tableString);
 }

@@ -85,7 +85,6 @@ $this->params['breadcrumbs'][] = $this->title;
             <textarea cols=5 rows=12 id='intro' name='intro' style='width: 100%'>$assessmentData->intro</textarea></div><br>"; ?>
         </div>
     </div><BR class=form>
-
         <div class=col-lg-2><?php AppUtility::t('Visibility')?></div>
             <div class=col-lg-10>
                 <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class="padding-left"><?php AppUtility::t('Show By Dates')?></span>

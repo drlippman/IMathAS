@@ -276,7 +276,6 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
         // Hack
 		//if ($GLOBALS['sessiondata']['graphdisp']==0) {
 		if (isset($GLOBALS['sessiondata']['graphdisp'])) {
-//            \app\components\AppUtility::dump('ddddd');
 			if ($xmax-$xmin>2) {
 				$dx = 1;
 				$stopat = ($xmax-$xmin)+1;

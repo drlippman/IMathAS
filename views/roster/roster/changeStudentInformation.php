@@ -81,13 +81,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php echo $form->field($model, 'locked')->checkbox(); ?>
             <?php echo $form->field($model, 'hidefromcourselist')->checkbox(); ?>
         </div>
-        <div class="col-sm-offset-3 password_checkbox">
+        <div class="col-sm-offset-3 password_checkbox" style="margin-left: 27%">
             <?php echo $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
         <div class="change-password-content">
             <?php echo $form->field($model, 'password')->textInput(); ?>
          </div>
     </fieldset>
+    <br>
      <div class="form-group">
         <div class=" col-sm-9 col-sm-offset-3 display_field">
             <?php echo Html::submitButton(AppUtility::t('Save', false), ['class' => 'btn btn-primary col-sm-1', 'name' => 'login-button']) ?>

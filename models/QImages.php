@@ -41,7 +41,7 @@ class QImages extends BaseImasQimages {
         $this->qsetid = $qSetId;
         $this->var = $params['var'];
         $this->filename = $params['filename'];
-        $this->alttext = $params['alttext'];AppUtility::dump($this);
+        $this->alttext = $params['alttext'];
         $this->save();
     }
 

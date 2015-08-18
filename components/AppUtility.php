@@ -76,7 +76,7 @@ class AppUtility extends Component
 
     public static function getTimeStampFromDate($dateStr)
     {
-        $a = strptime($dateStr, '%m-%d-%Y');
+        $a = strptime($dateStr, '%m/%d/%Y');
         $timestamp = mktime(0, 0, 0, $a['tm_mon'] + 1, $a['tm_mday'], $a['tm_year'] + 1900);
         return $timestamp;
     }

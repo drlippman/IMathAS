@@ -75,12 +75,8 @@ $currentLevel = 0;
         <br><br>
     <?php $cnt = AppConstant::NUMERIC_ZERO;
         $now = time();
-
-
         foreach ($postdata as $index => $data){
-//    AppUtility::dump($postdata);
         ?>
-
         <?php if ($data['level'] != AppConstant::NUMERIC_ZERO && $data['level'] < $currentLevel)
         {
         $cnt--;
@@ -88,8 +84,7 @@ $currentLevel = 0;
         for ($i = $currentLevel;
         $data['level'] < $i;
         $i--){
-//        ?>
-
+        ?>
     </div>
     <?php }
     } ?>

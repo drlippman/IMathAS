@@ -4,7 +4,6 @@ use app\components\AppConstant;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
-
 $this->title = $pageTitle;
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
@@ -44,7 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="editor-summary">
             <div class="col-lg-2"><?php AppUtility::t('Description')?></div>
             <div class="col-lg-10">
-
                 <div class=editor>
              <?php  $description = 'Enter forum description here';
                          if ($forumData) {

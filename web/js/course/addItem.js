@@ -7,7 +7,7 @@ $(document).ready(function(){
             var tb = 't';
 
             var html = '<div class="">' +
-                            '<a href="../../assessment/assessment/add-assessment?cid='+ courseId+'">' +
+                            '<a href="../../site/work-in-progress?cid='+ courseId+'">' +
                              '<div class="assessment itemLink" >' +
                                 '<img class="icon-center icon-size" id=\"addtype$parent-$tb\" onclick= \"additem(1, t)" src="../../img/iconAssessment.png">' +
                                 '<div class="item-name">Assessment</div>'+

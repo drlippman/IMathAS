@@ -32,7 +32,6 @@ $now = $currentTime;
 <!-- ////////////////// Assessment here //////////////////-->
 <div class="tab-content shadowBox student-no-second-level-nav">
     <?php if(count($courseDetail)){
-        AppUtility::dump($courseDetail);
         foreach($courseDetail as $key => $item){
 
             switch(key($item)):

@@ -299,7 +299,6 @@ class QuestionController extends AppController
             //DEFAULT LOAD PROCESSING GOES HERE
             //load filter.  Need earlier than usual header.php load
             $curdir = rtrim(dirname(__FILE__), '/\\');
-//            AppUtility::dump(Yii::$app->basePath."/filter/filter.php");
             require_once (Yii::$app->basePath."/filter/filter.php");
             $query = AssessmentSession::getByAssessmentSessionIdJoin($aid,$cid);
             if (count($query) > 0) {

@@ -516,9 +516,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo "<a href=\"#\" ";
                                 echo "onmouseover=\"tipshow(this,'" . AppUtility::t('5-number summary:', false) . " {$gradebook[0][1][$j][9]}')\" onmouseout=\"tipout()\" ";
                                 echo ">";
-                            } else {
-                                echo "<a href=\"#\">";
-                            }
+                            } else {   ?>
+                                <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress')?>">
+                            <?php }
                             if ($gradebook[$i][1][$j][3] > 9) {
                                 $gradebook[$i][1][$j][3] -= 10;
                             }
