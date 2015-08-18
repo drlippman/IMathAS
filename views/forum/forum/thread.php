@@ -9,13 +9,16 @@ $this->title = AppUtility::t($forumData['name'],false );
 $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
-
 ?>
 <?php if($page){?>
     <input type="hidden" id="page" value="<?php echo $page;?>">
 <?php }?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+    <?php if($users['rights'] == 100 || $users['rights'] == 20) {
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]);
+    } elseif($users['rights'] == 10){
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
+    }?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -31,7 +34,11 @@ $now = $currentTime;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+    <?php if($users['rights'] == 100 || $users['rights'] == 20) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+    } elseif($users['rights'] == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    }?>
 </div>
 <input type="hidden" id="courseId" class="courseId" value="<?php echo $cid ?>">
 <div class="tab-content shadowBox ">

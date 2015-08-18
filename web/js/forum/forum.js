@@ -6,7 +6,7 @@ $('.search-dropdown').click(function(){
 $(document).ready(function ()
 {  var courseId = $('.courseId').val();
     jQuerySubmit('get-forums-ajax', {cid: courseId}, 'forumsSuccess');
-    $('#sea-thread').hide();
+    $('#search-thread').hide();
     $('#search-post').hide();
     $('#result').hide();
     $('#forum_search').click(function ()
@@ -133,9 +133,10 @@ function forumsSuccess(response) {
     if (response.status == 0)
     {
         var forums = response.data;
-        showForumTable(forums);
+
 
     }
+    showForumTable(forums);
 }
     function showForumTable(forums)
     {
