@@ -63,7 +63,8 @@ class AssessmentUtility extends Component
     }
 
 //writeHtmlChecked is used for checking the appropriate radio box on html forms
-    public static function writeHtmlChecked ($var,$test,$notEqual=null) {
+    public static function writeHtmlChecked ($var,$test,$notEqual=null)
+    {
         if ((isset($notEqual)) && ($notEqual==1)) {
             if ($var!=$test) {
                 echo "checked ";

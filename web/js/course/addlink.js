@@ -10,9 +10,10 @@ function linktypeupdate(el) {
         } else {
             disp = "none";
         }
-        document.getElementById(tochg[i] + "input").style.display = disp;
+        document.getElementById(tochg[i] +"input").style.display = disp;
     }
 }
+
 function toggleGBdetail(v) {
     document.getElementById("gbdetail").style.display = v ? "block" : "none";
 }

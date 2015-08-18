@@ -1079,10 +1079,10 @@ class ForumController extends AppController
         $pageTitle = AppConstant::ADD_FORUM;
         $saveTitle = AppConstant::CREATE_FORUM;
         $defaultValue = array(
-            'startDate' => time(),
-            'endDate' > time(),
+            'startDate' => AppConstant::NUMERIC_ONE,
             'replyBy' => AppConstant::ALWAYS_TIME,
             'postBy' => AppConstant::ALWAYS_TIME,
+            'endDate' => AppConstant::NUMERIC_ONE,
             'hasSubScrip' => false,
             'hasGroupThreads' => AppConstant::NUMERIC_ZERO,
             'postTag' => 'FP',
@@ -1102,12 +1102,10 @@ class ForumController extends AppController
             'eTime' => time(),
              'postDate' => date("m-d-Y",strtotime("+1 week")),
             'replyByDate' => date("m-d-Y",strtotime("+1 week")),
-            'avail' => AppConstant::NUMERIC_ZERO,
+            'avail' => AppConstant::NUMERIC_ONE,
             'defDisplay' => AppConstant::NUMERIC_ZERO,
             'replyByTime' => time(),
             'postTime' => time(),
-            'replyBy' => AppConstant::NUMERIC_ZERO,
-            'postBy' => AppConstant::NUMERIC_ZERO,
             'outcomes' => ' ',
             'isOutcomes' => $course['outcomes'],
         );
@@ -1229,6 +1227,7 @@ class ForumController extends AppController
                 );
         }
         if ($this->isPostMethod()) {
+        AppUtility::dump($params);
              if ($params['modifyFid']) {
                  if(isset($params['outcomes'])){
                      foreach ($params['outcomes'] as $outcomeId) {
@@ -1351,7 +1350,7 @@ class ForumController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-        $this->includeJS(["forum/addforum.js","editor/tiny_mce.js",'assessment/addAssessment.js', 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $this->includeJS(["forum/addforum.js","editor/tiny_mce.js",'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
         'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,

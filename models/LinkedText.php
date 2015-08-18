@@ -45,6 +45,7 @@ class LinkedText extends BaseImasLinkedtext
         $this->startdate = $params['startdate'];
         $this->enddate = $params['enddate'];
         $this->save();
+
         return $this->id;
     }
 
@@ -108,7 +109,6 @@ class LinkedText extends BaseImasLinkedtext
             $date->save();
         }
     }
-
 
     public static function getLinkedTextForOutcomeMap($courseId)
     {
