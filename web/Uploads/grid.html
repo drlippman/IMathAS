@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jQuery UI Selectable - Display as grid</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="/resources/demos/style.css">
+<style>
+#feedback { font-size: 1.4em; }
+#selectable .ui-selecting { background: #FECA40; }
+#selectable .ui-selected { background: #F39814; color: white; }
+#selectable { list-style-type: none; margin: 0; padding: 0; width: 450px; }
+#selectable li { margin: 3px; padding: 1px; float: left; width: 130px; height: 80px; font-size: 4em; text-align: center; }
+</style>
+<script>
+$(function() {
+$( "#selectable" ).selectable();
+});
+</script>
+</head>
+<body>
+<ol id="selectable">
+<li class="ui-state-default">1</li>
+<li class="ui-state-default">2</li>
+<li class="ui-state-default">3</li>
+<li class="ui-state-default">4</li>
+<li class="ui-state-default">5</li>
+<li class="ui-state-default">6</li>
+
+</ol>
+</body>
+</html>
