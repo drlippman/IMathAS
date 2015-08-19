@@ -14,7 +14,7 @@ $(document).ready(function(){
                             '</div>' +
                             '</a>' +
 
-                            '<a href="../../course/course/modify-inline-text?courseId=' + courseId+'"><div class="inline-text itemLink">' +
+                            '<a href="#"><div class="inline-text itemLink">' +
                                 '<img class="icon-center icon-size" src="../../img/inlineText.png">' +
                                 '<div class="item-name">Inline Text</div>'+
                             '</div></a>' +
