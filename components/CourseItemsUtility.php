@@ -7,35 +7,35 @@ use app\components\AppConstant;
 class CourseItemsUtility extends Component
 {
 ////////////////////////////////////////////// ASSESSMENT //////////////////////////////////////////////////////////////////////////////////
-    public $cnt = 0;
+    public $cnt = AppConstant::NUMERIC_ZERO;
     public static  function AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll)
     {
         $assessment = $item[key($item)];
         $notHidden = $item['nothidden'];
         $hasstats = true;
-        if (strpos($assessment['summary'],'<p ')!==0 && strpos($assessment['summary'],'<ul')!==0 && strpos($assessment['summary'],'<ol')!==0) {
+        if (strpos($assessment['summary'],'<p ')!==AppConstant::NUMERIC_ZERO && strpos($assessment['summary'],'<ul')!==AppConstant::NUMERIC_ZERO && strpos($assessment['summary'],'<ol')!==AppConstant::NUMERIC_ZERO) {
             $assessment['summary'] = '<p>'.$assessment['summary'].'</p>';
             if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/',$assessment['summary'])) {
                 $assessment['summary'] = '';
             }
         }
-        if ($assessment['startdate']==0) {
+        if ($assessment['startdate']==AppConstant::NUMERIC_ZERO) {
             $startDate = _('Always');
         } else {
             $startDate = AppUtility::formatdate($assessment['startdate']);
         }
-        if ($assessment['enddate']==2000000000) {
+        if ($assessment['enddate']==AppConstant::ALWAYS_TIME) {
             $endDate =  _('Always');
         } else {
             $endDate =AppUtility::formatdate($assessment['enddate']);
         }
-        if ($assessment['reviewdate']==2000000000) {
+        if ($assessment['reviewdate']==AppConstant::ALWAYS_TIME) {
             $reviewDate = _('Always');
         } else {
             $reviewDate = AppUtility::formatdate($assessment['reviewdate']);
         }
         if ($assessment->avail == 1 && $assessment->enddate > $currentTime && $assessment->startdate < $currentTime && $notHidden) {
-             if(substr($assessment->deffeedback,0,8) == 'Practice'){
+             if(substr($assessment->deffeedback,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_EIGHT) == 'Practice'){
                  $endName = 'Available until';
              }else{
                  $endName = 'Due';
@@ -43,7 +43,7 @@ class CourseItemsUtility extends Component
             if($assessment->enddate != AppConstant::ALWAYS_TIME){
                 $message = "$endName $endDate";
             }
-        }else if($assessment->avail == 1 && $assessment->enddate < $currentTime && $assessment->reviewdate > $currentTime){
+        }else if($assessment->avail == AppConstant::NUMERIC_ONE && $assessment->enddate < $currentTime && $assessment->reviewdate > $currentTime){
             $message = sprintf(AppConstant::PAST_DUE_DATE, $endDate);
             if ($assessment->reviewdate != AppConstant::ALWAYS_TIME) {
                 $message .= " until $reviewDate. ";
@@ -65,7 +65,7 @@ class CourseItemsUtility extends Component
             <b>
                 <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>" class="confirmation-require assessment-link"
                    id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
-            </b>
+            </b><br>
             <div class="floatright">
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                 <ul class=" select1 dropdown-menu selected-options">

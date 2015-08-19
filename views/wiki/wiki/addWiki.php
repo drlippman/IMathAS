@@ -2,9 +2,13 @@
 use app\components\AppUtility;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
-$this->title = $pageTitle;
+use app\components\AppConstant;
+use app\components\AssessmentUtility;
+$this->title = $defaultValue['pageTitle'];
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
+
+//AppUtility::dump($defaultValue);
 ?>
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>"
       xmlns="http://www.w3.org/1999/html">
@@ -16,8 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
+
             <div class="pull-left header-btn">
-                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
+                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $defaultValue['saveTitle'] ?></button>
             </div>
         </div>
     </div>
@@ -27,11 +32,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-lg-2"><?php AppUtility::t('Name of Wiki')?></div>
             <div class="col-lg-10">
                 <?php $title = AppUtility::t('Enter title here', false);
-                if($wiki['name']){
-                      $title = $wiki['name'];
+                if($defaultValue['name']){
+                      $title = $defaultValue['name'];
                     } ?>
-                <input class="input-item-title" type=text size=0 name=name value="<?php echo $title;?>">
-
+                <input class="input-item-title" type=text size=0 name=name value="<?php echo $defaultValue['title'];?>">
             </div>
         </div>
         <BR class=form>
@@ -42,9 +46,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class=editor>
                     <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
                         <?php $text = AppUtility::t('Enter Wiki description here');
-                        if($wiki['description'])
+                        if($defaultValue['description'])
                         {
-                            $text = $wiki['description'];
+                            $text = $defaultValue['description'];
                         }
                         echo htmlentities($text);?>
                     </textarea>
@@ -55,22 +59,23 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="visibility-item">
             <div class="col-lg-2"><?php AppUtility::t('Visibility')?></div>
             <div class="col-lg-10">
-                <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($line['avail'],1);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
-                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($line['avail'],0);?>/><span class='padding-left'><?php AppUtility::t('Hide')?></span></label>
-                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($line['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/><span class='padding-left'><?php AppUtility::t('Show Always')?></span></label>
+
+                <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked($defaultValue['avail'], AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class='padding-left'><?php AppUtility::t('Show by Dates')?></span>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],0);?>/><span class='padding-left'><?php AppUtility::t('Hide')?></span></label>
+                <label class="non-bold" style="padding-left: 80px"><input type=radio name="avail" value="2" <?php AppUtility::writeHtmlChecked($defaultValue['avail'],2);?> onclick="document.getElementById('datediv').style.display='none';"/><span class='padding-left'><?php AppUtility::t('Show Always')?></span></label>
             </div>
             <div>
-                <div id="datediv" style="display:<?php echo ($wiki['avail']==1)?"block":"none"; ?>"><BR class=form><br>
+                <div id="datediv" style="display:<?php echo ($defaultValue['avail']==1)?"block":"none"; ?>"><BR class=form><br>
                     <div class="col-lg-2"><?php AppUtility::t('Available After')?></div>
                 <div class=col-lg-10>
-                    <input type=radio name="sdatetype" class="pull-left" value="0" <?php AppUtility::writeHtmlChecked($startdate,'0',0) ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
-                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="sdatetype" class="pull-left" value="sdate" <?php AppUtility::writeHtmlChecked($startdate,'0',1) ?>/></label>
+                    <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
+                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
-                        'name' => 'StartDate',
+                        'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                        'value' => date("m/d/Y"),
+                        'value' => $defaultValue['sDate'],
                         'removeButton' => false,
                         'pluginOptions' => [
                             'autoclose' => true,
@@ -81,8 +86,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<label class="end pull-left non-bold">at</label>';
                     echo '<div class="pull-left col-lg-4">';
                     echo TimePicker::widget([
-                        'name' => 'start_end_time',
-                        'value' => time(),
+                        'name' => 'stime',
+                        'value' => $defaultValue['sTime'],
                         'pluginOptions' => [
                             'showSeconds' => false,
                             'class' => 'time'
@@ -93,14 +98,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                  <div class=col-lg-2><?php AppUtility::t('Available Until')?></div>
                 <div class=col-lg-10>
-                    <label class="pull-left non-bold"><input type=radio name="edatetype" class="pull-left" value="2000000000" <?php AppUtility::writeHtmlChecked($enddate,'2000000000',0) ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
-                    <label class="pull-left" style="padding-left: 34px"><input type=radio name="edatetype" class="pull-left" value="edate"  <?php AppUtility::writeHtmlChecked($enddate,'2000000000',1) ?>/></label>
+                    <label class="pull-left non-bold"><input type=radio name="available-until" class="pull-left" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 0); ?>/><span class="padding-left"><?php AppUtility::t('Always after start date')?></span></label>
+                    <label class="pull-left" style="padding-left: 34px"><input type=radio name="available-until" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['endDate'], "2000000000", 1); ?>/></label>
                     <?php
                     echo '<div class = "time-input  col-lg-4">';
                     echo DatePicker::widget([
-                        'name' => 'EndDate',
+                        'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                        'value' => date("m/d/Y"),
+                        'value' => $defaultValue['eDate'],
                         'removeButton' => false,
                         'pluginOptions' => [
                             'autoclose' => true,
@@ -112,8 +117,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<div class="pull-left col-lg-4">';
 
                     echo TimePicker::widget([
-                        'name' => 'end_end_time',
-                        'value' => time(),
+                        'name' => 'etime',
+                        'value' => $defaultValue['eTime'],
                         'pluginOptions' => [
                             'showSeconds' => false,
                             'class' => 'time'
@@ -149,7 +154,7 @@ if ($started) {
             echo DatePicker::widget([
                 'name' => 'Calendar',
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                'value' => date("m/d/Y"),
+                'value' => $defaultValue['rdatetype'],
                 'removeButton' => false,
                 'pluginOptions' => [
                     'autoclose' => true,

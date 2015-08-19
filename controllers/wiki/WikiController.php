@@ -122,34 +122,74 @@ class WikiController extends AppController
             $saveTitle = AppConstant::SAVE_BUTTON;
         }
         else {
-            $pageTitle = 'Add Wiki';
-            if($this->isPostMethod()){
-                $params = $this->getRequestParams();
-                $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
-                $saveChanges = new Wiki();
-                $lastWikiId = $saveChanges->createItem($params);
-                $saveItems = new Items();
-                $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
-                $courseItemOrder = Course::getItemOrder($courseId);
-                $itemorder = $courseItemOrder->itemorder;
-                $items = unserialize($itemorder);
-                $blocktree = array(0);
-                $sub =& $items;
-
-                for ($i=1;$i<count($blocktree);$i++) {
-                    $sub =& $sub[$blocktree[$i]-1]['items'];
+                $defaultValues = array(
+                    'pageTitle' => 'Create Wiki',
+                    'saveTitle' => AppConstant::New_Item,
+                    'title' => "Enter title here",
+                    'summary' => "Enter wiki description here (displays on course page)",
+                    'sDate' => date("m/d/Y"),
+                    'sTime' => time(),
+                    'eDate' => date("m/d/Y",strtotime("+1 week")),
+                    'eTime' => time(),
+                    'calendar' => AppConstant::NUMERIC_ZERO,
+                    'avail' => AppConstant::NUMERIC_ONE,
+                    'rdatetype' => date("m/d/Y",strtotime("+1 week")),
+                );
+             }
+        if ($this->isPost()) {
+            if ($params['avail']==1) {
+                if ($params['available-after']=='0') {
+                    $startDate = 0;
+                } else if ($params['available-after']=='now') {
+                    $startDate = time();
+                } else {
+                    $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                 }
-                array_unshift($sub,intval($lastItemsId));
-                $itemorder = (serialize($items));
-                $saveItemOrderIntoCourse = new Course();
-                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+                if ($params['available-until']=='2000000000') {
+                    $endDate = 2000000000;
+                } else {
+                    $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+                }
+            } else if ($params['avail']==2) {
+                if ($params['place-on-calendar-always']==0) {
+                    $startDate = 0;
+                } else {
+                    $startDate = AppUtility::parsedatetime($params['cdate'],"12:00 pm");
+                }
+                $endDate =  2000000000;
+            } else {
+                $startDate = 0;
+                $endDate =  2000000000;
             }
-            $saveTitle = AppConstant::New_Item;
+            $finalArray['courseid'] = $params['courseId'];
+            $finalArray['title'] = $params['name'];
+            $finalArray['description'] = $params['description'];
+            $finalArray['avail'] = $params['avail'];
+            $finalArray['startdate'] = $startDate;
+            $finalArray['enddate'] = $endDate;
+            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
+            $saveChanges = new Wiki();
+            $lastWikiId = $saveChanges->createItem($finalArray);
+            $saveItems = new Items();
+            $lastItemsId = $saveItems->saveItems($courseId, $lastWikiId, 'Wiki');
+            $courseItemOrder = Course::getItemOrder($courseId);
+            $itemorder = $courseItemOrder->itemorder;
+            $items = unserialize($itemorder);
+            $blocktree = array(0);
+            $sub =& $items;
+
+            for ($i=1;$i<count($blocktree);$i++) {
+                $sub =& $sub[$blocktree[$i]-1]['items'];
+            }
+            array_unshift($sub,intval($lastItemsId));
+            $itemorder = (serialize($items));
+            $saveItemOrderIntoCourse = new Course();
+            $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'pageTitle' => $pageTitle);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'pageTitle' => $pageTitle, 'defaultValue' => $defaultValues);
         return $this->render('addWiki', $returnData);
     }
 }

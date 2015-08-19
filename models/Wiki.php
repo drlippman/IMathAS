@@ -33,43 +33,12 @@ class Wiki extends BaseImasWikis
 
     public function createItem($params)
     {
-        $endDate = AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
-        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
-        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
-
-        $this->name = isset($params['name']) ? $params['name'] : null;
-        $this->courseid = $params['courseId'];
-        if(empty($params['description']))
-        {
-            $params['description'] = ' ';
-        }
-        $this->description = isset($params['description']) ? $params['description'] : null;
-        $this->avail = isset($params['avail']) ? $params['avail'] : null;
-
-        if($params['avail'] == AppConstant::NUMERIC_ONE)
-        {
-            if($params['available-after'] == AppConstant::NUMERIC_ONE){
-                $startDate = 0;
-            }
-            if($params['available-until'] == AppConstant::ALWAYS_TIME){
-                $endDate = AppConstant::ALWAYS_TIME;
-            }
-            $this->startdate = $startDate;
-            $this->enddate = $endDate;
-        }else
-        {
-            $this->startdate = AppConstant::NUMERIC_ZERO;
-            $this->enddate = AppConstant::ALWAYS_TIME;
-        }
-        $this->settings = 0;
-
-        if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
-            $tag = $params['rdatetype'];
-        }
-        if(!empty($params['group-wiki']))
-        {
-            $this->groupsetid = $params['group-wiki'];
-        }
+        $this->courseid = $params['courseid'];
+        $this->name = $params['title'];
+        $this->description = $params['description'];
+        $this->avail = $params['avail'];
+        $this->startdate = $params['startdate'];
+        $this->enddate = $params['enddate'];
         $this->save();
         return $this->id;
     }
