@@ -157,12 +157,17 @@ if (isset($_GET['delete'])) {
 						$result = mysql_query($query) or die("Query failed : " . mysql_error());
 						$filesout = array();
 						while ($r = mysql_fetch_row($result)) {
-							//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
-							copycoursefile($r[2], $newdir.'/'.$filedir.basename($r[2]));
-							$resitem =  '<resource href="'.$filedir.basename($r[2]).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'file'.$r[0].'" type="webcontent">'."\n";
-							$resitem .= '  <file href="'.$filedir.basename($r[2]).'" />'."\n";
-							$resitem .= '</resource>';
-							$res[] = $resitem;
+							//if s3 filehandler, do files as weblinks rather than including the file itself
+							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+								$r[2] = getcoursefileurl($r[2]);
+							} else {
+								//copy("../course/files/{$r[2]}",$newdir.'/'.$r[2]);
+								copycoursefile($r[2], $newdir.'/'.$filedir.basename($r[2]));
+								$resitem =  '<resource href="'.$filedir.basename($r[2]).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'file'.$r[0].'" type="webcontent">'."\n";
+								$resitem .= '  <file href="'.$filedir.basename($r[2]).'" />'."\n";
+								$resitem .= '</resource>';
+								$res[] = $resitem;
+							}
 							$filesout[$r[0]] = array($r[1],$r[2]);
 						}
 					}
@@ -188,7 +193,11 @@ if (isset($_GET['delete'])) {
 					if ($row[2]!='') {
 						fwrite($fp,'<ul>');
 						foreach ($files as $f) {
-							fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
+							if ($GLOBALS['filehandertypecfiles'] == 's3') {
+								fwrite($fp,'<li><a href="'.$filesout[$f][1].'">'.htmlentities($filesout[$f][0]).'</a></li>');
+							} else {
+								fwrite($fp,'<li><a href="'.$filedir.basename($filesout[$f][1]).'">'.htmlentities($filesout[$f][0]).'</a></li>');
+							}
 						}
 						fwrite($fp,'</ul>');
 					}
