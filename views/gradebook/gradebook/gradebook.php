@@ -380,7 +380,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo "<input type=\"checkbox\" name='checked' value='{$gradebook[$i][4][0]}' />&nbsp;";
             }
             ?>
-            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
+            <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress')?>" >
 
                 <?php
                 if ($gradebook[$i][4][1] > 0) {

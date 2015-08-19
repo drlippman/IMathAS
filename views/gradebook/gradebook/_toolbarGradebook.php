@@ -7,10 +7,12 @@ use app\components\AppUtility;
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Offline Grades');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">
                 <li><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Add Offline Grades');?></a></li>
-                <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/manage-offline-grades?cid=' . $course->id); ?>"><?php AppUtility::t('Manage Offline Grades');?></a></li>
+<!--                <li><a href="--><?php //echo AppUtility::getURLFromHome('gradebook', 'gradebook/manage-offline-grades?cid=' . $course->id); ?><!--">--><?php //AppUtility::t('Manage Offline Grades');?><!--</a></li>-->
+                <li><a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress'); ?>"><?php AppUtility::t('Manage Offline Grades');?></a></li>
             </ul>
         </li>
-        <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' . $course->id.'&studentId=-1'); ?>"><?php AppUtility::t('Averages');?></a></li>
+<!--        <li><a href="--><?php //echo AppUtility::getURLFromHome('gradebook', 'gradebook/grade-book-student-detail?cid=' . $course->id.'&studentId=-1'); ?><!--">--><?php //AppUtility::t('Averages');?><!--</a></li>-->
+        <li><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress'); ?>"><?php AppUtility::t('Averages');?></a></li>
         <li><a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gb-comments?cid=' . $course->id . "&stu=0"); ?>"><?php AppUtility::t('Comments');?></a></li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Filter');?><span class="caret"></span></a>
