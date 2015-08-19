@@ -255,12 +255,18 @@ class ForumPosts extends BaseImasForumPosts
         $query = \Yii::$app->db->createCommand("SELECT id FROM imas_forum_posts WHERE forumid IN ($forumlist) AND files<>''")->queryAll();
         return $query;
     }
-    public static function deleteForumPostByForumList($forumlist){
+    public static function deleteForumPostByForumList($forumlist)
+    {
         $query = ForumPosts::find()->where(['IN', 'forumid', $forumlist])->andWhere(['posttype' => AppConstant::NUMERIC_ZERO])->all();
         if($query){
             foreach($query as $object){
                 $object->delete();
             }
         }
+    }
+    public static function deleteForumPosts($delList)
+    {
+        $query = "DELETE FROM imas_forum_posts WHERE threadid IN ($delList)";
+        \Yii::$app->db->createCommand($query)->queryAll();
     }
 }

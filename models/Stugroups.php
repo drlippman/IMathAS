@@ -24,6 +24,55 @@ class Stugroups extends BaseImasStugroups {
         return $data;
     }
 
+    public static function findByGrpSetId($copyGrpSet)
+    {
+        return Stugroups::find()->where(['groupsetid' => $copyGrpSet])->one();
+    }
+    public function insertStuGrpData($stuGroupName,$NewGrpSetId)
+    {
+        $this->name = $stuGroupName;
+        $this->groupsetid = $NewGrpSetId;
+        $this->save();
+        return $this->id;
+
+    }
+
+    public static  function findByGrpSetIdToDlt($deleteGrpSet)
+    {
+        $query = new Query();
+        $query	->select(['id'])
+            ->from('imas_stugroups')
+            ->where(['groupsetid' => $deleteGrpSet]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function deleteGrp($grpId)
+    {
+        $query = Stugroups::find()->where(['id' => $grpId])->all();
+        if($query)
+        {
+            foreach($query as $data)
+            {
+                $data->delete();
+            }
+        }
+
+    }
+
+    public static  function findByGrpSetIdForCopy($copyGrpSet)
+    {
+
+        $query = new Query();
+        $query	->select(['id','name'])
+            ->from('imas_stugroups')
+            ->where(['groupsetid' => $copyGrpSet]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
 
 
 }

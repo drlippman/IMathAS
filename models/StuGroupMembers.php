@@ -25,4 +25,34 @@ class StuGroupMembers extends BaseImasStugroupmembers{
             }
         }
     }
+
+    public static function findByStuGroupId($groupId)
+    {
+        $query = new Query();
+        $query ->select('userid')
+                ->from('imas_stugroupmembers')
+                ->where(['stugroupid' => $groupId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function insertStuGrpMemberData($userId,$newStuGrpId)
+    {
+        $this->userid = $userId;
+        $this->stugroupid = $newStuGrpId;
+        $this->save();
+    }
+
+    public static function deleteStuGroupMembers($grpId)
+    {
+        $query = StuGroupMembers::find()->where(['stugroupid' => $grpId])->all();
+        if($query)
+        {
+            foreach($query as $data)
+            {
+                $data->delete();
+            }
+        }
+    }
 }

@@ -131,4 +131,23 @@ class Wiki extends BaseImasWikis
         }
 
     }
+
+    public static function getByGroupSetId($deleteGrpSet)
+    {
+        return Wiki::find()->where(['groupsetid' => $deleteGrpSet])->all();
+    }
+
+    public static function updateWikiForGroups($deleteGrpSet)
+    {
+        $query = Wiki::find()->where(['groupsetid' => $deleteGrpSet])->all();
+        if($query)
+        {
+            foreach($query as $singleData)
+            {
+                $singleData->groupsetid = AppConstant::NUMERIC_ZERO;
+                $singleData->save();
+            }
+        }
+    }
+
 } 

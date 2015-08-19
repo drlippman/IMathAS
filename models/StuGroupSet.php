@@ -64,6 +64,29 @@ class StuGroupSet extends BaseImasStugroupset {
         $query->save();
 
      }
-  }
+    }
+
+    public function  copyGroupSet($copyGrpSet,$courseId)
+    {
+        $query = StuGroupSet::find('name')->where(['id' => $copyGrpSet])->one();
+        $copiedName =addslashes($query['name']) . ' (copy)';
+        $this->InsertGroupData($copiedName,$courseId);
+        return $this->id;
+    }
+
+    public static  function deleteGrpSet($deleteGrpSet)
+    {
+        $query = StuGroupSet::find()->where(['id' => $deleteGrpSet])->all();
+        if($query)
+        {
+            foreach($query as $dlt)
+            {
+
+                $dlt->delete();
+            }
+
+        }
+
+    }
 
 }

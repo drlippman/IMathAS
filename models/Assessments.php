@@ -344,4 +344,23 @@ class Assessments extends BaseImasAssessments
 
     }
 
+    public static function getByGroupSetId($deleteGrpSet)
+    {
+        return Assessments::find()->where(['>','isgroup','0'])->andWhere(['groupsetid' => $deleteGrpSet])->all();
+    }
+
+    public static function updateAssessmentForGroups($deleteGrpSet)
+    {
+        $query = Assessments::find()->where(['groupsetid' => $deleteGrpSet])->all();
+        if($query)
+        {
+            foreach($query as $singleData)
+            {
+                $singleData->isgroup = AppConstant::NUMERIC_ZERO;
+                $singleData->groupsetid = AppConstant::NUMERIC_ZERO;
+                $singleData->save();
+            }
+        }
+    }
+
 }

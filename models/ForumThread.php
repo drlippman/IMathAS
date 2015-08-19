@@ -12,6 +12,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumThreads;
+use yii\db\Query;
 
 class ForumThread extends BaseImasForumThreads
 {
@@ -53,5 +54,34 @@ class ForumThread extends BaseImasForumThreads
         $this->lastposttime = $forumPostArray['postdate'];
         $this->lastpostuser = $forumPostArray['userid'];
         $this->save();
+    }
+
+    public static function findByStuGrpId($grpId)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+               ->from('imas_forum_threads')
+               ->where(['stugroupid' => $grpId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function deleteForumThread($delList)
+    {
+        $query = "DELETE FROM imas_forum_threads WHERE id IN ($delList)";
+        \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function updateThreadForGroups($grpId)
+    {
+        $query = ForumThread::find()->where(['stugroupid' => $grpId])->all();
+        if($query)
+        {
+            foreach($query as $data)
+            {
+                $data->stugroupid = AppConstant::NUMERIC_ZERO;
+                $data->save();
+            }
+        }
     }
 }

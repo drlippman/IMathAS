@@ -295,6 +295,10 @@ body {
     color: #fff;
     background-color: #008E71;
 }
+.notification > li >ul
+{
+    min-width: 100%;
+}
 .nav-course-icon{
     height: 24px;
     width: 24px;
@@ -364,8 +368,8 @@ i.fa-home{
     background-color: #104E87;
     overflow-y: scroll;
     height: auto;
-    max-height: 300px;
-    max-width: 300px;
+
+    min-width: 100%;
 }
 .myclasses > li > ul> li >a
 {
@@ -388,7 +392,7 @@ i.fa-home{
 .user-menu{
     color: #fff;
     background-color: #1460AA;
-    margin-right: 40px;
+    margin-right: 39px;
     height: 53px;
 }
 .navbar-inverse .user-menu> .open > a, .navbar-inverse .user-menu > .open > a:hover, .navbar-inverse .user-menu > .open > a:focus
@@ -401,11 +405,11 @@ i.fa-home{
 .user-menu > li >ul
 {
     background-color: #104E87;
+    min-width: 100%;
 }
 .user-menu > li > ul> li >a
 {
     color: #ffffff;
-
 }
 
 .help-img{

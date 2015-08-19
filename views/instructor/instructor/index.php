@@ -41,12 +41,12 @@ $now = $currentTime;
         <div class="col-md-2 course-top-menu">
             <a href="#"><?php AppUtility::t('Export Course');?></a>
         </div>
-<!--        <div class="col-md-2 course-top-menu">-->
-<!--            <a href="--><?php //echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?><!--">--><?php //AppUtility::t('outcomes');?><!--</a>-->
-<!--        </div>-->
-<!--        <div class="col-md-2 course-top-menu">-->
-<!--            <a href="--><?php //echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id);?><!--">--><?php //AppUtility::t('Groups');?><!--</a>-->
-<!--        </div>-->
+        <div class="col-md-2 course-top-menu">
+            <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('outcomes');?></a>
+        </div>
+        <div class="col-md-2 course-top-menu">
+            <a href="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id);?>"><?php AppUtility::t('Groups');?></a>
+        </div>
         <ul class="nav nav-tabs  roster-menu-bar-nav sub-menu col-md-2 pull-right">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>

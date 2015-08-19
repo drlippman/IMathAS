@@ -9,6 +9,7 @@
 namespace app\models;
 
 
+use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasAssessmentSessions;
 use yii\db\Query;
@@ -197,4 +198,18 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $items = $command->queryAll();
         return $items;
     }
+
+    public static function updateAssSessionForGrp($grpId)
+    {
+        $query = AssessmentSession::find()->where(['agroupid' => $grpId])->all();
+        if($query)
+        {
+            foreach($query as $data)
+            {
+                $data->agroupid = AppConstant::NUMERIC_ZERO;
+                $data->save();
+            }
+        }
+    }
+
 } 

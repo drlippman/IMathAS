@@ -3,11 +3,29 @@
     background-color: #12856D;
     color: #FFF;
 }
-.btn-primary-1
+/*.btn-primary-1*/
+/*{*/
+    /*color: #FFF;*/
+    /*background-color: #12856D;*/
+    /*text-transform: capitalize;*/
+    /*border-radius: 0px;*/
+/*}*/
+
+.align-groups
 {
-    color: #FFF;
-    background-color: #12856D;
-    color:whitesmoke;
-    text-transform: capitalize;
-    border-radius: 0px;
+
+    margin-left: 30%;
+    margin-right: 30%;
+    margin-bottom: 3%;
+}
+.group-background
+{
+    width: auto;
+    background-color:#f8f8f8;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:hover, input[type="submit"]:hover, button:hover, input[type="button"]:hover, a.abutton:hover
+{
+    color: #ffffff;
 }

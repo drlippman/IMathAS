@@ -227,4 +227,22 @@ class Forums extends BaseImasForums {
         return $data;
     }
 
+    public static function getByGroupSetId($deleteGrpSet)
+    {
+        return Forums::find()->where(['groupsetid' => $deleteGrpSet])->all();
+    }
+
+    public static function updateForumForGroups($deleteGrpSet)
+    {
+        $query = Forums::find()->where(['groupsetid' => $deleteGrpSet])->all();
+        if($query)
+        {
+            foreach($query as $singleData)
+            {
+                $singleData->groupsetid = AppConstant::NUMERIC_ZERO;
+                $singleData->save();
+            }
+        }
+    }
+
 }

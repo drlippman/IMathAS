@@ -31,13 +31,13 @@ class ContentTrack extends BaseImasContentTrack
         $this->courseid = $courseId;
         if($type == AppConstant::NUMERIC_TWO)
         {
-            $this->type = 'Forummod';
+            $this->type = 'forummod';
         }elseif($type == AppConstant::NUMERIC_ONE)
         {
-            $this->type = 'Forumreply';
+            $this->type = 'forumreply';
         }elseif($type == AppConstant::NUMERIC_ZERO)
         {
-            $this->type = 'Forumpost';
+            $this->type = 'forumpost';
         }
         $this->typeid = $threadId;
         $this->viewtime = $now;

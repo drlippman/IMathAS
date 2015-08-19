@@ -63,4 +63,16 @@ class WikiRevision extends BaseImasWikiRevisions
             }
         }
     }
+
+    public static function deleteGrp($grpId)
+    {
+        $query = WikiRevision::find()->where(['stugroupid'=> $grpId])->all();
+        if($query)
+        {
+            foreach($query as $object)
+            {
+                $object->delete();
+            }
+        }
+    }
 }
