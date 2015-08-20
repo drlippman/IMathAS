@@ -324,7 +324,6 @@ class BlockController extends AppController
             $page_sectionlistlabel = array(_("No restriction"));
             $distinctStudSection = new Student();
             $result = $distinctStudSection->findDistinctSection($courseId);
-            AppUtility::dump($result);
         }
         $this->includeJS(['js/colorpicker.js']);
         $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids);
