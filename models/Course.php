@@ -236,7 +236,5 @@ class Course extends BaseImasCourses {
         }
         return $items;
     }
-
-
 }
 

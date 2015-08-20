@@ -17,6 +17,11 @@ use app\models\Student;
 
 class BlockController extends AppController
 {
+    public  $existblocks = array();
+    public  $existblockids = array();
+    public  $existBlocksVals = array();
+    public  $existBlocksLabels = array();
+
     public function actionAddBlock()
     {
         $this->guestUserHandler();
@@ -258,5 +263,106 @@ class BlockController extends AppController
             }
         }
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
+    }
+
+    /**
+     * @return string
+     * Mass changes: Block
+     */
+    public function actionChangeBlock(){
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = "master";
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $courseID = $this->getParamVal('courseId');
+        $course = Course::getById($courseId);
+        $userId = $user['id'];
+        $teacherId = $this->isTeacher($userId,$courseId);
+        $courseItemOrder = Course::getItemOrder($courseId);
+        $itemOrder = $courseItemOrder->itemorder;
+        $items = unserialize($itemOrder);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        if(!(isset($teacherId))){
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+        }elseif(isset($params['checked'])){
+            $checked = array();
+            foreach ($params['checked'] as $id) {
+                $id = intval($id);
+                if ($id != 0) {
+                    $checked[] = $id;
+                }
+            }
+            $sets = array();
+            if (isset($params['chgavail'])) {
+                $sets['avail'] = intval($params['avail']);
+            }
+            if (isset($params['chgavailbeh'])) {
+                $sets['SH'] = $params['showhide'] . $params['availbeh'];
+            }
+            if (isset($params['chggrouplimit'])) {
+                $grouplimit = array();
+                if ($params['grouplimit']!='none') {
+                    $grouplimit[] = $params['grouplimit'];
+                }
+                $sets['grouplimit'] = $grouplimit;
+            }
+            $items = $this->updateBlocksArray($items,$checked,$sets);
+            $itemorder = serialize($items);
+            $saveItemOrderIntoCourse = new Course();
+            $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+        }
+        else
+        {
+            $parent = AppConstant::NUMERIC_ZERO;
+            $this->buildExistBlocksArray($items, $parent);
+
+            $page_sectionlistval = array("none");
+            $page_sectionlistlabel = array(_("No restriction"));
+            $distinctStudSection = new Student();
+            $result = $distinctStudSection->findDistinctSection($courseId);
+            AppUtility::dump($result);
+        }
+        $this->includeJS(['js/colorpicker.js']);
+        $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids);
+        return $this->renderWithData('changeBlock', $responseData);
+    }
+
+    public function buildExistBlocksArray($items,$parent) {
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+
+                $this->existblocks[$parent.'-'.($k+1)] = $item['name'];
+                $this->existblockids[$parent.'-'.($k+1)] = $item['id'];
+                if (count($item['items'])>0) {
+                    $this->buildExistBlocksArray($item['items'],$parent.'-'.($k+1));
+                }
+            }
+        }
+        $i=0;
+        foreach ($this->existblocks as $k=>$name) {
+            $existBlocksVals[$i] = $k;
+            $existBlocksLabels[$i] = stripslashes($name);
+            $i++;
+        }
+    }
+
+    public function updateBlocksArray($items,$tochg,$sets) {
+        foreach ($items as $n=>$item) {
+            if (is_array($item)) {
+                if (in_array($item['id'], $tochg)) {
+                    foreach ($sets as $k=>$v) {
+                        $items[$n][$k] = $v;
+                    }
+                }
+                if (count($item['items'])>0) {
+                    $this->updateBlocksArray($items[$n]['items'], $tochg, $sets);
+                }
+            }
+        }
+        return $items;
     }
 }

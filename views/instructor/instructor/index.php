@@ -59,7 +59,7 @@ $now = $currentTime;
                         <a href="#"><?php AppUtility::t('Forums'); ?></a>
                     </li>
                     <li>
-                        <a href="#"><?php AppUtility::t('Blocks'); ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('block', 'block/change-block?cid=' . $course->id)?>"><?php AppUtility::t('Blocks'); ?></a>
                     </li>
                     <li>
                         <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/mass-change-dates?cid=' . $course->id)?>"><?php AppUtility::t('Dates'); ?></a>

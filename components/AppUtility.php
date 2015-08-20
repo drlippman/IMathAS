@@ -1,13 +1,12 @@
 <?php
 
 namespace app\components;
-
-
 use app\models\Exceptions;
 use app\models\Questions;
 use app\models\Course;
 use Yii;
 use yii\base\Component;
+require_once("../filter/filter.php");
 
 class AppUtility extends Component
 {
@@ -1054,7 +1053,7 @@ class AppUtility extends Component
                         }
                     }
 
-                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=" . $assessmentId . "&amp;cid=" . $courseId . "&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=".$assessmentId."&amp;cid=".$courseId."&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
 //                echo "<input type=\"hidden\" name=\"asidverify\" value=\"$testid\" />";
 //                echo '<input type="hidden" name="disptime" value="'.time().'" />';
 //                echo "<input type=\"hidden\" name=\"isreview\" value=\"". ($isreview?1:0) ."\" />";
@@ -1110,9 +1109,9 @@ class AppUtility extends Component
                         }
                         $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans'] == '0') || $qi[$questions[$next]]['showans'] == 'F' || $qi[$questions[$next]]['showans'] == 'J') || ($showansduring && $qi[$questions[$next]]['showans'] == '0' && $attempts[$next] >= $testsettings['showans']));
                         if ($qshowans) {
-                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], 2, false, $attempts[$next], false, false, false, $colors);
+                            displayq2::displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], 2, false, $attempts[$next], false, false, false, $colors);
                         } else {
-                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], false, false, $attempts[$next], false, false, false, $colors);
+                            displayq2::displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], false, false, $attempts[$next], false, false, false, $colors);
                         }
                         $contactlinks = showquestioncontactlinks($next);
                         if ($contactlinks != '') {

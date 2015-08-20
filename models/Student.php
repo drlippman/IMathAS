@@ -423,5 +423,9 @@ class Student extends BaseImasStudents {
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getSection(){
+
+    }
 }
 
