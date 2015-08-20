@@ -55,4 +55,12 @@ class StuGroupMembers extends BaseImasStugroupmembers{
             }
         }
     }
+
+    public static function manageGrpSet($grpIds)
+    {
+        $query = "SELECT stugroupid,userid FROM imas_stugroupmembers WHERE stugroupid IN ($grpIds)";
+        $data = Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
+    }
 }

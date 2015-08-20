@@ -220,6 +220,7 @@ class Course extends BaseImasCourses {
         $course->newflag = $newflag;
         $course->save();
     }
+ /*Query To Show Courses available For Teacher in My classes drop-down*/
     public static  function getGetMyClasses($userId)
     {
         $items = [];
@@ -237,4 +238,3 @@ class Course extends BaseImasCourses {
         return $items;
     }
 }
-

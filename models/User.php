@@ -293,4 +293,21 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $data;
 
     }
+
+    public static function findStuForGroups($courseId)
+    {
+
+        $query = new Query();
+        $query ->select(['imas_users.id','imas_users.FirstName','imas_users.LastName','imas_users.hasuserimg'])
+            ->from('imas_users')
+            ->join(	'JOIN',
+                'imas_students',
+                'imas_users.id = imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
 }

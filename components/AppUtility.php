@@ -2801,7 +2801,6 @@ class AppUtility extends Component
 
     public function printOutcomesForMap($arr,$ind,$outcomeAssoc=null,$outcomeInfo=null,$catNames=null,$n=null,$cnt=null,$items=null,$assessNames=null,$forumNames=null,$offNames=null,$linkNames=null,$inlineNames=null)
     {
-
         foreach ($arr as $oi)
         {
             if ($cnt%2==0) {
@@ -2810,23 +2809,30 @@ class AppUtility extends Component
                 $class = "odd";
             }
             $cnt++;
-            if (is_array($oi)) { //is outcome group
+            if (is_array($oi))
+            { //is outcome group
                 echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
                 $this->printOutcomesForMap($oi['outcomes'],$ind+1);
-            }else {
+            }else
+            {
                 echo '<tr class="'.$class.'">';
                 echo '<td><span class="ind'.$ind.'">'.$outcomeInfo[$oi].'</span></td><td>';
-                if (isset($outcomeAssoc[$oi]['UG'])) {
+                if (isset($outcomeAssoc[$oi]['UG']))
+                {
                     $this->printItems($outcomeAssoc[$oi]['UG'],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
                 }
                 echo '</td>';
-                foreach ($catNames as $id=>$cn) {
+                foreach ($catNames as $id=>$cn)
+                {
                     echo '<td>';
-                    if (isset($outcomeAssoc[$oi][$id])) {
+                    if (isset($outcomeAssoc[$oi][$id]))
+                    {
+
                         $this->printItems($outcomeAssoc[$oi][$id],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
                     }
                     echo '</td>';
                 }
+
                 echo '</tr>';
             }
 

@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     }else{?>
     <?php
-        echo '<table class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
+    echo '<table class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
     foreach ($catNames as $cn)
     {
         echo '<th>'.$cn.'</th>';

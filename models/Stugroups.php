@@ -63,7 +63,6 @@ class Stugroups extends BaseImasStugroups {
 
     public static  function findByGrpSetIdForCopy($copyGrpSet)
     {
-
         $query = new Query();
         $query	->select(['id','name'])
             ->from('imas_stugroups')
@@ -73,6 +72,31 @@ class Stugroups extends BaseImasStugroups {
         return $data;
     }
 
+    public static function findByGrpSetIdToManageSet($grpSetId)
+    {
+        $query = new Query();
+        $query	->select(['id','name'])
+            ->from('imas_stugroups')
+            ->where(['groupsetid' => $grpSetId]);
+        $query->orderBy('id');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
 
+    }
+    public static function getById($renameGrp)
+    {
+        return Stugroups::find()->where(['id' => $renameGrp])->one();
 
+    }
+
+    public static function renameGrpName($renameGrp,$grpName)
+    {
+        $query = Stugroups::find()->where(['id' => $renameGrp])->one();
+        if($query)
+        {
+                $query ->name = $grpName;
+                $query ->save();
+        }
+    }
 }

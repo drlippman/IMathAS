@@ -142,8 +142,106 @@ class GroupsController extends AppController
                 }
 
         }
+        $grpSetId = $this->getParamVal('grpSetId');
+        if(isset($grpSetId))
+        {
+            $query = StuGroupSet::getByGrpSetId($grpSetId);
+            $grpSetName = $query['name'];
+            $page_Grp = array();
+            $page_GrpMembers = array();
+            $grpNum = AppConstant::NUMERIC_ONE;
+            $query = Stugroups::findByGrpSetIdToManageSet($grpSetId);
+            foreach($query as $singleData)
+            {
+                 if($singleData['name'] == 'Unamed Group')
+                 {
+                     $singleData['name'] .= " $grpNum";
+                     $grpNum++;
+                 }
+                $page_Grp[$singleData['id']] = $singleData['name'];
+                $page_GrpMembers[$singleData['id']] = array();
+            }
+            $grpIds = implode(',',array_keys($page_Grp));
+            natsort($page_Grp);
+            $stuNames = array();
+            $hasUserImg = array();
+            $query = User::findStuForGroups($courseId);
+            foreach($query  as $singleStuData)
+            {
+                $stuNames[$singleStuData['id']] = $singleStuData['LastName'].','.$singleStuData['FirstName'];
+                $hasUserImg[$singleStuData['id']] = $singleStuData['hasuserimg'];
+            }
+            $stuUserIdsInGroup = array();
+            if (count($page_Grp)>0)
+            {
+
+                $query =StuGroupMembers::manageGrpSet($grpIds);
+                foreach($query as $singleMember)
+                {
+                    if (!isset($page_GrpMembers[$singleMember['stugroupid']]))
+                    {
+                        $page_GrpMembers[$singleMember['stugroupid']] = array();
+                    }
+                    $page_GrpMembers[$singleMember['stugroupid']][$singleMember['userid']] = $stuNames[$singleMember['userid']];
+                    $stuUserIdsInGroup[] = $singleMember['userid'];
+                }
+
+                foreach ($page_GrpMembers as $k=>$stuArr)
+                {
+                    natcasesort($stuArr);
+                    $page_GrpMembers[$k] = $stuArr;
+                }
+                $unGrpIds = array_diff(array_keys($stuNames),$stuUserIdsInGroup);
+                $page_unGrpStu = array();
+                foreach ($unGrpIds as $uid)
+                {
+                    $page_unGrpStu[$uid] = $stuNames[$uid];
+                }
+                natcasesort($page_unGrpStu);
+
+            }
+        }
+        $renameGrp = $this->getParamVal('renameGrp');
+        if(isset($renameGrp))
+        {
+
+            $params = $this->getRequestParams();
+            $grpName = $params['grpname'];
+            if(isset($grpName))
+            {
+                Stugroups::renameGrpName($renameGrp,$grpName);
+                return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
+
+            }else
+            {
+                $query = Stugroups::getById($renameGrp);
+                $currGrpName = $query['name'];
+                $query = StuGroupSet::getByGrpSetId($grpSetId);
+                $grpSetName = $query['name'];
+            }
+
+        }
+        $deleteGrp = $this->getParamVal('deleteGrp');
+        if(isset($deleteGrp))
+        {
+            $confirm = $this->getParamVal('confirm');
+            $params = $this->getRequestParams();
+            $delPost = $params['delpost'];
+            if(isset($confirm))
+            {
+                $this->deleteGroup($deleteGrp,$delPost=1);
+                return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
+            }else
+            {
+                $query = Stugroups::getById($deleteGrp);
+                $currGrpNameToDlt = $query['name'];
+                $query = StuGroupSet::getByGrpSetId($grpSetId);
+                $currGrpSetNameToDlt = $query['name'];
+
+            }
+        }
         $this->includeCSS(['groups.css']);
-        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName ]);
+        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'deleteGrp' => $deleteGrp]);
 
 
     }

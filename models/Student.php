@@ -391,14 +391,14 @@ class Student extends BaseImasStudents {
         return $data;
 
     }
-
+/*Query To Show Courses available For Students in My classes drop-down*/
     public static function  getMyClassesForStudent($userId)
     {
         $items = [];
         $Students =  static::findAll(['userid' => $userId]);
         foreach($Students as $singleStudent)
         {
-            $items[] = ['label' => $singleStudent->course['name'], 'url' => '#'];
+            $items[] = ['label' => $singleStudent->course['name'], 'url' => '../../course/course/index?cid='.$singleStudent['courseid']];
         }
         return $items;
     }

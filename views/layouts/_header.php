@@ -3,6 +3,7 @@
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use app\models\Student;
+use \app\components\AppConstant;
 $basePath = '/site/';
 $imgPath = \app\components\AppUtility::getAssetURL().'img/';
 NavBar::begin([
@@ -71,7 +72,7 @@ echo Nav::widget([
          ],
 ]);
 
-if($user->rights == \app\components\AppConstant::ADMIN_RIGHT){
+if($user->rights >= AppConstant::TEACHER_RIGHT){
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav myclasses margin-left'],
     'encodeLabels' => false,
@@ -85,7 +86,7 @@ echo Nav::widget([
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
             ],
 ]);
-}elseif($user->rights == \app\components\AppConstant::STUDENT_RIGHT)
+}elseif($user->rights == AppConstant::STUDENT_RIGHT)
 {
     echo Nav::widget([
         'options' =>['class' => 'navbar-nav myclasses margin-left'],

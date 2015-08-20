@@ -177,6 +177,10 @@ class ForumController extends AppController
         $this->layout = 'master';
         $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
+        $countPost = $this->getNotificationDataForum($courseId,$user);
+        $msgList = $this->getNotificationDataMessage($courseId,$user);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
         $threadArray = array();
         $NewPostCounts = Thread::findNewPostCnt($courseId,$user);
