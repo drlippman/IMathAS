@@ -13,7 +13,7 @@ NavBar::begin([
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
 ]);
-
+/*User Setting Drop-Down */
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav user-menu navbar-right'],
     'encodeLabels' => false,
@@ -43,7 +43,7 @@ echo Nav::widget([
     ],
 ]);
 
-
+/*Notification Drop-Down*/
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav notification navbar-right'],
     'encodeLabels' => false,
@@ -72,6 +72,7 @@ echo Nav::widget([
          ],
 ]);
 
+/*My Classes Drop-Down For Teacher*/
 if($user->rights >= AppConstant::TEACHER_RIGHT){
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav myclasses margin-left'],
@@ -86,7 +87,9 @@ echo Nav::widget([
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
             ],
 ]);
-}elseif($user->rights == AppConstant::STUDENT_RIGHT)
+}
+/*My Classes Drop-Down For Student*/
+elseif($user->rights == AppConstant::STUDENT_RIGHT)
 {
     echo Nav::widget([
         'options' =>['class' => 'navbar-nav myclasses margin-left'],
@@ -106,6 +109,3 @@ NavBar::end();
 ?>
 </header>
 </div>
-<script>
-</script>
-
