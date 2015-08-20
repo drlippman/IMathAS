@@ -29,7 +29,7 @@ class GbCats extends BaseImasGbcats
 
     public static function getByCourseId($courseId)
     {
-        return GbCats::find()->select('id,name')->where(['courseid' => $courseId])->all();
+        return GbCats::find()->select('id,name')->where(['courseid' => $courseId])->orderBy(['name' => AppConstant::ASCENDING])->all();
     }
 
     public  static function updateGbCat($id, $name, $scale, $scaleType, $chop, $drop, $weight, $hide, $calcType){

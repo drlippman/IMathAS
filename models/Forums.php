@@ -14,6 +14,7 @@ use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\models\_base\BaseImasForums;
 use yii\db\Query;
+use Yii;
 
 class Forums extends BaseImasForums {
 
@@ -244,5 +245,12 @@ class Forums extends BaseImasForums {
             }
         }
     }
+    public static function updateForumData($setslist,$checkedlist)
+    {
+        $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist)";
+        Yii::$app->db->createCommand($query)->query();
+
+    }
+
 
 }

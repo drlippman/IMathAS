@@ -40,12 +40,15 @@ class Student extends BaseImasStudents {
 
         return static::findAll(['userid' => $uid,'courseid' => $courseid]);
     }
-    public function createNewStudent($userId,$cid,$param){
-
+    public function createNewStudent($userId,$cid,$params)
+    {
         $this->userid = $userId;
         $this->courseid = $cid;
-        $this->section = empty($param['section']) ? null : $param['section'];
-        $this->code = empty($param['code']) ? null : $param['code'];;
+        $this->section = empty($params['section']) ? null : $params['section'];
+        $this->code = empty($params['code']) ? null : $params['code'];
+        if(isset($params['latepass'])){
+            $this->latepass = $params['latepass'];
+        }
         $this->save();
     }
     public static function findByCid($cId){

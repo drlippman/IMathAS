@@ -192,21 +192,20 @@ class RosterController extends AppController
         if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $param = $param['StudentEnrollmentForm'];
-            $uid = User::findByUsername($param['usernameToEnroll']);
-            if (!$uid) {
+            $user = User::findByUsername($param['usernameToEnroll']);
+            if (!$user) {
                 $this->setErrorFlash(AppConstant::STUDENT_ERROR_MESSAGE);
             } else {
-
-                $teacher = Teacher::getTeacherByUserId($uid->id);
+                $teacher = Teacher::getTeacherByUserId($user->id);
                 if ($teacher) {
                     $this->setErrorFlash(AppConstant::TEACHER_CANNOT_CHANGE_AS_SRUDENT);
                 } else {
-                    $studentRecord = Student::getByUserIdentity($uid->id, $courseId);
+                    $studentRecord = Student::getByUserIdentity($user->id, $courseId);
                     if ($studentRecord) {
                         $this->setErrorFlash(AppConstant::USERNAME_ENROLLED);
                     } else {
                         $student = new Student();
-                        $student->createNewStudent($uid->id, $courseId, $param);
+                        $student->createNewStudent($user->id, $courseId, $param);
                         $this->redirect('student-roster?cid=' . $courseId);
                     }
                 }
@@ -405,12 +404,12 @@ class RosterController extends AppController
             if (!$findUser) {
                 $user = new User();
                 $user->createAndEnrollNewStudent($params['CreateAndEnrollNewStudentForm']);
-                $studentid = User::findByUsername($params['CreateAndEnrollNewStudentForm']['username']);
+                $student = User::findByUsername($params['CreateAndEnrollNewStudentForm']['username']);
+                $params['latepass'] = $course['deflatepass'];
                 $newStudent = new Student();
-                $newStudent->createNewStudent($studentid['id'], $courseId, $params['CreateAndEnrollNewStudentForm']);
+                $newStudent->createNewStudent($student['id'], $courseId, $params['CreateAndEnrollNewStudentForm']);
                 $this->setSuccessFlash('Student have been created and enrolled in course ' . $course->name . ' successfully');
                 return $this->redirect('student-roster?cid=' . $courseId);
-
             } else {
                 $this->setErrorFlash(AppConstant::USER_EXISTS);
             }

@@ -3,6 +3,7 @@
 
 namespace app\models;
 
+use app\components\AppConstant;
 use Yii;
 use yii\db\Exception;
 use app\components\AppUtility;
@@ -12,7 +13,7 @@ use yii\db\Query;
 class StuGroupSet extends BaseImasStugroupset {
 
     public static function getByCourseId($courseId){
-        return StuGroupSet::find()->select('id,name')->where(['courseid' => $courseId])->all();
+        return StuGroupSet::find()->select('id,name')->where(['courseid' => $courseId])->orderBy(['name' => AppConstant::ASCENDING])->all();
     }
 
     public static function getByJoin($courseId){

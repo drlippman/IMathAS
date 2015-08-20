@@ -190,7 +190,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
-    public static function getByAssessmentSessionIdJoin($assessmentId,$courseId){
+    public static function getByAssessmentSessionIdJoin($assessmentId,$courseId)
+    {
         $query = new Query();
         $query->select(['imas_assessment_sessions.id'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
             ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId])->limit(1);
@@ -209,6 +210,41 @@ class AssessmentSession extends BaseImasAssessmentSessions
                 $data->agroupid = AppConstant::NUMERIC_ZERO;
                 $data->save();
             }
+        }
+    }
+
+    public static function getByIdAndUserId($assessmentId,$userId,$isteacher,$istutor)
+    {
+        $query = new Query();
+        $query->select(['imas_assessments.name'])->from('imas_assessment_sessions')
+            ->join('INNER JOIN', 'imas_assessments', 'imas_assessments.id=imas_assessment_sessions.assessmentid')
+            ->where(['imas_assessment_sessions.id' => $assessmentId]);
+            if (!$isteacher && !$istutor) {
+                $query->andWhere(['imas_assessment_sessions.userid' => $userId]);
+            }
+
+        $command = $query->createCommand();
+        $items = $command->queryOne();
+        return $items;
+    }
+
+    public static function getByAssessmentIdAndCourseId($assessmentId,$courseId){
+        $query = new Query();
+        $query->select(['imas_assessment_sessions.assessmentid','imas_assessment_sessions.lti_sourcedid'])
+            ->from('imas_assessment_sessions')
+            ->join('INNER JOIN', 'imas_assessments', 'imas_assessment_sessions.assessmentid = imas_assessments.id ')
+            ->where(['imas_assessment_sessions.id' => $assessmentId, 'imas_assessments.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $items = $command->queryOne();
+        return $items;
+     }
+    public static function deleteByAssessment($data)
+    {
+//        $data[0] value change by condition it will be either 'id' or 'groupid'
+        $assessment = AssessmentSession::find()->where([$data[0] => $data[1]])->andWhere(['assessmentid'=> $data[2]])->one();
+        if($assessment)
+        {
+            $assessment->delete();
         }
     }
 
