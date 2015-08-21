@@ -174,4 +174,8 @@ class AppConstant
     const IMAGE_FILE_ERROR1 = "<p>Need to specify variable for image to be referenced by</p>";
     const IMAGE_FILE_ERROR2 = "is not an allowed variable name";
     const QUESTION_DESCRIPTION = "Enter description here";
+    const GROUP_NAME = 'Unnamed group set';
+    const NEW_GROUP_NAME = 'Unnamed Group';
+    const GROUP_MESSAGE = 'You need to log in as a teacher to access this page';
+
 }

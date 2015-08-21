@@ -99,4 +99,11 @@ class Stugroups extends BaseImasStugroups {
                 $query ->save();
         }
     }
+    public function insertStuGrpName($grpSetId,$newGrpName)
+    {
+        $this->groupsetid = $grpSetId;
+        $this->name = $newGrpName;
+        $this->save();
+        return $this->id;
+    }
 }

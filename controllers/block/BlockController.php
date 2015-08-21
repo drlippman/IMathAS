@@ -215,7 +215,7 @@ class BlockController extends AppController
     public function actionNewFlag()
     {
         $this->guestUserHandler();
-        $courseId = $this->getParam('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $blockData = unserialize($course['itemorder']);
         $newFlag = $this->getParamVal('newflag');
@@ -243,7 +243,7 @@ class BlockController extends AppController
     {
         $this->guestUserHandler();
         $previewShift = - AppConstant::NUMERIC_ONE;
-        $courseId = $this->getParam('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $blockData = unserialize($course['itemorder']);
         $folder = $this->getParamVal('Folder');

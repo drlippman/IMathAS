@@ -110,7 +110,7 @@ class AssessmentController extends AppController
         $isTeacher = false;
         $printData = '';
         if($user){
-            $assessmentId = $this->getParam('aid');
+            $assessmentId = $this->getParamVal('aid');
             $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
             if($assessmentSession){
                 $courseId = $assessmentSession->assessment->course->id;

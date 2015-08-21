@@ -248,4 +248,67 @@ class AssessmentSession extends BaseImasAssessmentSessions
         }
     }
 
+    public static function getDataForGroups($fieldsToCopy,$grpId,$data)
+    {
+        $query = new Query();
+        $query->select([$fieldsToCopy])
+               ->from('imas_assessment_sessions')
+            ->where(['agroupid' => $grpId])
+            ->andWhere(['assessmentid' => $data]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
+
+    public static function getIdForGroups($stuList,$data,$fieldsToCopy)
+    {
+        $query = "SELECT id,$fieldsToCopy ";
+        $query .= "FROM imas_assessment_sessions WHERE userid IN ($stuList) AND assessmentid='{$data}'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function dataForFileHandling($searchnot,$lookforstr)
+    {
+        $query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+
+    }
+
+    public static function getAGroupId($stuId,$data)
+    {
+        $query = new Query();
+        $query->select(['id','agroupid'])
+            ->from('imas_assessment_sessions')
+            ->where(['userid' => $stuId])
+            ->andWhere(['assessmentid' => $data]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
+
+    public static function updateAssessmentForStuGrp($id,$setsList)
+    {
+        $query = "UPDATE imas_assessment_sessions SET $setsList WHERE id='{$id}'";
+        \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function insertDataOfGroup($fieldsToCopy,$stuId,$insRow)
+    {
+       $query = "INSERT INTO imas_assessment_sessions (userid,$fieldsToCopy) ";
+        $query .= "VALUES ('$stuId',$insRow)";
+    }
+    public static function updateAssSessionForGrpByGrpIdAndUid($uid,$grpId)
+    {
+        $query = AssessmentSession::find()->where(['agroupid' => $grpId])->andWhere(['userid' => $uid])->all();
+        if($query)
+        {
+            foreach($query as $data)
+            {
+                $data->agroupid = AppConstant::NUMERIC_ZERO;
+                $data->save();
+            }
+
+        }
+    }
+
 } 

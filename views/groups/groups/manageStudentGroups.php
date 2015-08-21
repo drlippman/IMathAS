@@ -63,12 +63,33 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p><input type="radio" name="delpost" value="1" checked="checked" /> Delete group forum posts
                 <input type="radio" name="delpost" value="0" /> Make group forum posts non-group-specific posts</p>
                 <p><input type="submit" value="Yes, Delete">
-                <input type=button value="Cancle" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId'.$grpSetId)?>'" /></p>
+                <input type=button value="Cancle" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
                 </form>
+        <?php }elseif(isset($addGrp)){?>
+            <h4>Add new student group</h4>
+            <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addGrp=true')?>">
+             <?php if (isset($stuList))
+             {
+                echo "<input type='hidden' name='stutoadd' value=$stuList />";
+             }?>
+                <p>New group name: <input name="grpname" type="text" /></p>
+                <p><input type="submit" value="Create" />
+                <input type=button value='Cancle' class='' onClick='window.location="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>"' /></p>
+                </form>
+        <?php }elseif(isset($remove) && isset($grpId)){?>
+            <h4>Remove group member</h4>
+            <p>Are you SURE you want to remove <b><?php echo $stuNameToBeRemoved;?></b> from the student group <b><?php echo $Stu_GrpName;?></b>?</p>
+             <p><input type=button value="Yes, Remove" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&remove='.$remove.'&grpId='.$grpId.'&confirm=true')?>'" />
+             <input type=button value="Cancle" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
+        <?php }elseif(isset($removeAll)){?>
+            <h4>Remove ALL group members</h4>
+                <p>Are you SURE you want to remove <b>ALL</b> members of the student group <b><?php echo $Stu_GrpName;?></b>?</p>
+            <p><input type=button value="Yes, Remove" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&removeall='.$removeAll.'&confirm=true')?>'" />
+                <input type=button value="Cancle" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
         <?php }elseif(isset($grpSetId)){?>
             <h3>Managing groups in set <?php echo $grpSetName?></h3>
             <div id="myTable">
-                <p><button type="button" onclick="">Add New Group</button>
+                <p><button type="button" onclick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addGrp=true')?>'">Add New Group</button>
                     <?php if(array_sum($hasUserImg)){
                         echo ' <button type="button" onclick="rotatepics(this)" >'.'View Pictures'.'</button><br/>';
                     }?>
@@ -81,7 +102,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "<b>Group: $grpName</b> | ";
                     echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a> | ";
                     echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&deleteGrp={$grpId}'>Delete</a> | ";
-                    echo "<a href='#'>Remove all members</a>";
+                    echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&removeall={$grpId}'>Remove all members</a>";
                     echo '<ul>';
                     if (count($page_GrpMembers[$grpId])==0)
                     {
@@ -95,28 +116,28 @@ $this->params['breadcrumbs'][] = $this->title;
                             {
 
                             }
-                            echo "$name | <a href='#'>Remove from group</a></li>";
+                            echo "$name | <a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&remove={$uid}&grpId={$grpId}'>Remove from group</a></li>";
                         }
                     }
                     echo '</ul>';
                  }
                 echo '<h3>Students not in a group yet</h3>';
                 if (count($page_unGrpStu) > AppConstant::NUMERIC_ZERO)
-                {
-                    echo "<form method='post' action=''>";
-                    echo 'With selected, add to group';
+                {?>
+                    <form method='post' action='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addstutogrp=true')?>'>
+                   <?php echo 'With selected, add to group';
                     echo '<select name="addtogrpid">';
                     echo "<option value='--new--'>New Group</option>";
                     foreach ($page_Grp as $grpId=>$grpName)
                     {
-                        echo "<option value='.$grpId'>$grpName</option>";
+                        echo "<option value=$grpId>$grpName</option>";
                     }
                     echo '</select>';
                     echo '&nbsp;<input type="submit" value="Add" class=" btn btn-primary"/>';
                     echo '<ul class="nomark">';
                     foreach ($page_unGrpStu as $grpId=>$grpName)
                     {
-                        echo "<li><input type='checkbox' style='text-align: center' name='stutoadd[]' value='.$uid' />";
+                        echo "<li><input type='checkbox' style='text-align: center' name='stutoadd[]' value=$grpId />";
                         if($hasUserImg[$uid] == AppConstant::NUMERIC_ONE)
                         {
 

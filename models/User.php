@@ -307,4 +307,22 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $data;
 
     }
+    public static function insertDataFroGroups($stuList)
+    {
+        $query = "SELECT FirstName,LastName FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
+
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function userDataForGroups($remove)
+    {
+        $query = new Query();
+        $query ->select(['FirstName','LastName'])
+            ->from('imas_users')
+            ->where(['id' => $remove]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
 }

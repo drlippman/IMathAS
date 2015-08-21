@@ -23,7 +23,7 @@ class WikiController extends AppController
         $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('wikiId');
         $course = Course::getById($courseId);
-        $subject = $this->getBodyParams('wikicontent');
+        $subject = $this->getRequestParams('wikicontent');
         $wiki = Wiki::getById($wikiId);
         $stugroupId = AppConstant::NUMERIC_ZERO;
         $revisionTotalData = WikiRevision::getRevisionTotalData($wikiId, $stugroupId, $userId);

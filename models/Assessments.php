@@ -363,4 +363,16 @@ class Assessments extends BaseImasAssessments
         }
     }
 
+    public static function getIdForGroups($grpSetId)
+    {
+        $query = new Query();
+        $query->select(['id'])
+            ->from('imas_assessments')
+            ->where(['groupsetid' => $grpSetId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
+
 }

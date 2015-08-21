@@ -681,7 +681,7 @@ class ForumController extends AppController
      */
     public function actionMarkAsRemoveAjax()
     {
-        $params = $this->getBodyParams();
+        $params = $this->getRequestParams();
         $threadId = $params['threadId'];
         $parentId = $params['parentId'];
         $deleteThreadData = ForumPosts::getPostById($threadId);

@@ -268,7 +268,7 @@ function deleteasidfilesfromstring($str) {
 */
 
 //need to exclude asid or agroupid we're deleting from 
-function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
+public static function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 	if (is_array($val)) {
 		$keylist = "'".implode("','",$val)."'";
 		$searchnot = "$tosearchby NOT IN ($keylist)";
@@ -294,14 +294,13 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 		$lookfor[] = "lastanswers LIKE '%$file%' OR bestlastanswers LIKE '%$file%' OR reviewlastanswers LIKE '%$file%'";
 	}
 	$lookforstr = implode(' OR ',$lookfor);
-	$query = "SELECT lastanswers,bestlastanswers,reviewlastanswers FROM imas_assessment_sessions WHERE $searchnot AND ($lookforstr)";
-	$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+	$query = AssessmentSession::dataForFileHandling($searchnot,$lookforstr);
 	$skip = array();
-	while ($row = mysql_fetch_row($result)) {
-		preg_match_all('/@FILE:(.+?)@/',$row[0].$row[1].$row[2],$exmatch);
-		//remove from todel list all files found in other sessions 
-		$todel = array_diff($todel,$exmatch[1]);
-	}
+    foreach($query as $data)
+    {
+        preg_match_all('/@FILE:(.+?)@/',$data['lastanswers'].$data['bestlastanswers'].$data['reviewlastanswers'],$exmatch);
+        $todel = array_diff($todel,$exmatch['bestlastanswers']);
+    }
 	$deled = array();
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -318,7 +317,8 @@ function deleteasidfilesfromstring2($str,$tosearchby,$val,$aid=null) {
 			if (in_array($file,$deled)) { continue;}
 			if (unlink($base.'/adata/'.$file)) {
 				$deled[] = $file;
-				recursiveRmdir(dirname($base.'/adata/'.$file));
+
+				filehandler::recursiveRmdir(dirname($base.'/adata/'.$file));
 			}
 		}
 	}
