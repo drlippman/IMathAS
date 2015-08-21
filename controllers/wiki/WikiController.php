@@ -110,23 +110,53 @@ class WikiController extends AppController
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
         $saveTitle = '';
-        if(isset($params['id']))
-        {
-            $pageTitle = 'Modify Wiki';
-            if($this->isPostMethod()){
-                $page_formActionTag = AppUtility::getURLFromHome('wiki', 'wiki/add-wiki?id=' . $wiki->id.'&courseId=' .$course->id);
-                $saveChanges = new Wiki();
-                $saveChanges->updateChange($params, $wikiid);
-                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+
+        if ($params['id']) {
+            $wiki = Wiki::getById($params['id']);
+
+            if ($wiki['description'] == '') {
+                $line['description'] = "<p>Enter description here (displays on course page)</p>";
             }
-            $saveTitle = AppConstant::SAVE_BUTTON;
+            $startDate = $wiki['startdate'];
+            $endDate = $wiki['enddate'];
+            if ($startDate != AppConstant::NUMERIC_ZERO) {
+                $sDate = AppUtility::tzdate("m/d/Y", $startDate);
+                $sTime = AppUtility::tzdate("g:i a", $startDate);
+                $startDate =AppConstant::NUMERIC_ONE;
+            } else {
+                $sDate = date('m/d/Y');
+                $sTime = time();
+            }
+            if ($endDate != AppConstant::ALWAYS_TIME) {
+                $eDate = AppUtility::tzdate("m/d/Y", $endDate);
+                $eTime = AppUtility::tzdate("g:i a", $endDate);
+                $endDate = AppConstant::NUMERIC_ONE;
+            } else {
+                $eDate = date("m/d/Y",strtotime("+1 week"));
+                $eTime = time();
+            }
+            $saveTitle = "Modify Wiki";
+            $saveButtonTitle = "Save Changes";
+            $defaultValues = array(
+                'title' => $wiki['name'],
+                'description' => $wiki['description'],
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'sDate' => $sDate,
+                'sTime' =>$sTime,
+                'eDate' => $eDate,
+                'eTime' => $eTime,
+                'pageTitle' => $saveTitle,
+                'saveTitle' => AppConstant::SAVE_BUTTON,
+                'avail' => $wiki['avail'],
+            );
         }
         else {
                 $defaultValues = array(
                     'pageTitle' => 'Create Wiki',
                     'saveTitle' => AppConstant::New_Item,
                     'title' => "Enter title here",
-                    'summary' => "Enter wiki description here (displays on course page)",
+                    'description' => "Enter wiki description here (displays on course page)",
                     'sDate' => date("m/d/Y"),
                     'sTime' => time(),
                     'eDate' => date("m/d/Y",strtotime("+1 week")),
@@ -137,20 +167,25 @@ class WikiController extends AppController
                 );
              }
         if ($this->isPost()) {
-            if ($params['avail']==1) {
-                if ($params['available-after']=='0') {
+            if ($wikiid) {
+                $link = new Wiki();
+                $link->updateChange($params);
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            } else{
+            if ($params['avail']== AppConstant::NUMERIC_ONE) {
+                if ($params['available-after'] == '0') {
                     $startDate = 0;
-                } else if ($params['available-after']=='now') {
+                } else if ($params['available-after'] == 'now') {
                     $startDate = time();
                 } else {
                     $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                 }
-                if ($params['available-until']=='2000000000') {
+                if ($params['available-until'] == '2000000000') {
                     $endDate = 2000000000;
                 } else {
                     $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                 }
-            } else if ($params['avail']==2) {
+            } else if ($params['avail'] == 2) {
                 if ($params['place-on-calendar-always']==0) {
                     $startDate = 0;
                 } else {
@@ -186,10 +221,11 @@ class WikiController extends AppController
             $saveItemOrderIntoCourse = new Course();
             $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
+            }
         }
         $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
-        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'pageTitle' => $pageTitle, 'defaultValue' => $defaultValues);
+        $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues);
         return $this->render('addWiki', $returnData);
     }
 }

@@ -1009,6 +1009,7 @@ class CourseController extends AppController
         }
         if ($this->isPost()) { //after modify done, save into database
             $modifyLinkId = $this->getParamVal('modifyLinkId');
+//            AppUtility::dump($modifyLinkId);
             if ($modifyLinkId) {
                 if(isset($params['outcomes'])){
                     foreach ($params['outcomes'] as $outcomeId) {

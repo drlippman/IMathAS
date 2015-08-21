@@ -43,44 +43,31 @@ class Wiki extends BaseImasWikis
         return $this->id;
     }
 
-    public function updateChange($params, $wiki)
+    public function updateChange($params)
     {
-        $endDate =   AppUtility::parsedatetime($params['EndDate'],$params['end_end_time']);
-        $startDate = AppUtility::parsedatetime($params['StartDate'],$params['start_end_time']);
-        $tag = AppUtility::parsedatetime($params['Calendar'],$params['calendar_end_time']);
-
-        $updateIdArray = Wiki::find()->where(['id' => $wiki])->all();
-        foreach($updateIdArray as $key => $updateId)
+        $updateWiki = Wiki::findOne(['id' => $params['id']]);
+        $endDate = AppUtility::parsedatetime($params['edate'],$params['etime']);
+        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+        $updateWiki->courseid = $params['cid'];
+        $updateWiki->name = $params['name'];
+        $updateWiki->description = $params['description'];
+        $updateWiki->avail = $params['avail'];
+        if($params['avail'] == AppConstant::NUMERIC_ONE)
         {
-            $updateId->name = isset($params['name']) ? $params['name'] : null;
-            $updateId->courseid = $params['courseId'];
-            $updateId->description = isset($params['description']) ? $params['description'] : null;
-            $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
-
-            if($params['avail'] == AppConstant::NUMERIC_ONE)
-            {
-                if($params['available-after'] == AppConstant::NUMERIC_ZERO){
-                    $startDate = AppConstant::NUMERIC_ZERO;
-                }
-                if($params['available-until'] == AppConstant::ALWAYS_TIME){
-                    $endDate = AppConstant::ALWAYS_TIME;
-                }
-                $updateId->startdate = $startDate;
-                $updateId->enddate = $endDate;
-            }else
-            {
-                $updateId->startdate = AppConstant::NUMERIC_ZERO;
-                $updateId->enddate = AppConstant::ALWAYS_TIME;
+            if($params['available-after'] == 0){
+                $startDate = 0;
             }
-            $updateId->settings = AppConstant::NUMERIC_ZERO;
-
-            if($params['rdatetype'] == AppConstant::NUMERIC_ZERO || $params['rdatetype'] == AppConstant::ALWAYS_TIME){
-                $tag = $params['rdatetype'];
+            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+                $endDate = AppConstant::ALWAYS_TIME;
             }
-            $updateId->editbydate = $tag;
-            $updateId->groupsetid = $params['group-wiki'];
-            $updateId->save();
+            $updateWiki->startdate = $startDate;
+            $updateWiki->enddate = $endDate;
+        }else
+        {
+            $updateWiki->startdate = AppConstant::NUMERIC_ZERO;
+            $updateWiki->enddate = AppConstant::ALWAYS_TIME;
         }
+        $updateWiki->save();
     }
 
     public static function deleteById($itemId){

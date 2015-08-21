@@ -21,8 +21,14 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox">
 <form id="qform" method="post" action="change-block?cid=<?php echo $course->id ?>">
-Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All');?></a>
-<a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None');?></a>
+    <div style="padding-top: 10px">
+        <div class="col-lg-1"><?php AppUtility::t('Check ')?></div>
+        <div class="col-lg-4">
+            <label class="col-lg-2"><a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php echo _('All');?></a></label>
+            <label class="col-lg-2"><a href="#" onclick="return chkAllNone('qform','checked[]',false)"><?php echo _('None');?></a></label>
+        </div>
+    </div>
+    <div class="clear-both"></div>
 <ul class="nomark">
     <?php
     foreach ($existblocks as $pos=>$name) {
@@ -37,33 +43,40 @@ Check: <a href="#" onclick="return chkAllNone('qform','checked[]',true)"><?php e
 </ul>
 <table class="gb" id="opttable">
     <thead>
-    <tr><th>Change?</th><th>Option</th><th>Setting</th></tr>
+    <tr><th><?php AppUtility::t('Change?')?></th><th><?php AppUtility::t('Option')?></th><th><?php AppUtility::t('Setting')?></th></tr>
     </thead>
     <tbody>
     <tr>
         <td><input type="checkbox" name="chgavail" class="chgbox"/></td>
-        <td class="r">Show:</td>
+        <td class="r"><?php AppUtility::t('Show')?></td>
         <td>
-            <input type=radio name="avail" value="0"/>Hide<br/>
-            <input type=radio name="avail" value="1"/>Show by Dates<br/>
-            <input type=radio name="avail" value="2" checked="checked"/>Show Always
+            <input type=radio name="avail" value="0"/><?php AppUtility::t('Hide')?><br/>
+            <input type=radio name="avail" value="1"/><?php AppUtility::t('Show by Dates')?><br/>
+            <input type=radio name="avail" value="2" checked="checked"/><?php AppUtility::t('Show Always')?>
         </td>
     </tr>
     <tr>
         <td><input type="checkbox" name="chgavailbeh" class="chgbox"/></td>
-        <td class="r">When available:<br/>
-            When not available:</td>
+        <td class="r"><?php AppUtility::t('When available')?><br/>
+            <?php AppUtility::t('When not available')?></td>
         <td>
             <select name="availbeh">
-                <option value="O" selected="selected">Show Expanded</option>
-                <option value="C">Show Collapsed</option>
-                <option value="F">Show as Folder</option>
-                <option value="T">Show as TreeReader</option>
+                <option value="O" selected="selected"><?php AppUtility::t('Show Expanded')?></option>
+                <option value="C"><?php AppUtility::t('Show Collapsed')?></option>
+                <option value="F"><?php AppUtility::t('Show as Folder')?></option>
+                <option value="T"><?php AppUtility::t('Show as TreeReader')?></option>
             </select><br/>
             <select name="showhide">
-                <option value="H" selected="selected">Hide from Students</option>
-                <option value="S">Show Collapsed/as folder</option>
+                <option value="H" selected="selected"><?php AppUtility::t('Hide from Students')?></option>
+                <option value="S"><?php AppUtility::t('Show Collapsed/as folder')?></option>
             </select>
+        </td>
+    </tr>
+    <tr>
+        <td><input type="checkbox" name="chggrouplimit" class="chgbox"/></td>
+        <td class="r"><?php AppUtility::t('Restrict access to students in section')?></td>
+        <td>
+            <?php AssessmentUtility::writeHtmlSelect('grouplimit',$page_sectionlistval,$page_sectionlistlabel,0); ?>
         </td>
     </tr>
     </tbody>

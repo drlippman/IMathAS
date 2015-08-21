@@ -324,9 +324,13 @@ class BlockController extends AppController
             $page_sectionlistlabel = array(_("No restriction"));
             $distinctStudSection = new Student();
             $result = $distinctStudSection->findDistinctSection($courseId);
+            foreach($result as $k=> $section){
+                $page_sectionlistval[] = 's-'.$section['section'];
+                $page_sectionlistlabel[] = 'Section '.$section['section'];
+            }
         }
-        $this->includeJS(['js/colorpicker.js']);
-        $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids);
+        $this->includeJS(['general.js']);
+        $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids, 'page_sectionlistval' => $page_sectionlistval, 'page_sectionlistlabel' => $page_sectionlistlabel);
         return $this->renderWithData('changeBlock', $responseData);
     }
 

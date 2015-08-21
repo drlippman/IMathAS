@@ -10,7 +10,6 @@ $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/in
 $this->params['breadcrumbs'][] = $this->title;
 ?>
     <div class="site-login">
-        <fieldset>
             <?php $form = ActiveForm::begin([
                 'id' => 'login-form',
                 'options' => ['class' => 'form-horizontal'],
@@ -34,11 +33,10 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 <div class="tab-content shadowBox" style="margin-top:30px">
-
             <div class="form-label-alignment" style="margin-left: 20px; margin-right: 20px; margin-top: 20px">
-
-                <?= $form->field($model, 'courseName')->textInput(); ?>
-                <?= $form->field($model, 'enrollmentKey')->textInput() ?>
+                <br/>
+                <?php echo $form->field($model, 'courseName')->textInput(); ?>
+                <?php echo $form->field($model, 'enrollmentKey')->textInput() ?>
 
                         <div class="datetime form-group">
                     <?php
@@ -67,14 +65,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
 
                 <div style="clear: both"></div>
-                <?= $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
-                <?= $form->field($model, 'theme')->dropDownList(['angelishmore.css' => 'Angelishmore', 'angelish.css' => 'Angelish', 'facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default'], ['prompt' => 'Select Theme']) ?>
-                <?= $form->field($model, 'selfEnroll')->radioList([AppConstant::NUMERIC_ONE => 'No', AppConstant::NUMERIC_TWO => 'Yes']) ?>
-                <?= $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
-                <?= $form->field($model, 'messageSystem')->radioList([AppConstant::NUMERIC_ONE => 'On for send and receive', AppConstant::NUMERIC_TWO => 'On for receive, students can only send to instructor', AppConstant::NUMERIC_THREE => 'On for receive, students can only send to students', AppConstant::NUMERIC_FOUR => 'On for receive, students cannot send', AppConstant::NUMERIC_FIVE => 'Off ']) ?>
-                <?= $form->field($model, 'navigationLink')->checkboxList([AppConstant::NUMERIC_ONE => 'Calender', AppConstant::NUMERIC_TWO => 'Forum List', AppConstant::NUMERIC_FOUR => 'Show']) ?>
-                <?= $form->field($model, 'latePasses')->textInput(); ?>
-                <?= $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
-        </fieldset>
+                <?php echo $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
+                <?php echo $form->field($model, 'theme')->dropDownList(['angelishmore.css' => 'Angelishmore', 'angelish.css' => 'Angelish', 'facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default'], ['prompt' => 'Select Theme']) ?>
+                <?php echo $form->field($model, 'selfEnroll')->radioList([AppConstant::NUMERIC_ONE => 'No', AppConstant::NUMERIC_TWO => 'Yes']) ?>
+                <?php echo $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
+                <?php echo $form->field($model, 'messageSystem')->radioList([AppConstant::NUMERIC_ONE => 'On for send and receive', AppConstant::NUMERIC_TWO => 'On for receive, students can only send to instructor', AppConstant::NUMERIC_THREE => 'On for receive, students can only send to students', AppConstant::NUMERIC_FOUR => 'On for receive, students cannot send', AppConstant::NUMERIC_FIVE => 'Off ']) ?>
+                <?php echo $form->field($model, 'navigationLink')->checkboxList([AppConstant::NUMERIC_ONE => 'Calender', AppConstant::NUMERIC_TWO => 'Forum List', AppConstant::NUMERIC_FOUR => 'Show']) ?>
+                <?php echo $form->field($model, 'latePasses')->textInput(); ?>
+                <?php echo $form->field($model, 'courseAsTemplate')->checkboxList([AppConstant::NUMERIC_TWO => 'Mark as group template course', AppConstant::NUMERIC_ONE => 'Mark as global template course', AppConstant::NUMERIC_FOUR => 'Mark as self-enroll course']) ?>
+
     </div>
 <?php ActiveForm::end(); ?>

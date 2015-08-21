@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-lg-10">
                 <div class=editor>
                     <textarea cols=5 rows=12 id=description name=description style="width: 100%;">
-                        <?php $text = AppUtility::t('Enter Wiki description here');
+                        <?php $text = "";
                         if($defaultValue['description'])
                         {
                             $text = $defaultValue['description'];
@@ -68,8 +68,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div id="datediv" style="display:<?php echo ($defaultValue['avail']==1)?"block":"none"; ?>"><BR class=form><br>
                     <div class="col-lg-2"><?php AppUtility::t('Available After')?></div>
                 <div class=col-lg-10>
-                    <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
-                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/></label>
+
+                    <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 0); ?>/><span class="pull-left padding-left"><?php AppUtility::t('Always until end date')?></span>
+                    <label class="pull-left" style="padding-left: 41px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValue['startDate'], "0", 1); ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
