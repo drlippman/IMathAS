@@ -16,6 +16,7 @@ use app\models\InlineText;
 use app\models\InstrFiles;
 use app\models\Items;
 use app\models\LinkedText;
+use app\models\Links;
 use app\models\Questions;
 use app\models\Rubrics;
 use app\models\Wiki;
@@ -409,36 +410,43 @@ public  static function copyallsub($items, $parent, &$addtoarr, $gbcats, $sethid
 }
 public  static function getiteminfo($itemid)
 {
-    $query = "SELECT itemtype,typeid FROM imas_items WHERE id='$itemid'";
-    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-    if (mysql_num_rows($result) == 0) {
+    $items  = Items::getById($itemid);
+
+    if (count($items) == 0) {
         echo "Uh oh, item #$itemid doesn't appear to exist";
     }
-    $itemtype = mysql_result($result, 0, 0);
-    $typeid = mysql_result($result, 0, 1);
+    $itemtype = $items['itemtype'] ;
+    $typeid = $items['typeid'] ;
     if ($itemtype === 'Calendar') {
         return array($itemtype, 'Calendar', '');
     }
     switch ($itemtype) {
         case ($itemtype === "InlineText"):
-            $query = "SELECT title,text FROM imas_inlinetext WHERE id=$typeid";
+            $inLineText = InlineText::getById($typeid);
+            $name = $inLineText['title'];
+            $summary = $inLineText['text'];
             break;
         case ($itemtype === "LinkedText"):
-            $query = "SELECT title,summary FROM imas_linkedtext WHERE id=$typeid";
+            $link = Links::getById($typeid);
+            $name = $link['title'];
+            $summary = $link['summary'];
             break;
         case ($itemtype === "Forum"):
-            $query = "SELECT name,description FROM imas_forums WHERE id=$typeid";
+            $forum = Forums::getById($typeid);
+            $name = $forum['name'];
+            $summary = $forum['description'];
             break;
         case ($itemtype === "Assessment"):
-            $query = "SELECT name,summary FROM imas_assessments WHERE id=$typeid";
+            $assessment = Assessments::getByAssessmentId($typeid);
+            $name = $assessment['name'];
+            $summary = $assessment['summary'];
             break;
         case ($itemtype === "Wiki"):
-            $query = "SELECT name,description FROM imas_wikis WHERE id=$typeid";
+            $wiki = Wiki::getById($typeid);
+            $name = $wiki['name'];
+            $summary = $wiki['description'];
             break;
     }
-    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-    $name = mysql_result($result, 0, 0);
-    $summary = mysql_result($result, 0, 1);
     return array($itemtype, $name, $summary, $typeid);
 }
 
@@ -448,7 +456,6 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
     if (!isset($gitypeids)) {
         $gitypeids = array();
     }
-
     foreach ($items as $k => $item) {
         if (is_array($item)) {
             $ids[] = $parent . '-' . ($k + 1);
@@ -459,13 +466,13 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
             $gitypeids[] = '';
             $sums[] = '';
             if (count($item['items']) > 0) {
-                getsubinfo($item['items'], $parent . '-' . ($k + 1), $pre . $spacer, $itemtypelimit, $spacer);
+                CopyItemsUtility::getsubinfo($item['items'], $parent . '-' . ($k + 1), $pre . $spacer, $itemtypelimit, $spacer);
             }
         } else {
             if ($item == null || $item == '') {
                 continue;
             }
-            $arr = getiteminfo($item);
+            $arr = CopyItemsUtility::getiteminfo($item);
             if ($itemtypelimit !== false && $arr[0] != $itemtypelimit) {
                 continue;
             }

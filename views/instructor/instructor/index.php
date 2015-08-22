@@ -53,10 +53,10 @@ $now = $currentTime;
                     <span class="caret right-aligned"></span></a>
                 <ul class="dropdown-menu selected-options">
                     <li>
-                        <a href="#"><?php AppUtility::t('Assessments'); ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/change-assessment?cid=' . $course->id)?>"><?php AppUtility::t('Assessments'); ?></a>
                     </li>
                     <li>
-                        <a href="#"><?php AppUtility::t('Forums'); ?></a>
+                        <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/change-forum?cid=' . $course->id)?>"><?php AppUtility::t('Forums'); ?></a>
                     </li>
                     <li>
                         <a href="<?php echo AppUtility::getURLFromHome('block', 'block/change-block?cid=' . $course->id)?>"><?php AppUtility::t('Blocks'); ?></a>

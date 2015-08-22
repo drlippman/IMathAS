@@ -4,6 +4,7 @@ namespace app\controllers\assessment;
 
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
+use app\components\CopyItemsUtility;
 use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
@@ -678,5 +679,354 @@ class AssessmentController extends AppController
             }
         }
         return $pageOutcomesList;
+    }
+
+    public function actionChangeAssessment()
+    {
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $params = $this->getBodyParams();
+        $courseId =$this->getParamVal('cid');
+        $course = Course::getById($courseId);
+        $isTeacher = $this->isTeacher($user['id'],$course['id']);
+        $key = AppConstant::NUMERIC_ONE;
+        $gbcatsId[0] = 0;
+        $gbcatsLabel[0] ='Default';
+        $gbcatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbcatsData as $singleGbcatsData) {
+            $gbcatsId[$key] = $singleGbcatsData['id'];
+            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+            $key++;
+        }
+        $overWriteBody = 0;
+        $body = "";
+        // SECURITY CHECK DATA PROCESSING
+        if ($isTeacher != AppConstant::NUMERIC_ONE) {
+            $overWriteBody = 1;
+            $body = "You need to log in as a teacher to access this page";
+        }
+
+            if($this->isPostMethod()){
+
+            if (isset($params['checked'])) { //if the form has been submitted
+                $checked = array();
+                foreach ($params['checked'] as $id) {
+                    $id = intval($id);
+                    if ($id != 0) {
+                        $checked[] = $id;
+                    }
+                }
+                $checkedlist = "'" . implode("','", $checked) . "'";
+                $count = AppConstant::NUMERIC_ZERO;
+                foreach($params as $key=>$singleParams){
+                    if(!is_array($key) && substr($key,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_THREE) === 'chg'){
+                        $count++;
+                    }
+                }
+                if($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])){
+                    $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
+                    return $this->redirect('change-assessment?cid='.$courseId);
+                }
+                $sets = array();
+                if (isset($params['docopyopt'])) {
+                    $tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
+                    $row = Assessments::CommonMethodToGetAssessmentData($tocopy,$params['copyopt']);
+                    $tocopyarr = explode(',', $tocopy);
+                    foreach ($row as $k => $item) {
+                        $sets[] = "$k='" . addslashes($item) . "'";
+                    }
+                } else {
+                    $turnonshuffle = 0;
+                    $turnoffshuffle = 0;
+                    if (isset($params['chgshuffle'])) {
+                        if (isset($params['shuffle'])) {
+                            $turnonshuffle += 1;
+                        } else {
+                            $turnoffshuffle += 1;
+                        }
+                    }
+                    if (isset($params['chgsameseed'])) {
+                        if (isset($params['sameseed'])) {
+                            $turnonshuffle += 2;
+                        } else {
+                            $turnoffshuffle += 2;
+                        }
+                    }
+                    if (isset($params['chgsamever'])) {
+                        if (isset($params['samever'])) {
+                            $turnonshuffle += 4;
+                        } else {
+                            $turnoffshuffle += 4;
+                        }
+                    }
+                    if (isset($params['chgdefattempts'])) {
+                        if (isset($params['reattemptsdiffver'])) {
+                            $turnonshuffle += 8;
+                        } else {
+                            $turnoffshuffle += 8;
+                        }
+                    }
+                    if (isset($params['chgallowlate'])) {
+                        $allowlate = intval($params['allowlate']);
+                        if (isset($params['latepassafterdue']) && $allowlate > 0) {
+                            $allowlate += 10;
+                        }
+                    }
+                    if (isset($params['chghints'])) {
+                        if (isset($params['showhints'])) {
+                            $showhints = 1;
+                        } else {
+                            $showhints = 0;
+                        }
+                    }
+                    if ($params['skippenalty'] == 10) {
+                        $params['defpenalty'] = 'L' . $params['defpenalty'];
+                    } else if ($params['skippenalty'] > 0) {
+                        $params['defpenalty'] = 'S' . $params['skippenalty'] . $params['defpenalty'];
+                    }
+                    if ($params['deffeedback'] == "Practice" || $params['deffeedback'] == "Homework") {
+                        $deffeedback = $params['deffeedback'] . '-' . $params['showansprac'];
+                        if (($turnoffshuffle & 8) != 8) {
+                            $turnoffshuffle += 8;
+                        }
+                        if (($turnonshuffle & 8) == 8) {
+                            $turnonshuffle -= 8;
+                        }
+                    } else {
+                        $deffeedback = $params['deffeedback'] . '-' . $params['showans'];
+                    }
+                    if (isset($params['chgtimelimit'])) {
+                        $timelimit = $params['timelimit'] * 60;
+                        if (isset($params['timelimitkickout'])) {
+                            $timelimit = -1 * $timelimit;
+                        }
+                        $sets[] = "timelimit='$timelimit'";
+                    }
+                    if (isset($params['chgtutoredit'])) {
+                        $sets[] = "tutoredit='{$params['tutoredit']}'";
+                    }
+                    if (isset($params['chgdisplaymethod'])) {
+                        $sets[] = "displaymethod='{$params['displaymethod']}'";
+                    }
+                    if (isset($params['chgdefpoints'])) {
+                        $sets[] = "defpoints='{$params['defpoints']}'";
+                    }
+                    if (isset($params['chgdefattempts'])) {
+                        $sets[] = "defattempts='{$params['defattempts']}'";
+                    }
+                    if (isset($params['chgdefpenalty'])) {
+                        $sets[] = "defpenalty='{$params['defpenalty']}'";
+                    }
+                    if (isset($params['chgfeedback'])) {
+                        $sets[] = "deffeedback='$deffeedback'";
+                    }
+                    if (isset($params['chggbcat'])) {
+                        $sets[] = "gbcategory='{$params['gbcat']}'";
+                    }
+                    if (isset($params['chgallowlate'])) {
+                        $sets[] = "allowlate='$allowlate'";
+                    }
+                    if (isset($params['chgexcpen'])) {
+                        $sets[] = "exceptionpenalty='{$params['exceptionpenalty']}'";
+                    }
+                    if (isset($params['chgpassword'])) {
+                        $sets[] = "password='{$params['assmpassword']}'";
+                    }
+                    if (isset($params['chghints'])) {
+                        $sets[] = "showhints='$showhints'";
+                    }
+                    if (isset($params['chgshowtips'])) {
+                        $sets[] = "showtips='{$params['showtips']}'";
+                    }
+                    if (isset($params['chgnoprint'])) {
+                        $sets[] = "noprint='{$params['noprint']}'";
+                    }
+                    if (isset($params['chgisgroup'])) {
+                        $sets[] = "isgroup='{$params['isgroup']}'";
+                    }
+                    if (isset($params['chggroupmax'])) {
+                        $sets[] = "groupmax='{$params['groupmax']}'";
+                    }
+                    if (isset($params['chgcntingb'])) {
+                        $sets[] = "cntingb='{$params['cntingb']}'";
+                    }
+                    if (isset($params['chgminscore'])) {
+                        if ($params['minscoretype'] == 1 && trim($params['minscore']) != '' && $params['minscore'] > 0) {
+                            $params['minscore'] = intval($params['minscore']) + 10000;
+                        }
+                        $sets[] = "minscore='{$params['minscore']}'";
+                    }
+                    if (isset($params['chgshowqcat'])) {
+                        $sets[] = "showcat='{$params['showqcat']}'";
+                    }
+                    if (isset($params['chgeqnhelper'])) {
+                        $sets[] = "eqnhelper='{$params['eqnhelper']}'";
+                    }
+
+                    if (isset($params['chgcaltag'])) {
+                        $caltag = $params['caltagact'];
+                        $sets[] = "caltag='$caltag'";
+                        $calrtag = $params['caltagrev'];
+                        $sets[] = "calrtag='$calrtag'";
+                    }
+                    if (isset($params['chgmsgtoinstr'])) {
+                        if (isset($params['msgtoinstr'])) {
+                            $sets[] = "msgtoinstr=1";
+                        } else {
+                            $sets[] = "msgtoinstr=0";
+                        }
+                    }
+                    if (isset($params['chgposttoforum'])) {
+                        if (isset($params['doposttoforum'])) {
+                            $sets[] = "posttoforum='{$params['posttoforum']}'";
+                        } else {
+                            $sets[] = "posttoforum=0";
+                        }
+                    }
+                    if (isset($params['chgdeffb'])) {
+                        if (isset($params['usedeffb'])) {
+                            $sets[] = "deffeedbacktext='{$params['deffb']}'";
+                        } else {
+                            $sets[] = "deffeedbacktext=''";
+                        }
+                    }
+                    if (isset($params['chgreqscore'])) {
+                        $sets[] = "reqscore=0";
+                        $sets[] = "reqscoreaid=0";
+                    }
+                    if (isset($params['chgistutorial'])) {
+                        if (isset($params['istutorial'])) {
+                            $sets[] = "istutorial=1";
+                        } else {
+                            $sets[] = "istutorial=0";
+                        }
+                    }
+                    if ($turnonshuffle != 0 || $turnoffshuffle != 0) {
+                        $shuff = "shuffle = ((shuffle";
+                        if ($turnoffshuffle > 0) {
+                            $shuff .= " & ~$turnoffshuffle)";
+                        } else {
+                            $shuff .= ")";
+                        }
+                        if ($turnonshuffle > 0) {
+                            $shuff .= " | $turnonshuffle";
+                        }
+                        $shuff .= ")";
+                        $sets[] = $shuff;
+
+                    }
+                }
+                if (isset($params['chgavail'])) {
+                    $sets[] = "avail='{$params['avail']}'";
+                }
+                if (isset($params['chgintro'])) {
+                    $assessmentData = Assessments::getByAssessmentId($params['intro']);
+                    $sets[] = "intro='" . addslashes($assessmentData['intro']) . "'";
+                }
+                if (isset($params['chgsummary'])) {
+                    $assessmentData = Assessments::getByAssessmentId($params['summary']);
+                    $sets[] = "summary='" . addslashes($assessmentData['summary']) . "'";
+                }
+                if (isset($params['chgdates'])) {
+                    $assessmentData = Assessments::getByAssessmentId($params['dates']);
+                    $sets[] = "startdate='{$assessmentData['startdate']}',enddate='{$assessmentData['enddate']}',reviewdate='{$assessmentData['reviewdate']}'";
+                }
+                if (isset($params['chgcopyendmsg'])) {
+                    $assessmentData = Assessments::getByAssessmentId($params['copyendmsg']);
+                    $sets[] = "endmsg='" . addslashes($assessmentData['endmsg']) . "'";
+                }
+
+                if (count($sets) > 0) {
+                    $setslist = implode(',', $sets);
+                     Assessments::updateAssessmentData($setslist,$checkedlist);
+                }
+                if (isset($params['removeperq'])) {
+                    Questions::updateQuestionData($checkedlist);
+                }
+
+                if (isset($params['chgendmsg'])) {
+                    return $this->redirect('change-assessment?cid='.$courseId);
+                    // redirect on new page
+//                    include("assessendmsg.php");
+                } else {
+                    $this->setWarningFlash(' Assessment data changes successfully.');
+                    return $this->redirect('change-assessment?cid='.$courseId);
+                }
+                exit;
+            } else {
+                $this->setWarningFlash('No assessments are selected to be changed.');
+                return $this->redirect('change-assessment?cid=' . $courseId);
+            }
+        }
+             //DATA MANIPULATION FOR INITIAL LOAD
+                $line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
+                $line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:10;
+                $line['defattempts'] = isset($CFG['AMS']['defattempts'])?$CFG['AMS']['defattempts']:1;
+                $testtype = isset($CFG['AMS']['testtype'])?$CFG['AMS']['testtype']:"AsGo";
+                $showans = isset($CFG['AMS']['showans'])?$CFG['AMS']['showans']:"A";
+                $line['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']:10;
+                $line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:0;
+                $line['minscore'] = isset($CFG['AMS']['minscore'])?$CFG['AMS']['minscore']:0;
+                $line['showhints']=isset($CFG['AMS']['showhints'])?$CFG['AMS']['showhints']:1;
+                $line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:0;
+                $line['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
+                $line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:1;
+                $line['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty'])?$CFG['AMS']['exceptionpenalty']:0;
+                $line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:0;
+                $line['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:0;
+                $line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
+                $line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
+                $line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:1;
+                if ($line['defpenalty']{0}==='L') {
+                    $line['defpenalty'] = substr($line['defpenalty'],1);
+                    $skippenalty=10;
+                } else if ($line['defpenalty']{0}==='S') {
+                    $skippenalty = $line['defpenalty']{1};
+                    $line['defpenalty'] = substr($line['defpenalty'],2);
+                } else {
+                    $skippenalty = 0;
+                }
+
+                $items = unserialize($course['itemorder']);
+               global $parents,$sums,$names,$types,$gitypeids,$ids,$prespace;
+                $agbcats = array();
+                CopyItemsUtility::getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
+                $assessments = Assessments::getByCourseId($courseId);
+                if (count($assessments) == 0) {
+                    $page_assessListMsg = "<li>No Assessments to change</li>\n";
+                } else {
+                    $page_assessListMsg = "";
+                    $i=0;
+                    $page_assessSelect = array();
+                     foreach($assessments as $assessment){
+                        $page_assessSelect['val'][$i] = $assessment['id'];
+                        $page_assessSelect['label'][$i] = $assessment['name'];
+                        $agbcats[$assessment['id']] = $assessment['gbcategory'];
+                        $i++;
+                    }
+                }
+
+                $page_forumSelect = array();
+                $forums = Forums::getByCourseId($courseId);
+                $page_forumSelect['val'][0] = 0;
+                $page_forumSelect['label'][0] = "None";
+                foreach($forums as $forum){
+                    $page_forumSelect['val'][] = $forum['id'];
+                    $page_forumSelect['label'][] = $forum['name'];
+                }
+
+                $page_allowlateSelect = array();
+                $page_allowlateSelect['val'][0] = 0;
+                $page_allowlateSelect['label'][0] = "None";
+                $page_allowlateSelect['val'][1] = 1;
+                $page_allowlateSelect['label'][1] = "Unlimited";
+                for ($k=1;$k<9;$k++) {
+                    $page_allowlateSelect['val'][] = $k+1;
+                    $page_allowlateSelect['label'][] = "Up to $k";
+                }
+        $this->includeJS(["general.js"]);
+        $responaseData = array('ids' => $ids,'page_allowlateSelect' => $page_allowlateSelect,'page_forumSelect' => $page_forumSelect,'agbcats' => $agbcats,'page_assessSelect' => $page_assessSelect,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'overWriteBody' => $overWriteBody,'body' => $body,'isTeacher' => $isTeacher,'course' => $course,
+            'parents' => $parents,'line' => $line,'sums' => $sums,'names' => $names,'types' => $types,'gitypeids' => $gitypeids,'prespace' => $prespace);
+        return $this->renderWithData('changeAssessment',$responaseData);
     }
 }

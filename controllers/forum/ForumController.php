@@ -1252,7 +1252,7 @@ class ForumController extends AppController
                  $subscriptionEntry = new ForumSubscriptions();
                  $subscriptionEntry->AddNewEntry($params['modifyFid'], $user['id']);
                  }else{
-                  ForumSubscriptions::deleteSubscriptionsEntry($params['modifyFid']);
+                  ForumSubscriptions::deleteSubscriptionsEntry($params['modifyFid'],$user['id']);
                  }
             } else {
                 $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
@@ -1378,4 +1378,207 @@ class ForumController extends AppController
         }
         return $pageOutcomesList;
     }
+
+  public function actionChangeForum()
+  {
+      $courseId = $this->getParamVal('cid');
+      $currentUser = $this->getAuthenticatedUser();
+      $isTeacher = $this->isTeacher($currentUser->id,$courseId);
+      $course = Course::getById($courseId);
+      $this->layout = "master";
+//prep for output
+      $forumItems = array();
+      $sort = AppConstant::ASCENDING;
+      $orderBy = 'name';
+      $forumData = Forums::getByCourseIdOrdered($courseId,$sort,$orderBy);
+      foreach($forumData as $forum){
+          $forumItems[$forum['id']] = $forum['name'];
+      }
+      $groupNames = StuGroupSet::getByCourseId($courseId);
+      $key = AppConstant::NUMERIC_ZERO;
+      foreach ($groupNames as $group) {
+          $groupNameId[$key] = $group['id'];
+          $groupNameLabel[$key] = 'Use group set:' . $group['name'];
+          $key++;
+      }
+      $key = AppConstant::NUMERIC_ZERO;
+      $gbcatsData = GbCats::getByCourseId($courseId);
+      foreach ($gbcatsData as $singleGbcatsData) {
+          $gbcatsId[$key] = $singleGbcatsData['id'];
+          $gbcatsLabel[$key] = $singleGbcatsData['name'];
+          $key++;
+      }
+      if($this->isPostMethod()) {
+          $params = $this->getRequestParams();
+
+           if (isset($params['checked'])) { //form submitted
+              $count = AppConstant::NUMERIC_ZERO;
+              foreach($params as $key=>$singleParams){
+                  if(!is_array($key) && substr($key,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_THREE) === 'chg'){
+                      $count++;
+                  }
+              }
+               if($count == AppConstant::NUMERIC_ZERO){
+                   $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
+                   return $this->redirect('change-forum?cid='.$courseId);
+               }
+              $checked = $params['checked'];
+              $checkedList = "'" . implode("','", $checked) . "'";
+              $sets = array();
+              if (isset($params['chg-avail'])) {
+                  $sets[] = 'avail=' . intval($params['avail']);
+              }
+              if (isset($params['chg-reply-by'])) {
+                  if ($params['reply'] == "Always") {
+                      $replyBy = AppConstant::ALWAYS_TIME;
+                  } else if ($params['reply'] == "Never") {
+                      $replyBy = AppConstant::NUMERIC_ZERO;
+                  } else {
+                      $replyBy = AssessmentUtility::parsedatetime($params['replyByDate'], $params['replyByTime']);
+                  }
+                  $sets[] = "replyby='$replyBy'";
+              }
+              if (isset($params['chg-reply-by'])) {
+                  if ($params['post'] == "Always") {
+                      $postBy = AppConstant::ALWAYS_TIME;
+                  } else if ($params['post'] == "Never") {
+                      $postBy = AppConstant::NUMERIC_ZERO;
+                  } else {
+                      $postBy = AssessmentUtility::parsedatetime($params['postDate'], $params['postTime']);
+                  }
+                  $sets[] = "postby='$postBy'";
+              }
+              if (isset($params['chg-cal-tag'])) {
+                  $sets[] = "caltag='" . $params['caltagpost'] . '--' . $params['caltagreply'] . "'";
+              }
+              $sops = array();
+              if (isset($params['chg-allow-anon'])) {
+                  if (isset($params['allow-anonymous-posts']) && $params['allow-anonymous-posts'] == 1) {
+                      //turn on 1's bit
+                      $sops[] = " | 1";
+                  } else {
+                      //turn off 1's bit
+                      $sops[] = " & ~1";
+                  }
+              }
+              if (isset($params['chg-allow-mod'])) {
+                  if (isset($params['allow-students-to-modify-posts']) && $params['allow-students-to-modify-posts'] == 1) {
+                      //turn on 2's bit
+                      $sops[] = " | 2";
+                  } else {
+                      //turn off 2's bit
+                      $sops[] = " & ~2";
+                  }
+              }
+              if (isset($params['chg-allow-del'])) {
+                  if (isset($params['allow-students-to-delete-own-posts']) && $params['allow-students-to-delete-own-posts'] == 1) {
+                      //turn on 4's bit
+                      $sops[] = " | 4";
+                  } else {
+                      //turn off 4's bit
+                      $sops[] = " & ~4";
+                  }
+              }
+              if (isset($params['chg-allow-likes'])) {
+                  if (isset($params['like-post']) && $params['like-post'] == AppConstant::NUMERIC_ONE) {
+                      //turn on 8's bit
+                      $sops[] = " | 8";
+                  } else {
+                      //turn off 8's bit
+                      $sops[] = " & ~8";
+                  }
+              }
+              if (isset($params['chg-view-before-post'])) {
+                  if (isset($params['viewing-before-posting']) && $params['viewing-before-posting'] == AppConstant::NUMERIC_ONE) {
+                      //turn on 8's bit
+                      $sops[] = " | 16";
+                  } else {
+                      //turn off 8's bit
+                      $sops[] = " & ~16";
+                  }
+              }
+              if (count($sops) > AppConstant::NUMERIC_ZERO) {
+                  $out = "settings";
+                  foreach ($sops as $op) {
+                      $out = "($out $op)";
+                  }
+                  $sets[] = "settings=$out";
+              }
+              if (isset($params['chg-def-display'])) {
+                  $sets[] = 'defdisplay=' . intval($params['default-display']);
+              }
+              if (isset($params['chg-sort-by'])) {
+                  $sets[] = 'sortby=' . intval($params['sort-thread']);
+              }
+              if (isset($params['chg-cnt-in-gb'])) {
+                  if (is_numeric($params['points']) && $params['points'] == AppConstant::NUMERIC_ZERO) {
+                      $params['count-in-gradebook'] = AppConstant::NUMERIC_ZERO;
+                  } else if ($params['count-in-gradebook'] == AppConstant::NUMERIC_ZERO) {
+                      $params['points'] = AppConstant::NUMERIC_ZERO;
+                  } else if ($params['count-in-gradebook'] == AppConstant::NUMERIC_FOUR) {
+                      $params['count-in-gradebook'] = AppConstant::NUMERIC_ZERO;
+                  }
+                  $sets[] = 'cntingb=' . intval($params['count-in-gradebook']);
+                  if (is_numeric($params['points'])) {
+                      $sets[] = 'points=' . intval($params['points']);
+                  }
+              }
+              if (isset($params['chg-gb-cat'])) {
+                  $sets[] = "gbcategory='{$params['gradebook-category']}'";
+              }
+              if (isset($params['chg-forum-type'])) {
+                  $sets[] = "forumtype='{$params['forum-type']}'";
+              }
+              if (isset($params['chg-tag-list'])) {
+                  if (isset($params['use-tags'])) {
+                      $tagList = trim($params['taglist']);
+                  } else {
+                      $tagList = '';
+                  }
+                  $sets[] = "taglist='$tagList'";
+              }
+
+              if (count($sets) > AppConstant::NUMERIC_ZERO & count($checked) > AppConstant::NUMERIC_ZERO) {
+                  $setsList = implode(',', $sets);
+
+                  $forum = new Forums();
+                        $forum->updateForumData($setsList,$checkedList);
+              }
+              if (isset($params['chg-subscribe'])) {
+                  if (isset($params['Get-email-notify-of-new-posts'])) {
+                      //add any subscriptions we don't already have
+                          $subScriptionId = ForumSubscriptions::getByManyForumIdsANdUserId($checkedList,$currentUser['id']);
+                      $hasSubscribe = array();
+                      if ($subScriptionId > AppConstant::NUMERIC_ZERO) {
+                          foreach($subScriptionId as $subScription){
+                              $hasSubscribe[] = $subScription['forumid'];
+                          }
+                      }
+                      $toadd = array_diff($params['checked'], $hasSubscribe);
+                      foreach ($toadd as $fid) {
+                          $fid = intval($fid);
+                          if ($fid > AppConstant::NUMERIC_ZERO) {
+                              $subScription = new ForumSubscriptions();
+                              $subScription->AddNewEntry($fid,$currentUser->id);
+                          }
+                      }
+                  } else {
+                      //remove any existing subscriptions
+                      foreach($params['checked'] as $forumId){
+                         ForumSubscriptions::deleteSubscriptionsEntry($forumId,$currentUser->id);
+                      }
+                  }
+              }
+               $this->setWarningFlash('Forums data changes successfully.');
+               return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
+          }else{
+              $this->setWarningFlash('No forums are selected to be changed.');
+              return $this->redirect('change-forum?cid='.$courseId);
+          }
+      }
+      $this->includeCSS(['dataTables.bootstrap.css']);
+      $this->includeJS(['general.js?ver=012115','DataTables-1.10.6/media/js/jquery.dataTables.js']);
+      $responseData = array('course' => $course,'gbcatsId' => $gbcatsId,'gbcatsLabel' => $gbcatsLabel,'groupNameId' => $groupNameId,'gbcatsLabel' => $gbcatsLabel,'isTeacher' => $isTeacher,'forumItems' => $forumItems);
+      return $this->renderWithData('changeForum',$responseData);
+  }
 }

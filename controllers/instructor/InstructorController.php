@@ -51,6 +51,7 @@ public $oa = array();
     public $cn = AppConstant::NUMERIC_ONE;
     public $key = AppConstant::NUMERIC_ZERO;
     public $enableCsrfValidation = false;
+    public $shift;
 
     public function actionIndex()
     {
@@ -525,6 +526,7 @@ public $oa = array();
     public function actionDeleteItemsAjax()
     {
         $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
         $courseId = $params['courseId'];
         $block = $params['block'];
         $itemType = $params['itemType'];
@@ -537,7 +539,7 @@ public $oa = array();
                     $itemDeletedId = Items::deleteByTypeIdName($itemId,$itemType);
                     AppUtility::UpdateitemOrdering($courseId,$block,$itemDeletedId);
                     Forums::deleteForum($itemId);
-                    ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+                    ForumSubscriptions::deleteSubscriptionsEntry($itemId,$user['id']);
                     $postId = ForumPosts::getForumPostByFile($itemId);
                     $threadIdArray = ForumThread::findThreadCount($itemId);
                     foreach($threadIdArray as $singleThread){
@@ -630,11 +632,12 @@ public $oa = array();
     public function deleteItemById($itemId)
     {
         $ItemType =Items::getByTypeId($itemId);
+        $user = $this->getAuthenticatedUser();
         switch($ItemType['itemtype'])
         {
             case AppConstant::FORUM:
                 Forums::deleteForum($itemId);
-                ForumSubscriptions::deleteSubscriptionsEntry($itemId);
+                ForumSubscriptions::deleteSubscriptionsEntry($itemId,$user['id']);
                 $postId = ForumPosts::getForumPostByFile($itemId);
                 $threadIdArray = ForumThread::findThreadCount($itemId);
                 foreach($threadIdArray as $singleThread){
@@ -768,12 +771,21 @@ public $oa = array();
     public function actionTimeShift()
     {
         $this->guestUserHandler();
-         $user = $this->getAuthenticatedUser();
+        $user = $this->getAuthenticatedUser();
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $assessments = Assessments::getByCourseId($courseId);
+        $isTeacher = $this->isTeacher($user['id'],$courseId);
+        //set some page specific variables and counters
+        $overWriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+            $assessments = Assessments::getByCourseId($courseId);
+        if ($isTeacher != AppConstant::NUMERIC_ONE) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+        } else {    //PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+
             if (isset($params['sdate'])) {
                 $assessment = Assessments::getByAssessmentId($params['aid']);
                 if (($params['base'] == AppConstant::NUMERIC_ZERO)) {
@@ -783,7 +795,7 @@ public $oa = array();
                 }
                 preg_match('/(\d+)\s*\/(\d+)\s*\/(\d+)/', $params['sdate'], $dmatches);
                 $newstamp = mktime(date('G', $basedate), date('i', $basedate), AppConstant::NUMERIC_ZERO, $dmatches[1], $dmatches[2], $dmatches[3]);
-                $shift = $newstamp - $basedate;
+                $this->shift = $newstamp - $basedate;
                 $items = unserialize($course['itemorder']);
                 $this->shiftsub($items);
                 $itemorder = serialize($items);
@@ -791,49 +803,49 @@ public $oa = array();
                 $itemsData = Items::getByCourseId($courseId);
                 foreach ($itemsData as $item) {
                     if ($item['itemtype'] == "InlineText") {
-                        InlineText::setStartDate($shift, $item['typeid']);
-                        InlineText::setEndDate($shift, $item['typeid']);
+                        InlineText::setStartDate($this->shift, $item['typeid']);
+                        InlineText::setEndDate($this->shift, $item['typeid']);
                     } else if ($item['itemtype'] == "LinkedText") {
-                        LinkedText::setStartDate($shift, $item['typeid']);
-                        LinkedText::setStartDate($shift, $item['typeid']);
+                        LinkedText::setStartDate($this->shift, $item['typeid']);
+                        LinkedText::setEndDate($this->shift, $item['typeid']);
                     } else if ($item['itemtype'] == "Forum") {
-                        Forums::setStartDate($shift, $item['typeid']);
-                        Forums::setEndDate($shift, $item['typeid']);
+                        Forums::setReplyBy($this->shift, $item['typeid']);
+                        Forums::setPostBy($this->shift, $item['typeid']);
                     } else if ($item['itemtype'] == "Assessment") {
-                        Assessments::setStartDate($shift, $item['typeid']);
-                        Assessments::setEndDate($shift, $item['typeid']);
+                        Assessments::setStartDate($this->shift, $item['typeid']);
+                        Assessments::setEndDate($this->shift, $item['typeid']);
                     } else if ($item['itemtype'] == "Calendar") {
                         continue;
                     } else if ($item['itemtype'] == "Wiki") {
-                        Wiki::setStartDate($shift, $item['typeid']);
-                        Wiki::setEndDate($shift, $item['typeid']);
+                        Wiki::setEditByDate($this->shift, $item['typeid']);
                     }
-                    CalItem::setDateByCourseId($shift, $courseId);
+                    CalItem::setDateByCourseId($this->shift, $courseId);
                 }
-                return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
-            }else { //DEFAULT DATA MANIPULATION
-            $sdate = AppUtility::tzdate("m/d/Y",time());
-            $i=AppConstant::NUMERIC_ZERO;
-            foreach($assessments as $singleData){
-                $page_assessmentList['val'][$i] = $singleData['id'];
-                $page_assessmentList['label'][$i] = $singleData['name'];
-                $i++;
+                $this->setSuccessFlash('Time shift data update successfully');
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId));
+            } else { //DEFAULT DATA MANIPULATION
+                $sdate = AppUtility::tzdate("m/d/Y", time());
+                $i = AppConstant::NUMERIC_ZERO;
+                foreach ($assessments as $singleData) {
+                    $page_assessmentList['val'][$i] = $singleData['id'];
+                    $page_assessmentList['label'][$i] = $singleData['name'];
+                    $i++;
+                }
             }
         }
-        $responseData = array('course' => $course, 'assessments' =>$assessments,'pageAssessmentList' => $page_assessmentList, 'date' => $sdate);
+        $responseData = array('overWriteBody' => $overWriteBody,'body' => $body,'course' => $course, 'assessments' =>$assessments,'pageAssessmentList' => $page_assessmentList, 'date' => $sdate);
         return $this->renderWithData('timeShift', $responseData);
     }
 
     public function shiftsub($itema) {
-        global $shift;
         if($itema){
             foreach ($itema as $k=>$item) {
                 if (is_array($item)) {
                     if ($itema[$k]['startdate'] > AppConstant::NUMERIC_ZERO) {
-                        $itema[$k]['startdate'] += $shift;
+                        $itema[$k]['startdate'] += $this->shift;
                     }
                     if ($itema[$k]['enddate'] < AppConstant::ALWAYS_TIME) {
-                        $itema[$k]['enddate'] += $shift;
+                        $itema[$k]['enddate'] += $this->shift;
                     }
                     $this->shiftsub($itema[$k]['items']);
                 }

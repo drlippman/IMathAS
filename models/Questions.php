@@ -13,6 +13,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasQuestions;
 use yii\db\Query;
+use Yii;
 
 class Questions extends BaseImasQuestions
 {
@@ -259,6 +260,9 @@ class Questions extends BaseImasQuestions
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-
-
+    public static function updateQuestionData($checkedlist)
+    {
+        $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
+        Yii::$app->db->createCommand($query)->query();
+    }
 }

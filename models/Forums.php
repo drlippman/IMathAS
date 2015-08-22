@@ -196,25 +196,25 @@ class Forums extends BaseImasForums {
         }
     }
 
-    public static function setStartDate($shift,$typeId)
+    public static function setReplyBy($shift,$typeId)
     {
-        $date = Forums::find()->where(['id'=>$typeId])->andWhere(['>','startdate','0'])->one();
-        if($date) {
-            $date->startdate = $date->startdate + $shift;
+        $date = Forums::find()->where(['id'=>$typeId])->andWhere(['>','replyby','0'])->andWhere(['<','replyby','2000000000'])->one();
+        if($date)
+        {
+            $date->replyby = $date->replyby + $shift;
             $date->save();
         }
     }
 
-    public static function setEndDate($shift,$typeId)
+    public static function setPostBy($shift,$typeId)
     {
-
-        $date = Forums::find()->where(['id' => $typeId])->andWhere(['<', 'enddate', '2000000000'])->one();
-        if ($date) {
-            $date->enddate = $date->enddate + $shift;
+        $date = Forums::find()->where(['id' => $typeId])->andWhere(['>', 'postby', '0'])->andWhere(['<', 'postby', '2000000000'])->one();
+        if ($date)
+        {
+            $date->postby = $date->postby + $shift;
             $date->save();
         }
     }
-
 
     public static function getForumsForOutcomeMap($courseId)
     {

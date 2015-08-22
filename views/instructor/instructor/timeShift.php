@@ -9,23 +9,29 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid='.$course->id]]); ?>
 </div>
-
+<form method=post action="time-shift?cid=<?php echo $course->id ?>" >
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            <div class="vertical-align title-page"><?php echo $this->title ?> </div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Change Dates' ?></button>
         </div>
     </div>
 </div>
-
 <div class="item-detail-content">
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?></div>
 <div class="col-md-12">
     <br/>
 </div>
+    <div class="tab-content shadowBox">
+    <?php
+if ($overWriteBody==1) {
+    echo $body;
+} else {
+?>
 
-<div class="tab-content shadowBox">
-    <form method=post action="time-shift?cid=<?php echo $course->id ?>" >
     <div class="col-md-12">
         <div class="col-md-12">
             <?php AppUtility::t("This page will change <b>ALL</b> course available dates and due dates based on changing one item. This is intended to allow you to reset all course item dates for a new term in one action.");?>
@@ -82,18 +88,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <br/>
     </div>
 
-    <div class="col-md-12">
-        <div class="col-md-4"> </div>
-        <div class="col-md-4">
-            <input class="btn btn-primary" type="submit" value="<?php AppUtility::t("Change Dates")?>">
-        </div>
-    </div>
+<?php } ?>
 
-    <div class="col-md-12">
-        <div><br/></div>
-    <div>
-    </form>
 </div>
+</form>
 
 
 

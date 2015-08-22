@@ -6,6 +6,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasAssessments;
 use yii\db\Query;
+use Yii;
 use yii\debug\components\search\matchers\GreaterThan;
 
 class Assessments extends BaseImasAssessments
@@ -373,6 +374,19 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryOne();
         return $data;
 
+    }
+
+    public static function CommonMethodToGetAssessmentData($toCopy,$id)
+    {
+        $query = "SELECT $toCopy FROM imas_assessments WHERE id='$id'";
+        $assessment = Yii::$app->db->createCommand($query)->queryOne();
+        return $assessment;
+
+    }
+    public static function updateAssessmentData($setslist,$checkedlist)
+    {
+        $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)";
+        Yii::$app->db->createCommand($query)->query();
     }
 
 }
