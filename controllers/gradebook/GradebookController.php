@@ -2948,12 +2948,12 @@ if($params['gbitem'] > 0){
                 '1' => $libraryName['category'],
                 '2' => $libraryName['name'],
             );
-            if($questionSet[0]['hasimg'] > 0){
+            if($questionSet['hasimg'] > 0){
 
             $questionImages = QuestionImages::getByQuestionSetId($questionId);
             }
             array_push($librariesName,$tempArray);
-            array_push($questionSetData,$questionSet[0]);
+            array_push($questionSetData,$questionSet);
         }
 
          $defaultValuesArray = array(

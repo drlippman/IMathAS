@@ -272,6 +272,7 @@ class Assessments extends BaseImasAssessments
             $assessmentData->itemorder = $itemOrder;
             $assessmentData->viddata = $viddata;
             $assessmentData->save();
+            return $assessmentData;
         }
     }
 
@@ -304,10 +305,13 @@ class Assessments extends BaseImasAssessments
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-    public static function UpdateItemOrder($newitemlist, $id)
+    public static function UpdateItemOrder($newItemList, $id)
     {
-        $query = "UPDATE imas_assessments SET itemorder='$newitemlist' WHERE id={$id}";
-        \Yii::$app->db->createCommand($query)->query();
+        $data = Assessments::findOne(['id'=>$id]);
+        if($data){
+            $data->itemorder = $newItemList;
+            $data->save();
+        }
     }
     public static  function assessmentDataForOutcomes($courseId)
     {

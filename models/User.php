@@ -159,7 +159,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function getById($id)
     {
-        return static::findOne($id);
+        return static::findOne(['id' => $id]);
     }
     public static function getByIdAndCode($id, $code)
     {

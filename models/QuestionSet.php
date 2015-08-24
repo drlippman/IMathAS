@@ -10,6 +10,7 @@ namespace app\models;
 
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasQuestionset;
 use yii\db\Query;
 
@@ -17,7 +18,7 @@ class QuestionSet extends BaseImasQuestionset
 {
     public static function getByQuesSetId($id)
     {
-        return static::findAll(['id' => $id]);
+        return static::findOne(['id' => $id]);
     }
     public static function getById($id)
     {
@@ -143,8 +144,15 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function getByQSetIdJoin($id){
         $query = "SELECT imas_questionset.*,imas_users.groupid FROM imas_questionset,imas_users WHERE ";
-        $query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$id";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        $query .= "imas_questionset.ownerid=imas_users.id AND imas_questionset.id='$id'";
+        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        return $data;
+    }
+
+    public static function getUserAndQuestionSetJoin($id){
+        $query = "SELECT imas_users.email,imas_questionset.* ";
+        $query .= "FROM imas_users,imas_questionset WHERE imas_users.id=imas_questionset.ownerid AND imas_questionset.id='$id'";
+        $data = \Yii::$app->db->createCommand($query)->queryOne();
         return $data;
     }
 } 

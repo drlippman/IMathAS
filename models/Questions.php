@@ -79,14 +79,15 @@ class Questions extends BaseImasQuestions
     public function addQuestions($params)
     {
         $this->assessmentid = isset($params['assessmentid']) ? $params['assessmentid'] : null;
-        $this->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : null;;
-        $this->points = isset($params['points']) ? $params['points'] : null;;
-        $this->attempts = isset($params['attempts']) ? $params['attempts'] : null;;
-        $this->penalty = isset($params['penalty']) ? $params['penalty'] : null;;
-        $this->category = isset($params['category']) ? $params['category'] : null;;
-        $this->regen = isset($params['regen']) ? $params['regen'] : null;;
-        $this->showans = isset($params['showans']) ? $params['showans'] : null;;
-        $this->showhints = isset($params['showhints']) ? $params['showhints'] : null;;
+        $this->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : null;
+        $this->points = isset($params['points']) ? $params['points'] : null;
+        $this->attempts = isset($params['attempts']) ? $params['attempts'] : null;
+        $this->penalty = isset($params['penalty']) ? $params['penalty'] : null;
+        $this->category = isset($params['category']) ? $params['category'] : null;
+        $this->regen = isset($params['regen']) ? $params['regen'] : null;
+        $this->showans = isset($params['showans']) ? $params['showans'] : null;
+        $this->showhints = isset($params['showhints']) ? $params['showhints'] : null;
+        $this->rubric = isset($params['rubric']) ? $params['rubric'] : null;
         $this->save();
         return $this->id;
     }
@@ -260,9 +261,34 @@ class Questions extends BaseImasQuestions
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
     public static function updateQuestionData($checkedlist)
     {
         $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";
         Yii::$app->db->createCommand($query)->query();
+    }
+
+    public static function updateQuestionFields($params, $id){
+        $questionData = Questions::getById(['id' => $id]);
+        if($questionData){
+            $questionData->points = $params['points'];
+            $questionData->attempts = $params['attempts'];
+            $questionData->penalty = $params['penalty'];
+            $questionData->regen = $params['regen'];
+            $questionData->showans = $params['showans'];
+            $questionData->rubric = $params['rubric'];
+            $questionData->showhints = $params['showhints'];
+            $questionData->questionsetid = $params['questionsetid'];
+            $questionData->save();
+        }
+    }
+
+    public static function deleteById($id){
+        $data = Questions::getByIdList($id);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->delete();
+            }
+        }
     }
 }

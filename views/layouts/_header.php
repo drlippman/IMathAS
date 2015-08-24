@@ -3,9 +3,11 @@
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use app\models\Student;
+use app\models\Course;
 use \app\components\AppConstant;
+use app\components\AppUtility;
 $basePath = '/site/';
-$imgPath = \app\components\AppUtility::getAssetURL().'img/';
+$imgPath = AppUtility::getAssetURL().'img/';
 NavBar::begin([
     'brandLabel' => 'OpenMath',
     'brandUrl' => Yii::$app->homeUrl.'site/login',
@@ -13,7 +15,9 @@ NavBar::begin([
         'class' => 'navbar-inverse navbar-fixed-top',
     ],
 ]);
-/*User Setting Drop-Down */
+/*
+ * User Setting Drop-Down
+ */
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav user-menu navbar-right'],
     'encodeLabels' => false,
@@ -51,28 +55,30 @@ echo Nav::widget([
         Yii::$app->user->isGuest ?
             ['label' => 'Notifications ', 'url' => [$basePath.'login'], 'options' => ['class' => 'notification-alignment',
 ]]:
-            ($totalCount >0 ?['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
+            ($totalCount > AppConstant::NUMERIC_ZERO ?['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications&nbsp;'.'<div class="circle"><div class="notification msg-count">'.$totalCount.'</div></div>',
                 'items' =>
                 [
-                    ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
+                    ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?newmsg=1&cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
                     '<li class="divider"></li>',
-                    ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                    ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/new-post?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
                 ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] :
 
                 ['label' =>'<img class="small-icon" src="../../img/notifctn.png">&nbsp;Notifications',
                 'items' =>
                     [
-                        ($messageCount>0 ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
+                        ($messageCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Message'.'('.$messageCount.')' , 'url' => '../../message/message/index?cid='.$courseId] : ['label' => 'Message', 'url' => '../../message/message/index?cid='.$courseId]),
                         '<li class="divider"></li>',
-                        ($postCount>0 ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
+                        ($postCount> AppConstant::NUMERIC_ZERO ? ['label' => 'Forum'.'('.$postCount.')', 'url' => '../../forum/forum/search-forum?cid='.$courseId] :['label' => 'Forum', 'url' => '../../forum/forum/search-forum?cid='.$courseId]),
                     ],
                 'url' => '#', 'options' => ['class' => 'notification-alignment']] ),
 
          ],
 ]);
 
-/*My Classes Drop-Down For Teacher*/
+/*
+ * My Classes Drop-Down For Teacher
+ */
 if($user->rights >= AppConstant::TEACHER_RIGHT){
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav myclasses margin-left'],
@@ -83,12 +89,14 @@ echo Nav::widget([
             ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
             ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
 
-                'items' => \app\models\Course::getGetMyClasses($user->id),
+                'items' => Course::getGetMyClasses($user->id),
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
             ],
 ]);
 }
-/*My Classes Drop-Down For Student*/
+/*
+ * My Classes Drop-Down For Student
+ */
 elseif($user->rights == AppConstant::STUDENT_RIGHT)
 {
     echo Nav::widget([
@@ -99,7 +107,7 @@ elseif($user->rights == AppConstant::STUDENT_RIGHT)
             Yii::$app->user->isGuest ?
                 ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
                 ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
-                'items' =>\app\models\Student::getMyClassesForStudent($user->id),
+                'items' =>Student::getMyClassesForStudent($user->id),
                  'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
         ],
     ]);

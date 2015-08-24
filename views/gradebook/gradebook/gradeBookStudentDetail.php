@@ -166,8 +166,8 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
     <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message"><?php AppUtility::t('Message')?></a> |
     <a href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$studentId.'&section-data='.$stusection)?>"><?AppUtility::t('Make Exception')?></a> |
     <a href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$studentId)?>"><?php AppUtility::t('Change Info')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId. '&gradebook=1')?>"><?php AppUtility::t('Login Log')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId. '&gradebook=1')?>"><?php AppUtility::t('Activity Log')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId. '&from=gb')?>"><?php AppUtility::t('Login Log')?></a> |
+    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId. '&from=gb')?>"><?php AppUtility::t('Activity Log')?></a> |
     <a href="#" onclick="makeofflineeditable(this); return false;"><?php AppUtility::t('Edit Offline Scores')?></a>
     </div>
 <?php } else if ($istutor) {

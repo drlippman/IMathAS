@@ -37,6 +37,7 @@ class  interpretUtility extends Component
             $str = str_replace("\r\n", "\n", $str);
             $str = str_replace("&&\n", "<br/>", $str);
             $str = str_replace("&\n", " ", $str);
+
             $r = interpretUtility::interpretline($str . ';', $anstype, $countcnt) . ';';
             return $r;
         }
@@ -57,6 +58,7 @@ class  interpretUtility extends Component
 //interpreter some code text.  Returns a PHP code string.
     public static function interpretline($str, $anstype, $countcnt)
     {
+
         $str .= ';';
         $bits = array();
         $lines = array();
@@ -71,6 +73,7 @@ class  interpretUtility extends Component
         $closeparens = 0;
         $symcnt = 0;
         //get tokens from tokenizer
+
         $syms = interpretUtility::tokenize($str, $anstype, $countcnt);
         $k = 0;
         $symlen = count($syms);
@@ -415,6 +418,7 @@ class  interpretUtility extends Component
                         } else if ($out == 'ln') {
                             $out = 'log';
                         } else {
+
                             //check it's and OK function
                             if (!in_array($out, $allowedmacros)) {
                                 echo sprintf(_('Eeek.. unallowed macro %s'), $out);
@@ -583,6 +587,7 @@ class  interpretUtility extends Component
                 }
             } else {
                 //no type - just append string.  Could be operators
+
                 $out .= $c;
                 $i++;
                 if ($i < $len) {
@@ -639,14 +644,17 @@ class  interpretUtility extends Component
                     }
                 }
             } else {
+
                 //add to symbol list, avoid repeat end-of-lines.
                 if ($intype != 7 || $lastsym[1] != 7) {
                     $lastsym = array($out, $intype);
                     $syms[] = array($out, $intype);
                 }
+
             }
 
         }
+
         return $syms;
     }
 

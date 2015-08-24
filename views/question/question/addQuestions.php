@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php AppUtility::t('Add/Remove Questions') ?></div>
+            <div class="vertical-align title-page"><?php AppUtility::t('Add/Remove Questions') ?> <img src="<?php echo AppUtility::getAssetURL(); ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo AppUtility::getAssetURL() ?>docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
         <div class="pull-left header-btn">
             <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$course->id); ?>"
@@ -25,9 +25,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
-</div>
+<!--<div class="item-detail-content">-->
+<!--    --><?php //echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
+<!--</div>-->
 <div class="tab-content shadowBox">
 <?php    if ($overwriteBody==1) {
     echo $body;
@@ -37,18 +37,22 @@ $this->params['breadcrumbs'][] = $this->title;
         var curcid = <?php echo $courseId ?>;
         var curaid = <?php echo $assessmentId ?>;
         var defpoints = <?php echo $defpoints ?>;
-        var AHAHsaveurl = "<?php echo AppUtility::getURLFromHome('question','question/save-Questions?cid='.$courseId.'&aid='.$assessmentId)?>";
+        var AHAHsaveurl = "<?php echo AppUtility::getURLFromHome('question','question/add-questions-save?cid='.$courseId.'&aid='.$assessmentId)?>";
         var curlibs = '<?php echo $searchlibs;?>';
     </script>
 
-    <div class="breadcrumb"></div>
-    <div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions
-            <img src="<?php echo AppUtility::getAssetURL(); ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo AppUtility::getAssetURL() ?>docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/>
-        </h2></div>
+<!--    <div class="breadcrumb"></div>-->
+<!--    <div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions-->
+<!--        </h2></div>-->
     <?php
-    echo '<div class="cp"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Assessment Settings').'</a></div>';
+    echo '<div class=""><div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Assessment Settings').'</a></div>
+    <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Categorize Questions').'</a></div>
+    <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Create Print Version').'</a></div>
+    <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Define End Messages').'</a></div>
+    </div>';
     if ($beentaken) {
     ?>
+    <div class="col-md-12">
         <h3>Warning</h3>
         <p>This assessment has already been taken.  Adding or removing questions, or changing a
             question's settings (point value, penalty, attempts) now would majorly mess things up.
@@ -56,8 +60,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </p>
         <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'">
         </p>
+    </div>
     <?php } ?>
-    <h3>Questions in Assessment - <?php echo $pageAssessmentName ?></h3>
+    <div class="col-md-8"><h3>Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
 
 <?php
 if ($itemorder == '') {
@@ -77,7 +82,7 @@ if ($itemorder == '') {
         echo " <li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
         echo "</ol>";
     } else if ($sessiondata['selfrom'.$assessmentId]=='assm') {
-        echo "<p>You are currently set to select questions existing assessments.  If you would like to select questions from ";
+        echo "<p>You are currently set t o select questions existing assessments.  If you would like to select questions from ";
         echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
         echo "<p>To find questions to add from existing assessments:";
         echo "<ol><li>Use the checkboxes to select the assessments you want to pull questions from</li>";
@@ -93,15 +98,35 @@ if ($itemorder == '') {
 
 } else {
 ?>
-    <form id="curqform" method="post" action="addquestions.php?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
+    <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
         <?php
         if (!$beentaken) {?>
 
             Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
 
-            With Selected: <input type=button value="Remove" onclick="removeSelected()" />
-            <input type=button value="Group" onclick="groupSelected()" />
-            <input type="submit" value="Change Settings" />
+<!--            With Selected: <input type=button value="Remove" onclick="removeSelected()" />-->
+<!--            <input type=button value="Group" onclick="groupSelected()" />-->
+<!--            <input type="submit" value="Change Settings" />-->
+            <div class="with-selected col-lg-2 pull-right">
+                <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                           href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
+                        <ul class="dropdown-menu with-selected">
+                            <li><a class="non-locked" href="javascript: removeSelected()"><i
+                                        class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Remove'); ?>
+                                </a>
+                            </li>
+                            <li><a class="non-locked" href="javascript: groupSelected()"><img class="nav-course-icon" src="/openmath/web/img/roster.png">&nbsp;<?php AppUtility::t('Group'); ?>
+                                </a>
+                            </li>
+                            <li type="submit"><a href="javascript: changeSetting()"><img class="small-icon" src="/openmath/web/img/courseSettingItem.png">&nbsp;&nbsp;<?php AppUtility::t('Change Settings'); ?>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
 
         <?php
         }
@@ -114,7 +139,8 @@ if ($itemorder == '') {
     <script>
         var itemarray = <?php echo $jsarr ?>;
         var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-        document.getElementById("curqtbl").innerHTML = generateTable();
+//        document.getElementById("curqtbl").innerHTML = generateTable();
+//        generate();
     </script>
 <?php
 }
@@ -204,7 +230,11 @@ if ($noSearchResults) {
 
                 for ($i=0;$i<count($pageLibqids[$pageLibstouse[$j]]); $i++) {
                     $qid =$pageLibqids[$pageLibstouse[$j]][$i];
-                    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+                    if ($alt==0) {
+                        echo "<tr class=even>"; $alt=1;
+                    } else {
+                        echo "<tr class=odd>"; $alt=0;
+                    }
                     ?>
 
 					<td><?php echo $pageQuestionTable[$qid]['checkbox'] ?></td>
@@ -252,7 +282,7 @@ if ($noSearchResults) {
             </tbody>
         </table>
         <p>Questions <span style="color:#999">in gray</span> have been added to the assessment.</p>
-        <script type="text/javascript">
+        <script type="javascript">
             initSortTable('myTable',Array(false,'S','N',false,'S',<?php echo ($searchall==1) ? "false, " : ""; ?>'N','S',false,false,false<?php echo ($searchall==0) ? ",false" : ""; ?>),true);
         </script>
     </form>
@@ -332,7 +362,7 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
             </tbody>
         </table>
 
-        <script type="text/javascript">
+        <script type="javascript">
             initSortTable('myTable',Array(false,'S','N',false,'S','N','S',false,false,false),true);
         </script>
     </form>
@@ -373,18 +403,19 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
 
             </tbody>
         </table>
-        <script type=\"text/javascript\">
+        <script type="javascript">
 			initSortTable('myTable',Array(false,'S','S',false,false,false),true);
 		</script>
     </form>
 
 <?php
 }
-
 }
 ?>
-
-
-
+    <input type="hidden" id="address" value="<?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId); ?>"/>
+    <script type="javascript">
+        var addqaddr = <?php echo $address; ?>;
+        var JunkFlagsaveurl = <?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>;
+    </script>
 <?php } ?>
 </div>

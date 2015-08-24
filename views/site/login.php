@@ -42,8 +42,9 @@ $this->title = 'About Us';
         </table>
         <p><?php AppUtility::t('Also available:') ?>
         <ul>
-            <li><a href="#"><?php AppUtility::t('Help for student with entering answers') ?></a></li>
+            <li><a href="<?php echo AppUtility::getURLFromHome('site','helper-guide')?>"><?php AppUtility::t('Help for student with entering answers') ?></a></li>
             <li><a href="#"><?php AppUtility::t('Instructor Documentation') ?></a></li>
+<!--            <li><a href="--><?php //echo AppUtility::getHomeURL()?><!--docs/docs.php">--><?php //AppUtility::t('Instructor Documentation') ?><!--</a></li>-->
         </ul>
     </div>
 

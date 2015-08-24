@@ -196,13 +196,17 @@ class Message extends BaseImasMsgs
 
     public static function getUsersToDisplay($uid)
     {
-        $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE imas_msgs.msgto='$uid' AND (imas_msgs.isread&2)=0 ORDER BY imas_msgs.id DESC")->queryAll();
-        return $query;
+        $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.senddate,imas_msgs.replied,imas_users.LastName,imas_users.FirstName,imas_msgs.isread,imas_courses.name,imas_msgs.msgfrom,imas_users.hasuserimg FROM imas_msgs LEFT JOIN imas_users ON imas_users.id=imas_msgs.msgfrom LEFT JOIN imas_courses ON imas_courses.id=imas_msgs.courseid WHERE  imas_msgs.msgto= :uid AND (imas_msgs.isread&2)=0 ORDER BY imas_msgs.id DESC");
+        $query->bindValue('uid',$uid);
+        $data = $query->queryAll();
+        return $data;
     }
 
     public static function getUsersToDisplayMessage($uid){
-        $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.msgto,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom='$uid' AND (imas_msgs.isread&4)=0 ORDER BY imas_msgs.id DESC")->queryAll();
-        return $query;
+        $query = Yii::$app->db->createCommand("SELECT imas_msgs.id,imas_msgs.courseid,imas_msgs.title,imas_msgs.msgto,imas_msgs.senddate,imas_users.LastName,imas_users.FirstName,imas_msgs.isread FROM imas_msgs,imas_users WHERE imas_users.id=imas_msgs.msgto AND imas_msgs.msgfrom= :uid AND (imas_msgs.isread&4)=0 ORDER BY imas_msgs.id DESC");
+        $query->bindValue('uid',$uid);
+        $data = $query->queryAll();
+        return $data;
     }
 
     public static function getUsersToUserMessage($userId){
@@ -211,7 +215,7 @@ class Message extends BaseImasMsgs
             ->distinct()
             ->from('imas_users')
             ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_users.id = imas_msgs.msgfrom')
-            ->where(['imas_msgs.msgto' => $userId])
+            ->where('imas_msgs.msgto = :userId',[':userId' => $userId])
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -224,7 +228,7 @@ class Message extends BaseImasMsgs
             ->distinct()
             ->from('imas_courses')
             ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_courses.id=imas_msgs.courseid')
-            ->where(['imas_msgs.msgfrom' => $userId]);
+            ->where('imas_msgs.msgfrom= :userId',[':userId' => $userId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -236,7 +240,7 @@ class Message extends BaseImasMsgs
             ->distinct()
             ->from('imas_users')
             ->join(	'LEFT OUTER JOIN', 'imas_msgs', 'imas_users.id = imas_msgs.msgto')
-            ->where(['imas_msgs.msgfrom' => $userId])
+            ->where('imas_msgs.msgfrom = :userId',[':userId' => $userId])
             ->orderBy('imas_users.LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -295,7 +299,7 @@ class Message extends BaseImasMsgs
         $query  = new Query();
         $query  ->select(['courseid','COUNT(id)'])
                 ->from('imas_msgs ')
-                ->where(['msgto' => $userId])
+                ->where('msgto= :userId',[':userId' => $userId])
                 ->andWhere(['LIKE','isread','0'])
                 ->orWhere(['LIKE','isread','4']);
                 $query->groupBy('courseid');

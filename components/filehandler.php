@@ -433,7 +433,7 @@ function deleteasidfilesbyquery($wherearr,$lim=0) {
 
 */
 //delete all assessment files for an assessmentid
-function deleteallaidfiles($aid) {
+public static function deleteallaidfiles($aid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
@@ -448,7 +448,7 @@ function deleteallaidfiles($aid) {
 		
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/adata/$aid",true))==0) {
+		if (($delcnt = filehandler::unlinkRecursive($base."/adata/$aid",true))==0) {
 			return false;
 		}
 	}

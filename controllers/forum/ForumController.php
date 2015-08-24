@@ -1,6 +1,5 @@
 <?php
 namespace app\controllers\forum;
-
 use app\components\AppConstant;
 use app\components\AssessmentUtility;
 use app\models\ContentTrack;

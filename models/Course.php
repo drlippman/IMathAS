@@ -170,7 +170,10 @@ class Course extends BaseImasCourses {
         $course->blockcnt = $blockCount;
         $course->save();
     }
-
+    public static function getByCourseAndUser($cid)
+    {
+        return Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= $cid AND imas_users.id=imas_courses.ownerid")->queryAll();
+    }
     public static function UpdateItemOrder($finalBlockItems,$course,$blockCnt)
     {
         $isRecord = Course::findOne(['id' =>$course]);
@@ -179,19 +182,6 @@ class Course extends BaseImasCourses {
             $isRecord->itemorder = $finalBlockItems;
             $isRecord->blockcnt = $blockCnt;
             $isRecord->save();
-        }
-    }
-
-    public static function setOwner($params,$user){
-        if($user->rights < AppConstant::GROUP_ADMIN_RIGHT){
-            $courseData = Course::findAll(['id' => $params['cid'],'ownerid' => $user->id]);
-        }else{
-            $courseData = Course::findOne(['id' => $params['cid']]);
-        }
-        if($courseData){
-            $courseData->ownerid = $params['newOwner'];
-            $courseData->save();
-            return $courseData->id;
         }
     }
 
@@ -209,9 +199,19 @@ class Course extends BaseImasCourses {
         }
     }
 
-    public static function getByCourseAndUser($cid){
-        return Yii::$app->db->createCommand("SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.topbar,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons FROM imas_courses,imas_users WHERE imas_courses.id= $cid AND imas_users.id=imas_courses.ownerid")->queryAll();
+    public static function setOwner($params,$user){
+        if($user->rights < AppConstant::GROUP_ADMIN_RIGHT){
+            $courseData = Course::findAll(['id' => $params['cid'],'ownerid' => $user->id]);
+        }else{
+            $courseData = Course::findOne(['id' => $params['cid']]);
+        }
+        if($courseData){
+            $courseData->ownerid = $params['newOwner'];
+            $courseData->save();
+            return $courseData->id;
+        }
     }
+
     public static function updateNewFlag($courseId)
     {
         $course = Course::find()->where(['id' => $courseId])->one();
@@ -220,27 +220,23 @@ class Course extends BaseImasCourses {
         $course->newflag = $newflag;
         $course->save();
     }
- /*Query To Show Courses available For Teacher in My classes drop-down*/
+ /*
+  *Query To Show Courses available For Teacher in My classes drop-down
+  */
     public static  function getGetMyClasses($userId)
+{
+    $items = [];
+    $myClasses = Course::find()->where(['ownerid' => $userId])->all();
+    foreach($myClasses as $key => $singleClass)
     {
-        $items = [];
-        $myClasses = Course::find()->where(['ownerid' => $userId])->all();
-        foreach($myClasses as $key => $singleClass)
+        $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
+        if(count($myClasses) == $key+AppConstant::NUMERIC_ONE)
         {
-            $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
-            if(count($myClasses) == $key+1)
-            {
-                            array_push($items,'<li class="divider"></li>');
-                            array_push($items,['label' => 'Manage Questions', 'url' => '#']);
-                            array_push($items,['label' => 'Questions Libraries', 'url' => '#']);
-            }
+            array_push($items,'<li class="divider"></li>');
+            array_push($items,['label' => 'Manage Questions', 'url' => '#']);
+            array_push($items,['label' => 'Questions Libraries', 'url' => '#']);
         }
-        return $items;
     }
-
-//    public static function getItemOrderForMassChanges($courseId)
-//    {
-//        $query =\Yii::$app->db->createCommand("SELECT itemorder FROM imas_courses WHERE id='$courseId'")->queryOne();
-//        return $query;
-//    }
+    return $items;
+}
 }

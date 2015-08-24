@@ -296,6 +296,10 @@ class MessageController extends AppController
         $userRights = $this->getAuthenticatedUser();
         $messageId = $this->getParamVal('message');
         $courseId = $this->getParamVal('cid');
+        $countPost = $this->getNotificationDataForum($courseId,$userRights);
+        $msgList = $this->getNotificationDataMessage($courseId,$userRights);
+        $this->setSessionData('messageCount',$msgList);
+        $this->setSessionData('postCount',$countPost);
         $course = Course::getById($courseId);
         $msgId = $this->getParamVal('id');
         if ($this->getAuthenticatedUser()) {

@@ -56,13 +56,12 @@ class Rubrics extends BaseImasRubrics
         $rubricsData = Rubrics::find()->where(['rubric'=> $rubric])->andWhere('ownerid = :ownerid',[':ownerid' => $userid] or ['groupid = :groupid',':groupid' => $groupid])->all();
         return $rubricsData;
     }
+
     public static function updateRubrics($params, $currentUserId, $rubricTextDataArray,$rubricId)
     {
-
         $rubricsData = Rubrics::find()->where(['ownerid' => $currentUserId])->Andwhere(['id' => $rubricId])->one();
         $ShareWithGroup = -1;
         if(isset($params['ShareWithGroup'])){
-
             $ShareWithGroup = 0;
         }
         $rubricsData ->groupid = $ShareWithGroup;
@@ -73,8 +72,12 @@ class Rubrics extends BaseImasRubrics
         }
         $rubricsData ->rubrictype = $params['rubtype'];
         $rubricsData ->rubric = $rubricTextDataArray;
-
         $rubricsData ->save();
+    }
 
+    public static function getIdAndName($userId, $groupId){
+        $rubricsData = Rubrics::find()->where('ownerid = :ownerid',[':ownerid' => $userId])
+            ->orWhere( 'groupid = :groupid',[':groupid' => $groupId])->orderBy('name')->all();
+        return $rubricsData;
     }
 }

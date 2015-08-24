@@ -8,6 +8,7 @@ function moveitem(from) {
 }
 
 function previewq(formn,loc,qn,docheck,onlychk) {
+    var previewqaddr = document.getElementById("address").value; alert(previewqaddr);
    var addr = previewqaddr+'&qsetid='+qn;
    if (formn!=null) {
 	    addr +='&formn='+formn;

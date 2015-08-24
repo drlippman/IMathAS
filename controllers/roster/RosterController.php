@@ -1288,6 +1288,7 @@ class RosterController extends AppController
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $userId = $this->getParamVal('uid');
+        $from = $this->getParamVal('from');
         $userData = User::getById($userId);
         $userFullName = trim(ucfirst($userData['LastName']) . ", " . ucfirst($userData['FirstName']));
         $course = Course::getById($courseId);
@@ -1303,16 +1304,24 @@ class RosterController extends AppController
             array_push($loginLogData, $tempArray);
         }
         $this->includeCSS(['roster/roster.css']);
-        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId);
+        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId,'from' => $from);
         return $this->renderWithData('loginLog', $responseData);
     }
 
     public function actionActivityLog()
     {
         $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
-        $userId = $this->getParamVal('uid');
+        $from = $this->getParamVal('from');
+        $isTeacher = $this->isTeacher($user['id'],$courseId);
+        $isTutor = $this->isTutor($user['id'],$courseId);
+        if (!isset($isTeacher) && !isset($isTutor)) {
+            $userId = $user['id'];
+        } else {
+            $userId = intval($this->getParamVal('uid'));
+        }
         $userData = User::getById($userId);
         $userFullName = trim(ucfirst($userData['LastName']) . ", " . ucfirst($userData['FirstName']));
         $course = Course::getById($courseId);
@@ -1323,7 +1332,7 @@ class RosterController extends AppController
         $loginLog = ActivityLog::getByCourseIdAndUserId($courseId, $userId, $orderBy, $sortBy);
         foreach ($loginLog as $log) {
             $actions = $loginLog;
-            $subType = substr($log['type'], 0, 2);
+            $subType = substr($log['type'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_TWO);
             $actionsArray[$subType][] = intval($log['typeid']);
 
             if ($subType == 'fo') {
@@ -1388,8 +1397,9 @@ class RosterController extends AppController
             }
         }
         $this->includeCSS(['roster/roster.css']);
-        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'userId' => $userId, 'exnames' => $exnames, 'forumPostName' => $forumPostName,
-            'actions' => $actions, 'assessmentName' => $assessmentName, 'inlineTextName' => $inlineTextName, 'linkName' => $linkName, 'wikiName' => $wikiName, 'forumName' => $forumName);
+        $responseData = array('course' => $course, 'userFullName' => $userFullName, 'userId' => $userId, 'exnames' => $exnames,
+            'forumPostName' => $forumPostName, 'actions' => $actions, 'assessmentName' => $assessmentName, 'inlineTextName' => $inlineTextName,
+            'linkName' => $linkName, 'wikiName' => $wikiName, 'forumName' => $forumName, 'from' => $from);
         return $this->renderWithData('activityLog', $responseData);
     }
 

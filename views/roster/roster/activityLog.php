@@ -5,7 +5,15 @@ $this->title = AppUtility::t('Activity Log', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+    <?php if(isset($from) && $from=='gb'){
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Gradebook', false),AppUtility::t('Student Detail', false)],
+            'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,
+                AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId=0'),AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$userId)]]);
+    }else{
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name, AppUtility::t('Roster', false)],
+            'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getURLFromHome('roster','roster/student-roster?cid='.$course->id)]]);
+
+    } ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -100,11 +108,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         break;
                     case 'forumreply':
                         $forumPost = explode(';', $record['info']);
-                        echo 'New reply <a target="_blank" href="' . AppUtility::getURLFromHome("forum", "forums/posts.php?cid=" . $course->id . "&forum=" . $forumPost[0] . "&thread=" . $forumPost[1]) . '">' . $forumPostName[$record['typeid']] . '</a> in forum ' . $forumName[$forumPost[0]];
+                        echo 'New reply <a target="_blank" href="' . AppUtility::getURLFromHome("forum", "forum/post?courseid=" . $course->id . "&forumid=" . $forumPost[0] . "&threadid=" . $forumPost[1]) . '">' . $forumPostName[$record['typeid']] . '</a> in forum ' . $forumName[$forumPost[0]];
                         break;
                     case 'forummod':
                         $forumPost = explode(';', $record['info']);
-                        echo 'Modified post/reply <a target="_blank" href="' . AppUtility::getURLFromHome("forum", "forums/posts.php?cid=" . $course->id . "&forum=" . $forumPost[0] . "&thread=" . $forumPost[1]) . '">' . $forumPostName['forumPostName'] . '</a> in forum ' . $forumName[$forumPost[0]];
+                        echo 'Modified post/reply <a target="_blank" href="' . AppUtility::getURLFromHome("forum", "forum/post?courseid=" . $course->id . "&forumid=" . $forumPost[0] . "&threadid=" . $forumPost[1]) . '">' . $forumPostName['forumPostName'] . '</a> in forum ' . $forumName[$forumPost[0]];
                         break;
                 }
             }

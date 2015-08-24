@@ -20,6 +20,7 @@ use app\models\LibraryItems;
 use app\models\Outcomes;
 use app\models\QImages;
 use app\models\Questions;
+use app\models\Rubrics;
 use app\models\User;
 use app\models\QuestionSet;
 use app\models\SetPassword;
@@ -41,7 +42,7 @@ class QuestionController extends AppController
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $teacherId = $this->isTeacher($userId,$courseId);
-        if ($user['rights']==100) {
+        if ($user['rights']==AppConstant::ADMIN_RIGHT) {
             $teacherId = $userId;
             $adminasteacher = true;
         }
@@ -53,7 +54,7 @@ class QuestionController extends AppController
 
         $curBreadcrumb =  $course['name'];
         if (isset($params['clearattempts']) || isset($params['clearqattempts']) || isset($params['withdraw'])) {
-            $curBreadcrumb .= "&gt; <a href=\"question/question/add-questions?cid=" . $params['cid'] . "&aid=" . $params['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
+            $curBreadcrumb .= "&gt; <a href=\"add-questions?cid=" . $params['cid'] . "&aid=" . $params['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
         } else {
             $curBreadcrumb .= "&gt; Add/Remove Questions\n";
         }
@@ -87,7 +88,8 @@ class QuestionController extends AppController
                     $overwriteBody = 1;
                     $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid).">Go back</a>";
                 } else if (isset($params['add'])) {
-                    include("modquestiongrid.php");
+                    require dirname(__FILE__) . '/modquestiongrid.php';
+//                    include("modquestiongrid.php");
                     if (isset($params['process'])) {
                         AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
                         exit;
@@ -156,11 +158,10 @@ class QuestionController extends AppController
             if (isset($params['clearattempts'])) {
                 if ($params['clearattempts']=="confirmed") {
 //                    require_once('../includes/filehandler.php');
-//                    deleteallaidfiles($aid);
+                    filehandler::deleteallaidfiles($aid);
                     AssessmentSession::deleteByAssessmentId($aid);
                     Questions::setWithdrawn($aid,AppConstant::NUMERIC_ZERO);
-                    AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
-                    exit;
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid));
                 } else {
                     $overwriteBody = 1;
                     $assessmentData = Assessments::getByAssessmentId($params['aid']);
@@ -286,14 +287,14 @@ class QuestionController extends AppController
             }
             $address = AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
 
-            $placeinhead = "<script type=\"text/javascript\">
-		var previewqaddr = '".AppUtility::getURLFromHome('question','question/testquestion?cid='.$cid)."';
-		var addqaddr = '$address';
-		</script>";
-            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getHomeURL().'/javascript/question/addquestions.js'."></script>";
-            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getHomeURL().'/javascript/question/addqsort.js?v=030315.js'."></script>";
-            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getHomeURL().'/javascript/question/junkflag.js'."></script>";
-            $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".AppUtility::getURLFromHome('question','question/savelibassignflag')."';</script>";
+//            $placeinhead = "<script type=\"text/javascript\">
+//		var previewqaddr = '".AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId)."';
+//		var addqaddr = '$address';
+//		</script>";
+//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/addquestions.js'."></script>";
+//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/addqsort.js?v=030315.js'."></script>";
+//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/junkflag.js'."></script>";
+//            $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".AppUtility::getURLFromHome('question','question/savelibassignflag')."';</script>";
 
 
             //DEFAULT LOAD PROCESSING GOES HERE
@@ -785,8 +786,8 @@ class QuestionController extends AppController
             'itemorder' => $itemorder, 'sessiondata' => $sessiondata, 'jsarr'=>$jsarr, 'displaymethod' => $displaymethod,'lnames'=>$lnames,
             'search'=>$search,'searchall'=>$searchall, 'searchmine'=> $searchmine,'newonly'=>$newonly,'noSearchResults'=>$noSearchResults,
             'pageLibRowHeader'=>$page_libRowHeader,'pageUseavgtimes'=>$page_useavgtimes,'pageLibstouse'=>$page_libstouse,'altr'=>$alt,
-            'lnamesarr' => $lnamesarr, '$pageLibqids' => $page_libqids, '$pageQuestionTable' => $page_questionTable,'qid'=>$qid,
-            'pageAssessmentQuestions'=> $page_assessmentQuestions, 'pageAssessmentList' => $page_assessmentList);
+            'lnamesarr' => $lnamesarr, 'pageLibqids' => $page_libqids, 'pageQuestionTable' => $page_questionTable,'qid'=>$qid,
+            'pageAssessmentQuestions'=> $page_assessmentQuestions, 'pageAssessmentList' => $page_assessmentList, 'address' => $address);
         return $this->renderWithData('addQuestions',$responseArray);
     }
 
@@ -1392,5 +1393,364 @@ class QuestionController extends AppController
 
     public function actionModTutorialQuestion(){
 
+    }
+
+    public function actionModQuestion(){
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $assessmentId = $params['aid'];
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $pagetitle = "Question Settings";
+        $teacherId = $this->isTeacher($userId, $courseId);
+        //CHECK PERMISSIONS AND SET FLAGS
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
+
+//            $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+//            $curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
+//            $curBreadcrumb .= "Modify Question Settings";
+
+            if ($params['process']== true) {
+                if (isset($params['usedef'])) {
+                    $points = AppConstant::QUARTER_NINE;
+                    $attempts = AppConstant::QUARTER_NINE;
+                    $penalty = AppConstant::QUARTER_NINE;
+                    $regen = AppConstant::NUMERIC_ZERO;
+                    $showans = AppConstant::NUMERIC_ZERO;
+                    $rubric = AppConstant::NUMERIC_ZERO;
+                    $showhints = AppConstant::NUMERIC_ZERO;
+                    $params['copies'] = AppConstant::NUMERIC_ONE;
+                } else {
+                    if (trim($params['points'])=="") {$points = AppConstant::QUARTER_NINE;} else {$points = intval($params['points']);}
+                    if (trim($params['attempts'])=="") {$attempts = AppConstant::QUARTER_NINE;} else {$attempts = intval($params['attempts']);}
+                    if (trim($params['penalty'])=="") {$penalty = AppConstant::QUARTER_NINE;} else {$penalty = intval($params['penalty']);}
+                    if ($penalty!= AppConstant::QUARTER_NINE) {
+                        if ($params['skippenalty']==AppConstant::NUMERIC_TEN) {
+                            $penalty = 'L'.$penalty;
+                        } else if ($params['skippenalty']>AppConstant::NUMERIC_ZERO) {
+                            $penalty = 'S'.$params['skippenalty'].$penalty;
+                        }
+                    }
+                    $regen = $params['regen'] + AppConstant::NUMERIC_THREE*$params['allowregen'];
+                    $showans = $params['showans'];
+                    $rubric = intval($params['rubric']);
+                    $showhints = intval($params['showhints']);
+                }
+                $questionArray = array();
+                $questionArray['points'] = $points;
+                $questionArray['attempts'] = $attempts;
+                $questionArray['penalty'] = $penalty;
+                $questionArray['regen'] = $regen;
+                $questionArray['showans'] = $showans;
+                $questionArray['rubric'] = $rubric;
+                $questionArray['showhints'] = $showhints;
+                $questionArray['assessmentid'] = $assessmentId;
+                if (isset($params['id'])) { //already have id - updating
+                    if (isset($params['replacementid']) && $params['replacementid']!='' && intval($params['replacementid'])!=0) {
+                        $questionArray['questionsetid'] = intval($params['replacementid']);
+                    }
+                    Questions::updateQuestionFields($questionArray,$params['id']);
+                    if (isset($params['copies']) && $params['copies']>AppConstant::NUMERIC_ZERO) {
+                        $query = Questions::getById($params['id']);
+                        $params['qsetid'] = $query['questionsetid'];
+                    }
+                }
+                if (isset($params['qsetid'])) { //new - adding
+                    $query = Assessments::getByAssessmentId($assessmentId);
+                    $itemorder = $query['itemorder'];
+                    $questionArray['questionsetid'] = $params['qsetid'];
+                    for ($i=AppConstant::NUMERIC_ZERO;$i<$params['copies'];$i++) {
+                        $question = new Questions();
+                        $qid = $question->addQuestions($questionArray);
+
+                        //add to itemorder
+                        if (isset($params['id'])) { //am adding copies of existing  
+                            $itemarr = explode(',',$itemorder);
+                            $key = array_search($params['id'],$itemarr);
+                            array_splice($itemarr,$key+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qid);
+                            $itemorder = implode(',',$itemarr);
+                        } else {
+                            if ($itemorder=='') {
+                                $itemorder = $qid;
+                            } else {
+                                $itemorder = $itemorder . ",$qid";
+                            }
+                        }
+                    }
+                    Assessments::UpdateItemOrder($itemorder,$assessmentId);
+                }
+                return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
+            } else { //DEFAULT DATA MANIPULATION
+
+                if (isset($params['id'])) {
+                    $line = Questions::getById($params['id']);
+                    if ($line['penalty']{AppConstant::NUMERIC_ZERO}==='L') {
+                        $line['penalty'] = substr($line['penalty'],AppConstant::NUMERIC_ONE);
+                        $skippenalty = AppConstant::NUMERIC_TEN ;
+                    } else if ($line['penalty']{AppConstant::NUMERIC_ZERO}==='S') {
+                        $skippenalty = $line['penalty']{AppConstant::NUMERIC_ONE};
+                        $line['penalty'] = substr($line['penalty'],AppConstant::NUMERIC_TWO);
+                    } else {
+                        $skippenalty = AppConstant::NUMERIC_ZERO;
+                    }
+
+                    if ($line['points'] == AppConstant::QUARTER_NINE) {$line['points']='';}
+                    if ($line['attempts'] == AppConstant::QUARTER_NINE) {$line['attempts']='';}
+                    if ($line['penalty'] == AppConstant::QUARTER_NINE) {$line['penalty']='';}
+                } else {
+                    //set defaults
+                    $line['points']="";
+                    $line['attempts']="";
+                    $line['penalty']="";
+                    $skippenalty = AppConstant::NUMERIC_ZERO;
+                    $line['regen'] = AppConstant::NUMERIC_ZERO;
+                    $line['showans']= AppConstant::ZERO_VALUE;
+                    $line['rubric'] = AppConstant::NUMERIC_ZERO;
+                    $line['showhints'] = AppConstant::NUMERIC_ZERO;
+                }
+
+                $rubric_vals = array(AppConstant::NUMERIC_ZERO);
+                $rubric_names = array('None');
+                $query = Rubrics::getIdAndName($userId, $user['groupid']);
+                foreach ($query as $row) {
+                    $rubric_vals[] = $row['id'];
+                    $rubric_names[] = $row['name'];
+                }
+                $query = AssessmentSession::getAssessmentIDs($assessmentId,$courseId);
+                if (count($query) > AppConstant::NUMERIC_ZERO) {
+                    $pageBeenTakenMsg = "<h3>Warning</h3>\n";
+                    $pageBeenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
+                    $pageBeenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
+                    $pageBeenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='add-questions.php?cid=$courseId&aid=$assessmentId&clearattempts=ask'\"></p>\n";
+                    $beentaken = true;
+                } else {
+                    $beentaken = false;
+                }
+            }
+        }
+        $renderData = array('course'=>$course,'overwriteBody' => $overwriteBody, 'body' => $body, 'pageBeenTakenMsg' => $pageBeenTakenMsg,
+            'courseId' => $courseId, '' => $assessmentId, 'beentaken' => $beentaken, 'params' => $params, 'skippenalty' => $skippenalty,
+            'line' => $line, 'rubricNames' => $rubric_names,'rubricVals' => $rubric_vals);
+        return $this->renderWithData('modQuestion',$renderData);
+    }
+
+    public function actionTestQuestion(){
+        $user = $this->getAuthenticatedUser();
+        $userId = $user['id'];
+        $myRights = $user['rights'];
+        $params = $this->getRequestParams();
+        $this->layout = 'master';
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $assessmentId = $params['aid'];
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $pagetitle = "Test Question";
+        $asid = AppConstant::NUMERIC_ZERO;
+        $teacherId = $this->isTeacher($userId, $courseId);
+        //CHECK PERMISSIONS AND SET FLAGS
+        if ($myRights < AppConstant::TEACHER_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+            $useeditor = AppConstant::NUMERIC_ONE;
+            if (isset($params['seed'])) {
+                $seed = $params['seed'];
+                $attempt = AppConstant::NUMERIC_ZERO;
+            } else if (!isset($params['seed']) || isset($params['regen'])) {
+                $seed = rand(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_TEN_THOUSAND);
+                $attempt = AppConstant::NUMERIC_ZERO;
+            } else {
+                $seed = $params['seed'];
+                $attempt = $params['attempt']+AppConstant::NUMERIC_ONE;
+            }
+            if (isset($params['onlychk']) && $params['onlychk']==AppConstant::NUMERIC_ONE) {
+                $onlychk = AppConstant::NUMERIC_ONE;
+            } else {
+                $onlychk = AppConstant::NUMERIC_ZERO;
+            }
+            if (isset($params['formn']) && isset($params['loc'])) {
+                $formn = $params['formn'];
+                $loc = $params['loc'];
+                if (isset($params['checked']) || isset($params['usecheck'])) {
+                    $chk = "&checked=0";
+                } else {
+                    $chk = '';
+                }
+                if ($onlychk==AppConstant::NUMERIC_ONE) {
+                    $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$params['loc']}',true);";
+                } else {
+                    $page_onlyChkMsg = "var prevnext = window.opener.getnextprev('$formn','{$params['loc']}');";
+                }
+            }
+            $lastanswers = array('');
+
+            if (isset($params['seed'])) {
+                list($score,$rawscores) = scoreq(AppConstant::NUMERIC_ZERO,$params['qsetid'],$params['seed'],$params['qn0']);
+                $scores[0] = $score;
+                $lastanswers[0] = stripslashes($lastanswers[0]);
+                $page_scoreMsg =  "<p>Score on last answer: $score/1</p>\n";
+            } else {
+                $page_scoreMsg = "";
+                $scores = array(AppConstant::NUMERIC_NEGATIVE_ONE);
+                $_SESSION['choicemap'] = array();
+            }
+
+            $page_formAction = "test-question?cid={$params['cid']}&qsetid={$params['qsetid']}";
+            if (isset($params['usecheck'])) {
+                $page_formAction .=  "&checked=".$params['usecheck'];
+            } else if (isset($params['checked'])) {
+                $page_formAction .=  "&checked=".$params['checked'];
+            }
+            if (isset($params['formn'])) {
+                $page_formAction .=  "&formn=".$params['formn'];
+                $page_formAction .=  "&loc=".$params['loc'];
+            }
+            if (isset($params['onlychk'])) {
+                $page_formAction .=  "&onlychk=".$params['onlychk'];
+            }
+
+            $line = QuestionSet::getUserAndQuestionSetJoin($params['qsetid']);
+
+            $lastmod = date("m/d/y g:i a",$line['lastmoddate']);
+
+            if (isset($CFG['AMS']['showtips'])) {
+                $showtips = $CFG['AMS']['showtips'];
+            } else {
+                $showtips = AppConstant::NUMERIC_ONE;
+            }
+            if (isset($CFG['AMS']['eqnhelper'])) {
+                $eqnhelper = $CFG['AMS']['eqnhelper'];
+            } else {
+                $eqnhelper = AppConstant::NUMERIC_ZERO;
+            }
+            $resultLibNames = Libraries::getUserAndLibrary($params['qsetid']);
+        }
+        $this->includeCSS(['mathquill.css','question/question.css','course/course.css','roster/roster.css']);
+        $this->includeJS(['eqntips.js','eqnhelper.js','tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js']);
+        $responseArray = array('course' => $course,'params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'showtips' => $showtips,
+            'eqnhelper' => $eqnhelper, 'page_onlyChkMsg' => $page_onlyChkMsg, 'chk' => $chk, 'formn' => $formn, 'onlychk' => $onlychk, 'page_scoreMsg' => $page_scoreMsg,
+            'page_formAction' => $page_formAction, 'seed' => $seed, 'attempt' => $attempt, 'rawscores' => $rawscores, 'line' => $line, 'lastmod' => $lastmod,
+            'resultLibNames' => $resultLibNames, 'myRights' => $myRights, 'params' => $params);
+        return $this->renderWithData('testQuestion',$responseArray);
+
+    }
+
+    public function actionAddQuestionsSave(){
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $aid = $params['aid'];
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        if (!isset($teacherId)) {
+            echo "error: validation";
+        }
+        $query = Assessments::getByAssessmentId($aid);
+        $rawitemorder = $query['itemorder'];
+        $viddata = $query['viddata'];
+        $itemorder = str_replace('~',',',$rawitemorder);
+        $curitems = array();
+        foreach (explode(',',$itemorder) as $qid) {
+            if (strpos($qid,'|')===false) {
+                $curitems[] = $qid;
+            }
+        }
+
+        $submitted = $params['order'];
+        $submitted = str_replace('~',',',$submitted);
+        $newitems = array();
+        foreach (explode(',',$submitted) as $qid) {
+            if (strpos($qid,'|')===false) {
+                $newitems[] = $qid;
+            }
+        }
+        $toremove = array_diff($curitems,$newitems);
+
+        if ($viddata != '') {
+            $viddata = unserialize($viddata);
+            $qorder = explode(',',$rawitemorder);
+            $qidbynum = array();
+            for ($i=0;$i<count($qorder);$i++) {
+                if (strpos($qorder[$i],'~')!==false) {
+                    $qids = explode('~',$qorder[$i]);
+                    if (strpos($qids[0],'|')!==false) { //pop off nCr
+                        $qidbynum[$i] = $qids[1];
+                    } else {
+                        $qidbynum[$i] = $qids[0];
+                    }
+                } else {
+                    $qidbynum[$i] = $qorder[$i];
+                }
+            }
+
+            $qorder = explode(',',$params['order']);
+            $newbynum = array();
+            for ($i=0;$i<count($qorder);$i++) {
+                if (strpos($qorder[$i],'~')!==false) {
+                    $qids = explode('~',$qorder[$i]);
+                    if (strpos($qids[0],'|')!==false) { //pop off nCr
+                        $newbynum[$i] = $qids[1];
+                    } else {
+                        $newbynum[$i] = $qids[0];
+                    }
+                } else {
+                    $newbynum[$i] = $qorder[$i];
+                }
+            }
+
+            $qidbynumflip = array_flip($qidbynum);
+
+            $newviddata = array();
+            $newviddata[0] = $viddata[0];
+            for ($i=0;$i<count($newbynum);$i++) {   //for each new item
+                $oldnum = $qidbynumflip[$newbynum[$i]];
+                $found = false; //look for old item in viddata
+                for ($j=1;$j<count($viddata);$j++) {
+                    if (isset($viddata[$j][2]) && $viddata[$j][2]==$oldnum) {
+                        //if found, copy data, and any non-question data following
+                        $new = $viddata[$j];
+                        $new[2] = $i;  //update question number;
+                        $newviddata[] = $new;
+                        $j++;
+                        while (isset($viddata[$j]) && !isset($viddata[$j][2])) {
+                            $newviddata[] = $viddata[$j];
+                            $j++;
+                        }
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    //item was not found in viddata.  it should have been.
+                    //count happen if the first item in a group was removed, perhaps
+                    //Add a blank item
+                    $newviddata[] =  array('','',$i);
+                }
+            }
+            //any old items will not get copied.
+            $viddata = addslashes(serialize($newviddata));
+
+
+        }
+
+        //delete any removed questions
+        $ids = implode(',',$toremove);
+        Questions::deleteById($ids);
+        //store new itemorder
+        $query = Assessments::setVidData($params['order'],$viddata,$aid);
+
+        if (count($query)>0) {
+            echo "OK";
+        } else {
+            echo "error: not saved";
+        }
+        $this->includeJS(['eqntips.js','eqnhelper.js','tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js']);
+//        return $this->renderWithData('addQuestion');
     }
 }

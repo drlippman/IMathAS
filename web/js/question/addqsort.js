@@ -5,9 +5,14 @@
 //itemarray: array
 //	item: array ( questionid, questionsetid, description, type, points, canedit ,withdrawn )
 //	group: array (pick n, without (0) or with (1) replacement, array of items)
-
+$(document).ready(function () {
+    generate();
+});
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
+function generate(){
+    document.getElementById("curqtbl").innerHTML = generateTable();
+}
 
 function refreshTable() {
 	document.getElementById("curqtbl").innerHTML = generateTable();
@@ -364,21 +369,21 @@ function generateTable() {
 				html += "<td>"+curitems[j][4]+"</td>";
 				curpt = curitems[j][4];
 			}
-			html += "<td class=c><a href=\"modquestion.php?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
+			html += "<td class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
 			if (curitems[j][5]) {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
+				html += "<td class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
 			} else {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
+				html += "<td class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
 			}
 			if (beentaken) {
-				html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
+				html += "<td><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
 				if (curitems[j][6]==1) {
 					html += "<td><span class='red'>Withdrawn</span></td>";
 				} else {
-					html += "<td><a href=\"addquestions.php?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
+					html += "<td><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
 				}
 			} else {
-				html += "<td class=c><a href=\"moddataset.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
+				html += "<td class=c><a href=\"mod-data-set.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
 				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
 			}
 			html += "</tr>";
@@ -393,7 +398,7 @@ function generateTable() {
 }
 
 function submitChanges() { 
-  url = AHAHsaveurl + '&order='+generateOutput();
+  url = AHAHsaveurl + '&order='+generateOutput();alert(url);
   var target = "submitnotice";
   document.getElementById(target).innerHTML = ' Saving Changes... ';
   if (window.XMLHttpRequest) { 
@@ -422,5 +427,9 @@ function ahahDone(url, target) {
 	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
 	    itemarray = olditemarray;
     } 
-  } 
+  }
+}
+
+function changeSetting(){
+
 }

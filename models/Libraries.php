@@ -34,4 +34,10 @@ class Libraries extends BaseImasLibraries
     {
         return Libraries::find()->where(['IN', 'id', $ids])->all();
     }
+
+    public static function getUserAndLibrary($questionId){
+        $query = "SELECT imas_libraries.name,imas_users.LastName,imas_users.FirstName FROM imas_libraries,imas_library_items,imas_users  WHERE imas_libraries.id=imas_library_items.libid AND imas_library_items.ownerid=imas_users.id AND imas_library_items.qsetid='$questionId'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

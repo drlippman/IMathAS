@@ -6,7 +6,8 @@ $(document).ready(function () {
         $('#flag-link').hide();
     }
 });
-    $("a[name=remove]").on("click", function () {
+    $("a[name=remove]").on("click", function (event) {
+        event.preventDefault();
         var threadid = $(this).attr("data-var");
         var parentId = $(this).attr("data-parent");
         var checkPostOrThread = 0;

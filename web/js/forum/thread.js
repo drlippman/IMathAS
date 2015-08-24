@@ -348,7 +348,8 @@ function threadSuccess(response)
     }
 
 
-    $("a[name=tabs]").on("click", function () {
+    $("a[name=tabs]").on("click", function (event) {
+        event.preventDefault();
         var threadsid = $(this).attr("data-var");
         var checkPostOrThread = 1;
         var html = '<div><p>Are you SURE you want to remove this thread and all replies?</p></div>';

@@ -417,7 +417,7 @@ class SiteController extends AppController
         $params = $this->getRequestParams();
         $section = $params['section'];
         $responseData = (['section' => $section]);
-        return $this->renderWithData('help', $responseData);
+        return $this->renderWithData('helpForStudentAnswer', $responseData);
     }
 
     public function actionDocumentation()

@@ -6,7 +6,7 @@
 		echo "This page cannot be accessed directly";
 		exit;
 	}
-	
+//	print_r('kkkkkkkkkkkkk');die;
 	if ($_GET['process']== true) {
 		if (isset($_POST['add'])) { //adding new questions
 			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";

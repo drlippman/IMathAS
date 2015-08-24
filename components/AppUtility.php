@@ -1,9 +1,14 @@
 <?php
 
 namespace app\components;
+
+use app\models\Assessments;
+use app\models\AssessmentSession;
 use app\models\Exceptions;
 use app\models\Questions;
 use app\models\Course;
+use app\models\QuestionSet;
+use app\models\User;
 use Yii;
 use yii\base\Component;
 require_once("../filter/filter.php");
@@ -1320,9 +1325,7 @@ class AppUtility extends Component
             $testid = $assessmentSessionId;
         }
 
-        $connection = Yii::$app->getDb();
-        $query = "SELECT * FROM imas_assessment_sessions WHERE id='$testid'";
-        $line = $connection->createCommand($query)->queryOne();
+        $line = AssessmentSession::getById($testid);
         if (strpos($line['questions'], ';') === false) {
             $questions = explode(",", $line['questions']);
             $bestquestions = $questions;
@@ -1351,15 +1354,13 @@ class AppUtility extends Component
 
         if ($isteacher) {
             if ($line['userid'] != $user->id) {
-                $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$line['userid']}'";
-                $row = $connection->createCommand($query)->queryOne();
-                $userfullname = $row[1] . " " . $row[0];
+                $row = User::getById($line['userid']);
+                $userfullname = $row['FirstName'] . " " . $row['LastName'];
             }
             $userid = $line['userid'];
         }
 
-        $query = "SELECT * FROM imas_assessments WHERE id='{$line['assessmentid']}'";
-        $testsettings = $connection->createCommand($query)->queryOne();
+        $testsettings = Assessments::getByAssessmentId($line['assessmentid']);
         list($testsettings['testtype'], $testsettings['showans']) = explode('-', $testsettings['deffeedback']);
 
         $qi = getquestioninfo($questions, $testsettings);
@@ -1367,11 +1368,9 @@ class AppUtility extends Component
         $now = time();
         $isreview = false;
         if (!$scoredview && ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now)) { //outside normal range for test
-            $query = "SELECT startdate,enddate FROM imas_exceptions WHERE userid='$userid' AND assessmentid='{$line['assessmentid']}'";
-
-            $row = $connection->createCommand($query)->queryOne();
+            $row = Exceptions::getByAssessmentIdAndUserId($userid, $line['assessmentid']);
             if ($row != null) {
-                if ($now < $row[0] || $row[1] < $now) { //outside exception dates
+                if ($now < $row['startdate'] || $row['enddate'] < $now) { //outside exception dates
                     if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                         $isreview = true;
                     } else {
@@ -1455,9 +1454,8 @@ class AppUtility extends Component
             }
             $responseString .= '<div class="nobreak">';
             if (isset($_GET['descr'])) {
-                $query = "SELECT description FROM imas_questionset WHERE id='$qsetid'";
-                $result = $connection->createCommand($query)->queryOne();
-                $responseString .= '<div>ID:' . $qsetid . ', ' . mysql_result($result, 0, 0) . '</div>';
+                $query = QuestionSet::getByQuesSetId($qsetid);
+                $responseString .= '<div>ID:' . $qsetid . ', ' . $query['description'] . '</div>';
             } else {
                 //list($points,$qattempts) = getpointspossible($questions[$i],$testsettings['defpoints'],$testsettings['defattempts']);
                 $points = $qi[$questions[$i]]['points'];

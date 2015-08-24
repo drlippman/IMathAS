@@ -30,7 +30,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
     }
     public static function getById($id)
     {
-        return AssessmentSession::findOne($id);
+        return AssessmentSession::findOne(['id' => $id]);
     }
 
     public static function getAssessmentSession($userId, $aid)
@@ -129,7 +129,8 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $data = $command->queryAll();
         return $data;
     }
- public static function findAssessmentForOutcomes($courseId, $limuser)
+
+    public static function findAssessmentForOutcomes($courseId, $limuser)
     {
         $query = new Query();
         $query	->select(['imas_assessment_sessions.id','imas_assessment_sessions.assessmentid','imas_assessment_sessions.questions', 'imas_assessment_sessions.bestscores', 'imas_assessment_sessions.starttime', 'imas_assessment_sessions.endtime', 'imas_assessment_sessions.timeontask', 'imas_assessment_sessions.feedback', 'imas_assessment_sessions.userid', 'imas_assessments.timelimit'])
@@ -238,9 +239,12 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $items = $command->queryOne();
         return $items;
      }
+
     public static function deleteByAssessment($data)
     {
-//        $data[0] value change by condition it will be either 'id' or 'groupid'
+/*
+ *         $data[0] value change by condition it will be either 'id' or 'groupid'
+ */
         $assessment = AssessmentSession::find()->where([$data[0] => $data[1]])->andWhere(['assessmentid'=> $data[2]])->one();
         if($assessment)
         {
@@ -252,9 +256,17 @@ class AssessmentSession extends BaseImasAssessmentSessions
     {
         $query = new Query();
         $query->select([$fieldsToCopy])
-               ->from('imas_assessment_sessions')
+            ->from('imas_assessment_sessions')
             ->where(['agroupid' => $grpId])
             ->andWhere(['assessmentid' => $data]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
+    public static function getAssessmentIDs($assessmentId,$courseId){
+        $query = new Query();
+        $query->select(['imas_assessment_sessions.id'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
+            ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId]);
         $command = $query->createCommand();
         $items = $command->queryAll();
         return $items;
@@ -297,6 +309,7 @@ class AssessmentSession extends BaseImasAssessmentSessions
        $query = "INSERT INTO imas_assessment_sessions (userid,$fieldsToCopy) ";
         $query .= "VALUES ('$stuId',$insRow)";
     }
+
     public static function updateAssSessionForGrpByGrpIdAndUid($uid,$grpId)
     {
         $query = AssessmentSession::find()->where(['agroupid' => $grpId])->andWhere(['userid' => $uid])->all();
@@ -310,5 +323,5 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
         }
     }
+}
 
-} 
