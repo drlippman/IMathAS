@@ -2838,4 +2838,30 @@ class AppUtility extends Component
 
     }
 
+    public function printOutcomesData($arr,$outcomeInfo,$cnt)
+    {
+        foreach ($arr as $item)
+        {
+            if (is_array($item))
+            { //is outcome group
+                echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
+                echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
+                echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
+                $cnt++;
+                if (count($item['outcomes'])>0) {
+                    echo '<ul class="qview">';
+                   $this->printoutcomesData($item['outcomes'],$outcomeInfo,$cnt);
+                    echo '</ul>';
+                }
+                echo '</li>';
+            } else
+            { //individual outcome
+                echo '<li id="'.$item.'"><span class=icon style="background-color:#0f0">O</span> ';
+                echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeInfo[$item]).'" onkeyup="txtchg()"> ';
+                echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
+            }
+        }
+
+    }
+
 }

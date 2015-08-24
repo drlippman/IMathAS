@@ -81,7 +81,10 @@ class GroupsController extends AppController
                 if($params['addtogrpid'] == '--new--')
                 {
                     $addGrp = true;
-                    $stuList = implode(',',$stuToAdd);
+                    if($stuToAdd)
+                    {
+                        $stuList = implode(',',$stuToAdd);
+                    }
                 }
                 else
                 {
@@ -395,7 +398,6 @@ class GroupsController extends AppController
                         $page_GrpMembers[$singleMember['stugroupid']][$singleMember['userid']] = $stuNames[$singleMember['userid']];
                         $stuUserIdsInGroup[] = $singleMember['userid'];
                     }
-
                     foreach ($page_GrpMembers as $k=>$stuArr)
                     {
                         natcasesort($stuArr);

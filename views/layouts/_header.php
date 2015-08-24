@@ -87,7 +87,7 @@ echo Nav::widget([
     'items' => [
         Yii::$app->user->isGuest ?
             ['label' => 'My Classes', 'url' => [$basePath.'login'], 'options' => ['class' => '',]]:
-            ['label' =>'<img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;',
+            ['label' =>'<b class="my-Classes"  <img class="small-icon" src="../../img/myClass.png">&nbsp;&nbsp;&nbsp;My Classes&nbsp;</b>',
 
                 'items' => Course::getGetMyClasses($user->id),
                 'url' => [$basePath.'dashboard'], 'options' => ['class' => '']]
@@ -115,5 +115,24 @@ elseif($user->rights == AppConstant::STUDENT_RIGHT)
 }
 NavBar::end();
 ?>
+    <input type="hidden" id="one" value="<?php echo $user->id;?>">
 </header>
 </div>
+
+<script>
+
+    $(document).ready(function(){
+
+        Id = $('#one').val();
+        $('.my-Classes').click(function(){
+
+            jQuerySubmit('get-myClasses-ajax',{id:Id},'MyClassesSuccess');
+        });
+     });
+
+    function MyClassesSuccess()
+    {
+
+    }
+
+</script>

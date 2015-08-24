@@ -249,6 +249,17 @@ class Forums extends BaseImasForums {
     {
         $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist)";
         Yii::$app->db->createCommand($query)->query();
+    }
+
+    public static function getForumName($forumId)
+    {
+        $query = new Query();
+        $query->select(['name'])
+            ->from('imas_forums')
+            ->where(['id' => $forumId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
 
     }
 

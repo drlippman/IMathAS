@@ -162,7 +162,7 @@ class ForumPosts extends BaseImasForumPosts
         $query = new Query();
         $query->select(['count(parent) as count'])
             ->from('imas_forum_posts')
-            ->where(['parent' => $threadId]);
+            ->where('parent=:threadId',[':threadId' => $threadId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -235,7 +235,7 @@ class ForumPosts extends BaseImasForumPosts
           $query = new Query();
           $query ->select(['DISTINCT(threadid)'])
                     ->from('imas_forum_posts ')
-                    ->where(['forumid' => $forumId]);
+                    ->where('forumid= :forumid',[':forumid' => $forumId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

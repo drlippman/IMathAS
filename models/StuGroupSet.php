@@ -19,9 +19,11 @@ class StuGroupSet extends BaseImasStugroupset {
     public static function getByJoin($courseId){
         $query = Yii::$app->db->createCommand("SELECT imas_stugroupset.id,imas_stugroupset.name FROM imas_stugroupset
          LEFT JOIN imas_stugroups ON imas_stugroups.groupsetid=imas_stugroupset.id LEFT JOIN imas_stugroupmembers
-         ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid='$courseId' GROUP BY
-         imas_stugroupset.id HAVING count(imas_stugroupmembers.id)=0")->queryAll();
-        return $query;
+         ON imas_stugroups.id=imas_stugroupmembers.stugroupid WHERE imas_stugroupset.courseid= :courseId GROUP BY
+         imas_stugroupset.id HAVING count(imas_stugroupmembers.id)=0");
+        $query->bindValue('courseId',$courseId);
+        $data = $query->queryAll();
+        return $data;
     }
 
     public function createGroupSet($courseId,$name){
@@ -36,7 +38,7 @@ class StuGroupSet extends BaseImasStugroupset {
         $query = new Query();
         $query	->select(['id','name'])
             ->from('imas_stugroupset')
-            ->where(['courseid' => $courseId])
+            ->where('courseid= :courseid',[':courseid' => $courseId])
             ->orderBy('name');
         $command = $query->createCommand();
         $data = $command->queryAll();

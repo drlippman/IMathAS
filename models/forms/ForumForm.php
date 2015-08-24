@@ -43,8 +43,8 @@ class ForumForm extends Model
             ->join('JOIN','imas_forum_threads'
                 ,'imas_forum_threads.id=imas_forum_posts.threadid ')
             ->leftJoin('imas_forum_views','imas_forum_threads.id=imas_forum_views.threadid')
-        ->andWhere(['imas_forum_views.userid' => $userId ])
-        ->andWhere(['imas_forums.courseid'=> $courseId ])
+        ->andWhere('imas_forum_views.userid= :userId',[':userId' => $userId ])
+        ->andWhere('imas_forums.courseid= :courseId',[':courseId'=> $courseId ])
         ->andWhere(['LIKE','imas_forum_posts.subject', $search])
         ->andWhere('imas_forum_posts.id = imas_forum_posts.threadid ');
         $query->orderBy(['imas_forum_posts.postdate'=> SORT_DESC]);
@@ -54,11 +54,17 @@ class ForumForm extends Model
 
 
     }
-    public static  function byAllpost($search ){
-
-        $subject = Yii::$app->db->createCommand("SELECT * from  imas_forum_posts where (subject LIKE '%$search%') OR (message LIKE '%$search%') order by postdate desc")->queryAll();
-        return $subject;
-
+    public static  function byAllpost($search)
+    {
+        $query = new Query();
+        $query->select(['*'])
+              ->from('imas_forum_posts')
+              ->where(['LIKE','subject',$search])
+              ->orWhere(['LIKE','message',$search])
+              ->orderBy(['postdate' => SORT_DESC]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
 }

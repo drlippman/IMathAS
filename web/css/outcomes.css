@@ -1,4 +1,17 @@
-div.cpmid {
-    border: 1px solid #000;
-    background-color: #eee;
+
+.align-outcomes
+{
+    margin: 30px;
+}
+
+.outcomes-nav-tab
+{
+    width: 100%;
+    background-color: #f8f8f8;
+    height: 30px;
+}
+
+.align-link
+{
+    margin-left: 30px;
 }

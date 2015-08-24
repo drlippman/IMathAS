@@ -31,7 +31,7 @@ class StuGroupMembers extends BaseImasStugroupmembers{
         $query = new Query();
         $query ->select('userid')
                 ->from('imas_stugroupmembers')
-                ->where(['stugroupid' => $groupId]);
+                ->where('stugroupid= :stugroupid',[':stugroupid' => $groupId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -66,10 +66,10 @@ class StuGroupMembers extends BaseImasStugroupmembers{
 
     public static function alreadyStuAdded($grpSetId,$stuList)
     {
-        $query = "SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id ";
-        $query .= "WHERE i_sg.groupsetid='$grpSetId' AND i_sgm.userid IN ($stuList)";
-
-        return Yii::$app->db->createCommand($query)->queryAll();
+        $data = Yii::$app->db->createCommand("SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id WHERE i_sg.groupsetid= :uid AND i_sgm.userid IN ($stuList) ");
+        $data->bindValue('uid',$grpSetId);
+        $query = $data->queryAll();
+        return $query;
     }
 
     public static function removeGrpMember($uid,$grpId)

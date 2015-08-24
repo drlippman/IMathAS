@@ -23,89 +23,129 @@ use Yii;
 
 class OutcomesController extends AppController
 {
+    public $currOutcomesArray = array();
+    public $seenOutcomesArr = array();
+    public $courseId;
+    public $params;
 
     public function actionAddOutcomes()
     {
         $this->guestUserHandler();
-        $courseId = $this->getParamVal('cid');
-        $this->includeCSS(['outcomes.css']);
-        return $this->render('addOutcomes',['courseId' => $courseId]);
-    }
-    public function actionGetOutcomeAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $params['courseId'];
-        $outcomeArray = $params['outcomeArray'];
-        $courseOutcomeData = Course::getById($courseId);
-        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
-        $outcomeId = array();
-        if($outcomeArray)
+        $this->layout = 'master';
+        $this->courseId = $this->getParamVal('cid');
+        $this->params = $this->getRequestParams();
+        if(isset($this->params['order']))
         {
-            foreach($outcomeArray as $outcome)
+            $query = Outcomes::getExistingOutcomes($this->courseId);
+            foreach($query as $singleOutcome)
             {
-                if($outcome)
-                {
-                    $saveOutcome = new Outcomes();
-                    $Id= $saveOutcome->SaveOutcomes($courseId,$outcome);
-                    array_push($courseOutcome,$Id);
-                }
+               $this->currOutcomesArray[$singleOutcome['id']] = $singleOutcome['name'];
+
             }
-            $serializedOutcomeGrp = serialize($courseOutcome);
+            $itemArray = $this->addItems($this->params['order']);
+            $outcomeOrder = serialize($itemArray);
             $saveOutcome = new Course();
-            $saveOutcome->SaveOutcomes($courseId,$serializedOutcomeGrp);
-            return $this->successResponse();
+            $saveOutcome->SaveOutcomes($this->courseId,$outcomeOrder);
+            $unused = array_diff(array_keys($this->currOutcomesArray), $this->seenOutcomesArr);
+            if(count($unused) > AppConstant::NUMERIC_ZERO)
+            {
+                $unusedList = implode(',',$unused);
+                Outcomes::deleteUnusedOutcomes($unusedList);
+                Assessments::updateOutcomes($this->courseId,$unusedList);
+//                $query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
+//                mysql_query($query) or die("Query failed : " . mysql_error());
+            }
+        }
+        //load existing outcomes
+        $courseOutcomeData = Course::getByCourseIdOutcomes($this->courseId);
+        if(($courseOutcomeData[0]['outcomes']) == '')
+        {
+            $outcomes = array();
         }
         else
         {
-            return $this->terminateResponse("");
+            $outcomes = unserialize(($courseOutcomeData[0]['outcomes']));
         }
-    }
-
-    public function actionGetOutcomeGrpAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $params['courseId'];
-        $outcomeGrpArray = $params['outcomeGrpArray'];
-        $courseOutcomeData = Course::getById($courseId);
-        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
-        if($outcomeGrpArray)
-        {
-            foreach($outcomeGrpArray as $outcomeGrp)
-            {
-                if($outcomeGrp)
-                {
-                    array_push($courseOutcome ,['outcomes'=> array(), 'name' => $outcomeGrp]);
-                }
-            }
-            $serializedOutcomeGrp = serialize($courseOutcome);
-            $saveOutcome = new Course();
-            $saveOutcome->SaveOutcomes($courseId,$serializedOutcomeGrp);
-            return $this->successResponse();
-        }else
-        {
-            return $this->terminateResponse("");
-        }
-    }
-
-    public function actionGetOutcomeDataAjax()
-    {
-        $this->guestUserHandler();
-        $params = $this->getRequestParams();
-        $courseId = $params['courseId'];
-        $outcomeData = Outcomes::getByCourseId($courseId);
-        $courseOutcomeData = Course::getById($courseId);
-        $courseOutcome = unserialize($courseOutcomeData['outcomes']);
-        $outcomeInfo = array();
+        $outcomeData = Outcomes::getExistingOutcomes($this->courseId);
         foreach($outcomeData as $data)
         {
             $outcomeInfo[$data['id']] = $data['name'];
         }
-        $responseData = array('courseOutcome' => $courseOutcome ,'outcomeData' => $outcomeInfo);
-        return $this->successResponse($responseData);
+        $this->includeCSS(['outcomes.css']);
+        $this->includeJS(['mootools.js','nested1.js']);
+        return $this->render('addOutcomes',['courseId' => $this->courseId,'outcomes' => $outcomes,'outcomeInfo' => $outcomeInfo,'order' => $this->params['order']]);
     }
 
+    function addItems($list)
+    {
+        $outArr = array();
+        $list = substr($list,1,-1);
+        $i = 0; $nd = 0; $last = 0;
+        $listArr = array();
+        while ($i<strlen($list))
+        {
+            if ($list[$i]=='[') {
+                $nd++;
+            } else if($list[$i]==']') {
+                $nd--;
+            } else if ($list[$i]==',' && $nd==0) {
+                $listArr[] = substr($list,$last,$i-$last);
+                $last = $i+1;
+            }
+            $i++;
+        }
+        $listArr[] = substr($list,$last);
+        foreach ($listArr as $it)
+        {
+            if (strpos($it,'grp')!==false)
+            { //is outcome group
+                $pos = strpos($it,':');
+                if ($pos===false)
+                {
+                    $block = array("outcomes"=>array());
+                    $pts[0] = $it;
+                } else
+                {
+                    $pts[0] = substr($it,0,$pos);
+                    $pts[1] = substr($it,$pos+1);
+                    $subarr = $this->addItems($pts[1]);
+                    $block = array("outcomes"=>$subarr);
+                }
+                if (substr($pts[0],0,3)=='new')
+                {
+                    $name = stripslashes($this->params['newg'.substr($pts[0],6)]);
+                } else
+                {
+                    $name = stripslashes($this->params['g'.substr($pts[0],3)]);
+                }
+                $block['name'] = $name;
+                $outArr[] = $block;
+
+            }else
+            { //is an outcome
+                if (substr($it,0,3)=='new')
+                {
+                    $oCnt = substr($it,3);
+                    $query  = new Outcomes();
+                    $insertId = $query->insertOutcomes($this->courseId,$this->params['newo'.$oCnt]);
+                    $this->seenOutcomesArr[] = $insertId;
+                    $outArr[] = $insertId;
+
+                }
+                elseif(isset($this->currOutcomesArray[$it]))
+                {
+                    if (stripslashes($this->params['o'.$it])!= $this->currOutcomesArray[$it])
+                    {
+                        Outcomes::UpdateOutcomes($this->params['o'.$it],$it,$this->courseId);
+                    }
+                    $outArr[]= $it;
+                    $this->seenOutcomesArr[] = $it;
+                }
+            }
+
+        }
+        return $outArr;
+    }
     public function actionOutcomeReport()
     {
         $this->guestUserHandler();

@@ -3,151 +3,119 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'AddOutComes';
+$cnt = AppConstant::NUMERIC_ZERO;
+$this->title = AppUtility::t('Course Outcomes', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
-<div><h3>Course Outcomes</h3></div>
-<div class="cpmid">
-<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-map?cid='.$courseId)?>">View Outcomes Map</a> |
-<a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-report?cid='.$courseId.'&report=0')?>">View Outcomes Report</a>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL()  . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
-<div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups.
-<input type="button" class="btn btn-primary" id="Save-changes"  value="Save Changes">
-<input type="hidden" id="course-id" value="<?php echo $courseId?>">
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
 </div>
-<div><ul id="qviewtree" class="qview"></ul></div>
-<button  onclick=addOutcomeGrp() class="btn btn-primary ">Add Outcome Group</button>
-<button  onclick=addOutcome() class="btn btn-primary ">Add Outcome</button>
-<style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>
-
-
-<script>
-    $(document).ready(function ()
-    {
-        var courseId = $('#course-id').val();
-
-        jQuerySubmit('get-outcome-data-ajax',{courseId:courseId},'outcomeDataResponse');
-    });
-    var cnt=0;
-    var isArray;
-    var outcome;
-    var html = "";
-    function addOutcomeGrp()
-    {
-        var html = '<li class="blockli" id="newgrp"><span class=icon style="background-color:#66f">G</span>';
-        html += '<input class="outcomeGrp" type="text" size="60" id="newgrp'+cnt+'" > ';
-        html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
-        $("#qviewtree").append(html);
-        $("#newgrp"+cnt).focus();
-        cnt++;
-    }
-    function addOutcome() {
-        var html = '<li id="new"><span class=icon style="background-color:#0f0">O</span>';
-        html += '<input class="outcome" type="text" size="60" id="new'+cnt+'">';
-        html += '<a href="#" onclick=removeOutcome(this);return false> Delete</a></li>';
-        $("#qviewtree").append(html);
-        $("#new"+cnt).focus();
-        cnt++;
-    }
-    function removeOutcome(el)
-    {
-        var deleteOutcome = $(el).parent();
-        deleteOutcome.find("li").each(function(){
-           deleteOutcome.before($(el));
-        });
-        deleteOutcome.remove();
-    }
-    function removeOutcomeGrp(el)
-    {
-
-        var deleteOutcome = $(el).parent();
-        deleteOutcome.find("li").each(function(){
-            deleteOutcome.before($(el));
-        });
-        deleteOutcome.remove();
-    }
-    $('#Save-changes').click(function()
-    {
-     var outcomeArray= [];
-        var outcomeGrpArray= [];
-        var els = $(".outcome");
-        var groupLen = $(".outcomeGrp");
-        var courseId = $('#course-id').val();
-        $('#Save-changes').parent().append('<span id="submitnotice" style="color:red;">Saving Changes...</span>');
-        for (var i=0; i<els.length; i++)
-        {
-            var outcome = $('#new' + i).val();
-            outcomeArray.push(outcome);
-        }
-        for (var j=0; j<groupLen.length; j++)
-        {
-            var outcomeGrp = $('#newgrp' + j).val();
-            outcomeGrpArray.push(outcomeGrp);
-        }
-        if(outcomeArray.length > 0)
-        {
-            jQuerySubmit('get-outcome-ajax',{outcomeArray:outcomeArray,courseId:courseId},'outcomeResponse');
-        }
-        if(outcomeGrpArray.length > 0)
-        {
-            jQuerySubmit('get-outcome-grp-ajax',{outcomeGrpArray:outcomeGrpArray,courseId:courseId},'outcomeGrpResponse');
-        }
-
-     });
-
-    function outcomeResponse(response)
-    {
-        $('#submitnotice').remove();
-    }
-    function outcomeGrpResponse(response)
-    {
-        $('#submitnotice').remove();
-    }
-    function outcomeDataResponse(response)
-    {
-        response = JSON.parse(response);
-
-        if(response.status == 0)
-        {
-            var outcomeGrp = response.data.courseOutcome;
-            outcome = response.data.outcomeData;
-            isArray = response.data.isArray;
-            html = printOutcomes(outcomeGrp);
-           $("#qviewtree").append(html);
-        }
-        else
-        {
-
-        }
-    }
-function printOutcomes(outcomeGrp){
-
-    $.each(outcomeGrp, function(key,group)
-    {
-        if(group.length == undefined)
-        {
-            html += '<li class="blockli" id="newgrp'+cnt+'">';
-            html +='<span class=icon style="background-color:#66f">G</span>';
-            html += '<input class="outcomeGrp" type="text" size="60" id="g'+cnt+'" value="'+group['name']+'" > ';
-            html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
-            cnt++;
-            if(group['outcomes'].length >0)
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
+</div>
+<div class="tab-content shadowBox">
+            <?php
+            if (isset($order))
             {
-                html +='<ul class="qview">';
-                printOutcomes(group['outcomes']);
-                html+= '</ul>';
+                $print = new AppUtility();
+                $print->printOutcomesData($outcomes,$outcomeInfo,$cnt);
+                exit;
             }
-            html+= '</li>';
+            ?>
+            <style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>
+            <div class="outcomes-nav-tab">
+                <div class="align-link">
+                    <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-map?cid='.$courseId)?>">View Outcomes Map</a>|
+                    <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/outcome-report?cid='.$courseId.'&report=0')?>">View Outcomes Report</a>
+                </div>
+            </div>
+            <div class="align-outcomes">
+                <?php
+                echo '<div class="breadcrumb">Use colored boxes to drag-and-drop order and move outcomes inside groups
+                <input type="button" id="recchg" disabled="disabled" value="Save Changes" onclick="submitChanges()"/>
+                <span id="submitnotice" style="color:red;"></span></div>';
+                echo '<ul id="qviewtree" class="qview">';
+                $print = new AppUtility();
+                $print->printOutcomesData($outcomes,$outcomeInfo,$cnt);
+                echo '</ul>';
+                echo '<input type="button" onclick="addoutcomegrp()" value="Add Outcome Group"/> ';
+                echo '<input type="button" onclick="addoutcome()" value="Add Outcome"/> ';
+                ?>
+            </div>
+</div>
+<script type="text/javascript">
+var AHAHsaveurl = $("#outcome-url").val();
+var j=jQuery.noConflict();
+</script>
+<script type="text/javascript">
+    var noblockcookie=true;
+    var ocnt = 0;
+    var html ="";
+    var unsavedmsg = "You have unrecorded changes.  Are you sure you want to abandon your changes?";
+    function txtchg() {
+        if (!sortIt.haschanged) {
+            sortIt.haschanged = true;
+            sortIt.fireEvent("onFirstChange", null);
+            window.onbeforeunload = function() {return unsavedmsg;}
         }
-        else
-        {
-            html += '<li id="'+group+'">';
-            html +='<span class=icon style="background-color:#0f0">O</span>';
-            html += '<input class="outcome" type="text" size="60" id="new" value="'+outcome[group]+'">';
-            html += '<a href="#" onclick=removeOutcomeGrp(this);return false> Delete</a></li>';
+    }
+    function addoutcome() {
+        var html = '<li id="new'+ocnt+'"><span class=icon style="background-color:#0f0">O</span> ';
+        html += '<input class="outcome" type="text" size="60" id="newo'+ocnt+'" onkeyup="txtchg()"> ';
+        html += '<a href="#" onclick="removeoutcome(this);return false\">Delete</a></li>';
+        j('#qviewtree').append(html);
+        j("#new"+ocnt).focus();
+        ocnt++;
+
+        if (!sortIt.haschanged) {
+            sortIt.haschanged = true;
+            sortIt.fireEvent('onFirstChange', null);
+            window.onbeforeunload = function() {return unsavedmsg;}
         }
-    });
-    return html;
-}
+    }
+    function addoutcomegrp() {
+        var html = '<li class="blockli" id="newgrp'+ocnt+'"><span class=icon style="background-color:#66f">G</span> ';
+        html += '<input class="outcome" type="text" size="60" id="newg'+ocnt+'" onkeyup="txtchg()"> ';
+        html += '<a href="#" onclick="removeoutcomegrp(this);return false\">Delete</a></li>';
+        j("#qviewtree").append(html);
+        j("#newgrp"+ocnt).focus();
+        ocnt++;
+
+        if (!sortIt.haschanged) {
+            sortIt.haschanged = true;
+            sortIt.fireEvent('onFirstChange', null);
+            window.onbeforeunload = function() {return unsavedmsg;}
+        }
+    }
+    function removeoutcome(el) {
+        if (confirm("Are you sure you want to delete this outcome?")) {
+            j(el).parent().remove();
+            if (!sortIt.haschanged) {
+                sortIt.haschanged = true;
+                sortIt.fireEvent('onFirstChange', null);
+                window.onbeforeunload = function() {return unsavedmsg;}
+            }
+        }
+    }
+    function removeoutcomegrp(el) {
+        if (confirm("Are you sure you want to delete this outcome group?  This will not delete the included outcomes.")) {
+            var curloc = j(el).parent();
+            curloc.find("li").each(function() {
+                curloc.before($(this));
+            });
+            curloc.remove();
+            if (!sortIt.haschanged) {
+                sortIt.haschanged = true;
+                sortIt.fireEvent('onFirstChange', null);
+                window.onbeforeunload = function() {return unsavedmsg;}
+            }
+        }
+    }
 </script>

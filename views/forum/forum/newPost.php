@@ -23,13 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <br><p></p>
     <div class="align-new-post-table">
      <?php if($threadArray){?>
-        <?php echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'.'Name'.'</th><th>'.'Link'.'</th>';?>
+        <?php echo '<table id="myTable" class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'.'Forum'.'</th><th>'.'Topic'.'</th><th>'.'Started By'.'<th>'.'Last Post Date'.'</th></th>';?>
         <?php
         foreach($threadArray as $data)
         {
             if(isset($data['subject']))
             {
-                echo '</thead><tr><td>'.$data['subject'].'</td><td><a href="post?courseid='.$course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata'].'">Click Here</td></tr>';
+                echo '</thead><tr><td><a href="search-forum?cid='.$course->id.'">'.$data['forumName'].'</a></td><td><a href="post?courseid='.$course->id.'&threadid='.$data['threadId'].'&forumid='.$data['forumiddata'].'">'.$data['subject'].'</a></td><td>'.$data['name'].'</td></td><td>'.$data['postdate'].'</td></tr>';
             }
         }
         echo '</tbody></table>';

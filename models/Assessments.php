@@ -378,7 +378,6 @@ class Assessments extends BaseImasAssessments
         return $data;
 
     }
-
     public static function CommonMethodToGetAssessmentData($toCopy,$id)
     {
         $query = "SELECT $toCopy FROM imas_assessments WHERE id='$id'";
@@ -407,4 +406,13 @@ class Assessments extends BaseImasAssessments
         $query = Assessments::find()->where(['courseid' => $courseId])->all();
         return $query;
     }
+
+    public static function  updateOutcomes($courseId,$unusedList)
+    {
+        $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$courseId' AND defoutcome IN ($unusedList)";
+        \Yii::$app->db->createCommand()->queryAll($query);
+
+    }
+
+
 }

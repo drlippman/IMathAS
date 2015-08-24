@@ -9,7 +9,8 @@ use app\components\AppUtility;
 use app\models\_base\BaseImasStugroups;
 use yii\db\Query;
 
-class Stugroups extends BaseImasStugroups {
+class Stugroups extends BaseImasStugroups
+{
     public static function findByCourseId($courseId){
         $query = new Query();
         $query	->select(['imas_stugroups.id'])
@@ -18,7 +19,7 @@ class Stugroups extends BaseImasStugroups {
                 'imas_stugroupset',
                 'imas_stugroups.groupsetid=imas_stugroupset.id'
             )
-            ->where(['imas_stugroupset.courseid' => $courseId]);
+            ->where('imas_stugroupset.courseid= :groupsetid',[ ':groupsetid' => $courseId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -42,7 +43,7 @@ class Stugroups extends BaseImasStugroups {
         $query = new Query();
         $query	->select(['id'])
             ->from('imas_stugroups')
-            ->where(['groupsetid' => $deleteGrpSet]);
+            ->where('groupsetid= :groupsetid',[ ':groupsetid' => $deleteGrpSet]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -66,7 +67,7 @@ class Stugroups extends BaseImasStugroups {
         $query = new Query();
         $query	->select(['id','name'])
             ->from('imas_stugroups')
-            ->where(['groupsetid' => $copyGrpSet]);
+            ->where('groupsetid= :groupsetid',[ ':groupsetid' => $copyGrpSet]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -77,7 +78,7 @@ class Stugroups extends BaseImasStugroups {
         $query = new Query();
         $query	->select(['id','name'])
             ->from('imas_stugroups')
-            ->where(['groupsetid' => $grpSetId]);
+            ->where('groupsetid= :groupsetid',[ ':groupsetid'=> $grpSetId]);
         $query->orderBy('id');
         $command = $query->createCommand();
         $data = $command->queryAll();

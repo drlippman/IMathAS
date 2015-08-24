@@ -61,7 +61,7 @@ class ForumThread extends BaseImasForumThreads
         $query = new Query();
         $query ->select(['id'])
                ->from('imas_forum_threads')
-               ->where(['stugroupid' => $grpId]);
+               ->where('stugroupid= :stugroupid',[':stugroupid' => $grpId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

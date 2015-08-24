@@ -145,7 +145,7 @@ class ForumView extends BaseImasForumViews
         $query = new Query();
         $query ->select('id')
                 ->from('imas_forum_views')
-                ->where(['userid' => $userId])
+                ->where('userid= :userid',[':userid' => $userId])
                 ->andWhere(['threadid' =>$threadId ]);
         $command = $query->createCommand();
         $data = $command->queryAll();

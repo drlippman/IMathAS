@@ -186,6 +186,7 @@ class ForumController extends AppController
         foreach($NewPostCounts as $newPost)
          {
                 $threads = ThreadForm::thread($newPost['forumid']);
+                $forumName = Forums::getForumName($newPost['forumid']);
                  foreach($threads as $thread)
                 {
                     $username = User::getById($thread['userid']);
@@ -197,10 +198,10 @@ class ForumController extends AppController
                             'parent' => $thread['parent'],
                             'threadId' => $thread['threadid'],
                             'forumiddata' => $thread['forumid'],
+                            'forumName' => $forumName['name'],
                             'subject' => $thread['subject'],
                             'postdate' => date('F d, o g:i a', $thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
-                            'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
                             'userright' => $user['rights'],
                             'postUserId' => $username->id,
                             'currentUserId' => $user['id'],
