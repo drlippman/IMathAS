@@ -89,6 +89,7 @@ table thead th {
 table.gb thead th, table.gbl thead th, table.gbl thead th.locked {
 	border-bottom: 2px solid #00f;
 	background-color: #eef;
+    color: #000000;
 }
 tr.even {
 	background-color: #fff;	

@@ -252,5 +252,18 @@ class Forums extends BaseImasForums {
 
     }
 
+    public static function updateForumMassChange($startdate, $enddate, $avail, $id)
+    {
+        $forum = Forums::findOne(['id' => $id]);
+        $forum->startdate = $startdate;
+        $forum->enddate = $enddate;
+        $forum->avail = $avail;
+        $forum->save();
+    }
 
+    public static function getForumMassChanges($courseId)
+    {
+        $query = Forums::find()->where(['courseid' => $courseId])->all();
+        return $query;
+    }
 }

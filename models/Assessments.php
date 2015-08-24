@@ -363,7 +363,6 @@ class Assessments extends BaseImasAssessments
             }
         }
     }
-
     public static function getIdForGroups($grpSetId)
     {
         $query = new Query();
@@ -389,4 +388,19 @@ class Assessments extends BaseImasAssessments
         Yii::$app->db->createCommand($query)->query();
     }
 
+    public static function updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id)
+    {
+        $assessment = Assessments::findOne(['id' => $id]);
+        $assessment->startdate = $startdate;
+        $assessment->enddate = $enddate;
+        $assessment->reviewdate = $reviewdate;
+        $assessment->avail = $avail;
+        $assessment->save();
+    }
+
+    public static function getAssessmentForMassChange($courseId)
+    {
+        $query = Assessments::find()->where(['courseid' => $courseId])->all();
+        return $query;
+    }
 }

@@ -27,6 +27,7 @@ use app\models\Items;
 use app\models\Outcomes;
 use app\models\Questions;
 use app\models\QuestionSet;
+use app\models\Sessions;
 use app\models\SetPassword;
 use app\models\Student;
 use app\models\Teacher;
@@ -861,9 +862,285 @@ public $oa = array();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $teacherId = $this->isTeacher($user['id'],$courseId);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $names = Array();
+        $startdates = Array();
+        $enddates = Array();
+        $reviewdates = Array();
+        $ids = Array();
+        $avails = array();
+        $types = Array();
+        $courseorder = Array();
+        $pres = array();
+        $body = "";
+        $prefix = array();
+
+        if(!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+        } else {
+            if (isset($params['chgcnt'])) {
+                $courseItemOrder = Course::getItemOrder($courseId);
+                $itemOrder = $courseItemOrder->itemorder;
+                $items = unserialize($itemOrder);
+
+                $cnt = $params['chgcnt'];
+                $blockchg = AppConstant::NUMERIC_ZERO;
+
+                for ($i=0; $i<$cnt; $i++) {
+                    $data = explode(',',$params['data'.$i]);
+
+                    if ($data['startdate'] == '0') {
+                        $startdate = AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $pts = explode('~',$data['startdate']);
+                        $startdate = AppUtility::parsedatetime($pts[0],$pts[1]);
+                    }
+
+                    if ($data['enddate'] == '2000000000') {
+                        $enddate = AppConstant::ALWAYS_TIME;
+                    } else {
+                        $pts = explode('~',$data['enddate']);
+                        $enddate = AppUtility::parsedatetime($pts[0],$pts[1]);
+                    }
+
+                    if ($data[2] != 'NA') {
+                        if ($data[2]=='A') {
+                            $reviewdate = AppConstant::ALWAYS_TIME;
+                        } else if ($data[2] == 'N') {
+                            $reviewdate = 0;
+                        } else {
+                            $pts = explode('~',$data[2]);
+                            $reviewdate = AppUtility::parsedatetime($pts[0],$pts[1]);
+                        }
+                    }
+                    $type = $data['type'];
+                    $id = $data['id'];
+                    $avail = intval($data['avail']);
+
+                    if ($type=='Assessment') {
+                        AppUtility::dump('hhhh');
+                        if ($id>0) {
+                            $assessment = new Assessments();
+                            $assessment->updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id);
+                        }
+                    } else if ($type=='Forum') {
+                        if ($id>0) {
+                            $forum = new Forums();
+                            $forum->updateForumMassChange($startdate, $enddate, $avail, $id);
+                        }
+                    } else if ($type=='Wiki') {
+                        if ($id>0) {
+                            $wiki = new Wiki();
+                            $wiki->updateWikiForMassChanges($startdate, $enddate, $avail, $id);
+                        }
+                    } else if ($type=='InlineText') {
+                        if ($id>0) {
+                            $inlineText = new InlineText();
+                            $inlineText->updateInlineTextForMassChanges($startdate, $enddate, $avail, $id);
+                        }
+                    } else if ($type=='Link') {
+                        if ($id>0) {
+                            $link = new LinkedText();
+                            $link->updateLinkForMassChanges($startdate, $enddate, $avail, $id);
+                        }
+                    } else if ($type=='Block') {
+                        $blocktree = explode('-',$id);
+                        $sub =& $items;
+                        if (count($blocktree)>1) {
+                            for ($j=1;$j<count($blocktree)-1;$j++) {
+                                $sub =& $sub[$blocktree[$j]-1]['items']; //-1 to adjust for 1-indexing
+                            }
+                        }
+                        $sub =& $sub[$blocktree[$j]-1];
+                        $sub['startdate'] = $startdate;
+                        $sub['enddate'] = $enddate;
+                        $sub['avail'] = $avail;
+                        $blockchg++;
+                    }
+                }
+                if ($blockchg > 0) {
+                    $itemorder = serialize($items);
+                    $saveItemOrderIntoCourse = new Course();
+                    $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+                }
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+            }
+            if ((!isset($params['folder']) || $params['folder'] == '') && !isset($sessiondata['folder'.$courseId])) {
+                $params['folder'] = '0';
+                $sessiondata['folder'.$courseId] = '0';
+            } else if ((isset($params['folder']) && $params['folder'] != '') && (!isset($sessiondata['folder'.$courseId]) || $sessiondata['folder'.$courseId]!= $params['folder'])) {
+                $sessiondata['folder'.$courseId] = $params['folder'];
+            } else if ((!isset($params['folder']) || $params['folder']=='') && isset($sessiondata['folder'.$courseId])) {
+                $params['folder'] = $sessiondata['folder'.$courseId];
+            }
+            $sessionId = $this->getSessionId();
+            $sessiondata = $this->getSessionData($sessionId);
+
+            if (isset($params['orderby'])) {
+                $orderby = $params['orderby'];
+                $sessiondata['mcdorderby'.$courseId] = $orderby;
+                Sessions::setSessionId($sessionId,$sessiondata);
+            } else if (isset($sessiondata['mcdorderby'.$courseId])) {
+                $orderby = $sessiondata['mcdorderby'.$courseId];
+            } else {
+                $orderby = AppConstant::NUMERIC_THREE;
+            }
+
+            if (isset($params['filter'])) {
+                $filter = $params['filter'];
+                $sessiondata['mcdfilter'.$courseId] = $filter;
+                Sessions::setSessionId($sessionId,$sessiondata);
+            } else if (isset($sessiondata['mcdfilter'.$courseId])) {
+                $filter = $sessiondata['mcdfilter'.$courseId];
+            } else {
+                $filter = "all";
+            }
+
+            if ($orderby == AppConstant::NUMERIC_THREE) {  //course page order
+               global $itemsassoc;
+               $itemsassoc = array();
+                $itemData = Items::getByCourseId($courseId);
+                foreach($itemData as $k => $item) {
+                    $itemsassoc[$item['id']] = $item['itemtype'].$item['typeid'];
+                }
+                $result = Course::getById($courseId);
+                $itemorder = $result['itemorder'];
+                $itemorder = unserialize($itemorder);
+                $itemsimporder = array();
+                $item1 = $this->flattenitems($itemorder,$itemscourseorder,'0','');
+                $itemscourseorder = array_flip($itemscourseorder);
+            }
+
+            if ($filter == 'all' || $filter == 'assessments') {
+                $result = Assessments::getAssessmentForMassChange($courseId);
+                foreach($result as $k => $row)
+                {
+                    $types[] = "Assessment";
+                    $names[] = $row['name'];
+                    $startdates[] = $row['startdate'];
+                    $enddates[] = $row['enddate'];
+                    $reviewdates[] = $row['reviewdate'];
+                    $ids[] = $row['id'];
+                    $avails[] = $row['avail'];
+                    if (isset($prefix['Assessment'.$row['id']])) {$pres[] = $prefix['Assessment'.$row['id']];} else {$pres[] = '';}
+                    if ($orderby == 3) {
+                        $courseorder[] = $itemscourseorder['Assessment'.$row['id']];
+//                        AppUtility::dump($courseorder);
+                    }
+                }
+            }
+
+
+            if ($filter == 'all' || $filter == 'inlinetext') {
+                $result = InlineText::getInlineTextForMassChanges($courseId);
+                foreach($result as $k => $row)
+                {
+                    $types[] = "InlineText";
+                    $names[] = $row['title'];
+                    $startdates[] = $row['startdate'];
+                    $enddates[] = $row['enddate'];
+                    $reviewdates[] = -1;
+                    $ids[] = $row['id'];
+                    $avails[] = $row['avail'];
+                    if (isset($prefix['InlineText'.$row['id']])) {$pres[] = $prefix['InlineText'.$row['id']];} else {$pres[] = '';}
+                    if ($orderby == 3) {$courseorder[] = $itemscourseorder['InlineText'.$row['id']];
+
+                    }
+                }
+            }
+            if ($filter == 'all' || $filter == 'linkedtext') {
+                $result = LinkedText::getLinkTextForMassChanges($courseId);
+                foreach($result as $k => $row)
+                {
+                    $types[] = "Link";
+                    $names[] = $row['title'];
+                    $startdates[] = $row['startdate'];
+                    $enddates[] = $row['enddate'];
+                    $reviewdates[] = -1;
+                    $ids[] = $row['id'];
+                    $avails[] = $row['avail'];
+                    if (isset($prefix['LinkedText'.$row['id']])) {$pres[] = $prefix['LinkedText'.$row['id']];} else {$pres[] = '';}
+                    if ($orderby == 3) {$courseorder[] = $itemscourseorder['LinkedText'.$row['id']];}
+                }
+            }
+            if ($filter == 'all' || $filter == 'forums') {
+                $result = Forums::getForumMassChanges($courseId);
+                foreach($result as $k => $row)
+                {
+                    $types[] = "Forum";
+                    $names[] = $row['name'];
+                    $startdates[] = $row['startdate'];
+                    $enddates[] = $row['enddate'];
+                    $reviewdates[] = -1;
+                    $ids[] = $row['id'];
+                    $avails[] = $row['avail'];
+                    if (isset($prefix['Forum'.$row['id']])) {$pres[] = $prefix['Forum'.$row['id']];} else {$pres[] = '';}
+                    if ($orderby == 3) {$courseorder[] = $itemscourseorder['Forum'.$row['id']];
+                    }
+                }
+            }
+            if ($filter=='all' || $filter=='wikis') {
+                $result = Wiki::getWikiMassChanges($courseId);
+                foreach($result as $k => $row)
+                {
+                    $types[] = "Wiki";
+                    $names[] = $row['name'];
+                    $startdates[] = $row['startdate'];
+                    $enddates[] = $row['enddate'];
+                    $reviewdates[] = -1;
+                    $ids[] = $row['id'];
+                    $avails[] = $row['avail'];
+                    if (isset($prefix['Wiki'.$row['id']])) {$pres[] = $prefix['Wiki'.$row['id']];} else {$pres[] = '';}
+                    if ($orderby == 3) {$courseorder[] = $itemscourseorder['Wiki'.$row['id']];}
+                }
+            }
+//            if ($filter=='all' || $filter=='blocks') {
+//                $result = Course::getItemOrderForMassChanges($courseId);
+//                $itemOrder = $result->itemorder;
+//                $items = unserialize($itemOrder);
+//                function getblockinfo($items,$parent) {
+//                    global $ids,$types,$names,$startdates,$enddates,$reviewdates,$ids,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix;
+//                    foreach($items as $k=>$item) {
+//                        if (is_array($item)) {
+//                            $ids[] = $parent.'-'.($k+1);
+//                            $types[] = "Block";
+//                            if ($orderby==3) {$courseorder[] = $itemscourseorder['Block'.$parent.'-'.($k+1)];}
+//                            $names[] = stripslashes($item['name']);
+//                            $startdates[] = $item['startdate'];
+//                            $enddates[] = $item['enddate'];
+//                            $avails[] = $item['avail'];
+//                            $reviewdates[] = -1;
+//                            if (isset($prefix['Block'.$parent.'-'.($k+1)])) {$pres[] = $prefix['Block'.$parent.'-'.($k+1)];} else {$pres[] = '';}
+//                            if (count($item['items'])>0) {
+//                                getblockinfo($item['items'],$parent.'-'.($k+1));
+//                            }
+//                        }
+//                    }
+//                }
+//                getblockinfo($items,'0');
+//            }
+
+            $cnt = 0;
+            $now = time();
+            if ($orderby == 0) {
+                asort($startdates);
+                $keys = array_keys($startdates);
+            } else if ($orderby == 1) {
+                asort($enddates);
+                $keys = array_keys($enddates);
+            } else if ($orderby == 2) {
+                natcasesort($names);
+                $keys = array_keys($names);
+            } else if ($orderby == 3) {
+                asort($courseorder);
+                $keys = array_keys($courseorder);
+            }
+
+        }
         $this->includeJS(['general.js']);
-        $this->includeJS(['masschgdates.js']);
-        $responseData = array('course' => $course);
+        $this->includeJS(['massChangeDates.js']);
+        $responseData = array('course' => $course, 'overwriteBody' => $overwriteBody, 'body' => $body, 'orderby' => $orderby, 'filter' => $filter, 'keys' => $keys, 'types' => $types, 'pres' => $pres, 'names' => $names, 'startdates' => $startdates, 'enddates' => $enddates, 'reviewdates' => $reviewdates, 'ids' => $ids, 'avails' => $avails, 'courseorder' => $courseorder, 'cnt' => $cnt);
         return $this->renderWithData('massChangeDates', $responseData);
     }
 
@@ -885,4 +1162,19 @@ public $oa = array();
             return round($tot,AppConstant::NUMERIC_ONE);
         }
     }
+
+            function flattenitems($items,&$addto,$parent,$pre) {
+                global $itemsimporder,$itemsassoc,$prefix,$imasroot;
+                foreach ($items as $k=>$item) {
+                    if (is_array($item)) {
+                        $addto[] = 'Block'.$parent.'-'.($k+1);
+                        $prefix['Block'.$parent.'-'.($k+1)] = $pre;
+                        $this->flattenitems($item['items'],$addto,$parent.'-'.($k+1),$pre.' ');
+                    } else {
+                        $addto[] = $itemsassoc[$item];
+                        $prefix[$itemsassoc[$item]] = $pre;
+                    }
+                }
+                return $items;
+            }
 }

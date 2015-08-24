@@ -52,7 +52,7 @@ div.block, div.blockitems div.blockitems div.block {
 	border-radius: 4px 4px 0 0;
 }
 div.blockitems, div.blockitems div.blockitems div.blockitems {
-	padding: 10px;
+	padding: 10px 0px;
 	margin-top: -10px;
 	margin-bottom: 10px;
 }
@@ -95,12 +95,12 @@ div.cpmid {
 ul.nomark {
 	margin-top: 5px;
 	list-style-type: none;
-	margin-left: 15px;
+	margin-left: 10px;
 	padding-left: 0px;
 }
 ul.nomark li {
 	margin-left: 0px;
-	padding-left: 0px;
+	padding-left: 5px;
 }
 
 ul.qview {
@@ -136,7 +136,7 @@ table.gb thead th {
 }
 td, th {
 	margin: 0px;
-	padding: 2px 5px 2px 5px;
+	padding: 7px 5px 7px 5px;
 }
 tr {
 	margin: 0px;

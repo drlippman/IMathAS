@@ -122,4 +122,19 @@ class LinkedText extends BaseImasLinkedtext
         return $data;
 
     }
+
+    public static function updateLinkForMassChanges($startdate, $enddate, $avail, $id)
+    {
+        $linkText = LinkedText::findOne(['id' => $id]);
+        $linkText->startdate = $startdate;
+        $linkText->enddate = $enddate;
+        $linkText->avail = $avail;
+        $linkText->save();
+    }
+
+    public static function getLinkTextForMassChanges($courseId)
+    {
+        $query = LinkedText::find()->where(['courseid' => $courseId])->all();
+        return $query;
+    }
 }

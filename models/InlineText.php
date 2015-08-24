@@ -141,5 +141,20 @@ class InlineText extends BaseImasInlinetext
         $data = $command->queryAll();
         return $data;
     }
-} 
+
+    public static function updateInlineTextForMassChanges($startdate, $enddate, $avail, $id)
+    {
+        $inlineText = InlineText::findOne(['id' => $id]);
+        $inlineText->startdate = $startdate;
+        $inlineText->enddate = $enddate;
+        $inlineText->avail = $avail;
+        $inlineText->save();
+    }
+
+    public static function getInlineTextForMassChanges($courseId)
+    {
+        $query = InlineText::find()->where(['courseid' => $courseId])->all();
+        return $query;
+    }
+}
 

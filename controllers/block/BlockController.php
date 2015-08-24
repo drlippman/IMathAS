@@ -329,6 +329,7 @@ class BlockController extends AppController
                 $page_sectionlistlabel[] = 'Section '.$section['section'];
             }
         }
+        $this->includeCSS(['course/items.css']);
         $this->includeJS(['general.js']);
         $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids, 'page_sectionlistval' => $page_sectionlistval, 'page_sectionlistlabel' => $page_sectionlistlabel);
         return $this->renderWithData('changeBlock', $responseData);

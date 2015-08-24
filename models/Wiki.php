@@ -124,4 +124,18 @@ class Wiki extends BaseImasWikis
         }
     }
 
+    public static function updateWikiForMassChanges($startdate, $enddate, $avail, $id)
+    {
+        $wiki = Wiki::findOne(['id' => $id]);
+        $wiki->startdate = $startdate;
+        $wiki->enddate = $enddate;
+        $wiki->avail = $avail;
+        $wiki->save();
+    }
+
+    public static function getWikiMassChanges($courseId)
+    {
+        $query = Wiki::find()->where(['courseid' => $courseId])->all();
+        return $query;
+    }
 } 

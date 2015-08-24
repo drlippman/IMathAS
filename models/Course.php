@@ -237,4 +237,10 @@ class Course extends BaseImasCourses {
         }
         return $items;
     }
+
+//    public static function getItemOrderForMassChanges($courseId)
+//    {
+//        $query =\Yii::$app->db->createCommand("SELECT itemorder FROM imas_courses WHERE id='$courseId'")->queryOne();
+//        return $query;
+//    }
 }
