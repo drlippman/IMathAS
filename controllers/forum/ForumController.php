@@ -1114,7 +1114,6 @@ class ForumController extends AppController
             'isOutcomes' => $course['outcomes'],
         );
         if ($modifyForumId) {
-
             $pageTitle = 'Modify Forum';
             $saveTitle = AppConstant::SAVE_BUTTON;
             $forumData = Forums::getById($modifyForumId);
@@ -1353,8 +1352,6 @@ class ForumController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-//        $this->includeJS(["editor/tiny_mce.js",'editor/tiny_mce_src.js','general.js', "forum/addforum.js",'editor.js']);
-
         $this->includeJS(["editor/tiny_mce.js", "forum/addforum.js", "general.js"]);
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,

@@ -177,5 +177,6 @@ class AppConstant
     const GROUP_NAME = 'Unnamed group set';
     const NEW_GROUP_NAME = 'Unnamed Group';
     const GROUP_MESSAGE = 'You need to log in as a teacher to access this page';
+    const NUMERIC_SIXTY = 60;
 
 }

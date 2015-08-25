@@ -1480,6 +1480,7 @@ class AppUtility extends Component
                 } else {
                     $colors = array();
                 }
+
                 displayq($i, $qsetid, $seeds[$i], 2, false, $attempts[$i], false, false, false, $colors);
 
                 $responseString .= '<div class="review">';

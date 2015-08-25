@@ -380,15 +380,20 @@ class Assessments extends BaseImasAssessments
     }
     public static function CommonMethodToGetAssessmentData($toCopy,$id)
     {
-        $query = "SELECT $toCopy FROM imas_assessments WHERE id='$id'";
-        $assessment = Yii::$app->db->createCommand($query)->queryOne();
-        return $assessment;
-
+        $query = new Query();
+        $query->select($toCopy)
+            ->from('imas_assessments')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
     }
     public static function updateAssessmentData($setslist,$checkedlist)
     {
         $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)";
-        Yii::$app->db->createCommand($query)->query();
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
     }
 
     public static function updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id)

@@ -708,6 +708,7 @@ class  interpretUtility extends Component
             }
         }
         if ($sessiondata['mathdisp'] == 2) {
+
             $str = str_replace('\\`', '&grave;', $str);
             if (strpos($str, '`') !== FALSE) {
                 $str = preg_replace_callback('/`(.*?)`/s', 'mathfiltercallback', $str);

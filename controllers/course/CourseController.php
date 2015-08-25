@@ -1007,9 +1007,8 @@ class CourseController extends AppController
                 'cntingb' => AppConstant::NUMERIC_ONE,
             );
         }
-        if ($this->isPost()) { //after modify done, save into database
+        if ($this->isPostMethod()) { //after modify done, save into database
             $modifyLinkId = $this->getParamVal('modifyLinkId');
-//            AppUtility::dump($modifyLinkId);
             if ($modifyLinkId) {
                 if(isset($params['outcomes'])){
                     foreach ($params['outcomes'] as $outcomeId) {

@@ -863,7 +863,6 @@ class QuestionController extends AppController
             $teacherId = $userId;
             $adminAsTeacher = true;
         }
-//AppUtility::dump($params);
         if ($params['cid'] == 'admin') {
             if ($myRights == AppConstant::ADMIN_RIGHT) {
                 $isAdmin = true;

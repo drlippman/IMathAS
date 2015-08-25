@@ -20,7 +20,7 @@ class Forums extends BaseImasForums {
 
     public static function getByCourseId($courseId)
     {
-        return Forums::findAll(['courseid' => $courseId]);
+        return Forums::findAll(['courseid'=>$courseId]);
     }
 
     public static function getById($id)
@@ -37,23 +37,23 @@ class Forums extends BaseImasForums {
     {
         return Forums::find()->where(['courseid' => $courseId])->orderBy([$orderBy => $sort])->all();
     }
+
     public  static  function findDiscussionGradeInfo($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now)
     {
-
         $query = new Query();
         $query->select(['id', 'name', 'gbcategory', 'startdate', 'enddate', 'replyby', 'postby', 'points', 'cntingb', 'avail'])
             ->from('imas_forums')
-            ->where(['courseid'=>$courseId])
+            ->where('courseid=:courseId',[':courseId'=>$courseId])
             ->andWhere(['>', 'points', AppConstant::NUMERIC_ZERO])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if (!$canviewall) {
-            $query->andWhere(['<','startdate', $now]);
+            $query->andWhere(['<','startdate',$now]);
         }
         if ($istutor) {
             $query->andWhere(['<','tutoredit', AppConstant::NUMERIC_TWO]);
         }
         if ($catfilter> AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory' => $catfilter]);
+            $query->andWhere('gbcategory=:gbCat',[':gbCat' => $catfilter]);
         }
         $query->orderBy('enddate, postby, replyby, startdate');
         $command = $query->createCommand();
@@ -66,17 +66,18 @@ class Forums extends BaseImasForums {
         $query = new Query();
         $query->select(['id', 'name', 'gbcategory', 'startdate', 'enddate', 'replyby', 'postby', 'points', 'cntingb', 'avail'])
             ->from('imas_forums')
-            ->where(['courseid'=>$courseId])
+            ->where('courseid=:courseId',[':courseId'=>$courseId])
             ->andWhere(['>', 'points', AppConstant::NUMERIC_ZERO])
             ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
         if ($catfilter>AppConstant::NUMERIC_NEGATIVE_ONE) {
-            $query->andWhere(['gbcategory' => $catfilter]);
+            $query->andWhere('gbcategory=:gbCat',[':gbCat' => $catfilter]);
         }
         $query->orderBy('enddate, postby, replyby, startdate');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
+
     public function addNewForum($params)
     {
         $this->name = trim(isset($params['name']))?$params['name']:null;
@@ -98,11 +99,12 @@ class Forums extends BaseImasForums {
         $this->gbcategory = isset($params['gbcategory']) ? $params['gbcategory'] : null;
         $this->points = isset($params['points']) ? $params['points'] : null;
         $this->tutoredit = isset($params['tutoredit']) ? $params['tutoredit'] : null;
-        $this->rubric = $params['rubric'] ? $params['rubric'] : 0;
+        $this->rubric = $params['rubric'] ? $params['rubric'] : AppConstant::NUMERIC_ZERO;
         $this->outcomes = isset($params['outcomes']) ? $params['outcomes'] : null;
         $this->save();
         return $this->id;
     }
+
     public static function deleteForum($itemId)
     {
         $forum = Forums::findOne(['id' => $itemId]);
@@ -110,9 +112,9 @@ class Forums extends BaseImasForums {
             $forum->delete();
         }
     }
+
     public function updateForum($params)
     {
-
         $endDate =   AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
         $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
         $postDate = AppUtility::parsedatetime($params['postDate'],$params['postTime']);
@@ -177,6 +179,7 @@ class Forums extends BaseImasForums {
         $updateForumData->outcomes = $params['outcomes'];
         $updateForumData->save();
     }
+
     public static function updateGbCat($catList){
 
         foreach($catList as $category){
@@ -190,7 +193,8 @@ class Forums extends BaseImasForums {
 
     public static function setRubric($id, $data){
         $rubricData = Forums::findOne(['id' => $id]);
-        if ($rubricData){
+        if ($rubricData)
+        {
             $rubricData->rubric = $data;
             $rubricData->save();
         }
@@ -198,7 +202,7 @@ class Forums extends BaseImasForums {
 
     public static function setReplyBy($shift,$typeId)
     {
-        $date = Forums::find()->where(['id'=>$typeId])->andWhere(['>','replyby','0'])->andWhere(['<','replyby','2000000000'])->one();
+        $date = Forums::find()->where(['id'=>$typeId])->andWhere(['>','replyby',AppConstant::NUMERIC_ZERO])->andWhere(['<','replyby',AppConstant::ALWAYS_TIME])->one();
         if($date)
         {
             $date->replyby = $date->replyby + $shift;
@@ -208,7 +212,7 @@ class Forums extends BaseImasForums {
 
     public static function setPostBy($shift,$typeId)
     {
-        $date = Forums::find()->where(['id' => $typeId])->andWhere(['>', 'postby', '0'])->andWhere(['<', 'postby', '2000000000'])->one();
+        $date = Forums::find()->where(['id' => $typeId])->andWhere(['>', 'postby', AppConstant::NUMERIC_ZERO])->andWhere(['<', 'postby', AppConstant::ALWAYS_TIME])->one();
         if ($date)
         {
             $date->postby = $date->postby + $shift;
@@ -221,7 +225,7 @@ class Forums extends BaseImasForums {
         $query = new Query();
         $query->select(['id','cntingb','name','gbcategory','outcomes'])
             ->from('imas_forums')
-            ->where(['courseid' => $courseId])
+            ->where('courseid = :courseId',[':courseId' => $courseId])
             ->andWhere(['<>','outcomes','']);
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -245,6 +249,7 @@ class Forums extends BaseImasForums {
             }
         }
     }
+
     public static function updateForumData($setslist,$checkedlist)
     {
         $query = "UPDATE imas_forums SET $setslist WHERE id IN ($checkedlist)";
@@ -260,7 +265,6 @@ class Forums extends BaseImasForums {
         $command = $query->createCommand();
         $data = $command->queryOne();
         return $data;
-
     }
 
     public static function updateForumMassChange($startdate, $enddate, $avail, $id)

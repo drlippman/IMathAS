@@ -89,9 +89,8 @@ class RosterController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $newStartDate = AppUtility::getTimeStampFromDate($params['newStartDate']);
-        $newEndDate = AppUtility::getTimeStampFromDate($params['newEndDate']);
-        $newEndDate1 = strtotime($params['newEndDate']. " ".date('g:i a'));
-        $loginLogs = LoginGrid::getById($courseId, $newStartDate, $newEndDate1);
+        $newEndDate = strtotime($params['newEndDate']. " ".date('g:i a'));
+        $loginLogs = LoginGrid::getById($courseId, $newStartDate, $newEndDate);
         $headsArray = array();
         $headsArray[] = 'Name';
         for ($curDate = $newStartDate; $curDate <= $newEndDate; ($curDate = $curDate + 86400)) {

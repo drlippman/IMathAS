@@ -17,15 +17,15 @@ use yii\db\Query;
 
 class Grades extends BaseImasGrades
 {
-    public function createGradesByUserId($singal,$gbItemsId)
+    public function createGradesByUserId($grade)
     {
-        if($singal['gradeText'] || $singal['feedbackText'] || $singal['fromUploadFile'] == AppConstant::NUMERIC_ONE){
-            $this->gradetypeid = $gbItemsId;
-            $this->userid = $singal['studentId'];
-            $this->score = $singal['gradeText'];
-            $this->feedback = $singal['feedbackText'];
+            $this->gradetypeid = $grade['gradetypeid'];
+            $this->userid = $grade['userid'];
+            $this->score = $grade['score'];
+            $this->feedback = $grade['feedback'];
+            $this->gradetype = $grade['gradetype'];
             $this->save();
-        }
+
     }
 
     public static function GetOtherGrades($gradetypeselects, $limuser){
@@ -82,9 +82,9 @@ class Grades extends BaseImasGrades
                 $this->save();
 
     }
-    public static function updateGradeToStudent($score,$feedback,$cuserid,$gbItemsId){
-
-        $grade = Grades::find()->where(['userid' => $cuserid])->andWhere(['gradetypeid'=> $gbItemsId])->andWhere(['gradetype' => 'offline'])->one();
+    public static function updateGradeToStudent($score,$feedback,$userid,$gbItemsId)
+    {
+        $grade = Grades::find()->where(['userid' => $userid])->andWhere(['gradetypeid'=> $gbItemsId])->andWhere(['gradetype' => 'offline'])->one();
         if($grade){
             $grade->score = $score;
             $grade->feedback = $feedback;
@@ -105,10 +105,10 @@ class Grades extends BaseImasGrades
         $query = new Query();
         $query	->select(['userid','score','feedback'])
             ->from('imas_grades')
-            ->where(['imas_grades.gradetype' => 'offline'])
-            ->andWhere(['imas_grades.gradetypeid' => $gbitemId]);
+            ->where(['gradetype' => 'offline'])
+            ->andWhere(['gradetypeid' => $gbitemId]);
         if($grades != 'all'){
-            $query->where(['imas_grades.userid' => $grades]);
+            $query->andWhere(['userid' => $grades]);
         }
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -119,7 +119,11 @@ class Grades extends BaseImasGrades
         $grade->score = $score;
         $grade->feedback = $feedback;
         $grade->save();
-}
+    }
+    public static function getUserId($gbItem,$kl)
+    {
+       return Grades::find()->where(['gradetype' => 'offline'])->andWhere(['gradetypeid' => $gbItem])->andWhere(['IN','userid',$kl])->all();
+    }
 
 }
 

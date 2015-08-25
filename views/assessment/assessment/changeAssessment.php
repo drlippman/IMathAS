@@ -24,7 +24,9 @@ $this->title = 'Mass Change Assessment Settings';
         </div>
     </div>
     <div class="tab-content shadowBox non-nav-tab-item">
-<?php
+        <div class="change-assessment ">
+        <?php
+
         if ($overWriteBody==1) {
         echo $body;
         } else { ?>
@@ -33,24 +35,29 @@ $this->title = 'Mass Change Assessment Settings';
                 taken will not change the scores of students who have already completed the assessment.<br/>
                 This page will <i>always</i> show the system default settings; it does not show the current settings for your
                 assessments.</p>
-
-
             <h3>Assessments to Change</h3>
-
+            <div class="col-lg-12">
+                <div class="pull-left">
             Check: <a href="#"
                       onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',true)">All</a>
             <a href="#"
                onclick="document.getElementById('selbygbcat').selectedIndex=0;return chkAllNone('qform','checked[]',false)">None</a>
             Check by gradebook category:
+            </div>
+<div class="col-lg-4">
             <?php
             AssessmentUtility::writeHtmlSelect("selbygbcat", $gbcatsId, $gbcatsLabel, null, "Select...", -1, ' onchange="chkgbcat(this.value);" id="selbygbcat" ');
             ?>
-<?php
+                </div>
+  </div>
+
+            <?php
 
 /******* begin html output ********/
 
 
 ?>
+   <div>
     <ul id="alistul" class=nomark>
         <?php
         echo $page_assessListMsg;
@@ -93,8 +100,9 @@ $this->title = 'Mass Change Assessment Settings';
         }*/
         ?>
     </ul>
-
-    <fieldset>
+        </div>
+        </div>
+        <div class="change-assessment">
         <legend>Assessment Options</legend>
         <table class="gb" id="opttable">
             <thead>
@@ -106,80 +114,89 @@ $this->title = 'Mass Change Assessment Settings';
             </thead>
             <tbody>
             <tr>
-                <td><input type="checkbox" name="chgsummary" class="chgbox"/></td>
-                <td class="r">Summary:</td>
-                <td>Copy from:
+              <div class="col-lg-12">
+                  <div class="col-lg-2"> <td><input type="checkbox" name="chgsummary" class="chgbox"/></td> </div>
+                  <div class="col-lg-4 "><td class="text-align">Summary:</td></div>
+                  <div class="col-lg-6"><td>
+                      <div class="pull-left">Copy from:</div>
+                  <div class="">
                     <?php
                     AssessmentUtility::writeHtmlSelect("summary", $page_assessSelect['val'], $page_assessSelect['label']);
                     ?>
-
-                </td>
+                          </div>
+                </td></div></div>
             </tr>
-            <tr>
-                <td><input type="checkbox" name="chgintro" class="chgbox"/></td>
-                <td class="r">Instructions:</td>
-                <td>Copy from:
+            <tr><div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgintro" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Instructions:</td></div>
+                <div class="col-lg-6"><td>
+                        <div class="pull-left">Copy from:</div>
                     <?php
                     AssessmentUtility::writeHtmlSelect("intro", $page_assessSelect['val'], $page_assessSelect['label']);
                     ?>
 
-                </td>
+                </td></div></div>
             </tr>
             <tr>
-                <td><input type="checkbox" name="chgdates" class="chgbox"/></td>
-                <td class="r">Dates and Times:</td>
-                <td>Copy from:
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgdates" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Dates and Times:</td></div>
+                <div class="col-lg-6"><td><div class="pull-left">Copy from:</div>
                     <?php
                     AssessmentUtility::writeHtmlSelect("dates", $page_assessSelect['val'], $page_assessSelect['label']);
                     ?>
-                </td>
+                </td></div></div>
             </tr>
-            <tr>
-                <td><input type="checkbox" name="chgavail" class="chgbox"/></td>
-                <td class="r">Show:</td>
-                <td>
-                    <input type=radio name="avail" value="0"/>Hide<br/>
+            <tr><div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgavail" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show:</td></div>
+                <div class="col-lg-6"><td>
+                    <input type=radio name="avail" value="0"/>Hide
                     <input type=radio name="avail" value="1" checked="checked"/>Show by Dates
-                </td>
+                </td></div></div>
             </tr>
             <tr>
-                <td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td>
-                <td class="r" style="border-bottom: 1px solid #000">End of Assessment Messages:</td>
-                <td style="border-bottom: 1px solid #000">Copy from:
+                <div class="col-lg-12"><div class="col-lg-2"><td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcopyendmsg"/></td></div>
+                <div class="col-lg-4"><td class="text-align" style="border-bottom: 1px solid #000">End of Assessment Messages:</td></div>
+                <div class="col-lg-6"><td style="border-bottom: 1px solid #000"><div class="pull-left">Copy from:</div>
                     <?php
                     AssessmentUtility::writeHtmlSelect("copyendmsg", $page_assessSelect['val'], $page_assessSelect['label']);
                     ?>
                     <br/><i style="font-size: 75%">Use option near the bottom to define new messages</i>
-                </td>
+                </td></div></div>
             </tr>
-            <tr>
-                <td><input type="checkbox" name="docopyopt" class="chgbox"
-                           onClick="copyfromtoggle(this.form,this.checked)"/></td>
-                <td class="r">Copy remaining options</td>
-                <td>Copy from:
+            <tr><div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="docopyopt" class="chgbox"
+                           onClick="copyfromtoggle(this.form,this.checked)"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Copy remaining options</td></div>
+                <div class="col-lg-6"><td><div class="pull-left">Copy from:</div>
                     <?php
                     AssessmentUtility::writeHtmlSelect("copyopt", $page_assessSelect['val'], $page_assessSelect['label']);
                     ?>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgpassword" class="chgbox"/></td>
-                <td class="r">Require Password (blank for none):</td>
-                <td><input type=text name="assmpassword" value="" autocomplete="off"></td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgpassword" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Require Password (blank for none):</td></div>
+                <div class="col-lg-6"><td><input type=text name="assmpassword" value="" autocomplete="off"></td></div>
+                </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td>
-                <td class="r">Time Limit (minutes, 0 for no time limit):</td>
-                <td><input type=text size=4 name="timelimit" value="0"/>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgtimelimit" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Time Limit (minutes, 0 for no time limit):</td></div>
+                <div class="col-lg-6"><td><input type=text size=4 name="timelimit" value="0"/>
                     <input type="checkbox" name="timelimitkickout"/> Kick student out at timelimit
-                </td>
+                </td></div></div>
             </tr>
 
             <tr class="coptr">
-                <td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td>
-                <td class="r">Display method:</td>
-                <td>
-                    <select name="displaymethod">
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgdisplaymethod" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Display method:</td></div>
+                <div class="col-lg-6"><td>
+                    <select name="displaymethod" class="form-control">
                         <option value="AllAtOnce" <?php AssessmentUtility::writeHtmlSelected($line['displaymethod'], "AllAtOnce", 0) ?>>
                             Full test at once
                         </option>
@@ -195,18 +212,21 @@ $this->title = 'Mass Change Assessment Settings';
                         <option value="Embed" <?php AssessmentUtility::writeHtmlSelected($line['displaymethod'], "Embed", 0) ?>>Embedded
                         </option>
                     </select>
-                </td>
+                </td></div></div>
             </tr>
 
             <tr class="coptr">
-                <td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td>
-                <td class="r">Default points per problem:</td>
-                <td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>"></td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgdefpoints" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Default points per problem:</td></div>
+                <div class="col-lg-6"><td><input type=text size=4 name=defpoints value="<?php echo $line['defpoints'];?>"></td></div>
+                    </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td>
-                <td class="r">Default attempts per problem (0 for unlimited):</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgdefattempts" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Default attempts per problem (0 for unlimited):</td></div>
+                <div class="col-lg-6"><td>
                     <input type=text size=4 name=defattempts value="<?php echo $line['defattempts'];?>">
  					<span id="showreattdiffver" class="<?php if ($testtype != "Practice" && $testtype != "Homework") {
                         echo "show";
@@ -215,16 +235,18 @@ $this->title = 'Mass Change Assessment Settings';
                     } ?>">
  					<input type=checkbox name="reattemptsdiffver" <?php AssessmentUtility::writeHtmlChecked($line['shuffle'] & 8, 8); ?> />
  					Reattempts different versions</span>
-                </td>
+                </td></div>
+                    </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td>
-                <td class="r">Default penalty:</td>
-                <td><input type=text size=4 name=defpenalty
+                <div class="col-lg-12">
+                    <div class="col-lg-2"><td><input type="checkbox" name="chgdefpenalty" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Default penalty:</td></div>
+                <div class="col-lg-6"><td><input type=text size=4 name=defpenalty style="margin-bottom: 4px"
                            value="<?php echo $line['defpenalty'];?>" <?php if ($taken) {
                         echo 'disabled=disabled';
                     }?>>%
-                    <select name="skippenalty" <?php if ($taken) {
+                    <select class="form-control" name="skippenalty" <?php if ($taken) {
                         echo 'disabled=disabled';
                     }?>>
                         <option value="0" <?php if ($skippenalty == 0) {
@@ -260,13 +282,14 @@ $this->title = 'Mass Change Assessment Settings';
                         } ?>>on last possible attempt only
                         </option>
                     </select>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgfeedback" class="chgbox"/></td>
-                <td class="r">Feedback method:<br/>and Show Answers:</td>
-                <td>
-                    <select id="deffeedback" name="deffeedback" onChange="chgfb()">
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgfeedback" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Feedback method:<br/>and Show Answers:</td></div>
+                <div class="col-lg-6"><td>
+                    <select class="form-control" id="deffeedback" name="deffeedback" onChange="chgfb()">
                         <option value="NoScores" <?php if ($testtype == "NoScores") {
                             echo "SELECTED";
                         } ?>>No scores shown (use with 1 attempt per problem)
@@ -304,7 +327,7 @@ $this->title = 'Mass Change Assessment Settings';
                     } else {
                         echo "hidden";
                     } ?>">
-					<select name="showansprac">
+					<select class="form-control" name="showansprac">
                         <option value="V" <?php if ($showans == "V") {
                             echo "SELECTED";
                         } ?>>Never, but allow students to review their own answers
@@ -352,7 +375,7 @@ $this->title = 'Mass Change Assessment Settings';
                     } else {
                         echo "hidden";
                     } ?>">
-					<select name="showans">
+					<select class="form-control" name="showans">
                         <option value="V" <?php if ($showans == "V") {
                             echo "SELECTED";
                         } ?>>Never, but allow students to review their own answers
@@ -375,14 +398,15 @@ $this->title = 'Mass Change Assessment Settings';
                         </option>
                     </select>
 					</span>
-                </td>
+                </td></div></div>
             </tr>
 
             <tr class="coptr">
-                <td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td>
-                <td class="r">Use equation helper?</td>
-                <td>
-                    <select name="eqnhelper">
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgeqnhelper" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Use equation helper?</td></div>
+                <div class="col-lg-6"><td>
+                    <select class="form-control" name="eqnhelper">
                         <option value="0" <?php AssessmentUtility::writeHtmlSelected($line['eqnhelper'], 0) ?>>No</option>
                         <?php
                         //phase out unless a default
@@ -401,206 +425,210 @@ $this->title = 'Mass Change Assessment Settings';
                         <option value="4" <?php AssessmentUtility::writeHtmlSelected($line['eqnhelper'], 4) ?>>MathQuill, advanced form
                         </option>
                     </select>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chghints" class="chgbox"/></td>
-                <td class="r">Show hints and video/text buttons when available?</td>
-                <td>
+               <div class="col-lg-12"> <div class="col-lg-2"><td><input type="checkbox" name="chghints" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show hints and video/text buttons when available?</td></div>
+                <div class="col-lg-6"><td>
                     <input type="checkbox" name="showhints" <?php AssessmentUtility::writeHtmlChecked($line['showhints'], 1); ?>>
-                </td>
+                </td></div>
+                   </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgmsgtoinstr" class="chgbox"/></td>
-                <td class="r">Show "Message instructor about this question" links</td>
-                <td>
+                <div class="col-lg-12">
+                    <div class="col-lg-2"><td><input type="checkbox" name="chgmsgtoinstr" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show "Message instructor about this question" links</td></div>
+                <div class="col-lg-6"><td>
                     <input type="checkbox" name="msgtoinstr" <?php AssessmentUtility::writeHtmlChecked($line['msgtoinstr'], 1); ?>/>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgposttoforum" class="chgbox"/></td>
-                <td class="r">Show "Post this question to forum" links?</td>
-                <td>
+                <div class="col-lg-12"><div class="col-lg-2" ><td><input type="checkbox" name="chgposttoforum" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show "Post this question to forum" links?</td></div>
+                <div class="col-lg-6"><td>
                     <input type="checkbox"
-                           name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($line['posttoforum'], 0, true); ?>/> To
+                           name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($line['posttoforum'], 0, true); ?> style="margin-bottom: 4px"/> To
                     forum <?php AssessmentUtility::writeHtmlSelect("posttoforum", $page_forumSelect['val'], $page_forumSelect['label'], $line['posttoforum']); ?>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgshowtips" class="chgbox"/></td>
-                <td class="r">Show answer entry tips?</td>
-                <td>
-                    <select name="showtips">
+            <div class="col-lg-12"> <div class="col-lg-2"><td><input type="checkbox" name="chgshowtips" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show answer entry tips?</td></div>
+                <div class="col-lg-6"><td>
+                    <select name="showtips" class="form-control">
                         <option value="0" <?php AssessmentUtility::writeHtmlSelected($line['showtips'], 0) ?>>No</option>
                         <option value="1" <?php AssessmentUtility::writeHtmlSelected($line['showtips'], 1) ?>>Yes, after question</option>
                         <option value="2" <?php AssessmentUtility::writeHtmlSelected($line['showtips'], 2) ?>>Yes, under answerbox</option>
                     </select>
                 </td>
+                </div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgallowlate" class="chgbox"/></td>
-                <td class="r">Allow use of LatePasses?:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" style="margin-bottom: 4px" name="chgallowlate" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Allow use of LatePasses?:</td></div>
+                <div class="col-lg-6"><td>
                     <?php
                     AssessmentUtility::writeHtmlSelect("allowlate", $page_allowlateSelect['val'], $page_allowlateSelect['label'], 1);
                     ?>
                     <label><input type="checkbox" name="latepassafterdue"> Allow LatePasses after due date, within 1
                         LatePass period</label>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgnoprint" class="chgbox"/></td>
-                <td class="r">Make hard to print?:</td>
-                <td>
+                <div class="col-lg-12">
+               <div class="col-lg-2"> <td><input type="checkbox" name="chgnoprint" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Make hard to print?:</td></div>
+                <div class="col-lg-6"><td>
                     <input type="radio" value="0" name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'], 0); ?>/> No
                     <input type="radio" value="1" name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'], 1); ?>/> Yes
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgshuffle" class="chgbox"/></td>
-                <td class="r">Shuffle item order:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgshuffle" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Shuffle item order:</td></div>
+                <div class="col-lg-6"><td>
 				<span class=formright><input type="checkbox"
                                              name="shuffle" <?php AssessmentUtility::writeHtmlChecked($line['shuffle'] & 1, 1); ?>>
-                </td>
+                </td></div></div>
             </tr>
 
-
-            <tr class="coptr">
-                <td><input type="checkbox" name="chggbcat" class="chgbox"/></td>
-                <td class="r">Gradebook category:</td>
-                <td>
+        <tr class="coptr">
+            <div class="col-lg-12">
+               <div class="col-lg-2"> <td><input type="checkbox" name="chggbcat" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Gradebook category:</td></div>
+                <div class="col-lg-6"><td>
                     <?php
                     AssessmentUtility::writeHtmlSelect("gbcat", $page_gbcatSelect['val'], $page_gbcatSelect['label'], null, null, null, " id=gbcat");
                     ?>
-
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td>
-                <td class="r">Tutor Access:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgtutoredit" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Tutor Access:</td></div>
+                <div class="col-lg-6"><td>
                     <?php
                     $page_tutorSelect['label'] = array("No access", "View Scores", "View and Edit Scores");
                     $page_tutorSelect['val'] = array(2, 0, 1);
                     AssessmentUtility::writeHtmlSelect("tutoredit", $page_tutorSelect['val'], $page_tutorSelect['label'], $line['tutoredit']);
 
                     ?>
-                </td>
+                </td></div></div>
             </tr>
 
             <tr class="coptr">
-                <td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td>
-                <td class="r" style="border-bottom: 1px solid #000">Count:</td>
-                <td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked"
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td style="border-bottom: 1px solid #000"><input type="checkbox" name="chgcntingb" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align" style="border-bottom: 1px solid #000">Count:</td></div>
+                <div class="col-lg-6"><td style="border-bottom: 1px solid #000"><input name="cntingb" value="1" checked="checked"
                                                                  type="radio"> Count in Gradebook<br>
                     <input name="cntingb" value="0" type="radio"> Don't count in grade total and hide from students<br>
                     <input name="cntingb" value="3" type="radio"> Don't count in grade total<br>
                     <input name="cntingb" value="2" type="radio"> Count as Extra Credit
-                </td>
+                </td></div></div>
             </tr>
 
-
             <tr class="coptr">
-                <td><input type="checkbox" name="chgcaltag" class="chgbox"/></td>
-                <td class="r">Calendar icon:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgcaltag" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Calendar icon:</td></div>
+                <div class="col-lg-6"><td>
                     Active: <input name="caltagact" type=text size=1 value="<?php echo $line['caltag'];?>"/>,
                     Review: <input name="caltagrev" type=text size=1 value="<?php echo $line['calrtag'];?>"/>
-                </td>
+                </td></div></div>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgminscore" class="chgbox"/></td>
-                <td class="r">Minimum score to receive credit:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgminscore" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Minimum score to receive credit:</td></div>
+                <div class="col-lg-6"><td>
                     <input type=text size=4 name=minscore value="<?php echo $line['minscore'];?>">
                     <input type="radio" name="minscoretype" value="0" checked="checked"> Points
                     <input type="radio" name="minscoretype" value="1"> Percent
-
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgdeffb" class="chgbox"/></td>
-                <td class="r">Default Feedback Text:</td>
-                <td>Use? <input type="checkbox" name="usedeffb"><br/>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgdeffb" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Default Feedback Text:</td></div>
+                <div class="</div>6"><td>Use? <input type="checkbox" name="usedeffb"><br/>
                     Text: <input type="text" size="60" name="deffb"
                                  value="This assessment contains items that not automatically graded.  Your grade may be inaccurate until your instructor grades these items."/>
-                </td>
+                </td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
-                <td class="r">Clear "show based on another assessment" settings.</td>
-                <td></td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgreqscore" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Clear "show based on another assessment" settings.</td></div>
+                <div class="col-lg-6"><td></td></div></div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>
-                <td class="r">All items same random seed:</td>
-                <td><input type="checkbox" name="sameseed"></td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgsameseed" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">All items same random seed:</td></div>
+                <div class="col-lg-6"><td><input type="checkbox" name="sameseed"></td></div>
+                    </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgsamever" class="chgbox"/></td>
-                <td class="r">All students same version of questions:</td>
-                <td><input type="checkbox" name="samever"></td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgsamever" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">All students same version of questions:</td></div>
+                <div class="col-lg-6"><td><input type="checkbox" name="samever"></td></div>
+                    </div>
             </tr>
 
             <tr class="coptr">
-                <td><input type="checkbox" name="chgexcpen" class="chgbox"/></td>
-                <td class="r">Penalty for questions done while in exception/LatePass:</td>
-                <td>
+                <div class="col-lg-12">
+                        <div class="col-lg-2"><td><input type="checkbox" name="chgexcpen" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Penalty for questions done while in exception/LatePass:</td></div>
+                <div class="col-lg-6"><td>
                     <input type=text size=4 name="exceptionpenalty" value="<?php echo $line['exceptionpenalty'];?>">%
-                </td>
+                </td></div>
+                    </div>
             </tr>
-            <?php
-            /* removed because gets too confusing with group sets
-                        <tr class="coptr">
-                            <td><input type="checkbox" name="chgisgroup"/></td>
-                            <td class="r">Group assessment: </td>
-                            <td><input type="radio" name="isgroup" value="0" checked="checked" />Not a group assessment<br/>
-                            <input type="radio" name="isgroup" value="1"  />Students can add members with login passwords<br/>
-                            <input type="radio" name="isgroup" value="2"  />Students can add members without passwords<br/>
-                            <input type="radio" name="isgroup" value="3"  />Students cannot add members</td>
-                        </tr>
-
-                        <tr class="coptr">
-                            <td><input type="checkbox" name="chggroupmax"/></td>
-                            <td class="r">Max group members (if group assessment):</td>
-                            <td>
-                            <input type="text" name="groupmax" value="<?php echo $line['groupmax'];?>" />
-                            </td>
-                        </tr>
-            */
-            ?>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgshowqcat" class="chgbox"/></td>
-                <td class="r">Show question categories:</td>
-                <td><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgshowqcat" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Show question categories:</td></div>
+                <div class="col-lg-6"><td><input name="showqcat" value="0" checked="checked" type="radio">No <br/>
                     <input name="showqcat" value="1" type="radio">In Points Possible bar <br/>
                     <input name="showqcat" value="2" type="radio">In navigation bar (Skip-Around only)
-                </td>
+                </td></div>
+                    </div>
             </tr>
             <tr class="coptr">
-                <td><input type="checkbox" name="chgistutorial" class="chgbox"/></td>
-                <td class="r">Display for tutorial-style questions:</td>
-                <td>
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td><input type="checkbox" name="chgistutorial" class="chgbox"/></td></div>
+                <div class="col-lg-4"><td class="text-align">Display for tutorial-style questions:</td></div>
+                <div class="col-lg-6"><td>
                     <input type="checkbox" name="istutorial"/>
-                </td>
+                </td></div>
+                    </div>
             </tr>
             <tr>
-                <td style="border-top: 1px solid #000"></td>
-                <td class="r" style="border-top: 1px solid #000">Define end of assessment messages?</td>
-                <td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will
+                <div class="col-lg-12">
+                <div class="col-lg-2"> <td style="border-top: 1px solid #000"></td></div>
+                <div class="col-lg-4"><td class="text-align" style="border-top: 1px solid #000">Define end of assessment messages?</td></div>
+                <div class="col-lg-6"><td style="border-top: 1px solid #000"><input type="checkbox" name="chgendmsg" class="chgbox"/> You will
                     be taken to a page to change these after you hit submit
-                </td>
+                </td></div>
+                    </div>
             </tr>
             <tr>
-                <td></td>
-                <td class="r">Remove per-question settings (points, attempts, etc.) for all questions in these
+                <div class="col-lg-12">
+                <div class="col-lg-2"><td></td></div>
+                <div class="col-lg-4"><td class="text-align">Remove per-question settings (points, attempts, etc.) for all questions in these
                     assessments?
-                </td>
-                <td><input type="checkbox" name="removeperq" class="chgbox"/></td>
+                </td></div>
+                <div class="col-lg-6"><td><input type="checkbox" name="removeperq" class="chgbox"/></td></div>
+                    </div>
             </tr>
             </tbody>
         </table>
-    </fieldset>
+
+        </div>
 <?php
            } ?>
     </div>

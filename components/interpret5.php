@@ -25,7 +25,6 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 		$str = str_replace("&&\n","<br/>",$str);
 		$str = str_replace("&\n"," ",$str);
 		$r =  interpretline($str.';',$anstype,$countcnt).';';
-//        \app\components\AppUtility::dump($r);
 		return $r;
 	}
 }

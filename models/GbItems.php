@@ -21,20 +21,14 @@ class GbItems extends BaseImasGbitems
     public function createGbItemsByCourseId($courseId,$params)
     {
         $this->courseid = $courseId;
-        $name = $params['name'];
-        $this->name = isset($name) ? $name : null;
-        $this->points = isset($params['points']) ? $params['points'] : 0;
-        $showdate = AppConstant::NUMERIC_ZERO;
-        if($params['sdate-type'] == AppConstant::NUMERIC_ONE)
-        {
-            $showdate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
-        }
-        $this->showdate = $showdate;
+        $this->name = $params['name'] ? $params['name'] : ' ';
+        $this->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
+        $this->showdate = $params['showdate'];
         $this->gbcategory = $params['gradebook-category'];
         $this ->rubric = $params['rubric'];
         $this->cntingb = $params['cntingb'];
         $this->tutoredit = $params['tutoredit'];
-        $this->outcomes = isset($params['outcomes']) ? $params['outcomes']:null ;
+        $this->outcomes = isset($params['outcomes']) ? $params['outcomes']:' ' ;
         $this->save();
         return $this->id;
     }
@@ -154,5 +148,17 @@ class GbItems extends BaseImasGbitems
         return $data;
 
     }
-
+    public static function updateGbItemsByCourseId($gbItemId , $params)
+    {
+        $GbItems = GbItems::find()->where(['id' => $gbItemId])->one();
+        $GbItems->name = $params['name'] ? $params['name'] : null;
+        $GbItems->points = $params['points'] ? $params['points'] : AppConstant::NUMERIC_ZERO;
+        $GbItems->showdate = $params['showdate'];
+        $GbItems->gbcategory = $params['gradebook-category'];
+        $GbItems->rubric = $params['rubric'];
+        $GbItems->cntingb = $params['cntingb'];
+        $GbItems->tutoredit = $params['tutoredit'];
+        $GbItems->outcomes = isset($params['outcomes']) ? $params['outcomes']:null ;
+        $GbItems->save();
+    }
 }

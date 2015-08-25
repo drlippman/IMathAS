@@ -919,7 +919,6 @@ public $oa = array();
                     $avail = intval($data['avail']);
 
                     if ($type=='Assessment') {
-                        AppUtility::dump('hhhh');
                         if ($id>0) {
                             $assessment = new Assessments();
                             $assessment->updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id);

@@ -180,7 +180,10 @@ class AssessmentSession extends BaseImasAssessmentSessions
     }
 
     public static function getByAssessmentId($assessmentId){
-        return AssessmentSession::findAll(['assessmentid' => $assessmentId]);
+        $assessment =  AssessmentSession::findAll(['assessmentid' => $assessmentId]);
+        if($assessment){
+            return $assessment;
+        }
     }
 
     public static function setBestScore($bestScore, $id){

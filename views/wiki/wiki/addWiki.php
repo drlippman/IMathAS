@@ -7,8 +7,6 @@ use app\components\AssessmentUtility;
 $this->title = $defaultValue['pageTitle'];
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
 $this->params['breadcrumbs'][] = $this->title;
-
-//AppUtility::dump($defaultValue);
 ?>
 <form enctype="multipart/form-data" method=post action="<?php echo $page_formActionTag ?>"
       xmlns="http://www.w3.org/1999/html">
