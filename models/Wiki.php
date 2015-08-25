@@ -124,13 +124,18 @@ class Wiki extends BaseImasWikis
         }
     }
 
-    public static function updateWikiForMassChanges($startdate, $enddate, $avail, $id)
+    public static function updateWikiById($startdate, $enddate, $avail, $id)
     {
         $wiki = Wiki::findOne(['id' => $id]);
-        $wiki->startdate = $startdate;
-        $wiki->enddate = $enddate;
-        $wiki->avail = $avail;
-        $wiki->save();
+//        print_r($enddate);print_r("//////////////");
+        if($wiki){
+            $wiki->startdate = $startdate;
+            $wiki->enddate = $enddate;
+            $wiki->avail = $avail;
+//        AppUtility::dump($wiki);
+            $wiki->save();
+        }
+
     }
 
     public static function getWikiMassChanges($courseId)

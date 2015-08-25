@@ -38,9 +38,9 @@ class BaseImasWikis extends \yii\db\ActiveRecord
     {
         return [
 //            [['name', 'description', 'courseid', 'startdate', 'editbydate', 'enddate'], 'required'],
-            [['description'], 'string'],
-            [['courseid', 'startdate', 'editbydate', 'enddate', 'settings', 'groupsetid', 'avail'], 'integer'],
-            [['name'], 'string', 'max' => 254]
+//            [['description'], 'string'],
+//            [['courseid', 'startdate', 'editbydate', 'enddate', 'settings', 'groupsetid', 'avail'], 'integer'],
+//            [['name'], 'string', 'max' => 254]
         ];
     }
 

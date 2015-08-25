@@ -53,6 +53,7 @@ class CourseSettingForm extends Model
     public function attributeLabels()
     {
         return [
+    'courseId' => AppUtility::t('Course Id', false),
     'courseName'=> AppUtility::t('Enter Course name', false),
     'enrollmentKey'=> AppUtility::t('Enter Enrollment key', false),
     'available'=> AppUtility::t('Available?', false),

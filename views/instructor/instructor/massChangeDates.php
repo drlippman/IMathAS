@@ -6,6 +6,7 @@ use kartik\date\DatePicker;
 $this->title = AppUtility::t("Mass Change Dates", false);
 $this->params['breadcrumbs'][] = $this->title;
 $courseId = $course->id;
+$imasroot2 = AppUtility::getHomeURL();
 $imasroot = AppUtility::getURLFromHome('instructor' ,'instructor/mass-change-dates?cid='.$courseId.'&orderby='.$orderby);
 $imasroot1 = AppUtility::getURLFromHome('instructor', 'instructor/mass-change-dates?cid='.$courseId.'&filter='.$filter)
 ?>
@@ -45,68 +46,120 @@ if ($overwriteBody == 1) {
     echo "<script type=\"text/javascript\">
     var filteraddr = \"$imasroot\";";
 
-    echo "var orderaddr = \"$imasroot1\";</script>";
+    echo "var orderaddr = \"$imasroot1\";</script>";  ?>
+<div class="col-lg-12">
+    <div class="col-lg-6">
+        <?php echo '<div class="col-lg-3">Order by</div>
+        <div class="col-lg-6">
+         <select id="orderby" class="form-control col-lg-4" onchange="chgorderby()">';
+        echo '<option value="0" ';
+        if ($orderby == 0) {
+            echo 'selected="selected"';
+        }
+        echo '>Start Date</option>';
+        echo '<option value="1" ';
+        if ($orderby==1) {
+            echo 'selected="selected"';
+        }
+        echo '>End Date</option>';
+        echo '<option value="2" ';
+        if ($orderby==2) {
+            echo 'selected="selected"';
+        }
+        echo '>Name</option>';
+        echo '<option value="3" ';
+        if ($orderby==3) {
+            echo 'selected="selected"';
+        }
 
-    echo '<p>Order by: <select id="orderby" onchange="chgorderby()">';
-    echo '<option value="0" ';
-    if ($orderby==0) {echo 'selected="selected"';}
-    echo '>Start Date</option>';
-    echo '<option value="1" ';
-    if ($orderby==1) {echo 'selected="selected"';}
-    echo '>End Date</option>';
-    echo '<option value="2" ';
-    if ($orderby==2) {echo 'selected="selected"';}
-    echo '>Name</option>';
-    echo '<option value="3" ';
-    if ($orderby==3) {echo 'selected="selected"';}
-    echo '>Course page</option>';
-    echo '</select> ';
+        echo '>Course page</option>';
+        echo '</select> </div>';
+        ?>
+    </div>
+    <div class="col-lg-6">
+        <?php
+        echo '<div class="col-lg-3">Filter by type</div>
+        <div class="col-lg-6">
+        <select id="filter" class="form-control col-lg-4" onchange="filteritems()">';
+        echo '<option value="all" ';
+        if ($filter=='all') {echo 'selected="selected"';}
+        echo '>All</option>';
+        echo '<option value="assessments" ';
+        if ($filter=='assessments') {echo 'selected="selected"';}
+        echo '>Assessments</option>';
+        echo '<option value="inlinetext" ';
+        if ($filter=='inlinetext') {echo 'selected="selected"';}
+        echo '>Inline Text</option>';
+        echo '<option value="linkedtext" ';
+        if ($filter=='linkedtext') {echo 'selected="selected"';}
+        echo '>Linked Text</option>';
+        echo '<option value="forums" ';
+        if ($filter=='forums') {echo 'selected="selected"';}
+        echo '>Forums</option>';
+        echo '<option value="wikis" ';
+        if ($filter=='wikis') {echo 'selected="selected"';}
+        echo '>Wikis</option>';
+        echo '<option value="blocks" ';
+        if ($filter=='blocks') {echo 'selected="selected"';}
+        echo '>Blocks</option>';
+        echo '</select></div>';?>
+    </div>
+</div>
 
-    echo 'Filter by type: <select id="filter" onchange="filteritems()">';
-    echo '<option value="all" ';
-    if ($filter=='all') {echo 'selected="selected"';}
-    echo '>All</option>';
-    echo '<option value="assessments" ';
-    if ($filter=='assessments') {echo 'selected="selected"';}
-    echo '>Assessments</option>';
-    echo '<option value="inlinetext" ';
-    if ($filter=='inlinetext') {echo 'selected="selected"';}
-    echo '>Inline Text</option>';
-    echo '<option value="linkedtext" ';
-    if ($filter=='linkedtext') {echo 'selected="selected"';}
-    echo '>Linked Text</option>';
-    echo '<option value="forums" ';
-    if ($filter=='forums') {echo 'selected="selected"';}
-    echo '>Forums</option>';
-    echo '<option value="wikis" ';
-    if ($filter=='wikis') {echo 'selected="selected"';}
-    echo '>Wikis</option>';
-    echo '<option value="blocks" ';
-    if ($filter=='blocks') {echo 'selected="selected"';}
-    echo '>Blocks</option>';
-    echo '</select>';
-    echo '</p>';
-
-    echo "<p><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
-    echo "<p>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
+<?php
+    echo "<p class='col-lg-12'><input type=checkbox id=\"onlyweekdays\" checked=\"checked\"> Shift by weekdays only</p>";
+    echo "<div class='col-lg-12'>Once changing dates in one row, you select <i>Send down date and time change</i> from the Action pulldown to send the date change ";
     echo "difference to all rows below.  You can select <i>Copy down time</i> or <i>Copy down date &amp; time</i>to copy the same time/date to all rows below.  ";
     echo "If you click the checkboxes on the left, you can limit the update to those items. ";
-    echo "Click the <img src=\"$imasroot/img/swap.gif\"> icon in each cell to swap from ";
-    echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</p>";
+    echo "Click the <img src=\"$imasroot2/img/swap.gif\"> icon in each cell to swap from ";
+    echo "Always/Never to Dates.  Swaps to/from Always/Never and Show changes cannot be sent down the list, but you can use the checkboxes and the pulldowns to change those settings for many items at once.</div>";
     echo "<form id=\"qform\">";
 
-    echo '<p>Check: <a href="#" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a>. ';
-
-    //echo '<p>Check/Uncheck All: <input type="checkbox" name="ca" value="1" onClick="chkAll(this.form, this.checked)"/>. ';
-    echo 'Change selected items <select id="swaptype" onchange="chgswaptype(this)"><option value="s">Start Date</option><option value="e">End Date</option><option value="r">Review Date</option><option value="a">Show</option></select>';
-    echo ' to <select id="swapselected"><option value="always">Always</option><option value="dates">Dates</option></select>';
+    echo '<div class="col-lg-12">
+    <div class="col-lg-4">
+    <div class="col-lg-2">Check</div>
+    <a href="#" class="col-lg-1" onclick="return chkAllNone(\'qform\',\'all\',true)">All</a>
+    <a href="#"  class="col-lg-1" onclick="return chkAllNone(\'qform\',\'all\',false)">None</a></div> ';?>
+    <div class="col-lg-8">
+<?php
+    echo 'Change selected items
+    <select id="swaptype" onchange="chgswaptype(this)">
+        <option value="s">Start Date</option>
+        <option value="e">End Date</option>
+        <option value="r">Review Date</option>
+        <option value="a">Show</option>
+    </select>';
+    echo ' to <select id="swapselected">
+        <option value="always">Always</option>
+        <option value="dates">Dates</option>
+    </select>';
     echo ' <input type="button" value="Go" onclick="MCDtoggleselected(this.form)" /> &nbsp;';
-    echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></p>';
+    echo ' <button type="button" onclick="submittheform()">'._("Save Changes").'</button></div>';
 
     if ($picicons) {
-        echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+        echo '<table class=gb>
+        <thead>
+        <tr><th></th>
+            <th class="col-lg-1">Name</th>
+            <th class="col-lg-1">Show</th>
+            <th class="col-lg-3">Start Date</th>
+            <th class="col-lg-3">End Date</th>
+            <th class="col-lg-3">Review Date</th>
+            <th class="col-lg-2">Send Date Chg / Copy Down List</th>
+        </thead>
+        <tbody>';
     } else {
-        echo '<table class=gb><thead><tr><th></th><th>Name</th><th>Type</th><th>Show</th><th>Start Date</th><th>End Date</th><th>Review Date</th><th>Send Date Chg / Copy Down List</th></thead><tbody>';
+        echo '<table class=gb>
+        <thead>
+        <tr><th></th>
+            <th class="col-lg-1">Name</th>
+            <th class="col-lg-1">Type</th>
+            <th>Show</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Review Date</th>
+            <th>Send Date Chg / Copy Down List</th>
+        </thead><tbody>';
     }
 
     foreach ($keys as $i) {
@@ -139,6 +192,7 @@ if ($overwriteBody == 1) {
         echo "<script> basesdates[$cnt] = ";
         //if ($startdates[$i]==0) { echo '"NA"';} else {echo $startdates[$i];}
         echo $startdates[$i];
+
         echo "; baseedates[$cnt] = ";
         //if ($enddates[$i]==0 || $enddates[$i]==2000000000) { echo '"NA"';} else {echo $enddates[$i];}
         echo $enddates[$i];
@@ -153,9 +207,11 @@ if ($overwriteBody == 1) {
             echo "</td>";
         }
 
-        echo '<td><span class="nowrap"><span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span><input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
+        echo '<td><span class="nowrap"><img src="'.$imasroot2.'img/swap.gif" onclick="MCDtoggle(\'a\','.$cnt.')"/>
+        <span id="availname'.$cnt.'">'.$availnames[$avails[$i]].'</span>
+        <input type="hidden" id="avail'.$cnt.'" value="'.$avails[$i].'"/></span></td>';
 
-        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
+        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\" onclick=\"MCDtoggle('s',$cnt)\"/>";
         if ($startdates[$i]==0) {
             echo "<input type=hidden id=\"sdatetype$cnt\" name=\"sdatetype$cnt\" value=\"0\"/>";
         } else {
@@ -174,18 +230,19 @@ if ($overwriteBody == 1) {
         if ($startdates[$i]==0) {
             $startdates[$i] = time();
             $sdate = AppUtility::tzdate("m/d/Y",$startdates[$i]);
+
         } else {
             $sdate = AppUtility::tzdate("m/d/Y",$startdates[$i]);
             $stime = AppUtility::tzdate("g:i a",$startdates[$i]);
         }
-
+        echo "<input type=hidden size=10 onblur=\"ob(this)\"/>";
         echo "<span id=\"sd$cnt\">".getshortday($startdates[$i]).'</span>';
-                                        echo '<label class="end pull-left non-bold padding-left"> Before</label>';
-                                        echo '<div class = "col-lg-8 time-input">';
+                                        echo '<div class = "col-lg-10 time-input"">';
                                         echo DatePicker::widget([
-                                            'name' => 'postDate',
+                                            'name' => 'sdate'.$cnt,
                                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
                                             'value' => $sdate,
+                                            'id' => 'sdate'.$cnt,
                                             'removeButton' => false,
                                             'pluginOptions' => [
                                                 'autoclose' => true,
@@ -193,10 +250,13 @@ if ($overwriteBody == 1) {
                                         ]);
                                         echo '</div>';
 
+//        echo "<input type=hidden size=8 id=\"stime$cnt\" name=\"stime$cnt\" value=\"$stime\">";
+
                                         echo '<label class="end pull-left non-bold"> at </label>';
-                                        echo '<div class=" col-lg-8">';
+                                        echo '<div class="col-lg-12 padding-top">';
                                         echo TimePicker::widget([
                                             'name' => 'postTime',
+                                            'id' => 'stime'.$cnt,
                                             'value' => $stime,
                                             'pluginOptions' => [
                                                 'showSeconds' => false,
@@ -207,7 +267,7 @@ if ($overwriteBody == 1) {
 
         echo '</span></td>';
 
-        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
+        echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\"><img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('e',$cnt)\"/>";
         if ($enddates[$i]==2000000000) {
             echo "<input type=hidden id=\"edatetype$cnt\" name=\"edatetype$cnt\" value=\"0\"/>";
         } else {
@@ -231,13 +291,13 @@ if ($overwriteBody == 1) {
             $edate = AppUtility::tzdate("m/d/Y",$enddates[$i]);
             $etime = AppUtility::tzdate("g:i a",$enddates[$i]);
         }
-
+        echo "<input type=hidden size=10  onblur=\"ob(this)\"/>";
         echo "<span id=\"ed$cnt\">".getshortday($enddates[$i]).'</span>';
         //echo ") <a href=\"#\" onClick=\"cal1.select(document.forms[0].edate$cnt,'anchor2$cnt','MM/dd/yyyy',document.forms[0].edate$cnt.value); return false;\" NAME=\"anchor2$cnt\" ID=\"anchor2$cnt\"><img src=\"../img/cal.gif\" alt=\"Calendar\"/></a>";
-                echo '<label class="end pull-left non-bold padding-left"> Before</label>';
-                echo '<div class = "col-lg-8 time-input">';
+                echo '<div class = "col-lg-10 time-input">';
                 echo DatePicker::widget([
-                    'name' => 'postDate',
+                    'name' => 'edate'.$cnt,
+                    'id' => 'edate'.$cnt,
                     'type' => DatePicker::TYPE_COMPONENT_APPEND,
                     'value' => $edate,
                     'removeButton' => false,
@@ -246,12 +306,13 @@ if ($overwriteBody == 1) {
                         'format' => 'mm/dd/yyyy']
                 ]);
                 echo '</div>';
-
+//        echo " <input type=hidden size=8 id=\"etime$cnt\" name=\"etime$cnt\" value=\"$etime\">";
                 echo '<label class="end pull-left non-bold"> at </label>';
-                echo '<div class=" col-lg-8">';
+                echo '<div class=" col-lg-12 padding-top">';
                 echo TimePicker::widget([
-                    'name' => 'postTime',
+                    'name' => 'etime'.$cnt,
                     'value' => $etime,
+                    'id' => 'etime'.$cnt,
                     'pluginOptions' => [
                         'showSeconds' => false,
                         'class' => 'time'
@@ -263,6 +324,7 @@ if ($overwriteBody == 1) {
 
         echo "<td class=\"togdis".($avails[$i]!=1?' dis':'')."\">";
         if ($types[$i]=='Assessment') {
+            echo "<img src=\"$imasroot2/img/swap.gif\"  onclick=\"MCDtoggle('r',$cnt)\"/>";
             if ($reviewdates[$i]==0 || $reviewdates[$i]==2000000000) {
                 echo "<input type=hidden id=\"rdatetype$cnt\" name=\"rdatetype$cnt\" value=\"0\"/>";
             } else {
@@ -273,7 +335,7 @@ if ($overwriteBody == 1) {
             } else {
                 echo "<span id=\"rspan0$cnt\" class=\"hide\">";
             }
-            echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" id=\"rateanN$cnt\" ";
+            echo "<input type=radio name=\"rdatean$cnt\" value=\"0\" id=\"rdateanN$cnt\" ";
             if ($reviewdates[$i]!=2000000000) {
                 echo 'checked=1';
             }
@@ -295,13 +357,13 @@ if ($overwriteBody == 1) {
                 $rdate = AppUtility::tzdate("m/d/Y",$reviewdates[$i]);
                 $rtime = AppUtility::tzdate("g:i a",$reviewdates[$i]);
             }
-
+            echo "<input type=hidden onblur=\"ob(this)\"/>(";
             echo "<span id=\"rd$cnt\">".getshortday($reviewdates[$i]).'</span>';
 
-            echo '<label class="end pull-left non-bold padding-left"> Before</label>';
-            echo '<div class = "col-lg-8 time-input">';
+            echo '<div class = "col-lg-10 time-input">';
             echo DatePicker::widget([
-                'name' => 'postDate',
+                'name' => 'rdate'.$cnt,
+                'id' => 'rdate'.$cnt,
                 'type' => DatePicker::TYPE_COMPONENT_APPEND,
                 'value' => $rdate,
                 'removeButton' => false,
@@ -310,11 +372,11 @@ if ($overwriteBody == 1) {
                     'format' => 'mm/dd/yyyy']
             ]);
             echo '</div>';
-
             echo '<label class="end pull-left non-bold"> at </label>';
-            echo '<div class=" col-lg-8">';
+            echo '<div class=" col-lg-12">';
             echo TimePicker::widget([
-                'name' => 'postTime',
+                'name' => 'rtime'.$cnt,
+                'id' => 'rtime'.$cnt,
                 'value' => $rtime,
                 'pluginOptions' => [
                     'showSeconds' => false,
@@ -326,8 +388,9 @@ if ($overwriteBody == 1) {
             echo "</span>";
         }
         echo '</td>';
-        //echo "<td>Send Down: <a href=\"#\" <input type=button value=\"Change\" onclick=\"senddown($cnt)\"/> <input type=button value=\"Copy\" onclick=\"copydown($cnt)\"/></td>";
-        echo "<td><select id=\"sel$cnt\" onchange=\"senddownselect(this);\"><option value=\"0\" selected=\"selected\">Action...</option>";
+        echo "<td class='col-lg-3'>
+        <select id=\"sel$cnt\" class='form-control col-sm-10' onchange=\"senddownselect(this);\">
+        <option value=\"0\" selected=\"selected\">Action...</option>";
         echo '<option value="1">Send down date &amp; time changes</option>';
         echo '<option value="2">Copy down times only</option>';
         echo '<option value="3">Copy down dates &amp; times</option>';
@@ -344,7 +407,6 @@ if ($overwriteBody == 1) {
     echo "<input type=hidden id=\"chgcnt\" name=\"chgcnt\" value=\"$cnt\" />";
     echo '<input type=submit value="Save Changes"/>';
     echo '</form>';
-    //echo "<script>var acnt = $cnt;</script>";
 }
 ?>
 </div>

@@ -8,7 +8,7 @@ use app\components\AppConstant;
 $this->title = 'Course Setting';
 $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
 $this->params['breadcrumbs'][] = $this->title;
-
+$model->courseId = $course->id;
 $model->courseName = AppUtility::getStringVal($course->name);
 $model->enrollmentKey = AppUtility::getStringVal($course->enrollkey);
 $model->theme = AppUtility::getStringVal($course->theme);
@@ -46,15 +46,15 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
             </div>
             <div class="tab-content shadowBox non-nav-tab-item">
                 <br><br>
-                <div class="form-label-alignment" style="margin:0 40px">
-
+                <div class="form-label-alignment form-display">
+                    <?php echo $form->field($model, 'courseId')->textInput(['class' => 'course-id']); ?>
                     <?php echo $form->field($model, 'courseName')->textInput(); ?>
                     <?php echo $form->field($model, 'enrollmentKey')->textInput() ?>
 
                     <div class="datetime form-group">
                         <?php
-                        echo '<label class="start col-lg-2 pull-left "> Start Time </label>';
-                        echo '<div class = "pull-left col-lg-4 time-input">';
+                        echo '<label class="start col-lg-2 pull-left padding-top"> Start Time </label>';
+                        echo '<div class = "pull-left col-lg-3 time-input">';
                         echo TimePicker::widget([
                             'name' => 'start_time',
                             'value' => $dispTime['startTime'],
@@ -64,8 +64,8 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                         ]);
                         echo '</div>';?>
                         <?php
-                        echo '<label class="end pull-left col-lg-1"> End Time </label>';
-                        echo '<div class="pull-left col-lg-4">';
+                        echo '<label class="end pull-left col-lg-2 padding-top"> End Time </label>';
+                        echo '<div class="pull-left col-lg-3">';
                         echo TimePicker::widget([
                             'name' => 'end_time',
                             'value' => $dispTime['endTime'],
@@ -78,7 +78,7 @@ $dispTime = AppUtility::calculateTimeToDisplay($course->deftime);
                     </div>
 
                     <?php echo $form->field($model, 'available')->checkboxList([AppConstant::NUMERIC_TWO => 'Available to students', AppConstant::NUMERIC_ONE => 'Show on instructors home page'], ['checked' => AppConstant::NUMERIC_ONE]) ?>
-                    <?php echo $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish', 'modern.css' => 'Mordern', 'default.css' => 'Default', 'angelish.css' => 'Angelish', 'angelishmore.css' => 'Angelishmore'], ['prompt' => 'Default']) ?>
+                    <?php echo $form->field($model, 'theme')->dropDownList(['facebookish.css' => 'Facebookish', 'modern.css' => 'Modern', 'default.css' => 'Default', 'angelish.css' => 'Angelish', 'angelishmore.css' => 'Angelishmore'], ['prompt' => 'Default']) ?>
                     <?php echo $form->field($model, 'copyCourse')->radioList([AppConstant::NUMERIC_ONE => 'Require enrollment key from everyone', AppConstant::NUMERIC_TWO => 'No key required for group members, require key from others ', AppConstant::NUMERIC_THREE => 'No key required from anyone']) ?>
                     <?php echo $form->field($model, 'messageSystem')->radioList([AppConstant::NUMERIC_ONE => 'On for send and receive', AppConstant::NUMERIC_TWO => 'On for receive, students can only send to instructor', AppConstant::NUMERIC_THREE => 'On for receive, students can only send to students', AppConstant::NUMERIC_FOUR => 'On for receive, students cannot send', AppConstant::NUMERIC_FIVE => 'Off ']) ?>
                     <?php echo $form->field($model, 'navigationLink')->checkboxList([AppConstant::NUMERIC_ONE => 'Calender', AppConstant::NUMERIC_TWO => 'Forum List', AppConstant::NUMERIC_FOUR => 'Show']) ?>

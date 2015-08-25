@@ -747,19 +747,16 @@ class CourseController extends AppController
                 $itemOrder = serialize($items);
                 $saveItemOrderIntoCourse = new Course();
                 $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
-
                 /*
                  * Upload a file into database
                  */
                 $target_dir = "Uploads/";
                 $target_file = $target_dir . basename($_FILES["userfile"]["name"]);
                 $uploadOk = 1;
-
                 // Check if file already exists
                 if (file_exists($target_file)) {
-                    $uploadOk = 0;
+                    $uploadOk = AppConstant::NUMERIC_ZERO;
                 }
-
                 if($uploadOk == 1) {
                     move_uploaded_file($_FILES["userfile"]["tmp_name"], $target_file);
                     $fileName = basename( $_FILES["userfile"]["name"]);
@@ -767,7 +764,6 @@ class CourseController extends AppController
                     $params['filename'] =  $fileName;
                     $insterFiles->saveFile($params,$inlineId);
                 }
-
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }

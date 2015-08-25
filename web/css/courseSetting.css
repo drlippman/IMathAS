@@ -27,3 +27,14 @@
 .non-nav-tab-item{
     margin-top:30px
 }
+.course-id{
+    border: none;
+    /*padding-top: 10px;*/
+}
+
+.padding-top{
+    padding-top: 10px;
+}
+.form-display{
+    margin:0 40px;
+}
