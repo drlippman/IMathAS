@@ -21,7 +21,7 @@ class Course extends BaseImasCourses {
         $course['available'] = AppUtility::makeAvailable($availables);
         $course['picicons'] = AppConstant::PIC_ICONS_VALUE;
         $course['allowunenroll'] = AppConstant::UNENROLL_VALUE;
-        $course['copyrights'] = $params['copyCourse'];
+        $course['copyrights'] = $params['copycourse'];
         $course['msgset'] = $params['messageSystem'];
         $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : AppConstant::NAVIGATION_NOT_CHECKED_VALUE;
         $isTemplate = isset($params['courseAsTemplate']) ? $params['courseAsTemplate'] : AppConstant::NUMERIC_ZERO;
@@ -224,19 +224,89 @@ class Course extends BaseImasCourses {
   *Query To Show Courses available For Teacher in My classes drop-down
   */
     public static  function getGetMyClasses($userId)
-{
-    $items = [];
-    $myClasses = Course::find()->where(['ownerid' => $userId])->all();
-    foreach($myClasses as $key => $singleClass)
     {
-        $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
-        if(count($myClasses) == $key+AppConstant::NUMERIC_ONE)
+        $items = [];
+        $myClasses = Course::find()->where(['ownerid' => $userId])->all();
+        foreach($myClasses as $key => $singleClass)
         {
-            array_push($items,'<li class="divider"></li>');
-            array_push($items,['label' => 'Manage Questions', 'url' => '#']);
-            array_push($items,['label' => 'Questions Libraries', 'url' => '#']);
+            $items[] = ['label' => $singleClass->name, 'url' => '../../instructor/instructor/index?cid='.$singleClass['id']];
+            if(count($myClasses) == $key+AppConstant::NUMERIC_ONE)
+            {
+                array_push($items,'<li class="divider"></li>');
+                array_push($items,['label' => 'Manage Questions', 'url' => '#']);
+                array_push($items,['label' => 'Questions Libraries', 'url' => '#']);
+            }
+        }
+        return $items;
+    }
+
+    public static function  getCidForCopyingCourse($userId,$ctc)
+    {
+
+        $query = Yii::$app->db->createCommand("SELECT imas_courses.id FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid= :userid AND imas_courses.id= :ctc");
+        $query->bindValue('userid',$userId);
+        $query->bindValue('ctc',$ctc);
+        $data = $query->queryOne();
+        return $data;
+    }
+
+    public static function getEnrollKey($ctc)
+    {
+        $query = new Query();
+        $query	->select(['enrollkey','copyrights'])
+            ->from('imas_courses')
+            ->where('id= :id',[':id' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
+    public static function getDataForCopyCourse($ctc)
+    {
+        $query = Yii::$app->db->createCommand("SELECT imas_users.groupid FROM imas_courses,imas_users,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid=imas_users.id AND imas_courses.id= :ctc");
+        $query->bindValue('ctc',$ctc);
+        $data = $query->queryOne();
+        return $data;
+    }
+
+    public static function getDataByCtc($toCopy,$ctc)
+    {
+        $query = new Query();
+        $query	->select([$toCopy])
+            ->from('imas_courses')
+            ->where('id= :id',[':id' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
+
+    public static function updateCourseForCopyCourse($courseId,$sets)
+    {
+
+        $query = Yii::$app->db->createCommand("UPDATE imas_courses SET $sets WHERE id=:cid");
+        $query->bindValue('cid',$courseId);
+        $query->queryOne();
+    }
+    public static function updateOutcomes($newOutcomeArr,$courseId)
+    {
+        $outcomes = Course::find()->select('outcomes')->where(['id' => $courseId])->one();
+        if($outcomes)
+        {
+            $outcomes->outcomes = $newOutcomeArr;
+            $outcomes->save();
         }
     }
-    return $items;
-}
+
+    public static function getBlockCnt($courseId)
+    {
+        $query = new Query();
+        $query	->select(['blockcnt'])
+            ->from('imas_courses')
+            ->where('id= :id',[':id' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
 }

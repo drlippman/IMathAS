@@ -285,7 +285,7 @@ class CourseController extends AppController
                 $courseSetting['enrollkey'] = $params['enrollmentKey'];
                 $available = $this->getSanitizedValue($params['available'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
                 $courseSetting['available'] = AppUtility::makeAvailable($available);
-                $courseSetting['copyrights'] = $params['copyCourse'];
+                $courseSetting['copyrights'] = $params['copycourse'];
                 $courseSetting['msgset'] = $params['messageSystem'];
                 $toolSet = $this->getSanitizedValue($params['navigationLink'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
                 $courseSetting['toolset'] = AppUtility::makeToolset($toolSet);

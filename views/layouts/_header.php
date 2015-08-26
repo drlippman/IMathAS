@@ -29,13 +29,7 @@ echo Nav::widget([
             ['label' => '<img class="small-icon" src="../../img/user.png">&nbsp;'.(ucfirst(Yii::$app->user->identity->FirstName) .' '.ucfirst(Yii::$app->user->identity->LastName)),
                 'items' =>
                     [
-                        ['label' => 'Account Setting',
-                            array('class' => 'dropdown-submenu'),
-                            'items' =>
-                                [
-                                    ['label' => 'Change UserInfo', 'url' => ['/site/change-user-info']],
-                                ],
-                        ],
+                        ['label' => 'Account Setting','url' => ['/site/change-user-info']],
                         ['label' => 'Help', 'url' => '#'],
                         ['label' => 'Logout', 'url' => ['/site/logout'],'linkOptions' => ['data-method' => 'post'], 'class' => 'user-alignment'],
                      ],

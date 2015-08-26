@@ -63,7 +63,7 @@ class CourseSettingForm extends Model
     'showIcons'=> AppUtility::t('Show Icons', false),
     'selfUnenroll'=> AppUtility::t('Allow students to self-unenroll', false),
     'selfEnroll'=> AppUtility::t('Allow students to self-enroll', false),
-    'copyCourse'=> AppUtility::t('Allow other instructors to copy course items', false),
+    'copycourse'=> AppUtility::t('Allow other instructors to copy course items', false),
     'messageSystem'=> AppUtility::t('Message System', false),
     'navigationLink'=> AppUtility::t('Navigation Links for Students', false),
     'courseReordering'=> AppUtility::t('Pull-downs for course item reordering', false),

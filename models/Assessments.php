@@ -416,7 +416,41 @@ class Assessments extends BaseImasAssessments
     {
         $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$courseId' AND defoutcome IN ($unusedList)";
         \Yii::$app->db->createCommand()->queryAll($query);
+    }
+    public static function updateAssessmentForCopyCourse($assessNewId,$newId,$num)
+    {
+        $query = Assessments::find()->where(['id' => $newId])->one();
+        if($query)
+        {
+            if($num == AppConstant::NUMERIC_ZERO)
+            {
+                $query->reqscoreaid = $assessNewId;
+                $query->save();
+            }else
+            {
+                $query->reqscoreaid = AppConstant::NUMERIC_ZERO;
+                $query->save();
+            }
 
+        }
+    }
+
+    public static function updatePostToForum($assessNewId,$newId,$num)
+    {
+        $query = Assessments::find()->where(['id' => $newId])->one();
+        if($query)
+        {
+            if($num == AppConstant::NUMERIC_ZERO)
+            {
+                $query->posttoforum = $assessNewId;
+                $query->save();
+            }else
+            {
+                $query->posttoforum = AppConstant::NUMERIC_ZERO;
+                $query->save();
+            }
+
+        }
     }
 
 

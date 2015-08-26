@@ -7,6 +7,7 @@ namespace app\models;
 use app\components\AppUtility;
 use app\models\_base\BaseImasOutcomes;
 use yii\db\Query;
+use Yii;
 
 class Outcomes extends BaseImasOutcomes {
 
@@ -69,5 +70,34 @@ class Outcomes extends BaseImasOutcomes {
     {
         $query = "DELETE FROM imas_outcomes WHERE id IN ($unusedList)";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getDataByJoins($ctc,$courseId)
+    {
+        $query = Yii::$app->db->createCommand("SELECT tc.id,toc.id FROM imas_outcomes AS tc JOIN imas_outcomes AS toc ON tc.name=toc.name WHERE tc.courseid= :ctc AND toc.courseid=:cid ");
+        $query->bindValue('ctc',$ctc);
+        $query->bindValue('cid',$courseId);
+        $data = $query->queryAll();
+        return $data;
+    }
+
+    public static function getDataForCopyCourse($ctc)
+    {
+        $query = new Query();
+        $query -> select(['id','name','ancestors'])
+            ->from('imas_outcomes')
+            ->where('courseid= :courseid',[':courseid' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function insertDataForCopyCourse($data,$courseId)
+    {
+        $this->courseid = $courseId;
+        $this->name = $data['name'];
+        $this->ancestors = $data['ancestors'];
+        $this->save();
+        return $this->id;
     }
 }

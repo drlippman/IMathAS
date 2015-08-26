@@ -20,6 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);?>
 </div>
+<input type="hidden" id="course-id" value="<?php echo $courseId?>">
+<input type="hidden" id="outcome-url" value="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$courseId.'&save=save')?>">
 <div class="tab-content shadowBox">
             <?php
             if (isset($order))

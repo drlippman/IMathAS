@@ -56,4 +56,28 @@ class GbScheme extends BaseImasGbscheme
             $query->save();
         }
     }
+    public static function getDataForCopyCourse($ctc)
+    {
+        $query = new Query();
+        $query	->select(['useweights','orderby','defaultcat','defgbmode','stugbmode','colorize'])
+            ->from('imas_gbscheme')
+            ->where('courseid= :id',[':id' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
+        return $data;
+    }
+    public static function updateDataForCopyCourse($query,$courseId)
+    {
+        $query = GbScheme::find()->where(['courseid' => $courseId])->one();
+        if($query)
+        {
+            $query->useweights = $query['useweights'];
+            $query->orderby = $query['orderby'];
+            $query->defaultcat = $query['defaultcat'];
+            $query->defgbmode = $query['defgbmode'];
+            $query->stugbmode = $query['stugbmode'];
+            $query->colorize = $query['colorize'];
+            $query->save();
+        }
+    }
 }

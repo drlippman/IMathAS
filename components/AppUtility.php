@@ -2865,4 +2865,17 @@ class AppUtility extends Component
 
     }
 
+    public function updateOutcomes($arr,$outcomes)
+    {
+        foreach ($arr as $k=>$v)
+        {
+            if (is_array($v))
+            {
+               $this->updateOutcomes($arr[$k]['outcomes'],$outcomes);
+            } else {
+                $arr[$k] = $outcomes[$v];
+            }
+        }
+    }
+
 }

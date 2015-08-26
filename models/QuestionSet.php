@@ -155,4 +155,14 @@ class QuestionSet extends BaseImasQuestionset
         $data = \Yii::$app->db->createCommand($query)->queryOne();
         return $data;
     }
+
+    public static function getDataForCopyCourse($ctc)
+    {
+        $query = 'SELECT imas_questionset.id,imas_questionset.replaceby FROM imas_questionset JOIN ';
+        $query .= 'imas_questions ON imas_questionset.id=imas_questions.questionsetid JOIN ';
+        $query .= 'imas_assessments ON imas_assessments.id=imas_questions.assessmentid WHERE ';
+        $query .= "imas_assessments.courseid='{$ctc}' AND imas_questionset.replaceby>0";
+        $data = \Yii::$app->db->createCommand($query)->queryOne();
+        return $data;
+    }
 } 

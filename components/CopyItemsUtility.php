@@ -19,11 +19,12 @@ use app\models\LinkedText;
 use app\models\Links;
 use app\models\Questions;
 use app\models\Rubrics;
+use app\models\Teacher;
 use app\models\Wiki;
 use \yii\base\Component;
 use app\components\AppUtility;
 use app\components\AppConstant;
-
+global $reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack,$exttooltrack,$userid,$groupid;
 class CopyItemsUtility extends Component
 {
 
@@ -301,108 +302,114 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
     return $newItemId;
 }
-public static function copysub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
+public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden = false,$params,$checked,$blockCnt)
 {
-    global $checked, $blockcnt;
     foreach ($items as $k => $item) {
         if (is_array($item)) {
             if (array_search($parent . '-' . ($k + 1), $checked) !== FALSE) { //copy block
-                $newblock = array();
-                $newblock['name'] = $item['name'] . stripslashes($_POST['append']);
-                $newblock['id'] = $blockcnt;
-                $blockcnt++;
-                $newblock['startdate'] = $item['startdate'];
-                $newblock['enddate'] = $item['enddate'];
-                $newblock['avail'] = $sethidden ? 0 : $item['avail'];
-                $newblock['SH'] = $item['SH'];
-                $newblock['colors'] = $item['colors'];
-                $newblock['public'] = $item['public'];
-                $newblock['fixedheight'] = $item['fixedheight'];
-                $newblock['grouplimit'] = $item['grouplimit'];
-                $newblock['items'] = array();
+                $newBlock = array();
+                $newBlock['name'] = $item['name'] . stripslashes($_POST['append']);
+                $newBlock['id'] = $blockCnt;
+                $blockCnt++;
+                $newBlock['startdate'] = $item['startdate'];
+                $newBlock['enddate'] = $item['enddate'];
+                $newBlock['avail'] = $sethidden ? 0 : $item['avail'];
+                $newBlock['SH'] = $item['SH'];
+                $newBlock['colors'] = $item['colors'];
+                $newBlock['public'] = $item['public'];
+                $newBlock['fixedheight'] = $item['fixedheight'];
+                $newBlock['grouplimit'] = $item['grouplimit'];
+                $newBlock['items'] = array();
                 if (count($item['items']) > 0) {
-                    copysub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
+                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$checked,$blockCnt);
                 }
-                $addtoarr[] = $newblock;
+                $addToArr[] = $newBlock;
             } else {
-                if (count($item['items']) > 0) {
-                    copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbcats, $sethidden);
+                if(count($item['items']) > 0)
+                {
+                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbCats, $sethidden,$params,$checked,$blockCnt);
                 }
             }
         } else {
             if (array_search($item, $checked) !== FALSE) {
-                $addtoarr[] = copyitem($item, $gbcats, $sethidden);
+                $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats, $sethidden,$params);
             }
         }
     }
 
 }
 
-public  static function doaftercopy($sourcecid)
+public  static function doaftercopy($sourceCid,$courseId)
 {
-    global $cid, $reqscoretrack, $assessnewid, $forumtrack, $posttoforumtrack;
-    if (intval($cid) == intval($sourcecid)) {
-        $samecourse = true;
+
+    global $reqscoretrack, $assessnewid, $forumtrack, $posttoforumtrack;
+    if (intval($courseId) == intval($sourceCid)) {
+        $sameCourse = true;
     } else {
-        $samecourse = false;
+        $sameCourse = false;
     }
-    //update reqscoreaids if possible.
-    if (count($reqscoretrack) > 0) {
+    if (count($reqscoretrack) > 0)
+    {
         foreach ($reqscoretrack as $newid => $oldreqaid) {
-            //is old reqscoreaid in copied list?
-            if (isset($assessnewid[$oldreqaid])) {
-                $query = "UPDATE imas_assessments SET reqscoreaid='{$assessnewid[$oldreqaid]}' WHERE id='$newid'";
-                mysql_query($query) or die("Query failed : $query" . mysql_error());
-            } else if (!$samecourse) {
-                $query = "UPDATE imas_assessments SET reqscore=0 WHERE id='$newid'";
-                mysql_query($query) or die("Query failed : $query" . mysql_error());
+            if (isset($assessnewid[$oldreqaid]))
+            {
+                Assessments::updateAssessmentForCopyCourse($assessnewid[$oldreqaid],$newid,AppConstant::NUMERIC_ZERO);
+            }else if(!$sameCourse)
+            {
+                Assessments::updateAssessmentForCopyCourse($assessnewid[$oldreqaid],$newid,AppConstant::NUMERIC_ONE);
             }
         }
     }
-    if (count($posttoforumtrack) > 0) {
-        foreach ($posttoforumtrack as $newaid => $oldforumid) {
-            if (isset($forumtrack[$oldforumid])) {
-                $query = "UPDATE imas_assessments SET posttoforum='{$forumtrack[$oldforumid]}' WHERE id='$newaid'";
-                mysql_query($query) or die("Query failed : $query" . mysql_error());
-            } else {
-                $query = "UPDATE imas_assessments SET posttoforum=0 WHERE id='$newaid'";
-                mysql_query($query) or die("Query failed : $query" . mysql_error());
+    if (count($posttoforumtrack) > 0)
+    {
+        foreach ($posttoforumtrack as $newaid => $oldforumid)
+        {
+            if (isset($forumtrack[$oldforumid]))
+            {
+                Assessments::updatePostToForum($forumtrack[$oldforumid],$newaid,AppConstant::NUMERIC_ZERO);
+
+            } else
+            {
+                Assessments::updatePostToForum($forumtrack[$oldforumid],$newaid,AppConstant::NUMERIC_ONE);
+
             }
         }
     }
-    if (!$samecourse) {
-        handleextoolcopy($sourcecid);
+    if (!$sameCourse) {
+        CopyItemsUtility::handleextoolcopy($sourceCid,$courseId);
     }
 }
 
-public  static function copyallsub($items, $parent, &$addtoarr, $gbcats, $sethidden = false)
+public function copyAllSub($items, $parent, &$addToArr, $gbCats, $sethidden = false,$params,$blockCnt)
 {
-    global $blockcnt, $reqscoretrack, $assessnewid;;
-    if (strlen($_POST['append']) > 0 && $_POST['append']{0} != ' ') {
-        $_POST['append'] = ' ' . $_POST['append'];
+
+    if (strlen($params['append']) > 0 && $params['append']{0} != ' ') {
+        $params['append'] = ' ' . $params['append'];
     }
-    foreach ($items as $k => $item) {
+    foreach ($items as $k => $item)
+    {
         if (is_array($item)) {
-            $newblock = array();
-            $newblock['name'] = $item['name'] . stripslashes($_POST['append']);
-            $newblock['id'] = $blockcnt;
-            $blockcnt++;
-            $newblock['startdate'] = $item['startdate'];
-            $newblock['enddate'] = $item['enddate'];
-            $newblock['avail'] = $sethidden ? 0 : $item['avail'];
-            $newblock['SH'] = $item['SH'];
-            $newblock['colors'] = $item['colors'];
-            $newblock['public'] = $item['public'];
-            $newblock['fixedheight'] = $item['fixedheight'];
-            $newblock['grouplimit'] = $item['grouplimit'];
-            $newblock['items'] = array();
+            $newBlock = array();
+            $newBlock['name'] = $item['name'] . stripslashes($params['append']);
+            $newBlock['id'] = $blockCnt;
+            $blockCnt++;
+            $newBlock['startdate'] = $item['startdate'];
+            $newBlock['enddate'] = $item['enddate'];
+            $newBlock['avail'] = $sethidden ? 0 : $item['avail'];
+            $newBlock['SH'] = $item['SH'];
+            $newBlock['public'] = $item['public'];
+            $newBlock['fixedheight'] = $item['fixedheight'];
+            $newBlock['grouplimit'] = $item['grouplimit'];
+            $newBlock['items'] = array();
             if (count($item['items']) > 0) {
-                copyallsub($item['items'], $parent . '-' . ($k + 1), $newblock['items'], $gbcats, $sethidden);
+                $this->copyAllSub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$blockCnt);
             }
-            $addtoarr[] = $newblock;
-        } else {
-            if ($item != null && $item != 0) {
-                $addtoarr[] = copyitem($item, $gbcats, $sethidden);
+            $addToArr[] = $newBlock;
+        } else
+        {
+            if ($item != null && $item != 0)
+            {
+                $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats,$params,$sethidden);
             }
         }
     }
@@ -572,15 +579,14 @@ public static function copyrubrics($offlinerubrics = array())
     }
 }
 
-public static function handleextoolcopy($sourcecid)
+public static function handleextoolcopy($sourcecid,$courseId)
 {
-    //assumes this is a copy into a different course
-    global $cid, $userid, $groupid, $exttooltrack;
+    global $userid, $groupid, $exttooltrack;
     if (count($exttooltrack) == 0) {
         return;
     }
-    //$exttooltrack is linked text id => tool id
     $toolmap = array();
+    Teacher::getByUserId($userid,$courseId);
     $query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
     $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
     if (mysql_num_rows($result) > 0) {

@@ -61,4 +61,31 @@ class CalItem extends BaseImasCalitems
 
     }
 
+    public static function deleteForCopyCourse($courseId)
+    {
+        $data = CalItem::find()->where(['courseid' => $courseId])->all();
+        if($data)
+        {
+            foreach($data as $singleCalItem)
+            {
+                $singleCalItem->delete();
+            }
+        }
+    }
+
+    public static function getDataForCopyCourse($chkList,$ctc)
+    {
+        $query = \Yii::$app->db->createCommand("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chkList) AND courseid= :ctc");
+        $query->bindValue('ctc',$ctc);
+        $data = $query->queryAll();
+        return $data;
+    }
+
+    public static function InsertDataForCopy($calItemData)
+    {
+        $query = \Yii::$app->db->createCommand("INSERT INTO imas_calitems (courseid,date,tag,title) VALUES $calItemData");
+        $data = $query->queryAll();
+
+    }
+
 }

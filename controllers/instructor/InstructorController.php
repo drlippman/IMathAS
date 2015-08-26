@@ -1183,7 +1183,295 @@ public $oa = array();
                     $this->getblockinfo($item['items'],$parent.'-'.($k+1),$ids,$types,$names,$startdates,$enddates,$reviewdates,$itemscourseorder,$courseorder,$orderby,$avails,$pres,$prefix);
                 }
             }
+
         }
         return array('name' => $names, 'ids' => $ids, 'types' => $types, 'startdates' => $startdates, 'enddates' => $enddates, 'reviewdates' => $reviewdates, 'itemscourseorder' => $itemscourseorder, 'courseorder' => $courseorder, 'orderby' => $orderby, 'avails' => $avails, 'pres' => $pres, 'prefix' => $prefix);
+    }
+
+    public function actionCopyCourseItems()
+    {
+         $this->guestUserHandler();
+         $courseId = $this->getParamVal('cid');
+         $user = $this->getAuthenticatedUser();
+         if(!$this->isTeacher($user->id,$courseId))
+         {
+             $overwriteBody = 1;
+             $message = AppConstant::GROUP_MESSAGE;
+         }else
+         {
+             $okToCopy = AppConstant::NUMERIC_ONE;
+             $action = $this->getParamVal('action');
+             $params = $this->getRequestParams();
+             if(isset($action))
+             {
+                 $query  = Course::getCidForCopyingCourse($user->id,$params['ctc']);
+                 if(count($query) == AppConstant::NUMERIC_ZERO)
+                 {
+                     $query = Course::getEnrollKey($params['ctc']);
+                     $copyRights = $query['copyrights']*AppConstant::NUMERIC_ONE;
+                     if($copyRights < AppConstant::NUMERIC_TWO)
+                     {
+                         $okToCopy = AppConstant::NUMERIC_ZERO;
+                         if($copyRights == AppConstant::NUMERIC_ONE)
+                         {
+                              $query = Course::getDataForCopyCourse($params['ctc']);
+                              if($query)
+                              {
+                                  foreach($query as $data)
+                                  {
+                                      if($data['groupid'] == $user->groupid)
+                                      {
+                                          $okToCopy = AppConstant::NUMERIC_ONE;
+                                          break;
+                                      }
+                                  }
+                              }
+                         }
+                         if($okToCopy == AppConstant::NUMERIC_ZERO)
+                         {
+                             $eKey = $query['copyrights'];
+                             if (!isset($params['ekey']) || strtolower(trim($eKey)) != strtolower(trim($params['ekey'])))
+                             {
+                                 $overwriteBody = 1;
+                                 $body = 'Invalid enrollment key entered. <a href="#">Try Again</a>';
+                             }
+                             else
+                             {
+                                 $okToCopy = AppConstant::NUMERIC_ONE;
+                             }
+
+                         }
+                     }
+
+                 }
+             }
+             if($okToCopy == AppConstant::NUMERIC_ONE)
+             {
+                 if(isset($action) && $action == "copycalitems")
+                 {
+                     if(isset($params['clearexisting']))
+                     {
+                         CalItem::deleteForCopyCourse($courseId);
+                     }
+                     if (isset($params['checked']) && count($params['checked']) > AppConstant::NUMERIC_ZERO)
+                     {
+                         $checked = $params['checked'];
+                         $chkList = "'".implode("','",$checked)."'";
+                         $query = CalItem::getDataForCopyCourse($chkList,$params['ctc']);
+                         $insArr = array();
+                         foreach($query as $data)
+                         {
+                             $insArr[] = "('$courseId','".implode("','",AppUtility::addslashes_deep($data))."')";
+                         }
+                         $calItemData = implode(',',$insArr);
+                         CalItem::InsertDataForCopy($calItemData);
+                         return $this->redirect('index?cid='.$courseId);
+                     }
+                 }
+                 elseif(isset($action) && $action == "copy")
+                 {
+                     if ($params['whattocopy']=='all')
+                     {
+                         $params['copycourseopt'] = AppConstant::NUMERIC_ONE;
+                         $params['copygbsetup'] = AppConstant::NUMERIC_ONE;
+                         $params['removewithdrawn'] = AppConstant::NUMERIC_ONE;
+                         $params['usereplaceby'] = AppConstant::NUMERIC_ONE;
+                         $params['copyrubrics'] = AppConstant::NUMERIC_ONE;
+                         $params['copyoutcomes'] = AppConstant::NUMERIC_ONE;
+                         $params['copystickyposts'] = AppConstant::NUMERIC_ONE;
+                         $params['append'] = '';
+                         if (isset($params['copyofflinewhole']))
+                         {
+                             $params['copyoffline'] = AppConstant::NUMERIC_ONE;
+                         }
+                         $params['addto'] = 'none';
+                     }
+                     $connection = $this->getDatabase();
+                     $transaction = $connection->beginTransaction();
+                     $gbCats = array();
+                     try
+                     {
+                         if (isset($params['copycourseopt']))
+                         {
+                             $toCopy = 'ancestors,hideicons,allowunenroll,copyrights,msgset,topbar,cploc,picicons,chatset,showlatepass,theme,latepasshrs';
+                             $query = Course::getDataByCtc($toCopy,$params['ctc']);
+                             $toCopyArr = explode(',',$toCopy);
+                             if($query['ancestors'])
+                             {
+                                 $query['ancestors'] = intval($params['ctc']);
+                             }else
+                             {
+                                 $query['ancestors'] = intval($params['ctc']).','.$query['ancestors'];
+                             }
+                             $sets = '';
+                             for ($i=0; $i<count($toCopyArr); $i++)
+                             {
+                                 if ($i> AppConstant::NUMERIC_ZERO){$sets .= ',';}
+                                 $sets .= $toCopyArr[$i] . "='" . addslashes($query[$i])."'";
+                             }
+                             Course::updateCourseForCopyCourse($courseId,$sets);
+                         }
+                         if (isset($params['copygbsetup']))
+                         {
+                             $query = GbScheme::getDataForCopyCourse($params['ctc']);
+                             if($query)
+                             {
+                                 GbScheme::updateDataForCopyCourse($query,$courseId);
+                             }
+                             $query = GbCats::getDataForCopyCourse($params['ctc']);
+                             if($query)
+                             {
+                                 foreach($query as $data)
+                                 {
+                                     $gbData= GbCats::getData($courseId,$data['name']);
+                                     if(count($gbData) == AppConstant::NUMERIC_ZERO)
+                                     {
+                                         $frId = array_shift($data);
+                                         $putValue = new GbCats();
+                                         $insertId = $putValue->insertData($courseId,$data);
+                                         $gbCats[$frId] = $insertId;
+                                     }
+                                     else
+                                     {
+                                         $rpId = $gbData[0]['id'];
+                                         GbCats::updateData($rpId,$data);
+                                         $gbCats[$data['id']] = $rpId;
+                                     }
+                                 }
+                             }
+                         }
+                         else
+                         {
+                             $gbCats = array();
+                             $gbData = GbCats::getDataByJoins($params['ctc'],$courseId);
+                             foreach($gbData as $singleData)
+                             {
+                                 $gbCats[$singleData['id']] = $singleData['id'];
+                             }
+
+                         }
+                         if(isset($params['copyoutcomes']))
+                         {
+                             //load any existing outcomes
+                             $outcomes = array();
+                             $outcomesData = Outcomes::getDataByJoins($params['ctc'],$courseId);
+                             if(count($outcomesData))
+                             {
+                                 $hasOutcomes = true;
+                             }
+                             else
+                             {
+                                 $hasOutcomes = false;
+                             }
+                             foreach($outcomesData as $singleOutcome)
+                             {
+                                 $outcomes[$singleOutcome['id']] = $singleOutcome['id'];
+                             }
+                             $newOutcomes = array();
+                             $query = Outcomes::getDataForCopyCourse($params['ctc']);
+                             foreach($query as $data)
+                             {
+                                 if (isset( $outcomes[$data['id']]))
+                                 {
+                                     continue;
+                                 }
+                                 if ($data['id']=='') {
+                                     $data['ancestors'] = $data['id'];
+                                 } else {
+                                     $data['ancestors'] = $data['id'].','.$data['ancestors'];
+                                 }
+                                 $data['name'] = addslashes($data['name']);
+                                 $putData = new Outcomes();
+                                 $insertId =  $putData->insertDataForCopyCourse($data,$courseId);
+                                 $outcomes[$data['id']] = $insertId;
+                                 $newOutcomes[] = $outcomes[$data['id']];
+                             }
+                             if($hasOutcomes)
+                             {
+                                 $courseOutcomeData = Course::getByCourseIdOutcomes($courseId);
+                                 $outcomesArr = unserialize($courseOutcomeData[0]['outcomes']);
+                                 foreach ($newOutcomes as $o)
+                                 {
+                                     $outcomesArr[] = $o;
+                                 }
+                             }
+                             else
+                             {
+                                 $courseOutcomeData = Course::getByCourseIdOutcomes($params['ctc']);
+                                 $outcomesArr = unserialize($courseOutcomeData[0]['outcomes']);
+                                 $update = new AppUtility();
+                                 $update->updateOutcomes($outcomesArr,$outcomes);
+                             }
+                             $newOutcomeArr = serialize($outcomesArr);
+                             Course::updateOutcomes($newOutcomeArr,$courseId);
+                         }
+                         else
+                         {
+                             $outcomes = array();
+                             $outcomesData = Outcomes::getDataByJoins($params['ctc'],$courseId);
+                             if($outcomesData)
+                             {
+                                 foreach($outcomesData as $singleOutcome)
+                                 {
+                                     $outcomes[$singleOutcome['id']] = $singleOutcome['id'];
+                                 }
+                             }
+
+                         }
+                         if(isset($params['removewithdrawn']))
+                         {
+                             $removeWithDrawn = true;
+                         }
+                         if (isset($params['usereplaceby']))
+                         {
+                             $useReplaceBy = "all";
+                             $questionData = QuestionSet::getDataForCopyCourse($params['ctc']);
+                             foreach($questionData as $singleQuestion)
+                             {
+                                 $replaceByArr[$singleQuestion['id']] = $singleQuestion['replaceby'];
+                             }
+                         }
+                         if (isset($params['checked']) || $params['whattocopy']=='all')
+                         {
+                             $checked = $params['checked'];
+                             $query = Course::getBlockCnt($courseId);
+                             $blockCnt = $query['blockcnt'];
+                             $itemOrder = Course::getItemOrder($courseId);
+                             $items = $itemOrder['itemorder'];
+                             $newItems = array();
+                             if (isset($params['copystickyposts']))
+                             {
+                                 $copyStickyPosts = true;
+                             }
+                             else
+                             {
+                                 $copyStickyPosts = false;
+                             }
+                             if ($params['whattocopy']=='all')
+                             {
+                                 $copy = new CopyItemsUtility();
+                                 $copy->copyAllSub($items,'0',$newItems,$gbCats,$params,$blockCnt);
+                             }
+                             else
+                             {
+                                 $copy = new CopyItemsUtility();
+                                 $copy ->copySub($items,'0',$newItems,$gbCats,$params,$checked,$blockCnt);
+                             }
+                             $doAfterCopy = new CopyItemsUtility();
+
+                             $doAfterCopy->doaftercopy($params['ctc'],$courseId);
+
+                         }
+                       $transaction->commit();
+                     }catch (Exception $e)
+                     {
+                        $transaction->rollBack();
+                        return false;
+                     }
+                 }
+
+             }
+         }
+        return $this->render('copyCourseItems');
     }
 }
