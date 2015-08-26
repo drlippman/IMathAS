@@ -1004,8 +1004,6 @@ class QuestionController extends AppController
                 foreach ($query as $row) {
                     if (isset($params['delimg-'.$row['id']])) {
                         $file = QImages::getByFileName($row['filename']);
-//                            "SELECT id FROM imas_qimages WHERE filename='{$row['filename']}'";
-                        $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
                         if (count($file) == AppConstant::NUMERIC_ONE) { //don't delete if file is used in other questions
                             filehandler::deleteqimage($row['filename']);
                         }
@@ -1396,6 +1394,7 @@ class QuestionController extends AppController
 
     public function actionModQuestion(){
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $userId = $user['id'];
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
@@ -1405,16 +1404,15 @@ class QuestionController extends AppController
         $body = "";
         $pagetitle = "Question Settings";
         $teacherId = $this->isTeacher($userId, $courseId);
-        //CHECK PERMISSIONS AND SET FLAGS
+        /*
+         * CHECK PERMISSIONS AND SET FLAGS
+         */
         if (!(isset($teacherId))) {
             $overwriteBody = AppConstant::NUMERIC_ONE;
             $body = AppConstant::NO_TEACHER_RIGHTS;
-        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION	
-
-//            $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-//            $curBreadcrumb .= "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
-//            $curBreadcrumb .= "Modify Question Settings";
-
+        } else {/*
+                 * PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+	             */
             if ($params['process']== true) {
                 if (isset($params['usedef'])) {
                     $points = AppConstant::QUARTER_NINE;
@@ -1426,9 +1424,21 @@ class QuestionController extends AppController
                     $showhints = AppConstant::NUMERIC_ZERO;
                     $params['copies'] = AppConstant::NUMERIC_ONE;
                 } else {
-                    if (trim($params['points'])=="") {$points = AppConstant::QUARTER_NINE;} else {$points = intval($params['points']);}
-                    if (trim($params['attempts'])=="") {$attempts = AppConstant::QUARTER_NINE;} else {$attempts = intval($params['attempts']);}
-                    if (trim($params['penalty'])=="") {$penalty = AppConstant::QUARTER_NINE;} else {$penalty = intval($params['penalty']);}
+                    if (trim($params['points'])=="") {
+                        $points = AppConstant::QUARTER_NINE;
+                    } else {
+                        $points = intval($params['points']);
+                    }
+                    if (trim($params['attempts'])=="") {
+                        $attempts = AppConstant::QUARTER_NINE;
+                    } else {
+                        $attempts = intval($params['attempts']);
+                    }
+                    if (trim($params['penalty'])=="") {
+                        $penalty = AppConstant::QUARTER_NINE;
+                    } else {
+                        $penalty = intval($params['penalty']);
+                    }
                     if ($penalty!= AppConstant::QUARTER_NINE) {
                         if ($params['skippenalty']==AppConstant::NUMERIC_TEN) {
                             $penalty = 'L'.$penalty;
@@ -1451,7 +1461,7 @@ class QuestionController extends AppController
                 $questionArray['showhints'] = $showhints;
                 $questionArray['assessmentid'] = $assessmentId;
                 if (isset($params['id'])) { //already have id - updating
-                    if (isset($params['replacementid']) && $params['replacementid']!='' && intval($params['replacementid'])!=0) {
+                    if (isset($params['replacementid']) && $params['replacementid']!='' && intval($params['replacementid'])!= AppConstant::NUMERIC_ZERO) {
                         $questionArray['questionsetid'] = intval($params['replacementid']);
                     }
                     Questions::updateQuestionFields($questionArray,$params['id']);
@@ -1467,7 +1477,6 @@ class QuestionController extends AppController
                     for ($i=AppConstant::NUMERIC_ZERO;$i<$params['copies'];$i++) {
                         $question = new Questions();
                         $qid = $question->addQuestions($questionArray);
-
                         //add to itemorder
                         if (isset($params['id'])) { //am adding copies of existing  
                             $itemarr = explode(',',$itemorder);
@@ -1486,7 +1495,6 @@ class QuestionController extends AppController
                 }
                 return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
             } else { //DEFAULT DATA MANIPULATION
-
                 if (isset($params['id'])) {
                     $line = Questions::getById($params['id']);
                     if ($line['penalty']{AppConstant::NUMERIC_ZERO}==='L') {
@@ -1534,7 +1542,7 @@ class QuestionController extends AppController
             }
         }
         $renderData = array('course'=>$course,'overwriteBody' => $overwriteBody, 'body' => $body, 'pageBeenTakenMsg' => $pageBeenTakenMsg,
-            'courseId' => $courseId, '' => $assessmentId, 'beentaken' => $beentaken, 'params' => $params, 'skippenalty' => $skippenalty,
+            'courseId' => $courseId, 'assessmentId' => $assessmentId, 'beentaken' => $beentaken, 'params' => $params, 'skippenalty' => $skippenalty,
             'line' => $line, 'rubricNames' => $rubric_names,'rubricVals' => $rubric_vals);
         return $this->renderWithData('modQuestion',$renderData);
     }
@@ -1726,22 +1734,27 @@ class QuestionController extends AppController
                     }
                 }
                 if (!$found) {
-                    //item was not found in viddata.  it should have been.
-                    //count happen if the first item in a group was removed, perhaps
-                    //Add a blank item
+                    /*item was not found in viddata.  it should have been.
+                     *count happen if the first item in a group was removed, perhaps
+                     *Add a blank item
+                     */
                     $newviddata[] =  array('','',$i);
                 }
             }
-            //any old items will not get copied.
+            /*
+             *any old items will not get copied.
+             */
             $viddata = addslashes(serialize($newviddata));
-
-
         }
 
-        //delete any removed questions
+        /*
+         * delete any removed questions
+         */
         $ids = implode(',',$toremove);
         Questions::deleteById($ids);
-        //store new itemorder
+        /*
+         * store new itemorder
+         */
         $query = Assessments::setVidData($params['order'],$viddata,$aid);
 
         if (count($query)>0) {
@@ -1749,7 +1762,5 @@ class QuestionController extends AppController
         } else {
             echo "error: not saved";
         }
-        $this->includeJS(['eqntips.js','eqnhelper.js','tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js']);
-//        return $this->renderWithData('addQuestion');
     }
 }

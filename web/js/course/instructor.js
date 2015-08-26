@@ -21,8 +21,20 @@ function additem(blk,tb) {
 }
 
 function deleteItem(id,type,block,courseId) {
-    var itemType = type;
-    var html = '<div><p>Are you sure? This will delete the '+itemType+' .</p></div>';
+    if(type == 'Forum'){
+        var message = "Are you SURE you want to delete this forum and all associated postings?";
+    }else if(type == 'Wiki'){
+        var message = "Are you SURE you want to delete this Wiki and all associated revisions?";
+    }else if(type == 'Assessment'){
+        var message = "Are you SURE you want to delete this assessment and all associated student attempts?";
+    }else if(type == 'InlineText'){
+        var message = "Are you SURE you want to delete this text item?";
+    }else if(type == 'LinkedText'){
+        var message = "Are you SURE you want to delete this link item?";
+    }else if(type == 'Block'){
+        var message = "Are you SURE you want to delete this Block?";
+    }
+    var html = '<div><p>'+message+'</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
@@ -42,6 +54,11 @@ function deleteItem(id,type,block,courseId) {
         },
         close: function (event, ui) {
             $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 }
@@ -52,7 +69,7 @@ function responseSuccess(response)
 
 function copyItem(id,type,block,courseId) {
     var itemType = type;
-    var html = '<div><p>Are you sure? This will copy the '+ itemType+' .</p></div>';
+    var html = '<div><p>Are you SURE you want to copy this '+ itemType+'?</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
         width: 'auto', resizable: false,
@@ -72,6 +89,11 @@ function copyItem(id,type,block,courseId) {
         },
         close: function (event, ui) {
             $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 }

@@ -1054,3 +1054,8 @@ div.review {
 .padding-left{
     padding-left: 15px;
 }
+
+.modify-question-drop-down
+{
+   width: 96% !important;
+}

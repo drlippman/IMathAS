@@ -78,16 +78,8 @@ class Questions extends BaseImasQuestions
 
     public function addQuestions($params)
     {
-        $this->assessmentid = isset($params['assessmentid']) ? $params['assessmentid'] : null;
-        $this->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : null;
-        $this->points = isset($params['points']) ? $params['points'] : null;
-        $this->attempts = isset($params['attempts']) ? $params['attempts'] : null;
-        $this->penalty = isset($params['penalty']) ? $params['penalty'] : null;
-        $this->category = isset($params['category']) ? $params['category'] : null;
-        $this->regen = isset($params['regen']) ? $params['regen'] : null;
-        $this->showans = isset($params['showans']) ? $params['showans'] : null;
-        $this->showhints = isset($params['showhints']) ? $params['showhints'] : null;
-        $this->rubric = isset($params['rubric']) ? $params['rubric'] : null;
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
         return $this->id;
     }
@@ -278,7 +270,8 @@ class Questions extends BaseImasQuestions
             $questionData->showans = $params['showans'];
             $questionData->rubric = $params['rubric'];
             $questionData->showhints = $params['showhints'];
-            $questionData->questionsetid = $params['questionsetid'];
+            $questionData->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : $questionData['questionsetid'];
+//            AppUtility::dump($questionData);
             $questionData->save();
         }
     }

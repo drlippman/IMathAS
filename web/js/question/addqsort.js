@@ -8,6 +8,7 @@
 $(document).ready(function () {
     generate();
 });
+var imasroot = '/openmath/web';
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 function generate(){
@@ -398,7 +399,7 @@ function generateTable() {
 }
 
 function submitChanges() { 
-  url = AHAHsaveurl + '&order='+generateOutput();alert(url);
+  url = AHAHsaveurl + '&order='+generateOutput();
   var target = "submitnotice";
   document.getElementById(target).innerHTML = ' Saving Changes... ';
   if (window.XMLHttpRequest) { 
@@ -414,7 +415,7 @@ function submitChanges() {
 }  
 
 function ahahDone(url, target) { 
-  if (req.readyState == 4) { // only if req is "loaded" 
+  if (req.readyState == 4) { // only if req is "loaded"
     if (req.status == 200) { // only if "OK" 
 	    if (req.responseText=='OK') {
 		    document.getElementById(target).innerHTML='';
@@ -423,7 +424,7 @@ function ahahDone(url, target) {
 		    document.getElementById(target).innerHTML=req.responseText;
 		    itemarray = olditemarray;
 	    }
-    } else { 
+    } else {
 	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
 	    itemarray = olditemarray;
     } 

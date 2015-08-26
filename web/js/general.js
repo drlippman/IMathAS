@@ -263,7 +263,7 @@ function GB_hide() {
 	document.getElementById("GB_overlay").style.display = "none";
 }
 
-function chkAllNone(frmid, arr, mark, skip) {
+function chkAllNone(frmid, arr, mark, skip) {alert(mark);
   var frm = document.getElementById(frmid);
   for (i = 0; i <= frm.elements.length; i++) {
    try{

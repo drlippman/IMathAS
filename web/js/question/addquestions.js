@@ -1,4 +1,42 @@
-function moveitem(from) { 
+$(document).ready(function () {
+    selectCheckBox();
+    $('input[name = "header-checked"]:checked').prop('checked', false);
+});
+
+function selectCheckBox() {
+    $('.question-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('#question-information-table input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('#question-information-table input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
+    //$('.non-locked').click(function () {
+    //    $('#student-information-table input:checkbox').each(function () {
+    //        var selectedEntry = $(this).val();
+    //        var lockedStudent = 0;
+    //        $.each(studentData, function (index, student) {
+    //            if(selectedEntry == student.id){
+    //                if(student.locked != 0){
+    //                    lockedStudent = 1;
+    //                }
+    //            }
+    //        });
+    //        if (lockedStudent == 0) {
+    //            $(this).prop('checked', true);
+    //        } else {
+    //            $(this).prop('checked', false);
+    //        }
+    //    })
+    //});
+}
+
+function moveitem(from) {
 	var to = document.getElementById(from).value; 
 	var grp = document.getElementById('group').value; 
 	if (to != from) {
@@ -8,7 +46,7 @@ function moveitem(from) {
 }
 
 function previewq(formn,loc,qn,docheck,onlychk) {
-    var previewqaddr = document.getElementById("address").value; alert(previewqaddr);
+    var previewqaddr = document.getElementById("address").value;
    var addr = previewqaddr+'&qsetid='+qn;
    if (formn!=null) {
 	    addr +='&formn='+formn;

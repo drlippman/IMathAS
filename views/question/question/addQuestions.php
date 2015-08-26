@@ -25,9 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<!--<div class="item-detail-content">-->
-<!--    --><?php //echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
-<!--</div>-->
 <div class="tab-content shadowBox">
 <?php    if ($overwriteBody==1) {
     echo $body;
@@ -41,9 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
         var curlibs = '<?php echo $searchlibs;?>';
     </script>
 
-<!--    <div class="breadcrumb"></div>-->
-<!--    <div id="headeraddquestions" class="pagetitle"><h2>Add/Remove Questions-->
-<!--        </h2></div>-->
     <?php
     echo '<div class=""><div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Assessment Settings').'</a></div>
     <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$params['aid'].'&amp;cid='.$course->id ).'">'._('Categorize Questions').'</a></div>
@@ -204,9 +198,14 @@ if ($noSearchResults) {
         <input name="add" type=submit value="Add" />
         <input name="addquick" type=submit value="Add (using defaults)">
         <input type=button value="Preview Selected" onclick="previewsel('selq')" /><br><br>
-        <table cellpadding="5" id="myTable" class="" style="clear:both; position:relative;">
+        <table cellpadding="5" id="myTable" class="question-table" style="clear:both; position:relative;">
             <thead>
-            <tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th>
+            <tr><th class="studentId"><div class="checkbox override-hidden">
+                        <label>
+                            <input type="checkbox" name="header-checked"  value="">
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                        </label>
+                    </div></th><th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th>
                 <?php echo $pageLibRowHeader ?>
                 <th>Times Used</th>
                 <?php if ($pageUseavgtimes) {?><th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()">Avg Time</span></th><?php } ?>
@@ -214,7 +213,7 @@ if ($noSearchResults) {
                 <?php if ($searchall==0) { echo '<th><span onmouseover="tipshow(this,\'Flag a question if it is in the wrong library\')" onmouseout="tipout()">Wrong Lib</span></th>';} ?>
             </tr>
             </thead>
-            <tbody>
+            <tbody id="question-information-table">
             <?php
             $alt=0;
             for ($j=0; $j<count($pageLibstouse); $j++) {

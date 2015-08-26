@@ -86,3 +86,12 @@ function setMinHeightToContainer() {
             $(".master-wrap").css('min-height', heightMin+"px");
 }
 </script>
+<script type="text/javascript">
+    noMathRender = false;
+    var usingASCIIMath = true;
+    var AMnoMathML = true;
+    var MathJaxCompatible = true;
+    function rendermathnode(node) {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, node]);
+    }
+</script>;

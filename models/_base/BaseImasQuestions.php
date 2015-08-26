@@ -40,10 +40,10 @@ class BaseImasQuestions extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['assessmentid', 'questionsetid', 'points', 'attempts', 'rubric', 'regen', 'showans', 'showhints', 'extracredit'], 'integer'],
-            [['penalty'], 'string', 'max' => 6],
-            [['category'], 'string', 'max' => 254],
-            [['withdrawn'], 'string', 'max' => 1]
+//            [['assessmentid', 'questionsetid', 'points', 'attempts', 'rubric', 'regen', 'showans', 'showhints', 'extracredit'], 'integer'],
+//            [['penalty'], 'string', 'max' => 6],
+//            [['category'], 'string', 'max' => 254],
+//            [['withdrawn'], 'string', 'max' => 1]
         ];
     }
 
