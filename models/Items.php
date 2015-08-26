@@ -78,10 +78,4 @@ class Items extends BaseImasItems
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-
-    public static function getByCourseIdForMassChange($courseId)
-    {
-        $query =\Yii::$app->db->createCommand("SELECT itemorder FROM imas_courses WHERE id='$courseId'")->queryOne();
-        return $query;
-    }
 }

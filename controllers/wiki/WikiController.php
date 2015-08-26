@@ -174,27 +174,27 @@ class WikiController extends AppController
             } else{
             if ($params['avail']== AppConstant::NUMERIC_ONE) {
                 if ($params['available-after'] == '0') {
-                    $startDate = 0;
+                    $startDate = AppConstant::NUMERIC_ZERO;
                 } else if ($params['available-after'] == 'now') {
                     $startDate = time();
                 } else {
                     $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                 }
                 if ($params['available-until'] == '2000000000') {
-                    $endDate = 2000000000;
+                    $endDate = AppConstant::ALWAYS_TIME;
                 } else {
                     $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                 }
-            } else if ($params['avail'] == 2) {
-                if ($params['place-on-calendar-always']==0) {
-                    $startDate = 0;
+            } else if ($params['avail'] == AppConstant::NUMERIC_TWO) {
+                if ($params['place-on-calendar-always'] == AppConstant::NUMERIC_ZERO) {
+                    $startDate = AppConstant::NUMERIC_ZERO;
                 } else {
                     $startDate = AppUtility::parsedatetime($params['cdate'],"12:00 pm");
                 }
-                $endDate =  2000000000;
+                $endDate =  AppConstant::ALWAYS_TIME;
             } else {
-                $startDate = 0;
-                $endDate =  2000000000;
+                $startDate = AppConstant::NUMERIC_ZERO;
+                $endDate =  AppConstant::ALWAYS_TIME;
             }
             $finalArray['courseid'] = $params['courseId'];
             $finalArray['title'] = $params['name'];

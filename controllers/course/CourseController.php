@@ -1072,35 +1072,35 @@ class CourseController extends AppController
                     $externalToolsData->updateExternalToolsData($params);
                 }
                 $caltag = $params['tag'];
-                $points = 0;
-                if ($params['avail']==1) {
+                $points = AppConstant::NUMERIC_ZERO;
+                if ($params['avail']== AppConstant::NUMERIC_ONE) {
                     if ($params['available-after']=='0') {
-                        $startDate = 0;
+                        $startDate = AppConstant::NUMERIC_ZERO;
                     } else if ($params['available-after']=='now') {
                         $startDate = time();
                     } else {
                         $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
                     }
                     if ($params['available-until']=='2000000000') {
-                        $endDate = 2000000000;
+                        $endDate = AppConstant::ALWAYS_TIME;
                     } else {
                         $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                     }
                     $oncal = $params['place-on-calendar'];
-                } else if ($params['avail']==2) {
-                    if ($params['place-on-calendar-always']==0) {
-                        $startDate = 0;
-                        $oncal = 0;
+                } else if ($params['avail']== AppConstant::NUMERIC_TWO) {
+                    if ($params['place-on-calendar-always']== AppConstant::NUMERIC_ZERO) {
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                        $oncal = AppConstant::NUMERIC_ZERO;
                     } else {
                         $startDate = AppUtility::parsedatetime($params['cdate'],"12:00 pm");
-                        $oncal = 1;
+                        $oncal = AppConstant::NUMERIC_ONE;
                         $caltag = $params['tag-always'];
                     }
-                    $endDate =  2000000000;
+                    $endDate =  AppConstant::ALWAYS_TIME;
                 } else {
-                    $startDate = 0;
-                    $endDate =  2000000000;
-                    $oncal = 0;
+                    $startDate = AppConstant::NUMERIC_ONE;
+                    $endDate =  AppConstant::ALWAYS_TIME;
+                    $oncal = AppConstant::NUMERIC_ZERO;
                 }
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];

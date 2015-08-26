@@ -37,7 +37,6 @@ class Student extends BaseImasStudents {
     }
     public static function getByUserIdentity($uid,$courseid)
     {
-
         return static::findAll(['userid' => $uid,'courseid' => $courseid]);
     }
     public function createNewStudent($userId,$cid,$params)

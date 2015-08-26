@@ -741,7 +741,15 @@ class CourseItemsUtility extends Component
             <div class="title">
                     <span class="pointer" onclick="#">
                         <b>
-                            <a href="#" onclick="return false;"><?php echo $block['name']?></a>
+                            <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') {?>
+                                <a href="<?php echo AppUtility::getURLFromHome('block', 'block/add-block?cid=' .$course->id)?>">
+                           <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
+                                <a href="<?php echo AppUtility::getURLFromHome('block', 'block/tree-reader?cid=' .$course->id)?>">
+                           <?php } else {?>
+                                <a href="#" onclick="return false;">
+                            <?php }?>
+
+                                <?php echo $block['name']?></a>
                             <?php if($block['newflag'] == 1){?>
                                 <span class="red">New</span>
                             <?php }?>
@@ -836,7 +844,7 @@ class CourseItemsUtility extends Component
 
                             <!-- ////////////////// Wiki here //////////////////-->
                         <?php case 'Wiki': ?>
-                            <?php $this->AddWiki($item,$course,$parent.'-'.$cnt); ?>
+                            <?php $this->AddWiki($item,$course,$parent.'-'.$cnt, $currentTime); ?>
                             <?php break; ?>
 
                             <!-- ////////////////// Linked text here //////////////////-->
