@@ -13,12 +13,11 @@ $this->title = $course->name;
             </div>
         </div>
     </div>
-
 <div class="tab-content shadowBox non-nav-tab-item">
-    <div class="padding-left padding-top">
+    <div class="padding-left padding-top-fifteen">
             <h3><b><?php echo $links->title ?></b></h3>
             <div class="col-lg-3">
-                <h5><?php echo $links->text ?></h5>
+                <h5><?php echo $links->text?></h5>
             </div>
     </div>
     <br>
@@ -33,6 +32,11 @@ $this->title = $course->name;
     <br>
     <br>
     <div class="col-lg-12 align-linked-text-right">
-        <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $links->courseid) ?>"> Return to course page </a>
+        <?php if($user->rights == 10){?>
+            <b><a href="<?php echo AppUtility::getURLFromHome('course', 'course/index?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
+                <?php } elseif($user->rights == 100 || $user->rights == 20){?>
+            <b><a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $links->courseid) ?>"><?php AppUtility::t('Return to course page')?></a>
+        <?php } ?>
+        <br><br>
     </div>
 </div>

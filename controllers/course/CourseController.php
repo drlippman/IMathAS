@@ -506,12 +506,13 @@ class CourseController extends AppController
     public function actionShowLinkedText()
     {
         $this->layout = 'master';
+        $user = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('cid');
         $id = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $link = Links::getById($id);
         $this->includeCSS(['course/items.css']);
-        $returnData = array('course' => $course, 'links' => $link);
+        $returnData = array('course' => $course, 'links' => $link, 'user' => $user);
         return $this->renderWithData('showLinkedText', $returnData);
     }
     /**

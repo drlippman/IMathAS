@@ -106,7 +106,8 @@ class CourseItemsUtility extends Component
                 $endDate = AppUtility::formatDate($forum->enddate);?>
                 <img alt="text item" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                 <div class="title">
-                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+                            <?php echo $forum->name ?></a></b>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
@@ -152,7 +153,8 @@ class CourseItemsUtility extends Component
                 $endDate = AppUtility::formatDate($forum->enddate);?>
                 <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                 <div class="title">
-                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+                            <?php echo $forum->name ?></a></b>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
@@ -178,7 +180,8 @@ class CourseItemsUtility extends Component
                 $endDate = AppUtility::formatDate($forum->enddate);?>
                 <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconForum.png"/>
                 <div class="title">
-                    <b><a><?php echo ucfirst($forum->name) ?></a></b>
+                    <b><a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/thread?cid=' . $forum->courseid.'&forumid='.$forum->id) ?>">
+                            <?php echo $forum->name ?></a></b>
                     <div class="floatright">
                         <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                         <ul class=" select1 dropdown-menu selected-options">
@@ -203,10 +206,11 @@ class CourseItemsUtility extends Component
 
 ////////////////////////////////////////////////////////////////////// WIKI////////////////////////////////////////////////////////////////////
 
-    public static function AddWiki($item,$course,$parent)
+    public static function AddWiki($item,$course,$parent, $currentTime)
     {
         $wikis = $item[key($item)]; ?>
         <?php $endDateOfWiki = AppUtility::formatDate($wikis['enddate'], 'm/d/y');
+        $startDateOfWiki = AppUtility::formatDate($wikis['startdate'], 'm/d/y');
         ?>
         <?php if ($wikis->avail == AppConstant::NUMERIC_ZERO) { ?>
 
@@ -250,12 +254,20 @@ class CourseItemsUtility extends Component
                         <li><a id="copy" href="javascript:copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                     </ul>
                 </div>
-                <br><span> Showing until:</span>
-                <?php if ($wikis['enddate'] < AppConstant::ALWAYS_TIME) {
-                    echo $endDateOfWiki;
-                } else { ?>
-                    Always
-                <?php } ?>
+                <br>
+                <?php
+                if ($wikis['startdate'] == 0 && $wikis['enddate'] <= $currentTime) {
+                    echo 'Showing Always until: ' .$endDateOfWiki;
+                } elseif(($wikis['startdate'] == 0 && $wikis['enddate'] == AppConstant::ALWAYS_TIME)) {
+                    echo 'Showing until: Always';
+                 } elseif($wikis['startdate'] <= $currentTime && $wikis['enddate'] == AppConstant::ALWAYS_TIME){
+                    echo 'Showing until: Always';
+                } elseif($wikis['startdate'] <= $currentTime && $wikis['enddate'] >= $currentTime){
+                    echo 'Showing Until: '.$endDateOfWiki;
+                }
+                else{
+                    echo 'Showing ' .$startDateOfWiki . ' Until ' .$endDateOfWiki;
+                } ?>
 
                 <?php if ($wikis['editbydate'] > AppConstant::NUMERIC_ONE && $wikis['editbydate'] < AppConstant::ALWAYS_TIME) { ?>
                     Edits due by <? echo $endDateOfWiki; ?>
@@ -570,6 +582,14 @@ class CourseItemsUtility extends Component
         <div class="item">
             <?php $InlineId = $inline->id;
             $endDate = AppUtility::formatDate($inline->enddate);?>
+            <div class="floatright">
+                <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+                <ul class=" select1 dropdown-menu selected-options pull-right">
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                    <li><a id="delete" href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                    <li><a id="copy" href="javascript:copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+                </ul>
+            </div>
             <!--Hide title and icon-->
 
             <?php if ($inline->title != '##hidden##') {
@@ -578,27 +598,9 @@ class CourseItemsUtility extends Component
         <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
             <div class="title">
                 <b><?php echo ucfirst($inline->title)?></b>
-
-                <div class="floatright">
-                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                    <ul class=" select1 dropdown-menu selected-options pull-right">
-                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
-                        <li><a id="delete" href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                        <li><a id="copy" href="javascript:copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                    </ul>
-                </div>
-
             </div>
             <div class="itemsum">
                 <?php } ?>
-                <div class="floatright">
-                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                    <ul class=" select1 dropdown-menu selected-options pull-right">
-                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
-                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                    </ul>
-                </div>
                 <?php if($inline->avail == 2) { ?>
                     <?php echo "Showing Always";
                 }
@@ -626,19 +628,18 @@ class CourseItemsUtility extends Component
         </div>
     <?php } elseif($inline->avail == 0) { ?>
         <div class="item">
+            <a class="dropdown-toggle grey-color-link select_button1" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
+            <ul class=" select1 dropdown-menu selected-options pull-right">
+                <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                <li><a id="delete" href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
+                <li><a id="copy" href="javascript:copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
+            </ul><br>
             <!--Hide title and icon-->
             <?php if ($inline->title != '##hidden##') {
             $endDate = AppUtility::formatDate($inline->enddate);?>
         <img alt="assess" class="floatleft faded item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/inlineText.png"/>
-
             <div class="title">
                 <b><?php echo ucfirst($inline->title) ?></b>
-                <a class="dropdown-toggle grey-color-link select_button1" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                <ul class=" select1 dropdown-menu selected-options pull-right">
-                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
-                    <li><a id="delete" href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                    <li><a id="copy" href="javascript:copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                </ul><br>
             </div>
             <div class="itemsum"><p>
                     <?php  }
@@ -677,14 +678,6 @@ class CourseItemsUtility extends Component
                     $startDate = AppUtility::formatDate($inline->startdate);
                     $endDate = AppUtility::formatDate($inline->enddate);
                     echo "Showing " .$startDate. " until " .$endDate; ?>
-                <div class="floatright">
-                    <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
-                    <ul class=" select1 dropdown-menu selected-options pull-right">
-                        <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
-                        <li><a id="delete" href="#" onclick="deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
-                        <li><a id="copy" href="#" onclick="copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                    </ul>
-                </div>
             </div>
         </div>
     <?php }?>

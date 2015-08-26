@@ -114,7 +114,7 @@ $now = $currentTime;
                     <!-- ////////////////// Wiki here //////////////////-->
                 <?php case 'Wiki': ?>
                     <?php  $cnt++; ?>
-                    <?php CourseItemsUtility::AddWiki($item,$course,$parent); ?>
+                    <?php CourseItemsUtility::AddWiki($item,$course,$parent, $currentTime); ?>
                     <?php break; ?>
                     <!-- ////////////////// Linked text here //////////////////-->
                 <?php
