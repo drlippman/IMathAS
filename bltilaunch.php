@@ -1677,10 +1677,10 @@ if (isset($_GET['launch'])) {
 	$_SESSION['ltiorigkey'] = $ltikey;
 	
 	// prepend ltiorg with courseid or sso+userid to prevent cross-instructor hacking  
-	if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {  //cid:org
+	if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {  //cid:org
 		$_SESSION['ltilookup'] = 'c';
 		$ltiorg = $keyparts[1].':'.$ltiorg;
-		if ($keyparts[0]=='placein') {
+		if ($keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 			$keytype = 'gc';
 		} else {
 			$keytype = 'c';
@@ -1998,7 +1998,7 @@ if ($_SESSION['lti_keytype']=='cc-vf' || $_SESSION['lti_keytype']=='cc-of') {
 	$keyparts = array('folder',$_SESSION['view_folder'][0],$_SESSION['view_folder'][1]);
 }
 //is course level placement
-if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='placein' || $keyparts[0]=='LTIkey') {
 	$cid = intval($keyparts[1]);
 	$query = "SELECT available,ltisecret FROM imas_courses WHERE id='$cid'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -2092,7 +2092,7 @@ if ($keyparts[0]=='cid' || $keyparts[0]=='placein') {
 } 
 
 //see if student is enrolled, if appropriate to action type
-if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder') {
+if ($keyparts[0]=='cid' || $keyparts[0]=='aid' || $keyparts[0]=='placein' || $keyparts[0]=='folder' || $keyparts[0]=='LTIkey') {
 	if ($_SESSION['ltirole']=='instructor') {
 		$query = "SELECT id FROM imas_teachers WHERE userid='$userid' AND courseid='$cid'";
 		$result = mysql_query($query) or die("Query failed : " . mysql_error());

@@ -3,6 +3,9 @@
 // Mike Jenck, Originally developed May 16-26, 2014
 // licensed under GPL version 2
 //
+//
+// 2015-04-13 Created simplexdisplaylatex() to output latex commands for a simplex matrix
+//
 // 2015-04-10 Updated simplexcreateinequalities to accept a blank object variable that will result in an output of just equations for for all inequalities strings.
 // 2015-04-03 Fixed bug in simplex - an error occurred sometimes when transposing the duality minimization
 //            to the maximization problem.
@@ -18,7 +21,7 @@
 
 
 global $allowedmacros;
-array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
+array_push($allowedmacros, "simplex", "simplexcreateanswerboxentrytable", "simplexcreateinequalities", "simplexconverttodecimals", "simplexconverttofraction", "simplexdebug", "simplexdefaultheaders", "simplexdisplaytable", "simplexdisplaylatex", "simplexfindpivotpoint", "simplexgetentry", "simplexsetentry", "simplexpivot", "simplexreadtoanswerarray", "simplexreadsolution", "simplexsolve", "simplexnumberofsolutions", "simplexchecksolution" );
 
 
 include_once("fractions.php");  // fraction routine
@@ -1129,6 +1132,149 @@ function simplexdisplaytable() {
     }
     $Tableau.= "</tbody>\r\n";
     $Tableau.= "</table>\r\n";
+
+    return $Tableau;
+  }
+
+
+//simplexdisplaytable(simplexmatrix, [simplexmatrixname, showentriesfractions=1, $pivot = array(-1,-1 ["blue","black"])]) 
+// Create a string that is a valid HTML table syntax for display.
+// simplexmatrix: a valid simplex matrix.
+//
+// optional
+// simplexmatrixname: a string that holds the matrix name, like A or B.  You should leave balnk if you
+//             are creating a simplex display
+// showfractions: either0 or 1
+//                 0 convert simplex element to a decimal
+//         default 1 convert simplex element to a \display\frac{}{}
+// pivot: list or array that contains the row, column, border color, and text color.  This puts a  
+//         border around the cell at (row,col). Both row and column are ZERO based.
+//    default point none
+//    default border color = blue
+//    default text  color  = black
+function simplexdisplaylatex() {
+    
+    //  arguments lise --------------------------------------------------
+    //  0 = simplex matrix
+    //  1 = simplex matrix name
+    //  2 = show fractions (string)
+    //  3 = circle pivot point, if supplied
+    
+    // process arguments -----------------------------------------------
+    $args = func_get_args();
+    if (count($args)==0) {
+        echo "Nothing to display - no simplex matrix supplied.<br/>\r\n";
+        return "";
+    }    
+    //   this function CANNOT use     
+    // as it will mess up when a string is sent to this procedure and is to be displayed
+    $sm = $args[0];
+    
+    $rows = count($sm);
+    if($rows==1)  {
+        // only 1 row 
+        echo "Error - a simplex matrix must have at least two rows.<br/>\r\n";
+        return "";
+    }
+    $cols = count($sm[0]);
+    
+  // simplex matrixname
+  if((count($args)>1)&&(!is_null($args[1]))) { $simplexmatrixname = $args[1]; } else { $simplexmatrixname = ""; } 
+  
+  //showfractions=1
+  if((count($args)>2)&&(!is_null($args[2]))) {
+  	$showfractions = verifyshowfraction("simplexdisplaylatex",$args[2],1,1);
+  } 
+  else { $showfractions=1; }
+  
+  //pivot
+  if((count($args)>3)&&(!is_null($args[3]))) {
+    if (!is_array($args[3])) { $args[3]=explode(',',$args[5]); }
+    $pivots = $args[3];    
+    for ($r=0; $r<count($pivots); $r++) {
+      $currentpoint = $pivots[$r];
+      if((count($currentpoint)>0)&&(!is_null($currentpoint[0]))&&($currentpoint[0]>=0)) {
+        $prow = $currentpoint[0];
+      }
+      else {
+        $prow = -1;
+      }
+      if((count($currentpoint)>1)&&(!is_null($currentpoint[1]))&&($currentpoint[1]>=0)) {
+        $pcol = $currentpoint[1];
+      }
+      else {
+        $pcol = -1;
+      }
+      
+      //pivotcolor
+      $pivotbordercolor = "blue";
+      if((count($currentpoint)>2)&&(!is_null($currentpoint[2]))&&($currentpoint[2]!="")) {
+        $pivotbordercolor = $currentpoint[2];
+      }
+      
+      //pivottextcolor
+      $pivottextcolor = "black";
+      if((count($currentpoint)>3)&&(!is_null($currentpoint[3]))&&($currentpoint[3]!="")) {
+        $pivottextcolor = $currentpoint[3];
+      }
+      
+      if(($prow >= 0)&&($prow >= 0)) { 
+        $pivotstylematrix[$prow][$pcol] = "style='border:1px solid $pivotbordercolor;color:$pivottextcolor'";
+      }
+    }
+  }  
+  
+    // Done processing arguments ---------------------------------------
+    $lastrow = $rows-1;
+    $lastcol = $cols-1;
+    if($simplexmatrixname=="") {
+		$Tableau = "$\begin{bmatrix}[";
+	} else {
+		$Tableau = "$simplexmatrixname = $\begin{bmatrix}[";
+	}
+    
+    for ($cloop=0; $cloop<$cols; $cloop++) {
+    	if($cloop==$cols-1) {
+			$Tableau .= "|c";
+		} else {
+			$Tableau .= "c";
+		}
+        
+    }
+    $Tableau .= "]<br/>\r\n";
+    for ($rloop=0; $rloop<$rows; $rloop++) {
+    	//$Tableau .= "\r\n";
+    	for ($cloop=0;$cloop<$cols; $cloop++) {
+    		if($cloop!=0) {
+				$amp = "&";
+			} else {
+				$amp = "";
+			}
+			$top = $sm[$rloop][$cloop][0];
+			$bot = $sm[$rloop][$cloop][1];
+			if($showfractions==1) {
+				if($bot!=1){
+					$Element = "\display\frac\{".$top."\}\{".$bot."\}"; 
+				} else {
+					$Element = "$top"; 
+				}
+        		
+        	} else {
+        		$Element = fractiontodecimal($sm[$rloop][$cloop]); // convert to decimal
+        	}
+        	
+        	// is this a pivot point
+        	if(($prow==$rloop)&&($pcol==$cloop)) {
+        		$Tableau.= $amp." \\numcircledtikz\{$".$Element."$\} ";
+			} else {
+				$Tableau.= $amp." $Element ";
+			}
+    	}
+        $Tableau.= "\\\\";
+        if ($rloop==($lastrow-1)) { $Tableau .= " \hline"; }
+        $Tableau.= "<br/>\r\n";
+    }
+    $Tableau.= "<br/>\end{bmatrix}$\r\n<br/>";
 
     return $Tableau;
   }

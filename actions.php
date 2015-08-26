@@ -1,6 +1,10 @@
 <?php
 	//IMathAS:  Basic Actions
 	//(c) 20006 David Lippman
+ini_set("memory_limit", "104857600");	
+ini_set("upload_max_filesize", "10485760");
+ini_set("post_max_size", "10485760");
+
 	if (isset($_GET['greybox'])) {
 		$isgb = true;
 		$gb = '&greybox=true';
