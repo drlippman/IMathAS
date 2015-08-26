@@ -267,6 +267,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <label class="padding-left non-bold"><?php AppUtility::t('Replies')?><span class="padding-left"><input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2"></span></label>
                             </div><br class=form>
                     </div>
+<!--        --><?php //AppUtility::dump($defaultValue['rubric']); ?>
                  <div class="item-alignment">
                     <div class=col-lg-2><?php AppUtility::t('Count in gradebook?')?></div>
                     <div class=col-lg-10>
@@ -301,7 +302,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="item-alignment">
                         <div class="col-lg-2"><?php AppUtility::t('Use Scoring Rubric')?></div>
                         <div class=col-lg-4>
-                                <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$defaultValue['rubric'],'None',0); ?>
+                                <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$defaultValue['rubric']); ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>">Add new
                                 <?php AppUtility::t('rubric')?></a> | <a
                                 href="<?php echo AppUtility::getURLFromHome('site','work-in-progress') ?>"><?php AppUtility::t('Edit rubrics')?></a>

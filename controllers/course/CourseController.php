@@ -1103,7 +1103,15 @@ class CourseController extends AppController
                 }
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['title'] = $params['name'];
-                $finalArray['summary'] = $params['summary'];
+                $str = '<p>Enter summary here (displays on course page)</p>';
+                if ($params['summary']== $str) {
+                    $finalArray['summary'] = ' ';
+                } else {
+                    /*
+                     * Apply html lawed here
+                     */
+                    $finalArray['summary'] = $params['summary'];
+                }
                 $finalArray['text'] = $params['text'];
                 $finalArray['avail'] = $params['avail'];
                 $finalArray['oncal'] = $oncal;

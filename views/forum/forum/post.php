@@ -28,7 +28,13 @@ $currentLevel = 0;
 <input type="hidden" id="tag-id" value="<?php echo $tagValue ?>">
 <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">
 <input type="hidden" id="user-id" value="<?php echo $currentUser['id'] ?>">
-<div id="postlabel">
+<?php $postBeforeView = (($forumData['settings']&16)==16);
+?>
+<?php if($postBeforeView && !$canViewAll){?>
+ <p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>
+    <a class="pull-right" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid=' . $course->id . '&forumid=' . $forumId);?>">Back to Forum Topics</a>
+    <?php }else {?>
+    <div id="postlabel">
     <div id="post">
         <h4><strong>Forum:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['forumName'] ?></h4><br>
         <h4><strong>Post:</strong>&nbsp;&nbsp;<?php echo $postdata[0]['subject'] ?></h4>
@@ -126,10 +132,10 @@ $currentLevel = 0;
                           <?php }  ?>
 
                            <?php  if($currentUser['rights'] == AppConstant::STUDENT_RIGHT ){ ?>
-                              <?php if($replyBy == AppConstant::ALWAYS_TIME || $replyBy === null){?>
+                              <?php if(($replyBy == AppConstant::ALWAYS_TIME || $replyBy === null)  && $allowReply){?>
                              <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply</a>
                                    <?php }
-                              elseif($replyBy > $now ){ ?>
+                              elseif($replyBy > $now && $allowReply){ ?>
                                   <a href="<?php echo AppUtility::getURLFromHome('forum', 'forum/reply-post?courseid=' . $course->id . '&id=' . $data['id'] . '&threadId=' . $data['threadId'] . '&forumid=' . $data['forumIdData']); ?>">  Reply</a>
                               <?php } ?>
                          <?php }
@@ -216,3 +222,4 @@ $currentLevel = 0;
             to Forum Topics</a>
     </div>
 </div>
+<?php } ?>

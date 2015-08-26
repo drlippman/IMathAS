@@ -523,10 +523,17 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $threadId = $this->getParamVal('threadid');
         $forumId = $this->getParamVal('forumid');
+        $forumData = Forums::getById($forumId);
         $allThreadIds = Thread::getAllThread($forumId);
         $prevNextValueArray =Thread::checkPreOrNextThreadByForunId($forumId);
         $isNew = ForumView::getById($threadId, $currentUser);
         $tagValue = $isNew[0]['tagged'];
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $isTutor = $this->isTutor($currentUser['id'],$courseId);
+        $canViewAll = false;
+        if($isTeacher || $isTutor){
+            $canViewAll = true;
+        }
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
              foreach($FullThread as $singleThreadArray){
@@ -641,9 +648,14 @@ class ForumController extends AppController
             }
             $FinalPostArray[$key] = $threadArray;
         }
+        if($forumData['replyby'] == AppConstant::ALWAYS_TIME || $forumData['replyby'] > time()){
+            $allowReply = AppConstant::NUMERIC_ONE;
+        }else{
+            $allowReply = AppConstant::NUMERIC_ZERO;
+        }
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
-        $responseData = array('postdata' => $FinalPostArray, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
+        $responseData = array('postdata' => $FinalPostArray,'allowReply' => $allowReply,'canViewAll' => $canViewAll,'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
         return $this->render('post', $responseData);
     }
 
@@ -1056,7 +1068,9 @@ class ForumController extends AppController
             $gbcatsLabel[$key] = $singleGbcatsData['name'];
             $key++;
         }
-        $rubrics = Rubrics::getByUserId($user['id']);
+        $rubricsId = array(0);
+        $rubricsLabel = array('None');
+        $rubrics = Rubrics::getIdAndName($user['id'],$user['groupid']);
         foreach ($rubrics as $rubric) {
             $rubricsId[$key] = $rubric['id'];
             $rubricsLabel[$key] = $rubric['name'];
@@ -1260,11 +1274,14 @@ class ForumController extends AppController
                 $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
                 $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
                 $finalArray['name'] = trim($params['name']);
-                if(empty($params['description']))
-                {
-                    $params['description'] = ' ';
-                }
-                $finalArray['description'] = trim($params['description']);
+                 if ($params['description']=='<p>Enter forum description here</p>') {
+                     $finalArray['description'] = '';
+                 } else {
+                     /*
+                      * Apply html lawed here
+                      */
+                     $finalArray['description'] =  $params['description'];
+                 }
                 $finalArray['courseid'] = $params['cid'];
                 $finalArray['settings'] = $settingValue;
                 if($params['avail'] == AppConstant::NUMERIC_ONE)
@@ -1534,10 +1551,8 @@ class ForumController extends AppController
                   }
                   $sets[] = "taglist='$tagList'";
               }
-
               if (count($sets) > AppConstant::NUMERIC_ZERO & count($checked) > AppConstant::NUMERIC_ZERO) {
                   $setsList = implode(',', $sets);
-
                   $forum = new Forums();
                         $forum->updateForumData($setsList,$checkedList);
               }
@@ -1573,7 +1588,7 @@ class ForumController extends AppController
               return $this->redirect('change-forum?cid='.$courseId);
           }
       }
-      $this->includeCSS(['dataTables.bootstrap.css']);
+      $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
       $this->includeJS(['general.js?ver=012115','DataTables-1.10.6/media/js/jquery.dataTables.js']);
       $responseData = array('course' => $course,'gbcatsId' => $gbcatsId,'gbcatsLabel' => $gbcatsLabel,'groupNameId' => $groupNameId,'gbcatsLabel' => $gbcatsLabel,'isTeacher' => $isTeacher,'forumItems' => $forumItems);
       return $this->renderWithData('changeForum',$responseData);

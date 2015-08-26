@@ -5,8 +5,6 @@ use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 $this->title = 'Mass Change Assessment Settings';
-//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-//$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="item-detail-header">
@@ -18,18 +16,20 @@ $this->title = 'Mass Change Assessment Settings';
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?> </div>
             </div>
+            <?php if ($overWriteBody != 1 ) { ?>
             <div class="pull-left header-btn">
                 <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?></button>
             </div>
+            <?php } ?>
         </div>
     </div>
     <div class="tab-content shadowBox non-nav-tab-item">
-        <div class="change-assessment ">
+        <div class="change-assessment">
         <?php
 
         if ($overWriteBody==1) {
-        echo $body;
-        } else { ?>
+            echo "<br><div style='  margin-left: 35%;'> <h4 class=''>$body </h4><br></div>";
+        }else { ?>
             <p>This form will allow you to change the assessment settings for several or all assessments at once.</p>
             <p><b>Be aware</b> that changing default points or penalty after an assessment has been
                 taken will not change the scores of students who have already completed the assessment.<br/>
@@ -61,6 +61,7 @@ $this->title = 'Mass Change Assessment Settings';
     <ul id="alistul" class=nomark>
         <?php
         echo $page_assessListMsg;
+
         $inblock = 0;
         for ($i = 0; $i < (count($ids)); $i++) {
 
@@ -92,24 +93,20 @@ $this->title = 'Mass Change Assessment Settings';
             }
 
         }
-
-        /*for ($i=0;$i<count($page_assessSelect['val']);$i++) {
-    ?>
-                <li><input type=checkbox name='checked[]' value='<?php echo $page_assessSelect['val'][$i] ?>' checked=checked><?php echo $page_assessSelect['label'][$i] ?></li>
-    <?php
-        }*/
         ?>
     </ul>
         </div>
         </div>
         <div class="change-assessment">
         <legend>Assessment Options</legend>
-        <table class="gb" id="opttable">
+        <table class="table table-bordered table-striped table-hover data-table " id="opttable">
             <thead>
             <tr>
-                <th>Change?</th>
-                <th>Option</th>
-                <th>Setting</th>
+               <div class="col-lg-12">
+                   <div class="col-lg-2"><th>Change?</th> </div>
+                <div class="col-lg-4"><th class="text-align">Option</th></div>
+                <div class="col-lg-6"><th class="text-align">Setting</th></div>
+                   </div>
             </tr>
             </thead>
             <tbody>

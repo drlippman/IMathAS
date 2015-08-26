@@ -38,16 +38,16 @@ class AssessmentController extends AppController
         $assessment = Assessments::getByAssessmentId($assessmentId);
         $teacher = Teacher::getByUserId($user->getId(), $courseId);
         $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
-        if(!$assessmentSession){
+        if (!$assessmentSession) {
             $assessmentSessionObject = new AssessmentSession();
             $assessmentSession = $assessmentSessionObject->saveAssessmentSession($assessment, $user->getId());
         }
         $response = AppUtility::showAssessment($user, $params, $assessmentId, $courseId, $assessment, $assessmentSession, $teacher, $to);
-        $isQuestions  = Questions::getByAssessmentId($assessmentId);
+        $isQuestions = Questions::getByAssessmentId($assessmentId);
         $this->includeCSS(['showAssessment.css', 'mathtest.css']);
         $this->getView()->registerJs('var imasroot="openmath/";');
         $this->includeJS(['timer.js', 'ASCIIMathTeXImg_min.js', 'general.js', 'eqntips.js', 'editor/tiny_mce.js']);
-        $responseData = array('response'=> $response,'isQuestions' =>$isQuestions, 'courseId' => $courseId, 'now' => time(),'assessment' => $assessment ,'assessmentSession' => $assessmentSession,'isShowExpiredTime' =>$to,'user' => $user, 'course' => $course);
+        $responseData = array('response' => $response, 'isQuestions' => $isQuestions, 'courseId' => $courseId, 'now' => time(), 'assessment' => $assessment, 'assessmentSession' => $assessmentSession, 'isShowExpiredTime' => $to, 'user' => $user, 'course' => $course);
         return $this->render('ShowAssessment', $responseData);
     }
 
@@ -74,8 +74,9 @@ class AssessmentController extends AppController
         $exception->attributes = $param;
         $exception->save();
         $student->save();
-        $this->redirect(AppUtility::getURLFromHome('course','course/index?id='.$assessmentId.'&cid='.$courseId));
+        $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
     }
+
     /**
      * Display password, when assessment need password.
      */
@@ -88,13 +89,12 @@ class AssessmentController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $assessment = Assessments::getByAssessmentId($assessmentId);
-        if ($this->isPost()){
+        if ($this->isPost()) {
             $params = $this->getRequestParams();
             $password = $params['SetPassword']['password'];
-            if($password == $assessment->password){
-                return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id));
-            }
-            else{
+            if ($password == $assessment->password) {
+                return $this->redirect(AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id));
+            } else {
                 $this->setErrorFlash(AppConstant::SET_PASSWORD_ERROR);
             }
         }
@@ -110,16 +110,16 @@ class AssessmentController extends AppController
         $user = $this->getAuthenticatedUser();
         $isTeacher = false;
         $printData = '';
-        if($user){
+        if ($user) {
             $assessmentId = $this->getParamVal('aid');
             $assessmentSession = AssessmentSession::getAssessmentSession($user->id, $assessmentId);
-            if($assessmentSession){
+            if ($assessmentSession) {
                 $courseId = $assessmentSession->assessment->course->id;
                 $assessmentName = $assessmentSession->assessment->name;
                 $assessmentId = $assessmentSession->assessment->id;
                 $course = $assessmentSession->assessment->course->name;
                 $teacher = Teacher::getByUserId($user->id, $courseId);
-                if($teacher){
+                if ($teacher) {
                     $isTeacher = true;
                     $teacherId = $teacher->id;
                 }
@@ -131,18 +131,19 @@ class AssessmentController extends AppController
         }
     }
 
-    public function actionAddAssessment(){
+    public function actionAddAssessment()
+    {
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $params = $this->getRequestParams();
-        $courseId =$this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $block = $this->getParamVal('block');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
         $assessmentArray = array();
         if (isset($params['from'])) {
             $from = $params['from'];
-        }else {
+        } else {
             $from = 'cp';
         }
         if (isset($params['tb'])) {
@@ -150,302 +151,302 @@ class AssessmentController extends AppController
         } else {
             $filter = 'b';
         }
-        if($courseId) {
+        if ($courseId) {
             $assessmentData = Assessments::getByAssessmentId($assessmentId);
-                if(isset($params['clearattempts'])){
-                    /*
-                     * For Updating Question
-                     */
-                } elseif($params['name']!= null) {//if the form has been submitted
-                    if ($params['avail']==AppConstant::NUMERIC_ONE) {
-                        if ($params['sdatetype']== AppConstant::NUMERIC_ZERO) {
-                            $startDate = AppConstant::NUMERIC_ZERO;
-                        } else {
-                            $startDate = AssessmentUtility::parsedatetime($params['sdate'],$params['stime']);
-                        }
-                        if ($params['edatetype']==AppConstant::ALWAYS_TIME) {
-                            $endDate = AppConstant::ALWAYS_TIME;
-                        } else {
-                            $endDate = AssessmentUtility::parsedatetime($params['edate'],$params['etime']);
-                        }
-                        if ($params['doreview']==AppConstant::NUMERIC_ZERO) {
-                            $reviewDate = AppConstant::NUMERIC_ZERO;
-                        } else if ($params['doreview']==AppConstant::ALWAYS_TIME) {
-                            $reviewDate = AppConstant::ALWAYS_TIME;
-                        } else {
-                            $reviewDate = AssessmentUtility::parsedatetime($params['rdate'],$params['rtime']);
-                        }
-                    } else {
+            if (isset($params['clearattempts'])) {
+                /*
+                 * For Updating Question
+                 */
+            } elseif ($params['name'] != null) {//if the form has been submitted
+                if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+                    if ($params['sdatetype'] == AppConstant::NUMERIC_ZERO) {
                         $startDate = AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $startDate = AssessmentUtility::parsedatetime($params['sdate'], $params['stime']);
+                    }
+                    if ($params['edatetype'] == AppConstant::ALWAYS_TIME) {
                         $endDate = AppConstant::ALWAYS_TIME;
+                    } else {
+                        $endDate = AssessmentUtility::parsedatetime($params['edate'], $params['etime']);
+                    }
+                    if ($params['doreview'] == AppConstant::NUMERIC_ZERO) {
                         $reviewDate = AppConstant::NUMERIC_ZERO;
-                    }
-                    if (isset($params['shuffle'])) {
-                        $shuffle = AppConstant::NUMERIC_ONE;
+                    } else if ($params['doreview'] == AppConstant::ALWAYS_TIME) {
+                        $reviewDate = AppConstant::ALWAYS_TIME;
                     } else {
-                        $shuffle = AppConstant::NUMERIC_ZERO;
+                        $reviewDate = AssessmentUtility::parsedatetime($params['rdate'], $params['rtime']);
                     }
-                    if (isset($params['sameseed'])) {
-                        $shuffle += AppConstant::NUMERIC_TWO;
+                } else {
+                    $startDate = AppConstant::NUMERIC_ZERO;
+                    $endDate = AppConstant::ALWAYS_TIME;
+                    $reviewDate = AppConstant::NUMERIC_ZERO;
+                }
+                if (isset($params['shuffle'])) {
+                    $shuffle = AppConstant::NUMERIC_ONE;
+                } else {
+                    $shuffle = AppConstant::NUMERIC_ZERO;
+                }
+                if (isset($params['sameseed'])) {
+                    $shuffle += AppConstant::NUMERIC_TWO;
+                }
+                if (isset($params['samever'])) {
+                    $shuffle += AppConstant::NUMERIC_FOUR;
+                }
+                if (isset($params['reattemptsdiffver']) && $params['deffeedback'] != "Practice" && $params['deffeedback'] != "Homework") {
+                    $shuffle += AppConstant::NUMERIC_EIGHT;
+                }
+                if ($params['minscoretype'] == AppConstant::NUMERIC_ONE && trim($params['minscore']) != '' && $params['minscore'] > AppConstant::NUMERIC_ZERO) {
+                    $params['minscore'] = intval($params['minscore']) + AppConstant::NUMERIC_TEN_THOUSAND;
+                }
+                $isGroup = $params['isgroup'];
+                if (isset($params['showhints'])) {
+                    $showHints = AppConstant::NUMERIC_ONE;
+                } else {
+                    $showHints = AppConstant::NUMERIC_ZERO;
+                }
+                if (isset($params['istutorial'])) {
+                    $isTutorial = AppConstant::NUMERIC_ONE;
+                } else {
+                    $isTutorial = AppConstant::NUMERIC_ZERO;
+                }
+                $tutorEdit = intval($params['tutoredit']);
+                $params['allowlate'] = intval($params['allowlate']);
+                if (isset($params['latepassafterdue']) && $params['allowlate'] > AppConstant::NUMERIC_ZERO) {
+                    $params['allowlate'] += AppConstant::NUMERIC_TEN;
+                }
+                $timeLimit = $params['timelimit'] * AppConstant::SECONDS;
+                if (isset($params['timelimitkickout'])) {
+                    $timeLimit = AppConstant::NUMERIC_NEGATIVE_ONE * $timeLimit;
+                }
+                if (isset($params['usedeffb'])) {
+                    $defFeedbackText = $params['deffb'];
+                } else {
+                    $defFeedbackText = '';
+                }
+                if ($params['deffeedback'] == "Practice" || $params['deffeedback'] == "Homework") {
+                    $defFeedback = $params['deffeedback'] . '-' . $params['showansprac'];
+                } else {
+                    $defFeedback = $params['deffeedback'] . '-' . $params['showans'];
+                }
+                if (!isset($params['doposttoforum'])) {
+                    $params['posttoforum'] = AppConstant::NUMERIC_ZERO;
+                }
+                if (isset($params['msgtoinstr'])) {
+                    $params['msgtoinstr'] = AppConstant::NUMERIC_ONE;
+                } else {
+                    $params['msgtoinstr'] = AppConstant::NUMERIC_ZERO;
+                }
+                if ($params['skippenalty'] == AppConstant::NUMERIC_TEN) {
+                    $params['defpenalty'] = 'L' . $params['defpenalty'];
+                } else if ($params['skippenalty'] > AppConstant::NUMERIC_ZERO) {
+                    $params['defpenalty'] = 'S' . $params['skippenalty'] . $params['defpenalty'];
+                }
+                if (!isset($params['copyendmsg'])) {
+                    $endMsg = '';
+                }
+                if ($params['copyfrom'] != AppConstant::NUMERIC_ZERO) {
+                    $copyAssessement = Assessments::getByAssessmentId($params['copyfrom']);
+                    $timeLimit = $copyAssessement['timelimit'];
+                    $params['minscore'] = $copyAssessement['minscore'];
+                    $params['displaymethod'] = $copyAssessement['displaymethod'];
+                    $params['defpoints'] = $copyAssessement['displaymethod'];
+                    $params['defattempts'] = $copyAssessement['defattempts'];
+                    $params['defpenalty'] = $copyAssessement['defpenalty'];
+                    $defFeedback = $copyAssessement['deffeedback'];
+                    $shuffle = $copyAssessement['shuffle'];
+                    $params['gbcat'] = $copyAssessement['gbcategory'];
+                    $params['assmpassword'] = $copyAssessement['password'];
+                    $params['cntingb'] = $copyAssessement['cntingb'];
+                    $tutorEdit = $copyAssessement['tutoredit'];
+                    $params['showqcat'] = $copyAssessement['showcat'];
+                    $copyIntro = $copyAssessement['intro'];
+                    $copySummary = $copyAssessement['summary'];
+                    $copyStartDate = $copyAssessement['startdate'];
+                    $copyEndDate = $copyAssessement['enddate'];
+                    $copyReviewDate = $copyAssessement['reviewdate'];
+                    $isGroup = $copyAssessement['isgroup'];
+                    $params['groupmax'] = $copyAssessement['groupmax'];
+                    $params['groupsetid'] = $copyAssessement['groupsetid'];
+                    $showHints = $copyAssessement['showhints'];
+                    $params['reqscore'] = $copyAssessement['reqscore'];
+                    $params['reqscoreaid'] = $copyAssessement['reqscoreaid'];
+                    $params['noprint'] = $copyAssessement['noprint'];
+                    $params['allowlate'] = $copyAssessement['allowlate'];
+                    $params['eqnhelper'] = $copyAssessement['eqnhelper'];
+                    $endMsg = $copyAssessement['endmsg'];
+                    $params['caltagact'] = $copyAssessement['caltag'];
+                    $params['caltagrev'] = $copyAssessement['calrtag'];
+                    $defFeedbackText = $copyAssessement['deffeedbacktext'];
+                    $params['showtips'] = $copyAssessement['showtips'];
+                    $params['exceptionpenalty'] = $copyAssessement['exceptionpenalty'];
+                    $params['ltisecret'] = $copyAssessement['ltisecret'];
+                    $params['msgtoinstr'] = $copyAssessement['msgtoinstr'];
+                    $params['posttoforum'] = $copyAssessement['posttoforum'];
+                    $isTutorial = $copyAssessement['istutorial'];
+                    $params['defoutcome'] = $copyAssessement['defoutcome'];
+                    if (isset($params['copyinstr'])) {
+                        $params['intro'] = $copyIntro;
                     }
-                    if (isset($params['samever'])) {
-                        $shuffle += AppConstant::NUMERIC_FOUR;
+                    if (isset($params['copysummary'])) {
+                        $params['summary'] = $copySummary;
                     }
-                    if (isset($params['reattemptsdiffver']) && $params['deffeedback']!="Practice" && $params['deffeedback']!="Homework") {
-                        $shuffle += AppConstant::NUMERIC_EIGHT;
+                    if (isset($params['copydates'])) {
+                        $startDate = $copyStartDate;
+                        $endDate = $copyEndDate;
+                        $reviewDate = $copyReviewDate;
                     }
-                    if ($params['minscoretype']==AppConstant::NUMERIC_ONE && trim($params['minscore'])!='' && $params['minscore']>AppConstant::NUMERIC_ZERO) {
-                        $params['minscore'] = intval($params['minscore'])+AppConstant::NUMERIC_TEN_THOUSAND;
+                    if (isset($params['removeperq'])) {
+                        Questions::setQuestionByAssessmentId($assessmentId);
                     }
-                    $isGroup = $params['isgroup'];
-                    if (isset($params['showhints'])) {
-                        $showHints = AppConstant::NUMERIC_ONE;
-                    } else {
-                        $showHints = AppConstant::NUMERIC_ZERO;
-                    }
-                    if (isset($params['istutorial'])) {
-                        $isTutorial = AppConstant::NUMERIC_ONE;
-                    } else {
-                        $isTutorial = AppConstant::NUMERIC_ZERO;
-                    }
-                    $tutorEdit = intval($params['tutoredit']);
-                    $params['allowlate'] = intval($params['allowlate']);
-                    if (isset($params['latepassafterdue']) && $params['allowlate']>AppConstant::NUMERIC_ZERO) {
-                        $params['allowlate'] += AppConstant::NUMERIC_TEN;
-                    }
-                    $timeLimit = $params['timelimit']*AppConstant::SECONDS;
-                    if (isset($params['timelimitkickout'])) {
-                        $timeLimit = AppConstant::NUMERIC_NEGATIVE_ONE*$timeLimit;
-                    }
-                    if (isset($params['usedeffb'])) {
-                        $defFeedbackText = $params['deffb'];
-                    } else {
-                        $defFeedbackText = '';
-                    }
-                    if ($params['deffeedback']=="Practice" || $params['deffeedback']=="Homework") {
-                        $defFeedback = $params['deffeedback'].'-'.$params['showansprac'];
-                    } else {
-                        $defFeedback = $params['deffeedback'].'-'.$params['showans'];
-                    }
-                    if (!isset($params['doposttoforum'])) {
-                        $params['posttoforum'] = AppConstant::NUMERIC_ZERO;
-                    }
-                    if (isset($params['msgtoinstr'])) {
-                        $params['msgtoinstr'] = AppConstant::NUMERIC_ONE;
-                    } else {
-                        $params['msgtoinstr'] = AppConstant::NUMERIC_ZERO;
-                    }
-                    if ($params['skippenalty']==AppConstant::NUMERIC_TEN) {
-                        $params['defpenalty'] = 'L'.$params['defpenalty'];
-                    } else if ($params['skippenalty']>AppConstant::NUMERIC_ZERO) {
-                        $params['defpenalty'] = 'S'.$params['skippenalty'].$params['defpenalty'];
-                    }
-                    if (!isset($params['copyendmsg'])) {
-                        $endMsg = '';
-                    }
-                    if ($params['copyfrom']!=AppConstant::NUMERIC_ZERO) {
-                        $copyAssessement = Assessments::getByAssessmentId($params['copyfrom']);
-                        $timeLimit = $copyAssessement['timelimit'];
-                        $params['minscore'] = $copyAssessement['minscore'];
-                        $params['displaymethod'] = $copyAssessement['displaymethod'];
-                        $params['defpoints'] = $copyAssessement['displaymethod'];
-                        $params['defattempts'] = $copyAssessement['defattempts'];
-                        $params['defpenalty'] = $copyAssessement['defpenalty'];
-                        $defFeedback = $copyAssessement['deffeedback'];
-                        $shuffle = $copyAssessement['shuffle'];
-                        $params['gbcat'] = $copyAssessement['gbcategory'];
-                        $params['assmpassword'] = $copyAssessement['password'];
-                        $params['cntingb'] = $copyAssessement['cntingb'];
-                        $tutorEdit = $copyAssessement['tutoredit'];
-                        $params['showqcat'] = $copyAssessement['showcat'];
-                        $copyIntro = $copyAssessement['intro'];
-                        $copySummary = $copyAssessement['summary'];
-                        $copyStartDate = $copyAssessement['startdate'];
-                        $copyEndDate = $copyAssessement['enddate'];
-                        $copyReviewDate = $copyAssessement['reviewdate'];
-                        $isGroup = $copyAssessement['isgroup'];
-                        $params['groupmax'] = $copyAssessement['groupmax'];
-                        $params['groupsetid'] = $copyAssessement['groupsetid'];
-                        $showHints = $copyAssessement['showhints'];
-                        $params['reqscore'] = $copyAssessement['reqscore'];
-                        $params['reqscoreaid'] = $copyAssessement['reqscoreaid'];
-                        $params['noprint'] = $copyAssessement['noprint'];
-                        $params['allowlate'] = $copyAssessement['allowlate'];
-                        $params['eqnhelper'] = $copyAssessement['eqnhelper'];
-                        $endMsg = $copyAssessement['endmsg'];
-                        $params['caltagact'] = $copyAssessement['caltag'];
-                        $params['caltagrev'] = $copyAssessement['calrtag'];
-                        $defFeedbackText = $copyAssessement['deffeedbacktext'];
-                        $params['showtips'] = $copyAssessement['showtips'];
-                        $params['exceptionpenalty'] = $copyAssessement['exceptionpenalty'];
-                        $params['ltisecret'] = $copyAssessement['ltisecret'];
-                        $params['msgtoinstr'] = $copyAssessement['msgtoinstr'];
-                        $params['posttoforum'] = $copyAssessement['posttoforum'];
-                        $isTutorial = $copyAssessement['istutorial'];
-                        $params['defoutcome'] = $copyAssessement['defoutcome'];
-                        if (isset($params['copyinstr'])) {
-                            $params['intro'] = $copyIntro;
+                }
+                if ($params['deffeedback'] == "Practice") {
+                    $params['cntingb'] = $params['pcntingb'];
+                }
+                if (isset($params['ltisecret'])) {
+                    $params['ltisecret'] = trim($params['ltisecret']);
+                } else {
+                    $params['ltisecret'] = '';
+                }
+                /*is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
+                 *if so, cannot handle
+                 */
+                $updategroupset = '';
+                if (isset($params['id']) && $params['isgroup'] > AppConstant::NUMERIC_ZERO && $params['groupsetid'] > AppConstant::NUMERIC_ZERO) {
+                    $isok = true;
+                    $query = $assessmentData['isgroup'];
+                    if ($query == AppConstant::NUMERIC_ZERO) {
+                        /*check to see if students have already started assessment
+                        *don't really care if groups exist - just whether asids exist
+                        */
+                        $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId, $courseId);
+                        if ($assessmentSessionData > AppConstant::NUMERIC_ZERO) {
+                            $this->setErrorFlash(AppConstant::ASSESSMENT_ALREADY_STARTED);
+                            exit;
                         }
-                        if (isset($params['copysummary'])) {
-                            $params['summary'] = $copySummary;
-                        }
-                        if (isset($params['copydates'])) {
-                            $startDate = $copyStartDate;
-                            $endDate = $copyEndDate;
-                            $reviewDate = $copyReviewDate;
-                        }
-                        if (isset($params['removeperq'])) {
-                            Questions::setQuestionByAssessmentId($assessmentId);
-                        }
                     }
-                    if ($params['deffeedback']=="Practice") {
-                        $params['cntingb'] = $params['pcntingb'];
-                    }
-                    if (isset($params['ltisecret'])) {
-                        $params['ltisecret'] = trim($params['ltisecret']);
-                    } else {
-                        $params['ltisecret'] = '';
-                    }
-                    /*is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
-                     *if so, cannot handle
+                    $updategroupset = "groupsetid='{$params['groupsetid']}',";
+                }
+                if ($params['isgroup'] > AppConstant::NUMERIC_ZERO && isset($params['groupsetid']) && $params['groupsetid'] == AppConstant::NUMERIC_ZERO) {
+                    /*
+                     * create new groupset
                      */
-                    $updategroupset='';
-                    if (isset($params['id']) && $params['isgroup']>AppConstant::NUMERIC_ZERO && $params['groupsetid']>AppConstant::NUMERIC_ZERO) {
-                        $isok = true;
-                        $query = $assessmentData['isgroup'];
-                        if ($query==AppConstant::NUMERIC_ZERO) {
-                            /*check to see if students have already started assessment
-                            *don't really care if groups exist - just whether asids exist
-                            */
-                            $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId);
-                            if ($assessmentSessionData>AppConstant::NUMERIC_ZERO) {
-                                $this->setErrorFlash(AppConstant::ASSESSMENT_ALREADY_STARTED);
-                                exit;
-                            }
-                        }
-                        $updategroupset = "groupsetid='{$params['groupsetid']}',";
-                    }
-                    if ($params['isgroup']>AppConstant::NUMERIC_ZERO && isset($params['groupsetid']) && $params['groupsetid']==AppConstant::NUMERIC_ZERO) {
-                        /*
-                         * create new groupset
-                         */
-                        $stuGroupSet = new StuGroupSet();
-                        $query = $stuGroupSet->createGroupSet($courseId,$params['name']);
-                        $params['groupsetid'] = $query;
-                        $updategroupset = "groupsetid='{$params['groupsetid']}',";
-                    }
-                    $calTag = $params['caltagact'];
-                    $calrTag = $params['caltagrev'];
-                    $params['name'] = htmlentities(stripslashes($params['name']));
-                    if ($params['summary']==AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
-                        $params['summary'] = '';
-                    } else {
-                        $params['summary'] = '';
-                        /*
-                         * HtmLawed in progress
-                         */
-                    }
-                    if ($params['intro']==AppConstant::DEFAULT_ASSESSMENT_INTRO) {
-                        $params['intro'] = '';
-                    } else {
+                    $stuGroupSet = new StuGroupSet();
+                    $query = $stuGroupSet->createGroupSet($courseId, $params['name']);
+                    $params['groupsetid'] = $query;
+                    $updategroupset = "groupsetid='{$params['groupsetid']}',";
+                }
+                $calTag = $params['caltagact'];
+                $calrTag = $params['caltagrev'];
+                $params['name'] = htmlentities(stripslashes($params['name']));
+                if ($params['summary'] == AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
+                    $params['summary'] = '';
+                } else {
+                    $params['summary'] = '';
+                    /*
+                     * HtmLawed in progress
+                     */
+                }
+                if ($params['intro'] == AppConstant::DEFAULT_ASSESSMENT_INTRO) {
+                    $params['intro'] = '';
+                } else {
 
-                        /*
-                         * HtmLawed in progress
-                         */
-                    }
-                    $assessmentArray['courseid'] = $params['cid'];
-                    $assessmentArray['name'] = $params['name'];
-                    $assessmentArray['summary'] = $params['summary'];
-                    $assessmentArray['intro'] = $params['intro'];
-                    $assessmentArray['avail'] = $params['avail'];
-                    $assessmentArray['password'] = $params['assmpassword'];
-                    $assessmentArray['displaymethod'] = $params['displaymethod'];
-                    $assessmentArray['defpoints'] = $params['defpoints'];
-                    $assessmentArray['defattempts'] = $params['defattempts'];
-                    $assessmentArray['eqnhelper'] = $params['eqnhelper'];
-                    $assessmentArray['msgtoinstr'] = $params['msgtoinstr'];
-                    $assessmentArray['posttoforum'] = $params['posttoforum'];
-                    $assessmentArray['showtips'] = $params['showtips'];
-                    $assessmentArray['allowlate'] = $params['allowlate'];
-                    $assessmentArray['noprint'] = $params['noprint'];
-                    $assessmentArray['gbcategory'] = $params['gbcat'];
-                    $assessmentArray['cntingb'] = $params['cntingb'];
-                    $assessmentArray['minscore'] = $params['minscore'];
-                    $assessmentArray['reqscore'] = $params['reqscore'];
-                    $assessmentArray['reqscoreaid'] = $params['reqscoreaid'];
-                    $assessmentArray['exceptionpenalty'] = $params['exceptionpenalty'];
-                    $assessmentArray['groupmax'] = $params['groupmax'];
-                    $assessmentArray['groupsetid'] = $params['groupsetid'];
-                    $assessmentArray['defoutcome'] = $params['defoutcome'];
-                    $assessmentArray['showcat'] = $params['showqcat'];
-                    $assessmentArray['ltisecret'] = $params['ltisecret'];
-                    $assessmentArray['defpenalty'] = $params['defpenalty'];
-                    $assessmentArray['startdate'] = $startDate;
-                    $assessmentArray['enddate'] = $endDate;
-                    $assessmentArray['reviewdate'] = $reviewDate;
-                    $assessmentArray['timelimit'] = $timeLimit;
-                    $assessmentArray['shuffle'] = $shuffle;
-                    $assessmentArray['deffeedback'] = $defFeedback;
-                    $assessmentArray['tutoredit'] = $tutorEdit;
-                    $assessmentArray['showhints'] = $showHints;
-                    $assessmentArray['endmsg'] = $endMsg;
-                    $assessmentArray['deffeedbacktext'] = $defFeedbackText;
-                    $assessmentArray['istutorial'] = $isTutorial;
-                    $assessmentArray['isgroup'] = $isGroup;
-                    $assessmentArray['caltag'] = $calTag;
-                    $assessmentArray['calrtag'] = $calrTag;
+                    /*
+                     * HtmLawed in progress
+                     */
+                }
+                $assessmentArray['courseid'] = $params['cid'];
+                $assessmentArray['name'] = $params['name'];
+                $assessmentArray['summary'] = $params['summary'];
+                $assessmentArray['intro'] = $params['intro'];
+                $assessmentArray['avail'] = $params['avail'];
+                $assessmentArray['password'] = $params['assmpassword'];
+                $assessmentArray['displaymethod'] = $params['displaymethod'];
+                $assessmentArray['defpoints'] = $params['defpoints'];
+                $assessmentArray['defattempts'] = $params['defattempts'];
+                $assessmentArray['eqnhelper'] = $params['eqnhelper'];
+                $assessmentArray['msgtoinstr'] = $params['msgtoinstr'];
+                $assessmentArray['posttoforum'] = $params['posttoforum'];
+                $assessmentArray['showtips'] = $params['showtips'];
+                $assessmentArray['allowlate'] = $params['allowlate'];
+                $assessmentArray['noprint'] = $params['noprint'];
+                $assessmentArray['gbcategory'] = $params['gbcat'];
+                $assessmentArray['cntingb'] = $params['cntingb'];
+                $assessmentArray['minscore'] = $params['minscore'];
+                $assessmentArray['reqscore'] = $params['reqscore'];
+                $assessmentArray['reqscoreaid'] = $params['reqscoreaid'];
+                $assessmentArray['exceptionpenalty'] = $params['exceptionpenalty'];
+                $assessmentArray['groupmax'] = $params['groupmax'];
+                $assessmentArray['groupsetid'] = $params['groupsetid'];
+                $assessmentArray['defoutcome'] = $params['defoutcome'];
+                $assessmentArray['showcat'] = $params['showqcat'];
+                $assessmentArray['ltisecret'] = $params['ltisecret'];
+                $assessmentArray['defpenalty'] = $params['defpenalty'];
+                $assessmentArray['startdate'] = $startDate;
+                $assessmentArray['enddate'] = $endDate;
+                $assessmentArray['reviewdate'] = $reviewDate;
+                $assessmentArray['timelimit'] = $timeLimit;
+                $assessmentArray['shuffle'] = $shuffle;
+                $assessmentArray['deffeedback'] = $defFeedback;
+                $assessmentArray['tutoredit'] = $tutorEdit;
+                $assessmentArray['showhints'] = $showHints;
+                $assessmentArray['endmsg'] = $endMsg;
+                $assessmentArray['deffeedbacktext'] = $defFeedbackText;
+                $assessmentArray['istutorial'] = $isTutorial;
+                $assessmentArray['isgroup'] = $isGroup;
+                $assessmentArray['caltag'] = $calTag;
+                $assessmentArray['calrtag'] = $calrTag;
                 if ($params['id']) {  //already have id; update
-                    if ($isGroup==AppConstant::NUMERIC_ZERO) { //set agroupid=0 if switching from groups to non groups
+                    if ($isGroup == AppConstant::NUMERIC_ZERO) { //set agroupid=0 if switching from groups to non groups
                         $query = $assessmentData['isgroup'];
-                        if ($query>AppConstant::NUMERIC_ZERO) {
+                        if ($query > AppConstant::NUMERIC_ZERO) {
                             AssessmentSession::setGroupId($assessmentId);
                         }
                     } else { /*if switching from nogroup to groups and groups already exist, need set agroupids if asids exist already
                               *NOT ALLOWED CURRENTLY
                               */
                     }
-                    Assessments::updateAssessment($params,$timeLimit,$isGroup,$showHints,$tutorEdit,$defFeedback,$shuffle,$calTag,$calrTag,$defFeedbackText,$isTutorial,$endMsg,$startDate,$endDate,$reviewDate);
-                    if ($from=='gb') {
-                        return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='. $courseId));
-                    } else if ($from=='mcd') {
-                        return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='. $courseId));
-                    } else if ($from=='lti') {
-                        return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress?cid='. $courseId));
+                    Assessments::updateAssessment($params, $timeLimit, $isGroup, $showHints, $tutorEdit, $defFeedback, $shuffle, $calTag, $calrTag, $defFeedbackText, $isTutorial, $endMsg, $startDate, $endDate, $reviewDate);
+                    if ($from == 'gb') {
+                        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $courseId));
+                    } else if ($from == 'mcd') {
+                        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $courseId));
+                    } else if ($from == 'lti') {
+                        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $courseId));
                     } else {
-                        return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='. $courseId));
+                        return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId));
                     }
                 } else { //add new
                     $assessment = new Assessments();
                     $newAssessmentId = $assessment->createAssessment($assessmentArray);
                     $itemAssessment = new Items();
-                    $itemId = $itemAssessment->saveItems($courseId,$newAssessmentId,'Assessment');
+                    $itemId = $itemAssessment->saveItems($courseId, $newAssessmentId, 'Assessment');
                     $courseItemOrder = Course::getItemOrder($courseId);
                     $itemOrder = $courseItemOrder->itemorder;
                     $items = unserialize($itemOrder);
-                    $blockTree = explode('-',$block);
+                    $blockTree = explode('-', $block);
                     $sub =& $items;
-                    for ($i=AppConstant::NUMERIC_ONE;$i<count($blockTree);$i++) {
-                        $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
+                    for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
+                        $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                     }
-                    if ($filter=='b') {
+                    if ($filter == 'b') {
                         $sub[] = intval($itemId);
-                    } else if ($filter=='t') {
-                        array_unshift($sub,intval($itemId));
+                    } else if ($filter == 't') {
+                        array_unshift($sub, intval($itemId));
                     }
                     $itemList = serialize($items);
-                    Course::setItemOrder($itemList,$courseId);
-                    return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' .$course->id.'&aid='.$newAssessmentId));
+                    Course::setItemOrder($itemList, $courseId);
+                    return $this->redirect(AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $course->id . '&aid=' . $newAssessmentId));
                 }
-            }else {
+            } else {
                 if (isset($params['id'])) {//page load in modify mode
                     $title = AppConstant::MODIFY_ASSESSMENT;
-                    $pageTitle =  AppConstant::MODIFY_ASSESSMENT;
-                    $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId,$courseId);
-                    list($testType,$showAnswer) = explode('-',$assessmentData['deffeedback']);
+                    $pageTitle = AppConstant::MODIFY_ASSESSMENT;
+                    $assessmentSessionData = AssessmentSession::getByUserCourseAssessmentId($assessmentId, $courseId);
+                    list($testType, $showAnswer) = explode('-', $assessmentData['deffeedback']);
                     $startDate = $assessmentData['startdate'];
                     $endDate = $assessmentData['enddate'];
                     $gradebookCategory = $assessmentData['gbcategory'];
-                    if ($testType=='Practice') {
+                    if ($testType == 'Practice') {
                         $pointCountInGb = $assessmentData['cntingb'];
                         $countInGb = AppConstant::NUMERIC_ONE;
                     } else {
@@ -453,36 +454,36 @@ class AssessmentController extends AppController
                         $pointCountInGb = AppConstant::NUMERIC_THREE;
                     }
                     $showQuestionCategory = $assessmentData['showcat'];
-                    $timeLimit = $assessmentData['timelimit']/AppConstant::SECONDS;
-                    if ($assessmentData['isgroup']==AppConstant::NUMERIC_ZERO) {
-                        $assessmentData['groupsetid']=AppConstant::NUMERIC_ZERO;
+                    $timeLimit = $assessmentData['timelimit'] / AppConstant::SECONDS;
+                    if ($assessmentData['isgroup'] == AppConstant::NUMERIC_ZERO) {
+                        $assessmentData['groupsetid'] = AppConstant::NUMERIC_ZERO;
                     }
-                    if ($assessmentData['deffeedbacktext']=='') {
+                    if ($assessmentData['deffeedbacktext'] == '') {
                         $useDefFeedback = false;
                         $defFeedback = AppConstant::DEFAULT_FEEDBACK;
                     } else {
                         $useDefFeedback = true;
                         $defFeedback = $assessmentData['deffeedbacktext'];
                     }
-                    if ($assessmentData['summary']=='') {
+                    if ($assessmentData['summary'] == '') {
                     }
-                    if ($assessmentData['intro']=='') {
+                    if ($assessmentData['intro'] == '') {
                     }
                     $saveTitle = AppConstant::SAVE_BUTTON;
-                }else {//page load in add mode set default values
+                } else {//page load in add mode set default values
                     $title = AppConstant::ADD_ASSESSMENT;
-                    $pageTitle =  AppConstant::ADD_ASSESSMENT;
+                    $pageTitle = AppConstant::ADD_ASSESSMENT;
                     $assessmentData['name'] = AppConstant::DEFAULT_ASSESSMENT_NAME;
                     $assessmentData['summary'] = AppConstant::DEFAULT_ASSESSMENT_SUMMARY;
                     $assessmentData['intro'] = AppConstant::DEFAULT_ASSESSMENT_INTRO;
-                    $startDate = time()+AppConstant::SECONDS*AppConstant::SECONDS;
+                    $startDate = time() + AppConstant::SECONDS * AppConstant::SECONDS;
                     $endDate = time() + AppConstant::WEEK_TIME;
                     $assessmentData['startdate'] = $startDate;
                     $assessmentData['enddate'] = $endDate;
                     $assessmentData['avail'] = AppConstant::NUMERIC_ONE;
                     $assessmentData['reviewdate'] = AppConstant::NUMERIC_ZERO;
                     $timeLimit = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['displaymethod']= "SkipAround";
+                    $assessmentData['displaymethod'] = "SkipAround";
                     $assessmentData['defpoints'] = AppConstant::NUMERIC_TEN;
                     $assessmentData['defattempts'] = AppConstant::NUMERIC_ONE;
                     $assessmentData['password'] = '';
@@ -492,7 +493,7 @@ class AssessmentController extends AppController
                     $assessmentData['shuffle'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['minscore'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['isgroup'] = AppConstant::NUMERIC_ZERO;
-                    $assessmentData['showhints']= AppConstant::NUMERIC_ONE;
+                    $assessmentData['showhints'] = AppConstant::NUMERIC_ONE;
                     $assessmentData['reqscore'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['reqscoreaid'] = AppConstant::NUMERIC_ZERO;
                     $assessmentData['groupsetid'] = AppConstant::NUMERIC_ZERO;
@@ -518,64 +519,64 @@ class AssessmentController extends AppController
                     $assessmentSessionData = false;
                     $saveTitle = AppConstant::CREATE_BUTTON;
                 }
-                if ($assessmentData['minscore']>AppConstant::NUMERIC_TEN_THOUSAND) {
+                if ($assessmentData['minscore'] > AppConstant::NUMERIC_TEN_THOUSAND) {
                     $assessmentData['minscore'] -= AppConstant::NUMERIC_TEN_THOUSAND;
                     $minScoreType = AppConstant::NUMERIC_ONE; //pct;
                 } else {
                     $minScoreType = AppConstant::NUMERIC_ZERO; //points;
                 }
-                    $courseDefTime = $course['deftime']%AppConstant::NUMERIC_TEN_THOUSAND;
-                    $hour = floor($courseDefTime/AppConstant::SECONDS)%AppConstant::NUMERIC_TWELVE;
-                    $minutes = $courseDefTime%AppConstant::SECONDS;
-                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?AppConstant::AM:AppConstant::PM;
-                    $defTime = (($hour==AppConstant::NUMERIC_ZERO)?AppConstant::NUMERIC_TWELVE:$hour).':'.(($minutes<AppConstant::NUMERIC_TEN)?'0':'').$minutes.' '.$am;
-                    $hour = floor($courseDefTime/AppConstant::SECONDS)%AppConstant::NUMERIC_TWELVE;
-                    $minutes = $courseDefTime%AppConstant::SECONDS;
-                    $am = ($courseDefTime<AppConstant::NUMERIC_TWELVE*AppConstant::SECONDS)?AppConstant::AM:AppConstant::PM;
-                    $defStartTime = (($hour==AppConstant::NUMERIC_ZERO)?AppConstant::NUMERIC_TWELVE:$hour).':'.(($minutes<AppConstant::NUMERIC_TEN)?'0':'').$minutes.' '.$am;
-                if ($startDate!=AppConstant::NUMERIC_ZERO) {
-                    $sDate = AppUtility::tzdate("m/d/Y",$startDate);
-                    $sTime = AppUtility::tzdate("g:i a",$startDate);
+                $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_TEN_THOUSAND;
+                $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
+                $minutes = $courseDefTime % AppConstant::SECONDS;
+                $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
+                $defTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
+                $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
+                $minutes = $courseDefTime % AppConstant::SECONDS;
+                $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
+                $defStartTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
+                if ($startDate != AppConstant::NUMERIC_ZERO) {
+                    $sDate = AppUtility::tzdate("m/d/Y", $startDate);
+                    $sTime = AppUtility::tzdate("g:i a", $startDate);
                 } else {
-                    $sDate = AppUtility::tzdate("m/d/Y",time());
+                    $sDate = AppUtility::tzdate("m/d/Y", time());
                     $sTime = $defStartTime;
                 }
-                if ($endDate!=AppConstant::ALWAYS_TIME) {
-                    $eDate = AppUtility::tzdate("m/d/Y",$endDate);
-                    $eTime = AppUtility::tzdate("g:i a",$endDate);
+                if ($endDate != AppConstant::ALWAYS_TIME) {
+                    $eDate = AppUtility::tzdate("m/d/Y", $endDate);
+                    $eTime = AppUtility::tzdate("g:i a", $endDate);
                 } else {
-                    $eDate = AppUtility::tzdate("m/d/Y",time()+AppConstant::WEEK_TIME);
+                    $eDate = AppUtility::tzdate("m/d/Y", time() + AppConstant::WEEK_TIME);
                     $eTime = $defTime;
                 }
                 if ($assessmentData['reviewdate'] > AppConstant::NUMERIC_ZERO) {
-                    if ($assessmentData['reviewdate']==AppConstant::ALWAYS_TIME) {
-                        $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
+                    if ($assessmentData['reviewdate'] == AppConstant::ALWAYS_TIME) {
+                        $reviewDate = AppUtility::tzdate("m/d/Y", $assessmentData['enddate'] + AppConstant::WEEK_TIME);
                         $reviewTime = $defTime;
                     } else {
-                        $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['reviewdate']);
-                        $reviewTime = AppUtility::tzdate("g:i a",$assessmentData['reviewdate']);
+                        $reviewDate = AppUtility::tzdate("m/d/Y", $assessmentData['reviewdate']);
+                        $reviewTime = AppUtility::tzdate("g:i a", $assessmentData['reviewdate']);
                     }
                 } else {
-                    $reviewDate = AppUtility::tzdate("m/d/Y",$assessmentData['enddate']+AppConstant::WEEK_TIME);
+                    $reviewDate = AppUtility::tzdate("m/d/Y", $assessmentData['enddate'] + AppConstant::WEEK_TIME);
                     $reviewTime = $defTime;
                 }
-                    if (!isset($params['id'])) {
-                        $sTime = $defStartTime;
-                        $eTime = $defTime;
-                        $reviewTime = $defTime;
-                    }
-                if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO}==='L') {
-                    $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'],AppConstant::NUMERIC_ONE);
-                    $skipPenalty=AppConstant::NUMERIC_TEN;
-                } else if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO}==='S') {
+                if (!isset($params['id'])) {
+                    $sTime = $defStartTime;
+                    $eTime = $defTime;
+                    $reviewTime = $defTime;
+                }
+                if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO} === 'L') {
+                    $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'], AppConstant::NUMERIC_ONE);
+                    $skipPenalty = AppConstant::NUMERIC_TEN;
+                } else if ($assessmentData['defpenalty']{AppConstant::NUMERIC_ZERO} === 'S') {
                     $skipPenalty = $assessmentData['defpenalty']{AppConstant::NUMERIC_ONE};
-                    $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'],AppConstant::NUMERIC_TWO);
+                    $assessmentData['defpenalty'] = substr($assessmentData['defpenalty'], AppConstant::NUMERIC_TWO);
                 } else {
                     $skipPenalty = AppConstant::NUMERIC_ZERO;
                 }
                 $query = Assessments::getByCourse($courseId);
                 $pageCopyFromSelect = array();
-                $key=AppConstant::NUMERIC_ZERO;
+                $key = AppConstant::NUMERIC_ZERO;
                 if ($query) {
                     foreach ($query as $singleData) {
                         $pageCopyFromSelect['val'][$key] = $singleData['id'];
@@ -595,40 +596,40 @@ class AssessmentController extends AppController
                 $query = Outcomes::getByCourse($courseId);
                 $pageOutcomes = array();
                 if ($query) {
-                    foreach($query as $singleData) {
+                    foreach ($query as $singleData) {
                         $pageOutcomes[$singleData['id']] = $singleData['name'];
                         $key++;
                     }
                 }
                 $pageOutcomes[0] = AppConstant::DEFAULT_OUTCOMES;
                 $pageOutcomesList = array(array(AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ZERO));
-                if ($key>AppConstant::NUMERIC_ZERO) {//there were outcomes
+                if ($key > AppConstant::NUMERIC_ZERO) {//there were outcomes
                     $query = $course['outcomes'];
                     $outcomeArray = unserialize($query);
                     $result = $this->flatArray($outcomeArray);
-                    if($result){
-                        foreach($result as $singlePage){
-                            array_push($pageOutcomesList,$singlePage);
+                    if ($result) {
+                        foreach ($result as $singlePage) {
+                            array_push($pageOutcomesList, $singlePage);
                         }
                     }
                 }
                 $query = StuGroupSet::getByCourseId($courseId);
                 $pageGroupSets = array();
-                if ($assessmentSessionData && $assessmentData['isgroup']==AppConstant::NUMERIC_ZERO) {
+                if ($assessmentSessionData && $assessmentData['isgroup'] == AppConstant::NUMERIC_ZERO) {
                     $query = StuGroupSet::getByJoin($courseId);
                 } else {
                     $query = StuGroupSet::getByCourseId($courseId);
                 }
                 $pageGroupSets['val'][0] = AppConstant::NUMERIC_ZERO;
                 $pageGroupSets['label'][0] = AppConstant::GROUP_SET;
-                    $key = AppConstant::NUMERIC_ONE;
+                $key = AppConstant::NUMERIC_ONE;
                 foreach ($query as $singleData) {
                     $pageGroupSets['val'][$key] = $singleData['id'];
                     $pageGroupSets['label'][$key] = $singleData['name'];
                     $key++;
                 }
-                $pageTutorSelect['label'] = array(AppConstant::TUTOR_NO_ACCESS,AppConstant::TUTOR_READ_SCORES,AppConstant::TUTOR_READ_WRITE_SCORES);
-                $pageTutorSelect['val'] = array(AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE);
+                $pageTutorSelect['label'] = array(AppConstant::TUTOR_NO_ACCESS, AppConstant::TUTOR_READ_SCORES, AppConstant::TUTOR_READ_WRITE_SCORES);
+                $pageTutorSelect['val'] = array(AppConstant::NUMERIC_TWO, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE);
                 $pageForumSelect = array();
                 $query = Forums::getByCourse($courseId);
                 $pageForumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
@@ -642,30 +643,31 @@ class AssessmentController extends AppController
                 $pageAllowLateSelect['label'][0] = AppConstant::NONE;
                 $pageAllowLateSelect['val'][1] = AppConstant::NUMERIC_ONE;
                 $pageAllowLateSelect['label'][1] = AppConstant::UNLIMITED;
-                for ($key=AppConstant::NUMERIC_ONE;$key<AppConstant::NUMERIC_NINE;$key++) {
-                    $pageAllowLateSelect['val'][] = $key+AppConstant::NUMERIC_ONE;
+                for ($key = AppConstant::NUMERIC_ONE; $key < AppConstant::NUMERIC_NINE; $key++) {
+                    $pageAllowLateSelect['val'][] = $key + AppConstant::NUMERIC_ONE;
                     $pageAllowLateSelect['label'][] = "Up to $key";
                 }
             }
         }
         $this->includeCSS(['course/items.css', 'course/course.css']);
-        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js","general.js","assessment/addAssessment.js"]);
-        return $this->renderWithData('addAssessment',['course' => $course,'assessmentData' => $assessmentData,
-        'saveTitle'=>$saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
-        'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType,'skipPenalty' => $skipPenalty,
-        'showAnswer' => $showAnswer,'startDate' => $startDate,'endDate' => $endDate, 'pageForumSelect' => $pageForumSelect,
-        'pageAllowLateSelect' => $pageAllowLateSelect,'pageGradebookCategorySelect' => $pageGradebookCategorySelect,
-        'gradebookCategory'=> $gradebookCategory, 'countInGradebook' => $countInGb, 'pointCountInGradebook' => $pointCountInGb,
-        'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
-        'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets,'pageOutcomesList' => $pageOutcomesList,
-        'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory,'sDate' => $sDate,
-        'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
-        'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle]);
+        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js", "general.js", "assessment/addAssessment.js"]);
+        return $this->renderWithData('addAssessment', ['course' => $course, 'assessmentData' => $assessmentData,
+            'saveTitle' => $saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
+            'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType, 'skipPenalty' => $skipPenalty,
+            'showAnswer' => $showAnswer, 'startDate' => $startDate, 'endDate' => $endDate, 'pageForumSelect' => $pageForumSelect,
+            'pageAllowLateSelect' => $pageAllowLateSelect, 'pageGradebookCategorySelect' => $pageGradebookCategorySelect,
+            'gradebookCategory' => $gradebookCategory, 'countInGradebook' => $countInGb, 'pointCountInGradebook' => $pointCountInGb,
+            'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
+            'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets, 'pageOutcomesList' => $pageOutcomesList,
+            'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,
+            'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
+            'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle]);
     }
 
-    public function flatArray($outcomesData) {
+    public function flatArray($outcomesData)
+    {
         global $pageOutcomesList;
-        if($outcomesData){
+        if ($outcomesData) {
             foreach ($outcomesData as $singleData) {
                 /*
                  * outcome group
@@ -686,26 +688,19 @@ class AssessmentController extends AppController
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $params = $this->getBodyParams();
-        $courseId =$this->getParamVal('cid');
+        $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
-        $isTeacher = $this->isTeacher($user['id'],$course['id']);
+        $isTeacher = $this->isTeacher($user['id'], $course['id']);
         $key = AppConstant::NUMERIC_ONE;
-        $gbcatsId[0] = AppConstant::NUMERIC_ZERO;
-        $gbcatsLabel[0] ='Default';
-        $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach ($gbcatsData as $singleGbcatsData) {
-            $gbcatsId[$key] = $singleGbcatsData['id'];
-            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+        $gbCatsId[0] = AppConstant::NUMERIC_ZERO;
+        $gbCatsLabel[0] = 'Default';
+        $gbCatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbCatsData as $singleGbCatsData) {
+            $gbCatsId[$key] = $singleGbCatsData['id'];
+            $gbCatsLabel[$key] = $singleGbCatsData['name'];
             $key++;
         }
-        $overWriteBody = AppConstant::NUMERIC_ZERO;
-        $body = "";
-        // SECURITY CHECK DATA PROCESSING
-        if ($isTeacher != AppConstant::NUMERIC_ONE) {
-            $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to log in as a teacher to access this page";
-        }
-            if($this->isPostMethod()){
+        if ($this->isPostMethod()) {
             if (isset($params['checked'])) { //if the form has been submitted
                 $checked = array();
                 foreach ($params['checked'] as $id) {
@@ -714,54 +709,54 @@ class AssessmentController extends AppController
                         $checked[] = $id;
                     }
                 }
-                $checkedlist = "'" . implode("','", $checked) . "'";
+                $checkedList = "'" . implode("','", $checked) . "'";
                 $count = AppConstant::NUMERIC_ZERO;
-                foreach($params as $key=>$singleParams){
-                    if(!is_array($key) && substr($key,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_THREE) === 'chg'){
+                foreach ($params as $key => $singleParams) {
+                    if (!is_array($key) && substr($key, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_THREE) === 'chg') {
                         $count++;
                     }
                 }
-                if($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])){
+                if ($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])) {
                     $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
-                    return $this->redirect('change-assessment?cid='.$courseId);
+                    return $this->redirect('change-assessment?cid=' . $courseId);
                 }
                 $sets = array();
                 if (isset($params['docopyopt'])) {
-                    $tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
-                    $row = Assessments::CommonMethodToGetAssessmentData($tocopy,$params['copyopt']);
-                    $tocopyarr = explode(',', $tocopy);
-                    foreach ($row as $k => $item) {
-                        $sets[] = "$k='" . addslashes($item) . "'";
+                    $toCopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
+                    $row = Assessments::CommonMethodToGetAssessmentData($toCopy, $params['copyopt']);
+                    $toCopyArray = explode(',', $toCopy);
+                    foreach ($toCopyArray as $k=>$item) {
+                        $sets[] = "$item='".addslashes($row[$k])."'";
                     }
                 } else {
-                    $turnonshuffle = AppConstant::NUMERIC_ZERO;
-                    $turnoffshuffle = AppConstant::NUMERIC_ZERO;
+                    $turnOnShuffle = AppConstant::NUMERIC_ZERO;
+                    $turnOffShuffle = AppConstant::NUMERIC_ZERO;
                     if (isset($params['chgshuffle'])) {
                         if (isset($params['shuffle'])) {
-                            $turnonshuffle += AppConstant::NUMERIC_ONE;
+                            $turnOnShuffle += AppConstant::NUMERIC_ONE;
                         } else {
-                            $turnoffshuffle += AppConstant::NUMERIC_ONE;
+                            $turnOffShuffle += AppConstant::NUMERIC_ONE;
                         }
                     }
                     if (isset($params['chgsameseed'])) {
                         if (isset($params['sameseed'])) {
-                            $turnonshuffle += AppConstant::NUMERIC_TWO;
+                            $turnOnShuffle += AppConstant::NUMERIC_TWO;
                         } else {
-                            $turnoffshuffle += AppConstant::NUMERIC_TWO;
+                            $turnOffShuffle += AppConstant::NUMERIC_TWO;
                         }
                     }
                     if (isset($params['chgsamever'])) {
                         if (isset($params['samever'])) {
-                            $turnonshuffle += AppConstant::NUMERIC_FOUR;
+                            $turnOnShuffle += AppConstant::NUMERIC_FOUR;
                         } else {
-                            $turnoffshuffle += AppConstant::NUMERIC_FOUR;
+                            $turnOffShuffle += AppConstant::NUMERIC_FOUR;
                         }
                     }
                     if (isset($params['chgdefattempts'])) {
                         if (isset($params['reattemptsdiffver'])) {
-                            $turnonshuffle += AppConstant::NUMERIC_EIGHT;
+                            $turnOnShuffle += AppConstant::NUMERIC_EIGHT;
                         } else {
-                            $turnoffshuffle += AppConstant::NUMERIC_EIGHT;
+                            $turnOffShuffle += AppConstant::NUMERIC_EIGHT;
                         }
                     }
                     if (isset($params['chgallowlate'])) {
@@ -784,11 +779,11 @@ class AssessmentController extends AppController
                     }
                     if ($params['deffeedback'] == "Practice" || $params['deffeedback'] == "Homework") {
                         $deffeedback = $params['deffeedback'] . '-' . $params['showansprac'];
-                        if (($turnoffshuffle & AppConstant::NUMERIC_EIGHT) != AppConstant::NUMERIC_EIGHT) {
-                            $turnoffshuffle += AppConstant::NUMERIC_EIGHT;
+                        if (($turnOffShuffle & AppConstant::NUMERIC_EIGHT) != AppConstant::NUMERIC_EIGHT) {
+                            $turnOffShuffle += AppConstant::NUMERIC_EIGHT;
                         }
-                        if (($turnonshuffle & AppConstant::NUMERIC_EIGHT) == AppConstant::NUMERIC_EIGHT) {
-                            $turnonshuffle -= AppConstant::NUMERIC_EIGHT;
+                        if (($turnOnShuffle & AppConstant::NUMERIC_EIGHT) == AppConstant::NUMERIC_EIGHT) {
+                            $turnOnShuffle -= AppConstant::NUMERIC_EIGHT;
                         }
                     } else {
                         $deffeedback = $params['deffeedback'] . '-' . $params['showans'];
@@ -899,15 +894,15 @@ class AssessmentController extends AppController
                             $sets[] = "istutorial=0";
                         }
                     }
-                    if ($turnonshuffle != AppConstant::NUMERIC_ZERO || $turnoffshuffle != AppConstant::NUMERIC_ZERO) {
+                    if ($turnOnShuffle != AppConstant::NUMERIC_ZERO || $turnOffShuffle != AppConstant::NUMERIC_ZERO) {
                         $shuff = "shuffle = ((shuffle";
-                        if ($turnoffshuffle > AppConstant::NUMERIC_ZERO) {
-                            $shuff .= " & ~$turnoffshuffle)";
+                        if ($turnOffShuffle > AppConstant::NUMERIC_ZERO) {
+                            $shuff .= " & ~$turnOffShuffle)";
                         } else {
                             $shuff .= ")";
                         }
-                        if ($turnonshuffle > AppConstant::NUMERIC_ZERO) {
-                            $shuff .= " | $turnonshuffle";
+                        if ($turnOnShuffle > AppConstant::NUMERIC_ZERO) {
+                            $shuff .= " | $turnOnShuffle";
                         }
                         $shuff .= ")";
                         $sets[] = $shuff;
@@ -935,97 +930,98 @@ class AssessmentController extends AppController
                 }
 
                 if (count($sets) > AppConstant::NUMERIC_ZERO) {
-                    $setslist = implode(',', $sets);
-                     Assessments::updateAssessmentData($setslist,$checkedlist);
+                    $setsList = implode(',', $sets);
+                    Assessments::updateAssessmentData($setsList, $checkedList);
                 }
                 if (isset($params['removeperq'])) {
-                    Questions::updateQuestionData($checkedlist);
+                    Questions::updateQuestionData($checkedList);
                 }
-
                 if (isset($params['chgendmsg'])) {
-                    return $this->redirect('change-assessment?cid='.$courseId);
-                    // redirect on new page
-//                    include("assessendmsg.php");
+                    return $this->redirect('change-assessment?cid=' . $courseId);
                 } else {
                     $this->setWarningFlash(' Assessment data changes successfully.');
-                    return $this->redirect('change-assessment?cid='.$courseId);
+                    return $this->redirect('change-assessment?cid=' . $courseId);
                 }
-                exit;
             } else {
                 $this->setWarningFlash('No assessments are selected to be changed.');
                 return $this->redirect('change-assessment?cid=' . $courseId);
             }
         }
-             //DATA MANIPULATION FOR INITIAL LOAD
-                $line['displaymethod']= isset($CFG['AMS']['displaymethod'])?$CFG['AMS']['displaymethod']:"SkipAround";
-                $line['defpoints'] = isset($CFG['AMS']['defpoints'])?$CFG['AMS']['defpoints']:AppConstant::NUMERIC_TEN;
-                $line['defattempts'] = isset($CFG['AMS']['defattempts'])?$CFG['AMS']['defattempts']:AppConstant::NUMERIC_ONE;
-                $testtype = isset($CFG['AMS']['testtype'])?$CFG['AMS']['testtype']:"AsGo";
-                $showans = isset($CFG['AMS']['showans'])?$CFG['AMS']['showans']:"A";
-                $line['defpenalty'] = isset($CFG['AMS']['defpenalty'])?$CFG['AMS']['defpenalty']:10;
-                $line['shuffle'] = isset($CFG['AMS']['shuffle'])?$CFG['AMS']['shuffle']:AppConstant::NUMERIC_ZERO;
-                $line['minscore'] = isset($CFG['AMS']['minscore'])?$CFG['AMS']['minscore']:AppConstant::NUMERIC_ZERO;
-                $line['showhints']=isset($CFG['AMS']['showhints'])?$CFG['AMS']['showhints']:AppConstant::NUMERIC_ONE;
-                $line['noprint'] = isset($CFG['AMS']['noprint'])?$CFG['AMS']['noprint']:AppConstant::NUMERIC_ZERO;
-                $line['groupmax'] = isset($CFG['AMS']['groupmax'])?$CFG['AMS']['groupmax']:6;
-                $line['allowlate'] = isset($CFG['AMS']['allowlate'])?$CFG['AMS']['allowlate']:AppConstant::NUMERIC_ONE;
-                $line['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty'])?$CFG['AMS']['exceptionpenalty']:AppConstant::NUMERIC_ZERO;
-                $line['tutoredit'] = isset($CFG['AMS']['tutoredit'])?$CFG['AMS']['tutoredit']:AppConstant::NUMERIC_ZERO;
-                $line['eqnhelper'] = isset($CFG['AMS']['eqnhelper'])?$CFG['AMS']['eqnhelper']:AppConstant::NUMERIC_ZERO;
-                $line['caltag'] = isset($CFG['AMS']['caltag'])?$CFG['AMS']['caltag']:'?';
-                $line['calrtag'] = isset($CFG['AMS']['calrtag'])?$CFG['AMS']['calrtag']:'R';
-                $line['showtips'] = isset($CFG['AMS']['showtips'])?$CFG['AMS']['showtips']:AppConstant::NUMERIC_ONE;
-                if ($line['defpenalty']{0}==='L') {
-                    $line['defpenalty'] = substr($line['defpenalty'],AppConstant::NUMERIC_ONE);
-                    $skippenalty=10;
-                } else if ($line['defpenalty']{0}==='S') {
-                    $skippenalty = $line['defpenalty']{1};
-                    $line['defpenalty'] = substr($line['defpenalty'],2);
-                } else {
-                    $skippenalty = AppConstant::NUMERIC_ZERO;
-                }
-
-                $items = unserialize($course['itemorder']);
-               global $parents,$sums,$names,$types,$gitypeids,$ids,$prespace;
-                $agbcats = array();
-                CopyItemsUtility::getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
-                $assessments = Assessments::getByCourseId($courseId);
-                if (count($assessments) == 0) {
-                    $page_assessListMsg = "<li>No Assessments to change</li>\n";
-                } else {
-                    $page_assessListMsg = "";
-                    $i=0;
-                    $page_assessSelect = array();
-                     foreach($assessments as $assessment){
-                        $page_assessSelect['val'][$i] = $assessment['id'];
-                        $page_assessSelect['label'][$i] = $assessment['name'];
-                        $agbcats[$assessment['id']] = $assessment['gbcategory'];
-                        $i++;
-                    }
-                }
-
-                $page_forumSelect = array();
-                $forums = Forums::getByCourseId($courseId);
-                $page_forumSelect['val'][0] = 0;
-                $page_forumSelect['label'][0] = "None";
-                foreach($forums as $forum){
-                    $page_forumSelect['val'][] = $forum['id'];
-                    $page_forumSelect['label'][] = $forum['name'];
-                }
-
-                $page_allowlateSelect = array();
-                $page_allowlateSelect['val'][0] = 0;
-                $page_allowlateSelect['label'][0] = "None";
-                $page_allowlateSelect['val'][1] = 1;
-                $page_allowlateSelect['label'][1] = "Unlimited";
-                for ($k=1;$k<9;$k++) {
-                    $page_allowlateSelect['val'][] = $k+1;
-                    $page_allowlateSelect['label'][] = "Up to $k";
-                }
+        //DATA MANIPULATION FOR INITIAL LOAD
+        $line['displaymethod'] = isset($CFG['AMS']['displaymethod']) ? $CFG['AMS']['displaymethod'] : "SkipAround";
+        $line['defpoints'] = isset($CFG['AMS']['defpoints']) ? $CFG['AMS']['defpoints'] : AppConstant::NUMERIC_TEN;
+        $line['defattempts'] = isset($CFG['AMS']['defattempts']) ? $CFG['AMS']['defattempts'] : AppConstant::NUMERIC_ONE;
+        $testtype = isset($CFG['AMS']['testtype']) ? $CFG['AMS']['testtype'] : "AsGo";
+        $showans = isset($CFG['AMS']['showans']) ? $CFG['AMS']['showans'] : "A";
+        $line['defpenalty'] = isset($CFG['AMS']['defpenalty']) ? $CFG['AMS']['defpenalty'] : AppConstant::NUMERIC_TEN;
+        $line['shuffle'] = isset($CFG['AMS']['shuffle']) ? $CFG['AMS']['shuffle'] : AppConstant::NUMERIC_ZERO;
+        $line['minscore'] = isset($CFG['AMS']['minscore']) ? $CFG['AMS']['minscore'] : AppConstant::NUMERIC_ZERO;
+        $line['showhints'] = isset($CFG['AMS']['showhints']) ? $CFG['AMS']['showhints'] : AppConstant::NUMERIC_ONE;
+        $line['noprint'] = isset($CFG['AMS']['noprint']) ? $CFG['AMS']['noprint'] : AppConstant::NUMERIC_ZERO;
+        $line['groupmax'] = isset($CFG['AMS']['groupmax']) ? $CFG['AMS']['groupmax'] : AppConstant::NUMERIC_SIX;
+        $line['allowlate'] = isset($CFG['AMS']['allowlate']) ? $CFG['AMS']['allowlate'] : AppConstant::NUMERIC_ONE;
+        $line['exceptionpenalty'] = isset($CFG['AMS']['exceptionpenalty']) ? $CFG['AMS']['exceptionpenalty'] : AppConstant::NUMERIC_ZERO;
+        $line['tutoredit'] = isset($CFG['AMS']['tutoredit']) ? $CFG['AMS']['tutoredit'] : AppConstant::NUMERIC_ZERO;
+        $line['eqnhelper'] = isset($CFG['AMS']['eqnhelper']) ? $CFG['AMS']['eqnhelper'] : AppConstant::NUMERIC_ZERO;
+        $line['caltag'] = isset($CFG['AMS']['caltag']) ? $CFG['AMS']['caltag'] : '?';
+        $line['calrtag'] = isset($CFG['AMS']['calrtag']) ? $CFG['AMS']['calrtag'] : 'R';
+        $line['showtips'] = isset($CFG['AMS']['showtips']) ? $CFG['AMS']['showtips'] : AppConstant::NUMERIC_ONE;
+        if ($line['defpenalty']{0} === 'L') {
+            $line['defpenalty'] = substr($line['defpenalty'], AppConstant::NUMERIC_ONE);
+            $skippenalty = AppConstant::NUMERIC_TEN;
+        } else if ($line['defpenalty']{0} === 'S') {
+            $skippenalty = $line['defpenalty']{1};
+            $line['defpenalty'] = substr($line['defpenalty'], AppConstant::NUMERIC_TWO);
+        } else {
+            $skippenalty = AppConstant::NUMERIC_ZERO;
+        }
+        $items = unserialize($course['itemorder']);
+        global $parents, $sums, $names, $types, $gTypeIds, $ids, $prespace;
+        $agbCats = array();
+        CopyItemsUtility::getsubinfo($items, '0', '', 'Assessment', '&nbsp;&nbsp;');
+        $assessments = Assessments::getByCourseId($courseId);
+        if (count($assessments) == AppConstant::NUMERIC_ZERO) {
+        } else {
+            $i = AppConstant::NUMERIC_ZERO;
+            $pageAssessmentSelect = array();
+            foreach ($assessments as $assessment) {
+                $pageAssessmentSelect['val'][$i] = $assessment['id'];
+                $pageAssessmentSelect['label'][$i] = $assessment['name'];
+                $agbCats[$assessment['id']] = $assessment['gbcategory'];
+                $i++;
+            }
+        }
+        $pageForumSelect = array();
+        $forums = Forums::getByCourseId($courseId);
+        $pageForumSelect ['val'][0] = AppConstant::NUMERIC_ZERO;
+        $pageForumSelect ['label'][0] = "None";
+        foreach ($forums as $forum) {
+            $pageForumSelect ['val'][] = $forum['id'];
+            $pageForumSelect ['label'][] = $forum['name'];
+        }
+        $pageAllowLateSelect  = array();
+        $pageAllowLateSelect['val'][0] = AppConstant::NUMERIC_ZERO;
+        $pageAllowLateSelect['label'][0] = "None";
+        $pageAllowLateSelect['val'][1] = AppConstant::NUMERIC_ONE;
+        $pageAllowLateSelect['label'][1] = "Unlimited";
+        for ($k = AppConstant::NUMERIC_ONE; $k < AppConstant::NUMERIC_NINE; $k++) {
+            $pageAllowLateSelect ['val'][] = $k + AppConstant::NUMERIC_ONE;
+            $pageAllowLateSelect['label'][] = "Up to $k";
+        }
+        $overWriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        // SECURITY CHECK DATA PROCESSING
+        if ($isTeacher != AppConstant::NUMERIC_ONE) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+        } else if (count($assessments) == AppConstant::NUMERIC_ZERO) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+            $body = "No Assessments to change.";
+        }
         $this->includeJS(["general.js"]);
-        $this->includeCSS(['assessment.css']);
-        $responaseData = array('ids' => $ids,'page_allowlateSelect' => $page_allowlateSelect,'page_forumSelect' => $page_forumSelect,'agbcats' => $agbcats,'page_assessSelect' => $page_assessSelect,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'overWriteBody' => $overWriteBody,'body' => $body,'isTeacher' => $isTeacher,'course' => $course,
-            'parents' => $parents,'line' => $line,'sums' => $sums,'names' => $names,'types' => $types,'gitypeids' => $gitypeids,'prespace' => $prespace);
-        return $this->renderWithData('changeAssessment',$responaseData);
+        $this->includeCSS(['assessment.css', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+        $responseData = array('ids' => $ids, 'skippenalty' => $skippenalty, 'page_allowlateSelect' => $pageAllowLateSelect, 'page_forumSelect' => $pageForumSelect , 'agbcats' => $agbCats, 'page_assessSelect' => $pageAssessmentSelect, 'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'overWriteBody' => $overWriteBody, 'body' => $body, 'isTeacher' => $isTeacher, 'course' => $course,
+            'parents' => $parents, 'testtype' => $testtype, 'showans' => $showans, 'line' => $line, 'sums' => $sums, 'names' => $names, 'types' => $types, 'gitypeids' => $gTypeIds, 'prespace' => $prespace);
+        return $this->renderWithData('changeAssessment', $responseData);
     }
 }
