@@ -12,7 +12,10 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\controllers\AppController;
+use app\models\Assessments;
+use app\models\Bookmark;
 use app\models\Course;
+use app\models\Exceptions;
 use app\models\Student;
 
 class BlockController extends AppController
@@ -368,67 +371,5 @@ class BlockController extends AppController
             }
         }
         return $items;
-    }
-
-    public function actionTreeReader()
-    {
-        $this->guestUserHandler();
-        $user = $this->getAuthenticatedUser();
-        $this->layout = "master";
-        $params = $this->getRequestParams();
-        $courseId = $params['cid'];
-        $course = Course::getById($courseId);
-        $userId = $user['id'];
-        $teacherId = $this->isTeacher($userId,$courseId);
-        $tutorId = $this->isTutor($userId, $courseId);
-        $previewshift = -1;
-
-        if(isset($teacherId) || isset($tutorId)){
-           $viewAll = true;
-        } else{
-            $viewAll = false;
-        }
-        $courseData = Course::getById($courseId);
-        $items = unserialize($courseData['itemorder']);
-
-        if ((!isset($params['folder']) || $params['folder'] == '') && !isset($sessiondata['folder'.$courseId])) {
-            $params['folder'] = '0';
-            $sessiondata['folder'.$courseId] = '0';
-        } else if ((isset($params['folder']) && $params['folder'] != '') && (!isset($sessiondata['folder'.$courseId]) || $sessiondata['folder'.$courseId]!= $params['folder'])) {
-            $sessiondata['folder'.$courseId] = $params['folder'];
-        } else if ((!isset($params['folder']) || $params['folder']=='') && isset($sessiondata['folder'.$courseId])) {
-            $params['folder'] = $sessiondata['folder'.$courseId];
-        }
-
-        $sessionId = $this->getSessionId();
-        $sessiondata = $this->getSessionData($sessionId);
-        $student = Student::getByCourseId($courseId, $userId);
-        if($student != NULL){
-            $studentinfo['section'] = $student['section'];
-        }
-
-        if ($params['folder'] != '0') {
-            $now = time() + $previewshift;
-            $blocktree = explode('-',$params['folder']);
-            $backtrack = array();
-            for ($i=1;$i<count($blocktree);$i++) {
-                $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
-                if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
-                    $_GET['folder'] = 0;
-                    $items = unserialize($courseData['itemorder']);
-                    unset($backtrack);
-                    unset($blocktree);
-                    break;
-                }
-                if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
-                    if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
-                    }
-                }
-                $items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
-            }
-        }
-
-        $responseData = array('course' => $course);
-        return $this->renderWithData('treeReader', $responseData);
     }
 }

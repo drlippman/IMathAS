@@ -744,7 +744,7 @@ class CourseItemsUtility extends Component
                             <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') {?>
                                 <a href="<?php echo AppUtility::getURLFromHome('block', 'block/add-block?cid=' .$course->id)?>">
                            <?php } elseif (strlen($block['SH']) > 1 && $block['SH'][1] == 'T') { ?>
-                                <a href="<?php echo AppUtility::getURLFromHome('block', 'block/tree-reader?cid=' .$course->id)?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('block', 'block/tree-reader?cid=' .$course->id. '&folder='.$parent.'-'.$cnt)?>">
                            <?php } else {?>
                                 <a href="#" onclick="return false;">
                             <?php }?>

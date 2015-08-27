@@ -453,5 +453,9 @@ class Assessments extends BaseImasAssessments
         }
     }
 
+    public static function getCourseAndUserId($courseId, $userId)
+    {
+        return Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid='$courseId' AND ias.userid='$userId'")->queryAll();
+    }
 
 }
