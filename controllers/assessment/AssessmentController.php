@@ -687,7 +687,7 @@ class AssessmentController extends AppController
     {
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
-        $params = $this->getBodyParams();
+        $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $isTeacher = $this->isTeacher($user['id'], $course['id']);
@@ -717,7 +717,7 @@ class AssessmentController extends AppController
                     }
                 }
                 if ($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])) {
-                    $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
+                    $this->setWarningFlash(AppConstant::NO_SETTING);
                     return $this->redirect('change-assessment?cid=' . $courseId);
                 }
                 $sets = array();
@@ -760,16 +760,16 @@ class AssessmentController extends AppController
                         }
                     }
                     if (isset($params['chgallowlate'])) {
-                        $allowlate = intval($params['allowlate']);
-                        if (isset($params['latepassafterdue']) && $allowlate > AppConstant::NUMERIC_ZERO) {
-                            $allowlate += AppConstant::NUMERIC_TEN;
+                        $allowLate = intval($params['allowlate']);
+                        if (isset($params['latepassafterdue']) && $allowLate > AppConstant::NUMERIC_ZERO) {
+                            $allowLate += AppConstant::NUMERIC_TEN;
                         }
                     }
                     if (isset($params['chghints'])) {
                         if (isset($params['showhints'])) {
-                            $showhints = AppConstant::NUMERIC_ONE;
+                            $showHints = AppConstant::NUMERIC_ONE;
                         } else {
-                            $showhints = AppConstant::NUMERIC_ZERO;
+                            $showHints = AppConstant::NUMERIC_ZERO;
                         }
                     }
                     if ($params['skippenalty'] == AppConstant::NUMERIC_TEN) {
@@ -778,7 +778,7 @@ class AssessmentController extends AppController
                         $params['defpenalty'] = 'S' . $params['skippenalty'] . $params['defpenalty'];
                     }
                     if ($params['deffeedback'] == "Practice" || $params['deffeedback'] == "Homework") {
-                        $deffeedback = $params['deffeedback'] . '-' . $params['showansprac'];
+                        $defaultFeedback = $params['deffeedback'] . '-' . $params['showansprac'];
                         if (($turnOffShuffle & AppConstant::NUMERIC_EIGHT) != AppConstant::NUMERIC_EIGHT) {
                             $turnOffShuffle += AppConstant::NUMERIC_EIGHT;
                         }
@@ -786,14 +786,14 @@ class AssessmentController extends AppController
                             $turnOnShuffle -= AppConstant::NUMERIC_EIGHT;
                         }
                     } else {
-                        $deffeedback = $params['deffeedback'] . '-' . $params['showans'];
+                        $defaultFeedback = $params['deffeedback'] . '-' . $params['showans'];
                     }
                     if (isset($params['chgtimelimit'])) {
-                        $timelimit = $params['timelimit'] * AppConstant::NUMERIC_SIXTY;
+                        $timeLimit = $params['timelimit'] * AppConstant::NUMERIC_SIXTY;
                         if (isset($params['timelimitkickout'])) {
-                            $timelimit = AppConstant::NUMERIC_NEGATIVE_ONE * $timelimit;
+                            $timeLimit = AppConstant::NUMERIC_NEGATIVE_ONE * $timeLimit;
                         }
-                        $sets[] = "timelimit='$timelimit'";
+                        $sets[] = "timelimit='$timeLimit'";
                     }
                     if (isset($params['chgtutoredit'])) {
                         $sets[] = "tutoredit='{$params['tutoredit']}'";
@@ -811,13 +811,13 @@ class AssessmentController extends AppController
                         $sets[] = "defpenalty='{$params['defpenalty']}'";
                     }
                     if (isset($params['chgfeedback'])) {
-                        $sets[] = "deffeedback='$deffeedback'";
+                        $sets[] = "deffeedback='$defaultFeedback'";
                     }
                     if (isset($params['chggbcat'])) {
                         $sets[] = "gbcategory='{$params['gbcat']}'";
                     }
                     if (isset($params['chgallowlate'])) {
-                        $sets[] = "allowlate='$allowlate'";
+                        $sets[] = "allowlate='$allowLate'";
                     }
                     if (isset($params['chgexcpen'])) {
                         $sets[] = "exceptionpenalty='{$params['exceptionpenalty']}'";
@@ -826,7 +826,7 @@ class AssessmentController extends AppController
                         $sets[] = "password='{$params['assmpassword']}'";
                     }
                     if (isset($params['chghints'])) {
-                        $sets[] = "showhints='$showhints'";
+                        $sets[] = "showhints='$showHints'";
                     }
                     if (isset($params['chgshowtips'])) {
                         $sets[] = "showtips='{$params['showtips']}'";
@@ -943,7 +943,7 @@ class AssessmentController extends AppController
                     return $this->redirect('change-assessment?cid=' . $courseId);
                 }
             } else {
-                $this->setWarningFlash('No assessments are selected to be changed.');
+                $this->setWarningFlash(AppConstant::NO_ASSESSMENT);
                 return $this->redirect('change-assessment?cid=' . $courseId);
             }
         }
@@ -951,8 +951,8 @@ class AssessmentController extends AppController
         $line['displaymethod'] = isset($CFG['AMS']['displaymethod']) ? $CFG['AMS']['displaymethod'] : "SkipAround";
         $line['defpoints'] = isset($CFG['AMS']['defpoints']) ? $CFG['AMS']['defpoints'] : AppConstant::NUMERIC_TEN;
         $line['defattempts'] = isset($CFG['AMS']['defattempts']) ? $CFG['AMS']['defattempts'] : AppConstant::NUMERIC_ONE;
-        $testtype = isset($CFG['AMS']['testtype']) ? $CFG['AMS']['testtype'] : "AsGo";
-        $showans = isset($CFG['AMS']['showans']) ? $CFG['AMS']['showans'] : "A";
+        $testType = isset($CFG['AMS']['testtype']) ? $CFG['AMS']['testtype'] : "AsGo";
+        $showAnswer = isset($CFG['AMS']['showans']) ? $CFG['AMS']['showans'] : "A";
         $line['defpenalty'] = isset($CFG['AMS']['defpenalty']) ? $CFG['AMS']['defpenalty'] : AppConstant::NUMERIC_TEN;
         $line['shuffle'] = isset($CFG['AMS']['shuffle']) ? $CFG['AMS']['shuffle'] : AppConstant::NUMERIC_ZERO;
         $line['minscore'] = isset($CFG['AMS']['minscore']) ? $CFG['AMS']['minscore'] : AppConstant::NUMERIC_ZERO;
@@ -994,16 +994,16 @@ class AssessmentController extends AppController
         $pageForumSelect = array();
         $forums = Forums::getByCourseId($courseId);
         $pageForumSelect ['val'][0] = AppConstant::NUMERIC_ZERO;
-        $pageForumSelect ['label'][0] = "None";
+        $pageForumSelect ['label'][0] = AppConstant::NONE;
         foreach ($forums as $forum) {
             $pageForumSelect ['val'][] = $forum['id'];
             $pageForumSelect ['label'][] = $forum['name'];
         }
         $pageAllowLateSelect  = array();
         $pageAllowLateSelect['val'][0] = AppConstant::NUMERIC_ZERO;
-        $pageAllowLateSelect['label'][0] = "None";
+        $pageAllowLateSelect['label'][0] = AppConstant::NONE;
         $pageAllowLateSelect['val'][1] = AppConstant::NUMERIC_ONE;
-        $pageAllowLateSelect['label'][1] = "Unlimited";
+        $pageAllowLateSelect['label'][1] = AppConstant::UNLIMITED;
         for ($k = AppConstant::NUMERIC_ONE; $k < AppConstant::NUMERIC_NINE; $k++) {
             $pageAllowLateSelect ['val'][] = $k + AppConstant::NUMERIC_ONE;
             $pageAllowLateSelect['label'][] = "Up to $k";
@@ -1013,15 +1013,17 @@ class AssessmentController extends AppController
         // SECURITY CHECK DATA PROCESSING
         if ($isTeacher != AppConstant::NUMERIC_ONE) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to log in as a teacher to access this page";
+            $body = AppConstant::NO_TEACHER_RIGHTS;
         } else if (count($assessments) == AppConstant::NUMERIC_ZERO) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "No Assessments to change.";
+            $body = AppConstant::NO_ASSESSMENT_TO_CHANGE;
         }
         $this->includeJS(["general.js"]);
         $this->includeCSS(['assessment.css', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('ids' => $ids, 'skippenalty' => $skippenalty, 'page_allowlateSelect' => $pageAllowLateSelect, 'page_forumSelect' => $pageForumSelect , 'agbcats' => $agbCats, 'page_assessSelect' => $pageAssessmentSelect, 'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'overWriteBody' => $overWriteBody, 'body' => $body, 'isTeacher' => $isTeacher, 'course' => $course,
-            'parents' => $parents, 'testtype' => $testtype, 'showans' => $showans, 'line' => $line, 'sums' => $sums, 'names' => $names, 'types' => $types, 'gitypeids' => $gTypeIds, 'prespace' => $prespace);
+        $responseData = array('ids' => $ids, 'skippenalty' => $skippenalty, 'pageAllowLateSelect' => $pageAllowLateSelect, 'pageForumSelect' => $pageForumSelect , 'agbCats' => $agbCats,
+            'pageAssessmentSelect' => $pageAssessmentSelect, 'gbCatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'overWriteBody' => $overWriteBody, 'body' => $body, 'isTeacher' => $isTeacher,
+            'course' => $course,'parents' => $parents, 'testType' => $testType, 'showAnswer' => $showAnswer, 'line' => $line, 'sums' => $sums, 'names' => $names, 'types' => $types,
+            'gTypeIds' => $gTypeIds, 'prespace' => $prespace);
         return $this->renderWithData('changeAssessment', $responseData);
     }
 }

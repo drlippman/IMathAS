@@ -165,4 +165,22 @@ class QuestionSet extends BaseImasQuestionset
         $data = \Yii::$app->db->createCommand($query)->queryOne();
         return $data;
     }
+    public static function getByQuestionId($questionList)
+    {
+        $query = new Query();
+        $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
+		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+		$query .= " AND imas_questions.id IN ($questionList)";
+//        $query	->select(['imas_questionset.description','imas_questions.id','imas_questions.points','imas_questionset.id','imas_questions.withdrawn','imas_questionset.qtype','imas_questionset.control','imas_questions.showhints','imas_questionset.extref'])
+//            ->from('imas_questionset')
+//            ->join(	'INNER JOIN',
+//                'imas_questions',
+//                'imas_questionset.id=imas_questions.questionsetid'
+//            )
+//            ->where(['IN','imas_questions.id',$questionList]);
+//        $command = $query->createCommand();
+//        $data = $command->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 } 

@@ -426,6 +426,21 @@ class Student extends BaseImasStudents {
         return $items;
     }
 
+    public static function getStudentCountUsingCourseIdAndLockedStudent($courseId,$secfilter)
+    {
+        $query = new Query();
+        $query -> select(['id'])
+            -> from('imas_students')
+            -> where(['imas_students.courseid' => $courseId])
+            -> andWhere(['locked' => '0']);
+        if ($secfilter != -1) {
+        $query -> andWhere(['imas_students.section' => $secfilter ]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
 
 }
 

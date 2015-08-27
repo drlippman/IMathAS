@@ -326,5 +326,25 @@ class AssessmentSession extends BaseImasAssessmentSessions
 
         }
     }
+
+    public static function getByAssessmentUsingStudentJoin($courseId,$assessmentId,$secfilter)
+    {
+        $query = new Query();
+        $query	->select(['imas_assessment_sessions.questions','imas_assessment_sessions.bestscores','imas_assessment_sessions.bestattempts','imas_assessment_sessions.bestlastanswers','imas_assessment_sessions.starttime','imas_assessment_sessions.endtime','imas_assessment_sessions.timeontask'])
+            ->from('imas_assessment_sessions')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_assessment_sessions.userid=imas_students.userid'
+            )
+            ->where(['imas_students.courseid' => $courseId])
+            ->andWhere(['imas_assessment_sessions.assessmentid' => $assessmentId])
+            ->andWhere(['imas_students.locked' => '0']);
+        if($secfilter != -1){
+            $query->andWhere(['imas_students.section' => $secfilter]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }
 

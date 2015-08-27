@@ -51,4 +51,26 @@ class ContentTrack extends BaseImasContentTrack
         $this->save();
     }
 
+    public static function getCourseIdUsingStudentTableJoin($courseId,$qlist,$secfilter)
+    {
+        $query = new Query();
+        $query -> select(['imas_content_track.typeid','imas_content_track.userid'])
+            -> from('imas_content_track')
+            ->join(	'INNER JOIN',
+                'imas_students',
+                'imas_content_track.userid=imas_students.userid'
+            )
+            -> distinct('imas_content_track.userid')
+            ->groupBy(['imas_content_track.typeid'])
+            -> where(['imas_students.courseid' => $courseId])
+            -> andWhere(['imas_content_track.courseid' => $courseId])
+            -> andWhere(['imas_content_track.type' => 'extref'])
+            -> andWhere(['IN','imas_content_track.typeid',$qlist]);
+           if($secfilter != -1){
+               $query->andWhere(['imas_students.section' => $secfilter]);
+           }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 } 

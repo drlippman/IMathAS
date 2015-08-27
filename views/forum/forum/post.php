@@ -15,7 +15,7 @@ if ($currentUser->rights > AppConstant::STUDENT_RIGHT) {
 $this->params['breadcrumbs'][] = ['label' => 'Forum', 'url' => ['/forum/forum/search-forum?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = ['label' => 'Thread', 'url' => ['/forum/forum/thread?cid=' . $course->id . '&forumid=' . $forumId]];
 $this->params['breadcrumbs'][] = $this->title;
-$currentLevel = 0;
+$currentLevel = AppConstant::NUMERIC_ZERO;
 ?>
 
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" xmlns="http://www.w3.org/1999/html"/>

@@ -73,7 +73,7 @@ class CourseItemsUtility extends Component
                     <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id); ?>"><?php AppUtility::t('Setting');?></a></li>
                     <li><a id="delete" href="javascript:deleteItem('<?php echo $assessment->id ;?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
                     <li><a id="copy" href="javascript:copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
-                    <li><a id="grades" href="#"><?php AppUtility::t('Grades');?></a></li>
+                    <li><a id="grades" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid=2&asid=average&aid=31');?>"><?php AppUtility::t('Grades');?></a></li>
                    <?php if (isset($hasstats['a'.$assessment->id])) { ?>
                         <li><a id="stats" href="#"><?php AppUtility::t('Stats');?></a></li>
                    <?php }?>

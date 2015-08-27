@@ -263,7 +263,8 @@ function GB_hide() {
 	document.getElementById("GB_overlay").style.display = "none";
 }
 
-function chkAllNone(frmid, arr, mark, skip) {alert(mark);
+function chkAllNone(frmid, arr, mark, skip) {
+
   var frm = document.getElementById(frmid);
   for (i = 0; i <= frm.elements.length; i++) {
    try{
@@ -273,7 +274,6 @@ function chkAllNone(frmid, arr, mark, skip) {alert(mark);
        } else {
        	 frm.elements[i].checked = mark;      
        }
-      
      }
    } catch(er) {}
   }
