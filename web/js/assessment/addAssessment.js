@@ -1,4 +1,6 @@
-
+$(document).ready(function () {
+    initEditor();
+});
 function chgfb() {
     if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
     document.getElementById("showanspracspan").className = "show";

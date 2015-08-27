@@ -2,16 +2,26 @@
 use yii\helpers\Html;
 use app\components\AppUtility;
 
-$this->title = Yii::t('yii', 'Help for student entering answers');
-$this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Help for student entering answers';
+//$this->params['breadcrumbs'][] = ['label' => 'About Us', 'url' => ['/site/about']];
+//$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
-    <img class="floatleft" src="<?php echo AppUtility::getHomeURL() ?>img/typing.jpg" alt="Computer screens"/>
-
+<div class="item-detail-header">
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home','About Us'], 'link_url' => [AppUtility::getHomeURL(),AppUtility::getHomeURL().'site/login'], 'page_title' => $this->title]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
+<div class="site-about padding-right-left-top-thirty padding-bottom-thirty">
+    <div style="background-color: #fafafa;" class="padding-bottom-twenty padding-right-left-top-thirty">
+    <img class="floatleft student-help-image" src="<?php echo AppUtility::getHomeURL() ?>img/typing.jpg" alt="Computer screens"/>
     <div class="content">
-        <h4><?php AppUtility::t('Answer Types');?></h4>
+        <h4 class="margin-top-minus-two"><?php AppUtility::t('Answer Types');?></h4>
         <p class="ind">
             <?php AppUtility::t('Each question requests a specific type of answer.  Usually a question will display a hint
             at the end of the question as to what type of answer is expected.  In addition to
@@ -52,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p class="ind">
             <?php AppUtility::t('Alternatively, you can enter mathematical expressions.  Some examples:')?>
-        <table class=bordered><tr><th><?php AppUtility::t('Enter')?></th><th><?php AppUtility::t('To get')?></th></tr>
+        <table class="bordered ind"><tr><th><?php AppUtility::t('Enter')?></th><th><?php AppUtility::t('To get')?></th></tr>
             <tr><td>sqrt(4)</td><td><img src="<?php echo AppUtility::getHomeURL() ?>img/answerimgs/s4.gif"> = 2</td></tr>
             <tr><td>2/(5-3)</td><td><img src="<?php echo AppUtility::getHomeURL() ?>img/answerimgs/2o5m3.gif"> = 1</td></tr>
             <tr><td>3^2</td><td><img src="<?php echo AppUtility::getHomeURL() ?>img/answerimgs/3s.gif"> = 9</td></tr>
@@ -70,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p class="ind">
             <?php AppUtility::t('Examples:')?>
-        <table class=bordered>
+        <table class="bordered margin-left-twentyone">
             <tr><th><?php AppUtility::t('Type')?></th><th><?php AppUtility::t('To get')?></th></tr>
             <tr><td>-3x^2+5</td><td><img src="<?php echo AppUtility::getHomeURL() ?>img/answerimgs/m3xs.gif"></td></tr>
             <tr><td>(2+x)/(3-x)</td><td><img src="<?php echo AppUtility::getHomeURL() ?>img/answerimgs/2pxo3mx.gif"></td></tr>
@@ -97,4 +107,6 @@ $this->params['breadcrumbs'][] = $this->title;
             can understand what you typed (though it may not be the correct answer).  If you see "syntax error", you may be missing a
             parenthese or have used the wrong variables in your answer.')?></p>
     </div>
+</div>
+</div>
 </div>

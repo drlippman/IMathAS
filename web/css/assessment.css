@@ -12,3 +12,16 @@
 {
     text-align: -webkit-center;
 }
+.assesment-msg-table {
+    margin-bottom: 10px;
+    margin-top: 3px !important;
+    border-collapse: collapse;
+    /*margin: 0px;*/
+    position: relative;
+}
+table.assesment-msg-table thead th {
+    border-bottom: 2px solid #00f;
+    position: relative;
+    text-align: center;
+    z-index: 20;
+}

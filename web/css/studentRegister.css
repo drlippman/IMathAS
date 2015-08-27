@@ -1,5 +1,33 @@
-.form-horizontal .form-group{
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 300px;
+.padding-top-seven {
+    padding-top: 7px;
+}
+.margin-left-fifteen {
+    margin-left: 15px;
+}
+.margin-left-zero {
+    margin-left:0px !important;
+}
+.student-signup-form {
+    margin-right:30px;
+    margin-left: 30px;
+    margin-bottom: 30px;
+    margin-top: 16px;
+}
+.student-signup-form-heading {
+    border-bottom: 2px solid #a9a9a9;
+    margin-top: -10px;
+    padding-bottom: 25px;
+    margin-bottom: 29px;
+}
+.course-message {
+    text-align: center;
+    margin-left: 16.2%;
+}
+
+.help-block
+{
+    display: block;
+     margin-top: 0px !important;
+     margin-bottom: 0px !important;
+    color: #737373;
 }

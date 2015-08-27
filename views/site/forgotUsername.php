@@ -17,30 +17,29 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
-<div class="site-login">
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'options' => ['class' => 'form-horizontal'],
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-1\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1 control-label'],
-        ],
-    ]); ?>
-    <div style="padding: 30px">
-        <div style="background-color:#fafafa; padding: 30px ">
-    <p>If you can't remember your username, enter your email address below. An email will be sent to your email address
-        with your username. </p>
-    <?= $form->field($model, 'email') ?>
-
-    <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Submit', ['id' => 'button-username','class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
-            &nbsp; &nbsp;         <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
-
-        </div>
-    </div>
-
-    <?php ActiveForm::end(); ?>
+    <div class="site-login">
+        <?php $form = ActiveForm::begin([
+            'id' => 'login-form',
+            'options' => ['class' => 'form-horizontal'],
+            'fieldConfig' => [
+                'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-1\">{error}</div>",
+                'labelOptions' => ['class' => 'col-lg-1 control-label'],
+            ],
+        ]); ?>
+        <div style="padding: 30px">
+            <div style="background-color:#fafafa; padding: 30px ">
+                 <p>If you can't remember your username, enter your email address below. An email will be sent to your email address
+                    with your username. </p>
+                <div class="margin-top-seventeen"><?= $form->field($model, 'email') ?></div>
+                <div class="form-group">
+                    <div class="col-lg-offset-1 col-lg-11">
+                        <?= Html::submitButton('Submit', ['id' => 'button-username','class' => 'btn btn-primary', 'name' => 'forgetusername-button']) ?>
+                        &nbsp; &nbsp;<a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'login'); ?>">Back</a>
+                    </div>
+                </div>
+                <?php ActiveForm::end(); ?>
             </div>
         </div>
+    </div>
 </div>
+<div style="height: 50px; width: 100%"></div>

@@ -13,7 +13,7 @@ $this->title = 'About Us';
     <h1 style="color: #ffffff"><?php echo Html::encode($this->title) ?></h1>
 </div>
 
-<div class="tab-content shadowBox" style="padding-top: 30px">
+<div class="tab-content shadowBox margin-top-fourty" style="padding-top: 30px">
     <div style="margin: 20px">
     <div class="col-lg-8 text-just"<?php echo AppUtility::getURLFromHome('course', 'course/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"ify">
 
@@ -57,7 +57,7 @@ $this->title = 'About Us';
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal'],
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-lg-8\">{input}</div>\n<div class=\"col-lg-10 col-lg-offset-3\">{error}</div>",
+                'template' => "{label}\n<div class=\"col-lg-8\">{input}</div>\n<div class=\"col-lg-10 clear-both col-lg-offset-4\">{error}</div>",
                 'labelOptions' => ['class' => 'col-lg-4 control-label'],
             ],
         ]); ?>

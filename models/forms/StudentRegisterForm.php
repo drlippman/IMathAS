@@ -9,8 +9,8 @@ use yii\base\Model;
 class StudentRegisterForm extends Model
 {
     public $username;
-    public $FirstName;
-    public $LastName;
+    public $firstName;
+    public $lastName;
     public $password;
     public $rePassword;
     public $email;
@@ -30,10 +30,10 @@ class StudentRegisterForm extends Model
     {
         return [
 
-            [['username', 'password', 'FirstName', 'LastName'], 'required'],
+            [['username', 'password', 'firstName', 'lastName'], 'required'],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens (-).'],
             ['rePassword', 'compare', 'compareAttribute' => 'password','message'=>'Confirm password must be repeated exactly.'],
-            [['FirstName', 'LastName'], 'string'],
+            [['firstName', 'lastName'], 'string', 'max' => 20, 'tooLong'=>'{attribute} contains maximum 20 characters.'],
             ['email', 'email','message' => 'Enter a valid email address.'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
             [['courseID', 'EnrollmentKey'], 'string'],
@@ -50,8 +50,8 @@ class StudentRegisterForm extends Model
             'SID' => AppUtility::t('Enter username', false),
             'password' => AppUtility::t('Password', false),
             'rePassword' => AppUtility::t('Confirm password', false),
-            'FirstName' => AppUtility::t('First name', false),
-            'LastName' => AppUtility::t('Last name', false),
+            'firstName' => AppUtility::t('First name', false),
+            'lastName' => AppUtility::t('Last name', false),
             'email' => AppUtility::t('Email', false),
             'CourseId' => AppUtility::t('Course Id', false),
             'EnrollmentKey' => AppUtility::t('Enrollment Key', false),

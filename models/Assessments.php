@@ -458,4 +458,11 @@ class Assessments extends BaseImasAssessments
         return Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid='$courseId' AND ias.userid='$userId'")->queryAll();
     }
 
+    public static function setEndMessage($id, $msgstr){
+        $data = Assessments::getByAssessmentId($id);
+        if($data){
+            $data->endmsg = $msgstr;
+            $data->save();
+        }
+    }
 }

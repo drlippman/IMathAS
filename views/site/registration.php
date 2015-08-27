@@ -23,15 +23,15 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
     <div style="margin: 30px;"><br>
-            <div class="vcenter"><h3 style="border-bottom: 2px solid #a9a9a9; margin-top: 0">Instructor Account Request</h3></div>
-            <div class="registration col-lg-6">
+            <div class="vcenter"><h3 style="border-bottom: 2px solid #a9a9a9; margin-top: 4px; margin-bottom: 30px; padding-bottom: 25px;">Instructor Account Request</h3></div>
+            <div class="registration col-lg-9">
                 <?php $form = ActiveForm::begin([
                     'id' => 'login-form',
                     'options' => ['class' => 'form-horizontal'],
                     'action' => '',
                     'fieldConfig' => [
-                        'template' => "{label}\n<div class=\"col-sm-6\">{input}</div>\n<div class=\"col-sm-6 clear-both col-sm-offset-2\">{error}</div>",
-                        'labelOptions' => ['class' => 'col-sm-4  text-align-left'],
+                        'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-sm-6 clear-both col-sm-offset-3\">{error}</div>",
+                        'labelOptions' => ['class' => 'col-sm-3  text-align-left margin-top-eight'],
                     ],
                 ]); ?>
 
@@ -44,9 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo $form->field($model, 'password')->passwordInput() ?>
                 <?php echo $form->field($model, 'confirmPassword')->passwordInput() ?>
                 <?php echo $form->field($model, 'terms')->checkbox(['labelOptions' => ['class' => 'register-terms-label']]) ?>
-
                 <div class="form-group">
-                    <div class="col-lg-offset-4"><?php echo Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
+                    <div class="col-sm-offset-3"><?php echo Html::submitButton('Request Account', ['class' => 'btn btn-primary instructor-save']) ?></div>
                 </div>
 
                 <?php ActiveForm::end(); ?>
@@ -71,7 +70,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <script type="text/javascript">
     $(document).ready(function(){
 
-        $('.register-terms-label').closest('div').addClass('col-lg-offset-4');
+        $('.register-terms-label').closest('div').addClass('col-lg-offset-3');
+        $('.register-terms-label').closest('div').removeClass('col-sm-4');
+        $('.register-terms-label').closest('div').addClass('col-sm-6');
     });
 
 </script>

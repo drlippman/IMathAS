@@ -937,7 +937,12 @@ class AssessmentController extends AppController
                     Questions::updateQuestionData($checkedList);
                 }
                 if (isset($params['chgendmsg'])) {
-                    return $this->redirect('change-assessment?cid=' . $courseId);
+                    if(strlen($checkedList) > 3){
+                        return $this->redirect('assessment-message?cid='.$courseId.'&checked='.$checkedList);
+                    }else{
+                        return $this->redirect('assessment-message?cid='.$courseId.'&aid='.$checkedList);
+                    }
+
                 } else {
                     $this->setWarningFlash(' Assessment data changes successfully.');
                     return $this->redirect('change-assessment?cid=' . $courseId);
@@ -1025,5 +1030,67 @@ class AssessmentController extends AppController
             'course' => $course,'parents' => $parents, 'testType' => $testType, 'showAnswer' => $showAnswer, 'line' => $line, 'sums' => $sums, 'names' => $names, 'types' => $types,
             'gTypeIds' => $gTypeIds, 'prespace' => $prespace);
         return $this->renderWithData('changeAssessment', $responseData);
+    }
+
+    public function actionAssessmentMessage() {
+        $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
+        $courseId = $params['cid'];
+        $this->layout = 'master';
+        $course = Course::getById($courseId);
+        $isTeacherId = $this->isTeacher($user['id'],$courseId);
+        if (!(isset($isTeacherId))) {
+            echo "You must be a teacher to access this page";
+            exit;
+        }
+        if (isset($params['record'])) {
+            $endmsg = array();
+            $endmsg['type'] = $params['type'];
+            $endmsg['def'] = stripslashes($params['msg'][0]);
+            $i= AppConstant::NUMERIC_ONE;
+            $msgarr = array();
+            while (isset($params['sc'][$i]) && !empty($params['sc'][$i]) ) {
+                $key = (int)$params['sc'][$i];
+                if ($key>AppConstant::NUMERIC_ZERO) {
+                    $msgarr[$key] = stripslashes($params['msg'][$i]);
+                }
+                $i++;
+            }
+            krsort($msgarr);
+            $endmsg['msgs'] = $msgarr;
+            $endmsg['commonmsg'] = $params['commonmsg'];
+            $msgstr = serialize($endmsg);
+            if (isset($params['aid'])) {
+                Assessments::setEndMessage($params['aid'],$msgstr);
+            } else if (isset($params['aidlist'])) {
+                $sets = "endmsg='" .$msgstr. "'";
+                Assessments::updateAssessmentData($sets,$params['aidlist']);
+            }
+            return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
+        }
+        $pagetitle = "End of Assessment Messages";
+        $useeditor = "commonmsg";
+        if (!isset($params['checked'])) {
+            $query = Assessments::getByAssessmentId($params['aid']);
+        } else {
+            $endmsg = '';
+            if (count($params['checked'])==0) {
+                echo "No assessments selected";
+                exit;
+            }
+        }
+        if ($endmsg!='') {
+            $endmsg = unserialize($endmsg);
+        } else {
+            $endmsg = array();
+            $endmsg['def'] = '';
+            $endmsg['type'] = 0;
+            $endmsg['msgs'] = array();
+            $endmsg['commonmsg'] = '';
+        }
+        $this->includeCSS(['assessment.css']);
+        $this->includeJS(['editor/tiny_mce.js','assessment/addAssessment.js','general.js']);
+        $responseData = array('course' => $course,'params' => $params,'endmsg'=>$endmsg);
+        return $this->renderWithData('assessmentMessage',$responseData);
     }
 }

@@ -20,8 +20,7 @@ $nologo = true;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
-    <p style="padding-top:0"></p>
+<div class="tab-content shadowBox non-nav-tab-item padding-top-nine">
     <div style="margin-right:30px; margin-left: 30px;margin-bottom: 30px; background-color: #fafafa">
         <div style="padding-right: 20px; padding-left: 20px; padding-bottom: 20px;">
             <h2 style="padding-top:15px"><?php echo AppConstant::INSTALL_NAME; ?><?php AppUtility::t('Browser Check')?></h2>

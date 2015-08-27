@@ -8,7 +8,9 @@ body {
 .master-items-container{
     padding: 0 5%;
     position: relative;
-    bottom: 240px;
+    float: left;
+    margin-top: -240px;
+    width: 100%;
 }
 .navbar-inverse {
     background-color: #104E88;
@@ -195,7 +197,9 @@ body {
 }
 .grey-color-link{
     color: #6d6d6d;
+    border: none;
 }
+
 .calendar-details{
     padding-top: 47px;
 }
@@ -205,6 +209,7 @@ body {
 .tab-content{
     background: #ffffff;
     box-shadow: 0px 4px 13px -2px #6d6d6d;
+    min-height:365px;
 }
 .tab-content:after{
     display: table;
@@ -420,4 +425,10 @@ i.fa-home{
     height: 34px;
     margin-left: 10px;
     cursor: pointer;
+}
+.margin-left-fifteen {
+    margin-left: 15px;
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus .grey-color-link {
+    border: none;
 }

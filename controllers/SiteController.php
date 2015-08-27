@@ -115,7 +115,7 @@ class SiteController extends AppController
     {
         $this->layout = 'nonLoggedUser';
         $model = new RegistrationForm();
-        if ($model->load($this->getPostData())) {
+        if ($this->isPostMethod()) {
             $params = $this->getRequestParams();
             $params = $params['RegistrationForm'];
             $params['SID'] = $params['username'];
@@ -224,6 +224,7 @@ class SiteController extends AppController
                 $this->setErrorFlash('Such username does not exist.');
             }
         }
+        $this->includeCSS(['login.css']);
         $responseData = array('model' => $model,);
         return $this->renderWithData('forgotPassword', $responseData);
     }
@@ -252,6 +253,7 @@ class SiteController extends AppController
             }
         }
         $responseData = array('model' => $model,);
+        $this->includeCSS(['login.css']);
         return $this->renderWithData('forgotUsername', $responseData);
     }
 
@@ -416,7 +418,9 @@ class SiteController extends AppController
     {
         $params = $this->getRequestParams();
         $section = $params['section'];
+        $this->layout = 'master';
         $responseData = (['section' => $section]);
+        $this->includeCSS(['infopages.css']);
         return $this->renderWithData('helpForStudentAnswer', $responseData);
     }
 
