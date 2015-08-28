@@ -105,7 +105,6 @@ class CourseController extends AppController
                         switch ($item->itemtype) {
 
                             case 'Assessment':
-                                AppUtility::dump($item);
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempItem[$item->itemtype] = $assessment;
                                 array_push($calendarCount, $assessment);
