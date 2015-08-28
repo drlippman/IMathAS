@@ -16,7 +16,11 @@ use app\models\Assessments;
 use app\models\Bookmark;
 use app\models\Course;
 use app\models\Exceptions;
+use app\models\Forums;
+use app\models\Items;
+use app\models\LinkedText;
 use app\models\Student;
+use app\models\Wiki;
 
 class BlockController extends AppController
 {
@@ -371,5 +375,305 @@ class BlockController extends AppController
             }
         }
         return $items;
+    }
+
+    public function actionTreeReader()
+    {
+        global $courseId,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = "master";
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $courseName = $course->name;
+        $userId = $user['id'];
+        $teacherId = $this->isTeacher($userId,$courseId);
+        $tutorId = $this->isTutor($userId, $courseId);
+        $previewshift = -1;
+        $curBreadcrumb = '';
+        $folder = 'TR'.$params['folder'];
+        $astatus = array();
+        $foundfirstitem = '';
+        $foundopenitem = '';
+        $now = time();
+        $value = Bookmark::getValue($userId, $courseId, $folder);
+
+        if(count($value) == AppConstant::NUMERIC_ZERO) {
+            $openitem = '';
+        } else{
+            $openitem = $value['value'];
+        }
+        if(isset($teacherId) || isset($tutorId)){
+           $viewall = true;
+        } else{
+            $viewall = false;
+        }
+        $courseData = Course::getById($courseId);
+        $items = unserialize($courseData['itemorder']);
+        if ((!isset($params['folder']) || $params['folder'] == '') && !isset($sessiondata['folder'.$courseId])) {
+            $params['folder'] = '0';
+            $sessiondata['folder'.$courseId] = '0';
+        } else if ((isset($params['folder']) && $params['folder'] != '') && (!isset($sessiondata['folder'.$courseId]) || $sessiondata['folder'.$courseId]!= $params['folder'])) {
+            $sessiondata['folder'.$courseId] = $params['folder'];
+        } else if ((!isset($params['folder']) || $params['folder']=='') && isset($sessiondata['folder'.$courseId])) {
+            $params['folder'] = $sessiondata['folder'.$courseId];
+        }
+        $sessionId = $this->getSessionId();
+        $sessiondata = $this->getSessionData($sessionId);
+        $student = Student::getByCourseId($courseId, $userId);
+        if($student != NULL){
+            $studentinfo['section'] = $student['section'];
+        }
+        if ($params['folder'] != '0') {
+            $now = time() + $previewshift;
+            $blocktree = explode('-',$params['folder']);
+            $backtrack = array();
+            for ($i=1;$i<count($blocktree);$i++) {
+                $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
+                if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
+                    $_GET['folder'] = 0;
+                    $items = unserialize($courseData['itemorder']);
+                    unset($backtrack);
+                    unset($blocktree);
+                    break;
+                }
+                if (isset($items[$blocktree[$i]-1]['grouplimit']) && count($items[$blocktree[$i]-1]['grouplimit'])>0 && !isset($teacherid) && !isset($tutorid)) {
+                    if (!in_array('s-'.$studentinfo['section'],$items[$blocktree[$i]-1]['grouplimit'])) {
+                        echo 'Not authorized';
+                        exit;
+                    }
+                }
+                $items = $items[$blocktree[$i]-1]['items']; //-1 to adjust for 1-indexing
+            }
+        }
+
+        if (!$viewall) {
+            $assessment = Assessments::getCourseAndUserId($courseId, $userId);
+            foreach ($assessment as $key => $row) {
+                if (strpos($row['bestscores'],'-1') === false) {
+                    $astatus[$row['id']] = AppConstant::NUMERIC_TWO; //completed
+                } else { //at least some undone
+                    $p = explode(',',$row['bestscores']);
+                    foreach ($p as $v) {
+                        if (strpos($v,'-1')===false) {
+                            $astatus[$row['id']] = AppConstant::NUMERIC_ONE; //at least some is done
+                            continue 2;
+                        }
+                    }
+                    $astatus[$row['id']] = 0; //unstarted
+                }
+            }
+            $exceptions = array();
+            if (!isset($teacherId) && !isset($tutorId)) {
+                $query = Exceptions::getByUserIdForTreeReader($userId);
+                foreach($query as $key => $line){
+                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass']);
+                }
+            }
+            //update block start/end dates to show blocks containing items with exceptions
+            if (count($exceptions)>0) {
+                $this->upsendexceptions($items);
+            }
+        }
+        if (isset($backtrack) && count($backtrack)>0) {
+            $blockName = $backtrack[count($backtrack)-1][0];
+
+            if (count($backtrack) == AppConstant::NUMERIC_ONE) {
+                $backlink =  "<span class=right><a href='".AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$courseId)."'>Back</a></span><br class=\"form\" />";
+            } else {
+                $backlink = "<span class=right><a href=".AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$courseId. '&folder='.$backtrack[count($backtrack)-2][1]).">Back</a></span><br class=\"form\" />";
+            }
+        } else {
+            $blockName = $course->name;
+
+        }
+        $printList = $this->printlist($items);
+
+        $this->includeCSS(['libtree.css', 'treeReader.css']);
+        $this->includeJS(['general.js']);
+        $responseData = array('course' => $course, 'printList' => $printList, 'openitem' => $openitem, 'foundfirstitem' => $foundfirstitem, 'foundopenitem' => $foundopenitem, 'item'=> $items, 'blockName' => $blockName, 'backlink' => $backlink);
+        return $this->renderWithData('treeReader', $responseData);
+    }
+
+    function printlist($items) {
+        global $courseId,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
+        $out = '';
+        $isopen = false;
+        foreach ($items as $item) {
+
+            if (is_array($item)) { //is block
+                $path = AppUtility::getHomeURL();
+                //TODO check that it's available
+                if ($viewall || $item['avail']== AppConstant::NUMERIC_TWO || ($item['avail']== AppConstant::NUMERIC_ONE && $item['startdate']<$now && $item['enddate']>$now)) {
+                    list($subcontent,$bisopen) = $this->printlist($item['items']);
+                    if ($bisopen) {
+                        $isopen = true;
+                    }
+                    if ($bisopen) {
+                        $out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">-</span> <img class=too-small-icon src=\"$path/img/block.png\"> ";
+                        $out .=  "{$item['name']}</span>\n";
+                        $out .=  '<ul class="show nomark" id="'.$item['id'].'">';
+                    } else {
+                        $out .=  "<li class=lihdr><span class=hdr onClick=\"toggle({$item['id']})\"><span class=btn id=\"b{$item['id']}\">+</span> <img class=too-small-icon src=\"$path/img/block.png\"> ";
+                        $out .=  "{$item['name']}</span>\n";
+                        $out .=  '<ul class="hide nomark" id="'.$item['id'].'">';
+                    }
+                    $out .= $subcontent;
+                    $out .=  '</ul></li>';
+                }
+            } else {
+                $line = Items::getByItem($item);
+                $typeid = $line['typeid'];
+                $itemtype = $line['itemtype'];
+
+
+                if ($line['itemtype']=='Assessment') {
+                    //TODO check availability, timelimit, etc.
+                    //TODO: reqscoreaid, latepasses
+                    $line = Assessments::getByAssessmentId($typeid);
+                    if (isset($exceptions[$item])) {
+                        $line['startdate'] = $exceptions[$item][0];
+                        $line['enddate'] = $exceptions[$item][1];
+                    }
+                    if ($viewall || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && ($line['enddate']>$now || $line['reviewdate']>$now))) {
+                        if ($openitem=='' && $foundfirstitem=='') {
+                            $foundfirstitem = 'assessment/assessment/show-assessment?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                        }
+                        if ($itemtype.$typeid===$openitem) {
+                            $foundopenitem = 'assessment/assessment/show-assessment?cid='.$courseId.'&id='.$typeid; $isopen = true;
+                        }
+                        $out .= '<li>';
+
+                        if ($line['displaymethod']!='Embed') {
+                            $out .=  '<img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconAssessment.png"> ';
+                        } else {
+                            if (!isset($astatus[$typeid]) || $astatus[$typeid]== AppConstant::NUMERIC_ONE) {
+                                $out .= '<img id="aimg'.$typeid.'" src="'.AppUtility::getHomeURL().'/img/q_fullbox.gif" /> ';
+                            } else if ($astatus[$typeid]==1) {
+                                $out .= '<img id="aimg'.$typeid.'" src="'.AppUtility::getHomeURL().'/img/q_halfbox.gif" /> ';
+                            } else {
+                                $out .= '<img id="aimg'.$typeid.'" src="'.AppUtility::getHomeURL().'/img/q_emptybox.gif" /> ';
+                            }
+                        }
+                        if (isset($studentinfo['timelimitmult'])) {
+                            $line['timelimit'] *= $studentinfo['timelimitmult'];
+                        }
+                        $line['timelimit'] = abs($line['timelimit']);
+
+                        if ($line['timelimit']> AppConstant::NUMERIC_ONE) {
+
+                            if ($line['timelimit']>3600) {
+
+                                $tlhrs = floor($line['timelimit']/3600);
+                                $tlrem = $line['timelimit'] % 3600;
+                                $tlmin = floor($tlrem/60);
+                                $tlsec = $tlrem % 60;
+                                $tlwrds = "$tlhrs " . _('hour');
+
+                                if ($tlhrs > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
+                                if ($tlmin > AppConstant::NUMERIC_ZERO) { $tlwrds .= ", $tlmin " . _('minute');}
+                                if ($tlmin > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
+                                if ($tlsec > AppConstant::NUMERIC_ZERO) { $tlwrds .= ", $tlsec " . _('second');}
+                                if ($tlsec > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
+                            } else if ($line['timelimit']>60) {
+                                $tlmin = floor($line['timelimit']/60);
+                                $tlsec = $line['timelimit'] % 60;
+                                $tlwrds = "$tlmin " . _('minute');
+                                if ($tlmin > 1) { $tlwrds .= "s";}
+                                if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
+                                if ($tlsec > 1) { $tlwrds .= "s";}
+                            } else {
+                                $tlwrds = $line['timelimit'] . _(' second(s)');
+                            }
+                        } else {
+                            $tlwrds = '';
+                        }
+                        if ($tlwrds != '') {
+                            $onclick = 'onclick="return confirm(\''. sprintf(_('This assessment has a time limit of %s.  Click OK to start or continue working on the assessment.'), $tlwrds). '\')"';
+                        } else {
+                            $onclick = 'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"';
+                        }
+                        $out .= '<a href="'.AppUtility::getURLFromHome("assessment", "assessment/show-assessment?cid=".$courseId."&id=".$typeid).'"onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['name'].'</a></li>';
+                    }
+                } else if ($line['itemtype']=='LinkedText') {
+                    //TODO check availability, etc.
+                    $line = LinkedText::getById($typeid);
+                    if ($viewall || $line['avail'] == AppConstant::NUMERIC_TWO || ($line['avail'] == AppConstant::NUMERIC_ONE && $line['startdate']< $now && $line['enddate'] > $now))
+                    {
+                        if ($openitem == '' && $foundfirstitem == '') {
+                            $foundfirstitem = 'course/course/show-linked-text?cid='.$courseId.'&amp;id='.$typeid; $isopen = true;
+                        }
+                        if ($itemtype.$typeid===$openitem) {
+                            $foundopenitem =  'course/course/show-linked-text?cid='.$courseId.'&amp;id='.$typeid; $isopen = true;
+                        }
+                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/link.png"> <a href="'.AppUtility::getURLFromHome('course', 'course/show-linked-text?cid='.$courseId.'&amp;id='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')"  target="readerframe">'.$line['title'].'</a></li>';
+                    }
+                } else if ($line['itemtype']=='Wiki') {
+                    //TODO check availability, etc.
+                    $line = Wiki::getById($typeid);
+                    if ($viewall || $line['avail']== AppConstant::NUMERIC_TWO || ($line['avail']== AppConstant::NUMERIC_ONE && $line['startdate']<$now && $line['enddate']>$now)) {
+                        if ($openitem=='' && $foundfirstitem=='') {
+                            $foundfirstitem = 'wiki/wikis/show-wiki?cid='.$courseId.'id='.$typeid.'&framed=true'; $isopen = true;
+                        }
+                        if ($itemtype.$typeid===$openitem) {
+                            $foundopenitem = 'wiki/wikis/show-wiki?cid='.$courseId.'id='.$typeid.'&framed=true'; $isopen = true;
+                        }
+                        $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconWiki.png"> <a href="'.AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?cid='.$courseId.'id='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+                    }
+                } else if ($line['itemtype']=='Forum') {
+				//TODO check availability.
+				 $line = Forums::getById($typeid);
+				 if ($openitem=='' && $foundfirstitem=='') {
+				 	 $foundfirstitem = 'forum/forums/thread?cid='.$courseId.'&id='.$typeid; $isopen = true;
+				 }
+				 if ($itemtype.$typeid===$openitem) {
+				 	 $foundopenitem = 'forum/forums/thread.php?cid='.$courseId.'&id='.$typeid; $isopen = true;
+				 }
+				 $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconForum.png"> <a href="'.AppUtility::getURLFromHome('forum', 'forum/thread?cid='.$courseId.'&id='.$typeid.'"').'onclick="recordlasttreeview(\''.$itemtype.$typeid.'\')" target="readerframe">'.$line['name'].'</a></li>';
+			} else if ($line['itemtype']=="Calendar") {
+                $out .=  '<li><img class=too-small-icon src="'.AppUtility::getHomeURL().'/img/iconCalendar.png">
+                <a href="'.AppUtility::getURLFromHome('course', 'course/calendar?cid='.$courseId.'"'). 'target="readerframe">Calendar</a></li>';
+                if ($openitem=='' && $foundfirstitem=='') {
+                      $foundfirstitem = 'course/course/calendar.php?cid='.$courseId;
+                      $isopen = true;
+                }
+            }
+            }
+        }
+        return array($out,$isopen);
+    }
+
+    function upsendexceptions(&$items) {
+        global $exceptions;
+        $minsdate = 9999999999;
+        $maxedate = AppConstant::NUMERIC_ZERO;
+        foreach ($items as $k=>$item) {
+            if (is_array($item)) {
+                $hasexc = $this->upsendexceptions($items[$k]['items']);
+                if ($hasexc!=FALSE) {
+                    if ($hasexc[0]<$items[$k]['startdate']) {
+                        $items[$k]['startdate'] = $hasexc[0];
+                    }
+                    if ($hasexc[1]>$items[$k]['enddate']) {
+                        $items[$k]['enddate'] = $hasexc[1];
+                    }
+                    //return ($hasexc);
+                    if ($hasexc[0]<$minsdate) { $minsdate = $hasexc[0];}
+                    if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
+                }
+            } else {
+                if (isset($exceptions[$item])) {
+                    // return ($exceptions[$item]);
+                    if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
+                    if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
+                }
+            }
+        }
+        if ($minsdate<9999999999 || $maxedate>0) {
+            return (array($minsdate,$maxedate));
+        } else {
+            return false;
+        }
     }
 }

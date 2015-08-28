@@ -10,9 +10,9 @@ $this->title = ucfirst($course->name);
 <?php
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
+$jsAddress1 = AppUtility::getURLFromHome('course', 'course/index?cid='.$course->id);
 ?>
 <input type="hidden" class="calender-course-id" value="<?php echo $course->id?>">
-
 
 <!--Course name-->
 <div class="item-detail-header">
@@ -25,6 +25,38 @@ $now = $currentTime;
         </div>
     </div>
 </div>
+<div>
+<div class="col-lg-12">
+<?php
+if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbuttons)) {
+
+    if($previewshift > -1 && !$useviewbuttons) { ?>
+        <div class="col-lg-3">
+       <?php  echo _('Showing student view. Show view:') ?></div>
+        <div class="col-lg-3">
+        <?php echo ' <select id="pshift" class="form-control" onchange="changeshift()">';
+        echo '<option value="0" ';
+        if ($previewshift==0) {echo "selected=1";}
+        echo '>', _('Now'), '</option>';
+        echo '<option value="3600" ';
+        if ($previewshift==3600) {echo "selected=1";}
+        echo '>', _('1 hour from now'), '</option>';
+        echo '<option value="14400" ';
+        if ($previewshift==14400) {echo "selected=1";}
+        echo '>', _('4 hours from now'), '</option>';
+        echo '<option value="86400" ';
+        if ($previewshift==86400) {echo "selected=1";}
+        echo '>', _('1 day from now'), '</option>';
+        echo '<option value="604800" ';
+        if ($previewshift==604800) {echo "selected=1";}
+        echo '>', _('1 week from now'), '</option>';
+        echo '</select>';?> </div>
+        <div class="col-lg-2">
+        <?php echo " <a class=link-instructor href=".AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id).">", _('Back to instructor view'), "</a>";?>
+        </div>
+   <?php }
+}
+?> </div></div>
 <div class="item-detail-content">
     <?php echo $this->render("_toolbarStudent", ['course' => $course, 'section' => 'course', 'students' => $students]);?>
 </div>
@@ -1401,5 +1433,14 @@ $now = $currentTime;
         }
     }
 </script>
-
-
+<?php
+    if ($previewshift>-1) {
+?>
+<script type="text/javascript">
+    function changeshift() {
+        var shift = document.getElementById("pshift").value;
+        var toopen = '<?php echo $jsAddress1 ?>&stuview='+shift;
+        window.location = toopen;
+    }
+</script>
+<?php }?>

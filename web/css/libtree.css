@@ -41,6 +41,8 @@ span.btn {
 	padding-left: 2px;
 	padding-right: 2px;
 	border: 1px solid;
+    border-radius: 0;
+    line-height: 0;
 }
 span.dd {
 	font-family: monospace;
@@ -64,4 +66,4 @@ span.r5 {
 span.r8 {
 	color: #000;
 }
-		
+

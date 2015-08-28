@@ -2,7 +2,44 @@
 use app\components\AppUtility;
 $imasroot = AppUtility::getURLFromHome('block', 'block/tree-reader?cid='.$courseId.'&folder='.$params['folder'].'&recordbookmark=" + id');
 $imasroot1 = AppUtility::getHomeURL();
-$pageinhead = '<script type="text/javascript">function toggle(id) {
+
+$this->title = $blockName;
+$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+</div>
+<div class = "title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div id="leftcontent" style="width: 250px; margin-left: 20px">
+<img id="navtoggle" src="<?php echo $imasroot1;?>img/collapse.gif"  onclick="toggletreereadernav()"/>
+<ul id="leftcontenttext" class="nomark" style="margin-left:5px; font-size: 90%;">
+<?php
+
+$ul = $printList;
+echo $ul[0];
+
+
+?>
+</ul>
+<div id="bmrecout" style="display:none;"></div>
+</div>
+<div id="centercontent" style="margin-left: 260px;">
+    <iframe id="readerframe" name="readerframe" style="width:100%; border:1px solid #ccc;" src="<?php echo AppUtility::getHomeURL() . (($openitem=='')?$foundfirstitem:$foundopenitem); ?>"></iframe>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        addLoadEvent(resizeiframe);
+    });
+    function toggle(id) {
 	node = document.getElementById(id);
 	button = document.getElementById("b"+id);
 	if (node.className.match("show")) {
@@ -27,8 +64,8 @@ function recordlasttreeview(id) {
 }
 var treereadernavstate = 1;
 function toggletreereadernav() {
-	if (treereadernavstate==1) {
-		document.getElementById("leftcontent").style.width = "20px";
+	if (treereadernavstate == 1) {
+        document.getElementById("leftcontent").style.width = "28px";
 		document.getElementById("leftcontenttext").style.display = "none";
 		document.getElementById("centercontent").style.marginLeft = "30px";
 		document.getElementById("navtoggle").src= document.getElementById("navtoggle").src.replace(/collapse/,"expand");
@@ -52,4 +89,5 @@ function updateTRunans(aid, status) {
 	}
 }
 addLoadEvent(resizeiframe);
-</script>';
+
+</script>

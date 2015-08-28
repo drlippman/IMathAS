@@ -72,21 +72,40 @@ class CourseController extends AppController
         $assessmentSession = AssessmentSession::getAssessmentSession($this->getUserId(), $id);
         $exception = Exceptions::getTotalData($userId);
         $responseData = array();
+        $now = time();
         $calendarCount = array();
+        $useviewbuttons = false;
+        $previewshift = $this->getParamVal('stuview');
         $course = Course::getById($courseId);
+        $topbar = explode('|',$course['topbar']);
+        $topbar[0] = explode(',',$topbar[0]);
+        $topbar[1] = explode(',',$topbar[1]);
+        if (!isset($topbar[2])) {
+            $topbar[2] = 0;
+        }
+        if ($topbar[0][0] == null) {
+            unset($topbar[0][0]);
+        }
+        if ($topbar[1][0] == null) {
+            unset($topbar[1][0]);
+        }
+
         if ($course && ($itemOrders = unserialize($course->itemorder))) {
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
                 if (is_array($itemOrder) || count($blockItems = $itemOrder['items'])) {
                     $tempAray['Block'] = $itemOrder;
-                    $blockItems = $itemOrder['items'];
                     $tempItemList = array();
                     $blockItems = $itemOrder['items'];
+
                     foreach ($blockItems as $blockKey => $blockItem) {
                         $tempItem = array();
                         $item = Items::getById($blockItem);
+
                         switch ($item->itemtype) {
+
                             case 'Assessment':
+                                AppUtility::dump($item);
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
                                 $tempItem[$item->itemtype] = $assessment;
                                 array_push($calendarCount, $assessment);
@@ -111,6 +130,7 @@ class CourseController extends AppController
                                 $tempItem[$item->itemtype] = $inlineText;
                                 break;
                         }
+
                         array_push($tempItemList, $tempItem);
                     }
                     $tempAray['itemList'] = $tempItemList;
@@ -120,14 +140,29 @@ class CourseController extends AppController
                     switch ($item->itemtype) {
                         case 'Assessment':
                             $assessment = Assessments::getByAssessmentId($item->typeid);
-                            $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
-                            if($exception){
-                                $assessment->startdate = $exception->startdate;
-                                $assessment->enddate = $exception->enddate;
+                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                               if($assessment['enddate'] > ($now + $previewshift))
+                               {
+                                   $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
+                                   if($exception){
+                                       $assessment->startdate = $exception->startdate;
+                                       $assessment->enddate = $exception->enddate;
+                                   }
+                                   $tempAray[$item->itemtype] = $assessment;
+                                   array_push($responseData, $tempAray);
+                                   array_push($calendarCount, $assessment);
+                               }
+                            }else
+                            {
+                                $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
+                                if($exception){
+                                    $assessment->startdate = $exception->startdate;
+                                    $assessment->enddate = $exception->enddate;
+                                }
+                                $tempAray[$item->itemtype] = $assessment;
+                                array_push($responseData, $tempAray);
+                                array_push($calendarCount, $assessment);
                             }
-                            $tempAray[$item->itemtype] = $assessment;
-                            array_push($responseData, $tempAray);
-                            array_push($calendarCount, $assessment);
                             break;
                         case 'Calendar':
                             $tempAray[$item->itemtype] = $itemOrder;
@@ -135,24 +170,53 @@ class CourseController extends AppController
                             break;
                         case 'Forum':
                             $form = Forums::getById($item->typeid);
-                            $tempAray[$item->itemtype] = $form;
-                            array_push($responseData, $tempAray);
-
+                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                                if($form['enddate'] > ($now + $previewshift))
+                                {
+                                    $tempAray[$item->itemtype] = $form;
+                                    array_push($responseData, $tempAray);
+                                }
+                            } else
+                            {
+                                $tempAray[$item->itemtype] = $form;
+                                array_push($responseData, $tempAray);
+                            }
                             break;
                         case 'Wiki':
                             $wiki = Wiki::getById($item->typeid);
-                            $tempAray[$item->itemtype] = $wiki;
-                            array_push($responseData, $tempAray);
+                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                                if($wiki['enddate'] > ($now + $previewshift)){
+                                    $tempAray[$item->itemtype] = $wiki;
+                                    array_push($responseData, $tempAray);
+                                }
+                            }else{
+                                $tempAray[$item->itemtype] = $wiki;
+                                array_push($responseData, $tempAray);
+                            }
                             break;
                         case 'InlineText':
                             $inlineText = InlineText::getById($item->typeid);
-                            $tempAray[$item->itemtype] = $inlineText;
-                            array_push($responseData, $tempAray);
+                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                                if($inlineText['enddate'] > ($now + $previewshift)){
+                                    $tempAray[$item->itemtype] = $inlineText;
+                                    array_push($responseData, $tempAray);
+                                }
+                            }else{
+                                $tempAray[$item->itemtype] = $inlineText;
+                                array_push($responseData, $tempAray);
+                            }
                             break;
                         case 'LinkedText':
                             $linkedText = Links::getById($item->typeid);
-                            $tempAray[$item->itemtype] = $linkedText;
-                            array_push($responseData, $tempAray);
+                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                                if($linkedText['enddate'] > ($now + $previewshift)){
+                                    $tempAray[$item->itemtype] = $linkedText;
+                                    array_push($responseData, $tempAray);
+                                }
+                            }else{
+                                $tempAray[$item->itemtype] = $linkedText;
+                                array_push($responseData, $tempAray);
+                            }
                             break;
                     }
                 }
@@ -170,9 +234,10 @@ class CourseController extends AppController
                     array_push($msgList, $singleMessage);
             }
         }
+
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception);
+        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception, 'topbar1' => $topbar[0], 'topbar2' => $topbar[2], 'previewshift' => $previewshift, 'useviewbuttons' => $useviewbuttons);
         return $this->render('index', $returnData);
     }
     /**

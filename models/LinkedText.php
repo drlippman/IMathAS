@@ -137,4 +137,5 @@ class LinkedText extends BaseImasLinkedtext
         $query = LinkedText::find()->where(['courseid' => $courseId])->all();
         return $query;
     }
+
 }

@@ -12,6 +12,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasItems;
+use Yii;
 
 class Items extends BaseImasItems
 {
@@ -77,5 +78,12 @@ class Items extends BaseImasItems
         $query .= "ON ii.typeid=ia.id AND ii.itemtype='Assessment' WHERE ii.courseid='$cid' AND ia.id<>'$aid'";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
+    }
+
+    public static function getByItem($item)
+    {
+        $query = Yii::$app->db->createCommand("SELECT itemtype,typeid FROM imas_items WHERE id=:item");
+        $query->bindValue('item', $item);
+        return $query->queryOne();
     }
 }

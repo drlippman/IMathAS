@@ -176,8 +176,8 @@ function togglepic(el) {
 
 
 //from http://www.webreference.com/programming/javascript/onloads/
-function addLoadEvent(func) { 
-	  var oldonload = window.onload; 
+function addLoadEvent(func) {
+	  var oldonload = window.onload;
 	  if (typeof window.onload != 'function') { 
 	    window.onload = func; 
 	  } else { 

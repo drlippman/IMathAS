@@ -172,7 +172,7 @@ body {
 }
 
 .item-detail-content{
-    padding-top: 30px;
+    padding-top: 40px;
     /*box-shadow: 0 0 5px 5px #888;*/
 
 }
@@ -426,9 +426,17 @@ i.fa-home{
     margin-left: 10px;
     cursor: pointer;
 }
+
 .margin-left-fifteen {
     margin-left: 15px;
 }
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus .grey-color-link {
     border: none;
+}
+.too-small-icon{
+    height: 14px;
+    width: 14px;
+}
+.link-instructor:active, .link-instructor:hover{
+    color: #428bca;
 }
