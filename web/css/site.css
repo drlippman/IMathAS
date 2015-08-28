@@ -1086,9 +1086,25 @@ div.review {
 .margin-top-twentyfour {
     margin-top: 24px;
 }
-/*.margin-left-twentythree-per {*/
-    /*margin-left: 23.5%;*/
-/*}*/
 .margin-left-twentyone {
     margin-left: 21px;
+}
+.course-sub-block {
+    margin-left: 46px;
+    border-left:1px solid #a9a9a9;
+    border-bottom: 1px solid #ffffff;
+}
+.nav-tabs .dropdown-menu {
+    max-width: 100%;
+    overflow-x: scroll;
+}
+.nav-tabs .roster-enroll-options a{
+    padding: 3px 5px !important;
+}
+.display-item-details .blockitems .course-sub-block .item{
+    margin-right: 0px !important;
+    border-right: 1px solid #ffffff;
+}
+.display-item-details .blockitems .course-sub-block .item .course-setting-button {
+    margin-right: 25px !important;
 }

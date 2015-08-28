@@ -450,8 +450,8 @@ class CourseItemsUtility extends Component
         <!--Link type : external tool-->
     <?php } elseif (substr($link->text, 0, 8) == 'exttool:') { ?>
         <div class="item">
-            <img alt="link to html" class="floatleft"
-                 src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+            <img alt="link to html" class="floatleft item-icon-alignment"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/link.png"/>
 
             <div class="title">
                 <!--open on new window or on same window-->
@@ -510,8 +510,8 @@ class CourseItemsUtility extends Component
         </div>
     <?php } else { ?>
         <div class="item">
-            <img alt="link to html" class="floatleft"
-                 src="<?php echo AppUtility::getHomeURL() ?>img/html.png"/>
+            <img alt="link to html" class="floatleft item-icon-alignment"
+                 src="<?php echo AppUtility::getHomeURL() ?>img/link.png"/>
 
             <div class="title">
                 <?php if ($link->target != 0) { ?>
@@ -817,6 +817,7 @@ class CourseItemsUtility extends Component
             </div>
         </div>
         <div class="blockitems block-alignment" id="block5<?php echo $block['id']?>">
+            <div class="course-sub-block">
             <?php if (count($item['itemList'])) { ?>
                 <?php $blockList = array();
                 $countCourseDetails = count($item['itemList']);
@@ -870,7 +871,9 @@ class CourseItemsUtility extends Component
                         <?php endswitch; ?>
                 <?php } ?>
             <?php } ?>
+            </div>
             <?php $this->AddItemsDropDown();?>
+
         </div>
         <div class="clear"></div>
     <?php }

@@ -15,7 +15,7 @@ use app\components\AppUtility;
         </li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Enroll Students');?><span class="caret"></span></a>
-            <ul class="dropdown-menu enroll-options">
+            <ul class="dropdown-menu enroll-options roster-enroll-options">
                 <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>"><?php AppUtility::t('Enroll Student with known username');?></a></li>
                 <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>"><?php AppUtility::t('Enroll Student from another Course');?></a></li>
                 <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>"><?php AppUtility::t('Create and Enroll new student');?></a></li>

@@ -52,9 +52,9 @@ div.block, div.blockitems div.blockitems div.block {
 	border-radius: 4px 4px 0 0;
 }
 div.blockitems, div.blockitems div.blockitems div.blockitems {
-	padding: 10px 0px;
+	padding-top: 20px;
 	margin-top: -10px;
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 }
 div.hidden {
 	display:none;
