@@ -522,7 +522,7 @@ class RosterController extends AppController
         $course = Course::getById($courseId);
         $studentRecords = '';
         $this->includeCSS(['roster/roster.css']);
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $params = $this->getRequestParams();
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {
@@ -1420,7 +1420,7 @@ class RosterController extends AppController
         $studentData = Student::getByCourseId($courseId, $userId);
         $user = User::findByUserId($userId);
         $model = new ChangeUserInfoForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
             if ($model->file) {

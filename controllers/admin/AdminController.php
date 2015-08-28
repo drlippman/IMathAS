@@ -22,6 +22,7 @@ class AdminController extends AppController
         $sortBy = AppConstant::FIRST_NAME;
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
+
         $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         return $this->renderWithData('index', ['users' => $users]);
@@ -33,7 +34,7 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $model = new AddNewUserForm();
-        if ($model->load($this->getPostData())){
+        if ($model->load($this->isPostMethod())){
             $params = $this->getRequestParams();
             $params = $params['AddNewUserForm'];
             $params['SID'] = $params['username'];
@@ -54,7 +55,7 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $model = new AdminDiagnosticForm();
-        if ($model->load($this->getPostData()))
+        if ($model->load($this->isPostMethod()))
         {
             $params = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
@@ -89,7 +90,7 @@ class AdminController extends AppController
         $this->guestUserHandler();
         $id = $this->getParamVal('id');
         $model = new ChangeRightsForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $params = $this->getRequestParams();
             $params = $params['ChangeRightsForm'];
             User::updateRights($id, $params['rights'], $params['groupid']);

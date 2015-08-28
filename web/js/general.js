@@ -264,7 +264,6 @@ function GB_hide() {
 }
 
 function chkAllNone(frmid, arr, mark, skip) {
-
   var frm = document.getElementById(frmid);
   for (i = 0; i <= frm.elements.length; i++) {
    try{

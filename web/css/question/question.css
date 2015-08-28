@@ -11,3 +11,25 @@
     padding-right: 0;
     width: 18%;
 }
+.question-checkbox{
+    margin-left: 20px;
+}
+.question-table{
+    width: 100%;
+}
+.question-check{
+    padding-left: 26px;
+}
+.small-preview-icon{
+    height: 12px;
+}
+
+.add-btn-question
+{
+    margin-right: 6px;
+    width: 60px;
+}
+.question-preview-btn
+{
+    width: 100px;
+}

@@ -1,10 +1,27 @@
 $(document).ready(function () {
     selectCheckBox();
+    selectCheckBox1();
     $('input[name = "header-checked"]:checked').prop('checked', false);
+    $('input[name = "header-checked1"]:checked').prop('checked', false);
 });
 
 function selectCheckBox() {
-    $('.question-table input[name = "header-checked"]').click(function(){
+
+    $('.potential-question-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('#potential-question-information-table input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('#potential-question-information-table input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
+}
+function selectCheckBox1() {
+    $('.question-table input[name = "header-checked1"]').live("click",function(){
         if($(this).prop("checked") == true){
             $('#question-information-table input:checkbox').each(function () {
                 $(this).prop('checked', true);
@@ -16,24 +33,6 @@ function selectCheckBox() {
             })
         }
     });
-    //$('.non-locked').click(function () {
-    //    $('#student-information-table input:checkbox').each(function () {
-    //        var selectedEntry = $(this).val();
-    //        var lockedStudent = 0;
-    //        $.each(studentData, function (index, student) {
-    //            if(selectedEntry == student.id){
-    //                if(student.locked != 0){
-    //                    lockedStudent = 1;
-    //                }
-    //            }
-    //        });
-    //        if (lockedStudent == 0) {
-    //            $(this).prop('checked', true);
-    //        } else {
-    //            $(this).prop('checked', false);
-    //        }
-    //    })
-    //});
 }
 
 function moveitem(from) {

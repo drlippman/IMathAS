@@ -240,7 +240,7 @@ class CourseController extends AppController
         $this->guestUserHandler();
         $this->layout = 'master';
         $model = new CourseSettingForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $isSuccess = false;
             $courseData = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
@@ -278,7 +278,7 @@ class CourseController extends AppController
         $course = Course::getById($courseId);
         if ($course) {
             $model = new CourseSettingForm();
-            if ($model->load($this->getPostData())) {
+            if ($model->load($this->isPostMethod())) {
                 $courseData = $this->getRequestParams();
                 $params = $courseData['CourseSettingForm'];
                 $courseSetting['name'] = $params['courseName'];

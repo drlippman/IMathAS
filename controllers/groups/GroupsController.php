@@ -54,7 +54,7 @@ class GroupsController extends AppController
             $addGrp = $this->getParamVal('addGrp');
             $params = $this->getRequestParams();
             $newGrpName = $params['grpname'];
-            $addStuToGrp = $this->getParam('addstutogrp');
+            $addStuToGrp = $this->getParamVal('addstutogrp');
             $stuToAdd = $params['stutoadd'];
             if(isset($addGrp) && isset($newGrpName) && isset($grpSetId))
             {

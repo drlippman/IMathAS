@@ -127,12 +127,10 @@ class Wiki extends BaseImasWikis
     public static function updateWikiById($startdate, $enddate, $avail, $id)
     {
         $wiki = Wiki::findOne(['id' => $id]);
-//        print_r($enddate);print_r("//////////////");
         if($wiki){
             $wiki->startdate = $startdate;
             $wiki->enddate = $enddate;
             $wiki->avail = $avail;
-//        AppUtility::dump($wiki);
             $wiki->save();
         }
 

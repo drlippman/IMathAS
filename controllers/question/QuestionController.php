@@ -579,7 +579,7 @@ class QuestionController extends AppController
                                 } else {
                                     $page_questionTable[$i]['desc'] = filter($line['description']);
                                 }
-                                $page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\"/>";
+                                $page_questionTable[$i]['preview'] = "<button class='question-preview-btn'><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/prvAssess.png'."' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
                                 $page_questionTable[$i]['type'] = $line['qtype'];
                                 $avgtimepts = explode(',', $line['avgtime']);
                                 if ($avgtimepts[0]>0) {
@@ -638,7 +638,7 @@ class QuestionController extends AppController
                                 }
 
 
-                                $page_questionTable[$i]['add'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$aid.'&cid='.$cid).">Add</a>";
+                                $page_questionTable[$i]['add'] = "<a class='btn btn-primary add-btn-question' href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$aid.'&cid='.$cid)."><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/addItem.png'."'>&nbsp; Add</a>";
 
                                 if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userId) {
                                     $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>";
@@ -780,7 +780,7 @@ class QuestionController extends AppController
             }
         }
         $this->includeCSS(['question/question.css','course/course.css','roster/roster.css']);
-        $this->includeJS(['tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js']);
+        $this->includeJS(['jquery.min.js','question/addqsort.js','question/addquestions.js','tablesorter.js','general.js','question/junkflag.js']);
         $responseArray = array('course' => $course,'assessmentId' => $aid,'params' => $params, 'overwriteBody'=>$overwriteBody, 'body'=> $body,
             'defpoints' => $defpoints,'searchlibs' => $searchlibs,'beentaken' => $beentaken, 'pageAssessmentName' => $page_assessmentName,
             'itemorder' => $itemorder, 'sessiondata' => $sessiondata, 'jsarr'=>$jsarr, 'displaymethod' => $displaymethod,'lnames'=>$lnames,

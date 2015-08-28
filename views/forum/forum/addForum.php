@@ -267,7 +267,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         <label class="padding-left non-bold"><?php AppUtility::t('Replies')?><span class="padding-left"><input type="text" name="calendar-icon-text2" value="<?php echo $defaultValue['replyTag'];?>" size="2"></span></label>
                             </div><br class=form>
                     </div>
-<!--        --><?php //AppUtility::dump($defaultValue['rubric']); ?>
                  <div class="item-alignment">
                     <div class=col-lg-2><?php AppUtility::t('Count in gradebook?')?></div>
                     <div class=col-lg-10>

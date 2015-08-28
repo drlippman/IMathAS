@@ -31,20 +31,9 @@ class AppController extends Controller
 
     public $enableCsrfValidation = false;
 
-
-    function getBodyParams()
-    {
-        return $_POST;
-    }
-
     function getRequestParams()
     {
         return $_REQUEST;
-    }
-
-    function getParam($key)
-    {
-        return $_REQUEST[$key];
     }
 
     function setSuccessFlash($message)
@@ -137,11 +126,6 @@ class AppController extends Controller
 
     public function isPost(){
         return Yii::$app->request->getMethod() == 'POST';
-    }
-
-    public function getPostData()
-    {
-        return Yii::$app->request->post();
     }
 
     public function successResponse($data = '')

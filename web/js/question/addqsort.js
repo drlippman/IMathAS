@@ -242,18 +242,19 @@ function generateTable() {
 	var ln = 0;
 	var pttotal = 0;
 	var html = '';
-	html += "<table cellpadding=5 class=gb><thead><tr>";
+	html += "<table cellpadding=5 class=question-table><thead><tr>";
 	if (!beentaken) {
-		html += "<th></th>";
+		html += "<th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked1' value=''>" +
+        "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Preview</th><th>Type</th><th>Points</th><th>Settings</th><th>Source</th>";
-	if (beentaken) {
-		html += "<th>Clear Attempts</th><th>Withdraw</th>";
-	} else {
-		html += "<th>Template</th><th>Remove</th>";
-	}
-	html += "</thead><tbody>";
+	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Type</th><th>Points</th><th>Action</th><th></th>";
+	//if (beentaken) {
+	//	html += "<th>Clear Attempts</th><th>Withdraw</th>";
+	//} else {
+	//	html += "<th></th><th></th>";
+	//}
+	html += "</thead><tbody id='question-information-table'>";
 	for (var i=0; i<itemcount; i++) {
 		if (itemarray[i].length<5) { //is group
 			curitems = itemarray[i][2];
@@ -290,7 +291,7 @@ function generateTable() {
 				html += "<input type=hidden id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/>";
 				html += "</td>";
 			} else {
-				html += "<td>";
+				html += "<td class='question-check'>";
 				if (j==0) {
 					if (!curisgroup) {
 						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
@@ -357,11 +358,7 @@ function generateTable() {
 			}  
 			html += "</div></td>";
 			html += "<td>"+curitems[j][1]+"</td>";
-			if (beentaken) {
-				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
-			} else {
-				html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
-			}
+
 			html += "<td>"+curitems[j][3]+"</td>"; //question type
 			if (curitems[j][4]==9999) { //points
 				html += "<td>"+defpoints+"</td>";
@@ -370,23 +367,36 @@ function generateTable() {
 				html += "<td>"+curitems[j][4]+"</td>";
 				curpt = curitems[j][4];
 			}
-			html += "<td class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Change</a></td>"; //settings
-			if (curitems[j][5]) {
-				html += "<td class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit
-			} else {
-				html += "<td class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\">Edit</a></td>"; //edit makelocal
-			}
-			if (beentaken) {
-				html += "<td><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\">Clear Attempts</a></td>"; //add link
-				if (curitems[j][6]==1) {
-					html += "<td><span class='red'>Withdrawn</span></td>";
-				} else {
-					html += "<td><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\">Withdraw</a></td>";
-				}
-			} else {
-				html += "<td class=c><a href=\"mod-data-set.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\">Template</a></td>"; //add link
-				html += "<td class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\">Remove</a></td>"; //add link and checkbox
-			}
+            //Action
+            html += "<td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>" +
+            "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+            "<ul class='dropdown-menu'>" +
+            "<li class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Change</a></li>" ;//settings
+            if (curitems[j][5]) {
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Edit</a></li>";//edit
+            } else {
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Edit</a></li>";//edit makelocal
+            }
+
+            if (beentaken) {
+                html += "<li><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&clearqattempts="+curitems[j][0]+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Clear Attempts</a></li>";//edit
+                if (curitems[j][6]==1) {
+                    html += "<li><span class='red'>Withdrawn</span></li>";
+                } else {
+                    html += "<li><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Withdrawn</a></li>";
+                }
+            } else {
+                html += "<li class=c><a href=\"mod-data-set.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Template</a></li>";//add link
+                html += "<li class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\"><img class='small-icon' src='../../img/gradebook.png'></i> Remove</a></li>";//add link and checkbox
+            }
+
+            html += "</ul></div></td>";
+
+            if (beentaken) {
+                html += "<td class='c'><button class='question-table'>  <img class = 'small-preview-icon' src='../../img/prvAssess.png' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">&nbsp;Preview</button></td>"; //Preview
+            } else {
+                html += "<td class='c'><button class='question-table'>  <img class = 'small-preview-icon' src='../../img/prvAssess.png' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">&nbsp;Preview</button></td>"; //Preview
+            }
 			html += "</tr>";
 			ln++;
 		}

@@ -271,7 +271,6 @@ class Questions extends BaseImasQuestions
             $questionData->rubric = $params['rubric'];
             $questionData->showhints = $params['showhints'];
             $questionData->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : $questionData['questionsetid'];
-//            AppUtility::dump($questionData);
             $questionData->save();
         }
     }

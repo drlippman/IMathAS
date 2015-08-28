@@ -151,7 +151,7 @@ class SiteController extends AppController
         $flashMsg ='';
         $this->layout = 'nonLoggedUser';
         $model = new StudentRegisterForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $params = $this->getRequestParams();
             $params = $params['StudentRegisterForm'];
             $status = User::createStudentAccount($params);
@@ -195,7 +195,7 @@ class SiteController extends AppController
     {
         $this->layout = 'nonLoggedUser';
         $model = new ForgotPasswordForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
                 $param = $this->getRequestParams();
                 $username = $param['ForgotPasswordForm']['username'];
                 $user = User::findByUsername($username);
@@ -233,7 +233,7 @@ class SiteController extends AppController
     {
         $this->layout = 'nonLoggedUser';
         $model = new ForgotUsernameForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
             $toEmail = $param['ForgotUsernameForm']['email'];
             $user = User::findByEmail($toEmail);
@@ -351,7 +351,7 @@ class SiteController extends AppController
         $this->guestUserHandler();
         $this->layout = 'nonLoggedUser';
         $model = new ChangePasswordForm();
-        if ($model->load($this->getPostData())) {
+        if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();
 
             $oldPass = $param['ChangePasswordForm']['oldPassword'];
@@ -384,7 +384,7 @@ class SiteController extends AppController
         $userid = $this->getUserId();
         $user = User::findByUserId($userid);
         $model = new ChangeUserInfoForm();
-        if ($model->load($this->getPostData()) && $model->checkPassword()) {
+        if ($model->load($this->isPostMethod()) && $model->checkPassword()) {
             $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
