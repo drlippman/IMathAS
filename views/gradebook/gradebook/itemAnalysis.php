@@ -11,12 +11,12 @@ $this->title = 'Item Analysis';?>
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Gradebook','Averages'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?stu=0&cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?stu='.$student.'&cid='.$course->id], 'page_title' => $this->title]);
     } else if ($from=='isolate') {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,'#'], 'page_title' => $this->title]);
-/* pass same parameters when assigne hyper link to isolateassessgrade page
+/* pass same parameters when assign hyper link to isolateassessgrade page
  *  echo "&gt; <a href=\"isolateassessgrade.php?cid=$courseId&aid=$assessmentId\"></a> ";
  */
     } else if ($from=='gisolate') {
       echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'View Group Scores'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id,'#'], 'page_title' => $this->title]);
-/*pass same parameters when assigne hyper link to isolateassessbygroup page
+/*pass same parameters when assign hyper link to isolateassessbygroup page
  *     echo "&gt; <a href=\"isolateassessbygroup.php?cid=$courseId&aid=$assessmentId\"></a> ";
  */
     } ?>
@@ -35,7 +35,7 @@ if (!$isTeacher) {
     echo "This page not available to students";
     exit;
 }
-$imasroot= AppUtility::getBasePath();
+$imasroot= AppUtility::getHomeURL();
 $placeinhead = '<script type="text/javascript">';
 $placeinhead .= '$(function() {$("a[href*=\'gradeallq\']").attr("title","'._('Grade this question for all students').'");});';
 $placeinhead .= 'function previewq(qn) {';
@@ -48,9 +48,9 @@ $placeinhead .= '<style type="text/css"> .manualgrade { background: #ff6;} td.po
      */
 
 //echo "&gt; Item Analysis";
-
-echo '<br><div class="cpmid item-analysis"><a href="isolateassessgrade.php?cid='.$courseId.'&amp;aid='.$assessmentId.'">View Score List</a></div>';
-
+?>
+    <br><div class="cpmid item-analysis"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$courseId.'&amp;aid='.$assessmentId)?>">View Score List</a></div>
+<?php
 echo '<div id="headergb-itemanalysis" class="pagetitle item-analysis"><h2>Item Analysis: ';
 $defpoints = $assessmentData['defpoints'];
 $aname = $assessmentData['name'];
@@ -59,10 +59,12 @@ $defoutcome = $assessmentData['defoutcome'];
 $showhints  = $assessmentData['showhints'];
 echo $aname.'</h2></div>';
     echo '<div class="item-analysis">';
+$root = AppUtility::getHomeURL().'instructor/instructor/item-analysis-detail?cid='.$courseId.'&aid='.$assessmentId.'&qid='.$qid.'&type=notstart';
+
 if ($notstarted==0) {
     echo '<p>All students have started this assessment. ';
 } else {
-    echo "<p><a href=\"#\" onclick=\"GB_show('Not Started','gb-itemanalysisdetail.php?cid=$cid&aid=$aid&qid=$qid&type=notstart',500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
+    echo "<p><a href=\"#\" onclick=\"GB_show('Not Started',$root,500,300);return false;\">$notstarted student".($notstarted>1?'s':'')."</a> ($nonstartedper%) ".($notstarted>1?'have':'has')." not started this assessment.  They are not included in the numbers below. ";
 }
 echo '</p>';
 //echo '<a href="isolateassessgrade.php?cid='.$cid.'&aid='.$aid.'">View Score List</a>.</p>';
@@ -80,7 +82,6 @@ echo "<tbody>";
 
 if (count($qtotal)>0) {
     $i = 1;
-    //$qs = array_keys($qtotal);
     $descrips = array();
     $points = array();
     $withdrawn = array();
@@ -111,6 +112,7 @@ if (count($qtotal)>0) {
 
     $avgscore = array();
     $qs = array();
+
     foreach ($itemarr as $qid) {
         if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
         $pts = $points[$qid];
@@ -221,9 +223,9 @@ echo 'All averages only include those who have started the assessment</p>';
 }
 echo '<div class="cpmid">Experimental:<br/>';
 echo "<a href=\"gb-itemresults.php?cid=$cid&amp;aid=$aid\">Summary of assessment results</a> (only meaningful for non-randomized questions)<br/>";
-
-echo "<a href=\"gb-aidexport.php?cid=$cid&amp;aid=$aid\">Export student answer details</a></div>";
-    echo '</div><br>';
+?>
+ <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/assessment-export?cid='.$course->id.'&aid='.$assessmentId);?>">Export student answer details</a></div>
+  <?  echo '</div><br>';
     echo '</div>';
 
 function getpts($sc) {

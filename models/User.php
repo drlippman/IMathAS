@@ -325,4 +325,39 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $data;
 
     }
+
+    public static function getNameByIdUsingINClause($ids)
+    {
+
+//        $query = new Query();
+        $query = "SELECT LastName,FirstName,id FROM imas_users WHERE id IN ($ids)";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+//        $query -> select(['LastName','FirstName','id'])
+//            ->from('imas_users')
+//            ->where(['id $ids IN']);
+//
+//        $command = $query->createCommand();
+//        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function findUserDataForIsolateAssessmentGrade($isTutor,$tutorsection,$aid,$cid,$hidelocked,$sortorder,$hassection)
+    {
+        $query = "SELECT iu.LastName,iu.FirstName,istu.section,istu.timelimitmult,";
+        $query .= "ias.id,istu.userid,ias.bestscores,ias.starttime,ias.endtime,ias.timeontask,ias.feedback,istu.locked FROM imas_users AS iu JOIN imas_students AS istu ON iu.id = istu.userid AND istu.courseid='$cid' ";
+        $query .= "LEFT JOIN imas_assessment_sessions AS ias ON iu.id=ias.userid AND ias.assessmentid='$aid' WHERE istu.courseid='$cid' ";
+        if ($isTutor && isset($tutorsection) && $tutorsection!='') {
+            $query .= " AND istu.section='$tutorsection' ";
+        }
+        if ($hidelocked) {
+            $query .= ' AND istu.locked=0 ';
+        }
+        if ($hassection && $sortorder=="sec") {
+            $query .= " ORDER BY istu.section,iu.LastName,iu.FirstName";
+        } else {
+            $query .= " ORDER BY iu.LastName,iu.FirstName";
+        }
+        $data = Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

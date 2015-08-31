@@ -167,7 +167,6 @@ class ForumController extends AppController
                 $this->includeJS(['forum/forum.js']);
                 return $this->successResponse($forumArray);
             }
-
     }
 /*Controller action to show new post to user*/
     public function actionNewPost()
@@ -534,6 +533,7 @@ class ForumController extends AppController
         if($isTeacher || $isTutor){
             $canViewAll = true;
         }
+        $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId,$currentUser['id']);
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
              foreach($FullThread as $singleThreadArray){
@@ -655,7 +655,7 @@ class ForumController extends AppController
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
-        $responseData = array('postdata' => $FinalPostArray,'allowReply' => $allowReply,'canViewAll' => $canViewAll,'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
+        $responseData = array('atLeastOneThread' => $atLeastOneThread,'postdata' => $FinalPostArray,'allowReply' => $allowReply,'canViewAll' => $canViewAll,'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
         return $this->render('post', $responseData);
     }
 
@@ -1029,6 +1029,7 @@ class ForumController extends AppController
         $responseData = array('displayCountData' => $countDataArray);
         return $this->successResponse($responseData);
     }
+
     public function actionMarkAllReadAjax()
     {
         $this->guestUserHandler();
@@ -1379,7 +1380,6 @@ class ForumController extends AppController
 
     public function flatArray($outcomesData)
     {
-        global $pageOutcomesList;
         if ($outcomesData) {
             foreach ($outcomesData as $singleData) {
                 if (is_array($singleData)) { //outcome group
@@ -1400,7 +1400,6 @@ class ForumController extends AppController
       $isTeacher = $this->isTeacher($currentUser->id,$courseId);
       $course = Course::getById($courseId);
       $this->layout = "master";
-//prep for output
       $forumItems = array();
       $sort = AppConstant::ASCENDING;
       $orderBy = 'name';
@@ -1424,7 +1423,6 @@ class ForumController extends AppController
       }
       if($this->isPostMethod()) {
           $params = $this->getRequestParams();
-
            if (isset($params['checked'])) { //form submitted
               $count = AppConstant::NUMERIC_ZERO;
               foreach($params as $key=>$singleParams){
@@ -1467,7 +1465,7 @@ class ForumController extends AppController
               }
               $sops = array();
               if (isset($params['chg-allow-anon'])) {
-                  if (isset($params['allow-anonymous-posts']) && $params['allow-anonymous-posts'] == 1) {
+                  if (isset($params['allow-anonymous-posts']) && $params['allow-anonymous-posts'] == AppConstant::NUMERIC_ONE) {
                       //turn on 1's bit
                       $sops[] = " | 1";
                   } else {
@@ -1476,7 +1474,7 @@ class ForumController extends AppController
                   }
               }
               if (isset($params['chg-allow-mod'])) {
-                  if (isset($params['allow-students-to-modify-posts']) && $params['allow-students-to-modify-posts'] == 1) {
+                  if (isset($params['allow-students-to-modify-posts']) && $params['allow-students-to-modify-posts'] == AppConstant::NUMERIC_ONE) {
                       //turn on 2's bit
                       $sops[] = " | 2";
                   } else {
@@ -1485,7 +1483,7 @@ class ForumController extends AppController
                   }
               }
               if (isset($params['chg-allow-del'])) {
-                  if (isset($params['allow-students-to-delete-own-posts']) && $params['allow-students-to-delete-own-posts'] == 1) {
+                  if (isset($params['allow-students-to-delete-own-posts']) && $params['allow-students-to-delete-own-posts'] == AppConstant::NUMERIC_ONE) {
                       //turn on 4's bit
                       $sops[] = " | 4";
                   } else {

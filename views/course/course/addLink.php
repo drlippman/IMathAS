@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php $form = ActiveForm::begin([
     'validateOnSubmit' => false,
     'options' => ['enctype'=>'multipart/form-data'],
-            'action' => 'add-link?cid='.$course['id'].'&modifyLinkId='.$linkData['id'],
+            'action' => 'add-link?cid='.$course['id'].'&id='.$linkData['id'],
 ]);
 ?>
     <?php }else{ ?>
@@ -88,14 +88,24 @@ $this->params['breadcrumbs'][] = $this->title;
     				<input size="80" name="web" value="<?php echo htmlentities($defaultValues['webaddr']); ?>"/>
     			</div><br class="form">
     </div>
+
     <div id="fileinput" style="display:<?php echo ($a['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
         <div class="col-lg-2"><?php AppUtility::t('File')?></div>
         <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
-    			<div class="col-lg-10">
+    	<span class="formright">
+			<?php if ($defaultValues['filename'] != ' ') {
+                echo '<input type="hidden" name="curfile" value="'.$defaultValues['filename'].'"/>';
+//                $alink = getcoursefileurl($filename);
+//                $alink = AppUtility::getBasePath().'/Uploads/'.$course->id.'/'.$defaultValues['filename'];
+                echo 'Current file: <a href="'.$alink.'">'.basename($defaultValues['filename']).'</a><br/>Replace ';
+            } else {
+                echo 'Attach ';
+            } ?>
+            </span>
+        <div class="col-lg-10">
                     <?php
                      echo $form->field($model, 'file')->fileInput();
                     ?>
-
 <!--                    file (Max 10MB)<sup>*</sup>: <input name="userfile" type="file"/>-->
     			</div><br class="form">
     </div>
@@ -173,8 +183,8 @@ $this->params['breadcrumbs'][] = $this->title;
         style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_ONE) ? "block" : "none"; ?>">
         <div class=col-lg-2><?php AppUtility::t('Available After')?></div>
 			<div class=col-lg-10>
-                <input type=radio name="available-after" class="pull-left" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['startDate'], "0", AppConstant::NUMERIC_ZERO); ?>/><span class="pull-left padding-left"><?php AppUtility::t("Always until end date")?></span>
-                <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="available-after" class="pull-left" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['startDate'], "1", AppConstant::NUMERIC_ONE); ?>/></label>
+                <input type=radio name="available-after" class="pull-left" value="0" <?php if($defaultValues['startDate'] == 0){ echo 'checked=1';} ?>/><span class="pull-left padding-left"><?php AppUtility::t("Always until end date")?></span>
+                <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="available-after" class="pull-left" value="1" <?php if($defaultValues['startDate'] == 1){ echo 'checked=1';} ?>/></label>
                     <?php
                     echo '<div class = "time-input pull-left col-lg-4">';
                     echo DatePicker::widget([
@@ -235,9 +245,9 @@ $this->params['breadcrumbs'][] = $this->title;
 		  <BR class=form>
         <div class=col-lg-2><?php AppUtility::t('Place on Calendar?')?></div>
 		 <div class=col-lg-10>
-             <input type=radio name="place-on-calendar" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
-             <input type=radio name="place-on-calendar" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ONE); ?>  /><span class="padding-left"><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></span><br>
-             <input type=radio name="place-on-calendar"  value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_TWO); ?>  /><span class="padding-left"><?php AppUtility::t(' Yes, on Available until date')?></span>
+             <input type=radio name="oncal" value="0" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ZERO); ?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
+             <input type=radio name="oncal" value="1" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_ONE); ?>  /><span class="padding-left"><?php AppUtility::t('Yes, on Available after date (will only show after that date)')?></span><br>
+             <input type=radio name="oncal"  value="2" <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar'], AppConstant::NUMERIC_TWO); ?>  /><span class="padding-left"><?php AppUtility::t(' Yes, on Available until date')?></span>
              <br><?php AppUtility::t('With tag')?><span class="padding-left"><input type="text" size="3" value="!" name="tag"></span>
          </div><br class="form"/><br>
     </div>
@@ -245,9 +255,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <div id="datediv" style="display:<?php echo ($defaultValues['avail'] == AppConstant::NUMERIC_TWO) ? "block" : "none"; ?>">
         <div class=col-lg-2><?php AppUtility::t('Place on Calendar?')?></div>
 		<div class=col-lg-10>
-            <input type=radio name="place-on-calendar-always" value="0" <?php if ($defaultValues['calendar-always'] == 0) { echo 'checked=1';}?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
+            <input type=radio name="altoncal" value="0" <?php if ($defaultValues['altoncal'] == 0) { echo 'checked=1';}?>  /><span class="padding-left"><?php AppUtility::t('No')?></span><br>
             <div class=col-lg-10>
-                <label class="pull-left" style="padding-left: 32px"><input type=radio name="place-on-calendar-always" class="pull-left" value="1"  <?php AssessmentUtility::writeHtmlChecked($defaultValues['calendar-always'], "1", 1); ?>/></label>
+                <label class="pull-left" style="padding-left: 32px"><input type=radio name="altoncal" class="pull-left" value="1"  <?php if ($defaultValues['altoncal'] == 1) { echo 'checked=1';}?>/></label>
                 <?php
                 echo '<div class = "time-input pull-left col-lg-4">';
                 echo DatePicker::widget([
@@ -268,8 +278,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <br><?php AppUtility::t('With tag')?><span class="padding-left"><input type="text" size="3" value="!" name="tag-always"></span>
         </div><br class="form"/><br>
     </div>
-
-    <?php if (count($pageOutcomesList) > 0) { ?>
+     <?php if (count($pageOutcomesList) > 0) { ?>
     <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes')?></div><div class="col-lg-10">
     <?php
         $gradeoutcomes = array();

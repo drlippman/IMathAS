@@ -442,5 +442,31 @@ class Student extends BaseImasStudents {
 
     }
 
+    public static function getByUserIdUsingAssessmentSessionJoin($courseId,$assessmentId,$secfilter)
+    {
+//        $query = new Query();
+//        $query	->select(['imas_students.userid'])
+//            ->from('imas_students')
+//            ->join(	'LEFT JOIN',
+//                'imas_assessment_sessions',
+//                'imas_students.userid=imas_assessment_sessions.userid'
+//            )
+//            ->where(['imas_students.courseid' => $courseId])
+//            ->andWhere(['imas_assessment_sessions.assessmentid' => $assessmentId])
+//            ->andWhere(['imas_students.locked' => '0'])
+//            ->andWhere(['IS','imas_assessment_sessions.id','NULL']);
+//        if($secfilter != -1){
+//            $query->andWhere(['imas_students.section' => $secfilter]);
+//        }
+        $query = "SELECT ims.userid FROM imas_students AS ims LEFT JOIN imas_assessment_sessions AS ias ON ims.userid=ias.userid AND ias.assessmentid='$assessmentId'";
+        $query .= "WHERE ias.id IS NULL AND ims.courseid='$courseId' AND ims.locked=0 ";
+        if ($secfilter!=-1) {
+            $query .= " AND ims.section='$secfilter' ";
+        }
+//        $command = $query->createCommand();
+//        $data = $command->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }
 

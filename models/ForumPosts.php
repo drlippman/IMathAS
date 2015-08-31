@@ -269,4 +269,10 @@ class ForumPosts extends BaseImasForumPosts
         $query = "DELETE FROM imas_forum_posts WHERE threadid IN ($delList)";
         \Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function checkLeastOneThread($forumId,$userId)
+    {
+        $query  = "SELECT id FROM imas_forum_posts WHERE forumid='$forumId' AND parent=0 AND userid='$userId' LIMIT 1";
+        return Yii::$app->db->createCommand($query)->queryOne();
+    }
 }

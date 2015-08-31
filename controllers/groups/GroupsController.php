@@ -115,7 +115,7 @@ class GroupsController extends AppController
                     }
                     if(count($stuToAdd) > AppConstant::NUMERIC_ZERO)
                     {
-                        for($i=0;$i<count($stuToAdd);$i++)
+                        for($i= AppConstant::NUMERIC_ZERO;$i<count($stuToAdd);$i++)
                         {
                             $stuGrpMember = new StuGroupMembers();
                             $stuGrpMember->insertStuGrpMemberData($stuToAdd[$i],$grpId);
@@ -148,7 +148,6 @@ class GroupsController extends AppController
                                             {
                                                 $fileData = filehandler::deleteasidfilesfromstring2($data['lastanswers'].$data['bestlastanswers'],'id',$data['id'],$data['assessmentid']);
                                             }
-
                                         }
                                     }
                                     if($rowGrpTest != '')
@@ -175,14 +174,11 @@ class GroupsController extends AppController
                                                 {
                                                     $logInfo .= "inserting ias for $stuId.";
                                                     AssessmentSession::insertDataOfGroup($fieldsToCopy,$stuId,$insRow);
-
                                                 }
-
                                             }
                                         }
                                     }
                                 }
-
                             }
                         }
                     }
@@ -195,7 +191,6 @@ class GroupsController extends AppController
                         {
                             foreach($query as $data)
                             {
-
                                 echo $data['LastName'].', '.$data['FirstName'].'<br/>';
                                 $logInfo .= $data['LastName'].', '.$data['FirstName'].' already in group.';
                             }
@@ -217,7 +212,6 @@ class GroupsController extends AppController
                     }
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
                 }
-
             }
             $remove  = $this->getParamVal('remove');
             $grpId = $this->getParamVal('grpId');
@@ -238,7 +232,6 @@ class GroupsController extends AppController
                     $query = StuGroupSet::getByGrpSetId($grpSetId);
                     $Stu_GrpSetName = $query['name'];
                 }
-
             }
             $removeAll = $this->getParamVal('removeall');
             if(isset($removeAll))
@@ -253,7 +246,6 @@ class GroupsController extends AppController
                     $query = Stugroups::getById($removeAll);
                     $Stu_GrpName = $query['name'];
                 }
-
             }
             if(isset($addGrpSet))
             {
@@ -283,7 +275,6 @@ class GroupsController extends AppController
                     $updateGrpSet = new StuGroupSet();
                     $updateGrpSet->UpdateGrpSet($modifiedGrpName,$params['renameGrpSet']);
                     return $this->redirect('manage-student-groups?cid='.$course->id);
-
                 }else
                 {
                     $grpSetName =StuGroupSet::getByGrpSetId($params['renameGrpSet']);
@@ -438,7 +429,7 @@ class GroupsController extends AppController
                 $delPost = $params['delpost'];
                 if(isset($confirm))
                 {
-                    $this->deleteGroup($deleteGrp,$delPost=1);
+                    $this->deleteGroup($deleteGrp,$delPost= AppConstant::NUMERIC_ONE);
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
                 }else
                 {
@@ -508,16 +499,15 @@ class GroupsController extends AppController
             /*Remaining*/
         }
     }
+
     public function removeGrpMember($uid,$grpId)
     {
         StuGroupMembers::removeGrpMember($uid,$grpId);
         AssessmentSession::updateAssSessionForGrpByGrpIdAndUid($uid,$grpId);
-
         $now = time();
         if (isset($log))
         {
             /*Remaining*/
         }
-
     }
 }

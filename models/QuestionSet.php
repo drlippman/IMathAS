@@ -20,13 +20,10 @@ class QuestionSet extends BaseImasQuestionset
     {
         return static::findOne(['id' => $id]);
     }
-    public static function getById($id)
+    public static function getByIdUsingInClause($ids)
     {
-        $query = "SELECT qtext FROM imas_questionset WHERE id= 1";
-        $connection = Yii::$app->getDb();
-        $command = $connection->createCommand($query);
-        $qdata = $command->queryAll();
-        return $qdata;
+        $data = QuestionSet::find()->where(['IN','id',$ids])->all();
+        return $data;
     }
 
     public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes){

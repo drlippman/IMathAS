@@ -180,7 +180,6 @@ class BlockController extends AppController
             $startDate = AppConstant::NUMERIC_ZERO;
             $endDate = AppConstant::ALWAYS_TIME;
         }
-
         if(isset($existingId))
         {
             $sub[$existingId]['name'] = htmlentities(stripslashes($params['title']));
@@ -246,6 +245,7 @@ class BlockController extends AppController
         Course::UpdateItemOrder($finalBlockItems,$courseId,$blockCnt=null);
         $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$courseId));
     }
+
     public function actionEditContent()
     {
         $this->guestUserHandler();
@@ -298,7 +298,7 @@ class BlockController extends AppController
             $checked = array();
             foreach ($params['checked'] as $id) {
                 $id = intval($id);
-                if ($id != 0) {
+                if ($id != AppConstant::NUMERIC_ZERO) {
                     $checked[] = $id;
                 }
             }
@@ -348,12 +348,12 @@ class BlockController extends AppController
 
                 $this->existblocks[$parent.'-'.($k+1)] = $item['name'];
                 $this->existblockids[$parent.'-'.($k+1)] = $item['id'];
-                if (count($item['items'])>0) {
+                if (count($item['items'])> AppConstant::NUMERIC_ZERO) {
                     $this->buildExistBlocksArray($item['items'],$parent.'-'.($k+1));
                 }
             }
         }
-        $i=0;
+        $i= AppConstant::NUMERIC_ZERO;
         foreach ($this->existblocks as $k=>$name) {
             $existBlocksVals[$i] = $k;
             $existBlocksLabels[$i] = stripslashes($name);
@@ -369,7 +369,7 @@ class BlockController extends AppController
                         $items[$n][$k] = $v;
                     }
                 }
-                if (count($item['items'])>0) {
+                if (count($item['items'])> AppConstant::NUMERIC_ZERO) {
                     $this->updateBlocksArray($items[$n]['items'], $tochg, $sets);
                 }
             }

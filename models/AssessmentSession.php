@@ -346,5 +346,16 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getByCourseIdAndAssessmentId($assessmentId,$courseId)
+    {
+        $query = new Query();
+        $query->select(['*'])->from('imas_assessment_sessions')->join('INNER JOIN', 'imas_students', 'imas_assessment_sessions.userid = imas_students.userid')
+            ->where(['imas_assessment_sessions.assessmentid' => $assessmentId, 'imas_students.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
+
 }
 

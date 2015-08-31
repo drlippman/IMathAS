@@ -30,7 +30,9 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
 <input type="hidden" id="user-id" value="<?php echo $currentUser['id'] ?>">
 <?php $postBeforeView = (($forumData['settings']&16)==16);
 ?>
-<?php if($postBeforeView && !$canViewAll){?>
+
+
+<?php if(!$atLeastOneThread && $postBeforeView && !$canViewAll ){?>
  <p>This post is blocked. In this forum, you must post your own thread before you can read those posted by others.</p>
     <a class="pull-right" href="<?php echo AppUtility::getURLFromHome('forum','forum/thread?cid=' . $course->id . '&forumid=' . $forumId);?>">Back to Forum Topics</a>
     <?php }else {?>

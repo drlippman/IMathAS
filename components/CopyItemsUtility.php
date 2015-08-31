@@ -460,6 +460,7 @@ public  static function getiteminfo($itemid)
 public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false, $spacer = '|&nbsp;&nbsp;')
 {
     global $ids, $types, $names, $sums, $parents, $gitypeids, $prespace, $CFG;
+
     if (!isset($gitypeids)) {
         $gitypeids = array();
     }
@@ -496,6 +497,7 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
             $sums[] = $arr[2];
         }
     }
+
 }
 
 public  static function buildexistblocks($items, $parent, $pre = '')

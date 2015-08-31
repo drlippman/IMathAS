@@ -73,4 +73,18 @@ class ContentTrack extends BaseImasContentTrack
         $data = $command->queryAll();
         return $data;
     }
-} 
+
+    public static function getDistinctUserIdUsingCourseIdAndQuestionId($courseId,$questionId,$secfilter)
+    {
+        $query = new Query();
+        $query = "SELECT DISTINCT ict.userid FROM imas_content_track AS ict JOIN imas_students AS ims ON ict.userid=ims.userid WHERE ims.courseid='$courseId' AND ict.courseid='$courseId' AND ict.type='extref' AND ict.typeid='$questionId' AND ims.locked=0 ";
+        if ($secfilter!=-1)
+        {
+        $query .= " AND ims.section='$secfilter' ";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+}
+
+//$query = ;
