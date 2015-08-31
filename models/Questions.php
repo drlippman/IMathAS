@@ -262,15 +262,9 @@ class Questions extends BaseImasQuestions
 
     public static function updateQuestionFields($params, $id){
         $questionData = Questions::getById(['id' => $id]);
+        $data = AppUtility::removeEmptyAttributes($params);
         if($questionData){
-            $questionData->points = $params['points'];
-            $questionData->attempts = $params['attempts'];
-            $questionData->penalty = $params['penalty'];
-            $questionData->regen = $params['regen'];
-            $questionData->showans = $params['showans'];
-            $questionData->rubric = $params['rubric'];
-            $questionData->showhints = $params['showhints'];
-            $questionData->questionsetid = isset($params['questionsetid']) ? $params['questionsetid'] : $questionData['questionsetid'];
+            $questionData->attributes = $data;
             $questionData->save();
         }
     }
@@ -282,5 +276,13 @@ class Questions extends BaseImasQuestions
                 $singleData->delete();
             }
         }
+    }
+
+    public static function retrieveQuestionData($qids){
+        $query = "SELECT imas_questions.id, imas_questionset.description, imas_questions.points, imas_questions.attempts, imas_questions.showhints, imas_questionset.extref ";
+        $query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
+        $query .= "imas_questions.id IN ('".implode("','",$qids)."')";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
     }
 }

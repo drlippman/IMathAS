@@ -18,12 +18,17 @@ class QuestionSet extends BaseImasQuestionset
 {
     public static function getByQuesSetId($id)
     {
-        return static::findOne(['id' => $id]);
+//        return static::findOne(['id' => $id]);
+        $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=$id";
+        return \Yii::$app->db->createCommand($query)->queryOne();
     }
-    public static function getByIdUsingInClause($ids)
+    public static function getById($id)
     {
-        $data = QuestionSet::find()->where(['IN','id',$ids])->all();
-        return $data;
+        $query = "SELECT qtext FROM imas_questionset WHERE id= 1";
+        $connection = Yii::$app->getDb();
+        $command = $connection->createCommand($query);
+        $qdata = $command->queryAll();
+        return $qdata;
     }
 
     public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes){
@@ -177,6 +182,12 @@ class QuestionSet extends BaseImasQuestionset
 //            ->where(['IN','imas_questions.id',$questionList]);
 //        $command = $query->createCommand();
 //        $data = $command->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public  static function getQuestionSetData($ids){
+        $query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$ids)."')";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }

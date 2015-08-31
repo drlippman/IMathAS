@@ -249,11 +249,6 @@ function generateTable() {
 	}
 	html += "<th>Order</th>";
 	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Type</th><th>Points</th><th>Action</th><th></th>";
-	//if (beentaken) {
-	//	html += "<th>Clear Attempts</th><th>Withdraw</th>";
-	//} else {
-	//	html += "<th></th><th></th>";
-	//}
 	html += "</thead><tbody id='question-information-table'>";
 	for (var i=0; i<itemcount; i++) {
 		if (itemarray[i].length<5) { //is group
@@ -393,9 +388,9 @@ function generateTable() {
             html += "</ul></div></td>";
 
             if (beentaken) {
-                html += "<td class='c'><button class='question-table'>  <img class = 'small-preview-icon' src='../../img/prvAssess.png' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">&nbsp;Preview</button></td>"; //Preview
+                html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
             } else {
-                html += "<td class='c'><button class='question-table'>  <img class = 'small-preview-icon' src='../../img/prvAssess.png' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">&nbsp;Preview</button></td>"; //Preview
+                html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
             }
 			html += "</tr>";
 			ln++;
@@ -442,5 +437,5 @@ function ahahDone(url, target) {
 }
 
 function changeSetting(){
-
+alert('jhkhkh');
 }

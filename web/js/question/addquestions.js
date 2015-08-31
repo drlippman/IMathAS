@@ -59,7 +59,7 @@ function previewq(formn,loc,qn,docheck,onlychk) {
    if (onlychk) {
       addr += '&onlychk=1';
    }
-  
+
    previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
    previewpop.focus();
 }

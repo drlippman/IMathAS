@@ -244,6 +244,7 @@ class Assessments extends BaseImasAssessments
         $assessmentData = Assessments::findOne(['id' => $id]);
         if($assessmentData){
             $assessmentData->itemorder = $itemOrder;
+            $assessmentData->save();
         }
     }
     public static function findOneAssessmentDataForGradebook($courseId,$istutor, $isteacher, $catfilter){

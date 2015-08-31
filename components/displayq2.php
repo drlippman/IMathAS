@@ -11,18 +11,18 @@ use Yii;
 use yii\base\Component;
 //require("macros.php");
 //require("../filter/filter.php");
-
+$GLOBALS['noformatfeedback'] = true;
+$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+$allowedmacros = $mathfuncs;
+//require_once("mathphp.php");
+require_once("mathphp2.php");
+require("interpretUtility.php");
 class  displayq2 extends Component
 {
 //IMathAS:  Core of the testing engine.  Displays and grades questions
 //(c) 2006 David Lippman
 //quadratic inequalities contributed by Cam Joyce
-//$GLOBALS['noformatfeedback'] = true;
-//globa $mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
-//$allowedmacros = $mathfuncs;
-//require_once("mathphp.php");
-//require_once("mathphp2.php");
-//require("interpretUtility.php");
+
 
     public static function displayq($qnidx,$questionId,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
         //$starttime = microtime(true);
@@ -38,8 +38,7 @@ class  displayq2 extends Component
         } else {
             $nosabutton = false;
         }
-        $qdata = QuestionSet::getByQuesSetId($questionId);
-
+        $qdata = QuestionSet::getByQuesSetId($questionId);var_dump($qdata['qtext']);
         if ($qdata['hasimg']>0) {
             $query = QImages::getByQuestionSetId($questionId);
             foreach ($query as $row) {
@@ -120,7 +119,7 @@ class  displayq2 extends Component
 
         eval(interpretUtility::interpret('control',$qdata['qtype'],$qdata['control']));
         eval(interpretUtility::interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
-
+        AppUtility::dump($qdata['qtext']);
         $toevalqtxt = interpretUtility::interpret('qtext',$qdata['qtype'],$qdata['qtext']);
         $toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);

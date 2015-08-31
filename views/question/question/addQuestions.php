@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </ul>
                     </div>
                 </div>
-            <?php } ?>
+            <?php } ?><input type="submit" value="Change Settings" />
                 <span id="submitnotice" style="color:red;"></span>
                 <div id="curqtbl"></div>
             </form>
@@ -419,6 +419,7 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
 ?>
     <input type="hidden" id="address" value="<?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId); ?>"/>
     <script type="javascript">
+        var previewqaddr = <?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$cid); ?>;
         var addqaddr = <?php echo $address; ?>;
         var JunkFlagsaveurl = <?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>;
     </script>

@@ -5,8 +5,11 @@ namespace app\components;
 use app\models\Exceptions;
 use app\models\Questions;
 use app\models\Course;
+use app\models\QuestionSet;
 use Yii;
 use yii\base\Component;
+
+global $disallowedvar;
 
 class  interpretUtility extends Component
 {
@@ -16,17 +19,13 @@ class  interpretUtility extends Component
 //(c) 2006 David Lippman
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
-//require_once("mathphp.php");
-//global $disallowedvar;
-//array_push($allowedmacros, "loadlibrary", "importcodefrom", "includecodefrom", "array", "off", "true", "false", "e", "pi", "null", "setseed", "if", "for", "where");
-//$disallowedvar = array('$link', '$qidx', '$qnidx', '$seed', '$qdata', '$toevalqtxt', '$la', '$laarr', '$shanspt', '$GLOBALS', '$laparts', '$anstype', '$kidx', '$iidx', '$tips', '$options', '$partla', '$partnum', '$score', '$disallowedvar', '$allowedmacros', '$wherecount', '$countcnt');
 
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
     public static function interpret($blockname, $anstype, $str, $countcnt = 1)
     {
 //        print_r($blockname);print_r($anstype);print_r($str);print_r($countcnt);die;
-        if ($blockname == "qtext") {
-            $str = preg_replace_callback('/(include|import)qtextfrom\((\d+)\)/', 'getquestionqtext', $str);
+        if ($blockname == "qtext") {AppUtility::dump($str);
+            $str = interpretUtility::getquestionqtext($str);
 
             $str = str_replace('"', '\"', $str);
             $str = str_replace("\r\n", "\n", $str);
@@ -46,13 +45,13 @@ class  interpretUtility extends Component
 
     public static function getquestionqtext($m)
     {
-        $query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        if (mysql_num_rows($result) == 0) {
+        $query = QuestionSet::getByQuesSetId($m[2]);
+
+        if (count($query['qtext']) == 0) {
             echo _('bad question id in includeqtextfrom');
             return "";
         } else {
-            return mysql_result($result, 0, 0);
+            return $query['qtext'];
         }
     }
 
@@ -309,10 +308,15 @@ class  interpretUtility extends Component
 //return array of arrays: array($symbol,$symtype)
 //types: 1 var, 2 funcname (w/ args), 3 num, 4 parens, 5 curlys, 6 string, 7 endofline, 8 control, 9 error, 0 other, 11 array index []
     public static function tokenize($str, $anstype, $countcnt)
-    {
-        global $allowedmacros;
-        global $mathfuncs;
-        global $disallowedwords, $disallowedvar;
+    {global $allowedmacros;global $mathfuncs;global $disallowedwords, $disallowedvar;
+        $mathfuncs = array("sin","cos","tan","sinh","cosh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+        $allowedmacros = $mathfuncs;
+        array_push($allowedmacros, "loadlibrary", "importcodefrom", "includecodefrom", "array", "off", "true", "false", "e", "pi", "null", "setseed", "if", "for", "where");
+        $disallowedvar = array('$link', '$qidx', '$qnidx', '$seed', '$qdata', '$toevalqtxt', '$la', '$laarr', '$shanspt', '$GLOBALS', '$laparts', '$anstype', '$kidx', '$iidx', '$tips', '$options', '$partla', '$partnum', '$score', '$disallowedvar', '$allowedmacros', '$wherecount', '$countcnt');
+
+
+
+
         $i = 0;
         $connecttolast = 0;
         $len = strlen($str);

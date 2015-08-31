@@ -1,19 +1,22 @@
-<?php
+ <?php
+ use app\models\Questions;
+ use app\models\Assessments;
+ use app\components\AppConstant;
+ use app\components\AppUtility;
+ use app\models\QuestionSet;
+ use app\controllers\AppController;
 //IMathAS:  Modify a question's settings in an assessment: grid for multiple.  Included in addquestions.php
 //(c) 2006 David Lippman
-
-	if (!(isset($teacherid))) {
+// $teacherId = $this->isTeacher($userId,$courseId);
+	if (!(isset($teacherId))) {
 		echo "This page cannot be accessed directly";
 		exit;
 	}
-//	print_r('kkkkkkkkkkkkk');die;
 	if ($_GET['process']== true) {
 		if (isset($_POST['add'])) { //adding new questions
-			$query = "SELECT itemorder,viddata FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = mysql_result($result,0,0);
-			$viddata = mysql_result($result,0,1);
-			
+			$query = Assessments::getByAssessmentId($aid);
+			$itemorder = $query['itemorder'];
+			$viddata = $query['viddata'];
 			$newitemorder = '';
 			if (isset($_POST['addasgroup'])) {
 				$newitemorder = '1|0';
@@ -28,10 +31,17 @@
 					if ($points==9999 && isset($_POST['pointsforparts']) && $_POST['qparts'.$qsetid]>1) {
 						$points = intval($_POST['qparts'.$qsetid]);
 					}
-					$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-					$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-					$result = mysql_query($query) or die("Query failed : " . mysql_error());
-					$qid = mysql_insert_id();
+                    $question = new Questions();
+                    $questionArray = array();
+                    $questionArray['assessmentid'] = $aid;
+                    $questionArray['points'] = $points;
+                    $questionArray['attempts'] = $attempts;
+                    $questionArray['showhints'] = $showhints;
+                    $questionArray['penalty'] = AppConstant::QUARTER_NINE;
+                    $questionArray['regen'] = AppConstant::NUMERIC_ZERO;
+                    $questionArray['showans'] = AppConstant::NUMERIC_ZERO;
+                    $questionArray['questionsetid'] = $qsetid;
+                    $qid = $question->addQuestions($questionArray);
 					if ($newitemorder=='') {
 						$newitemorder = $qid;
 					} else {
@@ -71,16 +81,11 @@
 			} else {
 				$itemorder .= ','.$newitemorder;
 			}
-			
-			
-			
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder',viddata='$viddata' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+            Assessments::setVidData($itemorder, $viddata, $aid);
 		} else if (isset($_POST['mod'])) { //modifying existing
 			
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = mysql_result($result,0,0);
+			$query = Assessments::getByAssessmentId($aid);
+			$itemorder = $query['itemorder'];
 			
 			//what qsetids do we need for adding copies?
 			$lookupid = array();
@@ -92,29 +97,38 @@
 			//lookup qsetids
 			$qidtoqsetid = array();
 			if (count($lookupid)>0) {
-				$query = "SELECT id,questionsetid FROM imas_questions WHERE id IN (".implode(',',$lookupid).")";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				while ($row = mysql_fetch_row($result)) {
-					$qidtoqsetid[$row[0]] = $row[1];
+				$query = Questions::getByIdList($lookupid);
+				foreach ($query as $row) {
+					$qidtoqsetid[$row['id']] = $row['questionsetid'];
 				}
 			}
-			
+
 			foreach(explode(',',$_POST['qids']) as $qid) {
 				$points = trim($_POST['points'.$qid]);
 				$attempts = trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
-				$query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
-				mysql_query($query) or die("Query failed : " . mysql_error());
+                $tempArray = array();
+                $tempArray['points'] = $points;
+                $tempArray['attempts'] = $attempts;
+                $tempArray['showhints'] = $showhints;
+				Questions::updateQuestionFields($tempArray, $qid);
+                $addQuestions = array();
 				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
 					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
 						$qsetid = $qidtoqsetid[$qid];
-						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-						$query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-						$result = mysql_query($query) or die("Query failed : " . mysql_error());
-						$newqid = mysql_insert_id();
-						
+                        $addQuestions['assessmentid'] = $aid;
+                        $addQuestions['points'] = $points;
+                        $addQuestions['attempts'] = $attempts;
+                        $addQuestions['showhints'] = $showhints;
+                        $addQuestions['penalty'] = '9999';
+                        $addQuestions['regen'] = AppConstant::NUMERIC_ZERO;
+                        $addQuestions['showans'] = AppConstant::NUMERIC_ZERO;
+                        $addQuestions['questionsetid'] = $qsetid;
+                        $question = new Questions();
+                        $newqid = $question->addQuestions($addQuestions);
+
 						$itemarr = explode(',',$itemorder);
 						$key = array_search($qid,$itemarr);
 						if ($key===false) {
@@ -126,26 +140,23 @@
 					}
 				}
 			}
-			$query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
+			Assessments::setItemOrder($itemorder, $aid);
 		}
-		
 	} else {
 		$pagetitle = "Question Settings";
-		require("../header.php");
-		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
+//		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
+//		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
 		
-		echo "Question Settings</div>\n";
+//		echo "Question Settings</div>\n";
 	
 ?>
 <div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.
 <?php
 if (isset($_POST['checked'])) { //modifying existing
-	echo "<form method=post action=\"addquestions.php?modqs=true&process=true&cid=$cid&aid=$aid\">";
+	echo "<form method=post action=\"add-questions?modqs=true&process=true&cid=$cid&aid=$aid\">";
 } else {
-	echo "<form method=post action=\"addquestions.php?addset=true&process=true&cid=$cid&aid=$aid\">";
+	echo "<form method=post action=\"add-questions?addset=true&process=true&cid=$cid&aid=$aid\">";
 }
 ?>
 Leave items blank to use the assessment's default values<br/>
@@ -160,22 +171,20 @@ Leave items blank to use the assessment's default values<br/>
 				$qids[] = $v[1];
 			}
 			$qrows = array();
-			$query = "SELECT imas_questions.id,imas_questionset.description,imas_questions.points,imas_questions.attempts,imas_questions.showhints,imas_questionset.extref ";
-			$query .= "FROM imas_questions,imas_questionset WHERE imas_questionset.id=imas_questions.questionsetid AND ";
-			$query .= "imas_questions.id IN ('".implode("','",$qids)."')";
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				if ($row[2]==9999) {
-					$row[2] = '';
+            $query = Questions::retrieveQuestionData($qids);
+
+			foreach ($query as $row) {
+				if ($row['points']==9999) {
+					$row['points'] = '';
 				} 
-				if ($row[3]==9999) {
-					$row[3] = '';
+				if ($row['attempts']==9999) {
+					$row['attempts'] = '';
 				}
 				
-				$qrows[$row[0]] = '<tr><td>'.$row[1].'</td>';
-				$qrows[$row[0]] .= '<td>';
-				if ($row[5]!='') {
-					$extref = explode('~~',$row[5]);
+				$qrows[$row['id']] = '<tr><td>'.$row['description'].'</td>';
+				$qrows[$row['id']] .= '<td>';
+				if ($row['extref']!='') {
+					$extref = explode('~~',$row['extref']);
 					$hasvid = false;  $hasother = false;
 					foreach ($extref as $v) {
 						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
@@ -186,28 +195,27 @@ Leave items blank to use the assessment's default values<br/>
 					}
 					$page_questionTable[$i]['extref'] = '';
 					if ($hasvid) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+						$qrows[$row['id']] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
 					}
 					if ($hasother) {
-						$qrows[$row[0]] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+						$qrows[$row['id']] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
 					}
 				} 
-				$qrows[$row[0]] .= '</td>';
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"{$row[2]}\" /></td>";
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"{$row[3]}\" /></td>";
-				$qrows[$row[0]] .= "<td><select name=\"showhints{$row[0]}\">";
-				$qrows[$row[0]] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
-				$qrows[$row[0]] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
-				$qrows[$row[0]] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
-				$qrows[$row[0]] .= "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"0\" /></td>";
-				$qrows[$row[0]] .= '</tr>';
+				$qrows[$row['id']] .= '</td>';
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
+				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
+				$qrows[$row['id']] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
+				$qrows[$row['id']] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
+				$qrows[$row['id']] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
+				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
+				$qrows[$row['id']] .= '</tr>';
 			} 
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
-			$query = "SELECT itemorder FROM imas_assessments WHERE id='$aid'";
-			$result = mysql_query($query) or die("Query failed : " . mysql_error());
-			$itemorder = explode(',', mysql_result($result,0,0));
+			$query = Assessments::getByAssessmentId($aid);
+			$itemorder = explode(',', $query['itemorder']);
 			foreach ($itemorder as $item) {
 				if (strpos($item,'~')!==false) {
 					$subs = explode('~',$item);
@@ -233,19 +241,18 @@ Leave items blank to use the assessment's default values<br/>
 		} else { //adding new questions
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
-			
-			$query = "SELECT id,description,extref,qtype,control FROM imas_questionset WHERE id IN ('".implode("','",$_POST['nchecked'])."')";
+			$query = QuestionSet::getQuestionSetData($_POST['nchecked']);
 			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-			while ($row = mysql_fetch_row($result)) {
-				if ($row[3]=='multipart') {
-					preg_match('/anstypes\s*=(.*)/',$row[4],$match);
+			foreach ($query as $row) {
+				if ($row['qtype']=='multipart') {
+					preg_match('/anstypes\s*=(.*)/',$row['control'],$match);
 					$n = substr_count($match[1],',')+1;
 				} else {
 					$n = 1;
 				}
-				echo '<tr><td>'.$row[1].'</td>';
-				if ($row[2]!='') {
-					$extref = explode('~~',$row[2]);
+				echo '<tr><td>'.$row['description'].'</td>';
+				if ($row['extref']!='') {
+					$extref = explode('~~',$row['extref']);
 					$hasvid = false;  $hasother = false;
 					foreach ($extref as $v) {
 						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
@@ -264,14 +271,14 @@ Leave items blank to use the assessment's default values<br/>
 				} else {
 					echo '<td></td>';
 				}
-				echo "<td><input type=text size=4 name=\"points{$row[0]}\" value=\"\" />";
-				echo '<input type="hidden" name="qparts'.$row[0].'" value="'.$n.'"/></td>';
-				echo "<td><input type=text size=4 name=\"attempts{$row[0]}\" value=\"\" /></td>";
-				echo "<td><select name=\"showhints{$row[0]}\">";
+				echo "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"\" />";
+				echo '<input type="hidden" name="qparts'.$row['id'].'" value="'.$n.'"/></td>';
+				echo "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"\" /></td>";
+				echo "<td><select name=\"showhints{$row['id']}\">";
 				echo '<option value="0" selected="selected">Use Default</option>';
 				echo '<option value="1">No</option>';
 				echo '<option value="2">Yes</option></select></td>';
-				echo "<td><input type=text size=4 name=\"copies{$row[0]}\" value=\"1\" /></td>";
+				echo "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"1\" /></td>";
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
@@ -283,7 +290,7 @@ Leave items blank to use the assessment's default values<br/>
 			echo '<div class="submit"><input type="submit" value="'._('Add Questions').'"></div>';
 		}
 		echo '</form>';
-		require("../footer.php");
+//		require("../footer.php");
 		exit;
 	}
 ?>
