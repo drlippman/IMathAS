@@ -271,11 +271,11 @@ class Course extends BaseImasCourses {
     public static function getDataByCtc($toCopy,$ctc)
     {
         $query = new Query();
-        $query	->select([$toCopy])
+        $query	->select($toCopy)
             ->from('imas_courses')
-            ->where('id= :id',[':id' => $ctc]);
+            ->where('id=:id',[':id' => $ctc]);
         $command = $query->createCommand();
-        $data = $command->queryOne();
+        $data = $command->queryone();
         return $data;
 
     }
@@ -285,18 +285,18 @@ class Course extends BaseImasCourses {
 
         $query = Yii::$app->db->createCommand("UPDATE imas_courses SET $sets WHERE id=:cid");
         $query->bindValue('cid',$courseId);
-        $query->queryOne();
+        $query->query();
     }
     public static function updateOutcomes($newOutcomeArr,$courseId)
     {
-        $outcomes = Course::find()->select('outcomes')->where(['id' => $courseId])->one();
+        $outcomes = Course::find()->where(['id' => $courseId])->one();
         if($outcomes)
         {
             $outcomes->outcomes = $newOutcomeArr;
             $outcomes->save();
         }
-    }
 
+    }
     public static function getBlockCnt($courseId)
     {
         $query = new Query();
@@ -308,6 +308,7 @@ class Course extends BaseImasCourses {
         return $data;
 
     }
+
     public static function getCourseData($myRights, $showcourses, $userId)
     {
         $query = new Query();
@@ -332,6 +333,49 @@ class Course extends BaseImasCourses {
         }
         $command = $query->createCommand();
         $data = $command->queryAll();
+        return $data;
+    }
+    public static function getPicIcons($ctc)
+    {
+        $query = new Query();
+        $query	->select(['itemorder','picicons'])
+            ->from('imas_courses')
+            ->where('id= :id',[':id' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
+    public static function getDataByJoins($groupId,$userId)
+    {
+        $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid,iu.groupid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu,imas_groups WHERE ";
+        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid=imas_groups.id AND iu.groupid<>'$groupId' AND iu.id<>'$userId' AND ic.available<4 ORDER BY imas_groups.name,iu.LastName,iu.FirstName,ic.name";
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getFromJoinOnTeacher($userId,$courseId)
+    {
+        $query  = Yii::$app->db->createCommand("SELECT ic.id,ic.name FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$userId' and ic.id<>'$courseId' AND ic.available<4 ORDER BY ic.name")->queryAll();
+        return $query;
+    }
+    public static function getFromJoinsData($groupId,$userId)
+    {
+        $query = "SELECT ic.id,ic.name,ic.copyrights,iu.LastName,iu.FirstName,iu.email,it.userid FROM imas_courses AS ic,imas_teachers AS it,imas_users AS iu WHERE ";
+        $query .= "it.courseid=ic.id AND it.userid=iu.id AND iu.groupid='$groupId' AND iu.id<>'$userId' AND ic.available<4 ORDER BY iu.LastName,iu.FirstName,ic.name";
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getTemplate()
+    {
+        $query = "SELECT id,name,copyrights FROM imas_courses WHERE (istemplate&1)=1 AND copyrights=2 AND available<4 ORDER BY name";
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getGroupTemplate($groupId)
+    {
+        $query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
+        $query .= "iu.groupid='$groupId' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
+        $data= Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
 }

@@ -75,13 +75,13 @@ class BaseImasCourses extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['ownerid', 'hideicons', 'allowunenroll', 'copyrights', 'blockcnt', 'msgset', 'toolset', 'chatset', 'showlatepass', 'cploc', 'available', 'lockaid', 'latepasshrs', 'picicons', 'newflag', 'istemplate', 'deflatepass', 'deftime'], 'integer'],
-            [['name', 'enrollkey'], 'required'],
-            [['itemorder', 'outcomes', 'ancestors'], 'string'],
-            [['name'], 'string', 'max' => 254],
-            [['enrollkey'], 'string', 'max' => 100],
-            [['topbar', 'theme'], 'string', 'max' => 32],
-            [['ltisecret'], 'string', 'max' => 10]
+//            [['ownerid', 'hideicons', 'allowunenroll', 'copyrights', 'blockcnt', 'msgset', 'toolset', 'chatset', 'showlatepass', 'cploc', 'available', 'lockaid', 'latepasshrs', 'picicons', 'newflag', 'istemplate', 'deflatepass', 'deftime'], 'integer'],
+//            [['name', 'enrollkey'], 'required'],
+//            [['itemorder', 'outcomes', 'ancestors'], 'string'],
+//            [['name'], 'string', 'max' => 254],
+//            [['enrollkey'], 'string', 'max' => 100],
+//            [['topbar', 'theme'], 'string', 'max' => 32],
+//            [['ltisecret'], 'string', 'max' => 10]
         ];
     }
 

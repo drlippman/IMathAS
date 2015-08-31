@@ -120,7 +120,8 @@ class AppUtility extends Component
 
     public static function removeEmptyAttributes($params)
     {
-        if (!empty($params) && is_array($params)) {
+        if (!empty($params) && is_array($params))
+        {
             if (is_object($params)) {
                 $params = (array)$params;
             }
@@ -2865,17 +2866,6 @@ class AppUtility extends Component
 
     }
 
-    public function updateOutcomes($arr,$outcomes)
-    {
-        foreach ($arr as $k=>$v)
-        {
-            if (is_array($v))
-            {
-               $this->updateOutcomes($arr[$k]['outcomes'],$outcomes);
-            } else {
-                $arr[$k] = $outcomes[$v];
-            }
-        }
-    }
+
 
 }

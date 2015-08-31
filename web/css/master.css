@@ -440,3 +440,9 @@ i.fa-home{
 .link-instructor:active, .link-instructor:hover{
     color: #428bca;
 }
+
+.align-copy-course
+{
+    margin-left: 30px;
+    margin-right: 30px;
+}

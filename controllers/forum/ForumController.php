@@ -205,7 +205,11 @@ class ForumController extends AppController
                             'postUserId' => $username->id,
                             'currentUserId' => $user['id'],
                         );
-                        array_push($threadArray, $temparray);
+                        if($temparray['parent'] == AppConstant::NUMERIC_ZERO)
+                        {
+                            array_push($threadArray, $temparray);
+                        }
+
                     }
                 }
             }

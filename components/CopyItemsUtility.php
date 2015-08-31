@@ -7,6 +7,7 @@
  */
 namespace app\components;
 use app\models\Assessments;
+use app\models\ExternalTools;
 use app\models\ForumPosts;
 use app\models\Forums;
 use app\models\ForumThread;
@@ -24,7 +25,9 @@ use app\models\Wiki;
 use \yii\base\Component;
 use app\components\AppUtility;
 use app\components\AppConstant;
-global $reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack,$exttooltrack,$userid,$groupid;
+global $reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack,$exttooltrack,$userid,$groupid,$qrubrictrack,$frubrictrack;
+$qrubrictrack = array();
+$frubrictrack = array();
 class CopyItemsUtility extends Component
 {
 
@@ -70,19 +73,26 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         array_pop($row);
         $inlineText = new InlineText();
         $newtypeid = $inlineText->saveChanges($row);
-        $instrFiles = InstrFiles::getAllData($typeid);
+        $instrFiles = InstrFiles::getFileName($typeid);
         $addedfiles = array();
-        foreach ($instrFiles as $singleData) {
+        foreach ($instrFiles as $singleData)
+        {
             $curid = $singleData['id'];
             array_pop($singleData);
-            $singleData = "'" . implode("','", AppUtility::addslashes_deep($singleData)) . "'";
             $instrFile = new InstrFiles();
+            if($params)
+            {
+                $singleData['newfiledescr'] = $singleData['description'];
+            }
             $newInstrFileId = $instrFile->saveFile($singleData, $newtypeid);
             $addedfiles[$curid] = $newInstrFileId;
         }
-        if (count($addedfiles) > 0) {
+        if (count($addedfiles) > 0)
+        {
             $addedfilelist = array();
-            foreach (explode(',', $fileorder) as $fid) {
+            foreach ((explode(',', $fileorder)) as $fid)
+            {
+
                 $addedfilelist[] = $addedfiles[$fid];
             }
             $addedfilelist = implode(',', $addedfilelist);
@@ -119,7 +129,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         if ($istool) {
             $exttooltrack[$newtypeid] = intval($tool[0]);
         }
-    } elseif ($itemtype == "Forum") {
+    } elseif ($itemtype == "Forum")
+    {
         $ForumData = Forums::getById($typeid);
         if ($sethidden) {
             $ForumData['avail'] = 0;
@@ -143,7 +154,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
         $forum = new Forums();
         $newtypeid = $forum->addNewForum($ForumData);
-        if ($params['ctc'] != $cid) {
+        if ($params['ctc'] != $cid)
+        {
             $forumtrack[$typeid] = $newtypeid;
         }
         if ($rubric != 0) {
@@ -184,9 +196,11 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $row['name'] .= stripslashes($params['append']);
         $wiki = new Wiki();
         $newtypeid = $wiki->addWiki($row);
-    } elseif ($itemtype == "Assessment") {
+    } elseif ($itemtype == "Assessment")
+    {
         $assessmentData = Assessments::getByAssessmentId($typeid);
-        if ($sethidden) {
+        if ($sethidden)
+        {
             $assessmentData['avail'] = 0;
         }
         if (isset($gbcats[$assessmentData['gbcategory']])) {
@@ -199,7 +213,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         } else {
             $assessmentData['defoutcome'] = 0;
         }
-        if ($assessmentData['ancestors'] == '') {
+        if ($assessmentData['ancestors'] == '')
+        {
             $assessmentData['ancestors'] = $typeid;
         } else {
             $assessmentData['ancestors'] = $typeid . ',' . $assessmentData['ancestors'];
@@ -221,9 +236,9 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
         $assessnewid[$typeid] = $newtypeid;
         $thiswithdrawn = array();
-
         $query = Assessments::getByAssessmentId($typeid);
-        if (trim($query['itemorder']) != '') {
+        if (trim($query['itemorder']) != '')
+        {
             $itemorder = explode(',', $query['itemorder']);
             $query = Questions::getByItemOrder($itemorder);
             $inss = array();
@@ -296,17 +311,22 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                 Assessments::setItemOrder($newitemorder, $newtypeid);
             }
         }
-    } elseif ($itemtype == "Calendar") {
+    }
+    elseif ($itemtype == "Calendar")
+    {
+
     }
     $items = new Items();
     $newItemId = $items->saveItems($params['courseId'], $newtypeid, $itemtype);
     return $newItemId;
 }
-public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden = false,$params,$checked,$blockCnt)
+public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden = false,$params=null,$checked=null,$blockCnt=null)
 {
+    global $newItems;
     foreach ($items as $k => $item) {
         if (is_array($item)) {
-            if (array_search($parent . '-' . ($k + 1), $checked) !== FALSE) { //copy block
+            if (array_search($parent . '-' . ($k + 1), $checked) !== FALSE)
+            { //copy block
                 $newBlock = array();
                 $newBlock['name'] = $item['name'] . stripslashes($_POST['append']);
                 $newBlock['id'] = $blockCnt;
@@ -315,7 +335,7 @@ public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden 
                 $newBlock['enddate'] = $item['enddate'];
                 $newBlock['avail'] = $sethidden ? 0 : $item['avail'];
                 $newBlock['SH'] = $item['SH'];
-                $newBlock['colors'] = $item['colors'];
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $newBlock['colors'] = $item['colors'];
                 $newBlock['public'] = $item['public'];
                 $newBlock['fixedheight'] = $item['fixedheight'];
                 $newBlock['grouplimit'] = $item['grouplimit'];
@@ -324,15 +344,20 @@ public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden 
                     CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$checked,$blockCnt);
                 }
                 $addToArr[] = $newBlock;
-            } else {
+                $newItems = $addToArr;
+            }else
+            {
                 if(count($item['items']) > 0)
                 {
-                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbCats, $sethidden,$params,$checked,$blockCnt);
+                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbCats, false,$params,$checked,$blockCnt);
                 }
             }
-        } else {
-            if (array_search($item, $checked) !== FALSE) {
-                $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats, $sethidden,$params);
+        }else
+        {
+            if (array_search($item, $checked) !== FALSE)
+            {
+                $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats,$params,$sethidden);
+                $newItems = $addToArr;
             }
         }
     }
@@ -382,7 +407,6 @@ public  static function doaftercopy($sourceCid,$courseId)
 
 public function copyAllSub($items, $parent, &$addToArr, $gbCats, $sethidden = false,$params,$blockCnt)
 {
-
     if (strlen($params['append']) > 0 && $params['append']{0} != ' ') {
         $params['append'] = ' ' . $params['append'];
     }
@@ -405,11 +429,13 @@ public function copyAllSub($items, $parent, &$addToArr, $gbCats, $sethidden = fa
                 $this->copyAllSub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$blockCnt);
             }
             $addToArr[] = $newBlock;
+            $newItems = $addToArr;
         } else
         {
             if ($item != null && $item != 0)
             {
                 $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats,$params,$sethidden);
+                $newItems = $addToArr;
             }
         }
     }
@@ -500,30 +526,33 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
 
 }
 
-public  static function buildexistblocks($items, $parent, $pre = '')
+public  static function buildexistblocks($items, $parent,$pre = '')
 {
-    global $existblocks;
+    global $existBlocks;
+
     foreach ($items as $k => $item) {
         if (is_array($item)) {
-            $existblocks[$parent . '-' . ($k + 1)] = $pre . $item['name'];
+            $existBlocks[$parent . '-' . ($k + 1)] = $pre . $item['name'];
             if (count($item['items']) > 0) {
-                buildexistblocks($item['items'], $parent . '-' . ($k + 1), $pre . '&nbsp;&nbsp;');
+               CopyItemsUtility::buildexistblocks($item['items'], $parent . '-' . ($k + 1), $pre . '&nbsp;&nbsp;');
             }
         }
     }
+    return $existBlocks;
 }
 
-public static function copyrubrics($offlinerubrics = array())
+public static function copyrubrics($offlinerubrics = array(),$userid=false,$groupid = false)
 {
-    global $userid, $groupid, $qrubrictrack, $frubrictrack;
-    if (count($qrubrictrack) == 0 && count($frubrictrack) == 0 && count($offlinerubrics) == 0) {
+    global $qrubrictrack, $frubrictrack;
+    if (count($qrubrictrack) == 0 && count($frubrictrack) == 0 && count($offlinerubrics) == 0)
+    {
         return;
     }
     $list = implode(',', array_merge($qrubrictrack, $frubrictrack, $offlinerubrics));
-
     //handle rubrics which I already have access to
     $rubricData = Rubrics::getByUserIdAndGroupId($userid,$groupid,$list);
-    foreach($rubricData as $singleData){
+    foreach($rubricData as $singleData)
+    {
         $qfound = array_keys($qrubrictrack, $singleData['id']);
         if (count($qfound) > 0) {
             foreach ($qfound as $qid) {
@@ -537,8 +566,10 @@ public static function copyrubrics($offlinerubrics = array())
             }
         }
         $ffound = array_keys($frubrictrack, $singleData['id']);
-        if (count($ffound) > 0) {
-            foreach ($ffound as $fid) {
+        if (count($ffound) > 0)
+        {
+            foreach ($ffound as $fid)
+            {
                 Forums::setRubric($fid,$singleData['id']);
             }
         }
@@ -546,36 +577,40 @@ public static function copyrubrics($offlinerubrics = array())
 
     //handle rubrics which I don't already have access to - need to copy them
     $rubricData = Rubrics::getByUserIdAndGroupIdAndList($userid,$groupid,$list);
-    foreach($rubricData as $singleData){
-        //echo "handing {$row[0]} which I don't have access to<br/>";
-        $rubric = Rubrics::getById($singleData['id']);
-        $rubrow = AppUtility::addslashes_deep($rubric);
-        $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubrow[2],$userid,$groupid);
+    if($rubricData)
+    {
+        foreach($rubricData as $singleData)
+        {
+            //echo "handing {$row[0]} which I don't have access to<br/>";
+            $rubric = Rubrics::getById($singleData['id']);
+            $rubrow = AppUtility::addslashes_deep($rubric);
+            $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubrow[2],$userid,$groupid);
 
-        if ($rubricItems > 0) {
-            $newid = $rubricItems['id'];
-        } else {
-            $rub = "'" . implode("','", $rubrow) . "'";
-            $temp = new Rubrics();
-            $rubricId = $temp->createNewEntry($userid,-1,$rub);
-            $newid = $rubricId;
-        }
-        $qfound = array_keys($qrubrictrack, $singleData['id']);
-        if (count($qfound) > 0) {
-            foreach ($qfound as $qid) {
-                Questions::setRubric($qid,$newid);
+            if ($rubricItems > 0) {
+                $newid = $rubricItems['id'];
+            } else {
+                $rub = "'" . implode("','", $rubrow) . "'";
+                $temp = new Rubrics();
+                $rubricId = $temp->createNewEntry($userid,-1,$rub);
+                $newid = $rubricId;
             }
-        }
-        $ffound = array_keys($frubrictrack, $singleData['id']);
-        if (count($ffound) > 0) {
-            foreach ($ffound as $fid) {
-                Forums::setRubric($fid,$newid);
+            $qfound = array_keys($qrubrictrack, $singleData['id']);
+            if (count($qfound) > 0) {
+                foreach ($qfound as $qid) {
+                    Questions::setRubric($qid,$newid);
+                }
             }
-        }
-        $ofound = array_keys($offlinerubrics, $singleData['id']);
-        if (count($ofound) > 0) {
-            foreach ($ofound as $oid) {
-                GbItems::setRubric($oid,$newid);
+            $ffound = array_keys($frubrictrack, $singleData['id']);
+            if (count($ffound) > 0) {
+                foreach ($ffound as $fid) {
+                    Forums::setRubric($fid,$newid);
+                }
+            }
+            $ofound = array_keys($offlinerubrics, $singleData['id']);
+            if (count($ofound) > 0) {
+                foreach ($ofound as $oid) {
+                    GbItems::setRubric($oid,$newid);
+                }
             }
         }
     }
@@ -588,59 +623,58 @@ public static function handleextoolcopy($sourcecid,$courseId)
         return;
     }
     $toolmap = array();
-    Teacher::getByUserId($userid,$courseId);
-    $query = "SELECT id FROM imas_teachers WHERE courseid='$sourcecid' AND userid='$userid'";
-    $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-    if (mysql_num_rows($result) > 0) {
+    $teacherData = Teacher::getByUserId($userid,$courseId);
+    if (count($teacherData) > 0)
+    {
         $oktocopycoursetools = true;
     }
     $toolidlist = implode(',', $exttooltrack);
-    $query = "SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools ";
-    $query .= "WHERE id IN ($toolidlist)";
-    $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-    while ($row = mysql_fetch_row($result)) {
+    $externalTool = ExternalTools::dataForCopy($toolidlist);
+    foreach($externalTool as $row)
+    {
         $doremap = false;
-        if (!isset($toolmap[$row[0]])) {
-            //try url matching of existing tools in the destination course
-            $query = "SELECT id FROM imas_external_tools WHERE url='" . addslashes($row[4]) . "' AND courseid='$cid'";
-            $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
-            if (mysql_num_rows($res) > 0) {
-                $toolmap[$row[0]] = mysql_result($res, 0, 0);
+        if (!isset($toolmap[$row['id']]))
+        {
+            $query  = ExternalTools::getId($courseId,$row['url']);
+            if(count($query) > 0)
+            {
+                $toolmap[$row['id']] = $query[0]['id'];
             }
         }
-        if (isset($toolmap[$row[0]])) {
-            //already have remapped this tool - need to update linkedtext item
+        if (isset($toolmap[$row['id']]))
+        {
+
             $doremap = true;
-        } else if ($row[1] > 0 && $oktocopycoursetools) {
+        }
+        else if ($row['courseid'] > 0 && $oktocopycoursetools)
+        {
             //do copy
             $rowsub = array_slice($row, 3);
-            $rowsub = AppUtility::addslashes_deep($rowsub);
-            $rowlist = implode("','", $rowsub);
-            $query = "INSERT INTO imas_external_tools (courseid,groupid,name,url,ltikey,secret,custom,privacy) ";
-            $query .= "VALUES ('$cid','$groupid','$rowlist')";
-            mysql_query($query) or die("Query failed : " . mysql_error());
-            $toolmap[$row[0]] = mysql_insert_id();
+            $insert = new ExternalTools();
+            $insertId = $insert ->insertData($courseId,$groupid,$rowsub);
+            $toolmap[$row['id']] = $insertId;
             $doremap = true;
-        } else if ($row[1] == 0 && ($row[2] == 0 || $row[2] == $groupid)) {
-            //no need to copy anything - tool will just work
-        } else {
-            //not OK to copy; must disable tool in linked text item
-            $toupdate = implode(",", array_keys($exttooltrack, $row[0]));
-            $query = "UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)";
-            mysql_query($query) or die("Query failed : " . mysql_error());
         }
-        if ($doremap) {
-            //update the linkedtext item with the new tool id
-            $toupdate = implode(",", array_keys($exttooltrack, $row[0]));
-            $query = "SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)";
-            $res = mysql_query($query) or die("Query failed : " . mysql_error());
-            while ($r = mysql_fetch_row($res)) {
-                $text = str_replace('exttool:' . $row[0] . '~~', 'exttool:' . $toolmap[$row[0]] . '~~', $r[1]);
-                $query = "UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$r[0]}";
-                mysql_query($query) or die("Query failed : " . mysql_error());
+        else if ($row['courseid'] == 0 && ($row['groupid'] == 0 || $row['groupid'] == $groupid))
+        {
+
+        }
+        else
+        {
+            $toupdate = implode(",", array_keys($exttooltrack, $row['id']));
+            LinkedText::updateDataForCopyCourse($toupdate);
+        }
+        if ($doremap)
+        {
+            $toupdate = implode(",", array_keys($exttooltrack, $row['id']));
+            $query = LinkedText::getByIdForCopy($toupdate);
+            foreach($query as $data)
+            {
+                $text = str_replace('exttool:' . $row['id'] . '~~', 'exttool:' . $toolmap[$row['id']] . '~~', $data['text']);
+                LinkedText::updateData($text,$data['id']);
             }
         }
     }
-}
+ }
 }
 

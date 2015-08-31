@@ -21,4 +21,30 @@ class ExternalTools extends BaseImasExternalTools
             $toolsData->save();
         }
     }
+
+    public static function dataForCopy($toolidlist)
+    {
+        $query = \Yii::$app->db->createCommand("SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools WHERE id IN ($toolidlist)")->queryAll();
+        return $query;
+    }
+    public static function getId($courseId,$url)
+    {
+        $query  = \Yii::$app->db->createCommand("SELECT id FROM imas_external_tools WHERE url='" . addslashes($url) . "' AND courseid='$courseId'")->queryAll();
+        return $query;
+    }
+
+    public function insertData($courseId,$groupid,$rowsub)
+    {
+           $this->courseid = $courseId;
+           $this->groupid =  $groupid;
+           $this->name =  $rowsub['name'];
+           $this->url =  $rowsub['url'];
+           $this->ltikey =   $rowsub['ltikey'];
+           $this->secret =   $rowsub['secret'];
+           $this->custom =   $rowsub['custom'];
+           $this->privacy =   $rowsub['privacy'];
+           $this->save();
+        return $this->id;
+
+    }
 }

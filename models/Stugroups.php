@@ -107,4 +107,14 @@ class Stugroups extends BaseImasStugroups
         $this->save();
         return $this->id;
     }
+    public static function getAllIdName()
+    {
+
+        $query = new Query();
+        $query	->select(['id','name'])
+            ->from('imas_stugroups');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

@@ -6,6 +6,7 @@ use Yii;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasRubrics;
+use yii\db\Query;
 
 class Rubrics extends BaseImasRubrics
 {
@@ -27,6 +28,7 @@ class Rubrics extends BaseImasRubrics
         $this->rubrictype = $params['rubtype'];
         $this->rubric = $rubricTextDataArray;
         $this->save();
+       return $this->id;
     }
     public static function getByUserIdAndRubricId($currentUserId,$rubricId)
     {
@@ -37,19 +39,26 @@ class Rubrics extends BaseImasRubrics
     public static function getByUserIdAndGroupId($userId,$groupid,$list)
     {
         $rubricsData = Rubrics::find()->where(['in','id',$list])->andwhere('ownerid = :ownerid',[':ownerid' => $userId])
-        ->orWhere( ['groupid = :groupid',':groupid' => $groupid])->all();
+        ->orWhere( 'groupid = :groupid',[':groupid' => $groupid])->all();
         return $rubricsData;
     }
 
     public static function getByUserIdAndGroupIdAndList($userId,$groupid,$list)
     {
-        $rubricsData = Rubrics::find()->where(['in','id',$list])->andWhere('ownerid != :ownerid',[':ownerid' => $userId])
-            ->orWhere( ['groupid != :groupid',':groupid' => $groupid])->all();
-        return $rubricsData;
+        $query = Yii::$app->db->createCommand("SELECT id FROM imas_rubrics WHERE id IN ($list) AND NOT (ownerid='$userId' OR groupid='$groupid')")->queryAll();
+        return $query;
     }
 
-    public static function getById($id){
-        return $rubricData = Rubrics::findOne(['id' => $id]);
+    public static function getById($id)
+    {
+        $query = new Query();
+        $query ->select(['name','rubrictype','rubric'])
+                ->from('imas_rubrics')
+                ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
     }
 
     public static function getByUserIdAndGroupIdAndRubric($rubric,$userid,$groupid){

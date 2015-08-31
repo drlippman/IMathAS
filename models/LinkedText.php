@@ -123,4 +123,19 @@ class LinkedText extends BaseImasLinkedtext
         return $query;
     }
 
+
+    public static function updateDataForCopyCourse($toupdate)
+    {
+        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='<p>Unable to copy tool</p>' WHERE id IN ($toupdate)")->queryAll();
+
+    }
+    public static function getByIdForCopy($toupdate)
+    {
+        $query  = \Yii::$app->db->createCommand("SELECT id,text FROM imas_linkedtext WHERE id IN ($toupdate)");
+        return $query;
+    }
+    public static function updateData($text,$id)
+    {
+        $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$id}")->queryAll();
+    }
 }

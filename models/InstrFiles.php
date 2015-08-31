@@ -5,6 +5,7 @@ namespace app\models;
 
 use app\components\AppUtility;
 use app\models\_base\BaseImasInstrFiles;
+use yii\db\Query;
 
 class InstrFiles extends BaseImasInstrFiles
 {
@@ -21,12 +22,25 @@ class InstrFiles extends BaseImasInstrFiles
         return $this->id;
     }
 
-    public static function deleteById($itemId){
+    public static function deleteById($itemId)
+    {
         $instrFileData = InstrFiles::findAll(['itemid' => $itemId]);
         if($instrFileData){
             foreach($instrFileData as $singleFile){
                 $singleFile->delete();
             }
         }
+    }
+
+    public static function getFileName($itemId)
+    {
+        $query = new Query();
+        $query ->select(['description','filename','id'])
+               ->from('imas_instr_files')
+                ->where(['itemid' => $itemId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
     }
 } 

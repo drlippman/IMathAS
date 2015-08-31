@@ -161,4 +161,29 @@ class GbItems extends BaseImasGbitems
         $GbItems->outcomes = isset($params['outcomes']) ? $params['outcomes']:null ;
         $GbItems->save();
     }
+
+    public static function getDataForCopyCourse($ctc)
+    {
+        $query = new Query();
+        $query->select(['name','points','showdate','gbcategory','cntingb','tutoredit','rubric'])
+            ->from('imas_gbitems ')
+            ->where(['courseid' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function insertData($courseId,$params)
+    {
+        $this->courseid = $courseId;
+        $this->name = $params['name'];
+        $this->points = $params['points'];
+        $this->showdate = $params['showdate'];
+        $this->gbcategory = $params['gbcategory'];
+        $this ->rubric = $params['rubric'];
+        $this->cntingb = $params['cntingb'];
+        $this->tutoredit = $params['tutoredit'];
+        $this->save();
+        return $this->id;
+    }
 }
