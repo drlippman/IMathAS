@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
     $message = '';
 }?>
 <div class="tab-content shadowBox">
-    <div class="inner-reply-msg-content">
+    <div class="inner-reply-msg-content padding-top-one-ten">
         <div class="drop-down padding-top col-sm-12">
             <div class="col-sm-1"><?php echo AppUtility::t('To');?></div>
             <div class="col-sm-11"><?php echo ucfirst($fromUser->FirstName) . ' ' . ucfirst($fromUser->LastName); ?>&nbsp;&nbsp;<a

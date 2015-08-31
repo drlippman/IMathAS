@@ -36,40 +36,39 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
     <div class="inner-reply-msg-content">
-        <div class="drop-down col-sm-12 padding-top">
-            <span class="col-sm-1"><?php echo AppUtility::t('To')?></span>
-            <?php if($newTo)
-            {?>
-                    <input type="hidden" id="newTo" value="1">
-                    <input type="hidden" id="newUserId" value="<?php echo $loginid?>">
-                    <span class="col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
-        <?php }else
+        <div class="padding-top-one-thwenty">
+            <div class="drop-down col-sm-12 padding-top">
+                <span class="col-sm-1"><?php echo AppUtility::t('To')?></span>
+                <?php if($newTo)
                 {?>
-                <span class="col-sm-4">
-                <select name="seluid" class="dropdown form-control" id="seluid">
-                    <option value="0">Select a recipient</option>
-                    <?php foreach ($users as $user) { ?>
-                    <option value="<?php echo $user['id'] ?>">
-                        <?php echo ucfirst($user['LastName']).", ".ucfirst($user['FirstName']); ?>
-                        </option><?php } ?>
-                </select>
-                    <?php }?>
-            </span>
-        </div>
+                        <input type="hidden" id="newTo" value="1">
+                        <input type="hidden" id="newUserId" value="<?php echo $loginid?>">
+                        <span class="col-sm-4"><strong><?php echo ucfirst($username->FirstName) . " " . ucfirst($username->LastName);?></strong>
+            <?php }else
+                    {?>
+                    <span class="col-sm-4">
+                    <select name="seluid" class="dropdown form-control" id="seluid">
+                        <option value="0">Select a recipient</option>
+                        <?php foreach ($users as $user) { ?>
+                        <option value="<?php echo $user['id'] ?>">
+                            <?php echo ucfirst($user['LastName']).", ".ucfirst($user['FirstName']); ?>
+                            </option><?php } ?>
+                    </select>
+                        <?php }?>
+                </span>
+            </div>
 
-        <div class="col-sm-12 padding-top">
-            <span class="col-sm-1"><?php echo AppUtility::t('Subject')?></span>
-            <span class="col-sm-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
-        </div>
+            <div class="col-sm-12 padding-top">
+                <span class="col-sm-1"><?php echo AppUtility::t('Subject')?></span>
+                <span class="col-sm-4"><?php echo '<input class="textbox subject form-control" type="text" maxlength="100" >'; ?></span>
+            </div>
 
-        <div class="col-sm-12 padding-top">
-            <span class="col-sm-1"><?php echo AppUtility::t('Message')?></span>
-            <?php echo "<span class='left col-sm-11'><div class= 'editor'>
-        <textarea id='message' name='message' style='width: 70%;' rows='12' cols='15'>";
-            echo "</textarea></div></span><br>"; ?>
+            <div class="col-sm-12 padding-top">
+                <span class="col-sm-1"><?php echo AppUtility::t('Message')?></span>
+                <?php echo "<span class='left col-sm-11'><div class= 'editor'>
+            <textarea id='message' name='message' style='width: 70%;' rows='12' cols='15'>";
+                echo "</textarea></div></span><br>"; ?>
+            </div>
         </div>
-
     </div>
-
-
 </div>

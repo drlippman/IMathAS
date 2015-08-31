@@ -35,7 +35,7 @@ $now = $currentTime;
 </div>
 <div class="tab-content shadowBox ">
     <br>
-     <div class="view-message-inner-contents">
+     <div class="view-message-inner-contents margin-top-fifty">
          <div class="row">
 
                  <div class=" col-sm-6 message-title">

@@ -109,7 +109,7 @@ $now = $currentTime;
                     ]);
                 echo '</div>';?>
                 <?php
-                echo '<label class="end col-lg-1 select-text-margin">At</label>';
+                echo '<label class="end col-lg-1 select-text-margin margin-right-minus-thirtythree">At</label>';
                 echo '<div class="pull-left col-lg-4">';
                 echo TimePicker::widget([
                         'name' => 'startTime',

@@ -57,9 +57,10 @@ class RegistrationForm extends Model
 
         return [
             [['FirstName', 'LastName', 'username', 'password','email'], 'required'],
-            ['email','email','message' => 'The email address is not valid.'],
+            ['email','email','message' => 'Enter a valid email address.'],
             [['password'], 'string', 'max' => 254],
-            [['FirstName', 'LastName'], 'string', 'max' => 20],
+            [['FirstName', 'LastName'], 'string', 'max' => 20,'tooLong'=>'{attribute} contains maximum 20 characters.'],
+            ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens (-).'],
             [['email'], 'string', 'max' => 100],
             ['phoneno','number'],
             [['phoneno'], 'string','max'=> 10,'min'=> 10],

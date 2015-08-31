@@ -30,9 +30,9 @@ class StudentRegisterForm extends Model
     {
         return [
 
-            [['username', 'password', 'firstName', 'lastName'], 'required'],
+            [['username', 'password', 'firstName', 'lastName','email'], 'required'],
             ['username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u', 'message' => 'Username can contain only alphanumeric characters and hyphens (-).'],
-            ['rePassword', 'compare', 'compareAttribute' => 'password','message'=>'Confirm password must be repeated exactly.'],
+            ['rePassword', 'compare', 'compareAttribute' => 'password','message'=>'Confirm password does not match with password.'],
             [['firstName', 'lastName'], 'string', 'max' => 20, 'tooLong'=>'{attribute} contains maximum 20 characters.'],
             ['email', 'email','message' => 'Enter a valid email address.'],
             ['NotifyMeByEmailWhenIReceiveANewMessage', 'boolean'],
