@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'password')->passwordInput() ?>
         <?= $form->field($model, 'rePassword')->passwordInput() ?>
         <?= $form->field($model, 'firstName')->textInput(); ?>
-        <?= $form->field($model, 'lastName') ?>
+        <?= $form->field($model, 'lastName')->textInput(); ?>
         <?= $form->field($model, 'email') ?>
         <?=
         $form->field($model, 'NotifyMeByEmailWhenIReceiveANewMessage',

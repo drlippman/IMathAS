@@ -25,9 +25,10 @@ class AdminController extends AppController
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
         $user = $this->getAuthenticatedUser();
+        $userId = $user->id;
         $myRights = $user['rights'];
-        $groupId = $user['groupid'];
-        if ($myRights==100) {
+        $groupId= $user['groupid'];
+        if ($myRights == AppConstant::NUMERIC_HUNDREAD) {
             if (isset($_GET['showusers'])) {
                 setcookie('showusers',$_GET['showusers']);
                 $showusers = $_GET['showusers'];
@@ -37,7 +38,50 @@ class AdminController extends AppController
                 $showusers = $groupId;
             }
         } else {
-            $showusers = 0;
+            $showusers = AppConstant::NUMERIC_ZERO;
+        }
+        if ($myRights >= 75) {
+            if (isset($_GET['showcourses'])) {
+                setcookie('showcourses',$_GET['showcourses']);
+                $showcourses = $_GET['showcourses'];
+            } else if (isset($_COOKIE['showcourses'])) {
+                $showcourses = $_COOKIE['showcourses'];
+            } else {
+                $showcourses = 0; //0: mine, #: userid
+            }
+        } else {
+            $showcourses = 0;
+        }
+
+        if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ZERO;
+        } else {
+            $query = Course::getCourseData($myRights, $showcourses, $userId);
+            $page_courseList = array();
+            $i=0;
+            foreach($query as $key => $line)
+            {
+                $page_courseList[$i]['id'] = $line['id'];
+                $page_courseList[$i]['name'] = $line['name'];
+                $page_courseList[$i]['LastName'] = $line['LastName'];
+                $page_courseList[$i]['FirstName'] = $line['FirstName'];
+                $page_courseList[$i]['ownerid'] = $line['ownerid'];
+                $page_courseList[$i]['available'] = $line['available'];
+                if (isset($CFG['GEN']['addteachersrights'])) {
+                    $minrights = $CFG['GEN']['addteachersrights'];
+                } else {
+                    $minrights = 40;
+                }
+                $page_courseList[$i]['addRemove'] = ($myRights < $minrights) ? "" : "<a href='#'>Add/Remove</a>";
+                $page_courseList[$i]['transfer'] = ($line['ownerid']!=$userId && $myRights <75) ? "" : "<a href='#'>Transfer</a>";
+                $i++;
+            }
+        }
+        //get list of teachers for the select box
+        if ($myRights == 75) {
+            $result = User::getListOfTeacher($groupId);
+        } else if ($myRights == 100) {
+            $result = User::getTeacherData();
         }
 
         //DATA PROCESSING FOR USERS BLOCK
@@ -95,7 +139,7 @@ class AdminController extends AppController
         }
         $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        return $this->renderWithData('index', ['users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights]);
+        return $this->renderWithData('index', ['users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights, 'page_courseList' => $page_courseList, 'result' => $result]);
     }
 /*
  * This method to add new user

@@ -128,6 +128,8 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $params['SID'] = $params['username'];
         $params['password'] = AppUtility::passwordHash($params['password']);
         $params['hideonpostswidget'] = '0';
+        $params['FirstName'] = $params['firstName'];
+        $params['LastName'] = $params['lastName'];
         $user = new User();
         $user->attributes = $params;
         $user->save();
@@ -373,5 +375,16 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         }
         $data = Yii::$app->db->createCommand($query)->queryAll();
         return $data;
+    }
+
+    public  static function getListOfTeacher($groupId)
+    {
+        $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 AND groupid='$groupId' ORDER BY LastName,FirstName";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
+    public static function getTeacherData()
+    {
+        $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 }

@@ -308,4 +308,30 @@ class Course extends BaseImasCourses {
         return $data;
 
     }
+    public static function getCourseData($myRights, $showcourses, $userId)
+    {
+        $query = new Query();
+        $query	->select(['imas_courses.id','imas_courses.ownerid','imas_courses.name','imas_courses.available','imas_users.FirstName','imas_users.LastName'])
+            ->from('imas_courses')
+            ->join('JOIN',
+                'imas_users',
+                'imas_courses.ownerid=imas_users.id'
+            );
+        if($myRights > AppConstant::ADMIN_RIGHT){
+            $query->andWhere(['imas_courses.available<4']);
+        }
+        if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==0){
+            $query->andWhere(['imas_courses.ownerid' => $userId]);
+        }
+        if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > 0)
+        {
+            $query->andWhere(['imas_courses.ownerid' => $showcourses]);
+            $query->orderBy('imas_users.LastName,imas_courses.name');
+        } else{
+            $query->orderBy('imas_courses.name');
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

@@ -38,7 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
     $model->timelimitmult = AppUtility::getStringVal($studentData['timelimitmult']);
     $model->hidefromcourselist = AppUtility::getStringVal($studentData['hidefromcourselist']);
     ?>
-    <fieldset>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
             'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
@@ -87,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="change-password-content">
             <?php echo $form->field($model, 'password')->textInput(); ?>
          </div>
-    </fieldset>
+
     <br>
      <div class="form-group">
         <div class=" col-sm-9 col-sm-offset-3 display_field">

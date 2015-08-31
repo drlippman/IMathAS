@@ -31,7 +31,47 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </tr>
             </thead>
-            <tbody class="course-table-body">
+            <tbody class="">
+            <?php
+            $alt = 0;
+            for ($i=0;$i<count($page_courseList);$i++) {
+
+                if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
+                ?>
+                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index?cid='.$page_courseList[$i]['id'])?>">
+                        <?php
+                        if (($page_courseList[$i]['available']&1)==1) {
+                            echo '<i>';
+                        }
+                        if (($page_courseList[$i]['available']&2)==2) {
+                            echo '<span style="color:#aaf;">';
+                        }
+                        if (($page_courseList[$i]['available']&4)==4) {
+                            echo '<span style="color:#faa;text-decoration: line-through;">';
+                        }
+
+                        echo $page_courseList[$i]['name'];
+
+                        if (($page_courseList[$i]['available']&1)==1) {
+                            echo '</i>';
+                        }
+                        if (($page_courseList[$i]['available']&2)==2 || ($page_courseList[$i]['available']&4)==4) {
+                            echo '</span>';
+                        }
+
+                        ?>
+                    </a>
+                </td>
+                <td class=c><?php echo $page_courseList[$i]['id'] ?></td>
+                <td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
+                <td class=c><a href="#">Settings</a></td>
+                <td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
+                <td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
+                <td class=c><a href="#">Delete</a></td>
+                </tr>
+            <?php
+            }
+            ?>
             </tbody>
         </table>
         <div class="lg-col-2 pull-left">
@@ -41,12 +81,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="lg-col-2 pull-left select-text-margin">
         &nbsp;&nbsp;Show courses of:&nbsp;&nbsp;
         </div>
+
         <div class="lg-col-3 pull-left">
             <select name="seluid" class="dropdown form-control" id="seluid" onchange="showcourses()">
                 <option value="0" selected>Select a user..</option>
-                <?php foreach ($users as $user) { ?>
+                <?php  $i=0;
+                foreach($result as $key => $row)
+                 {  $page_teacherSelectVal[$i] = $row['id'];?>
                     <option
-                        value="<?php echo $user['id'] ?>"><?php echo $user['FirstName'] . " " . $user['LastName'] . "(" . $user['SID'] . ")"; ?></option>
+                        value="<?php echo $page_teacherSelectLabel[$i] ?>"><?php echo $row['LastName'] . ", " . $row['FirstName']. ' ('.$row['SID'].')'; $i++;?></option>
                 <?php } ?>
             </select>
         </div>
@@ -150,9 +193,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?php echo $page_userDataEmail[$i] ?></td>
                 <td><?php echo $page_userDataType[$i] ?></td>
                 <td><?php echo $page_userDataLastAccess[$i] ?></td>
-                <td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
-                <td class=c><a href="actions.php?action=resetpwd&id=<?php echo $page_userDataId[$i] ?>">Reset</a></td>
-                <td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
+                <td class=c><a href="#" ?>">Change</a></td>
+                <td class=c><a href="#">Reset</a></td>
+                <td class=c><a href="#">Delete</a></td>
                 </tr>
             <?php
             }
@@ -190,7 +233,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="clear"></div>
 </div>
-<div class="footerwrapper"></div>
 </div>
 <script type="text/javascript">
      $(document).ready(function () {
@@ -274,4 +316,10 @@ $this->params['breadcrumbs'][] = $this->title;
         $(".user-table-body").append(html);
         $('.user-table').DataTable();
     }
+     function showcourses() {
+           var uid=document.getElementById("seluid").value;
+           if (uid>0) {
+               window.location='admin/index?showcourses='+uid;
+           }
+     }
 </script>
