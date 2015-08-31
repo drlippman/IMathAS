@@ -139,12 +139,53 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Delete</th>
             </tr>
             </thead>
-            <tbody class="user-table-body">
+            <tbody class="">
+
+            <?php
+            for ($i=0;$i<count($page_userDataId);$i++) {
+                if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
+                ?>
+                <td><?php echo $page_userDataLastName[$i] . ", " . $page_userDataFirstName[$i] ?></td>
+                <td><?php echo $page_userDataSid[$i] ?></td>
+                <td><?php echo $page_userDataEmail[$i] ?></td>
+                <td><?php echo $page_userDataType[$i] ?></td>
+                <td><?php echo $page_userDataLastAccess[$i] ?></td>
+                <td class=c><a href="forms.php?action=chgrights&id=<?php echo $page_userDataId[$i] ?>">Change</a></td>
+                <td class=c><a href="actions.php?action=resetpwd&id=<?php echo $page_userDataId[$i] ?>">Reset</a></td>
+                <td class=c><a href="forms.php?action=deladmin&id=<?php echo $page_userDataId[$i] ?>">Delete</a></td>
+                </tr>
+            <?php
+            }
+            ?>
 
             </tbody>
         </table>
         <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add
             New User</a>
+        <?php
+        //if ($myrights==100) {
+            writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");
+        //}
+        ?>
+        <?php
+        function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
+        echo "<select class='user-select' name=\"$name\" id=\"$name\" ";
+        echo (isset($actions)) ? $actions : "" ;
+        echo ">\n";
+        if (isset($defaultLabel) && isset($defaultVal)) {
+        echo "		<option value=\"$defaultVal\" selected>$defaultLabel</option>\n";
+        }
+        for ($i=0;$i<count($valList);$i++) {
+        if ((isset($selectedVal)) && ($valList[$i]==$selectedVal)) {
+        echo "		<option value=\"$valList[$i]\" selected>$labelList[$i]</option>\n";
+        } else {
+        echo "		<option value=\"$valList[$i]\">$labelList[$i]</option>\n";
+        }
+        }
+        echo "</select>\n";
+        }
+        ?>
+
     </div>
 
     <div class="clear"></div>
@@ -157,7 +198,10 @@ $this->params['breadcrumbs'][] = $this->title;
         jQuerySubmit('get-all-course-user-ajax',{},'getAllCourseSuccess');
 
     });
-
+     function showgroupusers() {
+         var grpid=document.getElementById("selgrpid").value;
+         window.location= 'index?showusers='+grpid;
+         }
     function getAllCourseSuccess(response)
     {
         var courseData = JSON.parse(response);

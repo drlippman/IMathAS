@@ -181,4 +181,6 @@ class AppConstant
     const NO_SETTING = 'No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.';
     const NO_ASSESSMENT = 'No assessments are selected to be changed.';
     const NO_ASSESSMENT_TO_CHANGE = 'No Assessments to change.';
+    const NON_STUDENT = "Group - Non Students";
+    const PENDING_USERS = "Pending Users";
 }

@@ -314,8 +314,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return Yii::$app->db->createCommand($query)->queryAll();
     }
 
-    public static function userDataForGroups($remove)
-    {
+    public static function userDataForGroups($remove) {
         $query = new Query();
         $query ->select(['FirstName','LastName'])
             ->from('imas_users')
@@ -323,7 +322,22 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
 
+    public static function getUserByIdAndGroupId($rights,$groupId,$orderBy) {
+        $user = User::find()->where(['>','rights',$rights])->andWhere(['groupid' => $groupId])->orderBy($orderBy)->all();
+        return $user;
+    }
+    public static function getUserByRights($rightsZero,$rightsTwelve,$orderBy) {
+        $user = User::find()->where(['rights' => $rightsZero])->orWhere(['rights' => $rightsTwelve])->orderBy($orderBy)->all();
+        return $user;
+    }
+    public static function getUserByLastNameSubstring($showusers,$orderBy) {
+        $user =  User::find()
+            ->where('LastName LIKE :query')
+            ->addParams([':query'=>$showusers.'%'])
+            ->all();
+        return $user;
     }
 
     public static function getNameByIdUsingINClause($ids)
