@@ -1,6 +1,7 @@
 $(document).ready(function () {
     initEditor();
     tinyMCE.triggerSave();
+
 });
 function linktypeupdate(el) {
     var tochg = ["text", "web", "file", "tool"];

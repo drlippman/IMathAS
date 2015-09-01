@@ -91,6 +91,7 @@ class AssessmentUtility extends Component
 
 //writeHtmlSelected is used for selecting the appropriate entry in a select item
     public static function writeHtmlSelected ($var,$test,$notEqual=null) {
+
         if ((isset($notEqual)) && ($notEqual==1)) {
             if ($var!=$test) {
                 echo 'selected="selected"';

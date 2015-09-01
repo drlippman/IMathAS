@@ -953,10 +953,6 @@ class CourseController extends AppController
         }
         if ($params['id']) {
             $linkData = LinkedText::getById($params['id']);
-            $gbcat = AppConstant::NUMERIC_ZERO;
-            $cntingb = AppConstant::NUMERIC_ONE;
-            $tutoredit = AppConstant::NUMERIC_ZERO;
-            $gradesecret = uniqid();
             if ($linkData['avail'] == AppConstant::NUMERIC_TWO && $linkData['startdate'] > AppConstant::NUMERIC_ZERO) {
                 $altoncal = AppConstant::NUMERIC_ONE;
             } else {
@@ -970,7 +966,6 @@ class CourseController extends AppController
                 $type = 'file';
                 $fileInitialCount = AppConstant::NUMERIC_SIX + strlen($courseId);
                 $filename = substr($linkData['text'], $fileInitialCount);
-                $line['text'] = "<p>Enter text here</p>";
             } else if (substr($linkData['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_EIGHT) == 'exttool:') {
                 $type = 'tool';
                 $points = $linkData['points'];
@@ -988,7 +983,6 @@ class CourseController extends AppController
                     $tutoredit = $toolParts[5];
                     $gradesecret = $toolParts[6];
                 }
-                $line['text'] = "<p>Enter text here</p>";
             } else {
                 $type = 'text';
             }
@@ -1018,16 +1012,15 @@ class CourseController extends AppController
                 $eDate = date("m/d/Y",strtotime("+1 week"));
                 $eTime = time();
             }
-
             $saveTitle = "Modify Link";
             $saveButtonTitle = "Save Changes";
             $gradesecret = uniqid();
-            $gradeoutcomes = array();
             $defaultValues = array(
                 'title' => $linkData['title'],
                 'summary' => $linkData['summary'],
                 'text' => $linkData['text'],
                 'startDate' => $startDate,
+                'gradeoutcomes' => $gradeoutcomes,
                 'endDate' => $endDate,
                 'sDate' => $sDate,
                 'sTime' =>$sTime,
@@ -1053,7 +1046,8 @@ class CourseController extends AppController
                 'calendar' => $linkData['oncal'],
                 'avail' => $linkData['avail'],
                 'open-page-in' => $linkData['target'],
-                'altoncal' => $altoncal
+                'altoncal' => $altoncal,
+                'caltag' => $linkData['caltag'],
             );
         } else {
             $defaultValues = array(
@@ -1062,6 +1056,8 @@ class CourseController extends AppController
                 'title' => "Enter title here",
                 'summary' => "Enter summary here (displays on course page)",
                 'text' => "Enter text here",
+                'gradeoutcomes' => array(),
+                'type' => 'text',
                 'points' => AppConstant::NUMERIC_ZERO,
                 'sDate' => date("m/d/Y"),
                 'sTime' => time(),
@@ -1070,8 +1066,15 @@ class CourseController extends AppController
                 'calendar' => AppConstant::NUMERIC_ZERO,
                 'avail' => AppConstant::NUMERIC_ONE,
                 'open-page-in' => AppConstant::NUMERIC_ZERO,
-                'calendar-always' => AppConstant::NUMERIC_ONE,
                 'cntingb' => AppConstant::NUMERIC_ONE,
+                'tutoredit' => AppConstant::NUMERIC_ZERO,
+                'filename' => ' ',
+                'selectedtool' => 0,
+                'endDate' => AppConstant::NUMERIC_ONE,
+                'startDate' => AppConstant::NUMERIC_ONE,
+                'gradesecret' => uniqid(),
+                'altoncal' => AppConstant::NUMERIC_ZERO,
+                'caltag' => '!'
             );
         }
         if ($this->isPostMethod()) { //after modify done, save into database
@@ -1110,12 +1113,13 @@ class CourseController extends AppController
                     $this->setSuccessFlash('Select external Tool');
                     return $this->redirect(AppUtility::getURLFromHome('course', 'course/add-link?cid=' . $course->id));
                 } else {
+
                     $params['text'] = 'exttool:' . $params['tool'] . '~~' . $params['toolcustom'] . '~~' . $params['toolcustomurl'];
                     if ($params['usegbscore'] == AppConstant::NUMERIC_ZERO || $params['points'] == AppConstant::NUMERIC_ZERO) {
-                        $points = AppConstant::NUMERIC_ZERO;
+                        $params['points'] = AppConstant::NUMERIC_ZERO;
                     } else {
                         $params['text'] .= '~~' . $params['gbcat'] . '~~' . $params['cntingb'] . '~~' . $params['tutoredit'] . '~~' . $params['gradesecret'];
-                        $points = intval($params['points']);
+                        $params['points'] = intval($params['points']);
                     }
                 }
             }
@@ -1124,7 +1128,6 @@ class CourseController extends AppController
                 $externalToolsData->updateExternalToolsData($params);
             }
             $caltag = $params['tag'];
-            $points = AppConstant::NUMERIC_ZERO;
             if ($params['avail']== AppConstant::NUMERIC_ONE) {
                 if ($params['available-after']== AppConstant::NUMERIC_ZERO) {
                     $startDate = AppConstant::NUMERIC_ZERO;
@@ -1156,7 +1159,6 @@ class CourseController extends AppController
             }
             $finalArray['courseid'] = $params['cid'];
             $finalArray['title'] = $params['name'];
-
             $str = '<p>Enter summary here (displays on course page)</p>';
             if ($params['summary']== $str) {
                 $finalArray['summary'] = ' ';
@@ -1173,7 +1175,6 @@ class CourseController extends AppController
             $finalArray['target'] = $params['target'];
             $finalArray['points'] = $params['points'];
             $finalArray['target'] = $params['open-page-in'];
-            $finalArray['points'] = $points;
             $finalArray['startdate'] = $startDate;
             $finalArray['enddate'] = $endDate;
             $finalArray['outcomes'] = $outcomes;
@@ -1205,7 +1206,6 @@ class CourseController extends AppController
             $this->includeJS(["editor/tiny_mce.js", "general.js"]);
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
-
         $this->includeCSS(["course/items.css"]);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'linkData' => $linkData,

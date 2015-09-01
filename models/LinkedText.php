@@ -57,6 +57,7 @@ class LinkedText extends BaseImasLinkedtext
 
     public function updateLinkData($params)
     {
+
         $updaateLink = LinkedText::findOne(['id' => $params['id']]);
         $updaateLink->courseid = $params['courseid'];
         $updaateLink->title = $params['title'];
@@ -69,6 +70,7 @@ class LinkedText extends BaseImasLinkedtext
         $updaateLink->points= $params['points'];
         $updaateLink->startdate = $params['startdate'];
         $updaateLink->enddate = $params['enddate'];
+        $updaateLink->outcomes = $params['outcomes'];
         $updaateLink->save();
     }
     public static function findByCourseId($cid)
