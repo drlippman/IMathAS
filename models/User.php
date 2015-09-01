@@ -424,4 +424,4 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
-}
+}   
