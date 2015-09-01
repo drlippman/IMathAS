@@ -154,11 +154,14 @@ class OutcomesController extends AppController
         $studentsOutcome = $this->getParamVal('stud');
         $typeSelected = $this->getParamVal('type');
         $outcomeData = Outcomes::getByCourseId($courseId);
-        if($studentsOutcome){
-            $finalData = $this->outcomeTable($courseId,$studentsOutcome);
-        }else
+        if($outcomeData)
         {
-            $finalData = $this->outcomeTable($courseId);
+            if($studentsOutcome){
+                $finalData = $this->outcomeTable($courseId,$studentsOutcome);
+            }else
+            {
+                $finalData = $this->outcomeTable($courseId);
+            }
         }
         if (isset($typeSelected))
         {
@@ -940,39 +943,42 @@ class OutcomesController extends AppController
          }
          for ($ln = AppConstant::NUMERIC_ONE; $ln<count($sturow)+AppConstant::NUMERIC_ONE;$ln++)
          {
-             foreach($gb[0][1] as $col=>$inf) {
-                 if ($gb[0][1][$col][2]>AppConstant::NUMERIC_ZERO || count($gb[$ln][1][$col][1])>AppConstant::NUMERIC_ZERO) {continue;} //skip if current, or if already set
-                 if ($inf[4]==AppConstant::NUMERIC_ZERO && count($possible[$assessidx[$inf[5]]])==AppConstant::NUMERIC_ZERO) {continue;} //assess has no outcomes
-                 $gb[$ln][1][$col] = array();
-                 $gb[$ln][1][$col][0] = array();
-                 $gb[$ln][1][$col][1] = array();
-                 if ($inf[4]==AppConstant::NUMERIC_ZERO)
-                 { //online item
-                     $i = $assessidx[$inf[5]];
-                     foreach ($possible[$i] as $oc=>$p)
-                     {
-                         $gb[$ln][1][$col][0][$oc] = AppConstant::NUMERIC_ZERO;
-                         $gb[$ln][1][$col][1][$oc] = $p;
-                         $cattotpast[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
-                         $catposspast[$ln][$category[$i]][$oc][$col] = $p;
-                         $cattotcur[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
-                         $catposscur[$ln][$category[$i]][$oc][$col] = $p;
-                     }
-                     $gb[$ln][1][$col][3] = AppConstant::NUMERIC_ZERO;
-                     $gb[$ln][1][$col][4] = 'new';
-                 }else { //offline or discussion
-                     if ($inf[4]==AppConstant::NUMERIC_ONE) {
-                         $i = $gradeidx[$inf[5]];
-                     } else if ($inf[4]==AppConstant::NUMERIC_TWO) {
-                         $i = $discussidx[$inf[5]];
-                     }
-                     foreach ($itemoutcome[$i] as $oc) {
-                         $gb[$ln][1][$col][0][$oc] = AppConstant::NUMERIC_ZERO;
-                         $gb[$ln][1][$col][1][$oc] = $possible[$i];
-                         $cattotpast[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
-                         $catposspast[$ln][$category[$i]][$oc][$col] = $possible[$i];
-                         $cattotcur[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
-                         $catposscur[$ln][$category[$i]][$oc][$col] = $possible[$i];
+             if($gb[0][1])
+             {
+                 foreach($gb[0][1] as $col=>$inf) {
+                     if ($gb[0][1][$col][2]>AppConstant::NUMERIC_ZERO || count($gb[$ln][1][$col][1])>AppConstant::NUMERIC_ZERO) {continue;} //skip if current, or if already set
+                     if ($inf[4]==AppConstant::NUMERIC_ZERO && count($possible[$assessidx[$inf[5]]])==AppConstant::NUMERIC_ZERO) {continue;} //assess has no outcomes
+                     $gb[$ln][1][$col] = array();
+                     $gb[$ln][1][$col][0] = array();
+                     $gb[$ln][1][$col][1] = array();
+                     if ($inf[4]==AppConstant::NUMERIC_ZERO)
+                     { //online item
+                         $i = $assessidx[$inf[5]];
+                         foreach ($possible[$i] as $oc=>$p)
+                         {
+                             $gb[$ln][1][$col][0][$oc] = AppConstant::NUMERIC_ZERO;
+                             $gb[$ln][1][$col][1][$oc] = $p;
+                             $cattotpast[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
+                             $catposspast[$ln][$category[$i]][$oc][$col] = $p;
+                             $cattotcur[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
+                             $catposscur[$ln][$category[$i]][$oc][$col] = $p;
+                         }
+                         $gb[$ln][1][$col][3] = AppConstant::NUMERIC_ZERO;
+                         $gb[$ln][1][$col][4] = 'new';
+                     }else { //offline or discussion
+                         if ($inf[4]==AppConstant::NUMERIC_ONE) {
+                             $i = $gradeidx[$inf[5]];
+                         } else if ($inf[4]==AppConstant::NUMERIC_TWO) {
+                             $i = $discussidx[$inf[5]];
+                         }
+                         foreach ($itemoutcome[$i] as $oc) {
+                             $gb[$ln][1][$col][0][$oc] = AppConstant::NUMERIC_ZERO;
+                             $gb[$ln][1][$col][1][$oc] = $possible[$i];
+                             $cattotpast[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
+                             $catposspast[$ln][$category[$i]][$oc][$col] = $possible[$i];
+                             $cattotcur[$ln][$category[$i]][$oc][$col] = AppConstant::NUMERIC_ZERO;
+                             $catposscur[$ln][$category[$i]][$oc][$col] = $possible[$i];
+                         }
                      }
                  }
              }
@@ -1043,20 +1049,24 @@ class OutcomesController extends AppController
          if ($limuser<AppConstant::NUMERIC_ONE) {
              $gb[$ln][0][0] = "Averages";
              $gb[$ln][0][1] = AppConstant::NUMERIC_NEGATIVE_ONE;
-             foreach ($gb[0][1] as $i=>$inf) {
-                 $avg = array();  $avgposs = array();
-                 for ($j=1;$j<$ln;$j++) {
-                     if (isset($gb[$j][1][$i]) && isset($gb[$j][1][$i][0])) {
-                         foreach ($gb[$j][1][$i][0] as $oc=>$sc) {
-                             if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
-                             $avg[$oc][] = $sc;
-                             $avgposs[$oc][] = $gb[$j][1][$i][1][$oc];
+             if($gb[0][1])
+             {
+                 foreach ($gb[0][1] as $i=>$inf)
+                 {
+                     $avg = array();  $avgposs = array();
+                     for ($j=1;$j<$ln;$j++) {
+                         if (isset($gb[$j][1][$i]) && isset($gb[$j][1][$i][0])) {
+                             foreach ($gb[$j][1][$i][0] as $oc=>$sc) {
+                                 if (!isset($avg[$oc])) { $avg[$oc] = array(); $avgposs[$oc] = array();}
+                                 $avg[$oc][] = $sc;
+                                 $avgposs[$oc][] = $gb[$j][1][$i][1][$oc];
+                             }
                          }
                      }
-                 }
-                 foreach ($avg as $oc=>$scs) {
-                     $gb[$ln][1][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
-                     $gb[$ln][1][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
+                     foreach ($avg as $oc=>$scs) {
+                         $gb[$ln][1][$i][0][$oc] = array_sum($avg[$oc])/count($avg[$oc]);
+                         $gb[$ln][1][$i][1][$oc] = array_sum($avgposs[$oc])/count($avg[$oc]);
+                     }
                  }
              }
              foreach ($gb[0][2] as $i=>$inf) {

@@ -2812,7 +2812,7 @@ class AppUtility extends Component
             if (is_array($oi))
             { //is outcome group
                 echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
-                $this->printOutcomesForMap($oi['outcomes'],$ind+1);
+                $this->printOutcomesForMap($oi['outcomes'],$ind+1,$outcomeAssoc,$outcomeInfo,$catNames,$n,$cnt,$items,$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
             }else
             {
                 echo '<tr class="'.$class.'">';
@@ -2822,15 +2822,17 @@ class AppUtility extends Component
                     $this->printItems($outcomeAssoc[$oi]['UG'],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
                 }
                 echo '</td>';
-                foreach ($catNames as $id=>$cn)
-                {
-                    echo '<td>';
-                    if (isset($outcomeAssoc[$oi][$id]))
+                if($catNames){
+                    foreach ($catNames as $id=>$cn)
                     {
+                        echo '<td>';
+                        if (isset($outcomeAssoc[$oi][$id]))
+                        {
 
-                        $this->printItems($outcomeAssoc[$oi][$id],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+                            $this->printItems($outcomeAssoc[$oi][$id],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+                        }
+                        echo '</td>';
                     }
-                    echo '</td>';
                 }
 
                 echo '</tr>';

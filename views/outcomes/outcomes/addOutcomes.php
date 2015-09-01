@@ -28,9 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             {
                 $print = new AppUtility();
                 $print->printOutcomesData($outcomes,$outcomeInfo,$cnt);
-                exit;
-            }
-            ?>
+            }else{?>
             <style type="text/css">.drag {color:red; background-color:#fcc;} .icon {cursor: pointer;} ul.qview li {padding: 3px}</style>
             <div class="outcomes-nav-tab">
                 <div class="align-link">
@@ -51,6 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo '<input type="button" onclick="addoutcome()" value="Add Outcome"/> ';
                 ?>
             </div>
+    <?php }?>
 </div>
 <script type="text/javascript">
 var AHAHsaveurl = $("#outcome-url").val();

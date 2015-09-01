@@ -378,4 +378,33 @@ class Course extends BaseImasCourses {
         $data= Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function queryForCourse($id)
+    {
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_students AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function queryFromCourseForTutor($id)
+    {
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_tutors AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function queryFromCourseForTeacher($id)
+    {
+        $query = "SELECT ic.id,ic.name FROM imas_courses AS ic JOIN imas_teachers AS istu ON istu.courseid=ic.id AND istu.userid=".$id;
+        $data= Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getItemOrderAndBlockCnt($ctc)
+    {
+        $query = new Query();
+        $query	->select(['itemorder','blockcnt'])
+            ->from('imas_courses')
+            ->where('id= :id',[':id' => $ctc]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }

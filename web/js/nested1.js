@@ -367,9 +367,9 @@ function NestedahahDone(url, target) {
 	    } else {
 		    document.getElementById(target).innerHTML=req.responseText;
 	    }
-    } else { 
-	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText; 
-    } 
+    } else {
+	    document.getElementById(target).innerHTML=" Couldn't save changes:\n"+ req.status + "\n" +req.statusText;
+    }
   } 
 }
 

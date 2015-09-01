@@ -1507,21 +1507,25 @@ public $oa = array();
                          {
                              $query = GbItems::getDataForCopyCourse($params['ctc']);
                              $insArr = array();
-                             foreach($query as $data)
+                             if($query)
                              {
-                                 $rubric = array_pop($data);
-                                 if (isset($gbCats[$data['gbcategory']]))
+                                 foreach($query as $data)
                                  {
-                                     $data['gbcategory'] = $gbCats[$data['gbcategory']];
-                                 } else {
-                                     $data['gbcategory'] = AppConstant::NUMERIC_ZERO;
-                                 }
-                                 $insert = new GbItems();
-                                 $insertId = $insert->insertData($courseId,$data);
-                                 if ($rubric>0) {
-                                     $offLineRubrics[$insertId] = $rubric;
-                                 }
+                                     $rubric = array_pop($data);
+                                     if (isset($gbCats[$data['gbcategory']]))
+                                     {
+                                         $data['gbcategory'] = $gbCats[$data['gbcategory']];
+                                     } else {
+                                         $data['gbcategory'] = AppConstant::NUMERIC_ZERO;
+                                     }
+                                     $insert = new GbItems();
+                                     $insertId = $insert->insertData($courseId,$data,$rubric);
+                                     if ($rubric>0)
+                                     {
+                                         $offLineRubrics[$insertId] = $rubric;
+                                     }
 
+                                 }
                              }
                          }
                          if (isset($params['copyrubrics']))

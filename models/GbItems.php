@@ -173,14 +173,14 @@ class GbItems extends BaseImasGbitems
         return $data;
     }
 
-    public function insertData($courseId,$params)
+    public function insertData($courseId,$params,$rubric)
     {
         $this->courseid = $courseId;
         $this->name = $params['name'];
         $this->points = $params['points'];
         $this->showdate = $params['showdate'];
         $this->gbcategory = $params['gbcategory'];
-        $this ->rubric = $params['rubric'];
+        $this ->rubric = $rubric;
         $this->cntingb = $params['cntingb'];
         $this->tutoredit = $params['tutoredit'];
         $this->save();

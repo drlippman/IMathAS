@@ -7,7 +7,7 @@ $this->title = 'Outcome Map';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Course Outcomes', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'outcomes/outcomes/add-outcomes?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -18,13 +18,10 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
-
     <div style="padding: 20px">
     <?php if ($outcomeLinks==0)
     {
         echo '<p>No items have been associated with outcomes yet</p>';
-        exit;
-
     }else{?>
     <?php
     echo '<table class="table table-bordered table-striped table-hover data-table"><thead><tr><th>'._('Outcome').'</th><th>'._('Not Graded').'</th>';
@@ -33,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo '<th>'.$cn.'</th>';
     }
     echo '</tr></thead><tbody>';
+
     $n = count($catNames)+2;
     $printItems = new AppUtility();
     $cnt = 0;

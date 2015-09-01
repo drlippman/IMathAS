@@ -387,4 +387,41 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = "SELECT id,LastName,FirstName,SID FROM imas_users WHERE rights>10 ORDER BY LastName,FirstName";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getDataByJoin($data,$num)
+    {
+        $query = new Query();
+        $query ->select(['imas_users.*','imas_groups.name'])
+            ->from('imas_users')
+            ->join('LEFT JOIN','imas_groups',
+                'imas_users.groupid=imas_groups.id');
+        if($num == 0){
+            $query->where(['imas_users.SID' => $data]);
+        }elseif($num == 1)
+        {
+            $query->where(['imas_users.SID' => $data]);
+        }
+
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function getDataByJoinForName($params)
+    {
+        $query = "SELECT imas_users.*,imas_groups.name FROM imas_users LEFT JOIN imas_groups ON imas_users.groupid=imas_groups.id WHERE ";
+        if(!empty($params['LastName']))
+        {
+            $query .= "imas_users.LastName='{$params['LastName']}' ";
+            if(!empty($params['FirstName']))
+            {
+                $query .= "AND ";
+            }
+        }
+        if(!empty($params['FirstName']))
+        {
+            $query .= "imas_users.FirstName='{$params['FirstName']}' ";
+        }
+        $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
+        return Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

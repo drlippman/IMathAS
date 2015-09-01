@@ -118,7 +118,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <?php
                             $tdpad = 16*strlen($prespace[$i]);
 
-                            if ($PicIcons) {
+                            if ($PicIcons)
+                            {
                                 echo '<td style="padding-left:'.$tdpad.'px"><img alt="'.$types[$i].'" title="'.$types[$i].'" src="'.$imasroot.'/img/';
                                 switch ($types[$i]) {
                                     case 'Calendar': echo $CFG['CPS']['miniicons']['calendar']; break;
@@ -131,8 +132,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     case 'Drill': echo $CFG['CPS']['miniicons']['drill']; break;
                                 }
                                 echo '" class="floatleft"/><div style="margin-left:21px">'.$names[$i].'</div></td>';
-                            } else {
-
+                            } else
+                            {
                                 echo '<td>'.$prespace[$i].$names[$i].'</td>';
                                 echo '<td>'.$types[$i].'</td>';
                             }
@@ -241,24 +242,23 @@ $this->params['breadcrumbs'][] = $this->title;
                 </ul>
                 </li>
                     <?php
-                    } else{
+                    }
+                    else
+                    {
+
                         echo '<li>No other users</li>';
                     }
 
         } else {?>
             <script>
-
-
                 var othersloaded = false;
-
-
                 var ahahurl = $('#url').val();
-                function loadothers() {
-                    if (!othersloaded) {
-                        //basicahah(ahahurl, "other");
+                function loadothers()
+                {
+                    if (!othersloaded)
+                    {
                         $.ajax({url:ahahurl, dataType:"html"}).done(function(resp)
                         {
-                            $('#other').html(resp);
                             $("#other input:radio").change(function() {
                                 if ($(this).hasClass("copyr")) {
                                     $("#ekeybox").show();
@@ -266,6 +266,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $("#ekeybox").hide();
                                 }
                             });
+                                $('#other').html(resp);
                         });
                         othersloaded = true;
                     }

@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <span class="column"><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
             Creds</a><br/>
         <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">External Tools</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Admin Utilities</a><br/>
+        <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities') ?>">Admin Utilities</a><br/>
     </span>
 
         <div class=clear></div>
