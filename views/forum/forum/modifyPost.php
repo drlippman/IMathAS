@@ -25,7 +25,11 @@ $now = $currentTime;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+    <?php if($currentUser->rights == 100 || $currentUser->rights == 20) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+    } elseif($currentUser->rights == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    }?>
 </div>
 
     <input type="hidden" id="thread-id" value="<?php echo $threadId ?>">

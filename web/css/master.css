@@ -225,7 +225,9 @@ body {
 .common-navbar #nav .active > a {
     color: #ffffff;
     background-color: #104E88;
-    border-bottom: none;
+    /*border-bottom: none;*/
+    border-radius: 0px;
+    width: 100.1%;
 }
 .icon-nav{
     font-size: 1.3em;
@@ -340,7 +342,7 @@ i.fa-home{
 .nav-tabs.aligned > li {
     float: left;
     width: 20%;
-    margin-bottom: -1px;
+    margin-bottom: -2px;
 }
 .nav-tabs > li > a{
     margin-right: 0;

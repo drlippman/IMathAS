@@ -20,7 +20,11 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
+    <?php if($userRights->rights == 100 || $userRights->rights == 20) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+    } elseif($userRights->rights == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    }?>
 </div>
 <input type="hidden" class="send-msg" value="<?php echo $course->id ?>">
 <input type="hidden" class="send-userId" value="<?php echo $course->ownerid ?>">

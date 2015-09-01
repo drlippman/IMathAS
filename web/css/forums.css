@@ -379,6 +379,7 @@ padding-top: 5px;
 {
     background-color: #12856D;
     color:whitesmoke;
+    border-radius:0px !important;
 }
 .btn-primary-1 {
     color: #FFF;
@@ -450,4 +451,34 @@ margin: 20px;
 
     margin-left: 50px;
     margin-right: 50px;
+}
+.padding-post-label {
+    padding: 17px 30px 30px 30px;
+}
+.padding-main-body {
+    padding: 0 30px 30px 30px;
+}
+.blockitems p{
+    padding-left: 10px;
+}
+.margin-bottom-twentyfive {
+    margin-bottom: 25px;
+}
+.post-btn-color {
+    background-color: #12856D !important;
+    color:whitesmoke !important;
+    border-radius:0px !important;
+}
+.hide-button {
+    color: #000 !important;
+    background-color: #eee !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0px !important;
+    font: inherit !important;
+    height:2.5em !important;
+    padding: 0 8px !important;
+    margin: 2px 3px !important;
+}
+.hide-button:focus,.hide-button:hover {
+    background-color: #e3e3ff !important;
 }

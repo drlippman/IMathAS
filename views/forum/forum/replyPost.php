@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <br>
         <div class="col-sm-12 padding-top">
             <div class="col-sm-1"><?php echo AppUtility::t('Subject')?></div>
-            <div class="col-sm-11"><input class="text-box subject" type="text" value="Re: <?php echo $reply[0]['subject'] ?>">
+            <div class="col-sm-11"><input class="text-box subject" type="text" readonly value="Re: <?php echo $reply[0]['subject'] ?>">
             </div>
         </div>
 

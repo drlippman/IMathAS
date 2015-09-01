@@ -481,10 +481,10 @@ a.abutton {
 a.abutton, a.abutton:hover, a.abutton:focus {
 	text-decoration: none;
 }
-input[type=submit],input[type=button], button, a.abutton {
+input[type=submit],input[type=button], button, a.abutton, {
 	color: #000;
 	background-color: #eee;
-	border-radius: 4px;
+	border-radius: 0px;
 	border: 1px solid #ccc;
 	font: inherit;
 	height:2.5em;

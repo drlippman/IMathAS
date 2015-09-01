@@ -521,6 +521,7 @@ class ForumController extends AppController
     public function actionPost()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $currentUser = $this->getAuthenticatedUser();
         $courseId = $this->getParamVal('courseid');
         $course = Course::getById($courseId);
