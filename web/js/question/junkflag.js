@@ -21,7 +21,8 @@ function toggleJunkFlag(libitemid) {
 	return false;
 }
 
-function submitJunkFlag(libitemid,tagged) { 
+function submitJunkFlag(libitemid,tagged) {
+  var JunkFlagsaveurl = document.getElementById('junk-flag').value;
   url = JunkFlagsaveurl + '?libitemid='+libitemid+'&flag='+tagged;
   if (window.XMLHttpRequest) { 
     req = new XMLHttpRequest(); 

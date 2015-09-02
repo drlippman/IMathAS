@@ -26,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="tab-content shadowBox">
-    <?php if ($overwriteBody==1) {
+    <?php if ($overwriteBody == AppConstant::NUMERIC_ONE) {
            echo $body;
           } else { ?>
                 <script type="text/javascript">
@@ -67,9 +67,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
                     echo "<p>To find questions to add from the question libraries:";
                     echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
-                    echo " <li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
-                    echo " <li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
-                    echo " <li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
+                    echo "<li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
+                    echo "<li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
+                    echo "<li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
                     echo "</ol>";
                 } else if ($sessiondata['selfrom'.$assessmentId]=='assm') {
                     echo "<p>You are currently set t o select questions existing assessments.  If you would like to select questions from ";
@@ -107,7 +107,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </ul>
                     </div>
                 </div>
-            <?php } ?><input type="submit" value="Change Settings" />
+            <?php } ?>
                 <span id="submitnotice" style="color:red;"></span>
                 <div id="curqtbl"></div>
             </form>
@@ -149,14 +149,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         Exclude added</span>
                     </div>
                 </div>
-            </form>
+
             <div class="col-md-12"><br>
                 <div class="col-md-6"><h3>Potential Questions</h3></div>
                 <div class="col-md-4 pull-right">
                     <span class="col-md-2"><input type=submit value=Search></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span class=""><input type=button value="Add New Question" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/mod-data-set?aid='.$assessmentId.'&cid='.$courseId) ?>'"></span>
                 </div>
-
+            </form>
                 <?php
                 if ($searchall==1 && trim($search)=='') {
                     echo "Must provide a search term when searching all libraries";
@@ -173,8 +173,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <span class="caret right-aligned"></span>
                                         </a>
                                         <ul class="dropdown-menu with-selected">
-                                            <li type="submit" name="add"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Add'); ?></li>
-                                            <li type="submit" name="addquick"><img class="nav-course-icon" src="/openmath/web/img/roster.png">&nbsp;<?php AppUtility::t('Add (using defaults)'); ?></a></li>
+                                            <li type="submit"><a href="javascript: submitSelq()" name="add"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Add'); ?></li>
+                                            <li type="submit"><a href="javascript: submitSelq()" name="addquick"><img class="nav-course-icon" src="/openmath/web/img/roster.png">&nbsp;<?php AppUtility::t('Add (using defaults)'); ?></a></li>
                                             <li type="submit"><a href="javascript: previewsel('selq')"><img class="small-icon" src="/openmath/web/img/courseSettingItem.png">&nbsp;&nbsp;<?php AppUtility::t('Preview Selected'); ?></a></li>
                                         </ul>
                                     </li>
@@ -203,35 +203,46 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <th><span onmouseover="tipshow(this,'Average time, in minutes, this question has taken students')" onmouseout="tipout()"><?php AppUtility::t('Avg Time') ?></span></th>
                                 <?php } ?>
                                 <th><?php AppUtility::t('Mine') ?></th>
-                                <?php if ($searchall==0) { ?>
+                                <?php if ($searchall == AppConstant::NUMERIC_ZERO) { ?>
                                     <th><span onmouseover="tipshow(this,'Flag a question if it is in the wrong library')" onmouseout="tipout()"><?php AppUtility::t('Wrong Lib') ?></span></th>
                                 <?php } ?>
                                 <th><?php AppUtility::t('Action') ?></th>
-                                <th><?php AppUtility::t('') ?></th>
-                                <th><?php AppUtility::t('') ?></th>
+                                <th></th>
+                                <th></th>
 
                             </tr>
                             </thead>
                             <tbody id="potential-question-information-table">
                             <?php
-                            $alt=0;
-                            for ($j=0; $j<count($pageLibstouse); $j++) {
+                            $alt = AppConstant::NUMERIC_ZERO;
+                            for ($j = AppConstant::NUMERIC_ZERO; $j<count($pageLibstouse); $j++) {
 
-                                if ($searchall==0) {
-                                    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;} echo '<td></td>';
+                                if ($searchall == AppConstant::NUMERIC_ZERO) {
+                                    if ($alt == AppConstant::NUMERIC_ZERO) {
+                                        echo "<tr class=even>";
+                                        $alt = AppConstant::NUMERIC_ONE;
+                                    } else {
+                                        echo "<tr class=odd>";
+                                        $alt = AppConstant::NUMERIC_ZERO;
+                                    }
+                                    echo '<td></td>';
                                     echo '<td>';
                                     echo '<b>'.$lnamesarr[$pageLibstouse[$j]].'</b>';
                                     echo '</td>';
-                                    for ($k=0;$k<9;$k++) {echo '<td></td>';}
+                                    for ($k = AppConstant::NUMERIC_ZERO; $k < AppConstant::NUMERIC_NINE; $k++) {
+                                        echo '<td></td>';
+                                    }
                                     echo '</tr>';
                                 }
 
-                                for ($i=0;$i<count($pageLibqids[$pageLibstouse[$j]]); $i++) {
+                                for ($i= AppConstant::NUMERIC_ZERO; $i<count($pageLibqids[$pageLibstouse[$j]]); $i++) {
                                     $qid =$pageLibqids[$pageLibstouse[$j]][$i];
-                                    if ($alt==0) {
-                                        echo "<tr class=even>"; $alt=1;
+                                    if ($alt == AppConstant::NUMERIC_ZERO) {
+                                        echo "<tr class=even>";
+                                        $alt = AppConstant::NUMERIC_ONE;
                                     } else {
-                                        echo "<tr class=odd>"; $alt=0;
+                                        echo "<tr class=odd>";
+                                        $alt = AppConstant::NUMERIC_ZERO;
                                     }
                                     ?>
 
@@ -381,7 +392,7 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
         <input type=submit value="Use these Assessments" /> or
         <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
 <br><br>
-        <table cellpadding=5 id=myTable class=>
+        <table cellpadding=5 id=myTable class=gb>
             <thead >
             <tr><th></th><th>Assessment</th><th>Summary</th></tr>
             </thead>
@@ -418,6 +429,7 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
 }
 ?>
     <input type="hidden" id="address" value="<?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId); ?>"/>
+    <input type="hidden" id="junk-flag" value="<?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>"/>
     <script type="javascript">
         var previewqaddr = <?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$cid); ?>;
         var addqaddr = <?php echo $address; ?>;

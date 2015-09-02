@@ -93,4 +93,13 @@ class LibraryItems extends BaseImasLibraryItems
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function UpdateJunkFlag($id, $flag){
+        $data = LibraryItems::findOne(['id' => $id]);
+        if($data){
+            $data->junkflag = $flag;
+            $data->save();
+        }
+        return count($data);
+    }
 }

@@ -142,3 +142,6 @@ function setlib(libs) {
 function setlibnames(libn) {
 	document.getElementById("libnames").innerHTML = libn;
 }
+function submitSelq(){
+    document.forms["selq"].submit()
+}

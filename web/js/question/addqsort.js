@@ -300,7 +300,7 @@ function generateTable() {
 					}
 					html += ms;
 					if (curisgroup) {
-						html += "</td><td colspan='"+(beentaken?8:9)+"'><b>Group</b> ";
+						html += "</td><td colspan='"+(beentaken?3:4)+"'><b>Group</b> ";
 						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group of "+curitems.length;
 						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
 						if (itemarray[i][1]==0) { 
@@ -311,7 +311,11 @@ function generateTable() {
 							html += "selected=1";
 						}
 						html += ">With</option></select> replacement";
-						html += "</td><td class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\">Remove</a></td></tr>";
+						html += "</td><td class=c><td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>" +
+                        "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+                        "<ul class='dropdown-menu'>" +
+                        "<li class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\"><img class='small-icon' src='../../img/gradebook.png'></i> Remove</a></li>" ;//remove
+                        html += "</ul></div></td><td></td></tr>";
 						if (itemarray[i][3]==0) { //collapsed group
 							if (curitems[0][4]==9999) { //points
 								curpt = defpoints;
@@ -320,7 +324,7 @@ function generateTable() {
 							}
 							break;
 						}
-						html += "<tr class="+curclass+"><td>";
+						html += "<tr class="+curclass+"><td class='question-check'>";
 						
 					}
 				}
@@ -437,5 +441,5 @@ function ahahDone(url, target) {
 }
 
 function changeSetting(){
-alert('jhkhkh');
+    document.forms["curqform"].submit()
 }

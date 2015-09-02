@@ -1763,4 +1763,27 @@ class QuestionController extends AppController
             echo "error: not saved";
         }
     }
+
+    public function actionSaveLibAssignFlag(){
+        $params = $this->getRequestParams();
+        $user = $this->getAuthenticatedUser();
+        $myRights = $user['rights'];
+        if (!isset($params['libitemid']) || $myRights< AppConstant::TEACHER_RIGHT) {
+            exit;
+        }
+        $isChanged = false;
+        $query = LibraryItems::UpdateJunkFlag($params['libitemid'],$params['flag']);
+        if ($query > AppConstant::NUMERIC_ZERO) {
+            $isChanged = true;
+        }
+        if ($isChanged) {
+            echo "OK";
+        } else {
+            echo "Error";
+        }
+    }
+
+    public function actionShowTest(){
+        return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
+    }
 }
