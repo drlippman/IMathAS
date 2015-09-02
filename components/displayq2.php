@@ -116,10 +116,8 @@ class  displayq2 extends Component
         if (isset($GLOBALS['scores'])) {
             $scorenonzero = getscorenonzero();
         }
-
         eval(interpretUtility::interpret('control',$qdata['qtype'],$qdata['control']));
         eval(interpretUtility::interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
-        AppUtility::dump($qdata['qtext']);
         $toevalqtxt = interpretUtility::interpret('qtext',$qdata['qtype'],$qdata['qtext']);
         $toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
         $toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
@@ -914,7 +912,7 @@ class  displayq2 extends Component
             if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}} else {$noshuffle = "none";}
 
             if (!is_array($questions)) {
-                $responseString .= _('Eeek!  $questions is not defined or needs to be an array');
+                echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
                 return false;
             }
 
@@ -1060,7 +1058,7 @@ class  displayq2 extends Component
             if (isset($options['displayformat'])) {if (is_array($options['displayformat'])) {$displayformat = $options['displayformat'][$qn];} else {$displayformat = $options['displayformat'];}}
 
             if (!is_array($questions)) {
-                $responseString .= _('Eeek!  $questions is not defined or needs to be an array');
+                echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
                 return false;
             }
 
@@ -1178,7 +1176,7 @@ class  displayq2 extends Component
             $la = $la[0];
 
             if (!is_array($questions) || !is_array($answers)) {
-                $responseString .= _('Eeek!  $questions or $answers is not defined or needs to be an array');
+                echo 'Eeek!  $questions or $answers is not defined or needs to be an array';
                 return false;
             }
             if (isset($matchlist)) { $matchlist = explode(',',$matchlist);}
@@ -1851,7 +1849,7 @@ class  displayq2 extends Component
                     $preview .= "<span id=p$qn></span> ";
                 } else if ($displayformat == 'typeahead') {
                     if (!is_array($questions)) {
-                        $responseString .= _('Eeek!  $questions is not defined or needs to be an array');
+                        echo _('Eeek!  $questions or $answers is not defined or needs to be an array');
                     } else {
                         foreach ($questions as $i=>$v) {
                             $questions[$i] = htmlentities(trim($v));
@@ -2797,7 +2795,7 @@ class  displayq2 extends Component
             }
 
             if (!is_array($questions)) {
-                $responseString .= _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
+                echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
                 return false;
             }
             if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2840,7 +2838,7 @@ class  displayq2 extends Component
             if (isset($options['scoremethod']))if (is_array($options['scoremethod'])) {$scoremethod = $options['scoremethod'][$qn];} else {$scoremethod = $options['scoremethod'];}
 
             if (!is_array($questions)) {
-                $responseString .= _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
+                echo _('Eeek!  $questions is not defined or needs to be an array.  Make sure $questions is defined in the Common Control section.');
                 return false;
             }
             if ($multi>0) { $qn = $multi*1000+$qn;}
@@ -2896,7 +2894,7 @@ class  displayq2 extends Component
             if (isset($options['noshuffle'])) {if (is_array($options['noshuffle'])) {$noshuffle = $options['noshuffle'][$qn];} else {$noshuffle = $options['noshuffle'];}}
 
             if (!is_array($questions) || !is_array($answers)) {
-                $responseString .= _('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.');
+                 echo _('Eeek!  $questions or $answers is not defined or needs to be an array.  Make sure both are defined in the Common Control section.');
                 return 0;
             }
             if ($multi>0) { $qn = $multi*1000+$qn;}

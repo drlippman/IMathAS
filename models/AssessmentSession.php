@@ -357,5 +357,13 @@ class AssessmentSession extends BaseImasAssessmentSessions
         return $items;
     }
 
+    public static function deleteByUserId($userId)
+    {
+        $assessmentSessions = AssessmentSession::find()->where(['userid' => $userId])->all();
+        foreach($assessmentSessions as $assessmentSession)
+        {
+            $assessmentSession->delete();
+        }
+    }
 }
 

@@ -51,7 +51,7 @@ foreach($sel1 as $k=>$s1) {
             <table >
                 <tbody id="out<?php echo $k ?>">
 
-                <?php AppUtility::dump($sel2);
+                <?php  
                 if (isset($sel2[$s1])) {
                     for ($i=0;$i<count($sel2[$s1]);$i++) {
                         ?>

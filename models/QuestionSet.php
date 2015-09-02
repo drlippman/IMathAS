@@ -18,17 +18,12 @@ class QuestionSet extends BaseImasQuestionset
 {
     public static function getByQuesSetId($id)
     {
-//        return static::findOne(['id' => $id]);
-        $query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg,extref,solution,solutionopts FROM imas_questionset WHERE id=$id";
-        return \Yii::$app->db->createCommand($query)->queryOne();
+        return QuestionSet::findOne(['id' => $id]);
     }
-    public static function getById($id)
+    public static function getByIdUsingInClause($ids)
     {
-        $query = "SELECT qtext FROM imas_questionset WHERE id= 1";
-        $connection = Yii::$app->getDb();
-        $command = $connection->createCommand($query);
-        $qdata = $command->queryAll();
-        return $qdata;
+        $data = QuestionSet::find()->where(['IN','id',$ids])->all();
+        return $data;
     }
 
     public static function getByUserIdJoin($searchall,$userid,$llist,$searchmine,$searchlikes){

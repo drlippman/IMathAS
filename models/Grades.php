@@ -124,6 +124,13 @@ class Grades extends BaseImasGrades
     {
        return Grades::find()->where(['gradetype' => 'offline'])->andWhere(['gradetypeid' => $gbItem])->andWhere(['IN','userid',$kl])->all();
     }
-
+    public static function deleteByUserId($userId)
+    {
+        $grades = Grades::find()->where(['userid' => $userId])->all();
+        foreach($grades as $grade)
+        {
+            $grade->delete();
+        }
+    }
 }
 

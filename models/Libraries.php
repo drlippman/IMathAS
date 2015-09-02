@@ -40,4 +40,16 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+    public static function updateGroupId($id)
+    {
+        $libraries = Libraries::find()->where(['groupid' => $id])->all();
+        if($libraries)
+        {
+            foreach($libraries as $library)
+            {
+                $library -> groupid = AppConstant::NUMERIC_ZERO;
+                $library -> save();
+            }
+        }
+    }
 }

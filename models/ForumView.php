@@ -191,5 +191,13 @@ class ForumView extends BaseImasForumViews
             }
         }
     }
+    public static function deleteByUserId($userId)
+    {
+        $views = ForumView::find()->where(['userid' => $userId])->all();
+        foreach($views as $view)
+        {
+            $view->delete();
+        }
+    }
 }
 

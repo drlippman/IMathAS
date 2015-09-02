@@ -468,5 +468,14 @@ class Student extends BaseImasStudents {
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function deleteByUserId($userId)
+    {
+        $students = Student::find()->where(['userid' => $userId])->all();
+        foreach($students as $student)
+        {
+            $student->delete();
+        }
+    }
 }
 

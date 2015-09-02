@@ -424,4 +424,43 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
-}   
+
+     public static function updateGroupId($id)
+    {
+        $Users = User::find()->where(['groupid' => $id])->all();
+        if($Users)
+        {
+             foreach($Users as $User)
+             {
+                 $User-> groupid = AppConstant::NUMERIC_ZERO;
+                 $User->save();
+             }
+        }
+    }
+    public static function getByLastAccessAndRights($old)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+            ->from('imas_users')
+            ->where(['rights' => 10])
+            ->orWhere(['rights' => 0])->andWhere(['<','lastaccess',$old]);
+        $command = $query->createCommand();
+        $users = $command->queryAll();
+        return $users;
+    }
+    public static function deleteByLastAccessAndRights($old)
+    {
+        $users = User::find()->where(['rights' => 10])->orWhere(['rights' => 0])->andWhere(['<','lastaccess',$old])->all();
+         foreach($users as $user){
+             $user->delete();
+         }
+    }
+    public static function deleteUserByLastAccess($old)
+    {
+        $users = User::find()->where(['<','lastaccess',$old])->andWhere(['<','rights',100])->all();
+        foreach($users as $user){
+            $user->delete();
+        }
+    }
+}
+

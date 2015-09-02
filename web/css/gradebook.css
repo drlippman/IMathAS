@@ -3,3 +3,41 @@
     margin-left: 30px;
     margin-right: 30px;
 }
+.text
+{
+    margin-left: 35%;
+}
+.scorebarinner {
+    height:10px;
+    font-size:1px;
+    display:-moz-inline-box;
+    display:inline-block;
+    position:relative;
+    left:0px;
+    top:0px;
+
+}
+.red-text
+{
+    color:#f00;
+}
+.item-result-border
+{
+    border:1px solid #000;padding:10px;margin-bottom:10px;clear:left;
+}
+.item-result-answer
+{
+    float:left;width:35%;
+}
+.item-result-question
+{
+    float:left;width:60%;margin-left:10px;
+}
+.black-text
+{
+    color: black;
+}
+.right-side
+{
+    float:right
+}

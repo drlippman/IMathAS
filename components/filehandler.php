@@ -27,7 +27,7 @@ if (isset($GLOBALS['AWSkey'])) {
 
 class filehandler extends Component
 {
-function storecontenttofile($content,$key,$sec="private") {
+public  static function storecontenttofile($content,$key,$sec="private") {
 	if ($GLOBALS['filehandertype'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -45,7 +45,7 @@ function storecontenttofile($content,$key,$sec="private") {
 		$dir = $base.dirname($key);
 		$fn = basename($key);
 		if (!is_dir($dir)) {
-			mkdir_recursive($dir);
+			filehandler::mkdir_recursive($dir);
 		} 
 		$fh = @fopen($dir.'/'.$fn,'wb');
 		if ($fh) {
@@ -118,7 +118,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
-				mkdir_recursive($dir);
+				filehandler::mkdir_recursive($dir);
 			} 
 			if (move_uploaded_file($_FILES[$id]['tmp_name'],$dir.'/'.$fn)) {
 				return true;
@@ -609,16 +609,15 @@ public static function deleteallpostfiles($postid) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/ffiles/$postid",true))==0) {
+		if (($delcnt = filehandler::unlinkRecursive($base."/ffiles/$postid",true))==0) {
 			return false;
 		}
 	}
 	return $delcnt;
 }
-function deletealluserfiles($uid) {
+public static function deletealluserfiles($uid) {
 	$delcnt = 0;
 	if ($GLOBALS['filehandertype'] == 's3') {
-		
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$arr = $s3->getBucket($GLOBALS['AWSbucket'],"ufiles/$uid/");
 		if ($arr!=false) {
@@ -632,7 +631,7 @@ function deletealluserfiles($uid) {
 		}
 	} else {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
-		if (($delcnt = unlinkRecursive($base."/ufiles/$uid",true))==0) {
+		if (($delcnt =  filehandler::unlinkRecursive($base."/ufiles/$uid",true))==0) {
 			return false;
 		}
 	}
@@ -710,7 +709,7 @@ public static function unlinkRecursive($dir, $deleteRootToo) {
 			$cnt++;
 		}
 	} else if (is_dir($dir . '/' . $obj)) {
-		$cnt += unlinkRecursive($dir.'/'.$obj, true);
+		$cnt += filehandler::unlinkRecursive($dir.'/'.$obj, true);
 	}
     }
     closedir($dh);

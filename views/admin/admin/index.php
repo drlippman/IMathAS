@@ -140,14 +140,15 @@ $this->params['breadcrumbs'][] = $this->title;
         if ($myRights == 100) {
         ?>
     <span class=column>
-        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Edit Groups</a><br/>
-        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Delete Old Users</a><br/>
-        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Students from File</a>
+        <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=listgroups') ?>">Edit Groups</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=deloldusers') ?>">Delete Old Users</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Students from File</a>
     </span>
-    <span class="column"><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Macro
-            File</a><br/>
-        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Question Images</a><br/>
-        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
+    <span class="column">
+        <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importmacros') ?>">Install Macro File</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importqimages') ?>">Install Question Images</a><br/>
+        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
+
     </span>
     <span class="column"><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
             Creds</a><br/>

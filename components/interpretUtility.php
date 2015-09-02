@@ -23,10 +23,8 @@ class  interpretUtility extends Component
 //main interpreter function.  Returns PHP code string, or HTML if blockname==qtext
     public static function interpret($blockname, $anstype, $str, $countcnt = 1)
     {
-//        print_r($blockname);print_r($anstype);print_r($str);print_r($countcnt);die;
-        if ($blockname == "qtext") {AppUtility::dump($str);
+         if ($blockname == "qtext") {
             $str = interpretUtility::getquestionqtext($str);
-
             $str = str_replace('"', '\"', $str);
             $str = str_replace("\r\n", "\n", $str);
             $str = str_replace("\n\n", "<br/><br/>\n", $str);

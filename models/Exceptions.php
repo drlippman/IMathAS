@@ -85,4 +85,12 @@ class Exceptions extends BaseImasExceptions
         $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')")->queryAll();
         return $query;
     }
-} 
+    public static function deleteByUserId($userId)
+    {
+        $exceptions = Exceptions::find()->where(['userid' => $userId])->all();
+        foreach($exceptions as $exception)
+        {
+            $exception->delete();
+        }
+    }
+}
