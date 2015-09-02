@@ -335,6 +335,7 @@ class Course extends BaseImasCourses {
         $data = $command->queryAll();
         return $data;
     }
+
     public static function getPicIcons($ctc)
     {
         $query = new Query();
@@ -406,5 +407,11 @@ class Course extends BaseImasCourses {
         $command = $query->createCommand();
         $data = $command->queryOne();
         return $data;
+    }
+
+    public static function getByUserId($userId)
+    {
+        $query = Yii::$app->db->createCommand("SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid='$userId' ORDER BY imas_courses.name")->queryAll();
+        return $query;
     }
 }

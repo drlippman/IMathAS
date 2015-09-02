@@ -92,42 +92,77 @@ class CourseController extends AppController
         }
 
         if ($course && ($itemOrders = unserialize($course->itemorder))) {
+
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
                 if (is_array($itemOrder) || count($blockItems = $itemOrder['items'])) {
                     $tempAray['Block'] = $itemOrder;
                     $tempItemList = array();
                     $blockItems = $itemOrder['items'];
-
                     foreach ($blockItems as $blockKey => $blockItem) {
                         $tempItem = array();
                         $item = Items::getById($blockItem);
-
                         switch ($item->itemtype) {
 
                             case 'Assessment':
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
-                                $tempItem[$item->itemtype] = $assessment;
-                                array_push($calendarCount, $assessment);
+                                if($previewshift > AppConstant::NUMERIC_ZERO){
+                                    if($assessment['enddate'] > ($now + $previewshift))
+                                    {
+                                    $tempItem[$item->itemtype] = $assessment;
+                                    array_push($calendarCount, $assessment);
+                                    }
+                                } else{
+                                    $tempItem[$item->itemtype] = $assessment;
+                                    array_push($calendarCount, $assessment);
+                                }
                                 break;
                             case 'Calendar':
                                 $tempItem[$item->itemtype] = $itemOrder;
                                 break;
                             case 'Forum':
                                 $form = Forums::getById($item->typeid);
-                                $tempItem[$item->itemtype] = $form;
+                                if($previewshift > AppConstant::NUMERIC_ZERO){
+                                    if($form['enddate'] > ($now + $previewshift))
+                                    {
+                                    $tempItem[$item->itemtype] = $form;
+                                    }
+                                } else{
+                                    $tempItem[$item->itemtype] = $form;
+                                }
                                 break;
                             case 'Wiki':
                                 $wiki = Wiki::getById($item->typeid);
-                                $tempItem[$item->itemtype] = $wiki;
+                                if($previewshift > AppConstant::NUMERIC_ZERO){
+                                    if($wiki['enddate'] > ($now + $previewshift))
+                                    {
+                                    $tempItem[$item->itemtype] = $wiki;
+                                    }
+                                } else{
+                                    $tempItem[$item->itemtype] = $wiki;
+                                }
                                 break;
                             case 'LinkedText':
                                 $linkedText = Links::getById($item->typeid);
-                                $tempItem[$item->itemtype] = $linkedText;
+                                if($previewshift > AppConstant::NUMERIC_ZERO){
+                                    if($linkedText['enddate'] > ($now + $previewshift))
+                                    {
+                                    $tempItem[$item->itemtype] = $linkedText;
+                                    }
+                                } else{
+                                    $tempItem[$item->itemtype] = $linkedText;
+                                }
                                 break;
                             case 'InlineText':
                                 $inlineText = InlineText::getById($item->typeid);
-                                $tempItem[$item->itemtype] = $inlineText;
+                                if($previewshift > AppConstant::NUMERIC_ZERO){
+                                    if($inlineText['enddate'] > ($now + $previewshift))
+                                    {
+                                    $tempItem[$item->itemtype] = $inlineText;
+                                    }
+                                } else{
+                                    $tempItem[$item->itemtype] = $inlineText;
+                                }
                                 break;
                         }
 

@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="headerwrapper"></div>
 <div class="midwrapper">
     <div id="headeradmin" class="pagetitle"><h2>OpenMath Administration</h2></div>
+    <b>Hello <?php echo $userName ?></b>
     <h3>Courses</h3>
 
     <div class=item>
@@ -78,22 +79,32 @@ $this->params['breadcrumbs'][] = $this->title;
         <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-new-course'); ?>">Add
             New Course</a>
         </div>
-        <div class="lg-col-2 pull-left select-text-margin">
-        &nbsp;&nbsp;Show courses of:&nbsp;&nbsp;
-        </div>
 
-        <div class="lg-col-3 pull-left">
-            <select name="seluid" class="dropdown form-control" id="seluid" onchange="showcourses()">
-                <option value="0" selected>Select a user..</option>
-                <?php  $i=0;
-                foreach($result as $key => $row)
-                 {  $page_teacherSelectVal[$i] = $row['id'];?>
-                    <option
-                        value="<?php echo $page_teacherSelectLabel[$i] ?>"><?php echo $row['LastName'] . ", " . $row['FirstName']. ' ('.$row['SID'].')'; $i++;?></option>
-                <?php } ?>
-            </select>
-        </div>
+<!--        <div class="lg-col-2 pull-left select-text-margin">-->
+<!--            &nbsp;&nbsp;Show courses of:&nbsp;&nbsp;-->
+<!--        </div>-->
+<!---->
+<!--        <div class="lg-col-3 pull-left">-->
+<!--            <select name="seluid" class="dropdown form-control" id="seluid" onchange="showcourses()">-->
+<!--                <option value="0" selected>Select a user..</option>-->
+<!--                --><?php // $i=0;
+//                foreach($resultTeacher as $key => $row)
+//                {  $page_teacherSelectVal[$i] = $row['id'];?>
+<!--                    <option-->
+<!--                        value="--><?php //echo $page_teacherSelectLabel[$i] ?><!--">--><?php //echo $row['LastName'] . ", " . $row['FirstName']. ' ('.$row['SID'].')'; $i++;?><!--</option>-->
+<!--                --><?php //} ?>
+<!--            </select>-->
+<!--        </div>-->
+        <?php
+        if ($myRights >= 75) {
+            if ($showcourses > 0) {
+                echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
+            }
 
+            echo " Show courses of: ";
+            AppUtility::writeHtmlSelect ("seluid",$page_teacherSelectVal,$page_teacherSelectLabel,$showcourses,"Select a user..",0,"onchange=\"showcourses()\"");
+        }
+        ?>
     </div>
 
 
@@ -101,39 +112,56 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class=cp>
         <a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a><BR>
-        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
-        <a HREF="<? echo AppUtility::getURLFromHome('site', 'work-in-progress')  ?>">Log Out</a><BR>
+        <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a><BR>
+        <a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress')  ?>">Log Out</a><BR>
     </div>
+    <?php
+    if($myRights < 75 && isset($CFG['GEN']['allowteacherexport'])) {
+    ?>
+    <div class=cp>
+        <a href="#">Export Question Set</a><BR>
+        <a href="#">Export Libraries</a>
+    </div>
+    <?php
+    } else if($myRights >= 75) {
+    ?>
     <div class=cp>
     <span class=column>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Question Set</a><BR>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Question Set</a><BR>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Question Set</a><BR>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Question Set</a><BR>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Question Set</a><BR>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Question Set</a><BR>
     </span>
     <span class=column>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Libraries</a><br>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Libraries</a><BR>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Libraries</a></span>
-
-    <span class=column>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Edit Groups</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Delete Old Users</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Students from File</a>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Libraries</a><br>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Libraries</a><BR>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Libraries</a>
     </span>
-    <span class="column"><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Macro
+        <?php
+        if ($myRights == 100) {
+        ?>
+    <span class=column>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Edit Groups</a><br/>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Delete Old Users</a><br/>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Students from File</a>
+    </span>
+    <span class="column"><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Macro
             File</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Question Images</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Question Images</a><br/>
+        <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
     </span>
-    <span class="column"><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
+    <span class="column"><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
             Creds</a><br/>
         <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">External Tools</a><br/>
         <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities') ?>">Admin Utilities</a><br/>
     </span>
-
+        <?php
+        }
+        ?>
         <div class=clear></div>
     </div>
-
+    <?php
+    }
+    if($myRights >= 60) {?>
     <h3>Diagnostics</h3>
 
     <div class=item>
@@ -149,24 +177,30 @@ $this->params['breadcrumbs'][] = $this->title;
             </tr>
             </thead>
             <tbody>
-            <tr class=odd>
-
-                <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Check Here</a></td>
-                <td class=c>Yes</td>
-                <td class=c>Yes</td>
-                <td><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Modify</a></td>
-                <td><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Remove</a></td>
-            <td><a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">One-time Passwords</a></td>
-            </tr>
+            <?php
+            $alt = 0;
+            for ($i=0;$i<count($page_diagnosticsId);$i++) {
+                if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
+                ?>
+                <td><a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics?id='.$page_diagnosticsId[$i])?>"><?php echo $page_diagnosticsName[$i] ?></a></td>
+                <td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
+                <td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
+                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">Modify</a></td>
+                <td><a href="#?id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
+                <td><a href="#?id=<?php echo $page_diagnosticsId[$i] ?>">One-time Passwords</a></td>
+                </tr>
+            <?php
+            }
+            ?>
             </tbody>
         </table>
 
-        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/admin-diagnostic') ?>">Add
+        <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics') ?>">Add
             New
             Diagnostic</a>
     </div>
-
-    <h3>Pending Users</h3>
+<?php }?>
+    <h3><?php echo $page_userBlockTitle?></h3>
 
     <div class=item>
         <table id="user-table displayCourse" class="display user-table table table-bordered table-striped table-hover data-table">
@@ -193,7 +227,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?php echo $page_userDataEmail[$i] ?></td>
                 <td><?php echo $page_userDataType[$i] ?></td>
                 <td><?php echo $page_userDataLastAccess[$i] ?></td>
-                <td class=c><a href="#" ?>">Change</a></td>
+                <td class=c><a href="#">Change</a></td>
                 <td class=c><a href="#">Reset</a></td>
                 <td class=c><a href="#">Delete</a></td>
                 </tr>
@@ -206,9 +240,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <a class="btn btn-primary" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add
             New User</a>
         <?php
-        //if ($myrights==100) {
+        if ($myRights==100) {
             writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");
-        //}
+        }
         ?>
         <?php
         function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
@@ -236,9 +270,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <script type="text/javascript">
      $(document).ready(function () {
-
         jQuerySubmit('get-all-course-user-ajax',{},'getAllCourseSuccess');
-
     });
      function showgroupusers() {
          var grpid=document.getElementById("selgrpid").value;
@@ -317,9 +349,10 @@ $this->params['breadcrumbs'][] = $this->title;
         $('.user-table').DataTable();
     }
      function showcourses() {
-           var uid=document.getElementById("seluid").value;
+           var uid = document.getElementById("seluid").value;
+
            if (uid>0) {
-               window.location='admin/index?showcourses='+uid;
+               window.location='index?showcourses='+uid;
            }
      }
 </script>

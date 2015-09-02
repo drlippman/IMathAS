@@ -43,12 +43,12 @@ class BaseImasDiags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['ownerid', 'public', 'cid', 'forceregen', 'reentrytime'], 'integer'],
-            [['ips', 'pws', 'sel1list', 'aidlist', 'sel2list'], 'string'],
-            [['name', 'idprompt', 'sel1name', 'sel2name'], 'string', 'max' => 254],
-            [['term'], 'string', 'max' => 10],
-            [['entryformat'], 'string', 'max' => 3]
+//            [['name'], 'required'],
+//            [['ownerid', 'public', 'cid', 'forceregen', 'reentrytime'], 'integer'],
+//            [['ips', 'pws', 'sel1list', 'aidlist', 'sel2list'], 'string'],
+//            [['name', 'idprompt', 'sel1name', 'sel2name'], 'string', 'max' => 254],
+//            [['term'], 'string', 'max' => 10],
+//            [['entryformat'], 'string', 'max' => 3]
         ];
     }
 

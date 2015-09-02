@@ -466,4 +466,10 @@ class Assessments extends BaseImasAssessments
             $data->save();
         }
     }
+
+    public static function getByCId($cid)
+    {
+        $query = Yii::$app->db->createCommand("SELECT id,name FROM imas_assessments WHERE courseid='$cid'")->queryAll();
+        return $query;
+    }
 }
