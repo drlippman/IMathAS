@@ -8,6 +8,7 @@ use app\models\_base\BaseImasDiags;
 use app\models\Assessments;
 use app\models\Course;
 use app\models\Diags;
+use app\models\ExternalTools;
 use app\models\forms\ChangeRightsForm;
 use app\models\Groups;
 use app\models\Stugroups;
@@ -477,4 +478,133 @@ class AdminController extends AppController
         'page_selectLabelList' => $page_selectLabelList, 'page_selectedOption' => $page_selectedOption, 'sel2list' => $sel2list, 'aidlist' => $aidlist);
         return $this->renderWithData('diagnostics', $responseData);
     }
+
+   public function actionExternalTool()
+   {
+       $this->guestUserHandler();
+       $user = $this->getAuthenticatedUser();
+       $this->layout = 'master';
+       $userId = $user->id;
+       $userName = $user->SID;
+       $myRights = $user['rights'];
+       $groupId= $user['groupid'];
+       $isAdmin = false;
+       $isGrpAdmin = false;
+       $isTeacher = false;
+       $id = $this->getParamVal('id');
+       $params = $this->getRequestParams();
+       $courseId = (isset($params['cid'])) ? $params['cid'] : "admin";
+       $course = Course::getById($courseId);
+       $teacherId = $this->isTeacher($userId,$courseId);
+       $err = '';
+
+       if ($myRights == AppConstant::GROUP_ADMIN_RIGHT && $courseId=='admin') {
+           $isGrpAdmin = true;
+       } else if ($myRights == 100 && $courseId == 'admin') {
+           $isAdmin = true;
+       } else {
+           $isTeacher = true;
+       }
+       if (isset($params['ltfrom'])) {
+           $ltfrom = '&amp;ltfrom='.$params['ltfrom'];
+       } else {
+           $ltfrom = '';
+       }
+
+       if (isset($params['tname'])) {
+           $privacy = AppConstant::NUMERIC_ZERO;
+           if (isset($params['privname']))
+           {
+               $privacy += AppConstant::NUMERIC_ONE;
+           }
+           if (isset($params['privemail']))
+           {
+               $privacy += AppConstant::NUMERIC_TWO;
+           }
+           $params['custom'] = str_replace("\n",'&',$params['custom']);
+           $params['custom'] = preg_replace('/\s/','',$params['custom']);
+
+           if (!empty($params['tname']) && !empty($params['key']) && !empty($params['secret'])) {
+               $query = '';
+               if ($params['id'] == 'new') {
+                   $external = new ExternalTools();
+                   $external->saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGrpAdmin, $isAdmin, $privacy);
+               } else
+               {
+                    $params['groupId'] = $groupId;
+                   if ($isTeacher) {
+                       $attr = 'courseid';
+                       $attrValue = $courseId;
+                       ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                   } else if ($isGrpAdmin) {
+                       AppUtility::dump('klnknlk');
+                       $attr = 'groupid';
+                       $attrValue = $groupId;
+                       ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
+                   }
+                   else{
+                       if($isAdmin)
+                       {
+                           if($params['scope'] == 0)
+                           {
+                               ExternalTools::updateExternalTool($params,0,$privacy);
+
+                           } else{
+                               ExternalTools::updateExternalTool($params,$params['groupId'],$privacy);
+
+                           }
+                       }
+
+                   }
+               }
+           }
+           $ltfrom = str_replace('&amp;','&',$ltfrom);
+           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
+       }  else if (isset($params['delete']) && $params['delete']=='true') {
+           $id = intval($params['id']);
+           if ($id>0) {
+                ExternalTools::deleteById($id, $isTeacher, $isGrpAdmin, $courseId, $groupId);
+           }
+           $ltfrom = str_replace('&amp;','&',$ltfrom);
+           return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
+       } else {
+           if (isset($params['delete'])) {
+
+           } else if (isset($_GET['id'])) {
+               if ($params['id'] == 'new') {
+                   $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
+               } else {
+                   $result = ExternalTools::getByRights($id, $isTeacher, $courseId, $isGrpAdmin, $groupId);
+                   if (count($result)==0) { die("invalid id");}
+                   $name = $result['name'];
+                   $url = $result['url'];
+                   $key = $result['ltikey'];
+                   $secret = $result['secret'];
+                   $custom = $result['custom'];
+                   $privacy = $result['privacy'];
+                   $grp = $result['groupid'];
+                   $custom = str_replace('&',"\n",$custom);
+               }
+               $tochg = array('name','url','key','secret','custom');
+               foreach ($tochg as $v) {
+                   ${$v} = htmlentities(${$v});
+               }
+           } else{
+               if($isAdmin){
+                   $courseid = AppConstant::NUMERIC_ZERO;
+                   $resultFirst = ExternalTools::getByCourseId($courseid);
+               } elseif($isGrpAdmin){
+                   $courseid = AppConstant::NUMERIC_ZERO;
+                   $resultFirst = ExternalTools::getByGroupId($courseid, $groupId);
+               } else{
+                   $resultFirst = ExternalTools::getByCourseAndOrderByName($courseId);
+               }
+
+           }
+       }
+       $this->includeCSS(['course/item.css']);
+       $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
+       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course);
+       return $this->renderWithData('externalTool', $responseData);
+   }
 }
