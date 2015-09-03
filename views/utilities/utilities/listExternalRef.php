@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'Rescue Course';
+$this->title = 'List External Reference';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
@@ -18,11 +18,16 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
-<br>
+    <br>
     <div class="align-copy-course">
-    <?php if(count($recoveredItems) > AppConstant::NUMERIC_ZERO){
-        echo "<p>recovered ". count($recoveredItems) . "items</p>";
-    }?>
-    <?php echo AppUtility::t('Done');?>
-        </div>
+        <?php if($questionSetData)
+        {
+            foreach($questionSetData as $row)
+            {
+                echo implode('@',$row).'<br/>';
+            }
+        }else{
+            echo AppUtility::t('No External Reference Available');
+        }?>
+    </div>
 </div>

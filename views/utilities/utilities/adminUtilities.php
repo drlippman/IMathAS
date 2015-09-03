@@ -144,11 +144,11 @@ $this->params['breadcrumbs'][] = $this->title;
           <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/replace-video');?>">Replace YouTube videos</a><br/></li>
           <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=rescue');?>">Recover lost items</a><br/></li>
           <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=emu');?>">Emulate User</a><br/></li>
-          <li><a href="listextref.php">List ExtRefs</a><br/></li>
-          <li><a href="updateextref.php">Update ExtRefs</a><br/></li>
-          <li><a href="listwronglibs.php">List WrongLibFlags</a><br/></li>
-          <li><a href="updatewronglibs.php">Update WrongLibFlags</a><br/></li>
-          <li><a href="blocksearch.php">Search Block titles</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/list-external-ref');?>">List ExtRefs</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/update-external-ref');?>">Update ExtRefs</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/list-wrong-lib-flag');?>">List WrongLibFlags</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/update-wrong-lib-flag');?>">Update WrongLibFlags</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/block-search');?>">Search Block titles</a><br/></li>
           <li><a href="itemsearch.php">Search inline/linked items</a><br/></li>
           <li><a href="../calcqtimes.php">Update question usage data (slow)</a><br/></li>
  <?php }?>

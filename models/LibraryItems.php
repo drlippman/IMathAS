@@ -102,4 +102,13 @@ class LibraryItems extends BaseImasLibraryItems
         }
         return count($data);
     }
+    public static function updateWrongLibFlag($val)
+    {
+        $query = "UPDATE imas_library_items AS ili
+	  JOIN imas_questionset AS iqs ON iqs.id=ili.qsetid
+	  JOIN imas_libraries AS il ON ili.libid=il.id
+	  SET ili.junkflag = 1 WHERE (iqs.uniqueid, il.uniqueid) IN (".implode(',',$val).")";
+        $data = \Yii::$app->db->createCommand($query)->execute();
+        return $data;
+    }
 }

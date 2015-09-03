@@ -15,6 +15,7 @@ use app\models\Course;
 use app\models\forms\LtiUserForm;
 use app\models\InlineText;
 use app\models\Items;
+use app\models\LibraryItems;
 use app\models\LinkedText;
 use app\models\QuestionSet;
 use app\models\Student;
@@ -254,8 +255,6 @@ class UtilitiesController extends AppController
             $to = trim($params['to']);
             if (strlen($from)!=11 || strlen($to)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to))
             {
-
-
             }else
             {
                 $updatedInlineText = InlineText::updateVideoId($from,$to);
@@ -268,6 +267,164 @@ class UtilitiesController extends AppController
         }
         return $this->renderWithData('replaceVideo',['updatedInlineText' => $updatedInlineText,'updatedLinkedText' => $updatedLinkedText,'updatedLinkedTextSummary' => $updatedLinkedTextSummary,'updatedAssessment' => $updatedAssessment,'updatedAssessmentSummary' => $updatedAssessmentSummary,'updatedQuestionSet' => $updatedQuestionSet,'params' => $params,'body' => $body,'message' => $message,'from' => $from,'to' => $to]);
     }
+    public function actionListExternalRef()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $questionSetData = QuestionSet::getExternalRef();
+        return $this->renderWithData('listExternalRef',['questionSetData' => $questionSetData]);
+    }
+
+    public function actionListWrongLibFlag()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        $data = QuestionSet::getWrongLibFlag();
+        return $this->renderWithData('listWrongLibFlag',['body ' => $body,'message' => $message,'data' => $data ]);
+    }
+    public function actionUpdateWrongLibFlag()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if(isset($params['data']))
+        {
+            $info = array();
+            $lines = explode("\n",$params['data']);
+            $valArray = array();
+            $tot = 0;
+            foreach ($lines as $line)
+            {
+                $line = str_replace(array("\r","\t"," "),'',$line);
+                list($uqId,$uLibId) = explode('@',$line);
+                $valArray[] = "('$uqId','$uLibId')";
+                if (count($valArray)==500)
+                {
+                    $tot += $this->doQuery($valArray);
+                    $valArray = array();
+                }
+            }
+            if (count($valArray)>AppConstant::NUMERIC_ZERO)
+            {
+                $tot += $this->doQuery($valArray);
+            }
+        }
+        $responseData = array('tot' => $tot,'message' => $message,'body' => $body,'params' => $params);
+        return $this->renderWithData('updateWrongLibFlag',$responseData);
+    }
+    public function actionUpdateExternalRef()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if(isset($params['data']))
+        {
+            $info = array();
+            $lines = explode("\n",$params['data']);
+            foreach ($lines as $line)
+            {
+                list($uid,$lastM,$extRef) = explode('@',$line);
+                $extRef = str_replace(array("\r","\t"," "),'',$extRef);
+                $info[$uid] = array($lastM,$extRef);
+            }
+            $questions = QuestionSet::getDataToUpdateExtRef();
+            foreach($questions as $question)
+            {
+                if (!isset($info[$question['uniqueid']])) {continue;}
+                if (trim($question['extref'])!=trim($info[$question['uniqueid']][1]))
+                {
+                    if ($question['extref']=='')
+                    {
+                        QuestionSet::updateExternalRef($info[$question['uniqueid']][1],$question['id']);
+                    }
+                    else
+                    {
+                        if ($question['lastmoddate']>$info[$question['uniqueid']][0])
+                        {
+
+                        } else
+                        {
+
+                            QuestionSet::updateExternalRef($info[$question['uniqueid']][1],$question['id']);
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+        $responseData = array('questions' => $questions,'info' => $info,'extRef' => $extRef,'params' => $params,'body' => $body,'message' => $message);
+        return $this->renderWithData('updateExternalRef',$responseData);
+    }
+
+    public function actionBlockSearch()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if(isset($params['search']))
+        {
+            $Search = trim($params['search']);
+            $blockTitles = Course::getBlckTitles($Search);
+            if($blockTitles)
+            {
+                foreach($blockTitles as $singleBlock)
+                {
+                    $items = unserialize($singleBlock['itemorder']);
+                    $det = $this->getStr($items, $Search, '0');
+                }
+            }
+        }
+        $this->layout = 'master';
+        $responseData = array('params' => $params,'body' => $body,'message' => $message,'blockTitles' => $blockTitles,'det' => $det);
+        return $this->renderWithData('blockSearch',$responseData);
+    }
+
+    public function getStr($items,$str,$parent)
+    {
+        foreach ($items as $k=>$it)
+        {
+            if (is_array($it)) {
+                if (stripos($it['name'],$str)!==false) {
+                    return array($parent.'-'.($k+1), $it['name']);
+                } else {
+                    $val = $this->getStr($it['items'], $str, $parent.'-'.($k+1));
+                    if (count($val)>0)
+                    {
+                        return $val;
+                    }
+                }
+            }
+        }
+        return array();
+
+    }
+
     public function fixSub($items)
     {
         global $itemsFnd;
@@ -290,6 +447,11 @@ class UtilitiesController extends AppController
         }
         $items = array_values($items);
 
+    }
+    public function doQuery($val)
+    {
+        $affectedRow = LibraryItems::updateWrongLibFlag($val);
+        return $affectedRow;
     }
 
 } 

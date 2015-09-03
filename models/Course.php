@@ -432,4 +432,15 @@ class Course extends BaseImasCourses {
         $query = "SELECT id FROM imas_courses WHERE (istemplate&4)=4";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getBlckTitles($search)
+    {
+        $query = new Query();
+        $query	->select(['id','itemorder','name'])
+            ->from('imas_courses')
+            ->where(['LIKE','itemorder',$search])->limit(40);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

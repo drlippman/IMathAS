@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'Rescue Course';
+$this->title = 'Update Wrong Lib Flag';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
@@ -18,11 +18,23 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
-<br>
+    <br>
     <div class="align-copy-course">
-    <?php if(count($recoveredItems) > AppConstant::NUMERIC_ZERO){
-        echo "<p>recovered ". count($recoveredItems) . "items</p>";
-    }?>
-    <?php echo AppUtility::t('Done');?>
-        </div>
+
+        <?php
+        if($body == AppConstant::NUMERIC_ONE)
+        {
+            echo $message;
+
+        }
+        if(isset($params['data']))
+        {
+            echo "$tot records newly marked as wrong library";
+
+        }else{?>
+            <form method="post"><textarea name="data" rows="30" cols="80"></textarea>
+                <input type="submit"></form>
+            <br>
+        <?php }?>
+    </div>
 </div>

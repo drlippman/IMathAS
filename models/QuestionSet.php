@@ -195,4 +195,42 @@ class QuestionSet extends BaseImasQuestionset
         $rowCount=$command->execute();
         return $rowCount;
     }
+
+    public static function getExternalRef()
+    {
+        $data = new Query();
+        $data ->select(['uniqueid','lastmoddate','extref'])
+               ->from(['imas_questionset'])
+            ->where(['<>','extref','']);
+        $command = $data->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function getWrongLibFlag()
+    {
+        $query = "SELECT iqs.uniqueid,il.uniqueid FROM imas_questionset AS iqs
+                  JOIN imas_library_items AS ili ON iqs.id=ili.qsetid
+                  JOIN imas_libraries AS il ON ili.libid=il.id
+                  WHERE ili.junkflag>0";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
+    }
+    public static function getDataToUpdateExtRef()
+    {
+        $query = "SELECT id,uniqueid,lastmoddate,extref FROM imas_questionset WHERE 1";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
+    }
+    public static function updateExternalRef($uniqueId,$rowId)
+    {
+        $data = QuestionSet::find()->where(['id' => $rowId])->one();
+        if($data)
+        {
+            $data->extref = $uniqueId;
+            $data->save();
+        }
+    }
+
 } 
