@@ -10,9 +10,14 @@ namespace app\controllers\utilities;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\models\Assessments;
 use app\models\Course;
 use app\models\forms\LtiUserForm;
+use app\models\InlineText;
 use app\models\Items;
+use app\models\LinkedText;
+use app\models\QuestionSet;
+use app\models\Student;
 use app\models\User;
 use \yii\web\Controller;
 use app\controllers\AppController;
@@ -88,6 +93,7 @@ class UtilitiesController extends AppController
     {
         $this->guestUserHandler();
         $params = $this->getRequestParams();
+        $this->layout = "master";
         $courseId = $params['cid'];
         if(isset($courseId))
         {
@@ -96,7 +102,7 @@ class UtilitiesController extends AppController
             $blockCnt = $query['blockcnt'];
         }else
         {
-
+                exit;
         }
         global $itemsFnd;
         $itemsFnd = array();
@@ -113,7 +119,7 @@ class UtilitiesController extends AppController
                 }
             }
         }
-        if(count($recoveredItems))
+        if(count($recoveredItems) > AppConstant::NUMERIC_ZERO)
         {
             $block = array();
             $block['name'] = "Recovered items";
@@ -127,10 +133,140 @@ class UtilitiesController extends AppController
             $block['public'] = AppConstant::NUMERIC_ZERO;
             $block['items'] = $recoveredItems;
             array_push($items,$block);
-            echo "recovered ". count($recoveredItems) . "items";
-            print_r($items);
+            $itemOrder = serialize($items);
+            Course::UpdateItemOrderAndBlockCnt($itemOrder,$blockCnt,$courseId,AppConstant::NUMERIC_ZERO);
+        }
+        else
+        {
+            $itemOrder = serialize($items);
+            Course::UpdateItemOrderAndBlockCnt($itemOrder,$blockCnt,$courseId,AppConstant::NUMERIC_ONE);
         }
 
+        return $this->renderWithData('rescueCourse',['items' => $items,'recoveredItems' => $recoveredItems]);
+
+    }
+    public function actionGetStudentCount()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        if($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = "You do not have access to this page";
+        }
+        $now = time();
+        $date = mktime(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_SEVEN,AppConstant::NUMERIC_TEN,AppConstant::YEAR_TWENTY_ELEVEN);
+        $studentCount = User::getDistinctUserCount($date);
+        $days = $this->getParamVal('days');
+        if(isset($days))
+        {
+            $days = intval($this->getParamVal('days'));
+        }
+        else
+        {
+            $days = AppConstant::NUMERIC_THIRTY;
+        }
+        if (isset($CFG['GEN']['guesttempaccts'])) {
+            $skipCid = $CFG['GEN']['guesttempaccts'];
+        } else {
+            $skipCid= array();
+        }
+        $queryForCid = Course::getDataByTemplate();
+        if($queryForCid)
+        {
+            foreach($queryForCid as $data)
+            {
+                $skipCid[] =$data['id'];
+            }
+        }
+        $skipCidS =implode(',',$skipCid);
+        $date = $now - AppConstant::SECONDS_CONVERSION*$days;
+        $stuCount = User::getStuCount($skipCid,$date,$skipCidS);
+        $queryForStu = User::queryForStu($skipCid,$date,$skipCidS);
+        $teacherCnt = User::getCountByJoin($skipCid,$date,$skipCidS);
+        $stuName = Student::getFNameAndLNameByJoin($date);
+        $date = $now - AppConstant::SECONDS*AppConstant::SECONDS;
+        $queryByDistinctCnt = User::getStuData($date);
+        $email = $this->getParamVal('email');
+        if(isset($email) && $user->rights > AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $userEmail = User::getUserEmail($user);
+        }
+        $responseData = array('studentCount' => $studentCount,'stuCount' => $stuCount,'queryForStu' => $queryForStu,'teacherCnt' => $teacherCnt,'stuName' => $stuName,'queryByDistinctCnt' => $queryByDistinctCnt,'userEmail' => $userEmail,'days' => $days,'email' => $email,'user' => $user,'body' => $body,'message' => $message );
+        return $this->renderWithData('getStudentCount',$responseData);
+    }
+
+    public function actionGetStudentDetailCount()
+    {
+        $this->layout = 'master';
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $days = $this->getParamVal('days');
+        $start = $this->getParamVal('start');
+        $end = $this->getParamVal('end');
+        if($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        $now = time();
+        $start = $now - AppConstant::SECONDS_CONVERSION *AppConstant::NUMERIC_THIRTY;
+        $end = $now;
+        if(isset($start))
+        {
+            $parts = explode('-',$start);
+            if (count($parts)==3)
+            {
+                $start = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
+            }
+        }
+        else if(isset($days))
+        {
+            $start = $now - AppConstant::SECONDS_CONVERSION *intval($days);
+        }
+        if(isset($end))
+        {
+            $parts = explode('-',$end);
+            if (count($parts)==3)
+            {
+                $end = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
+            }
+        }
+        $query = Student::getstuDetails($start,$now,$end);
+        return $this->renderWithData('getStudentDetailCount',['query' => $query,'start' => $start,'end'=> $end,'body' => $body,'message' => $message]);
+    }
+
+    public function actionReplaceVideo()
+    {
+        $this->layout = 'master';
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if(!empty($params['from']) && ($params['to']))
+        {
+            $from = trim($params['from']);
+            $to = trim($params['to']);
+            if (strlen($from)!=11 || strlen($to)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to))
+            {
+
+
+            }else
+            {
+                $updatedInlineText = InlineText::updateVideoId($from,$to);
+                $updatedLinkedText = LinkedText::updateVideoId($from,$to);
+                $updatedLinkedTextSummary = LinkedText::updateSummary($from,$to);
+                $updatedAssessment = Assessments::updateVideoId($from,$to);
+                $updatedAssessmentSummary = LinkedText::updateSummary($from,$to);
+                $updatedQuestionSet = QuestionSet::updateVideoId($from,$to);
+            }
+        }
+        return $this->renderWithData('replaceVideo',['updatedInlineText' => $updatedInlineText,'updatedLinkedText' => $updatedLinkedText,'updatedLinkedTextSummary' => $updatedLinkedTextSummary,'updatedAssessment' => $updatedAssessment,'updatedAssessmentSummary' => $updatedAssessmentSummary,'updatedQuestionSet' => $updatedQuestionSet,'params' => $params,'body' => $body,'message' => $message,'from' => $from,'to' => $to]);
     }
     public function fixSub($items)
     {

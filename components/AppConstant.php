@@ -63,12 +63,15 @@ class AppConstant
     const NUMERIC_THIRTEEN = 13;
     const NUMERIC_FOURTEEN = 14;
     const NUMERIC_FIFTEEN = 15;
+    const NUMERIC_THIRTY = 30;
     const NUMERIC_TEN_THOUSAND = 10000;
     const NUMERIC_NEGATIVE_ONE = -1;
     const NUMERIC_SIXTY_ONE = 61;
     const NUMERIC_THIRTY_TWO = 32;
     const TRIPLE_SEVEN = 0777;
     const POINT_ZERO_TWO = .02;
+    const YEAR_TWENTY_ELEVEN = 2011;
+    const SECONDS_CONVERSION = 86400;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;

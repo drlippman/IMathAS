@@ -459,17 +459,34 @@ class Assessments extends BaseImasAssessments
         return Yii::$app->db->createCommand("SELECT ia.id,ias.bestscores FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid WHERE ia.courseid='$courseId' AND ias.userid='$userId'")->queryAll();
     }
 
-    public static function setEndMessage($id, $msgstr){
+    public static function setEndMessage($id, $msgstr)
+    {
         $data = Assessments::getByAssessmentId($id);
         if($data){
             $data->endmsg = $msgstr;
             $data->save();
         }
     }
-
     public static function getByCId($cid)
     {
         $query = Yii::$app->db->createCommand("SELECT id,name FROM imas_assessments WHERE courseid='$cid'")->queryAll();
         return $query;
+    }
+    public static function updateVideoId($from,$to)
+    {
+        $query = "UPDATE imas_assessments SET intro=REPLACE(intro,'$from','$to') WHERE intro LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+    }
+    public static function updateSummary($from,$to)
+    {
+        $query = "UPDATE imas_assessments SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+
     }
 }

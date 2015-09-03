@@ -140,4 +140,21 @@ class LinkedText extends BaseImasLinkedtext
     {
         $query  = \Yii::$app->db->createCommand("UPDATE imas_linkedtext SET text='" . addslashes($text) . "' WHERE id={$id}")->queryAll();
     }
+
+    public static function updateVideoId($from,$to)
+    {
+        $query = "UPDATE imas_linkedtext SET text=REPLACE(text,'$from','$to') WHERE text LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+    }
+    public static function updateSummary($from,$to)
+    {
+        $query = "UPDATE imas_linkedtext SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+    }
 }

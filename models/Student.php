@@ -469,7 +469,6 @@ class Student extends BaseImasStudents {
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
-
     public static function deleteByUserId($userId)
     {
         $students = Student::find()->where(['userid' => $userId])->all();
@@ -477,6 +476,27 @@ class Student extends BaseImasStudents {
         {
             $student->delete();
         }
+    }
+    public static function getFNameAndLNameByJoin($date)
+    {
+        $query = "SELECT g.name,u.LastName,COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_courses AS t ";
+        $query .= "ON s.courseid=t.id AND s.lastaccess>$date  JOIN imas_users as u  ";
+        $query .= "ON u.id=t.ownerid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id ORDER BY g.name";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getstuDetails($start,$now,$end)
+    {
+        $query = "SELECT g.name,u.LastName,u.FirstName,c.id,c.name AS cname, COUNT(DISTINCT s.id) FROM imas_students AS s JOIN imas_teachers AS t ";
+        $query .= "ON s.courseid=t.courseid AND s.lastaccess > {$start} ";
+        if ($end != $now) {
+            $query .= "AND s.lastaccess<$end ";
+        }
+        $query .= "JOIN imas_courses AS c ON t.courseid=c.id ";
+        $query .= "JOIN imas_users as u ";
+        $query .= "ON u.id=t.userid JOIN imas_groups AS g ON g.id=u.groupid GROUP BY u.id,c.id ORDER BY g.name,u.LastName,u.FirstName,c.name";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+
     }
 }
 

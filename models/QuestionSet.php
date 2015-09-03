@@ -186,4 +186,13 @@ class QuestionSet extends BaseImasQuestionset
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function updateVideoId($from,$to)
+    {
+        $query = "UPDATE imas_questionset SET extref=REPLACE(extref,'$from','$to') WHERE extref LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+    }
 } 

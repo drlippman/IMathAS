@@ -408,10 +408,28 @@ class Course extends BaseImasCourses {
         $data = $command->queryOne();
         return $data;
     }
-
     public static function getByUserId($userId)
     {
         $query = Yii::$app->db->createCommand("SELECT imas_courses.id,imas_courses.name FROM imas_courses,imas_teachers WHERE imas_courses.id=imas_teachers.courseid AND imas_teachers.userid='$userId' ORDER BY imas_courses.name")->queryAll();
         return $query;
+    }
+    public static function UpdateItemOrderAndBlockCnt($itemOrder,$blockCnt,$courseId,$num)
+    {
+        $isRecord = Course::findOne(['id' =>$courseId]);
+        if($isRecord)
+        {
+            $isRecord->itemorder = $itemOrder;
+            if($num == AppConstant::NUMERIC_ZERO)
+            {
+                $isRecord->blockcnt = $blockCnt+AppConstant::NUMERIC_ONE;
+            }
+            $isRecord->save();
+        }
+    }
+
+    public static function getDataByTemplate()
+    {
+        $query = "SELECT id FROM imas_courses WHERE (istemplate&4)=4";
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 }

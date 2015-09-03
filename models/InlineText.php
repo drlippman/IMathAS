@@ -156,5 +156,14 @@ class InlineText extends BaseImasInlinetext
         $query = InlineText::find()->where(['courseid' => $courseId])->all();
         return $query;
     }
+
+    public static function updateVideoId($from,$to)
+    {
+        $query = "UPDATE imas_inlinetext SET text=REPLACE(text,'$from','$to') WHERE text LIKE '%$from%'";
+        $connection=\Yii::$app->db;
+        $command=$connection->createCommand($query);
+        $rowCount=$command->execute();
+        return $rowCount;
+    }
 }
 

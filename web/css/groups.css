@@ -14,18 +14,27 @@
 .align-groups
 {
 
-    margin-left: 30%;
+    margin-left: 6%;
     margin-right: 30%;
     margin-bottom: 3%;
+
 }
-.group-background
+.group-background-div
 {
-    width: auto;
+    height: 100%;
     background-color:#f8f8f8;
-    margin-left: 30px;
-    margin-right: 30px;
+
 }
 input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:hover, input[type="submit"]:hover, button:hover, input[type="button"]:hover, a.abutton:hover
 {
     color: #ffffff;
+}
+
+.circular-profile-image{
+    width: 47px;
+    height: 47px;
+    border-radius: 50%;
+    background-image: none;
+    background-position: center center;
+    background-size: cover;
 }

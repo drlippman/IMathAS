@@ -3,11 +3,32 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-$this->title = 'Admin Utilities';
+if(!$form){
+    $this->title = AppUtility::t('Admin Utilities',false);
+}else
+{
+    if($form == 'rescue')
+    {
+        $this->title = AppUtility::t('Recovered Items',false);
+    }
+    elseif($form == 'emu')
+    {
+        $this->title = AppUtility::t('Emulated Users',false);
+    }
+    elseif($form == 'lookup')
+    {
+        $this->title = AppUtility::t('User Lookup',false);
+    }
+}
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
+    <?php if(!$form){?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false),AppUtility::t('Admin', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index',AppUtility::getHomeURL() . 'admin/admin/index']]); ?>
+    <?php }else{?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false),AppUtility::t('Admin', false),AppUtility::t('Util', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index',AppUtility::getHomeURL() . 'admin/admin/index',AppUtility::getHomeURL() . 'utilities/utilities/admin-utilities']]);?>
+    <?php }?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -29,14 +50,14 @@ $this->params['breadcrumbs'][] = $this->title;
     {
         if($form == 'emu'){?>
             <form method="post" action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=emulateuser');?>">
-            <?php echo AppUtility::t('Emulate user with userid:', false)?><input type="text" size="5" name="uid"/>
-            <input type="submit" value="Go"/>
+            <?php echo AppUtility::t('Emulate user with userid:', false)?><input type="text" size="30" name="uid"/>
+            <input type="submit" style="width: 60px; height: 26px" value="Go"/>
 
         <?php }elseif($form == 'rescue'){?>
 
               <form method="post" action="<?php echo AppUtility::getURLFromHome('utilities','utilities/rescue-course')?>">
-              <?php echo AppUtility::t('Recover lost items in course ID: ', false)?><input type="text" size="5" name="cid"/>
-              <input type="submit" value="Go"/>
+              <?php echo AppUtility::t('Recover lost items in course ID: ', false)?><input type="text" size="30" name="cid"/>
+                  <input type="submit" style="width: 60px; height: 26px" value="Go"/>
 
         <?php }elseif($form == 'lookup'){?>
                   <?php if(!empty($params['LastName']) || !empty($params['FirstName']) || !empty($params['SID']) || !empty($params['email'])){
@@ -53,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                       echo '<li>Email: '.$user['email'].'</li>';
                       echo '<li>Last Login: '.AppUtility::tzdate("n/j/y g:ia", $user['lastaccess']).'</li>';
                       echo '<li>Rights: '.$user['rights'].'</li>';
-                      echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" value="'._('Go').'"/></li>';
+                      echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" style="width: 60px; height: 26px" value="Go"/></li>';
 
                   }?>
                   <?php
@@ -107,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
                           <div class="align-lookup"><input type="text" size="30" placeholder="FirstName" name="FirstName"></div>
                           <div class="align-lookup"><input type="text" size="30" placeholder="UserName" name="SID"></div>
                           <div class="align-lookup"><input type="text" size="30" placeholder="Email" name="email"></div>
-                          <div class="align-lookup"><input type="submit"  value="Go"></div>
+                          <div class="align-lookup"><input type="submit" style="width: 60px; height: 26px" value="Go"></div>
                 <?php }?>
        <?php } ?>
 <?php }else{
@@ -115,21 +136,21 @@ $this->params['breadcrumbs'][] = $this->title;
         {
             echo '<p>Debug Mode Enabled - Error reporting is now turned on.</p>';
         }?>
-        <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=lookup');?>">User lookup</a><br/>
-        <a href="getstucnt.php">Get Student Count</a><br/>
-        <a href="getstucntdet.php">Get Detailed Student Count</a><br/>
-        <a href="'.$imasroot.'/admin/approvepending.php">Approve Pending Instructor Accounts</a><br/>
-        <a href="utils.php?debug=true">Enable Debug Mode</a><br/>
-        <a href="replacevids.php">Replace YouTube videos</a><br/>
-        <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=rescue');?>">Recover lost items</a><br/>
-        <a href="utils.php?form=emu">Emulate User</a><br/>
-        <a href="listextref.php">List ExtRefs</a><br/>
-        <a href="updateextref.php">Update ExtRefs</a><br/>
-        <a href="listwronglibs.php">List WrongLibFlags</a><br/>
-        <a href="updatewronglibs.php">Update WrongLibFlags</a><br/>
-        <a href="blocksearch.php">Search Block titles</a><br/>
-        <a href="itemsearch.php">Search inline/linked items</a><br/>
-        <a href="../calcqtimes.php">Update question usage data (slow)</a><br/>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=lookup');?>">User lookup</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/get-student-count');?>">Get Student Count</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/get-student-detail-count');?>">Get Detailed Student Count</a><br/></li>
+          <li> <a href="#">Approve Pending Instructor Accounts</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?debug=true');?>">Enable Debug Mode</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/replace-video');?>">Replace YouTube videos</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=rescue');?>">Recover lost items</a><br/></li>
+          <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=emu');?>">Emulate User</a><br/></li>
+          <li><a href="listextref.php">List ExtRefs</a><br/></li>
+          <li><a href="updateextref.php">Update ExtRefs</a><br/></li>
+          <li><a href="listwronglibs.php">List WrongLibFlags</a><br/></li>
+          <li><a href="updatewronglibs.php">Update WrongLibFlags</a><br/></li>
+          <li><a href="blocksearch.php">Search Block titles</a><br/></li>
+          <li><a href="itemsearch.php">Search inline/linked items</a><br/></li>
+          <li><a href="../calcqtimes.php">Update question usage data (slow)</a><br/></li>
  <?php }?>
     </div>
 <div>

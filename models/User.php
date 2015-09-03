@@ -424,7 +424,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
-
      public static function updateGroupId($id)
     {
         $Users = User::find()->where(['groupid' => $id])->all();
@@ -461,6 +460,90 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         foreach($users as $user){
             $user->delete();
         }
+    }
+    public static function getDistinctUserCount($date)
+    {
+        $query = new Query();
+        $query->select('imas_users.id')
+            ->distinct('imas_users.id')
+            ->from(['imas_users','imas_students'])
+            ->where('imas_users.id=imas_students.userid')
+            ->andWhere(['>','imas_users.lastaccess',$date]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+    }
+    public static function getStuCount($skipCid,$date,$skipCidS)
+    {
+        $query = new Query();
+        $query->select('imas_students.id')
+            ->from(['imas_users','imas_students'])
+            ->where('imas_users.id=imas_students.userid')
+            ->andWhere(['>','imas_users.lastaccess',$date]);
+        if(count($skipCid)>0)
+        {
+            $query->andWhere(['NOT IN','imas_students.courseid',$skipCidS]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+    }
+    public static function queryForStu($skipCid,$date,$skipCidS)
+    {
+        $query = new Query();
+        $query->select('imas_users.id')
+            ->distinct('imas_users.id')
+            ->from(['imas_users','imas_students'])
+            ->where('imas_users.id=imas_students.userid')
+            ->andWhere(['>','imas_users.lastaccess',$date]);
+        if(count($skipCid)>0)
+        {
+            $query->andWhere(['NOT IN','imas_students.courseid',$skipCidS]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+
+    }
+    public static function getCountByJoin($skipCid,$date,$skipCidS )
+    {
+        $query = new Query();
+        $query->select('imas_users.id')
+            ->distinct('imas_users.id')
+            ->from(['imas_users','imas_teachers'])
+            ->where('imas_users.id=imas_teachers.userid')
+            ->andWhere(['>','imas_users.lastaccess',$date]);
+        if(count($skipCid)>0)
+        {
+            $query->andWhere(['NOT IN','imas_teachers.courseid',$skipCidS]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+    }
+
+    public static function getStuData($date)
+    {
+        $query = new Query();
+        $query->select('imas_users.id')
+            ->distinct('imas_users.id')
+            ->from(['imas_users','imas_students'])
+            ->where('imas_users.id=imas_students.userid')
+            ->andWhere(['>','imas_users.lastaccess',$date]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+    }
+    public static function getUserEmail($user)
+    {
+        $query = new Query();
+        $query->select('email')
+            ->from('imas_users')
+            ->where(['>','rights',20]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return  count($data);
+
     }
 }
 
