@@ -203,7 +203,7 @@ public static function storeuploadedqimage($id,$key,$sec="public-read") {
 		}
 	} else {
 		if (is_uploaded_file($_FILES[$id]['tmp_name'])) {	
-			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/assessment/qimages/';
+			$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/web/Uploads/qimages/';
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {

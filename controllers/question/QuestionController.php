@@ -29,14 +29,13 @@ use app\models\StuGroupSet;
 use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
-//use app\models\User;
 
 class QuestionController extends AppController
 {
     public function actionAddQuestions()
     {
         $user = $this->getAuthenticatedUser();
-        $groupid = $user['groupid'];
+        $groupId = $user['groupid'];
         $userId = $user['id'];
         $params = $this->getRequestParams();
         $this->layout = 'master';
@@ -44,178 +43,182 @@ class QuestionController extends AppController
         $teacherId = $this->isTeacher($userId,$courseId);
         if ($user['rights']==AppConstant::ADMIN_RIGHT) {
             $teacherId = $userId;
-            $adminasteacher = true;
+            $adminAsTeacher = true;
         }
         $overwriteBody=AppConstant::NUMERIC_ZERO;
         $body = '';
         $course = Course::getById($courseId);
         $this->checkSession($params);
-        $pagetitle = "Add/Remove Questions";
-
+        $pagetitle = AppConstant::QUESTION_TITLE;
         $curBreadcrumb =  $course['name'];
         if (isset($params['clearattempts']) || isset($params['clearqattempts']) || isset($params['withdraw'])) {
             $curBreadcrumb .= "&gt; <a href=\"add-questions?cid=" . $params['cid'] . "&aid=" . $params['aid'] . "\">Add/Remove Questions</a> &gt; Confirm\n";
         } else {
             $curBreadcrumb .= "&gt; Add/Remove Questions\n";
         }
-        if (!$teacherId) { // loaded by a NON-teacher
+        /*
+         * Loaded by a NON-teacher
+         */
+        if (!$teacherId) { 
             $overwriteBody=AppConstant::NUMERIC_ONE;
-            $body = "You need to log in as a teacher to access this page";
+            $body = AppConstant::NO_TEACHER_RIGHTS;
         } elseif (!(isset($params['cid'])) || !(isset($params['aid']))) {
             $overwriteBody=AppConstant::NUMERIC_ONE;
-            $body = "You need to access this page from the course page menu";
-        }else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-            $cid = $this->getParamVal('cid');;
-            $aid = $this->getParamVal('aid');
+            $body = AppConstant::NO_PAGE_ACCESS;
+        }else { 
+        /*
+         * PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+         */ 
+            $courseId = $this->getParamVal('cid');;
+            $assessmentId = $this->getParamVal('aid');
             $sessionId = $this->getSessionId();
-            $sessiondata  = $this->getSessionData($sessionId);
+            $sessionData  = $this->getSessionData($sessionId);
+            
             if (isset($params['grp'])) {
-                $sessiondata['groupopt'.$aid] = $params['grp'];
-                $this->writesessiondata($sessiondata,$sessionId);
+                $sessionData['groupopt'.$assessmentId] = $params['grp'];
+                $this->writesessiondata($sessionData,$sessionId);
             }
+            
             if (isset($params['selfrom'])) {
-                $sessiondata['selfrom'.$aid] = $params['selfrom'];
-                $this->writesessiondata($sessiondata,$sessionId);
+                $sessionData['selfrom'.$assessmentId] = $params['selfrom'];
+                $this->writesessiondata($sessionData,$sessionId);
             } else {
-                if (!isset($sessiondata['selfrom'.$aid])) {
-                    $sessiondata['selfrom'.$aid] = 'lib';
-                    $this->writesessiondata($sessiondata,$sessionId);
+                if (!isset($sessionData['selfrom'.$assessmentId])) {
+                    $sessionData['selfrom'.$assessmentId] = 'lib';
+                    $this->writesessiondata($sessionData,$sessionId);
                 }
             }
 
             if (isset($teacherId) && isset($params['addset'])) {
                 if (!isset($params['nchecked']) && !isset($params['qsetids'])) {
                     $overwriteBody = AppConstant::NUMERIC_ONE;
-                    $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid).">Go back</a>";
+                    $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId).">Go back</a>";
                 } else if (isset($params['add'])) {
                     require dirname(__FILE__) . '/modquestiongrid.php';
-//                    include("modquestiongrid.php");
                     if (isset($params['process'])) {
-                        AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
-                        exit;
+                        return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                     }
                 } else {
                     $checked = $params['nchecked'];
-                    foreach ($checked as $qsetid) {
+                    foreach ($checked as $questionSetId) {
                         $questionData = array(
-                            'assessmentid' => $aid,
+                            'assessmentid' => $assessmentId,
                             'points' => AppConstant::QUARTER_NINE,
                             'attempts' => AppConstant::QUARTER_NINE,
                             'penalty' => AppConstant::QUARTER_NINE,
-                            'questionsetid' => $qsetid
+                            'questionsetid' => $questionSetId
                         );
                         $question = new Questions();
                         $questionId = $question->addQuestions($questionData);
                         $qids[] = $questionId;
                     }
                     //add to itemorder
-                    $assessment = Assessments::getByAssessmentId($aid);
+                    $assessment = Assessments::getByAssessmentId($assessmentId);
                     if ($assessment['itemorder']=='') {
-                        $itemorder = implode(",",$qids);
+                        $itemOrder = implode(",",$qids);
                     } else {
-                        $itemorder  = $assessment['itemorder'] . "," . implode(",",$qids);
+                        $itemOrder  = $assessment['itemorder'] . "," . implode(",",$qids);
                     }
-                    $viddata = $assessment['viddata'];
-                    if ($viddata != '') {
+                    $vidData = $assessment['viddata'];
+                    if ($vidData != '') {
                         if ($assessment['itemorder']=='') {
-                            $nextnum = AppConstant::NUMERIC_ZERO;
+                            $nextNum = AppConstant::NUMERIC_ZERO;
                         } else {
-                            $nextnum = substr_count($assessment['itemorder'],',')+AppConstant::NUMERIC_ONE;
+                            $nextNum = substr_count($assessment['itemorder'],',')+AppConstant::NUMERIC_ONE;
                         }
-                        $numnew= count($checked);
-                        $viddata = unserialize($viddata);
-                        if (!isset($viddata[count($viddata)-AppConstant::NUMERIC_ONE][1])) {
-                            $finalseg = array_pop($viddata);
+                        $numNew= count($checked);
+                        $vidData = unserialize($vidData);
+                        if (!isset($vidData[count($vidData)-AppConstant::NUMERIC_ONE][1])) {
+                            $finalSeg = array_pop($vidData);
                         } else {
-                            $finalseg = '';
+                            $finalSeg = '';
                         }
-                        for ($i=$nextnum;$i<$nextnum+$numnew;$i++) {
-                            $viddata[] = array('','',$i);
+                        for ($i=$nextNum;$i<$nextNum+$numNew;$i++) {
+                            $vidData[] = array('','',$i);
                         }
-                        if ($finalseg != '') {
-                            $viddata[] = $finalseg;
+                        if ($finalSeg != '') {
+                            $vidData[] = $finalSeg;
                         }
-                        $viddata = serialize($viddata);
+                        $vidData = serialize($vidData);
                     }
-                    Assessments::setVidData($itemorder,$viddata,$aid);
-                    AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
-                    exit;
+                    Assessments::setVidData($itemOrder,$vidData,$assessmentId);
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                 }
             }
             if (isset($params['modqs'])) {
                 if (!isset($params['checked']) && !isset($params['qids'])) {
                     $overwriteBody = AppConstant::NUMERIC_ONE;
-                    $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid).">Go back</a>\n";
+                    $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId).">Go back</a>\n";
                 } else {
-//                    require dirname(__FILE__) . '/modquestiongrid.php';
                     include("modquestiongrid.php");
                     if (isset($params['process'])) {
-                        return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid));
-//                        exit;
+                        return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                     }
                 }
             }
             if (isset($params['clearattempts'])) {
                 if ($params['clearattempts']=="confirmed") {
-//                    require_once('../includes/filehandler.php');
-                    filehandler::deleteallaidfiles($aid);
-                    AssessmentSession::deleteByAssessmentId($aid);
-                    Questions::setWithdrawn($aid,AppConstant::NUMERIC_ZERO);
-                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid));
+/*
+ *                     require_once('../includes/filehandler.php');
+ */
+                    filehandler::deleteallaidfiles($assessmentId);
+                    AssessmentSession::deleteByAssessmentId($assessmentId);
+                    Questions::setWithdrawn($assessmentId,AppConstant::NUMERIC_ZERO);
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                 } else {
                     $overwriteBody = AppConstant::NUMERIC_ONE;
                     $assessmentData = Assessments::getByAssessmentId($params['aid']);
-                    $assessmentname = $assessmentData['name'];
-                    $body .= "<h3>$assessmentname</h3>";
+                    $assessmentName = $assessmentData['name'];
+                    $body .= "<h3>$assessmentName</h3>";
                     $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-                    $body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid.'&clearattempts=confirmed')."'\">\n";
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid)."';\"></p>\n";
+                    $body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=confirmed')."'\">\n";
+                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId)."';\"></p>\n";
                 }
             }
 
             if (isset($params['withdraw'])) {
                 if (isset($params['confirmed'])) {
                     if (strpos($params['withdraw'],'-')!==false) {
-                        $isingroup = true;
+                        $isInGroup = true;
                         $loc = explode('-',$params['withdraw']);
-                        $toremove = $loc[0];
+                        $toRemove = $loc[0];
                     } else {
-                        $isingroup = false;
-                        $toremove = $params['withdraw'];
+                        $isInGroup = false;
+                        $toRemove = $params['withdraw'];
                     }
-                    $query = Assessments::getByAssessmentId($aid);
-                    $itemorder = explode(',',$query['itemorder']);
-                    $defpoints = $query['defpoints'];
+                    $query = Assessments::getByAssessmentId($assessmentId);
+                    $itemOrder = explode(',',$query['itemorder']);
+                    $defPoints = $query['defpoints'];
 
                     $qids = array();
-                    if ($isingroup && $params['withdrawtype']!='full') { //is group remove
-                        $qids = explode('~',$itemorder[$toremove]);
+                    if ($isInGroup && $params['withdrawtype']!='full') { //is group remove
+                        $qids = explode('~',$itemOrder[$toRemove]);
                         if (strpos($qids[0],'|')!==false) { //pop off nCr
                             array_shift($qids);
                         }
-                    } else if ($isingroup) { //is single remove from group
-                        $sub = explode('~',$itemorder[$toremove]);
+                    } else if ($isInGroup) { //is single remove from group
+                        $sub = explode('~',$itemOrder[$toRemove]);
                         if (strpos($sub[0],'|')!==false) { //pop off nCr
                             array_shift($sub);
                         }
                         $qids = array($sub[$loc[1]]);
                     } else { //is regular item remove
-                        $qids = array($itemorder[$toremove]);
+                        $qids = array($itemOrder[$toRemove]);
                     }
-                    $qidlist = implode(',',$qids);
+                    $qidList = implode(',',$qids);
                     //withdraw question
-                    Questions::updateWithPoints(AppConstant::NUMERIC_ONE,'',$qidlist);
+                    Questions::updateWithPoints(AppConstant::NUMERIC_ONE,'',$qidList);
                     if ($params['withdrawtype']=='zero' || $params['withdrawtype']=='groupzero') {
-                        Questions::updateWithPoints(AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qidlist);
+                        Questions::updateWithPoints(AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qidList);
                     }
 
                     //get possible points if needed
                     if ($params['withdrawtype']=='full' || $params['withdrawtype']=='groupfull') {
                         $poss = array();
-                        $questionList = Questions::getByIdList($qidlist);
+                        $questionList = Questions::getByIdList($qidList);
                         foreach ($questionList  as $list) {
                             if ($list['points']==AppConstant::QUARTER_NINE) {
-                                $poss[$list['id']] = $defpoints;
+                                $poss[$list['id']] = $defPoints;
                             } else {
                                 $poss[$list['id']] = $list['points'];
                             }
@@ -223,53 +226,61 @@ class QuestionController extends AppController
                     }
 
                     //update assessment sessions
-                    $assessmentSessionData = AssessmentSession::getByAssessmentId($aid);
+                    $assessmentSessionData = AssessmentSession::getByAssessmentId($assessmentId);
                     foreach ($assessmentSessionData as $data) {
                         if (strpos($data['questions'],';')===false) {
-                            $qarr = explode(",",$data['questions']);
+                            $queArray = explode(",",$data['questions']);
                         } else {
-                            list($questions,$bestquestions) = explode(";",$data['questions']);
-                            $qarr = explode(",",$bestquestions);
+                            /*
+                             * Work to be done
+                             */
+                            list($questions,$bestQuestions) = explode(";",$data['questions']);
+                            $queArray = explode(",",$bestQuestions);
                         }
                         if (strpos($data['bestscores'],';')===false) {
-                            $bestscores = explode(',',$data['bestscores']);
-                            $doraw = false;
+                            $bestScores = explode(',',$data['bestscores']);
+                            $doRaw = false;
                         } else {
-                            list($bestscorelist,$bestrawscorelist,$firstscorelist) = explode(';',$data['bestscores']);
-                            $bestscores = explode(',', $bestscorelist);
-                            $bestrawscores = explode(',', $bestrawscorelist);
-                            $firstscores = explode(',', $firstscorelist);
-                            $doraw = true;
+                            /*
+                             * Work to be done
+                             */
+                            list($bestScoreList,$bestRawScoreList,$firstScoreList) = explode(';',$data['bestscores']);
+                            $bestScores = explode(',', $bestScoreList);
+                            $bestRawScores = explode(',', $bestRawScoreList);
+                            $firstScores = explode(',', $firstScoreList);
+                            $doRaw = true;
                         }
-                        for ($i=AppConstant::NUMERIC_ZERO; $i<count($qarr); $i++) {
-                            if (in_array($qarr[$i],$qids)) {
+                        for ($i=AppConstant::NUMERIC_ZERO; $i<count($queArray); $i++) {
+                            if (in_array($queArray[$i],$qids)) {
                                 if ($params['withdrawtype']=='zero' || $params['withdrawtype']=='groupzero') {
-                                    $bestscores[$i] = AppConstant::NUMERIC_ZERO;
+                                    $bestScores[$i] = AppConstant::NUMERIC_ZERO;
                                 } else if ($params['withdrawtype']=='full' || $params['withdrawtype']=='groupfull') {
-                                    $bestscores[$i] = $poss[$qarr[$i]];
+                                    $bestScores[$i] = $poss[$queArray[$i]];
                                 }
                             }
                         }
-                        if ($doraw) {
-                            $slist = implode(',',$bestscores).';'.implode(',',$bestrawscores).';'.implode(',',$firstscores);
+                        if ($doRaw) {
+                            $sList = implode(',',$bestScores).';'.implode(',',$bestRawScores).';'.implode(',',$firstScores);
                         } else {
-                            $slist = implode(',',$bestscores );
+                            $sList = implode(',',$bestScores );
                         }
-                        AssessmentSession::setBestScore($slist,$data['id']);
+                        AssessmentSession::setBestScore($sList,$data['id']);
                     }
-                    AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
-                    exit;
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                 } else {
                     if (strpos($params['withdraw'],'-')!==false) {
-                        $isingroup = true;
+                        $isInGroup = true;
                     } else {
-                        $isingroup = false;
+                        $isInGroup = false;
                     }
                     $overwriteBody = AppConstant::NUMERIC_ONE;
-//                    $body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
+                    /*
+                     * Work to be done
+                     * $body = "<div class=breadcrumb>$curBreadcrumb</div>\n";
+                     */
                     $body .= "<h3>Withdraw Question</h3>";
-                    $body .= "<form method=post action=\"add-questions?cid=$cid&aid=$aid&withdraw={$params['withdraw']}&confirmed=true\">";
-                    if ($isingroup) {
+                    $body .= "<form method=post action=\"add-questions?cid=$courseId&aid=$assessmentId&withdraw={$params['withdraw']}&confirmed=true\">";
+                    if ($isInGroup) {
                         $body .= '<p><b>This question is part of a group of questions</b>.  </p>';
                         $body .= '<input type=radio name="withdrawtype" value="groupzero" > Set points possible and all student scores to zero <b>for all questions in group</b><br/>';
                         $body .= '<input type=radio name="withdrawtype" value="groupfull" checked="1"> Set all student scores to points possible <b>for all questions in group</b><br/>';
@@ -280,57 +291,48 @@ class QuestionController extends AppController
                     }
                     $body .= '<p>This action can <b>not</b> be undone.</p>';
                     $body .= '<p><input type=submit value="Withdraw Question">';
-                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid)."'\"></p>\n";
+                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId)."'\"></p>\n";
                     $body .= '</form>';
                 }
 
             }
-            $address = AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid);
-
-//            $placeinhead = "<script type=\"text/javascript\">
-//		var previewqaddr = '".AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId)."';
-//		var addqaddr = '$address';
-//		</script>";
-//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/addquestions.js'."></script>";
-//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/addqsort.js?v=030315.js'."></script>";
-//            $placeinhead .= "<script type=\"text/javascript\" src=".AppUtility::getAssetURL().'/js/question/junkflag.js'."></script>";
-//            $placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '".AppUtility::getURLFromHome('question','question/savelibassignflag')."';</script>";
-
-
-            //DEFAULT LOAD PROCESSING GOES HERE
-            //load filter.  Need earlier than usual header.php load
+            $address = AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId);
+            /*
+             * DEFAULT LOAD PROCESSING GOES HERE
+             * load filter.  Need earlier than usual header.php load
+             */
             $curdir = rtrim(dirname(__FILE__), '/\\');
             require_once (Yii::$app->basePath."/filter/filter.php");
-            $query = AssessmentSession::getByAssessmentSessionIdJoin($aid,$cid);
+            $query = AssessmentSession::getByAssessmentSessionIdJoin($assessmentId,$courseId);
             if (count($query) > AppConstant::NUMERIC_ZERO) {
-                $beentaken = true;
+                $beenTaken = true;
             } else {
-                $beentaken = false;
+                $beenTaken = false;
             }
-            $result = Assessments::getByAssessmentId($aid);
-            $itemorder = $result['itemorder'];
-            $page_assessmentName = $result['name'];
+            $result = Assessments::getByAssessmentId($assessmentId);
+            $itemOrder = $result['itemorder'];
+            $pageAssessmentName = $result['name'];
             $ln = AppConstant::NUMERIC_ONE;
-            $defpoints = $result['defpoints'];
-            $displaymethod = $result['displaymethod'];
-            $showhintsdef = $result['showhints'];
+            $defPoints = $result['defpoints'];
+            $displayMethod = $result['displaymethod'];
+            $showHintsDef = $result['showhints'];
 
             $grp0Selected = "";
-            if (isset($sessiondata['groupopt'.$aid])) {
-                $grp = $sessiondata['groupopt'.$aid];
+            if (isset($sessionData['groupopt'.$assessmentId])) {
+                $grp = $sessionData['groupopt'.$assessmentId];
                 $grp1Selected = ($grp==AppConstant::NUMERIC_ONE) ? " selected" : "";
             } else {
                 $grp = AppConstant::NUMERIC_ZERO;
                 $grp0Selected = " selected";
             }
 
-            $jsarr = '[';
-            if ($itemorder != '') {
-                $items = explode(",",$itemorder);
+            $jsArray = '[';
+            if ($itemOrder != '') {
+                $items = explode(",",$itemOrder);
             } else {
                 $items = array();
             }
-            $existingq = array();
+            $existingQuestion = array();
             $apointstot = AppConstant::NUMERIC_ZERO;
             for ($i = AppConstant::NUMERIC_ZERO; $i < count($items); $i++) {
                 if (strpos($items[$i],'~')!==false) {
@@ -339,141 +341,143 @@ class QuestionController extends AppController
                     $subs[] = $items[$i];
                 }
                 if ($i>AppConstant::NUMERIC_ZERO) {
-                    $jsarr .= ',';
+                    $jsArray .= ',';
                 }
                 if (count($subs)>AppConstant::NUMERIC_ONE) {
                     if (strpos($subs[0],'|')===false) { //for backwards compat
-                        $jsarr .= '[1,0,[';
+                        $jsArray .= '[1,0,[';
                     } else {
-                        $grpparts = explode('|',$subs[0]);
-                        $jsarr .= '['.$grpparts[0].','.$grpparts[1].',[';
+                        $grpParts = explode('|',$subs[0]);
+                        $jsArray .= '['.$grpParts[0].','.$grpParts[1].',[';
                         array_shift($subs);
                     }
                 }
                 for ($j=AppConstant::NUMERIC_ZERO;$j<count($subs);$j++) {
                     $line = Questions::getQuestionData($subs[$j]);
-                    $existingq[] = $line['questionsetid'];
+                    $existingQuestion[] = $line['questionsetid'];
                     if ($j>AppConstant::NUMERIC_ZERO) {
-                        $jsarr .= ',';
+                        $jsArray .= ',';
                     }
                     //output item array
-                    $jsarr .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
-                    if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupid) || $line['ownerid']==$userId || $adminasteacher) { //can edit without template?
-                        $jsarr .= '1';
+                    $jsArray .= '['.$subs[$j].','.$line['questionsetid'].',"'.addslashes(filter(str_replace(array("\r\n", "\n", "\r")," ",$line['description']))).'","'.$line['qtype'].'",'.$line['points'].',';
+                    if ($line['userights']>3 || ($line['userights']==3 && $line['groupid']==$groupId) || $line['ownerid']==$userId || $adminAsTeacher) { //can edit without template?
+                        $jsArray .= '1';
                     } else {
-                        $jsarr .= '0';
+                        $jsArray .= '0';
                     }
-                    $jsarr .= ','.$line['withdrawn'];
-                    $extrefval = AppConstant::NUMERIC_ZERO;
-                    if (($line['showhints']==AppConstant::NUMERIC_ZERO && $showhintsdef==AppConstant::NUMERIC_ONE) || $line['showhints']==AppConstant::NUMERIC_TWO) {
-                        $extrefval += AppConstant::NUMERIC_ONE;
+                    $jsArray .= ','.$line['withdrawn'];
+                    $extRefVal = AppConstant::NUMERIC_ZERO;
+                    if (($line['showhints']==AppConstant::NUMERIC_ZERO && $showHintsDef==AppConstant::NUMERIC_ONE) || $line['showhints']==AppConstant::NUMERIC_TWO) {
+                        $extRefVal += AppConstant::NUMERIC_ONE;
                     }
                     if ($line['extref']!='') {
-                        $extref = explode('~~',$line['extref']);
-                        $hasvid = false;  $hasother = false;  $hascap = false;
-                        foreach ($extref as $v) {
+                        $extRef = explode('~~',$line['extref']);
+                        $hasVideo = false;  $hasOther = false;  $hasCap = false;
+                        foreach ($extRef as $v) {
                             if (strtolower(substr($v,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FIVE))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-                                $hasvid = true;
+                                $hasVideo = true;
                                 if (strpos($v,'!!1')!==false) {
-                                    $hascap = true;
+                                    $hasCap = true;
                                 }
                             } else {
-                                $hasother = true;
+                                $hasOther = true;
                             }
                         }
-                        $page_questionTable[$i]['extref'] = '';
-                        if ($hasvid) {
-                            $extrefval += AppConstant::NUMERIC_FOUR;
+                        $pageQuestionTable[$i]['extref'] = '';
+                        if ($hasVideo) {
+                            $extRefVal += AppConstant::NUMERIC_FOUR;
                         }
-                        if ($hasother) {
-                            $extrefval += AppConstant::NUMERIC_TWO;
+                        if ($hasOther) {
+                            $extRefVal += AppConstant::NUMERIC_TWO;
                         }
-                        if ($hascap) {
-                            $extrefval += 16;
+                        if ($hasCap) {
+                            $extRefVal += 16;
                         }
                     }
                     if ($line['solution']!='' && ($line['solutionopts']&AppConstant::NUMERIC_TWO)==AppConstant::NUMERIC_TWO) {
-                        $extrefval += AppConstant::NUMERIC_EIGHT;
+                        $extRefVal += AppConstant::NUMERIC_EIGHT;
                     }
-                    $jsarr .= ','.$extrefval;
-                    $jsarr .= ']';
+                    $jsArray .= ','.$extRefVal;
+                    $jsArray .= ']';
                 }
                 if (count($subs)>AppConstant::NUMERIC_ONE) {
-                    $jsarr .= '],';
-                    if (isset($_COOKIE['closeqgrp-'.$aid]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$aid],true))) {
-                        $jsarr .= '0';
+                    $jsArray .= '],';
+                    if (isset($_COOKIE['closeqgrp-'.$assessmentId]) && in_array("$i",explode(',',$_COOKIE['closeqgrp-'.$assessmentId],true))) {
+                        $jsArray .= '0';
                     } else {
-                        $jsarr .= '1';
+                        $jsArray .= '1';
                     }
-                    $jsarr .= ']';
+                    $jsArray .= ']';
                 }
 //                $alt = 1 - $alt;
                 unset($subs);
             }
-            $jsarr .= ']';
-
-//            DATA MANIPULATION FOR POTENTIAL QUESTIONS
-            if ($sessiondata['selfrom'.$aid]=='lib') { //selecting from libraries
-
-                //remember search
+            $jsArray .= ']';
+            /*
+             * DATA MANIPULATION FOR POTENTIAL QUESTIONS
+             */
+            if ($sessionData['selfrom'.$assessmentId]=='lib') { //selecting from libraries
+                /*
+                 * remember search
+                 */
                 if (isset($params['search'])) {
-                    $safesearch = $params['search'];
-                    $safesearch = str_replace(' and ', ' ',$safesearch);
-                    $search = stripslashes($safesearch);
+                    $safeSearch = $params['search'];
+                    $safeSearch = str_replace(' and ', ' ',$safeSearch);
+                    $search = stripslashes($safeSearch);
                     $search = str_replace('"','&quot;',$search);
-                    $sessiondata['lastsearch'.$cid] = $safesearch; ///str_replace(" ","+",$safesearch);
+                    $sessionData['lastsearch'.$courseId] = $safeSearch; ///str_replace(" ","+",$safeSearch);
                     if (isset($params['searchall'])) {
-                        $searchall = AppConstant::NUMERIC_ONE;
+                        $searchAll = AppConstant::NUMERIC_ONE;
                     } else {
-                        $searchall = AppConstant::NUMERIC_ZERO;
+                        $searchAll = AppConstant::NUMERIC_ZERO;
                     }
-                    $sessiondata['searchall'.$cid] = $searchall;
+                    $sessionData['searchall'.$courseId] = $searchAll;
                     if (isset($params['searchmine'])) {
-                        $searchmine = AppConstant::NUMERIC_ONE;
+                        $searchMine = AppConstant::NUMERIC_ONE;
                     } else {
-                        $searchmine = AppConstant::NUMERIC_ZERO;
+                        $searchMine = AppConstant::NUMERIC_ZERO;
                     }
                     if (isset($params['newonly'])) {
-                        $newonly = AppConstant::NUMERIC_ONE;
+                        $newOnly = AppConstant::NUMERIC_ONE;
                     } else {
-                        $newonly = AppConstant::NUMERIC_ZERO;
+                        $newOnly = AppConstant::NUMERIC_ZERO;
                     }
-                    $sessiondata['searchmine'.$cid] = $searchmine;
-                    $this->writesessiondata($sessiondata,$sessionId);
-                } else if (isset($sessiondata['lastsearch'.$cid])) {
-                    $safesearch = $sessiondata['lastsearch'.$cid]; //str_replace("+"," ",$sessiondata['lastsearch'.$cid]);
-                    $search = stripslashes($safesearch);
+                    $sessionData['searchmine'.$courseId] = $searchMine;
+                    $this->writesessiondata($sessionData,$sessionId);
+                } else if (isset($sessionData['lastsearch'.$courseId])) {
+                    $safeSearch = $sessionData['lastsearch'.$courseId]; //str_replace("+"," ",$sessionData['lastsearch'.$courseId]);
+                    $search = stripslashes($safeSearch);
                     $search = str_replace('"','&quot;',$search);
-                    $searchall = $sessiondata['searchall'.$cid];
-                    $searchmine = $sessiondata['searchmine'.$cid];
+                    $searchAll = $sessionData['searchall'.$courseId];
+                    $searchMine = $sessionData['searchmine'.$courseId];
                 } else {
                     $search = '';
-                    $searchall = AppConstant::NUMERIC_ZERO;
-                    $searchmine = AppConstant::NUMERIC_ZERO;
-                    $safesearch = '';
+                    $searchAll = AppConstant::NUMERIC_ZERO;
+                    $searchMine = AppConstant::NUMERIC_ZERO;
+                    $safeSearch = '';
                 }
-                if (trim($safesearch)=='') {
-                    $searchlikes = '';
+                if (trim($safeSearch)=='') {
+                    $searchLikes = '';
                 } else {
-                    if (substr($safesearch,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_SIX)=='regex:') {
-                        $safesearch = substr($safesearch,AppConstant::NUMERIC_SIX);
-                        $searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+                    if (substr($safeSearch,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_SIX)=='regex:') {
+                        $safeSearch = substr($safeSearch,AppConstant::NUMERIC_SIX);
+                        $searchLikes = "imas_questionset.description REGEXP '$safeSearch' AND ";
                     } else {
-                        $searchterms = explode(" ",$safesearch);
-                        $searchlikes = '';
-                        foreach ($searchterms as $k=>$v) {
+                        $searchTerms = explode(" ",$safeSearch);
+                        $searchLikes = '';
+                        foreach ($searchTerms as $k=>$v) {
                             if (substr($v,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FIVE) == 'type=') {
-                                $searchlikes .= "imas_questionset.qtype='".substr($v,AppConstant::NUMERIC_FIVE)."' AND ";
-                                unset($searchterms[$k]);
+                                $searchLikes .= "imas_questionset.qtype='".substr($v,AppConstant::NUMERIC_FIVE)."' AND ";
+                                unset($searchTerms[$k]);
                             }
                         }
-                        $searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
-                        if (substr($safesearch,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_THREE)=='id=') {
-                            $searchlikes = "imas_questionset.id='".substr($safesearch,AppConstant::NUMERIC_THREE)."' AND ";
-                        } else if (is_numeric($safesearch)) {
-                            $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+                        $searchLikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchTerms)."%') ";
+                        if (substr($safeSearch,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_THREE)=='id=') {
+                            $searchLikes = "imas_questionset.id='".substr($safeSearch,AppConstant::NUMERIC_THREE)."' AND ";
+                        } else if (is_numeric($safeSearch)) {
+                            $searchLikes .= "OR imas_questionset.id='$safeSearch') AND ";
                         } else {
-                            $searchlikes .= ") AND";
+                            $searchLikes .= ") AND";
                         }
                     }
                 }
@@ -482,194 +486,198 @@ class QuestionController extends AppController
                     if ($params['libs']=='') {
                         $params['libs'] = $user['deflib'];
                     }
-                    $searchlibs = $params['libs'];
-                    $sessiondata['lastsearchlibs'.$aid] = $searchlibs;
-                    $this->writesessiondata($sessiondata, $sessionId);
+                    $searchLibs = $params['libs'];
+                    $sessionData['lastsearchlibs'.$assessmentId] = $searchLibs;
+                    $this->writesessiondata($sessionData, $sessionId);
                 } else if (isset($params['listlib'])) {
-                    $searchlibs = $params['listlib'];
-                    $sessiondata['lastsearchlibs'.$aid] = $searchlibs;
-                    $searchall = AppConstant::NUMERIC_ZERO;
-                    $sessiondata['searchall'.$aid] = $searchall;
-                    $sessiondata['lastsearch'.$aid] = '';
-                    $searchlikes = '';
+                    $searchLibs = $params['listlib'];
+                    $sessionData['lastsearchlibs'.$assessmentId] = $searchLibs;
+                    $searchAll = AppConstant::NUMERIC_ZERO;
+                    $sessionData['searchall'.$assessmentId] = $searchAll;
+                    $sessionData['lastsearch'.$assessmentId] = '';
+                    $searchLikes = '';
                     $search = '';
-                    $safesearch = '';
-                    $this->writesessiondata($sessiondata, $sessionId);
-                }else if (isset($sessiondata['lastsearchlibs'.$aid])) {
-                    $searchlibs = $sessiondata['lastsearchlibs'.$aid];
+                    $safeSearch = '';
+                    $this->writesessiondata($sessionData, $sessionId);
+                }else if (isset($sessionData['lastsearchlibs'.$assessmentId])) {
+                    $searchLibs = $sessionData['lastsearchlibs'.$assessmentId];
                 } else {
-                    if (isset($CFG['AMS']['guesslib']) && count($existingq)>AppConstant::NUMERIC_ZERO) {
-                        $maj = count($existingq)/AppConstant::NUMERIC_TWO;
-                        $existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-                        $query = LibraryItems::getByQuestionSetId($existingqlist);
-
-                        $foundmaj = false;
+                    if (isset($CFG['AMS']['guesslib']) && count($existingQuestion)>AppConstant::NUMERIC_ZERO) {
+                        $maj = count($existingQuestion)/AppConstant::NUMERIC_TWO;
+                        $existingQList = implode(',',$existingQuestion);  //pulled from database, so no quotes needed
+                        /*
+                         * Work to do for fetching library items
+                         */
+                        $query = LibraryItems::getByQuestionSetId($existingQList);
+                        $foundMaj = false;
                         foreach ($query as $row) {
-                            if ($row[1]>=$maj) {
-                                $searchlibs = $row[0];
-                                $foundmaj = true;
+                            if ($row[COUNT('qsetid')]>=$maj) {
+                                $searchLibs = $row['libid'];
+                                $foundMaj = true;
                                 break;
                             }
                         }
-                        if (!$foundmaj) {
-                            $searchlibs = $user['deflib'];
+                        if (!$foundMaj) {
+                            $searchLibs = $user['deflib'];
                         }
                     } else {
-                        $searchlibs = $user['deflib'];
+                        $searchLibs = $user['deflib'];
                     }
                 }
-                $llist = "'".implode("','",explode(',',$searchlibs))."'";
+                $lList = "'".implode("','",explode(',',$searchLibs))."'";
 
-                if (!$beentaken) {
+                if (!$beenTaken) {
                     //potential questions
-                    $libsortorder = array();
-                    if (substr($searchlibs,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE)=="0") {
-                        $lnamesarr[0] = "Unassigned";
-                        $libsortorder[0] = AppConstant::NUMERIC_ZERO;
+                    $libSortOrder = array();
+                    if (substr($searchLibs,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE)=="0") {
+                        $lNamesArray[0] = "Unassigned";
+                        $libSortOrder[0] = AppConstant::NUMERIC_ZERO;
                     }
 
-                    $query = Libraries::getByIdList($llist);
+                    $query = Libraries::getByIdList($lList);
                     foreach ($query as $row) {
-                        $lnamesarr[$row['id']] = $row['name'];
-                        $libsortorder[$row['id']] = $row['sortorder'];
+                        $lNamesArray[$row['id']] = $row['name'];
+                        $libSortOrder[$row['id']] = $row['sortorder'];
                     }
-                    $lnames = implode(", ",$lnamesarr);
+                    $lNames = implode(", ",$lNamesArray);
 
-                    $page_libRowHeader = ($searchall==AppConstant::NUMERIC_ONE) ? "<th>Library</th>" : "";
+                    $pageLibRowHeader = ($searchAll == AppConstant::NUMERIC_ONE) ? "<th>Library</th>" : "";
 
                     if (isset($search)) {
-                        $result = QuestionSet::getByUserIdJoin($searchall,$userId,$llist,$searchmine,$searchlikes);
-                        if ($search=='recommend' && count($existingq)>AppConstant::NUMERIC_ZERO) {
-                            $existingqlist = implode(',',$existingq);  //pulled from database, so no quotes needed
-                            $result = QuestionSet::getByUserId($aid,$userId,$existingqlist);
+                        $result = QuestionSet::getByUserIdJoin($searchAll,$userId,$lList,$searchMine,$searchLikes);
+                        if ($search=='recommend' && count($existingQuestion)>AppConstant::NUMERIC_ZERO) {
+                            $existingQList = implode(',',$existingQuestion);  //pulled from database, so no quotes needed
+                            $result = QuestionSet::getByUserId($assessmentId,$userId,$existingQList);
                         }
                         if ($result==AppConstant::NUMERIC_ZERO) {
                             $noSearchResults = true;
                         } else {
                             $alt=AppConstant::NUMERIC_ZERO;
-                            $lastlib = -AppConstant::NUMERIC_ONE;
+                            $lastLib = -AppConstant::NUMERIC_ONE;
                             $i=AppConstant::NUMERIC_ZERO;
-                            $page_questionTable = array();
-                            $page_libstouse = array();
-                            $page_libqids = array();
-                            $page_useavgtimes = false;
+                            $pageQuestionTable = array();
+                            $pageLibsToUse = array();
+                            $pageLibQIds = array();
+                            $pageUseAvgTimes = false;
 
                             foreach ( $result as $line){
-                                if ($newonly && in_array($line['id'],$existingq)) {
+                                if ($newOnly && in_array($line['id'],$existingQuestion)) {
                                     continue;
                                 }
-                                if (isset($page_questionTable[$line['id']])) {
+                                if (isset($pageQuestionTable[$line['id']])) {
                                     continue;
                                 }
-                                if ($lastlib!=$line['libid'] && isset($lnamesarr[$line['libid']])) {
-                                    $page_libstouse[] = $line['libid'];
-                                    $lastlib = $line['libid'];
-                                    $page_libqids[$line['libid']] = array();
+                                if ($lastLib!=$line['libid'] && isset($lNamesArray[$line['libid']])) {
+                                    $pageLibsToUse[] = $line['libid'];
+                                    $lastLib = $line['libid'];
+                                    $pageLibQIds[$line['libid']] = array();
                                 }
 
-                                if (isset($libsortorder[$line['libid']]) && $libsortorder[$line['libid']]==AppConstant::NUMERIC_ONE) { //alpha
-                                    $page_libqids[$line['libid']][$line['id']] = $line['description'];
+                                if (isset($libSortOrder[$line['libid']]) && $libSortOrder[$line['libid']]==AppConstant::NUMERIC_ONE) { //alpha
+                                    $pageLibQIds[$line['libid']][$line['id']] = $line['description'];
                                 } else { //id
-                                    $page_libqids[$line['libid']][] = $line['id'];
+                                    $pageLibQIds[$line['libid']][] = $line['id'];
                                 }
                                 $i = $line['id'];
-                                $page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
-                                if (in_array($i,$existingq)) {
-                                    $page_questionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
+                                $pageQuestionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                                if (in_array($i,$existingQuestion)) {
+                                    $pageQuestionTable[$i]['desc'] = '<span style="color: #999">'.filter($line['description']).'</span>';
                                 } else {
-                                    $page_questionTable[$i]['desc'] = filter($line['description']);
+                                    $pageQuestionTable[$i]['desc'] = filter($line['description']);
                                 }
-                                $page_questionTable[$i]['preview'] = "<button class='question-preview-btn'><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/prvAssess.png'."' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
-                                $page_questionTable[$i]['type'] = $line['qtype'];
-                                $avgtimepts = explode(',', $line['avgtime']);
-                                if ($avgtimepts[0]>AppConstant::NUMERIC_ZERO) {
-                                    $page_useavgtimes = true;
-                                    $page_questionTable[$i]['avgtime'] = round($avgtimepts[0]/60,AppConstant::NUMERIC_ONE);
-                                } else if (isset($avgtimepts[1]) && isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-                                    $page_useavgtimes = true;
-                                    $page_questionTable[$i]['avgtime'] = round($avgtimepts[1]/60,AppConstant::NUMERIC_ONE);
+                                $pageQuestionTable[$i]['preview'] = "<button class='question-preview-btn'><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/prvAssess.png'."' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
+                                $pageQuestionTable[$i]['type'] = $line['qtype'];
+                                $avgTimePts = explode(',', $line['avgtime']);
+                                if ($avgTimePts[0]>AppConstant::NUMERIC_ZERO) {
+                                    $pageUseAvgTimes = true;
+                                    $pageQuestionTable[$i]['avgtime'] = round($avgTimePts[0]/60,AppConstant::NUMERIC_ONE);
+                                } else if (isset($avgTimePts[1]) && isset($avgTimePts[3]) && $avgTimePts[3]>10) {
+                                    $pageUseAvgTimes = true;
+                                    $pageQuestionTable[$i]['avgtime'] = round($avgTimePts[1]/60,AppConstant::NUMERIC_ONE);
                                 } else {
-                                    $page_questionTable[$i]['avgtime'] = '';
+                                    $pageQuestionTable[$i]['avgtime'] = '';
                                 }
-                                if (isset($avgtimepts[3]) && $avgtimepts[3]>10) {
-                                    $page_questionTable[$i]['qdata'] = array($avgtimepts[2],$avgtimepts[1],$avgtimepts[3]);
+                                if (isset($avgTimePts[3]) && $avgTimePts[3]>10) {
+                                    $pageQuestionTable[$i]['qdata'] = array($avgTimePts[2],$avgTimePts[1],$avgTimePts[3]);
                                 }
-                                if ($searchall==AppConstant::NUMERIC_ONE) {
-                                    $page_questionTable[$i]['lib'] = "<a href=".AppUtility::getURLFromHome('question','question/add-question?cid='.$cid.'&aid='.$aid.'&listlib='.$line['libid']).">List lib</a>";
+                                if ($searchAll==AppConstant::NUMERIC_ONE) {
+                                    $pageQuestionTable[$i]['lib'] = "<a href=".AppUtility::getURLFromHome('question','question/add-question?cid='.$courseId.'&aid='.$assessmentId.'&listlib='.$line['libid']).">List lib</a>";
                                 } else {
-                                    $page_questionTable[$i]['junkflag'] = $line['junkflag'];
-                                    $page_questionTable[$i]['libitemid'] = $line['libitemid'];
+                                    $pageQuestionTable[$i]['junkflag'] = $line['junkflag'];
+                                    $pageQuestionTable[$i]['libitemid'] = $line['libitemid'];
                                 }
-                                $page_questionTable[$i]['extref'] = '';
-                                $page_questionTable[$i]['cap'] = AppConstant::NUMERIC_ZERO;
+                                $pageQuestionTable[$i]['extref'] = '';
+                                $pageQuestionTable[$i]['cap'] = AppConstant::NUMERIC_ZERO;
                                 if ($line['extref']!='') {
-                                    $extref = explode('~~',$line['extref']);
-                                    $hasvid = false;  $hasother = false; $hascap = false;
-                                    foreach ($extref as $v) {
+                                    $extRef = explode('~~',$line['extref']);
+                                    $hasVideo = false;  $hasOther = false; $hasCap = false;
+                                    foreach ($extRef as $v) {
                                         if (substr($v,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FIVE)=="Video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-                                            $hasvid = true;
+                                            $hasVideo = true;
                                             if (strpos($v,'!!1')!==false) {
-                                                $page_questionTable[$i]['cap'] = AppConstant::NUMERIC_ONE;
+                                                $pageQuestionTable[$i]['cap'] = AppConstant::NUMERIC_ONE;
                                             }
                                         } else {
-                                            $hasother = true;
+                                            $hasOther = true;
                                         }
                                     }
-                                    if ($hasvid) {
-                                        $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'/img/video_tiny.png'.">";
+                                    if ($hasVideo) {
+                                        $pageQuestionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/video_tiny.png'.">";
                                     }
-                                    if ($hasother) {
-                                        $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'/img/html_tiny.png'.">";
+                                    if ($hasOther) {
+                                        $pageQuestionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/html_tiny.png'.">";
                                     }
                                 }
                                 if ($line['solution']!='' && ($line['solutionopts']&AppConstant::NUMERIC_TWO)==AppConstant::NUMERIC_TWO) {
-                                    $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'/img/assess_tiny.png'."/>";
+                                    $pageQuestionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/assess_tiny.png'.">";
                                 }
-                                $page_questionTable[$i]['times'] = AppConstant::NUMERIC_ZERO;
+                                $pageQuestionTable[$i]['times'] = AppConstant::NUMERIC_ZERO;
 
                                 if ($line['ownerid']==$userId) {
                                     if ($line['userights']==AppConstant::NUMERIC_ZERO) {
-                                        $page_questionTable[$i]['mine'] = "Private";
+                                        $pageQuestionTable[$i]['mine'] = "Private";
                                     } else {
-                                        $page_questionTable[$i]['mine'] = "Yes";
+                                        $pageQuestionTable[$i]['mine'] = "Yes";
                                     }
                                 } else {
-                                    $page_questionTable[$i]['mine'] = "";
+                                    $pageQuestionTable[$i]['mine'] = "";
                                 }
 
 
-                                $page_questionTable[$i]['add'] = "<a class='btn btn-primary add-btn-question' href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$aid.'&cid='.$cid)."><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/addItem.png'."'>&nbsp; Add</a>";
+                                $pageQuestionTable[$i]['add'] = "<a class='btn btn-primary add-btn-question' href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId)."><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/addItem.png'."'>&nbsp; Add</a>";
 
-                                if ($line['userights']>AppConstant::NUMERIC_THREE || ($line['userights']==AppConstant::NUMERIC_THREE && $line['groupid']==$groupid) || $line['ownerid']==$userId) {
-                                    $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>";
+                                if ($line['userights']>AppConstant::NUMERIC_THREE || ($line['userights']==AppConstant::NUMERIC_THREE && $line['groupid']==$groupId) || $line['ownerid']==$userId) {
+                                    $pageQuestionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1').">Edit</a>";
                                 } else {
-                                    $page_questionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$line['id'].'&aid='.$aid.'&cid='.$cid).">View</a>";
+                                    $pageQuestionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId).">View</a>";
                                 }
 
-                                $page_questionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$aid.'&cid='.$cid.'&template='.true).">Template</a>";
+                                $pageQuestionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&template='.true).">Template</a>";
                                 //$i++;
                                 $ln++;
 
                             } //end while
-
-                            //pull question useage data
-                            if (count($page_questionTable)>AppConstant::NUMERIC_ZERO) {
-                                $allusedqids = implode(',', array_keys($page_questionTable));
-                                $query = Questions::getByQuestionSetId($allusedqids);
+                            /*
+                             * pull question useage data
+                             */
+                            if (count($pageQuestionTable)>AppConstant::NUMERIC_ZERO) {
+                                $allUsedQids = implode(',', array_keys($pageQuestionTable));
+                                $query = Questions::getByQuestionSetId($allUsedQids);
                                 foreach ($query as $row) {
-                                    $page_questionTable[$row[0]]['times'] = $row[1];
+                                    $pageQuestionTable[$row['questionsetid']]['times'] = $row[COUNT('id')];
                                 }
                             }
-
-                            //sort alpha sorted libraries
-                            foreach ($page_libstouse as $libid) {
-                                if ($libsortorder[$libid]==AppConstant::NUMERIC_ONE) {
-                                    natcasesort($page_libqids[$libid]);
-                                    $page_libqids[$libid] = array_keys($page_libqids[$libid]);
+                            /*
+                             * sort alpha sorted libraries
+                             */
+                            foreach ($pageLibsToUse as $libId) {
+                                if ($libSortOrder[$libId]==AppConstant::NUMERIC_ONE) {
+                                    natcasesort($pageLibQIds[$libId]);
+                                    $pageLibQIds[$libId] = array_keys($pageLibQIds[$libId]);
                                 }
                             }
-                            if ($searchall==AppConstant::NUMERIC_ONE) {
-                                $page_libstouse = array_keys($page_libqids);
+                            if ($searchAll==AppConstant::NUMERIC_ONE) {
+                                $pageLibsToUse = array_keys($pageLibQIds);
                             }
 
                         }
@@ -677,88 +685,95 @@ class QuestionController extends AppController
 
                 }
 
-            } else if ($sessiondata['selfrom'.$aid]=='assm') { //select from assessments
+            } else if ($sessionData['selfrom'.$assessmentId]=='assm') {
+                /*
+                 * select from assessments
+                 */
                 if (isset($params['clearassmt'])) {
-                    unset($sessiondata['aidstolist'.$aid]);
+                    unset($sessionData['aidstolist'.$assessmentId]);
                 }
                 if (isset($params['achecked'])) {
                     if (count($params['achecked'])!=AppConstant::NUMERIC_ZERO) {
-                        $aidstolist = $params['achecked'];
-                        $sessiondata['aidstolist'.$aid] = $aidstolist;
-                        $this->writesessiondata($sessiondata,$sessionId);
+                        $aidsToList = $params['achecked'];
+                        $sessionData['aidstolist'.$assessmentId] = $aidsToList;
+                        $this->writesessiondata($sessionData,$sessionId);
                     }
                 }
-                if (isset($sessiondata['aidstolist'.$aid])) { //list questions
-
-                    $aidlist = "'".implode("','",addslashes_deep($sessiondata['aidstolist'.$aid]))."'";
-                    $query = Assessments::getByAssessmentIds($aidlist);
+                if (isset($sessionData['aidstolist'.$assessmentId])) {
+                    /*
+                     * list questions
+                     */
+                    $query = Assessments::getByAssessmentIds($sessionData['aidstolist'.$assessmentId]);
                     foreach ( $query as $row ) {
-                       $aidnames[$row['id']] = $row['name'];
+                       $aidNames[$row['id']] = $row['name'];
                         $items = str_replace('~',',',$row['itemorder']);
                         if ($items=='') {
-                            $aiditems[$row['id']] = array();
+                            $aidItems[$row['id']] = array();
                         } else {
-                            $aiditems[$row['id']] = explode(',',$items);
+                            $aidItems[$row['id']] = explode(',',$items);
                         }
                     }
-                    $x=AppConstant::NUMERIC_ZERO;
-                    $page_assessmentQuestions = array();
-                    foreach ($sessiondata['aidstolist'.$aid] as $aidq) {
-                        $query = Questions::getByAssessmentIdJoin($aidq);
-                        if ($query==AppConstant::NUMERIC_ZERO) { //maybe defunct aid; if no questions in it, skip it
+                    $x = AppConstant::NUMERIC_ZERO;
+                    $pageAssessmentQuestions = array();
+                    foreach ($sessionData['aidstolist'.$assessmentId] as $aidQuestion) {
+                        $query = Questions::getByAssessmentIdJoin($aidQuestion);
+                        if ($query==AppConstant::NUMERIC_ZERO) {
+                         /*
+                          * maybe defunct aid; if no questions in it, skip it
+                          */
                             continue;
                         }
                         foreach ($query as $row) {
-                            $qsetid[$row[0]] = $row[1];
-                            $descr[$row[0]] = $row[2];
-                            $qtypes[$row[0]] = $row[3];
-                            $owner[$row[0]] = $row[4];
-                            $userights[$row[0]] = $row[5];
-                            $extref[$row[0]] = $row[6];
-                            $qgroupid[$row[0]] = $row[7];
-                            $result2 = Questions::getQuestionCount($row[1]);
-                            $times[$row[0]] = $result2[0];
+                            $questionSetId[$row['id']] = $row['qid'];
+                            $descr[$row['id']] = $row['description'];
+                            $qTypes[$row['id']] = $row['qtype'];
+                            $owner[$row['id']] = $row['ownerid'];
+                            $useRights[$row['id']] = $row['userights'];
+                            $extRef[$row['id']] = $row['extref'];
+                            $qGroupId[$row['id']] = $row['groupid'];
+                            $queResult = Questions::getQuestionCount($row['qid']);
+                            $times[$row['id']] = $queResult[COUNT('id')];
                         }
 
-                        $page_assessmentQuestions['desc'][$x] = $aidnames[$aidq];
+                        $pageAssessmentQuestions['desc'][$x] = $aidNames[$aidQuestion];
                         $y=AppConstant::NUMERIC_ZERO;
-                        foreach($aiditems[$aidq] as $qid) {
+                        foreach($aidItems[$aidQuestion] as $qid) {
                             if (strpos($qid,'|')!==false) { continue;}
-                            $page_assessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $qsetid[$qid] . "'>";
-                            if (in_array($qsetid[$qid],$existingq)) {
-                                $page_assessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
+                            $pageAssessmentQuestions[$x]['checkbox'][$y] = "<input type=checkbox name='nchecked[]' id='qo$ln' value='" . $questionSetId[$qid] . "'>";
+                            if (in_array($questionSetId[$qid],$existingQuestion)) {
+                                $pageAssessmentQuestions[$x]['desc'][$y] = '<span style="color: #999">'.filter($descr[$qid]).'</span>';
                             } else {
-                                $page_assessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
+                                $pageAssessmentQuestions[$x]['desc'][$y] = filter($descr[$qid]);
                             }
-                            //$page_assessmentQuestions[$x]['desc'][$y] = $descr[$qid];
-                            $page_assessmentQuestions[$x]['qsetid'][$y] = $qsetid[$qid];
-                            $page_assessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$qsetid[$qid],true)\"/>";
-                            $page_assessmentQuestions[$x]['type'][$y] = $qtypes[$qid];
-                            $page_assessmentQuestions[$x]['times'][$y] = $times[$qid];
-                            $page_assessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userId) ? "Yes" : "" ;
-                            $page_assessmentQuestions[$x]['add'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid).">Add</a>";
-                            $page_assessmentQuestions[$x]['src'][$y] = ($userights[$qid]>AppConstant::NUMERIC_THREE || ($userights[$qid]==AppConstant::NUMERIC_THREE && $qgroupid[$qid]==$groupid) || $owner[$qid]==$userId) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid.'&frompot=1').">Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid).">View</a>" ;
-                            $page_assessmentQuestions[$x]['templ'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$qsetid[$qid].'&aid='.$aid.'&cid='.$cid.'&template=true').">Template</a>";
-                            $page_assessmentQuestions[$x]['extref'][$y] = '';
-                            $page_assessmentQuestions[$x]['cap'][$y] = AppConstant::NUMERIC_ZERO;
-                            if ($extref[$qid]!='') {
-                                $extrefarr = explode('~~',$extref[$qid]);
-                                $hasvid = false;  $hasother = false;
-                                foreach ($extrefarr as $v) {
+                            //$pageAssessmentQuestions[$x]['desc'][$y] = $descr[$qid];
+                            $pageAssessmentQuestions[$x]['qsetid'][$y] = $questionSetId[$qid];
+                            $pageAssessmentQuestions[$x]['preview'][$y] = "<input type=button value=\"Preview\" onClick=\"previewq('selq','qo$ln',$questionSetId[$qid],true)\"/>";
+                            $pageAssessmentQuestions[$x]['type'][$y] = $qTypes[$qid];
+                            $pageAssessmentQuestions[$x]['times'][$y] = $times[$qid];
+                            $pageAssessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userId) ? "Yes" : "" ;
+                            $pageAssessmentQuestions[$x]['add'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId).">Add</a>";
+                            $pageAssessmentQuestions[$x]['src'][$y] = ($useRights[$qid]>AppConstant::NUMERIC_THREE || ($useRights[$qid]==AppConstant::NUMERIC_THREE && $qGroupId[$qid]==$groupId) || $owner[$qid]==$userId) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1').">Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId).">View</a>" ;
+                            $pageAssessmentQuestions[$x]['templ'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId.'&template=true').">Template</a>";
+                            $pageAssessmentQuestions[$x]['extref'][$y] = '';
+                            $pageAssessmentQuestions[$x]['cap'][$y] = AppConstant::NUMERIC_ZERO;
+                            if ($extRef[$qid]!='') {
+                                $extRefArr = explode('~~',$extRef[$qid]);
+                                $hasVideo = false;  $hasOther = false;
+                                foreach ($extRefArr as $v) {
                                     if (substr($v,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FIVE)=="Video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
-                                        $hasvid = true;
+                                        $hasVideo = true;
                                         if (strpos($v,'!!1')!==false) {
-                                            $page_assessmentQuestions[$x]['cap'][$y] = AppConstant::NUMERIC_ONE;
+                                            $pageAssessmentQuestions[$x]['cap'][$y] = AppConstant::NUMERIC_ONE;
                                         }
                                     } else {
-                                        $hasother = true;
+                                        $hasOther = true;
                                     }
                                 }
-                                if ($hasvid) {
-                                    $page_assessmentQuestions[$x]['extref'][$y] .= "<img src=".AppUtility::getHomeURL().'/img/video_tiny.png'."/>";
+                                if ($hasVideo) {
+                                    $pageAssessmentQuestions[$x]['extref'][$y] .= "<img src=".AppUtility::getHomeURL().'/img/video_tiny.png'."/>";
                                 }
-                                if ($hasother) {
-                                    $page_assessmentQuestions[$x]['extref'][$y] .= "<img src=".AppUtility::getHomeURL().'/img/html_tiny.png'."/>";
+                                if ($hasOther) {
+                                    $pageAssessmentQuestions[$x]['extref'][$y] .= "<img src=".AppUtility::getHomeURL().'/img/html_tiny.png'."/>";
                                 }
                             }
 
@@ -767,46 +782,49 @@ class QuestionController extends AppController
                         }
                         $x++;
                     }
-                } else {  //choose assessments
+                } else {
+                    /*
+                     * choose assessments
+                     */
                     $items = unserialize($course['itemorder']);
-                    $itemassoc = array();
-                    $result = Items::getByAssessmentId($cid,$aid);
+                    $itemAssoc = array();
+                    $result = Items::getByAssessmentId($courseId,$assessmentId);
                     foreach ($result as $row){
-                        $itemassoc[$row['itemid']] = $row;
+                        $itemAssoc[$row['itemid']] = $row;
                     }
                     $i=AppConstant::NUMERIC_ZERO;
-                    $page_assessmentList = $this->addtoassessmentlist($items,$i,$itemassoc);
+                    $pageAssessmentList = $this->addtoassessmentlist($items,$i,$itemAssoc);
                 }
             }
         }
         $this->includeCSS(['question/question.css','course/course.css','roster/roster.css']);
         $this->includeJS(['jquery.min.js','question/addqsort.js','question/addquestions.js','tablesorter.js','general.js','question/junkflag.js']);
-        $responseArray = array('course' => $course,'assessmentId' => $aid,'params' => $params, 'overwriteBody'=>$overwriteBody, 'body'=> $body,
-            'defpoints' => $defpoints,'searchlibs' => $searchlibs,'beentaken' => $beentaken, 'pageAssessmentName' => $page_assessmentName,
-            'itemorder' => $itemorder, 'sessiondata' => $sessiondata, 'jsarr'=>$jsarr, 'displaymethod' => $displaymethod,'lnames'=>$lnames,
-            'search'=>$search,'searchall'=>$searchall, 'searchmine'=> $searchmine,'newonly'=>$newonly,'noSearchResults'=>$noSearchResults,
-            'pageLibRowHeader'=>$page_libRowHeader,'pageUseavgtimes'=>$page_useavgtimes,'pageLibstouse'=>$page_libstouse,'altr'=>$alt,
-            'lnamesarr' => $lnamesarr, 'pageLibqids' => $page_libqids, 'pageQuestionTable' => $page_questionTable,'qid'=>$qid,
-            'pageAssessmentQuestions'=> $page_assessmentQuestions, 'pageAssessmentList' => $page_assessmentList, 'address' => $address);
+        $responseArray = array('course' => $course,'assessmentId' => $assessmentId,'params' => $params, 'overwriteBody'=>$overwriteBody, 'body'=> $body,
+            'defpoints' => $defPoints,'searchlibs' => $searchLibs,'beentaken' => $beenTaken, 'pageAssessmentName' => $pageAssessmentName,
+            'itemorder' => $itemOrder, 'sessiondata' => $sessionData, 'jsarr'=>$jsArray, 'displaymethod' => $displayMethod,'lnames'=>$lNames,
+            'search'=>$search,'searchall'=>$searchAll, 'searchmine'=> $searchMine,'newonly'=>$newOnly,'noSearchResults'=>$noSearchResults,
+            'pageLibRowHeader'=>$pageLibRowHeader,'pageUseavgtimes'=>$pageUseAvgTimes,'pageLibstouse'=>$pageLibsToUse,'altr'=>$alt,
+            'lnamesarr' => $lNamesArray, 'pageLibqids' => $pageLibQIds, 'pageQuestionTable' => $pageQuestionTable,'qid'=>$qid,
+            'pageAssessmentQuestions'=> $pageAssessmentQuestions, 'pageAssessmentList' => $pageAssessmentList, 'address' => $address);
         return $this->renderWithData('addQuestions',$responseArray);
     }
 
-    public function addtoassessmentlist($items,$i,$itemassoc) {
+    public function addtoassessmentlist($items,$i,$itemAssoc) {
         foreach ($items as $item) {
             if (is_array($item)) {
-                $this->addtoassessmentlist($item['items'],$i,$itemassoc);
-            } else if (isset($itemassoc[$item])) {
-                $page_assessmentList[$i]['id'] = $itemassoc[$item]['id'];
-                $page_assessmentList[$i]['name'] = $itemassoc[$item]['name'];
-                $itemassoc[$item]['summary'] = strip_tags($itemassoc[$item]['summary']);
-                if (strlen($itemassoc[$item]['summary'])>100) {
-                    $itemassoc[$item]['summary'] = substr($itemassoc[$item]['summary'],AppConstant::NUMERIC_ZERO,97).'...';
+                $this->addtoassessmentlist($item['items'],$i,$itemAssoc);
+            } else if (isset($itemAssoc[$item])) {
+                $pageAssessmentList[$i]['id'] = $itemAssoc[$item]['id'];
+                $pageAssessmentList[$i]['name'] = $itemAssoc[$item]['name'];
+                $itemAssoc[$item]['summary'] = strip_tags($itemAssoc[$item]['summary']);
+                if (strlen($itemAssoc[$item]['summary'])> AppConstant::NUMERIC_HUNDREAD) {
+                    $itemAssoc[$item]['summary'] = substr($itemAssoc[$item]['summary'],AppConstant::NUMERIC_ZERO,AppConstant::NINETY_SEVEN).'...';
                 }
-                $page_assessmentList[$i]['summary'] = $itemassoc[$item]['summary'];
+                $pageAssessmentList[$i]['summary'] = $itemAssoc[$item]['summary'];
                 $i++;
             }
         }
-        return $page_assessmentList;
+        return $pageAssessmentList;
     }
 
     public function actionSaveQuestions(){
@@ -913,21 +931,21 @@ class QuestionController extends AppController
             //handle help references
             if (isset($params['id']) || isset($params['templateid'])) {
                 if (isset($params['id'])) {
-                    $query = Questions::getById($params['id']);
+                    $query = QuestionSet::getQuestionDataById($params['id']);
                 } else {
-                    $query = Questions::getById($params['templateid']);
+                    $query = QuestionSet::getQuestionDataById($params['templateid']);
                 }
-                $extref = $query['extref'];
-                if ($extref=='') {
-                    $extref = array();
+                $extRef = $query['extref'];
+                if ($extRef=='') {
+                    $extRef = array();
                 } else {
-                    $extref = explode('~~',$extref);
+                    $extRef = explode('~~',$extRef);
                 }
 
                 $newextref = array();
-                for ($i=AppConstant::NUMERIC_ZERO;$i<count($extref);$i++) {
+                for ($i=AppConstant::NUMERIC_ZERO;$i<count($extRef);$i++) {
                     if (!isset($params["delhelp-$i"])) {
-                        $newextref[] = $extref[$i];
+                        $newextref[] = $extRef[$i];
                     }
                 }
             } else {
@@ -949,7 +967,7 @@ class QuestionController extends AppController
                 }
                 $newextref[] = $params['helptype'].'!!'.$params['helpurl'].'!!'.$captioned;
             }
-            $extref = implode('~~',$newextref);
+            $extRef = implode('~~',$newextref);
             if (isset($params['doreplaceby'])) {
                 $replaceby = intval($params['replaceby']);
             } else {
@@ -974,7 +992,7 @@ class QuestionController extends AppController
             $params['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$params['description']);
 
             if (isset($params['id'])) { //modifying existing
-                $qsetid = intval($params['id']);
+                $questionSetId = intval($params['id']);
                 $isok = true;
                 if ($isGrpAdmin) {
                     $query = QuestionSet::getByGroupId($params['id'],$groupId);
@@ -988,7 +1006,7 @@ class QuestionController extends AppController
                         $isok = false;
                     }
                 }
-                $query = QuestionSet::updateQuestionSet($params,$now,$extref,$replaceby,$solutionopts);
+                $query = QuestionSet::updateQuestionSet($params,$now,$extRef,$replaceby,$solutionopts);
 
                 //checked separately above now
                 if ($isok) {
@@ -999,7 +1017,6 @@ class QuestionController extends AppController
                     }
                 }
                 $query = QImages::getByQuestionSetId($params['id']);
-                $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
                 $imgcnt = count($query);
                 foreach ($query as $row) {
                     if (isset($params['delimg-'.$row['id']])) {
@@ -1024,7 +1041,7 @@ class QuestionController extends AppController
                     }
                 }
                 if ($replaceby!= AppConstant::NUMERIC_ZERO) {
-                    Questions::setQuestionSetId($qsetid,$replaceby);
+                    Questions::setQuestionSetId($questionSetId,$replaceby);
                 }
             } else { //adding new
                 $mt = microtime();
@@ -1069,26 +1086,26 @@ class QuestionController extends AppController
                 $questionSetArray['hasimg'] = $params['hasimg'];
                 $questionSetArray['ancestors'] = $ancestors;
                 $questionSetArray['ancestorauthors'] = $ancestorauthors;
-                $questionSetArray['extref'] = $extref;
+                $questionSetArray['extref'] = $extRef;
                 $questionSetArray['replaceby'] = $replaceby;
                 $questionSetArray['solution'] = $params['solution'];
                 $questionSetArray['solutionopts'] = $solutionopts;
-                $questionSet = new QuestionSet();
-                $qsetid = $questionSet->createQuestionSet($questionSetArray);
-                $params['id'] = $qsetid;
 
+                $questionSet = new QuestionSet();
+                $questionSetId = $questionSet->createQuestionSet($questionSetArray);
+                $params['id'] = $questionSetId;
                 if (isset($params['templateid'])) {
                     $query = QImages::getByQuestionSetId($params['templateid']);
                     foreach ($query as $row) {
                         if (!isset($params['delimg-'.$row['id']])) {
                             $qImage = new QImages();
-                            $qImage->createQImages($qsetid,$row);
+                            $qImage->createQImages($questionSetId,$row);
                         }
                     }
                 }
 
                 if (isset($params['makelocal'])) {
-                    Questions::setQuestionSetIdById($qsetid, $params['makelocal']);
+                    Questions::setQuestionSetIdById($questionSetId, $params['makelocal']);
                     $outputmsg .= AppConstant::Question_OUTPUT_MSG1;
                     $frompot = AppConstant::NUMERIC_ZERO;
                 } else {
@@ -1104,7 +1121,7 @@ class QuestionController extends AppController
                 } else if (in_array($params['newimgvar'],$disallowedvar)) {
                     $errmsg .= $newvar. AppConstant::IMAGE_FILE_ERROR2 ;
                 } else {
-                    $uploaddir = AppConstant::UPLOAD_DIRECTORY.'/qimages/';
+                    $uploaddir = AppConstant::UPLOAD_DIRECTORY.'qimages/';
                     $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['imgfile']['name']));
                     $filename = $userfilename;
 
@@ -1116,12 +1133,12 @@ class QuestionController extends AppController
                             $params['newimgvar'] = str_replace('$','',$params['newimgvar']);
                             $filename = addslashes($filename);
                             $questImageData  = array();
-                            $questionSetArray['var'] = $params['newimgvar'];
-                            $questionSetArray['filename'] = $filename;
-                            $questionSetArray['alttext'] = $params['newimgalt'];
+                            $questImageData['var'] = $params['newimgvar'];
+                            $questImageData['filename'] = $filename;
+                            $questImageData['alttext'] = $params['newimgalt'];
                             $qImage = new QImages();
-                            $qImage->createQImages($qsetid,$questImageData);
-                            QuestionSet::setHasImage($qsetid, AppConstant::NUMERIC_ONE);
+                            $qImage->createQImages($questionSetId,$questImageData);
+                            QuestionSet::setHasImage($questionSetId, AppConstant::NUMERIC_ONE);
                         } else {
                             echo "<p>Error uploading image file!</p>\n";
                             exit;
@@ -1139,40 +1156,40 @@ class QuestionController extends AppController
             if ($params['libs']=='') {
                 $newlibs = array();
             }
-            $libraryData = LibraryItems::getByGroupId($groupId, $qsetid,$userId,$isGrpAdmin,$isAdmin);
+            $libraryData = LibraryItems::getByGroupId($groupId, $questionSetId,$userId,$isGrpAdmin,$isAdmin);
             $existing = array();
             foreach($libraryData as $row) {
                 $existing[] = $row['libid'];
             }
 
             $toadd = array_values(array_diff($newlibs,$existing));
-            $toremove = array_values(array_diff($existing,$newlibs));
+            $toRemove = array_values(array_diff($existing,$newlibs));
 
-            while(count($toremove)>AppConstant::NUMERIC_ZERO && count($toadd)>AppConstant::NUMERIC_ZERO) {
-                $tochange = array_shift($toremove);
+            while(count($toRemove)>AppConstant::NUMERIC_ZERO && count($toadd)>AppConstant::NUMERIC_ZERO) {
+                $tochange = array_shift($toRemove);
                 $torep = array_shift($toadd);
-                LibraryItems::setLibId($torep,$qsetid,$tochange);
+                LibraryItems::setLibId($torep,$questionSetId,$tochange);
             }
             if (count($toadd)>AppConstant::NUMERIC_ZERO) {
-                foreach($toadd as $libid) {
+                foreach($toadd as $libId) {
                     $libArray = array();
-                    $libArray['libid'] = $libid;
-                    $libArray['qsetid'] = $qsetid;
+                    $libArray['libid'] = $libId;
+                    $libArray['qsetid'] = $questionSetId;
                     $libArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
                     $lib->createLibraryItems($libArray);
                 }
-            } else if (count($toremove)>AppConstant::NUMERIC_ZERO) {
-                foreach($toremove as $libid) {
-                    LibraryItems::deleteLibraryItems($libid,$qsetid);
+            } else if (count($toRemove)>AppConstant::NUMERIC_ZERO) {
+                foreach($toRemove as $libId) {
+                    LibraryItems::deleteLibraryItems($libId,$questionSetId);
                 }
             }
             if (count($newlibs)==AppConstant::NUMERIC_ZERO) {
-                $query = LibraryItems::getByQid($qsetid);
+                $query = LibraryItems::getByQid($questionSetId);
                 if (count($query)==AppConstant::NUMERIC_ZERO) {
                     $libArray = array();
                     $libArray['libid'] = AppConstant::NUMERIC_ZERO;
-                    $libArray['qsetid'] = $qsetid;
+                    $libArray['qsetid'] = $questionSetId;
                     $libArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
                     $lib->createLibraryItems($libArray);
@@ -1182,8 +1199,8 @@ class QuestionController extends AppController
                 $outputmsg .= "<a href=".AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId).">Return to Question Set Management</a>\n";
             } else {
                 if ($frompot==AppConstant::NUMERIC_ONE) {
-                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid.'&cid='.$courseId.'&aid='.$params['aid'].'&process=true&usedef=true').">Add Question to Assessment using Defaults</a> | \n";
-                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$qsetid.'&cid='.$courseId.'&aid='.$params['aid']).">Add Question to Assessment</a> | \n";
+                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$questionSetId.'&cid='.$courseId.'&aid='.$params['aid'].'&process=true&usedef=true').">Add Question to Assessment using Defaults</a> | \n";
+                    $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$questionSetId.'&cid='.$courseId.'&aid='.$params['aid']).">Add Question to Assessment</a> | \n";
                 }
                 $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']).">Return to Assessment</a>\n";
             }
@@ -1194,9 +1211,9 @@ class QuestionController extends AppController
                 $outputmsg .= "</script>";
             } else {
                 if ($errmsg == '' && !isset($params['aid'])) {
-                    AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId);
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId));
                 } else if ($errmsg == '' && $frompot==AppConstant::NUMERIC_ZERO) {
-                    AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']);
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']));
                 } else {
                     echo $errmsg;
                     echo $outputmsg;
@@ -1227,9 +1244,9 @@ class QuestionController extends AppController
 
             $inlibs = array();
             if($line['extref']!='') {
-                $extref = explode('~~',$line['extref']);
+                $extRef = explode('~~',$line['extref']);
             } else {
-                $extref = array();
+                $extRef = array();
             }
             $images = array();
             $images['vars'] = array();
@@ -1309,16 +1326,16 @@ class QuestionController extends AppController
             $line['hasimg'] = AppConstant::NUMERIC_ZERO;
             $line['deleted'] = AppConstant::NUMERIC_ZERO;
             $line['replaceby'] = AppConstant::NUMERIC_ZERO;
-            if (isset($params['aid']) && isset($sessiondata['lastsearchlibs'.$params['aid']])) {
-                $inlibs = $sessiondata['lastsearchlibs'.$params['aid']];
-            } else if (isset($sessiondata['lastsearchlibs'.$courseId])) {
-                $inlibs = $sessiondata['lastsearchlibs'.$courseId];
+            if (isset($params['aid']) && isset($sessionData['lastsearchlibs'.$params['aid']])) {
+                $inlibs = $sessionData['lastsearchlibs'.$params['aid']];
+            } else if (isset($sessionData['lastsearchlibs'.$courseId])) {
+                $inlibs = $sessionData['lastsearchlibs'.$courseId];
             } else {
                 $inlibs = $userdeflib;
             }
             $locklibs='';
             $images = array();
-            $extref = array();
+            $extRef = array();
             $author = $myname;
             $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
             if (!isset($params['id']) || isset($params['template'])) {
@@ -1336,20 +1353,20 @@ class QuestionController extends AppController
         }
         $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
 
-        $lnames = array();
+        $lNames = array();
         if (substr($inlibs,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE)===AppConstant::ZERO_VALUE) {
-            $lnames[] = "Unassigned";
+            $lNames[] = "Unassigned";
         }
         $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
         $query = Libraries::getByIdList($inlibssafe);
         foreach ($query as $row) {
-            $lnames[] = $row['name'];
+            $lNames[] = $row['name'];
         }
-        $lnames = implode(", ",$lnames);
-        $this->includeJS(['editor/tiny_mce.js','ASCIIMathTeXImg_min.js']);
+        $lNames = implode(", ",$lNames);
+        $this->includeJS(['general.js','question/modDataSet.js','editor/tiny_mce.js','ASCIIMathTeXImg_min.js']);
         $renderData = array('course' => $course, 'addMode' => $addmod, 'params' => $params,'inusecnt' => $inusecnt, 'line'=> $line, 'myq' => $myq,
             'frompot' => $frompot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
-            'inlibs' => $inlibs, 'locklibs' => $locklibs, 'lnames' => $lnames, 'twobx' => $twobx, 'images'=> $images, 'extref' => $extref,
+            'inlibs' => $inlibs, 'locklibs' => $locklibs, 'lnames' => $lNames, 'twobx' => $twobx, 'images'=> $images, 'extref' => $extRef,
             'myRights' => $myRights, 'sessionData' => $sessionData);
         return  $this->renderWithData('modDataSet',$renderData);
     }
@@ -1472,26 +1489,26 @@ class QuestionController extends AppController
                 }
                 if (isset($params['qsetid'])) { //new - adding
                     $query = Assessments::getByAssessmentId($assessmentId);
-                    $itemorder = $query['itemorder'];
+                    $itemOrder = $query['itemorder'];
                     $questionArray['questionsetid'] = $params['qsetid'];
                     for ($i=AppConstant::NUMERIC_ZERO;$i<$params['copies'];$i++) {
                         $question = new Questions();
                         $qid = $question->addQuestions($questionArray);
                         //add to itemorder
                         if (isset($params['id'])) { //am adding copies of existing  
-                            $itemarr = explode(',',$itemorder);
+                            $itemarr = explode(',',$itemOrder);
                             $key = array_search($params['id'],$itemarr);
                             array_splice($itemarr,$key+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qid);
-                            $itemorder = implode(',',$itemarr);
+                            $itemOrder = implode(',',$itemarr);
                         } else {
-                            if ($itemorder=='') {
-                                $itemorder = $qid;
+                            if ($itemOrder=='') {
+                                $itemOrder = $qid;
                             } else {
-                                $itemorder = $itemorder . ",$qid";
+                                $itemOrder = $itemOrder . ",$qid";
                             }
                         }
                     }
-                    Assessments::UpdateItemOrder($itemorder,$assessmentId);
+                    Assessments::UpdateItemOrder($itemOrder,$assessmentId);
                 }
                 return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
             } else { //DEFAULT DATA MANIPULATION
@@ -1535,14 +1552,14 @@ class QuestionController extends AppController
                     $pageBeenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
                     $pageBeenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
                     $pageBeenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='add-questions.php?cid=$courseId&aid=$assessmentId&clearattempts=ask'\"></p>\n";
-                    $beentaken = true;
+                    $beenTaken = true;
                 } else {
-                    $beentaken = false;
+                    $beenTaken = false;
                 }
             }
         }
         $renderData = array('course'=>$course,'overwriteBody' => $overwriteBody, 'body' => $body, 'pageBeenTakenMsg' => $pageBeenTakenMsg,
-            'courseId' => $courseId, 'assessmentId' => $assessmentId, 'beentaken' => $beentaken, 'params' => $params, 'skippenalty' => $skippenalty,
+            'courseId' => $courseId, 'assessmentId' => $assessmentId, 'beentaken' => $beenTaken, 'params' => $params, 'skippenalty' => $skippenalty,
             'line' => $line, 'rubricNames' => $rubric_names,'rubricVals' => $rubric_vals);
         return $this->renderWithData('modQuestion',$renderData);
     }
@@ -1653,17 +1670,17 @@ class QuestionController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
-        $aid = $params['aid'];
+        $assessmentId = $params['aid'];
         $teacherId = $this->isTeacher($user['id'], $courseId);
         if (!isset($teacherId)) {
             echo "error: validation";
         }
-        $query = Assessments::getByAssessmentId($aid);
+        $query = Assessments::getByAssessmentId($assessmentId);
         $rawitemorder = $query['itemorder'];
-        $viddata = $query['viddata'];
-        $itemorder = str_replace('~',',',$rawitemorder);
+        $vidData = $query['viddata'];
+        $itemOrder = str_replace('~',',',$rawitemorder);
         $curitems = array();
-        foreach (explode(',',$itemorder) as $qid) {
+        foreach (explode(',',$itemOrder) as $qid) {
             if (strpos($qid,'|')===false) {
                 $curitems[] = $qid;
             }
@@ -1677,10 +1694,10 @@ class QuestionController extends AppController
                 $newitems[] = $qid;
             }
         }
-        $toremove = array_diff($curitems,$newitems);
+        $toRemove = array_diff($curitems,$newitems);
 
-        if ($viddata != '') {
-            $viddata = unserialize($viddata);
+        if ($vidData != '') {
+            $vidData = unserialize($vidData);
             $qorder = explode(',',$rawitemorder);
             $qidbynum = array();
             for ($i=AppConstant::NUMERIC_ZERO;$i<count($qorder);$i++) {
@@ -1714,19 +1731,19 @@ class QuestionController extends AppController
             $qidbynumflip = array_flip($qidbynum);
 
             $newviddata = array();
-            $newviddata[0] = $viddata[0];
+            $newviddata[0] = $vidData[0];
             for ($i=AppConstant::NUMERIC_ZERO;$i<count($newbynum);$i++) {   //for each new item
                 $oldnum = $qidbynumflip[$newbynum[$i]];
                 $found = false; //look for old item in viddata
-                for ($j=AppConstant::NUMERIC_ONE;$j<count($viddata);$j++) {
-                    if (isset($viddata[$j][2]) && $viddata[$j][2]==$oldnum) {
+                for ($j=AppConstant::NUMERIC_ONE;$j<count($vidData);$j++) {
+                    if (isset($vidData[$j][2]) && $vidData[$j][2]==$oldnum) {
                         //if found, copy data, and any non-question data following
-                        $new = $viddata[$j];
+                        $new = $vidData[$j];
                         $new[2] = $i;  //update question number;
                         $newviddata[] = $new;
                         $j++;
-                        while (isset($viddata[$j]) && !isset($viddata[$j][2])) {
-                            $newviddata[] = $viddata[$j];
+                        while (isset($vidData[$j]) && !isset($vidData[$j][2])) {
+                            $newviddata[] = $vidData[$j];
                             $j++;
                         }
                         $found = true;
@@ -1744,18 +1761,18 @@ class QuestionController extends AppController
             /*
              *any old items will not get copied.
              */
-            $viddata = addslashes(serialize($newviddata));
+            $vidData = addslashes(serialize($newviddata));
         }
 
         /*
          * delete any removed questions
          */
-        $ids = implode(',',$toremove);
+        $ids = implode(',',$toRemove);
         Questions::deleteById($ids);
         /*
          * store new itemorder
          */
-        $query = Assessments::setVidData($params['order'],$viddata,$aid);
+        $query = Assessments::setVidData($params['order'],$vidData,$assessmentId);
 
         if (count($query)>AppConstant::NUMERIC_ZERO) {
             echo "OK";

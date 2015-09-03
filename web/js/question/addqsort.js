@@ -385,7 +385,7 @@ function generateTable() {
                     html += "<li><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Withdrawn</a></li>";
                 }
             } else {
-                html += "<li class=c><a href=\"mod-data-set.php?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Template</a></li>";//add link
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Template</a></li>";//add link
                 html += "<li class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\"><img class='small-icon' src='../../img/gradebook.png'></i> Remove</a></li>";//add link and checkbox
             }
 

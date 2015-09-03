@@ -38,7 +38,7 @@ class  displayq2 extends Component
         } else {
             $nosabutton = false;
         }
-        $qdata = QuestionSet::getByQuesSetId($questionId);var_dump($qdata['qtext']);
+        $qdata = QuestionSet::getByQuesSetId($questionId);
         if ($qdata['hasimg']>0) {
             $query = QImages::getByQuestionSetId($questionId);
             foreach ($query as $row) {

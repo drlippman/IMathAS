@@ -72,6 +72,7 @@ class AppConstant
     const POINT_ZERO_TWO = .02;
     const YEAR_TWENTY_ELEVEN = 2011;
     const SECONDS_CONVERSION = 86400;
+    const NINETY_SEVEN = 97;
 
     const GB_USE_WEIGHT = 0;
     const GB_ORDERED_BY = 0;
@@ -186,4 +187,6 @@ class AppConstant
     const NO_ASSESSMENT_TO_CHANGE = 'No Assessments to change.';
     const NON_STUDENT = "Group - Non Students";
     const PENDING_USERS = "Pending Users";
+    const QUESTION_TITLE = "Add/Remove Questions";
+    const NO_PAGE_ACCESS = "You need to access this page from the course page menu";
 }

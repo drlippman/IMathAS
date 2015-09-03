@@ -29,7 +29,7 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 	}
 }
 
-function getquestionqtext($m) {
+function getquestionqtext1($m) {
 	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	if (mysql_num_rows($result)==0) {

@@ -1,4 +1,5 @@
 //dropdown menu
+var imasroot = '/openmath/web';
 var closetimer	= 0;
 var ddmenuitem	= 0;
 var homemenuloaded = 0;

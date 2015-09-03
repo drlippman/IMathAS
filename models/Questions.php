@@ -148,7 +148,7 @@ class Questions extends BaseImasQuestions
 
     public static function getByAssessmentIdJoin($aidq)
     {
-        $query = "SELECT imas_questions.id,imas_questionset.id,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
+        $query = "SELECT imas_questions.id,imas_questionset.id AS qid,imas_questionset.description,imas_questionset.qtype,imas_questionset.ownerid,imas_questionset.userights,imas_questionset.extref,imas_users.groupid FROM imas_questionset,imas_questions,imas_users";
         $query .= " WHERE imas_questionset.id=imas_questions.questionsetid AND imas_questionset.ownerid=imas_users.id AND imas_questions.assessmentid='$aidq'";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
@@ -227,8 +227,8 @@ class Questions extends BaseImasQuestions
     {
         $query = 'UPDATE imas_questions LEFT JOIN imas_assessment_sessions ON imas_questions.assessmentid = imas_assessment_sessions.assessmentid ';
         $query .= "SET imas_questions.questionsetid='$replaceby' WHERE imas_assessment_sessions.id IS NULL AND imas_questions.questionsetid='$qsetid'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        \Yii::$app->db->createCommand($query)->query();
+
     }
     public static function numberOfQuestionByIdAndCategory($assessmentid)
     {
@@ -248,10 +248,9 @@ class Questions extends BaseImasQuestions
     }
 
     public static function getQidCount($userId,$qSetId){
-        $query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
-        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='$qSetId' AND imas_courses.ownerid<>'$userId'";
-        $data = \Yii::$app->db->createCommand($query)->queryAll();
-        return $data;
+        $query = Questions::find()->from(['imas_questions','imas_assessments','imas_courses'])->where(['imas_assessments.id' => 'imas_questions.assessmentid'])->
+        andWhere(['imas_assessments.courseid' => 'imas_courses.id'])->andWhere(['imas_questions.questionsetid' =>$qSetId])->andWhere(['<>','imas_courses.ownerid',$userId])->all();
+        return count($query);
     }
 
     public static function updateQuestionData($checkedlist)

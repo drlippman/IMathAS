@@ -56,7 +56,7 @@ class BaseImasQuestionset extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-//            [['uniqueid', 'adddate', 'lastmoddate', 'ownerid', 'userights', 'license', 'hasimg', 'deleted', 'replaceby', 'broken', 'solutionopts'], 'integer'],
+            [['uniqueid', 'adddate', 'lastmoddate', 'ownerid', 'userights', 'license', 'hasimg', 'deleted', 'replaceby', 'broken', 'solutionopts'], 'integer'],
 //            [['author', 'control', 'qcontrol', 'qtext', 'answer', 'solution', 'extref', 'ancestors', 'ancestorauthors', 'otherattribution'], 'required'],
             [['author', 'control', 'qcontrol', 'qtext', 'answer', 'solution', 'extref', 'ancestors', 'ancestorauthors', 'otherattribution'], 'string'],
             [['description', 'avgtime', 'importuid'], 'string', 'max' => 254],
