@@ -114,7 +114,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings',false);
         </div>
         <div class="change-assessment">
             <legend><?php AppUtility::t('Assessment Options')?></legend>
-            <table class="table table-bordered table-striped table-hover data-table " id="opttable">
+            <table class="table table-bordered table-striped table-hover data-table" id="opttable">
                 <thead>
                 <tr>
                     <div class="col-lg-12">

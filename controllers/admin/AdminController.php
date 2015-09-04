@@ -8,9 +8,9 @@ use app\controllers\PermissionViolationException;
 use app\models\_base\BaseImasDiags;
 use app\models\Assessments;
 use app\models\Course;
+use app\models\DiagOneTime;
 use app\models\Diags;
 use app\models\ExternalTools;
-use app\models\AssessmentSession;
 use app\models\Exceptions;
 use app\models\forms\ChangeRightsForm;
 use app\models\ForumView;
@@ -545,7 +545,6 @@ class AdminController extends AppController
                        $attrValue = $courseId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
                    } else if ($isGrpAdmin) {
-                       AppUtility::dump('klnknlk');
                        $attr = 'groupid';
                        $attrValue = $groupId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
@@ -577,6 +576,8 @@ class AdminController extends AppController
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
        } else {
            if (isset($params['delete'])) {
+               $nameOfExtTool = ExternalTools::deleteExternalTool($id);
+
 
            } else if (isset($_GET['id'])) {
                if ($params['id'] == 'new') {
@@ -612,7 +613,7 @@ class AdminController extends AppController
        }
        $this->includeCSS(['course/item.css']);
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
-       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course);
+       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'nameOfExtTool' => $nameOfExtTool);
        return $this->renderWithData('externalTool', $responseData);
    }
 
@@ -2212,5 +2213,96 @@ class AdminController extends AppController
         } else {
             return $this->redirect('index');
         }
+    }
+
+    public function actionDiagOneTime()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $userId = $user->id;
+        $userName = $user->SID;
+        $myRights = $user['rights'];
+        $groupId= $user['groupid'];
+        $diag = $this->getParamVal('id');
+        $params = $this->getRequestParams();
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+
+        if ($myRights < AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+        } else if (isset($_GET['generate'])) {
+            if (isset($params['n'])) {
+                $lets = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+                $code_list = array();
+                $now = time();
+                $n = intval($_POST['n']);
+                $goodfor = intval($_POST['multi']);
+                for ($i=0; $i<$n; $i++) {
+
+                    $code = '';
+                    for ($j=0;$j<3;$j++) {
+                        $code .= substr($lets,rand(0,23),1);
+                    }
+                    for ($j=0;$j<3;$j++) {
+                        $code .= rand(1,9);
+                    }
+
+                    $query = new DiagOneTime();
+                    $query->generateDiagOneTime($diag, $now, $code, $goodfor);
+//                    if ($i>0) { $query .= ','; }
+//                    $query .= "('$diag',$now,'$code',$goodfor)";
+                    $code_list[] = $code;
+                }
+                $code_list = array();
+                $result = DiagOneTime::getByTime($now);
+
+                foreach($result as $key => $row) {
+                    if ($row['goodfor']==0) {
+                        $row['goodfor'] = "One-time";
+                    } else if ($row['goodfor']>1000000000) {
+                        if ($row['goodfor']<time()) {
+                            $row['goodfor'] = "Used - Expired";
+                        } else {
+                            $row['goodfor'] = "Used - set to expire";
+                        }
+                    } else {
+                        $row['goodfor'] = intval($row['goodfor']) . " minutes";
+                    }
+                    $code_list[] = $row;
+                }
+            }
+        } else if (isset($_GET['delete'])) {
+            if ($_GET['delete']=='true') {
+                 DiagOneTime::deleteDiagOneTime($diag);
+                return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
+            }
+        } else {
+            $old = time() - 365*24*60*60; //one year ago
+            $now = time();
+//            $queryDelete = DiagOneTime::deleteByTime($old, $now);
+            $code_list = array();
+            $diagByTime = DiagOneTime::getByDiag($diag);
+            foreach($diagByTime as $key => $row)
+             {
+                $row['time'] = AppUtility::tzdate("F j, Y",$row['time']);
+                if ($row['goodfor']==0) {
+                    $row['goodfor'] = "One-time";
+                } else if ($row['goodfor']>1000000000) {
+                    $row['goodfor'] = "Used - set to expire";
+                } else {
+                    $row['goodfor'] = intval($row['goodfor']) . " minutes";
+                }
+                $code_list[] = $row;
+            }
+
+        }
+        if ($overwriteBody == AppConstant::NUMERIC_ONE) { //NO AUTHORITY
+            echo $body;
+            } else {
+            $nameOfDiag = Diags::getNameById($diag);
+        }
+        $responseData = array('nameOfDiag' => $nameOfDiag, 'params' => $params, 'diag' =>$diag, 'code_list' => $code_list);
+        return $this->renderWithData('diagOneTime',$responseData);
     }
 }

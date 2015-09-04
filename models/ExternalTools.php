@@ -176,4 +176,10 @@ class ExternalTools extends BaseImasExternalTools
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function deleteExternalTool($id)
+    {
+        $query = \Yii::$app->db->createCommand("SELECT name FROM imas_external_tools WHERE id='$id'")->queryOne();
+        return $query;
+    }
 }

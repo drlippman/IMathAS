@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 if ($alt==0) {echo "	<tr class=even>"; $alt=1;} else {echo "	<tr class=odd>"; $alt=0;}
                 ?>
-                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/index?cid='.$page_courseList[$i]['id'])?>">
+                <td><a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$page_courseList[$i]['id'])?>">
                         <?php
                         if (($page_courseList[$i]['available']&1)==1) {
                             echo '<i>';
@@ -65,10 +65,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
                 <td class=c><?php echo $page_courseList[$i]['id'] ?></td>
                 <td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-                <td class=c><a href="#">Settings</a></td>
-                <td class=c><?php echo $page_courseList[$i]['addRemove'] ?></td>
-                <td class=c><?php echo $page_courseList[$i]['transfer'] ?></td>
-                <td class=c><a href="#">Delete</a></td>
+                <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$page_courseList[$i]['id']);?>">Settings</a></td>
+                <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>">Add/Remove</a></td>
+                <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/transfer-course?cid='.$page_courseList[$i]['id']);?>">Transfer</a></td>
+                <td class=c><a class='delete-link' href='<?php echo AppUtility::getURLFromHome('course', 'course/delete-course?cid='.$page_courseList[$i]['id']) ?>"'>Delete</a></td>
                 </tr>
             <?php
             }
@@ -187,7 +187,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
                 <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">Modify</a></td>
                 <td><a href="#?id=<?php echo $page_diagnosticsId[$i] ?>">Remove</a></td>
-                <td><a href="#?id=<?php echo $page_diagnosticsId[$i] ?>">One-time Passwords</a></td>
+                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$page_diagnosticsId[$i])?>"">One-time Passwords</a></td>
                 </tr>
             <?php
             }
@@ -227,7 +227,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?php echo $page_userDataEmail[$i] ?></td>
                 <td><?php echo $page_userDataType[$i] ?></td>
                 <td><?php echo $page_userDataLastAccess[$i] ?></td>
-                <td class=c><a href="#">Change</a></td>
+                <td class=c><a href=<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id='.$page_userDataId[$i])?>>Change</a></td>
                 <td class=c><a href="#">Reset</a></td>
                 <td class=c><a href="#">Delete</a></td>
                 </tr>

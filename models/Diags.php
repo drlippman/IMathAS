@@ -86,4 +86,15 @@ class Diags extends BaseImasDiags
         $updateDiagno->save();
         return $updateDiagno->id;
     }
+
+    public static function getNameById($id)
+    {
+        $query = new Query();
+        $query	->select(['name'])
+            ->from('imas_diags')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }
