@@ -56,4 +56,13 @@ class Sessions extends BaseImasSessions {
             $sessionData->delete();
         }
     }
+    public static function updateUId($be,$sessionId)
+    {
+        $sessionData = Sessions::findOne(['sessionid' => $sessionId]);
+        if($sessionData)
+        {
+            $sessionData->userid = $be;
+            $sessionData->save();
+        }
+    }
 }

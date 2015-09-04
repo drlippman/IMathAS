@@ -17,6 +17,7 @@ use app\models\ForumView;
 use app\models\Grades;
 use app\models\Groups;
 use app\models\Libraries;
+use app\models\Sessions;
 use app\models\Student;
 use app\models\Stugroups;
 use Yii;
@@ -1267,13 +1268,13 @@ class AdminController extends AppController
         $myRights = $currentUser['rights'];
         $userid = 0;
         $groupid = 0;
-        $sessionid = 0;
         switch($action) {
             case "emulateuser":
-                if ($myRights < 100 ) { break;}
-                $be = $_REQUEST['uid'];
-                $query = "UPDATE imas_sessions SET userid='$be' WHERE sessionid='$sessionid'";
-                mysql_query($query) or die("Query failed : " . mysql_error());
+                if ($myRights < AppConstant::ADMIN_RIGHT )
+                { break;}
+                $sessionId = $this->getSessionId();
+                $be = $params['uid'];
+                Sessions::updateUId($be,$sessionId);
                 break;
             case "chgrights":
                 if ($myRights < 100 && $_POST['newrights']>75) {echo "You don't have the authority for this action"; break;}
@@ -1292,23 +1293,28 @@ class AdminController extends AppController
                 }
                 break;
             case "resetpwd":
-                if ($myRights < 75) { echo "You don't have the authority for this action"; break;}
-                if (isset($_POST['newpw'])) {
-                    if (isset($CFG['GEN']['newpasswords'])) {
-                        $md5pw = password_hash($_POST['newpw'], PASSWORD_DEFAULT);
+                if ($myRights < 75)
+                {
+                    echo "You don't have the authority for this action"; break;
+                }
+                $id = $this->getParamVal('id');
+                if (isset($params['newpw']))
+                {
+                    if (isset($CFG['GEN']['newpasswords']))
+                    {
+                        $md5pw = password_hash($params['newpw'], PASSWORD_DEFAULT);
                     } else {
-                        $md5pw = md5($_POST['newpw']);
+                        $md5pw = password_hash($params['newpw'], PASSWORD_DEFAULT);
                     }
                 } else {
-                    if (isset($CFG['GEN']['newpasswords'])) {
+                    if (isset($CFG['GEN']['newpasswords']))
+                    {
                         $md5pw = password_hash("password", PASSWORD_DEFAULT);
                     } else {
                         $md5pw =md5("password");
                     }
                 }
-                $query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$_GET['id']}'";
-                if ($myRights < 100) { $query .= " AND groupid='$groupid' AND rights<100"; }
-                mysql_query($query) or die("Query failed : " . mysql_error());
+                User::updatePassword($md5pw,$id,$myRights,$currentUser->groupid);
                 break;
             case "deladmin":
                 if ($myRights < 75) { echo "You don't have the authority for this action"; break;}

@@ -233,4 +233,29 @@ class QuestionSet extends BaseImasQuestionset
         }
     }
 
+    public static function getDataToUpdateQuestionUsageData()
+    {
+        $query = "SELECT id,questionsetid FROM imas_questions WHERE 1";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
+    }
+
+    public static function updateAvgTime($avg,$qsid)
+    {
+        $query = "UPDATE imas_questionset SET avgtime='$avg' WHERE id=$qsid";
+        return  \Yii::$app->db->createCommand($query)->query();
+
+    }
+
+    public static function getIdAndAvgTime()
+    {
+        $data = new Query();
+        $data ->select(['avgtime','id'])
+            ->from(['imas_questionset']);
+        $command = $data->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
 } 

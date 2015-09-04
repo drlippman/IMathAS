@@ -11,7 +11,10 @@ namespace app\controllers\utilities;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\Assessments;
+use app\models\AssessmentSession;
 use app\models\Course;
+use app\models\DbSchema;
+use app\models\FirstScores;
 use app\models\forms\LtiUserForm;
 use app\models\InlineText;
 use app\models\Items;
@@ -74,17 +77,17 @@ class UtilitiesController extends AppController
                     {
                         foreach($queryForUser as $userData)
                         {
-                            $queryForCourse = Course::queryForCourse($userData['id']);
-                            $queryFromCourseForTutor = Course::queryFromCourseForTutor($userData['id']);
-                            $queryFromCourseForTeacher = Course::queryFromCourseForTeacher($userData['id']);
-                            $queryForLtiUser = LtiUserForm::getUserData($userData['id']);
+
+                            $queryForCourse[$userData['id']] = Course::queryForCourse($userData['id']);
+                            $queryFromCourseForTutor[$userData['id']] = Course::queryFromCourseForTutor($userData['id']);
+                            $queryFromCourseForTeacher[$userData['id']] = Course::queryFromCourseForTeacher($userData['id']);
+                            $queryForLtiUser[] = LtiUserForm::getUserData($userData['id']);
                         }
 
                     }
                 }
 
                 }
-
         }
         $responseData = array('form' => $form,'debug' => $debug,'body' => $body,'message' => $message,'queryForCourse' => $queryForCourse,'queryFromCourseForTutor' => $queryFromCourseForTutor,'queryFromCourseForTeacher' => $queryFromCourseForTeacher,'queryForLtiUser' => $queryForLtiUser,'params' => $params,'queryForUser' => $queryForUser);
         return $this->render('adminUtilities',$responseData);
@@ -403,6 +406,215 @@ class UtilitiesController extends AppController
         $this->layout = 'master';
         $responseData = array('params' => $params,'body' => $body,'message' => $message,'blockTitles' => $blockTitles,'det' => $det);
         return $this->renderWithData('blockSearch',$responseData);
+    }
+
+    public function actionUpdateQuestionsData()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        ini_set('display_errors',1);
+        error_reporting(E_ALL);
+        @set_time_limit(AppConstant::NUMERIC_ZERO);
+        ini_set("max_input_time", "3600");
+        ini_set("max_execution_time", "3600");
+        ini_set("memory_limit", "712857600");
+        $start = microtime(true);
+        $data = DbSchema::getData();
+        if(count($data) > 0)
+        {
+            $lastUpdate = 0;
+            $lastFirstUpdate = 0;
+        }
+        else
+        {
+            foreach($data as  $result)
+            {
+                if ($result['id']== 3)
+                {
+                    $lastUpdate = $result['ver'];
+                } else {
+                    $lastFirstUpdate = $result['ver'];
+                }
+            }
+        }
+        $trim = .2;
+        $dosLowMethod = false;
+        if ($dosLowMethod)
+        {
+            $qTimes = array();
+            $query = AssessmentSession::getDataToUpdateQuestionUsageData($lastUpdate);
+            if($query)
+            {
+                foreach($query as $row)
+                {
+                    if (strpos($row['questions'],';')===false)
+                    {
+                        $q = explode(",",$row['questions']);
+
+                    }else
+                    {
+                        list($questions,$bestQuestions) = explode(";",$row['questions']);
+                        $q = explode(",",$bestQuestions);
+                    }
+
+                    $t = explode(',',$row['timeontask']);
+                    foreach ($q as $k=>$qn)
+                    {
+                        if ($t[$k]=='') {continue;}
+                        if (isset($qTimes[$qn])) {
+                            $qTimes[$qn] .= '~'.$t[$k];
+                        } else {
+                            $qTimes[$qn] = $t[$k];
+                        }
+                    }
+                }
+            }
+            $qsTimes = array();
+            $qsFirstTimes = array();
+            $qsFirstScores = array();
+            $questionSet = QuestionSet::getDataToUpdateQuestionUsageData();
+            if($questionSet)
+            {
+
+                foreach($questionSet as $Question)
+                {
+                    if (isset($qTimes[$Question['id']])) {
+                        if (isset($qsTimes[$Question['questionsetid']])) {
+                            $qsTimes[$Question['questionsetid']] .= '~'.$qTimes[$Question['id']];
+                        } else {
+                            $qsTimes[$Question['questionsetid']] = $qTimes[$Question['id']];
+                        }
+                    }
+                }
+            }
+            unset($qTimes);
+            $avgTime = array();
+            if($qsTimes)
+            {
+                foreach ($qsTimes as $qsId=>$tv)
+                {
+                    $times = explode('~',$tv);
+                    sort($times, SORT_NUMERIC);
+                    $trimN = floor($trim*count($times));
+                    $times = array_slice($times,$trimN,count($times)-2*$trimN);
+                    $avgTime[$qsId] = round(array_sum($times)/count($times));
+                }
+            }
+        }
+        $avgFirstTime = array();
+        $avgFirstScore = array();
+        $n = array();
+        $thisTimes = array();
+        $thisScores = array();
+        $lastQ = -1;
+        $fScore = FirstScores::getDataForQuestionUsage($lastFirstUpdate);
+        if($fScore)
+        {
+            foreach($fScore as $row)
+            {
+                if ($row['qsetid'] != $lastQ && $lastQ>0) {
+                    $n[$lastQ] = count($thisScores);
+                    sort($thisTimes, SORT_NUMERIC);
+                    $trimN = floor($trim*count($thisTimes));
+                    $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-2*$trimN);
+                    $avgFirstTime[$lastQ] = round(array_sum($thisTimes)/count($thisTimes));
+                    $avgFirstScore[$lastQ] = round(array_sum($thisScores)/count($thisScores));
+                    $thisTimes = array();
+                    $thisScores = array();
+                }
+                $thisTimes[] = $row['timespent'];
+                $thisScores[] = $row['score'];
+                if ($row['qsetid'] != $lastQ) {
+                    $lastQ = $row['qsetid'];
+                }
+            }
+        }
+        if (count($thisTimes)>0)
+        {
+            $n[$lastQ] = count($thisScores);
+            sort($thisTimes, SORT_NUMERIC);
+            $trimN = floor($trim*count($thisTimes));
+            $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-2*$trimN);
+            $avgFirstTime[$lastQ] = round(array_sum($thisTimes)/count($thisTimes));
+            $avgFirstScore[$lastQ] = round(array_sum($thisScores)/count($thisScores));
+        }
+        $nq = count($n);
+        $toTn = array_sum($n);
+        if ($lastFirstUpdate == AppConstant::NUMERIC_ZERO)
+        {
+            foreach ($n as $qsId=>$nval)
+            {
+                if ($dosLowMethod) {
+                    $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                }
+                else
+                {
+                    $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                }
+                QuestionSet::updateAvgTime($avg,$qsId);
+            }
+        }
+        else
+        {
+            $questionSetData = QuestionSet::getIdAndAvgTime();
+            if($questionSetData)
+            {
+                foreach($questionSetData as $row)
+                {
+                    $qsId = $row['id'];
+                    if (!isset($avgFirstTime[$qsId]) || $n[$qsId]==0) {continue;}
+
+                    if (strpos($row['avgtime'],',')!==false)
+                    {
+                        list($oldAvgTime,$oldFirstTime,$oldFirstScore,$oldN) = explode(',',$row['avgtime']);
+                        if ($dosLowMethod)
+                        {
+                            $avgTime[$qsId] = round(($avgTime[$qsId]*$n[$qsId] + $oldAvgTime*$oldN)/($n[$qsId]+$oldN));
+                        }
+                        $avgFirstTime[$qsId] = round(($avgFirstTime[$qsId]*$n[$qsId] + $oldFirstTime*$oldN)/($n[$qsId]+$oldN));
+                        $avgFirstScore[$qsId] = round(($avgFirstScore[$qsId]*$n[$qsId] + $oldFirstScore*$oldN)/($n[$qsId]+$oldN));
+                        $n[$qsId] += $oldN;
+                    }
+                    if ($dosLowMethod)
+                    {
+                        $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                    }
+                    else
+                    {
+                        $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                    }
+                    QuestionSet::updateAvgTime($avg,$qsId);
+                }
+            }
+        }
+        $maxId = FirstScores::getMaxId();
+        if ($lastFirstUpdate == 0)
+        {
+            $lastFirstUpdate = $maxId;
+            if ($dosLowMethod)
+            {
+                $lastUpdate = time();
+            }
+            DbSchema::insertData($lastFirstUpdate,$lastUpdate);
+        }
+        else
+        {
+            $lastFirstUpdate = $maxId;
+            DbSchema::updateData($lastFirstUpdate,4);
+            if($dosLowMethod)
+            {
+                $lastUpdate = time();
+                DbSchema::updateData($lastUpdate,3);
+            }
+        }
+        return $this->renderWithData('updateQuestionUsage',['nq' => $nq,'toTn' => $toTn,'start' => $start]);
     }
 
     public function getStr($items,$str,$parent)

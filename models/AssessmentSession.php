@@ -365,5 +365,17 @@ class AssessmentSession extends BaseImasAssessmentSessions
             $assessmentSession->delete();
         }
     }
+    public static function getDataToUpdateQuestionUsageData($lastUpdate)
+    {
+        $query = new Query();
+        $query->select(['questions','timeontask'])
+            ->from('imas_assessment_sessions')
+            ->where(['<>','timeontask',''])
+            ->andWhere(['>','endtime',$lastUpdate]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
 }
+
 

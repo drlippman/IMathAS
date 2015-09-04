@@ -21,4 +21,31 @@ class DbSchema extends BaseImasDbschema {
             $dbData->save();
         }
     }
+
+    public static function getData()
+    {
+        $query = new Query();
+        $query ->select(['id','ver'])
+                ->from('imas_dbschema')
+                ->where(['id' => 3])
+                ->orWhere(['id' => 4]);
+        $command = $query->createCommand();
+        return $command->queryAll();
+
+    }
+    public static function insertData($lastFirstUpdate,$lastUpdate)
+    {
+        $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastUpdate),(4,$lastFirstUpdate)";
+    }
+
+    public static function updateData($update,$id)
+    {
+
+        $data = DbSchema::find()->where(['id' => $id])->one();
+        if($data)
+        {
+            $data->ver = $update;
+            $data->save();
+        }
+    }
 }

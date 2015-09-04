@@ -584,5 +584,15 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         }
 
     }
+    public static function updatePassword($md5pw,$id,$myRights,$groupid)
+    {
+        $query = "UPDATE imas_users SET password='$md5pw' WHERE id='{$id}'";
+        if ($myRights < AppConstant::ADMIN_RIGHT)
+        {
+            $query .= " AND groupid='$groupid' AND rights<100";
+        }
+        Yii::$app->db->createCommand($query)->query();
+
+    }
 }
 
