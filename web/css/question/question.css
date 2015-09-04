@@ -33,3 +33,39 @@
 {
     width: 100px;
 }
+.help-with-adding-question {
+    display:none;
+    background-color: #F8f8f8;
+}
+.order-btn {
+color: white;
+height: 34px;
+width: 75px;
+}
+input[type="checkbox"]:checked {
+    background-color: #1460aa !important;
+}
+.background-color-blue {
+background-color: #1460aa !important;
+}
+input.empty {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+}
+.dropdown-menu li a {
+    padding: 3px 10px !important;
+}
+.dropdown-menu {
+max-width: 100% !important;
+min-width: 100% !important;
+overflow-x: scroll !important;
+}
+.setting-btn {
+min-width: 90px !important;
+}
+.preview-btn {
+min-width: 75px !important;
+max-width: 75px !important;
+}

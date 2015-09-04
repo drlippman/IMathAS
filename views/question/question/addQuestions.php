@@ -12,16 +12,18 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $courseId]]); ?>
 </div>
 <!--Course name-->
-<div class = "title-container">
+<div class="title-container">
     <div class="row">
-        <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php AppUtility::t('Add/Remove Questions') ?> <img src="<?php echo AppUtility::getAssetURL(); ?>/img/help.gif" alt="Help" onClick="window.open('<?php echo AppUtility::getAssetURL() ?>docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
-        </div>
-        <div class="pull-left header-btn">
-            <a title="Preview this assessment" onClick="window.open('<?php echo AppUtility::getURLFromHome('assessment','assessment/show-assessment?cid='.$courseId.'&id='.$assessmentId);?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))"
-               class="btn btn-primary page-settings"><img class = "small-preview-icon" src="<?php echo AppUtility::getAssetURL()?>img/prvAssess.png">&nbsp;&nbsp;Preview Assessment</a>
-            <a title="Exit back to course page" href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId); ?>"
-               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/done.png">&nbsp;Done</a>
+        <div class="col-sm-12">
+            <div class=" col-sm-6" style="right: 30px;">
+                <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('/openmath/web/docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
+            </div>
+            <div class="col-sm-6" style="left: 35px;">
+                <div class="col-sm-5 col-sm-offset-5"> <a style="margin-left: 20px;" title="Preview this assessment" onclick="window.open('/openmath/web/assessment/assessment/show-assessment?cid=2&amp;id=10','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="/openmath/web/img/prvAssess.png">&nbsp;&nbsp;Preview Assessment</a></div>
+                <div class="col-sm-2 pull-right">
+                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -38,10 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 </script>
     <div class="col-md-12">
         <?php
-            echo '<div class="col-md-2"><a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'</a></div>
+            echo '<div style="background-color: #E0E0E0;height: 60px; margin-right: -15px; margin-left: -15px; padding-top: 21px;"><div class="col-md-2"><a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'</a></div>
             <div class="col-md-2"><a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'</a></div>
             <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('assessment','assessment/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
-            <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('question','question/assess-end-msg?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div>';
+            <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('question','question/assess-end-msg?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div></div>';
         if ($beentaken) { ?>
     </div>
     <div class="col-md-12">
@@ -53,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
     </div>
     <?php } ?>
-    <div class="col-md-8"><h3>Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+    <div class="col-md-8" style="margin-left:-17px"><h3 style="margin-top: 15px;">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
     <?php
         if ($itemorder == '') {
             echo '<div class="col-md-12">';
@@ -61,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
             echo "<img src='".AppUtility::getAssetURL()."/img/help.gif' /> ";
             echo 'How do I find questions to add?</a>';
-            echo '<div id="helpwithadding" style="display:none">';
+            echo '<div id="helpwithadding" class="col-md-12 help-with-adding-question">';
                 if ($sessiondata['selfrom'.$assessmentId]=='lib') {
                     echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
                     echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
@@ -90,8 +92,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
             <?php
             if (!$beentaken) {?>
-                Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a>
-                <div class="col-lg-2 pull-right">
+              <div style="float: left">  Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a></div>
+                <div class="col-lg-2 pull-right" style="left: 15px; margin-top: 10px; margin-bottom: 10px;">
                     <div class="with-selected ">
                         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
                             <li class="dropdown">
@@ -100,8 +102,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </a>
                                 <ul class="dropdown-menu with-selected">
                                     <li><a class="non-locked" href="javascript: removeSelected()"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Remove'); ?></a></li>
-                                    <li><a class="non-locked" href="javascript: groupSelected()"><img class="nav-course-icon" src="/openmath/web/img/roster.png">&nbsp;<?php AppUtility::t('Group'); ?></a></li>
-                                    <li type="submit"><a href="javascript: changeSetting()"><img class="small-icon" src="/openmath/web/img/courseSettingItem.png">&nbsp;&nbsp;<?php AppUtility::t('Change Settings'); ?></a></li>
+                                    <li><a class="non-locked" href="javascript: groupSelected()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Group'); ?></a></li>
+                                    <li type="submit"><a href="javascript: changeSetting()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Change Settings'); ?></a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -133,10 +135,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <form method=post action="add-questions?aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
                 <div class="col-md-12">
                     <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
-                    <div class="col-md-2"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
+                    <div class="col-md-2"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?'libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
                     <div class="col-md-2"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
                     <input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
-                    <div class="col-md-2 col-lg-2"><input class="form-control" placeholder="Search &#xf002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
+                    <div class="col-md-2 col-lg-2"><input class="form-control" placeholder="Search&#xF002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
+<!--                    <div class="col-md-2 col-lg-2"><input style="font-family: FontAwesome;font-style:normal;font-weight: normal;text-decoration: inherit;" class="form-control empty" placeholder="Search&#xF002;" type=text size=15 name=search value="--><?php //echo $search ?><!--"></div>-->
                     <div class="col-md-4">
                         <span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
                         <input type=checkbox name="searchall" value="1" <?php AppUtility::writeHtmlChecked($searchall,1,0) ?> />
@@ -172,10 +175,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('With selected'); ?>
                                             <span class="caret right-aligned"></span>
                                         </a>
-                                        <ul class="dropdown-menu with-selected">
-                                            <li type="submit"><a href="javascript: submitSelq()" name="add"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Add'); ?></li>
-                                            <li type="submit"><a href="javascript: submitSelq()" name="addquick"><img class="nav-course-icon" src="/openmath/web/img/roster.png">&nbsp;<?php AppUtility::t('Add (using defaults)'); ?></a></li>
-                                            <li type="submit"><a href="javascript: previewsel('selq')"><img class="small-icon" src="/openmath/web/img/courseSettingItem.png">&nbsp;&nbsp;<?php AppUtility::t('Preview Selected'); ?></a></li>
+                                        <ul class="dropdown-menu with-selected potential-ques-dropdown">
+                                            <li type="submit">
+                                                <a style="  margin-left: -3px;" href="javascript: submitSelq()" name="add">
+                                                    <i class="fa fa-plus"></i>&nbsp;
+                                                    <?php AppUtility::t('Add'); ?>
+                                                </a>
+                                            </li>
+                                            <li type="submit">
+                                                <a style="margin-left: -4px;" href="javascript: submitSelq()" name="addquick">
+                                                    <i class="fa fa-cart-plus"></i>&nbsp;
+                                                    <?php AppUtility::t('Add (using defaults)'); ?>
+                                                </a>
+                                            </li>
+                                            <li type="submit">
+                                                <a style="margin-left: -6px;" href="javascript: previewsel('selq')">
+                                                    <i class="fa fa-fw"></i>
+                                                    <?php AppUtility::t('Preview Selected'); ?>
+                                                </a>
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -207,7 +225,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <th><span onmouseover="tipshow(this,'Flag a question if it is in the wrong library')" onmouseout="tipout()"><?php AppUtility::t('Wrong Lib') ?></span></th>
                                 <?php } ?>
                                 <th><?php AppUtility::t('Action') ?></th>
-                                <th></th>
+                                <th  style="width: 140px"></th>
                                 <th></th>
 
                             </tr>
@@ -219,7 +237,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 if ($searchall == AppConstant::NUMERIC_ZERO) {
                                     if ($alt == AppConstant::NUMERIC_ZERO) {
-                                        echo "<tr class=even>";
+                                        echo "<tr class=even style='background-color: #f0f0f0;'>";
                                         $alt = AppConstant::NUMERIC_ONE;
                                     } else {
                                         echo "<tr class=odd>";
@@ -281,8 +299,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                             echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
                                         }
                                     } ?>
-                                    <td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>
-                                        <i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
+                                    <td class=""><div> <a style="width: 80%" class='btn btn-primary disable-btn background-color-blue'>
+                                        <i class='fa fa-cog fa-fw'></i> Settings</a><a style="width: 20%" class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
                                         <ul class='dropdown-menu'>
                                         <li class=c><?php echo $pageQuestionTable[$qid]['src'] ?></i></a></li>
                                         <li class=c><?php echo $pageQuestionTable[$qid]['templ'] ?></i></a></li>
@@ -332,7 +350,7 @@ if (isset($params['achecked']) && (count($params['achecked'])==0)) {
         <table cellpadding=5 id=myTable class=gb>
             <thead>
             <tr>
-                <th> </th><th>Description</th><th></th><th>ID</td><th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+                <th> </th><th>Description</th><th></th><th>ID<th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
             </tr>
             </thead>
             <tbody>

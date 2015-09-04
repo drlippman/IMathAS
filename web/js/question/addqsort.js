@@ -24,7 +24,7 @@ function refreshTable() {
 }
 function generateMoveSelect(num,cnt) {
 	num++; //adjust indexing
-	var sel = "<select id="+num+" onChange=\"moveitem2("+num+")\">";
+	var sel = "<select id="+num+" class='order-btn background-color-blue' onChange=\"moveitem2("+num+")\">";
 	for (var i=1; i<=cnt; i++) {
 		sel += "<option value=\""+i+"\" ";
 		if (i==num) {
@@ -248,7 +248,7 @@ function generateTable() {
         "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th>";
 	}
 	html += "<th>Order</th>";
-	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Type</th><th>Points</th><th>Action</th><th></th>";
+	html += "<th>Description</th><th>&nbsp;</th><th>ID</th><th>Type</th><th>Points</th><th class='setting-btn'>Action</th><th class='preview-btn'></th>";
 	html += "</thead><tbody id='question-information-table'>";
 	for (var i=0; i<itemcount; i++) {
 		if (itemarray[i].length<5) { //is group
@@ -311,10 +311,10 @@ function generateTable() {
 							html += "selected=1";
 						}
 						html += ">With</option></select> replacement";
-						html += "</td><td class=c><td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>" +
+						html += "</td><td class=c><td><div class='btn-group settings setting-btn'> <a class='btn btn-primary disable-btn background-color-blue'>" +
                         "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
                         "<ul class='dropdown-menu'>" +
-                        "<li class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\"><img class='small-icon' src='../../img/gradebook.png'></i> Remove</a></li>" ;//remove
+                        "<li class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\"><i class='fa fa-trash-o fa-fw'></i></i> Remove</a></li>" ;//remove
                         html += "</ul></div></td><td></td></tr>";
 						if (itemarray[i][3]==0) { //collapsed group
 							if (curitems[0][4]==9999) { //points
@@ -367,14 +367,14 @@ function generateTable() {
 				curpt = curitems[j][4];
 			}
             //Action
-            html += "<td><div class='btn-group settings'> <a class='btn btn-primary disable-btn'>" +
+            html += "<td><div class='btn-group settings'> <a class='btn btn-primary disable-btn background-color-blue'>" +
             "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
             "<ul class='dropdown-menu'>" +
-            "<li class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Change</a></li>" ;//settings
+            "<li class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Change</a></li>" ;//settings
             if (curitems[j][5]) {
-                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Edit</a></li>";//edit
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Edit</a></li>";//edit
             } else {
-                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Edit</a></li>";//edit makelocal
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&makelocal="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Edit</a></li>";//edit makelocal
             }
 
             if (beentaken) {
@@ -385,16 +385,17 @@ function generateTable() {
                     html += "<li><a href=\"add-questions?aid="+curaid+"&cid="+curcid+"&withdraw="+(curisgroup?i+'-'+j:i)+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Withdrawn</a></li>";
                 }
             } else {
-                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\"><img class='small-icon' src='../../img/gradebook.png'></i> Template</a></li>";//add link
-                html += "<li class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\"><img class='small-icon' src='../../img/gradebook.png'></i> Remove</a></li>";//add link and checkbox
+
+                html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&template=true&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-archive'></i></i>&nbsp;&nbsp;Template</a></li>";//add link
+                html += "<li class=c><a href=\"#\" onclick=\"return removeitem("+(curisgroup?"'"+i+'-'+j+"'":"'"+i+"'")+");\"><i class='fa fa-trash-o fa-fw'></i></i> Remove</a></li>";//add link and checkbox
             }
 
             html += "</ul></div></td>";
 
             if (beentaken) {
-                html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
+                html += "<td><input style='width: 95% !important;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
             } else {
-                html += "<td><input type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+                html += "<td><input style='width: 95% !important;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
             }
 			html += "</tr>";
 			ln++;

@@ -585,7 +585,7 @@ class QuestionController extends AppController
                                 } else {
                                     $pageQuestionTable[$i]['desc'] = filter($line['description']);
                                 }
-                                $pageQuestionTable[$i]['preview'] = "<button class='question-preview-btn'><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/prvAssess.png'."' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
+                                $pageQuestionTable[$i]['preview'] = "<button style='width: 100%;' class='question-preview-btn'><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/prvAssess.png'."' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
                                 $pageQuestionTable[$i]['type'] = $line['qtype'];
                                 $avgTimePts = explode(',', $line['avgtime']);
                                 if ($avgTimePts[0]>AppConstant::NUMERIC_ZERO) {
@@ -642,18 +642,15 @@ class QuestionController extends AppController
                                 } else {
                                     $pageQuestionTable[$i]['mine'] = "";
                                 }
-
-
-                                $pageQuestionTable[$i]['add'] = "<a class='btn btn-primary add-btn-question' href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId)."><img class = 'small-preview-icon' src='".AppUtility::getAssetURL().'img/addItem.png'."'>&nbsp; Add</a>";
+                                $pageQuestionTable[$i]['add'] = "<a style='background-color: #008E71;' class='btn btn-primary add-btn-question' href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId)."><i class='fa fa-plus'></i>&nbsp; Add</a>";
 
                                 if ($line['userights']>AppConstant::NUMERIC_THREE || ($line['userights']==AppConstant::NUMERIC_THREE && $line['groupid']==$groupId) || $line['ownerid']==$userId) {
-                                    $pageQuestionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1').">Edit</a>";
+                                    $pageQuestionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1')."><i class='fa fa-fw'></i>Edit</a>";
                                 } else {
                                     $pageQuestionTable[$i]['src'] = "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId).">View</a>";
                                 }
 
-                                $pageQuestionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&template='.true).">Template</a>";
-                                //$i++;
+                                $pageQuestionTable[$i]['templ'] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$line['id'].'&aid='.$assessmentId.'&cid='.$courseId.'&template='.true)."><i class='fa fa-archive'></i>Template</a>";
                                 $ln++;
 
                             } //end while
@@ -752,7 +749,7 @@ class QuestionController extends AppController
                             $pageAssessmentQuestions[$x]['times'][$y] = $times[$qid];
                             $pageAssessmentQuestions[$x]['mine'][$y] = ($owner[$qid]==$userId) ? "Yes" : "" ;
                             $pageAssessmentQuestions[$x]['add'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId).">Add</a>";
-                            $pageAssessmentQuestions[$x]['src'][$y] = ($useRights[$qid]>AppConstant::NUMERIC_THREE || ($useRights[$qid]==AppConstant::NUMERIC_THREE && $qGroupId[$qid]==$groupId) || $owner[$qid]==$userId) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1').">Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId).">View</a>" ;
+                            $pageAssessmentQuestions[$x]['src'][$y] = ($useRights[$qid]>AppConstant::NUMERIC_THREE || ($useRights[$qid]==AppConstant::NUMERIC_THREE && $qGroupId[$qid]==$groupId) || $owner[$qid]==$userId) ? "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId.'&frompot=1')."><i class='fa fa-fw'></i>Edit</a>" : "<a href=".AppUtility::getURLFromHome('question','question/view-source?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId).">View</a>" ;
                             $pageAssessmentQuestions[$x]['templ'][$y] = "<a href=".AppUtility::getURLFromHome('question','question/mod-data-set?id='.$questionSetId[$qid].'&aid='.$assessmentId.'&cid='.$courseId.'&template=true').">Template</a>";
                             $pageAssessmentQuestions[$x]['extref'][$y] = '';
                             $pageAssessmentQuestions[$x]['cap'][$y] = AppConstant::NUMERIC_ZERO;
