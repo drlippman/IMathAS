@@ -58,7 +58,7 @@ public  static function storecontenttofile($content,$key,$sec="private") {
 	}
 }
 
-function relocatecoursefileifneeded($file, $key, $sec="public") {
+public static function relocatecoursefileifneeded($file, $key, $sec="public") {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -638,7 +638,7 @@ public static function deletealluserfiles($uid) {
 	return $delcnt;
 }
 
-function doesfileexist($type,$key) {
+public  static function doesfileexist($type,$key) {
 	if ($type=='cfile') {
 		if ($GLOBALS['filehandertypecfiles'] == 's3') {
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);

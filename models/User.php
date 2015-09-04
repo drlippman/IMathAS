@@ -457,10 +457,12 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function deleteUserByLastAccess($old)
     {
         $users = User::find()->where(['<','lastaccess',$old])->andWhere(['<','rights',100])->all();
-        foreach($users as $user){
+        foreach($users as $user)
+        {
             $user->delete();
         }
     }
+
     public static function getDistinctUserCount($date)
     {
         $query = new Query();
@@ -539,10 +541,47 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query = new Query();
         $query->select('email')
             ->from('imas_users')
-            ->where(['>','rights',20]);
+            ->where(['>', 'rights', 20]);
         $command = $query->createCommand();
         $data = $command->queryAll();
-        return  count($data);
+        return count($data);
+    }
+    public static function getByRights()
+    {
+        $users = User::find()->select(['id','email','SID','rights'])->where(['rights' => 11])->orWhere(['rights' => 76])->orWhere(['rights' => 77])->all();
+        return $users;
+    }
+
+    public static function updateLTIDomainCredentials($params)
+    {
+        $user = User::find()->where(['id' => $params['id']])->one();
+        $user->email = $params['ltidomain'];
+        $user->FirstName=$params['ltidomain'];
+        $user->LastName='LTIcredential';
+        $user->SID=$params['ltikey'];
+        $user->password= $params['ltisecret'];
+        $user->rights= $params['createinstr'];
+        $user->groupid= $params['groupid'];
+        $user->save();
+    }
+    public function createLTIDomainCredentials($params)
+    {
+        $this->email = $params['ltidomain'];
+        $this->FirstName=$params['ltidomain'];
+        $this->LastName='LTIcredential';
+        $this->SID=$params['ltikey'];
+        $this->password= $params['ltisecret'];
+        $this->rights= $params['createinstr'];
+        $this->groupid= $params['groupid'];
+        $this->save();
+    }
+    public static function deleteUserById($id)
+    {
+        $user = User::find()->where(['id' => $id ])->one();
+        if($user)
+        {
+            $user->delete();
+        }
 
     }
 }

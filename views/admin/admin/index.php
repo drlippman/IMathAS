@@ -147,11 +147,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <span class="column">
         <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importmacros') ?>">Install Macro File</a><br/>
         <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importqimages') ?>">Install Question Images</a><br/>
-        <a href="<? echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Install Course Files</a><br/>
-
+        <a href="<? echo AppUtility::getURLFromHome('admin', 'admin/forms?action=importcoursefiles') ?>">Install Course Files</a><br/>
     </span>
-    <span class="column"><a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">LTI Provider
-            Creds</a><br/>
+    <span class="column">
+        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=listltidomaincred') ?>">LTI Provider Creds</a><br/>
         <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=admin') ?>">External Tools</a><br/>
         <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities') ?>">Admin Utilities</a><br/>
     </span>
