@@ -7,7 +7,7 @@ $this->title = 'Help for student entering answers';
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home','About Us'], 'link_url' => [AppUtility::getHomeURL(),AppUtility::getHomeURL().'site/login'], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../itemHeader/_indexWithLeftContent",['link_title'=>['Home'], 'link_url' => [AppUtility::getHomeURL()], 'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container">
     <div class="row">

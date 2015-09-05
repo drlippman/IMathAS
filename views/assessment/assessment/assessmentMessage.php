@@ -36,17 +36,17 @@ $useeditor = "commonmsg"; ?>
                     $i=1;
                     foreach($endmsg['msgs'] as $sc=>$msg) {
                         $msg = str_replace('"','&quot;',$msg);
-                        echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"$sc\"/></td>";
-                        echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
+                        echo "<tr><td><input  type=\"text\" size=\"4\" class='form-control' name=\"sc[$i]\" value=\"$sc\"/></td>";
+                        echo "<td><input type=\"text\" size=\"80\" class='form-control' name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
                         $i++;
                     }
                     for ($j=0;$j<10;$j++) {
-                        echo "<tr><td><input type=\"text\" size=\"4\" name=\"sc[$i]\" value=\"\"/></td>";
-                        echo "<td><input type=\"text\" size=\"80\" name=\"msg[$i]\" value=\"\" /></td></tr>";
+                        echo "<tr><td><input type=\"text\" size=\"4\" class='col-md-2 form-control' name=\"sc[$i]\" value=\"\"/></td>";
+                        echo "<td><input type=\"text\" size=\"80\" class='col-md-10 form-control' name=\"msg[$i]\" value=\"\" /></td></tr>";
                         $i++;
                     }
                     echo "<tr><td>Otherwise, show:</td>";
-                    echo "<td><input type=\"text\" size=\"80\" name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
+                    echo "<td><input type=\"text\" size=\"80\" class='form-control' name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
                     echo '</tbody></table>';
 
                     echo '<p>After the score-specific message, display this text to everyone:</p>';
@@ -58,7 +58,7 @@ $useeditor = "commonmsg"; ?>
             <p>Order of entries is not important; the message with highest applicable score will be reported.
             The "otherwise, show" message will display if no other score messages are defined.  Use this instead
             of trying to create a 0 score entry</p>
-   </div>
+   </di22v>
 <?php    if (isset($params['checked'])) {
     echo '<input type="hidden" name="aidlist" value="'.$params['checked'].'" />';
     } else {

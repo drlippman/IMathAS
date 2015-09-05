@@ -44,88 +44,89 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2"><a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'</a></div>
             <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
             <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div></div>';
-        if ($beentaken) { ?>
+         ?>
     </div>
-    <div class="col-md-12">
-        <h3>Warning</h3>
-        <p>This assessment has already been taken.  Adding or removing questions, or changing a
-            question's settings (point value, penalty, attempts) now would majorly mess things up.
-            If you want to make these changes, you need to clear all existing assessment attempts
-        </p>
-        <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
-    </div>
-    <?php } ?>
-    <div class="col-md-8" style="margin-left:-17px"><h3 style="margin-top: 15px;">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
-    <?php
-        if ($itemorder == '') {
-            echo '<div class="col-md-12">';
-            echo "<p>No Questions currently in assessment</p>\n";
-            echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-            echo "<img src='".AppUtility::getAssetURL()."/img/help.gif' /> ";
-            echo 'How do I find questions to add?</a>';
-            echo '<div id="helpwithadding" class="col-md-12 help-with-adding-question">';
-                if ($sessiondata['selfrom'.$assessmentId]=='lib') {
-                    echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
-                    echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
-                    echo "<p>To find questions to add from the question libraries:";
-                    echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
-                    echo "<li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
-                    echo "<li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
-                    echo "<li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
-                    echo "</ol>";
-                } else if ($sessiondata['selfrom'.$assessmentId]=='assm') {
-                    echo "<p>You are currently set t o select questions existing assessments.  If you would like to select questions from ";
-                    echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
-                    echo "<p>To find questions to add from existing assessments:";
-                    echo "<ol><li>Use the checkboxes to select the assessments you want to pull questions from</li>";
-                    echo " <li>Click <b>Use these Assessments</b> button to list the questions in the assessments selected</li>";
-                    echo "</ol>";
-                }
-                echo "<p>To select questions and add them:</p><ul>";
-                echo " <li>Click the <b>Preview</b> button after the question description to view an example of the question</li>";
-                echo " <li>Use the checkboxes to mark the questions you want to use</li>";
-                echo " <li>Click the <b>Add</b> button above the question list to add the questions to your assessment</li> ";
-                echo "  </ul>";
-        echo '</div>';
-        echo '</div>';
-    } else { ?>
-            <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
-            <?php
-            if (!$beentaken) {?>
-              <div style="float: left">  Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a></div>
-                <div class="col-lg-2 pull-right" style="left: 15px; margin-top: 10px; margin-bottom: 10px;">
-                    <div class="with-selected ">
-                        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
-                            <li class="dropdown">
-                                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('With selected'); ?>
-                                    <span class="caret right-aligned"></span>
-                                </a>
-                                <ul class="dropdown-menu with-selected">
-                                    <li><a class="non-locked" href="javascript: removeSelected()"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Remove'); ?></a></li>
-                                    <li><a class="non-locked" href="javascript: groupSelected()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Group'); ?></a></li>
-                                    <li type="submit"><a href="javascript: changeSetting()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Change Settings'); ?></a></li>
-                                </ul>
-                            </li>
-                        </ul>
+    <div class="assessment-ques-shadowbox">
+        <?php if ($beentaken) { ?>
+            <div class="col-md-12">
+                <h3>Warning</h3>
+                <p>This assessment has already been taken.  Adding or removing questions, or changing a
+                    question's settings (point value, penalty, attempts) now would majorly mess things up.
+                    If you want to make these changes, you need to clear all existing assessment attempts
+                </p>
+                <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
+            </div>
+        <?php } ?>
+        <div class="col-md-8" style="margin-left:-17px"><h3 style="margin-top: 15px;">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+        <?php
+            if ($itemorder == '') {
+                echo '<div class="col-md-12">';
+                echo "<p>No Questions currently in assessment</p>\n";
+                echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
+                echo "<img src='".AppUtility::getAssetURL()."/img/help.gif' /> ";
+                echo 'How do I find questions to add?</a>';
+                echo '<div id="helpwithadding" class="col-md-12 help-with-adding-question">';
+                    if ($sessiondata['selfrom'.$assessmentId]=='lib') {
+                        echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
+                        echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
+                        echo "<p>To find questions to add from the question libraries:";
+                        echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
+                        echo "<li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
+                        echo "<li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
+                        echo "<li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
+                        echo "</ol>";
+                    } else if ($sessiondata['selfrom'.$assessmentId]=='assm') {
+                        echo "<p>You are currently set t o select questions existing assessments.  If you would like to select questions from ";
+                        echo "the question libraries, click the <b>Select From Libraries</b> button below</p>";
+                        echo "<p>To find questions to add from existing assessments:";
+                        echo "<ol><li>Use the checkboxes to select the assessments you want to pull questions from</li>";
+                        echo " <li>Click <b>Use these Assessments</b> button to list the questions in the assessments selected</li>";
+                        echo "</ol>";
+                    }
+                    echo "<p>To select questions and add them:</p><ul>";
+                    echo " <li>Click the <b>Preview</b> button after the question description to view an example of the question</li>";
+                    echo " <li>Use the checkboxes to mark the questions you want to use</li>";
+                    echo " <li>Click the <b>Add</b> button above the question list to add the questions to your assessment</li> ";
+                    echo "  </ul>";
+            echo '</div>';
+            echo '</div>';
+        } else { ?>
+                <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
+                <?php
+                if (!$beentaken) {?>
+                  <div style="float: left">  Check: <a href="#" onclick="return chkAllNone('curqform','checked[]',true)">All</a> <a href="#" onclick="return chkAllNone('curqform','checked[]',false)">None</a></div>
+                    <div class="col-lg-2 pull-right" style="left: 15px; margin-top: 10px; margin-bottom: 10px;">
+                        <div class="with-selected ">
+                            <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('With selected'); ?>
+                                        <span class="caret right-aligned"></span>
+                                    </a>
+                                    <ul class="dropdown-menu with-selected">
+                                        <li><a class="non-locked" href="javascript: removeSelected()"><i class="fa fa-trash-o fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Remove'); ?></a></li>
+                                        <li><a class="non-locked" href="javascript: groupSelected()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Group'); ?></a></li>
+                                        <li type="submit"><a href="javascript: changeSetting()"><i class="fa fa-fw"></i>&nbsp;&nbsp;<?php AppUtility::t('Change Settings'); ?></a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            <?php } ?>
-                <span id="submitnotice" style="color:red;"></span>
-                <div id="curqtbl"></div>
-            </form>
-            <div class="pull-right">Assessment points total: <span id="pttotal"></span></div>
-            <script>
-                var itemarray = <?php echo $jsarr ?>;
-                var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
-            </script>
-    <?php }
-    if ($displaymethod=='VideoCue') {
-        echo '<p><input type=button value="Define Video Cues" onClick="window.location='.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'"/></p>';
-    } ?>
-    <br><br>
+                <?php } ?>
+                    <span id="submitnotice" style="color:red;"></span>
+                    <div id="curqtbl"></div>
+                </form>
+                <div class="pull-right">Assessment points total: <span id="pttotal"></span></div>
+                <script>
+                    var itemarray = <?php echo $jsarr ?>;
+                    var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
+                </script>
+        <?php }
+        if ($displaymethod=='VideoCue') {
+            echo '<p><input type=button value="Define Video Cues" onClick="window.location='.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'"/></p>';
+        } ?>
+    </div>
 </div>
-
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox margin-top-fifteen">
     <?php
     /*
      * POTENTIAL QUESTIONS
@@ -133,14 +134,18 @@ $this->params['breadcrumbs'][] = $this->title;
     if ($sessiondata['selfrom'.$assessmentId]=='lib') { //selecting from libraries
         if (!$beentaken) { ?>
             <form method=post action="add-questions?aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
-                <div class="col-md-12">
+                <div class="col-md-12 patential-ques-header search-patential-ques-header">
                     <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
-                    <div class="col-md-2"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
+                    <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?'libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
                     <div class="col-md-2"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
                     <input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
-                    <div class="col-md-2 col-lg-2"><input class="form-control" placeholder="Search&#xF002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
-<!--                    <div class="col-md-2 col-lg-2"><input style="font-family: FontAwesome;font-style:normal;font-weight: normal;text-decoration: inherit;" class="form-control empty" placeholder="Search&#xF002;" type=text size=15 name=search value="--><?php //echo $search ?><!--"></div>-->
-                    <div class="col-md-4">
+
+               </div>
+
+            <div class="col-md-12 question-search">
+                <div class="col-md-2"><input class="form-control" placeholder="Search&#xF002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
+                <!--                    <div class="col-md-2 col-lg-2"><input style="font-family: FontAwesome;font-style:normal;font-weight: normal;text-decoration: inherit;" class="form-control empty" placeholder="Search&#xF002;" type=text size=15 name=search value="--><?php //echo $search ?><!--"></div>-->
+                <div class="col-md-4">
                         <span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
                         <input type=checkbox name="searchall" value="1" <?php AppUtility::writeHtmlChecked($searchall,1,0) ?> />
                         Search all libs</span>
@@ -150,16 +155,18 @@ $this->params['breadcrumbs'][] = $this->title;
                         <span onmouseover="tipshow(this,'Exclude questions already in assessment')" onmouseout="tipout()">
                         <input type=checkbox name="newonly" value="1" <?php AppUtility::writeHtmlChecked($newonly,1,0) ?> />
                         Exclude added</span>
+                </div>
+                <div class="col-md-4 pull-right">
+                    <div style="margin-right: -30px;float: right">
+                        <span class=""><input type=submit value=Search></span>&nbsp;&nbsp;&nbsp;
+                        <span class=""><input type=button value="Add New Question" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/mod-data-set?aid='.$assessmentId.'&cid='.$courseId) ?>'"></span>
                     </div>
                 </div>
+            </div>
+         </form>
+            <div class="col-md-12">
+                <div class="col-md-6 right-fifteen"><h3 class="margin-top-seven">Potential Questions</h3></div>
 
-            <div class="col-md-12"><br>
-                <div class="col-md-6"><h3>Potential Questions</h3></div>
-                <div class="col-md-4 pull-right">
-                    <span class="col-md-2"><input type=submit value=Search></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <span class=""><input type=button value="Add New Question" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/mod-data-set?aid='.$assessmentId.'&cid='.$courseId) ?>'"></span>
-                </div>
-            </form>
                 <?php
                 if ($searchall==1 && trim($search)=='') {
                     echo "Must provide a search term when searching all libraries";
@@ -168,7 +175,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo "<p>No Questions matched search</p>\n";
                     } else { ?>
                     <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
-                        <div class="col-lg-2">
+                        <div class="col-lg-2 right-float left-fifteen margin-bottom-fifteen">
                             <div class="with-selected ">
                                 <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
                                     <li class="dropdown">
@@ -301,9 +308,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     } ?>
                                     <td class=""><div> <a style="width: 80%" class='btn btn-primary disable-btn background-color-blue'>
                                         <i class='fa fa-cog fa-fw'></i> Settings</a><a style="width: 20%" class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
-                                        <ul class='dropdown-menu'>
-                                        <li class=c><?php echo $pageQuestionTable[$qid]['src'] ?></i></a></li>
-                                        <li class=c><?php echo $pageQuestionTable[$qid]['templ'] ?></i></a></li>
+                                        <ul class='qmenu'>
+                                        <li class=><?php echo $pageQuestionTable[$qid]['src'] ?></i></a></li>
+                                        <li class=><?php echo $pageQuestionTable[$qid]['templ'] ?></i></a></li>
                                         </ul></div></td>
                                         <td><?php echo $pageQuestionTable[$qid]['preview'] ?></td>
                                         <td ><div class=''><?php echo $pageQuestionTable[$qid]['add'] ?>
@@ -328,130 +335,134 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 } else if ($sessiondata['selfrom'.$assessmentId]=='assm') { //select from assessments
     ?>
+    <div style="margin: 15px;">
 
-    <h3>Potential Questions</h3>
-
-    <?php
-if (isset($params['achecked']) && (count($params['achecked'])==0)) {
-    echo "<p>No Assessments Selected.  Select at least one assessment.</p>";
-} elseif (isset($sessiondata['aidstolist'.$assessmentId])) { //list questions
-    ?>
-    <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
-
-        <input type=button value="Select Assessments" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearassmt=1') ?>'">
-        or <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
-        <br/>
-
-        Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
-        <input name="add" type=submit value="Add" />
-        <input name="addquick" type=submit value="Add Selected (using defaults)">
-        <input type=button value="Preview Selected" onclick="previewsel('selq')" />
-
-        <table cellpadding=5 id=myTable class=gb>
-            <thead>
-            <tr>
-                <th> </th><th>Description</th><th></th><th>ID<th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
-            </tr>
-            </thead>
-            <tbody>
             <?php
-            $alt=0;
-            for ($i=0; $i<count($pageAssessmentQuestions['desc']);$i++) {
-                if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                ?>
-				<td></td>
-				<td><b><?php echo $pageAssessmentQuestions['desc'][$i] ?></b></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
-<?php
-                for ($x=0;$x<count($pageAssessmentQuestions[$i]['desc']);$x++) {
-                    if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                    ?>
-				<td><?php echo $pageAssessmentQuestions[$i]['checkbox'][$x] ?></td>
-				<td><?php echo $pageAssessmentQuestions[$i]['desc'][$x] ?></td>
-				<td class="nowrap">
-				  <div <?php if ($pageAssessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $pageAssessmentQuestions[$i]['extref'][$x] ?></div>
-				</td>
-				<td><?php echo $pageAssessmentQuestions[$i]['qsetid'][$x] ?></td>
-				<td><?php echo $pageAssessmentQuestions[$i]['preview'][$x] ?></td>
-				<td><?php echo $pageAssessmentQuestions[$i]['type'][$x] ?></td>
-				<td class=c><?php echo $pageAssessmentQuestions[$i]['times'][$x] ?></td>
-				<td><?php echo $pageAssessmentQuestions[$i]['mine'][$x] ?></td>
-				<td class=c><?php echo $pageAssessmentQuestions[$i]['add'][$x] ?></td>
-				<td class=c><?php echo $pageAssessmentQuestions[$i]['src'][$x] ?></td>
-				<td class=c><?php echo $pageAssessmentQuestions[$i]['templ'][$x] ?></td>
-			</tr>
-
-<?php
-                }
-            }
+        if (isset($params['achecked']) && (count($params['achecked'])==0)) {
+            echo "<p>No Assessments Selected.  Select at least one assessment.</p>";
+        } elseif (isset($sessiondata['aidstolist'.$assessmentId])) { //list questions
             ?>
-            </tbody>
-        </table>
+            <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
+                <h3 style="padding-top: 10px;">Potential Questions</h3>
 
-        <script type="javascript">
-            initSortTable('myTable',Array(false,'S','N',false,'S','N','S',false,false,false),true);
-        </script>
-    </form>
+                <input type=button value="Select Assessments" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearassmt=1') ?>'">
+                or <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
+                <br/>
 
-<?php
-} else {  //choose assessments
-    ?>
-    <h4>Choose assessments to take questions from</h4>
-    <form id="sela" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>">
-        Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
-        <input type=submit value="Use these Assessments" /> or
-        <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
-<br><br>
-        <table cellpadding=5 id=myTable class=gb>
-            <thead >
-            <tr><th></th><th>Assessment</th><th>Summary</th></tr>
-            </thead>
-            <tbody>
-            <?php
+                Check: <a href="#" onclick="return chkAllNone('selq','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('selq','nchecked[]',false)">None</a>
+                <input name="add" type=submit value="Add" />
+                <input name="addquick" type=submit value="Add Selected (using defaults)">
+                <input type=button value="Preview Selected" onclick="previewsel('selq')" />
 
-            $alt=0;
-            for ($i=0;$i<count($pageAssessmentList);$i++) {
-                if ($alt==0) {
-                    echo "<tr class=even>";
-                    $alt=1;
-                } else {
-                    echo "<tr class=odd>";
+                <table cellpadding=5 id=myTable class=gb>
+                    <thead>
+                    <tr>
+                        <th> </th><th>Description</th><th></th><th>ID<th>Preview</th><th>Type</th><th>Times Used</th><th>Mine</th><th>Add</th><th>Source</th><th>Use as Template</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
                     $alt=0;
-                }
-                ?>
-				<td><input type=checkbox name='achecked[]' value='<?php echo $pageAssessmentList[$i]['id'] ?>'></td>
-				<td><?php echo $pageAssessmentList[$i]['name'] ?></td>
-				<td><?php echo $pageAssessmentList[$i]['summary'] ?></td>
-				<?php echo "</tr>" ?>
-<?php
-            }
+                    for ($i=0; $i<count($pageAssessmentQuestions['desc']);$i++) {
+                        if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+                        ?>
+                        <td></td>
+                        <td><b><?php echo $pageAssessmentQuestions['desc'][$i] ?></b></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+        <?php
+                        for ($x=0;$x<count($pageAssessmentQuestions[$i]['desc']);$x++) {
+                            if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
+                            ?>
+                        <td><?php echo $pageAssessmentQuestions[$i]['checkbox'][$x] ?></td>
+                        <td><?php echo $pageAssessmentQuestions[$i]['desc'][$x] ?></td>
+                        <td class="nowrap">
+                          <div <?php if ($pageAssessmentQuestions[$i]['cap'][$x]) {echo 'class="ccvid"';}?>><?php echo $pageAssessmentQuestions[$i]['extref'][$x] ?></div>
+                        </td>
+                        <td><?php echo $pageAssessmentQuestions[$i]['qsetid'][$x] ?></td>
+                        <td><?php echo $pageAssessmentQuestions[$i]['preview'][$x] ?></td>
+                        <td><?php echo $pageAssessmentQuestions[$i]['type'][$x] ?></td>
+                        <td class=c><?php echo $pageAssessmentQuestions[$i]['times'][$x] ?></td>
+                        <td><?php echo $pageAssessmentQuestions[$i]['mine'][$x] ?></td>
+                        <td class=c><?php echo $pageAssessmentQuestions[$i]['add'][$x] ?></td>
+                        <td class=c><?php echo $pageAssessmentQuestions[$i]['src'][$x] ?></td>
+                        <td class=c><?php echo $pageAssessmentQuestions[$i]['templ'][$x] ?></td>
+                    </tr>
+
+        <?php
+                        }
+                    }
+                    ?>
+                    </tbody>
+                </table>
+
+                <script type="javascript">
+                    initSortTable('myTable',Array(false,'S','N',false,'S','N','S',false,false,false),true);
+                </script>
+            </form>
+
+        <?php
+        } else {  //choose assessments
             ?>
 
-            </tbody>
-        </table>
-        <script type="javascript">
-			initSortTable('myTable',Array(false,'S','S',false,false,false),true);
-		</script>
-    </form>
+            <form id="sela" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>">
+                <div class="patential-ques-header">
+                Check: <a href="#" onclick="return chkAllNone('sela','achecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('sela','achecked[]',false)">None</a>
+                <input type=submit value="Use these Assessments" /> or
+                <input type=button value="Select From Libraries" onClick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=lib') ?>'">
+                </div>
+                <h3>Potential Questions</h3>
+                <div><h4>Choose assessments to take questions from</h4></div>
+                <table cellpadding=5 id=myTable class="question-table">
+                    <thead >
+                    <tr><th></th><th>Assessment</th><th>Summary</th></tr>
+                    </thead>
+                    <tbody>
+                    <?php
 
-<?php
-}
-}
-?>
-    <input type="hidden" id="address" value="<?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId); ?>"/>
-    <input type="hidden" id="junk-flag" value="<?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>"/>
-    <script type="javascript">
-        var previewqaddr = <?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$cid); ?>;
-        var addqaddr = <?php echo $address; ?>;
-        var JunkFlagsaveurl = <?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>;
-    </script>
-<?php } ?>
+                    $alt=0;
+                    for ($i=0;$i<count($pageAssessmentList);$i++) {
+                        if ($alt==0) {
+                            echo "<tr class=even>";
+                            $alt=1;
+                        } else {
+                            echo "<tr class=odd>";
+                            $alt=0;
+                        }
+                        ?>
+                        <td class="question-check"><input type=checkbox name='achecked[]' value='<?php echo $pageAssessmentList[$i]['id'] ?>'></td>
+                        <td><?php echo $pageAssessmentList[$i]['name'] ?></td>
+                        <td><?php echo $pageAssessmentList[$i]['summary'] ?></td>
+                        <?php echo "</tr>" ?>
+        <?php
+                    }
+                    ?>
+
+                    </tbody>
+                </table>
+                <script type="javascript">
+                    initSortTable('myTable',Array(false,'S','S',false,false,false),true);
+                </script>
+            </form>
+
+        <?php
+        }
+        }
+        ?>
+            <input type="hidden" id="address" value="<?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$courseId); ?>"/>
+            <input type="hidden" id="junk-flag" value="<?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>"/>
+            <script type="javascript">
+                var previewqaddr = <?php echo AppUtility::getURLFromHome('question','question/test-question?cid='.$cid); ?>;
+                var addqaddr = <?php echo $address; ?>;
+                var JunkFlagsaveurl = <?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>;
+            </script>
+        <?php } ?>
+    </div>
 </div>

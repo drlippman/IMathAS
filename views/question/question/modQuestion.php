@@ -18,12 +18,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="vertical-align title-page"><?php AppUtility::t('Modify Question Settings') ?></div>
             </div>
             <div class="pull-left header-btn">
-                <div class="submit"><input type="submit" value="Save Settings"></div>
+                <div class="submit floatright"><input type="submit" value="Save Settings"></div>
             </div>
         </div>
     </div>
-    <div class="tab-content shadowBox">
-    <div class="col-md-12">
+    <div class="tab-content shadowBox margin-top-fourty">
+    <div class="col-md-12 mod-question-form">
         <?php
         if ($overwriteBody==1) {
         echo $body;
@@ -111,17 +111,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo "<div class=col-md-3>Number, if any, of additional copies to add to assessment:</div><div class=col-md-4><input type=text class=form-control size=4 name=copies value=\"0\"/></div>";
             } ?>
         </div>
-        <div class="col-md-12 text-label">
             <?php
             if ($beentaken) {
+                echo '<div class="col-md-12 text-label">';
                 echo '<div class="form"><a href="#" onclick="$(this).hide();$(\'#advanced\').show();return false">Advanced</a></div>';
                 echo '<div id="advanced" style="display:none;">';
                 echo '<span class="form">Replace this question with question ID: <br/>';
                 echo '<span style="color:red">WARNING: This is NOT recommended. It will mess up the question for any student who has already attempted it, and any work they have done may look garbled when you view it</span></span>';
                 echo '<span class="formright"><input size="7" name="replacementid"/></span><br class="form"/>';
                 echo '</div>';
+                echo '</div>';
             } ?>
-        </div>
         <?php } ?>
         </div>
     </div>

@@ -457,3 +457,28 @@ i.fa-home{
 .padding-top-zero{
     padding-top: 0;
 }
+.margin-top-fifteen {
+    margin-top: 15px;
+}
+.right-five {
+right: 5px;
+}
+.right-fifteen {
+    right: 15px;
+}
+.left-fifteen {
+    left: 15px;
+}
+.left-twenty-eight {
+    left: 28px;
+}
+.margin-top-seven {
+margin-top: 7px;
+}
+.margin-bottom-fifteen {
+    margin-bottom: 15px;
+}
+.mod-question-form {
+    margin-left: -16px;
+    margin-top: 15px;
+}

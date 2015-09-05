@@ -24,7 +24,7 @@ function refreshTable() {
 }
 function generateMoveSelect(num,cnt) {
 	num++; //adjust indexing
-	var sel = "<select id="+num+" class='order-btn background-color-blue' onChange=\"moveitem2("+num+")\">";
+	var sel = "<select style='padding-left: 10px;' id="+num+" class='order-btn background-color-blue' onChange=\"moveitem2("+num+")\">";
 	for (var i=1; i<=cnt; i++) {
 		sel += "<option value=\""+i+"\" ";
 		if (i==num) {
@@ -311,7 +311,7 @@ function generateTable() {
 							html += "selected=1";
 						}
 						html += ">With</option></select> replacement";
-						html += "</td><td class=c><td><div class='btn-group settings setting-btn'> <a class='btn btn-primary disable-btn background-color-blue'>" +
+						html += "</td><td class=c><td><div class='btn-group settings setting-btn'> <a style='width: 72% !important;' class='btn btn-primary disable-btn background-color-blue'>" +
                         "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
                         "<ul class='dropdown-menu'>" +
                         "<li class=c><a href=\"#\" onclick=\"return removegrp('"+i+"');\"><i class='fa fa-trash-o fa-fw'></i></i> Remove</a></li>" ;//remove
@@ -367,9 +367,9 @@ function generateTable() {
 				curpt = curitems[j][4];
 			}
             //Action
-            html += "<td><div class='btn-group settings'> <a class='btn btn-primary disable-btn background-color-blue'>" +
+            html += "<td><div class='btn-group settings'> <a style='width: 72% !important;' class='btn btn-primary disable-btn background-color-blue'>" +
             "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
-            "<ul class='dropdown-menu'>" +
+            "<ul class='dropdown-menu' style='min-width: 92%;max-width: 92%;'>" +
             "<li class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Change</a></li>" ;//settings
             if (curitems[j][5]) {
                 html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Edit</a></li>";//edit
@@ -393,9 +393,9 @@ function generateTable() {
             html += "</ul></div></td>";
 
             if (beentaken) {
-                html += "<td><input style='width: 95% !important;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
+                html += "<td><input style='width: 95% !important;margin-left: -10px;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
             } else {
-                html += "<td><input style='width: 95% !important;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+                html += "<td><input style='width: 95% !important;margin-left: -10px;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
             }
 			html += "</tr>";
 			ln++;
