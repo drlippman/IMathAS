@@ -146,8 +146,8 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>">
     <input type="hidden" name="hasimg" value="<?php echo $line['hasimg'];?>"/>
     <div class="col-md-12">
-        Description:<BR>
-        <textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea>
+       <div class="col-md-2"> Description: </div>
+        <div class="col-md-10"><textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea></div>
     </div>
     <div class="col-md-12">
         <div>Author:</div>

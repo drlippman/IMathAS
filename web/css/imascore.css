@@ -682,3 +682,16 @@ div.multiselitem {
 	left: 0;
 	/*background: transparent url("img/cc.png") no-repeat right bottom;*/
 }
+.text-align-left {
+    text-align: left !important;
+}
+.width-hundread-per {
+    width: 100%;
+}
+.margin-thirty {
+    margin: 30px;
+}
+.categorize-question-form {
+margin-bottom: 23px;
+padding-top: 10px;
+}

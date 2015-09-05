@@ -833,10 +833,11 @@ class QuestionController extends AppController
     }
 
     public function actionCategorize(){
+        $this->layout = 'master';
         $params = $this->getRequestParams();
         $assessmentId = $params['aid'];
         $courseId = $params['cid'];
-
+        $course = Course::getById($courseId);
         if (isset($params['record'])) {
             $query = Questions::getByAssessmentId($assessmentId);
             foreach ($query as $row) {
@@ -894,7 +895,8 @@ class QuestionController extends AppController
         $this->includeJS(['question/categorize.js']);
         $responseArray = array('cid' => $courseId,'aid' => $assessmentId, 'itemarr' => $itemArray, 'descriptions' => $descriptions,'category' => $category,
             'outcomes' => $outcomes, 'outcomenames' => $outcomeNames, 'questionlibs' => $questionLibs, 'libnames' => $libNames,
-            'extracats' => $extraCats);
+            'extracats' => $extraCats,'course' => $course);
+//AppUtility::dump($responseArray);
         return $this->renderWithData('categorize',$responseArray);
     }
 

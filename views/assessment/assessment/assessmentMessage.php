@@ -23,30 +23,30 @@ $useeditor = "commonmsg"; ?>
             </div>
         </div>
     </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+<div class="tab-content shadowBox non-nav-tab-item end-assesment-shadowbox">
     <div class="col-lg-12">
             <?php
-                echo '<p>Base messages on: ';
-                    echo '<input type="radio" name="type" value="0" ';
+                echo '<div class="col-md-12 margin-bottom-twenty-five"><div class="col-md-2 margin-left-minus-thirty">Base messages on: </div>';
+                    echo '<div class="col-md-2"><input type="radio" name="type" value="0" ';
                     if ($endmsg['type']==0) { echo 'checked="checked"';}
-                    echo ' />Points <input type="radio" name="type" value="1" ';
+                    echo ' />&nbsp;&nbsp;Points </div> <div class="col-md-2"><input type="radio" name="type" value="1" ';
                     if ($endmsg['type']==1) { echo 'checked="checked"';}
-                    echo ' />Percents</p>';
-                    echo '<table class="assesment-msg-table"><thead><tr><th>If score is at least</th><th>Display this message</th></tr></thead><tbody>';
+                    echo ' />&nbsp;&nbsp;Percents</div></div>';
+                    echo '<table class="assesment-msg-table col-md-12"><thead><tr><th class="col-md-3">If score is at least</th><th class="col-md-9">Display this message</th></tr></thead><tbody>';
                     $i=1;
                     foreach($endmsg['msgs'] as $sc=>$msg) {
                         $msg = str_replace('"','&quot;',$msg);
-                        echo "<tr><td><input  type=\"text\" size=\"4\" class='form-control' name=\"sc[$i]\" value=\"$sc\"/></td>";
-                        echo "<td><input type=\"text\" size=\"80\" class='form-control' name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
+                        echo "<tr><td><input  type=\"text\" size=\"4\" class='col-md-3 form-control' name=\"sc[$i]\" value=\"$sc\"/></td>";
+                        echo "<td class='padding-left-fifteen'><input type=\"text\" size=\"80\" class='col-md-9 form-control' name=\"msg[$i]\" value=\"$msg\" /></td></tr>";
                         $i++;
                     }
                     for ($j=0;$j<10;$j++) {
-                        echo "<tr><td><input type=\"text\" size=\"4\" class='col-md-2 form-control' name=\"sc[$i]\" value=\"\"/></td>";
-                        echo "<td><input type=\"text\" size=\"80\" class='col-md-10 form-control' name=\"msg[$i]\" value=\"\" /></td></tr>";
+                        echo "<tr><td><input type=\"text\" size=\"4\" class='col-md-3 form-control' name=\"sc[$i]\" value=\"\"/></td>";
+                        echo "<td class='padding-left-fifteen'><input type=\"text\" size=\"80\" class='col-md-9 form-control' name=\"msg[$i]\" value=\"\" /></td></tr>";
                         $i++;
                     }
                     echo "<tr><td>Otherwise, show:</td>";
-                    echo "<td><input type=\"text\" size=\"80\" class='form-control' name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
+                    echo "<td class='padding-left-fifteen'><input type=\"text\" size=\"80\" class='col-md-12 form-control' name=\"msg[0]\" value=\"{$endmsg['def']}\" /></td></tr>";
                     echo '</tbody></table>';
 
                     echo '<p>After the score-specific message, display this text to everyone:</p>';

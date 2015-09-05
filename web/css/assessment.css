@@ -25,3 +25,24 @@ table.assesment-msg-table thead th {
     text-align: center;
     z-index: 20;
 }
+.width-hundread-per {
+    width: 100%;
+}
+.margin-left-minus-thirty {
+    margin-left: -30px;
+}
+.padding-left-fifteen {
+padding-left: 15px !important;
+}
+
+.end-assesment-shadowbox {
+    padding: 15px;
+    padding-top: 23px;
+    padding-bottom: 18px;
+}
+.margin-bottom-twenty-five {
+margin-bottom: 25px;
+}
+.end-assesment-shadowbox td, .end-assesment-shadowbox th {
+padding: 7px 0px 7px 0px;
+}

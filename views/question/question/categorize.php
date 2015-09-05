@@ -1,12 +1,45 @@
 <?php
-    echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
-    echo "<form method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+use app\components\AppUtility;
+use app\components\AppConstant;
+
+/* @var $this yii\web\View */
+/* @var $form yii\bootstrap\ActiveForm */
+/* @var $model app\models\RegisterModel */
+
+$this->title = 'Categorize Questions';
+$this->params['breadcrumbs'][] = $this->title;
+//echo '<div id="headercategorize" class="pagetitle"><h2>Categorize Questions</h2></div>';
+?>
+ <div class="item-detail-header">
+     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Add/Remove Questions'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'question/question/add-questions?aid='.$aid.'&cid='.$cid]]); ?>
+<!--        --><?php //echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
+ </div>
+ <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+ </div>
+<?php
+    echo '<div class="tab-content shadowBox non-nav-tab-item">';
+    echo "<form class='margin-thirty categorize-question-form' method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
     echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
     echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-    echo '<table class="gb"><thead><tr><th></th><th>Description</th><th>Category</th></tr></thead><tbody>';
-
+    echo '<table class="width-hundread-per"><thead><tr><th class="text-align-left"><input type="checkbox" name="" value=""></th><th class="text-align-left">Description</th><th class="text-align-left">Category</th></tr></thead><tbody>';
+    $alt = AppConstant::NUMERIC_ZERO;
     foreach($itemarr as $qid) {
-        echo "<tr><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+        if ($alt == AppConstant::NUMERIC_ZERO) {
+        echo "<tr class='even'><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+            $alt = AppConstant::NUMERIC_ONE;
+        }else{
+            echo "<tr class='odd'><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+            $alt = AppConstant::NUMERIC_ZERO;
+        }
+
+
         echo "<td>{$descriptions[$qid]}</td><td>";
         echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
         echo "<option value=\"0\" ";
@@ -19,31 +52,36 @@
         }
         $ingrp = false;
         $issel = false;
-        foreach ($outcomes as $oc) {
-            if ($oc[1]==1) {//is group
-                if ($ingrp) {
-                    echo '</optgroup>';
+        if($outcomes){
+            foreach ($outcomes as $oc) {
+                if ($oc[1]==1) {//is group
+                    if ($ingrp) {
+                        echo '</optgroup>';
+                    }
+                    echo '<optgroup label="'.htmlentities($oc[0]).'">';
+                    $ingrp = true;
+                } else {
+                    echo '<option value="'.$oc[0].'" ';
+                    if ($category[$qid] == $oc[0]) {
+                        echo "selected=1"; $issel = true;
+                    }
+                    echo '>'.$outcomenames[$oc[0]].'</option>';
                 }
-                echo '<optgroup label="'.htmlentities($oc[0]).'">';
-                $ingrp = true;
-            } else {
-                echo '<option value="'.$oc[0].'" ';
-                if ($category[$qid] == $oc[0]) {
-                    echo "selected=1"; $issel = true;
-                }
-                echo '>'.$outcomenames[$oc[0]].'</option>';
             }
         }
+
         if ($ingrp) {
             echo '</optgroup>';
         }
         echo '<optgroup label="Libraries">';
-        foreach ($questionlibs[$qid] as $qlibid) {
-            echo "<option value=\"{$libnames[$qlibid]}\" ";
-            if ($category[$qid] == $libnames[$qlibid] && !$issel) {
-                echo "selected=1"; $issel= true;
+        if($questionlibs[$qid]){
+            foreach ($questionlibs[$qid] as $qlibid) {
+                echo "<option value=\"{$libnames[$qlibid]}\" ";
+                if ($category[$qid] == $libnames[$qlibid] && !$issel) {
+                    echo "selected=1"; $issel= true;
+                }
+                echo ">{$libnames[$qlibid]}</option>\n";
             }
-            echo ">{$libnames[$qlibid]}</option>\n";
         }
         echo '</optgroup><optgroup label="Custom">';
         foreach ($extracats as $cat) {
@@ -80,4 +118,5 @@
     echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
     echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
     echo "</form>\n";
+echo"</div>";
 ?>
