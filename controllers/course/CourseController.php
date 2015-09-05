@@ -959,9 +959,10 @@ class CourseController extends AppController
         if ($key > AppConstant::NUMERIC_ZERO) {//there were outcomes
             $query = $course['outcomes'];
             $outcomeArray = unserialize($query);
-            $result = $this->flatArray($outcomeArray);
-            if ($result) {
-                foreach ($result as $singlePage) {
+            global $outcomesList;
+             $this->flatArray($outcomeArray);
+            if ($outcomesList) {
+                foreach ($outcomesList as $singlePage) {
                     array_push($pageOutcomesList, $singlePage);
                 }
             }
@@ -973,17 +974,17 @@ class CourseController extends AppController
             $gbcatsLabel[$key] = $group['name'];
             $key++;
         }
-        $toolsData = ExternalTools::externalToolsData($courseId);
+        $toolsData = ExternalTools::externalToolsDataForLink($courseId,$user['groupid']);
         $toolvals = array();
         $toolvals[0] = AppConstant::NUMERIC_ZERO;
         $key = AppConstant::NUMERIC_ONE;
         foreach ($toolsData as $tool) {
             $toolvals[$key++] = $tool['id'];
-
         }
         $toollabels[0] = 'Select a tool...';
         $key = AppConstant::NUMERIC_ONE;
-        foreach ($toolsData as $tool) {
+        foreach ($toolsData as $tool)
+        {
             $toollabels[$key++] = $tool['name'];
         }
         if ($params['id']) {
@@ -1277,17 +1278,17 @@ class CourseController extends AppController
 
     public function flatArray($outcomesData)
     {
-        global $pageOutcomesList;
+        global $outcomesList;
         if ($outcomesData) {
             foreach ($outcomesData as $singleData) {
                 if (is_array($singleData)) { //outcome group
-                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $outcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
                     $this->flatArray($singleData['outcomes']);
                 } else {
-                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                    $outcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
                 }
             }
         }
-        return $pageOutcomesList;
+        return $outcomesList;
     }
 }

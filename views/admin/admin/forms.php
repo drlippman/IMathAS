@@ -1,9 +1,22 @@
 <?php
 use app\components\AppUtility;
-if (!isset($_GET['cid'])) {
-    echo "<div class=breadcrumb>$breadcrumbbase <a href=\"admin.php\">Admin</a> &gt; Form</div>\n";
-}
-
+$this->title = AppUtility::t('Form',false);
+if (!isset($params['cid'])) {
+?>
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+</div>
+<?php } ?>
+    <div class="title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?> </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content shadowBox non-nav-tab-item ">
+        <br><div class="change-assessment">
+<?php
 switch($action) {
     case "delete":
         $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
@@ -715,13 +728,11 @@ switch($action) {
         break;
 
     case "listgroups":
-
         echo '<div id="headerforms" class="pagetitle">';
         echo "<h3>Modify Groups</h3>\n";
         echo '</div>';
-        echo "<table><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
+        echo "<table class='table table-bordered table-striped table-hover data-table'><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
         foreach($groupsName as $row) {
-
             echo "<tr><td>{$row['name']}</td>"; ?>
               <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>">Modify</a></td>
             <?php if ($row['id']==0) {
@@ -731,7 +742,6 @@ switch($action) {
            <?php }
             echo "</tr>\n";
         }
-
         echo "</table>\n"; ?>
          <form method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=addgroup');?>">
         <?php  echo "Add new group: <input type=text name=gpname id=gpname size=50><br/>\n";
@@ -752,7 +762,6 @@ switch($action) {
         echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
         break;
 }
-
-
 ?>
-
+             </div>
+</div>

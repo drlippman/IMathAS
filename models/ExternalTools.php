@@ -182,4 +182,12 @@ class ExternalTools extends BaseImasExternalTools
         $query = \Yii::$app->db->createCommand("SELECT name FROM imas_external_tools WHERE id='$id'")->queryOne();
         return $query;
     }
+
+    public static function externalToolsDataForLink($courseId,$groupId)
+    {
+        $query = "SELECT id,name FROM imas_external_tools WHERE courseid= '$courseId' ";
+        $query .= "OR (courseid=0 AND (groupid='$groupId' OR groupid=0)) ORDER BY name";
+        $groupNames  = \Yii::$app->db->createCommand($query)->queryAll();
+        return $groupNames;
+    }
 }
