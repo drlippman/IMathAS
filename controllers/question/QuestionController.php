@@ -94,7 +94,7 @@ class QuestionController extends AppController
                     $overwriteBody = AppConstant::NUMERIC_ONE;
                     $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId).">Go back</a>";
                 } else if (isset($params['add'])) {
-                    require dirname(__FILE__) . '/modquestiongrid.php';
+                    include("../views/question/question/modQuestionGrid.php");
                     if (isset($params['process'])) {
                         return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                     }
@@ -150,7 +150,7 @@ class QuestionController extends AppController
                     $overwriteBody = AppConstant::NUMERIC_ONE;
                     $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId).">Go back</a>\n";
                 } else {
-                    include("modquestiongrid.php");
+                    include("../views/question/question/modQuestionGrid.php");
                     if (isset($params['process'])) {
                         return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId));
                     }
@@ -1839,12 +1839,10 @@ class QuestionController extends AppController
              */
             $vidData = addslashes(serialize($newviddata));
         }
-
         /*
          * delete any removed questions
          */
-        $ids = implode(',',$toRemove);
-        Questions::deleteById($ids);
+        Questions::deleteById($toRemove);
         /*
          * store new itemorder
          */
@@ -1874,6 +1872,11 @@ class QuestionController extends AppController
         } else {
             echo "Error";
         }
+    }
+
+    public function ModQuestionGrid(){
+        return $this->layout = 'master';
+//        return $this->render('modQuestionGrid');
     }
 
     public function actionShowTest(){

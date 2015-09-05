@@ -268,8 +268,8 @@ class Questions extends BaseImasQuestions
         }
     }
 
-    public static function deleteById($id){
-        $data = Questions::getByIdList($id);
+    public static function deleteById($ids){
+        $data = Questions::getByIdList($ids);
         if($data){
             foreach($data as $singleData){
                 $singleData->delete();
