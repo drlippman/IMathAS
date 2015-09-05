@@ -148,7 +148,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo 'No Tools defined yet<br/><br>';
             }
             if (!isset($CFG['GEN']['noInstrExternalTools'])) { ?>
-                <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id) ?>">Add or
+                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/external-tool?cid=' . $course->id) ?>">Add or
                     edit an external tool</a>
             <?php }
             ?>

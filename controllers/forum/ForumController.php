@@ -1091,12 +1091,14 @@ class ForumController extends AppController
                 $key++;
             }
         }
+
         $pageOutcomesList = array();
         $query = $course['outcomes'];
         $outcomeArray = unserialize($query);
-        $result = $this->flatArray($outcomeArray);
-        if ($result) {
-            foreach ($result as $singlePage) {
+        global $outcomesList;
+         $this->flatArray($outcomeArray);
+        if ($outcomesList) {
+            foreach ($outcomesList as $singlePage) {
                 array_push($pageOutcomesList, $singlePage);
             }
         }
@@ -1385,17 +1387,17 @@ class ForumController extends AppController
 
     public function flatArray($outcomesData)
     {
+        global $outcomesList;
         if ($outcomesData) {
             foreach ($outcomesData as $singleData) {
                 if (is_array($singleData)) { //outcome group
-                    $pageOutcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
+                    $outcomesList[] = array($singleData['name'], AppConstant::NUMERIC_ONE);
                     $this->flatArray($singleData['outcomes']);
                 } else {
-                    $pageOutcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
+                    $outcomesList[] = array($singleData, AppConstant::NUMERIC_ZERO);
                 }
             }
         }
-        return $pageOutcomesList;
     }
 
   public function actionChangeForum()
