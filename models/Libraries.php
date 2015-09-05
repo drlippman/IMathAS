@@ -52,4 +52,12 @@ class Libraries extends BaseImasLibraries
             }
         }
     }
+
+    public static function getQidAndLibID($aid){
+        $query = "SELECT imas_questions.id,imas_libraries.id AS libid,imas_libraries.name FROM imas_questions,imas_library_items,imas_libraries ";
+        $query .= "WHERE imas_questions.assessmentid='$aid' AND imas_questions.questionsetid=imas_library_items.qsetid AND ";
+        $query .= "imas_library_items.libid=imas_libraries.id ORDER BY imas_questions.id";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

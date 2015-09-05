@@ -7,145 +7,147 @@
  use app\controllers\AppController;
 //IMathAS:  Modify a question's settings in an assessment: grid for multiple.  Included in addquestions.php
 //(c) 2006 David Lippman
-// $teacherId = $this->isTeacher($userId,$courseId);
 	if (!(isset($teacherId))) {
 		echo "This page cannot be accessed directly";
 		exit;
 	}
-	if ($_GET['process']== true) {
-		if (isset($_POST['add'])) { //adding new questions
-			$query = Assessments::getByAssessmentId($aid);
-			$itemorder = $query['itemorder'];
-			$viddata = $query['viddata'];
-			$newitemorder = '';
-			if (isset($_POST['addasgroup'])) {
-				$newitemorder = '1|0';
+	if ($params['process']== true) {
+		if (isset($params['add'])) {
+		    /*
+		     * adding new questions
+		     */
+			$query = Assessments::getByAssessmentId($assessmentId);
+			$itemOrder = $query['itemorder'];
+			$vidData = $query['viddata'];
+			$newItemOrder = '';
+			if (isset($params['addasgroup'])) {
+				$newItemOrder = '1|0';
 			}
-			foreach (explode(',',$_POST['qsetids']) as $qsetid) {
-				for ($i=0; $i<$_POST['copies'.$qsetid];$i++) {
-					$points = trim($_POST['points'.$qsetid]);
-					$attempts = trim($_POST['attempts'.$qsetid]);
-					$showhints = intval($_POST['showhints'.$qsetid]);
+			foreach (explode(',',$params['qsetids']) as $questionSetId) {
+				for ($i=0; $i<$params['copies'.$questionSetId];$i++) {
+					$points = trim($params['points'.$questionSetId]);
+					$attempts = trim($params['attempts'.$questionSetId]);
+					$showHints = intval($params['showhints'.$questionSetId]);
 					if ($points=='') { $points = 9999;}
 					if ($attempts=='') {$attempts = 9999;}
-					if ($points==9999 && isset($_POST['pointsforparts']) && $_POST['qparts'.$qsetid]>1) {
-						$points = intval($_POST['qparts'.$qsetid]);
+					if ($points==9999 && isset($params['pointsforparts']) && $params['qparts'.$questionSetId]>1) {
+						$points = intval($params['qparts'.$questionSetId]);
 					}
                     $question = new Questions();
                     $questionArray = array();
-                    $questionArray['assessmentid'] = $aid;
+                    $questionArray['assessmentid'] = $assessmentId;
                     $questionArray['points'] = $points;
                     $questionArray['attempts'] = $attempts;
-                    $questionArray['showhints'] = $showhints;
+                    $questionArray['showhints'] = $showHints;
                     $questionArray['penalty'] = AppConstant::QUARTER_NINE;
                     $questionArray['regen'] = AppConstant::NUMERIC_ZERO;
                     $questionArray['showans'] = AppConstant::NUMERIC_ZERO;
-                    $questionArray['questionsetid'] = $qsetid;
+                    $questionArray['questionsetid'] = $questionSetId;
                     $qid = $question->addQuestions($questionArray);
-					if ($newitemorder=='') {
-						$newitemorder = $qid;
+					if ($newItemOrder=='') {
+						$newItemOrder = $qid;
 					} else {
-						if (isset($_POST['addasgroup'])) {
-							$newitemorder = $newitemorder . "~$qid";
+						if (isset($params['addasgroup'])) {
+							$newItemOrder = $newItemOrder . "~$qid";
 						} else {
-							$newitemorder = $newitemorder . ",$qid";
+							$newItemOrder = $newItemOrder . ",$qid";
 						}
 					}
 				}
 			}
 			
-			if ($viddata != '') {
-				if ($itemorder=='') {
-					$nextnum = 0;
+			if ($vidData != '') {
+				if ($itemOrder=='') {
+					$nextNum = 0;
 				} else {
-					$nextnum = substr_count($itemorder,',')+1;
+					$nextNum = substr_count($itemOrder,',')+1;
 				}
-				$numnew= substr_count($newitemorder,',')+1;
-				$viddata = unserialize($viddata);
-				if (!isset($viddata[count($viddata)-1][1])) {
-					$finalseg = array_pop($viddata);
+				$numNew= substr_count($newItemOrder,',')+1;
+				$vidData = unserialize($vidData);
+				if (!isset($vidData[count($vidData)-1][1])) {
+					$finalSeg = array_pop($vidData);
 				} else {
-					$finalseg = '';
+					$finalSeg = '';
 				}
-				for ($i=$nextnum;$i<$nextnum+$numnew;$i++) {
-					$viddata[] = array('','',$i);
+				for ($i=$nextNum;$i<$nextNum+$numNew;$i++) {
+					$vidData[] = array('','',$i);
 				}
-				if ($finalseg != '') {
-					$viddata[] = $finalseg;
+				if ($finalSeg != '') {
+					$vidData[] = $finalSeg;
 				}
-				$viddata = addslashes(serialize($viddata));
+				$vidData = addslashes(serialize($vidData));
 			}
 			
-			if ($itemorder == '') {
-				$itemorder = $newitemorder;
+			if ($itemOrder == '') {
+				$itemOrder = $newItemOrder;
 			} else {
-				$itemorder .= ','.$newitemorder;
+				$itemOrder .= ','.$newItemOrder;
 			}
-            Assessments::setVidData($itemorder, $viddata, $aid);
-		} else if (isset($_POST['mod'])) { //modifying existing
+            Assessments::setVidData($itemOrder, $vidData, $assessmentId);
+		} else if (isset($params['mod'])) { //modifying existing
 			
-			$query = Assessments::getByAssessmentId($aid);
-			$itemorder = $query['itemorder'];
+			$query = Assessments::getByAssessmentId($assessmentId);
+			$itemOrder = $query['itemorder'];
 			
 			//what qsetids do we need for adding copies?
-			$lookupid = array();
-			foreach(explode(',',$_POST['qids']) as $qid) {
-				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
-					$lookupid[] = intval($qid);
+			$lookupId = array();
+			foreach(explode(',',$params['qids']) as $qid) {
+				if (intval($params['copies'.$qid])>0 && intval($qid)>0) {
+					$lookupId[] = intval($qid);
 				}
 			}
 			//lookup qsetids
-			$qidtoqsetid = array();
-			if (count($lookupid)>0) {
-				$query = Questions::getByIdList($lookupid);
+			$qidToQSetId = array();
+			if (count($lookupId)>0) {
+				$query = Questions::getByIdList($lookupId);
 				foreach ($query as $row) {
-					$qidtoqsetid[$row['id']] = $row['questionsetid'];
+					$qidToQSetId[$row['id']] = $row['questionsetid'];
 				}
 			}
 
-			foreach(explode(',',$_POST['qids']) as $qid) {
-				$points = trim($_POST['points'.$qid]);
-				$attempts = trim($_POST['attempts'.$qid]);
-				$showhints = intval($_POST['showhints'.$qid]);
+			foreach(explode(',',$params['qids']) as $qid) {
+				$points = trim($params['points'.$qid]);
+				$attempts = trim($params['attempts'.$qid]);
+				$showHints = intval($params['showhints'.$qid]);
 				if ($points=='') { $points = 9999;}
 				if ($attempts=='') {$attempts = 9999;}
                 $tempArray = array();
                 $tempArray['points'] = $points;
                 $tempArray['attempts'] = $attempts;
-                $tempArray['showhints'] = $showhints;
+                $tempArray['showhints'] = $showHints;
 				Questions::updateQuestionFields($tempArray, $qid);
                 $addQuestions = array();
-				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
-					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
-						$qsetid = $qidtoqsetid[$qid];
-                        $addQuestions['assessmentid'] = $aid;
+				if (intval($params['copies'.$qid])>0 && intval($qid)>0) {
+					for ($i=0;$i<intval($params['copies'.$qid]);$i++) {
+						$questionSetId = $qidToQSetId[$qid];
+                        $addQuestions['assessmentid'] = $assessmentId;
                         $addQuestions['points'] = $points;
                         $addQuestions['attempts'] = $attempts;
-                        $addQuestions['showhints'] = $showhints;
+                        $addQuestions['showhints'] = $showHints;
                         $addQuestions['penalty'] = '9999';
                         $addQuestions['regen'] = AppConstant::NUMERIC_ZERO;
                         $addQuestions['showans'] = AppConstant::NUMERIC_ZERO;
-                        $addQuestions['questionsetid'] = $qsetid;
+                        $addQuestions['questionsetid'] = $questionSetId;
                         $question = new Questions();
-                        $newqid = $question->addQuestions($addQuestions);
+                        $newQid = $question->addQuestions($addQuestions);
 
-						$itemarr = explode(',',$itemorder);
-						$key = array_search($qid,$itemarr);
+						$itemArray = explode(',',$itemOrder);
+						$key = array_search($qid,$itemArray);
 						if ($key===false) {
-							$itemarr[] = $newqid;
+							$itemArray[] = $newQid;
 						} else {
-							array_splice($itemarr,$key+1,0,$newqid);
+							array_splice($itemArray,$key+1,0,$newQid);
 						}
-						$itemorder = implode(',',$itemarr);
+						$itemOrder = implode(',',$itemArray);
 					}
 				}
 			}
-			Assessments::setItemOrder($itemorder, $aid);
+			Assessments::setItemOrder($itemOrder, $assessmentId);
 		}
 	} else {
 		$pagetitle = "Question Settings";
-//		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$cid\">$coursename</a> ";
-//		echo "&gt; <a href=\"addquestions.php?aid=$aid&cid=$cid\">Add/Remove Questions</a> &gt; ";
+//		echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid=$courseId\">$coursename</a> ";
+//		echo "&gt; <a href=\"addquestions.php?aid=$assessmentId&cid=$courseId\">Add/Remove Questions</a> &gt; ";
 		
 //		echo "Question Settings</div>\n";
 	
@@ -153,24 +155,24 @@
 <div id="headermodquestiongrid" class="pagetitle"><h2>Modify Question Settings</h2></div>
 <p>For more advanced settings, modify the settings for individual questions after adding.
 <?php
-if (isset($_POST['checked'])) { //modifying existing
-	echo "<form method=post action=\"add-questions?modqs=true&process=true&cid=$cid&aid=$aid\">";
+if (isset($params['checked'])) { //modifying existing
+	echo "<form method=post action=\"add-questions?modqs=true&process=true&cid=$courseId&aid=$assessmentId\">";
 } else {
-	echo "<form method=post action=\"add-questions?addset=true&process=true&cid=$cid&aid=$aid\">";
+	echo "<form method=post action=\"add-questions?addset=true&process=true&cid=$courseId&aid=$assessmentId\">";
 }
 ?>
 Leave items blank to use the assessment's default values<br/>
 <table class=gb>
 <thead><tr>
 <?php
-		if (isset($_POST['checked'])) { //modifying existing questions
+		if (isset($params['checked'])) { //modifying existing questions
 			
 			$qids = array();
-			foreach ($_POST['checked'] as $k=>$v) {
+			foreach ($params['checked'] as $k=>$v) {
 				$v = explode(':',$v);
 				$qids[] = $v[1];
 			}
-			$qrows = array();
+			$qRows = array();
             $query = Questions::retrieveQuestionData($qids);
 
 			foreach ($query as $row) {
@@ -181,54 +183,54 @@ Leave items blank to use the assessment's default values<br/>
 					$row['attempts'] = '';
 				}
 				
-				$qrows[$row['id']] = '<tr><td>'.$row['description'].'</td>';
-				$qrows[$row['id']] .= '<td>';
+				$qRows[$row['id']] = '<tr><td>'.$row['description'].'</td>';
+				$qRows[$row['id']] .= '<td>';
 				if ($row['extref']!='') {
-					$extref = explode('~~',$row['extref']);
-					$hasvid = false;  $hasother = false;
-					foreach ($extref as $v) {
+					$extRef = explode('~~',$row['extref']);
+					$hasVideo = false;  $hasOther = false;
+					foreach ($extRef as $v) {
 						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
-							$hasvid = true;
+							$hasVideo = true;
 						} else {
-							$hasother = true;
+							$hasOther = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
-					if ($hasvid) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/video_tiny.png\"/>";
+					$pageQuestionTable[$i]['extref'] = '';
+					if ($hasVideo) {
+						$qRows[$row['id']] .= "<img src=".AppUtility::getHomeURL().'img/video_tiny.png'.">";
 					}
-					if ($hasother) {
-						$qrows[$row['id']] .= "<img src=\"$imasroot/img/html_tiny.png\"/>";
+					if ($hasOther) {
+						$qRows[$row['id']] .= "<img src=".AppUtility::getHomeURL().'img/html_tiny.png'.">";
 					}
 				} 
-				$qrows[$row['id']] .= '</td>';
-				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
-				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
-				$qrows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
-				$qrows[$row['id']] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
-				$qrows[$row['id']] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
-				$qrows[$row['id']] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
-				$qrows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
-				$qrows[$row['id']] .= '</tr>';
+				$qRows[$row['id']] .= '</td>';
+				$qRows[$row['id']] .= "<td><input type=text size=4 name=\"points{$row['id']}\" value=\"{$row['points']}\" /></td>";
+				$qRows[$row['id']] .= "<td><input type=text size=4 name=\"attempts{$row['id']}\" value=\"{$row['attempts']}\" /></td>";
+				$qRows[$row['id']] .= "<td><select name=\"showhints{$row['id']}\">";
+				$qRows[$row['id']] .= '<option value="0" '.(($row[4]==0)?'selected="selected"':'').'>Use Default</option>';
+				$qRows[$row['id']] .= '<option value="1" '.(($row[4]==1)?'selected="selected"':'').'>No</option>';
+				$qRows[$row['id']] .= '<option value="2" '.(($row[4]==2)?'selected="selected"':'').'>Yes</option></select></td>';
+				$qRows[$row['id']] .= "<td><input type=text size=4 name=\"copies{$row['id']}\" value=\"0\" /></td>";
+				$qRows[$row['id']] .= '</tr>';
 			} 
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Additional Copies to Add</th></tr></thead>";
 			echo "<tbody>";
 
-			$query = Assessments::getByAssessmentId($aid);
-			$itemorder = explode(',', $query['itemorder']);
-			foreach ($itemorder as $item) {
+			$query = Assessments::getByAssessmentId($assessmentId);
+			$itemOrder = explode(',', $query['itemorder']);
+			foreach ($itemOrder as $item) {
 				if (strpos($item,'~')!==false) {
 					$subs = explode('~',$item);
 					if (strpos($subs[0],'|')!==false) {
 						array_shift($subs);
 					}
 					foreach ($subs as $sub) {
-						if (isset($qrows[$sub])) {
-							echo $qrows[$sub];
+						if (isset($qRows[$sub])) {
+							echo $qRows[$sub];
 						}
 					}
-				} else if (isset($qrows[$item])) {
-					echo $qrows[$item];
+				} else if (isset($qRows[$item])) {
+					echo $qRows[$item];
 				}	
 			}
 			
@@ -241,8 +243,7 @@ Leave items blank to use the assessment's default values<br/>
 		} else { //adding new questions
 			echo "<th>Description</th><th></th><th>Points</th><th>Attempts (0 for unlimited)</th><th>Show hints &amp; video buttons?</th><th>Number of Copies to Add</th></tr></thead>";
 			echo "<tbody>";
-			$query = QuestionSet::getQuestionSetData($_POST['nchecked']);
-			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$query = QuestionSet::getQuestionSetData($params['nchecked']);
 			foreach ($query as $row) {
 				if ($row['qtype']=='multipart') {
 					preg_match('/anstypes\s*=(.*)/',$row['control'],$match);
@@ -252,21 +253,21 @@ Leave items blank to use the assessment's default values<br/>
 				}
 				echo '<tr><td>'.$row['description'].'</td>';
 				if ($row['extref']!='') {
-					$extref = explode('~~',$row['extref']);
-					$hasvid = false;  $hasother = false;
-					foreach ($extref as $v) {
+					$extRef = explode('~~',$row['extref']);
+					$hasVideo = false;  $hasOther = false;
+					foreach ($extRef as $v) {
 						if (substr($v,0,5)=="Video" || strpos($v,'youtube.com')!==false) {
-							$hasvid = true;
+							$hasVideo = true;
 						} else {
-							$hasother = true;
+							$hasOther = true;
 						}
 					}
-					$page_questionTable[$i]['extref'] = '';
-					if ($hasvid) {
-						echo "<td><img src=\"$imasroot/img/video_tiny.png\"/></td>";
+					$pageQuestionTable[$i]['extref'] = '';
+					if ($hasVideo) {
+						echo "<td><img src=".AppUtility::getHomeURL().'img/video_tiny.png'."></td>";
 					}
-					if ($hasother) {
-						echo "<td><img src=\"$imasroot/img/html_tiny.png\"/></td>";
+					if ($hasOther) {
+						echo "<td><img src=".AppUtility::getHomeURL().'img/html_tiny.png'."/></td>";
 					}
 				} else {
 					echo '<td></td>';
@@ -282,7 +283,7 @@ Leave items blank to use the assessment's default values<br/>
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
-			echo '<input type=hidden name="qsetids" value="'.implode(',',$_POST['nchecked']).'" />';
+			echo '<input type=hidden name="qsetids" value="'.implode(',',$params['nchecked']).'" />';
 			echo '<input type=hidden name="add" value="true" />';
 			
 			echo '<p><input type=checkbox name="addasgroup" value="1" /> Add as a question group?</p>';

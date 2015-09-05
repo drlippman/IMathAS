@@ -251,11 +251,17 @@ class QuestionSet extends BaseImasQuestionset
     public static function getIdAndAvgTime()
     {
         $data = new Query();
-        $data ->select(['avgtime','id'])
+        $data->select(['avgtime', 'id'])
             ->from(['imas_questionset']);
         $command = $data->createCommand();
         $data = $command->queryAll();
         return $data;
-    }
 
+    }
+    public static function getQuestionData($aid){
+        $query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+        $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 } 

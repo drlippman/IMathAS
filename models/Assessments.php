@@ -489,4 +489,8 @@ class Assessments extends BaseImasAssessments
         return $rowCount;
 
     }
+
+    public static function getItemOrderById($assessmentId){
+        return Assessments::find()->select('itemorder')->where(['id' => $assessmentId])->one();
+    }
 }

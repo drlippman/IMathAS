@@ -140,7 +140,7 @@ class Course extends BaseImasCourses {
     }
 
     public static function getOutcome($courseId){
-        return Course::find()->select('outcomes')->where(['id' => $courseId])->all();
+        return Course::find()->select('outcomes')->where(['id' => $courseId])->one();
     }
 
     public function SaveOutcomes($courseId,$outcomeGrp)

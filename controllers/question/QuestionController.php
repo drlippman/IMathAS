@@ -833,7 +833,84 @@ class QuestionController extends AppController
     }
 
     public function actionCategorize(){
-        return  $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
+        $params = $this->getRequestParams();
+        $assessmentId = $params['aid'];
+        $courseId = $params['cid'];
+
+        if (isset($params['record'])) {
+            $query = Questions::getByAssessmentId($assessmentId);
+            foreach ($query as $row) {
+                if ($row['category'] != $params[$row['id']]) {
+                    Questions::updateQuestionFields($params[$row['id']], $row['id']);
+                }
+            }
+            return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
+        }
+        $query = Outcomes::getByCourse($courseId);
+        $outcomeNames = array();
+        foreach ($query as $row) {
+            $outcomeNames[$row['id']] = $row['name'];
+        }
+        $query = Course::getOutcome($courseId);
+        if ($query['outcomes']=='') {
+            $outcomeArray = array();
+        } else {
+            $outcomeArray = unserialize($query['outcomes']);
+        }
+        global $outcomes;
+        if($outcomeArray){
+            $this->flattenarr($outcomeArray);
+        }
+        $query  = Libraries::getQidAndLibID($assessmentId);
+        $libNames = array();
+        $questionLibs = array();
+        foreach ($query as $row) {
+            $questionLibs[$row['id']][] = $row['libid'];
+            $libNames[$row['libid']] = $row['name'];
+        }
+        $query = QuestionSet::getQuestionData($assessmentId);
+
+        $descriptions = array();
+        $category = array();
+        $extraCats = array();
+        foreach ($query as $line) {
+            $descriptions[$line['id']] = $line['description'];
+            $category[$line['id']] = $line['category'];
+            if (!is_numeric($line['category']) && trim($line['category'])!='' && !in_array($line['category'],$extraCats)) {
+                $extraCats[] = $line['category'];
+            }
+        }
+
+        $query = Assessments::getItemOrderById($assessmentId);
+        $itemArray = explode(',',$query['itemorder']);
+        foreach ($itemArray as $k=>$v) {
+            if (($p=strpos($v,'~'))!==false) {
+                $itemArray[$k] = substr($v,$p+1);
+            }
+        }
+        $itemArray = implode(',',$itemArray);
+        $itemArray = str_replace('~',',',$itemArray);
+        $itemArray = explode(',', $itemArray);
+        $this->includeJS(['question/categorize.js']);
+        $responseArray = array('cid' => $courseId,'aid' => $assessmentId, 'itemarr' => $itemArray, 'descriptions' => $descriptions,'category' => $category,
+            'outcomes' => $outcomes, 'outcomenames' => $outcomeNames, 'questionlibs' => $questionLibs, 'libnames' => $libNames,
+            'extracats' => $extraCats);
+        return $this->renderWithData('categorize',$responseArray);
+    }
+
+    public function flattenarr($ar) {
+        global $outcomes;
+        foreach ($ar as $v) {
+            if (is_array($v)) {
+            /*
+             * outcome group
+             */
+                $outcomes[] = array($v['name'], AppConstant::NUMERIC_ONE);
+                $this->flattenarr($v['outcomes']);
+            } else {
+                $outcomes[] = array($v, AppConstant::NUMERIC_ZERO);
+            }
+        }
     }
 
     public function actionPrintTest(){
@@ -1493,10 +1570,10 @@ class QuestionController extends AppController
                         $qid = $question->addQuestions($questionArray);
                         //add to itemorder
                         if (isset($params['id'])) { //am adding copies of existing  
-                            $itemarr = explode(',',$itemOrder);
-                            $key = array_search($params['id'],$itemarr);
-                            array_splice($itemarr,$key+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qid);
-                            $itemOrder = implode(',',$itemarr);
+                            $itemArray = explode(',',$itemOrder);
+                            $key = array_search($params['id'],$itemArray);
+                            array_splice($itemArray,$key+AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO,$qid);
+                            $itemOrder = implode(',',$itemArray);
                         } else {
                             if ($itemOrder=='') {
                                 $itemOrder = $qid;
