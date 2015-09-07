@@ -916,11 +916,25 @@ class QuestionController extends AppController
     }
 
     public function actionPrintTest(){
-        return  $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
-    }
-
-    public function actionAssessEndMsg(){
-        return  $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $this->layout = 'master';
+        $course = Course::getById($courseId);
+        $teacherId = $this->isTeacher($user['id'],$courseId);
+        //set some page specific variables and counters
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        //CHECK PERMISSIONS AND SET FLAGS
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+            $assessmentId = $this->getParamVal('aid');
+        }
+        $renderData = array('course' => $course, 'courseId' => $courseId, 'assessmentId' => $assessmentId, 'overwriteBody' => $overwriteBody,
+            'params' => $params, 'body' => $body);
+        return  $this->renderWithData('printTest',$renderData);
     }
 
     public function actionLibraryTree(){
@@ -1881,5 +1895,95 @@ class QuestionController extends AppController
 
     public function actionShowTest(){
         return $this->redirect(AppUtility::getURLFromHome('site','work-in-progress'));
+    }
+
+    public function actionPrintLayout(){
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $this->layout = 'master';
+        $course = Course::getById($courseId);
+        $teacherId = $this->isTeacher($user['id'],$courseId);
+        //set some page specific variables and counters
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+            $assessmentId = $this->getParamVal('aid');
+            if (isset($params['vert'])) {
+                $ph = 11 - $params['vert'];
+                $pw = 8.5 - $params['horiz'];
+                if ($params['browser']==1) {
+                    $ph -= .5;
+                    $pw -= .5;
+                }
+            } else if (isset ($params['pw'])) {
+                $ph = $params['ph'];
+                $pw = $params['pw'];
+            }
+            $isfinal = isset($params['final']);
+            $line = Assessments::getByAssessmentId($assessmentId);
+            $ioquestions = explode(",",$line['itemorder']);
+            $questions = array();
+            foreach($ioquestions as $k=>$q) {
+                if (strpos($q,'~')!==false) {
+                    $sub = explode('~',$q);
+                    if (strpos($sub[0],'|')===false) { //backwards compat
+                        $questions[] = $sub[array_rand($sub,1)];
+                    } else {
+                        $grpqs = array();
+                        $grpparts = explode('|',$sub[0]);
+                        array_shift($sub);
+                        if ($grpparts[1]==1) { // With replacement
+                            for ($i=0; $i<$grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub,1)];
+                            }
+                        } else if ($grpparts[1]==0) { //Without replacement
+                            shuffle($sub);
+                            for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
+                                $questions[] = $sub[$i];
+                            }
+                            //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
+                            if ($grpparts[0]>count($sub)) { //fix stupid inputs
+                                for ($i=count($sub); $i<$grpparts[0]; $i++) {
+                                    $questions[] = $sub[array_rand($sub,1)];
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $questions[] = $q;
+                }
+            }
+            $points = array();
+            $qn = array();
+            $query = Questions::getByIdList($questions);
+            foreach ($query as $row) {
+                if ($row['points']==9999) {
+                    $points[$row['id']] = $line['defpoints'];
+                } else {
+                    $points[$row['id']] = $row['points'];
+                }
+                $qn[$row['id']] = $row['questionsetid'];
+            }
+
+
+            $numq = count($questions);
+            $phs = $ph-0.6;
+            $pws = $pw-0.5;
+            $pwss = $pw-0.6;
+
+        }
+        $this->includeCSS(['mathtest.css','print.css']);
+        $this->includeJS(['AMhelpers.js']);
+        $renderData = array('course' => $course, 'overwriteBody' => $overwriteBody, 'body' => $body, 'courseId' => $courseId,
+            'assessmentId' => $assessmentId, 'line' => $line, 'user' => $user, 'pwss' => $pwss, 'pws' => $pws, 'phs' => $phs, 'numq' => $numq);
+        return $this->renderWithData('printLayout', $renderData);
+    }
+
+    public function actionPrintLayoutBare(){
+        return $this->renderWithData('printLayoutBare');
     }
 }

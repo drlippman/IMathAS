@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
             echo '<div style="background-color: #E0E0E0;height: 60px; margin-right: -15px; margin-left: -15px; padding-top: 21px;"><div class="col-md-2"><a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'</a></div>
             <div class="col-md-2"><a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'</a></div>
-            <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
+            <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('question','question/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
             <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div></div>';
          ?>
     </div>
@@ -136,7 +136,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <form method=post action="add-questions?aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
                 <div class="col-md-12 patential-ques-header search-patential-ques-header">
                     <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
-                    <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?'libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
+                    <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
                     <div class="col-md-2"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
                     <input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
 
@@ -144,7 +144,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-12 question-search">
                 <div class="col-md-2"><input class="form-control" placeholder="Search&#xF002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
-                <!--                    <div class="col-md-2 col-lg-2"><input style="font-family: FontAwesome;font-style:normal;font-weight: normal;text-decoration: inherit;" class="form-control empty" placeholder="Search&#xF002;" type=text size=15 name=search value="--><?php //echo $search ?><!--"></div>-->
                 <div class="col-md-4">
                         <span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
                         <input type=checkbox name="searchall" value="1" <?php AppUtility::writeHtmlChecked($searchall,1,0) ?> />
