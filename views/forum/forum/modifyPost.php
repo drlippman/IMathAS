@@ -37,16 +37,16 @@ $now = $currentTime;
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
   <div class="tab-content shadowBox">
     <div style="padding-top: 20px">
-        <div class="col-lg-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
-        <div class="col-lg-10">
-            <input type=text  value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;"  name=subject class="subject textbox 3">
+        <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
+        <div class="col-sm-10">
+            <input type=text  value="&nbsp;&nbsp;<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;"  name=subject class="subject textbox 3">
         </div>
     </div>
     <BR class=form>
 
     <div class="editor-div">
-        <div class="col-lg-2 message-label"><?php echo AppUtility::t('Message');?></div>
-        <div class="col-lg-10 message-div">
+        <div class="col-sm-2 message-label"><?php echo AppUtility::t('Message');?></div>
+        <div class="col-sm-10 message-div">
             <div class=editor>
                 <textarea cols=5 rows=12 id=message name=message style="width: 100%">
                     <?php echo $thread[0]['message'];?>
@@ -60,8 +60,8 @@ $now = $currentTime;
     <?php if($currentUser['rights'] > 10)
     {?>
         <div >
-            <span class="col-md-2 align-title"><?php echo AppUtility::t('Post Type');?></span>
-            <span class="col-md-10" id="post-type-radio-list">
+            <span class="col-sm-2 align-title"><?php echo AppUtility::t('Post Type');?></span>
+            <span class="col-sm-10" id="post-type-radio-list">
                  <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
                                  <input type='radio' checked name='post-type' id="regular" value='0'value="0"<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'], AppConstant::NUMERIC_ZERO);?> >
                                  <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Regular');?></td></div></tr>
@@ -75,7 +75,7 @@ $now = $currentTime;
                                  <input type='radio'  name='post-type' id="only_students_can_see" value='3'<?php AssessmentUtility::writeHtmlChecked($thread[0]['postType'], AppConstant::NUMERIC_THREE);?> >
                                  <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Displayed at top and students can only see their own replies ');?></td></div></tr>
             </span>
-        </div>
+        </div><br><br>
         <?php if ($thread[0]['replyBy'] === null) {
         $thread[0]['replyBy'] = 1;
     }
@@ -90,8 +90,8 @@ $now = $currentTime;
         }
         ?>
         <div>
-            <span class="col-md-2 align-title"><?php echo AppUtility::t('Always Replies');?></span>
-            <span class="col-md-10" id="always-replies-radio-list">
+            <span class="col-sm-2 align-title"><?php echo AppUtility::t('Always Replies');?></span>
+            <span class="col-sm-10" id="always-replies-radio-list">
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
                                 <input type='radio' checked  name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::NUMERIC_ZERO);?>>
                                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Use default');?></td></div></tr>
@@ -116,7 +116,7 @@ $now = $currentTime;
                 ]);
                 echo '</div>';?>
                 <?php
-                echo '<label class="end col-lg-1">At</label>';
+                echo '<label class="end col-lg-1 select-text-margin margin-right-minus-thirtythree">At</label>';
                 echo '<div class="pull-left col-lg-4">';
                 echo TimePicker::widget([
                     'name' => 'startTime',

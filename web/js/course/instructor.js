@@ -21,46 +21,86 @@ function additem(blk,tb) {
 }
 
 function deleteItem(id,type,block,courseId) {
-    if(type == 'Forum'){
-        var message = "Are you SURE you want to delete this forum and all associated postings?";
-    }else if(type == 'Wiki'){
-        var message = "Are you SURE you want to delete this Wiki and all associated revisions?";
-    }else if(type == 'Assessment'){
-        var message = "Are you SURE you want to delete this assessment and all associated student attempts?";
-    }else if(type == 'InlineText'){
-        var message = "Are you SURE you want to delete this text item?";
-    }else if(type == 'LinkedText'){
-        var message = "Are you SURE you want to delete this link item?";
-    }else if(type == 'Block'){
-        var message = "Are you SURE you want to delete this Block?";
-    }
-    var html = '<div><p>'+message+'</p></div>';
-    $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-        modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
-        closeText: "hide",
-        buttons: {
-            "Cancel": function () {
-                $(this).dialog('destroy').remove();
-                return false;
-            },
-            "confirm": function () {
-
-                jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId},'responseSuccess');
-
-                $(this).dialog('destroy').remove();
-                return true;
-            }
-        },
-        close: function (event, ui) {
-            $(this).remove();
-        },
-        open: function(){
-            jQuery('.ui-widget-overlay').bind('click',function(){
-                jQuery('#dialog').dialog('close');
-            })
+     if(type == 'Block')
+     {
+        var message = "Are you SURE you want to delete this Block?</br>";
+         message+="<span id='post-type-radio-list'><input type='radio'  name='delete' value='0'>Move all items out of block</br>";
+         message+="<input type='radio' checked='checked' name='delete' value='1'>Also Delete all items in block</br></span>";
+         var html = '<div><p>'+message+'</p></div>';
+         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+             width: 'auto', resizable: false,
+             closeText: "hide",
+             buttons:
+             {
+                 "Cancel": function ()
+                 {
+                     $(this).dialog('destroy').remove();
+                     return false;
+                 },
+                 "confirm": function ()
+                 {
+                     var sel = $("#post-type-radio-list input[type='radio']:checked");
+                     var selected = sel.val();
+                     jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId,selected:selected},'responseSuccess');
+                     $(this).dialog('destroy').remove();
+                     return true;
+                 }
+             },
+             close: function (event, ui) {
+                 $(this).remove();
+             },
+             open: function(){
+                 jQuery('.ui-widget-overlay').bind('click',function(){
+                     jQuery('#dialog').dialog('close');
+                 })
+             }
+         });
+     }
+     else
+     {
+         if(type == 'Forum'){
+            var message = "Are you SURE you want to delete this forum and all associated postings?";
+        }else if(type == 'Wiki'){
+            var message = "Are you SURE you want to delete this Wiki and all associated revisions?";
+        }else if(type == 'Assessment'){
+            var message = "Are you SURE you want to delete this assessment and all associated student attempts?";
+        }else if(type == 'InlineText'){
+            var message = "Are you SURE you want to delete this text item?";
+        }else if(type == 'LinkedText'){
+            var message = "Are you SURE you want to delete this link item?";
         }
-    });
+        var html = '<div><p>'+message+'</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons:
+            {
+                "Cancel": function ()
+                {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "confirm": function ()
+                {
+
+                    jQuerySubmit('delete-items-ajax', {id: id, itemType: type, block: block, courseId: courseId},'responseSuccess');
+
+                    $(this).dialog('destroy').remove();
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });
+     }
 }
 function responseSuccess(response)
 {

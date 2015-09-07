@@ -13,9 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php echo $page_isTakenMsg ?>
 <?php if ($assessmentData['id']){ ?>
-    <form method=post action="add-assessment?cid=<?php echo $course->id ?>&id=<?php echo $assessmentData['id'];?>">
+    <form method=post action="add-assessment?cid=<?php echo $course->id ?>&id=<?php echo $assessmentData['id'];?>&block=<?php echo $block ?>">
 <?php }else{ ?>
-<form method=post action="add-assessment?cid=<?php echo $course->id ?>"
+<form method=post action="add-assessment?cid=<?php echo $course->id ?>&block=<?php echo $block ?>"
 <?php } ?>
 <p></p>
 <div class="item-detail-header">

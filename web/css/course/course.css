@@ -16,6 +16,14 @@
     border-top: 1px #dadada solid;
     cursor: pointer;
 }
+.add-item-in-block{
+    background-color: #f0f0f0;
+    display: block;
+    padding: 10px 22px;
+    border-bottom: 1px #dadada solid;
+    border-top: 1px #dadada solid;
+    cursor: pointer;
+}
 
 .add-item-text{
     padding-top: 3px;

@@ -15,14 +15,14 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php $form = ActiveForm::begin([
         'validateOnSubmit' => false,
         'options' => ['enctype' => 'multipart/form-data'],
-        'action' => 'add-link?cid=' . $course['id'] . '&id=' . $linkData['id'],
+        'action' => 'add-link?cid=' . $course['id'] . '&id='.$linkData['id'].'&block='.$block,
     ]);
     ?>
 <?php } else { ?>
     <?php $form = ActiveForm::begin([
         'validateOnSubmit' => false,
         'options' => ['enctype' => 'multipart/form-data'],
-        'action' => 'add-link?cid=' . $course['id'],
+        'action' => 'add-link?cid='.$course['id'].'&block='.$block,
     ]);
     ?>
 <?php } ?>

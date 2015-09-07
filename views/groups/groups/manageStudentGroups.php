@@ -54,14 +54,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if(isset($addGrpSet)){?>
             <h4>Add new set of student groups</h4>
             <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&addgrpset=true')?>">
-            <p>New group set name: <input name="grpsetname" type="text" /></p>
+            <p>New group set name: <input name="grpsetname" type="text" maxlength="60" size="40"/></p>
+            <div class="margin-left-groups">
             <p><input type="submit" value="Create" />
-            <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
+            <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p></div>
             </form>
         <?php }elseif(isset($renameGrpSet)){?>
              <h4>Rename student group set</h4>
              <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&renameGrpSet='.$renameGrpSet)?>">
-             <p>New group set name: <input name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"/></p>
+             <p>New group set name: <input name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"  maxlength="60"/></p>
              <p><input type="submit" value="Rename" />
              <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
              </form>
@@ -104,9 +105,11 @@ $this->params['breadcrumbs'][] = $this->title;
              {
                 echo "<input type='hidden' name='stutoadd' value=$stuList />";
              }?>
-                <p>New group name: <input name="grpname" type="text" /></p>
+                <p>New group name: <input name="grpname" type="text" size="40" /></p>
+                <div class="margin-left-groups-set">
                 <p><input type="submit" value="Create" />
                 <input type=button value='Nevermind' class='' onClick='window.location="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>"' /></p>
+                </div>
                 </form>
         <?php }elseif(isset($remove) && isset($grpId)){?>
             <h4>Remove group member</h4>
@@ -132,19 +135,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<p>No student groups have been created yet</p>';
                 }foreach($page_Grp as $grpId=>$grpName)
                 {
-                    echo "<b>Group: $grpName</b> | ";
-                    echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a> | ";
-                    echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&deleteGrp={$grpId}'>Delete</a> | ";
-                    echo "<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&removeall={$grpId}'>Remove all members</a>";
+                    echo "<br><b>Group: $grpName</b>&nbsp;&nbsp;";
+                    echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
+                    echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&deleteGrp={$grpId}'>Delete</a>] ";
+                    echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&removeall={$grpId}'>Remove all members</a>]";
                     echo '<ul>';
                     if (count($page_GrpMembers[$grpId])==0)
                     {
-                        echo '<li>No group members</li>';
+                        echo '<br><li>No group members</li>';
                     }else
                     {
                         foreach($page_GrpMembers[$grpId] as $uid=>$name)
                         {
-                            echo '<li>';
+                            echo '<br><li>';
                             $imageUrl = $uid . '' . ".jpg";
                             if($hasUserImg[$uid] == AppConstant::NUMERIC_ONE)
                             {
@@ -167,15 +170,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 if (count($page_unGrpStu) > AppConstant::NUMERIC_ZERO)
                 {?>
                     <form method='post' action='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&addstutogrp=true')?>'>
-                   <?php echo 'With selected, add to group';
-                    echo '<select name="addtogrpid">';
+                   <div class="pull-left select-text-margin with-selected"><?php echo 'With selected, add to group';?></div>
+                    <?php echo '<select class="form-control-1 " name="addtogrpid">';
                     echo "<option value='--new--'>New Group</option>";
                     foreach ($page_Grp as $grpId=>$grpName)
                     {
                         echo "<option value=$grpId>$grpName</option>";
                     }
                     echo '</select>';
-                    echo '&nbsp;<input type="submit" value="Add" class=" btn btn-primary"/>';
                     echo '<ul class="nomark">';
                     foreach ($page_unGrpStu as $grpId=>$grpName)
                     {
@@ -190,14 +192,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                             else
                             {?>
-
-                                <img class="circular-profile-image" id="img"
-                                     src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl ?>">
+                                <img class="circular-profile-image" id="img" src="<?php echo AppUtility::getAssetURL() ?>Uploads/<?php echo $imageUrl ?>">
                       <?php }
                         }
 
-                        echo "&nbsp; $grpName</li>";
+                        echo "&nbsp;$grpName</li>";
                     }
+                    echo '<br>&nbsp;<input type="submit" value="Add" class="add-grp-btn btn btn-primary"/>';
                     echo '</ul>';
                     echo '</form>';
                     echo '<p>&nbsp;</p>';
@@ -220,7 +221,7 @@ $this->params['breadcrumbs'][] = $this->title;
             echo '<table><tbody><tr>';
                 foreach ($page_groupSets as $gs)
                 {
-                        echo "<td><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class=small>";
+                        echo "<div class='col-sm-12'><td class='col-sm-8'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class='small col-sm-4'></div>";
                         echo "<a href='manage-student-groups?cid=$course->id&renameGrpSet={$gs['id']}'>Rename</a> | ";
                         echo "<a href='manage-student-groups?cid=$course->id&copyGrpSet={$gs['id']}'>Copy</a> | ";
                         echo "<a href='manage-student-groups?cid=$course->id&deleteGrpSet={$gs['id']}'>Delete</a>";

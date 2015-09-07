@@ -599,13 +599,21 @@ public $oa = array();
                             $sub =& $sub[$blockTree[$i]-AppConstant::NUMERIC_ONE]['items'];
                         }
                     }
-                    if (is_array($sub[$blockId])) {
+                    if (is_array($sub[$blockId]))
+                    {
                         $blockItems = $sub[$blockId]['items'];
                         $obId = $sub[$blockId]['id'];
                         if (count($blockItems)>AppConstant::NUMERIC_ZERO)
                         {
-                            $this->deleteRecursive($blockItems);
-                            array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+                            if(isset($params['selected']) && $params['selected'] == AppConstant::NUMERIC_ONE)
+                            {
+                                $this->deleteRecursive($blockItems);
+                                array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);
+                            }else
+                            {
+                                array_splice($sub,$blockId,AppConstant::NUMERIC_ONE,$blockItems);
+                            }
+
                         }else
                         {
                                 array_splice($sub,$blockId,AppConstant::NUMERIC_ONE);

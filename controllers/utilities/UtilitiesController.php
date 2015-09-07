@@ -20,14 +20,17 @@ use app\models\InlineText;
 use app\models\Items;
 use app\models\LibraryItems;
 use app\models\LinkedText;
+use app\models\Message;
 use app\models\QuestionSet;
 use app\models\Student;
+use app\models\Teacher;
 use app\models\User;
 use \yii\web\Controller;
 use app\controllers\AppController;
 
 class UtilitiesController extends AppController
 {
+    public $a = array();
     public function actionAdminUtilities()
     {
         $this->guestUserHandler();
@@ -617,6 +620,212 @@ class UtilitiesController extends AppController
         return $this->renderWithData('updateQuestionUsage',['nq' => $nq,'toTn' => $toTn,'start' => $start]);
     }
 
+    public function actionItemSearch()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $massEnd = $this->getParamVal('masssend');
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if ((isset($params['submit']) && $params['submit']=="Message") || isset($massEnd))
+        {
+            $this->a = $params;
+            return $this->redirect(array('mass-end','params' => $params));
+        }
+        $search = $params['search'];
+        if(isset($search))
+        {
+                $searchResult = User::getUserDetailsByJoin($search);
+        }
+        $responseData = array('params' => $params,'body' => $body,'message' => $message,'searchResult' => $searchResult);
+        return $this->renderWithData('itemSearch',$responseData);
+    }
+
+    public function actionMassEnd()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $massEnd = $this->getParamVal('masssend');
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
+        $teacherId = true;
+        $calledFrom = "itemsearch";
+        $aid =$this->getParamVal('aid');
+        $id = $this->getParamVal('id');
+        if($user->rights != AppConstant::TEACHER_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = "You need to log in as a teacher to access this page";
+        }
+
+        if(isset($params['message']))
+        {
+            $toIgnore = array();
+            if (intval($params['aidselect'])!= AppConstant::NUMERIC_ZERO)
+            {
+                $limitAid = $params['aidselect'];
+                $query = AssessmentSession::getDataForUtilities($limitAid);
+                if($query)
+                {
+                    foreach($query as $row)
+                    {
+                        $toIgnore[] = $row['userid'];
+                    }
+                }
+            }
+            $message = $params['message'];
+            $subject = $params['subject'];
+            if($massEnd == 'Message')
+            {
+                $now = time();
+                $toList = "'".implode("','",explode(",",$params['tolist']))."'";
+                $userDetails = User::getFirstNameAndLastName($toList);
+                $emailAddy = array();
+                if($userDetails)
+                {
+                    foreach($userDetails as $user)
+                    {
+                        if (!in_array($user['id'],$toIgnore))
+                        {
+                            $fullNames[$user['id']] = $user['LastName']. ', '.$user['FirstName'];
+                            $firstNames[$user['id']] = addslashes($user['FirstName']);
+                            $lastNames[$user['id']] = addslashes($user['LastName']);
+                        }
+                    }
+                }
+                $toList = explode(',',$params['tolist']);
+                if (isset($params['savesent']))
+                {
+                    $isRead = AppConstant::NUMERIC_ZERO;
+                } else
+                {
+                    $isRead = AppConstant::NUMERIC_FOUR;
+                }
+                if($toList)
+                {
+                    foreach($toList as $msgTo)
+                    {
+                        if (!in_array($msgTo,$toIgnore))
+                        {
+                            $message = str_replace(array('LastName','FirstName'),array($lastNames[$msgTo],$firstNames[$msgTo]),$params['message']);
+                            $insert = new Message();
+                            $insert->insertFromUtilities($params['subject'],$message,$msgTo,$user->id,time(),$isRead,$courseId);
+
+                        }
+                    }
+                }
+                $toList = array();
+                if ($params['self']=="self")
+                {
+                    $toList[] = $user->id;
+                }
+                elseif($params['self']=="allt")
+                {
+                    $teacherData = Teacher::getUserIdByJoin($courseId);
+                    if($teacherData)
+                    {
+                        foreach($teacherData as $row)
+                        {
+                            $toList[] = $row['id'];
+                        }
+                    }
+                }
+                $sentTo = implode('<br/>',$fullNames);
+                $message = $params['message'] . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br/> $sentTo </p>\n");
+                foreach($toList as $data)
+                {
+                    $insert = new Message();
+                    $insert->insertFromUtilities($params['subject'],$message,$data,$user->id,time(),AppConstant::NUMERIC_ZERO,$courseId);
+                }
+            }
+            else
+            {
+                $toList = "'".implode("','",explode(",",$params['tolist']))."'";
+                $query = User::getFirstNameAndLastName($toList);
+                $emailAddy = array();
+                foreach($query as $row)
+                {
+                    if (!in_array($row['id'],$toIgnore))
+                    {
+                        $emailAddy[] = "{$row['FirstName']} {$row['LastName']} <{$row['email']}>";
+                        $firstNames[] = $row['FirstName'];
+                        $lastNames[] = $row['LastName'];
+                    }
+                }
+                $sentTo = implode('<br/>',$emailAddy);
+                $subject = stripslashes($params['subject']);
+                $message = stripslashes($params['message']);
+                $userData = User::getById($user->id);
+                $headers  = 'MIME-Version: 1.0' . "\r\n";
+                $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+                $self = "{$userData['FirstName']} {$userData['LastName']} <{$userData['email']}>";
+                $headers .= "From: $self\r\n";
+                $teacherAddy = array();
+                if ($params['self']!="none")
+                {
+                    $teacherAddy[] = $self;
+                }
+                if($emailAddy)
+                {
+                    foreach($emailAddy as $k=>$addy)
+                    {
+                        $addy = trim($addy);
+                        if ($addy!='' && $addy!='none@none.com')
+                        {
+                            mail($addy,$subject,str_replace(array('LastName','FirstName'),array($lastNames[$k],$firstNames[$k]),$message),$headers);
+                        }
+                    }
+                }
+                $message = $params['message'] . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br/> $sentTo </p>\n");
+                if ($params['self']!="allt")
+                {
+                    $query = Teacher::getDataForUtilities($courseId,$user);
+                    if($query)
+                    {
+                        foreach($query as $row)
+                        {
+                            $teacherAddy[] = "{$row['FirstName']} {$row['LastName']} <{$row['email']}>";
+                        }
+                    }
+                    $message .= "<p>A copy was also emailed to all instructors for this course</p>\n";
+                }
+                foreach ($teacherAddy as $addy)
+                {
+                    mail($addy,$subject,$message,$headers);
+                }
+
+            }
+            if ($calledFrom=='lu')
+            {
+                //LinkToListUser
+            } else if ($calledFrom=='gb')
+            {
+                //LinkToGradeBook
+            } else if ($calledFrom=='itemsearch')
+            {
+                return $this->redirect('item-search');
+            }
+        }
+        else
+        {
+            $assessmentData = Assessments::getByCourse($courseId);
+            $toList = $params['checked'];
+            if($toList)
+            {
+                $detailsOfUser = User::insertDataFroGroups($toList);
+            }
+        }
+    $responseData = array('params' => $params,'assessmentData' => $assessmentData,'detailsOfUser' => $detailsOfUser,'calledFrom' => $calledFrom,'aid' => $aid,'id' => $id);
+    return $this->renderWithData('massEnd',$responseData);
+    }
+
     public function getStr($items,$str,$parent)
     {
         foreach ($items as $k=>$it)
@@ -666,4 +875,4 @@ class UtilitiesController extends AppController
         return $affectedRow;
     }
 
-} 
+}

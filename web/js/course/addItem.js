@@ -1,8 +1,10 @@
-$(document).ready(function(){
+$(document).ready(function()
+{
         var assessmentLink = $(".assessment-link").val();
         var courseId = $(".courseId").val();
 
-        $('.add-item').on('click', function (evt) {
+        $('.add-item').on('click', function (evt)
+        {
             var block = 0;
             var tb = 't';
 

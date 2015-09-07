@@ -12,6 +12,7 @@ use Yii;
 use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasTeachers;
+use yii\db\Query;
 
 class Teacher extends BaseImasTeachers
 {
@@ -52,5 +53,21 @@ class Teacher extends BaseImasTeachers
     public static function getUniqueByUserId($userid)
     {
         return static::findOne( ['userid' => $userid]);
+    }
+    public static function getUserIdByJoin($courseId)
+    {
+        $query = new Query();
+        $query ->select('imas_users.id')->from(['imas_teachers','imas_users'])->where(['imas_teachers.courseid' => $courseId])
+                ->andWhere(['imas_teachers.userid=imas_users.id'])->all();
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function getDataForUtilities($courseId,$user)
+    {
+        $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
+        $query .= "FROM imas_teachers,imas_users WHERE imas_teachers.courseid='$courseId' AND imas_teachers.userid=imas_users.id ";
+        $query .= "AND imas_users.id<>'$user->id'";
+        return Yii::$app->db->createCommand($query)->queryAll();
     }
 }

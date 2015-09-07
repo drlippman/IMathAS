@@ -376,6 +376,14 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $items = $command->queryAll();
         return $items;
     }
+
+    public static function getDataForUtilities($limitAid)
+    {
+        $query = "SELECT IAS.userid FROM imas_assessment_sessions AS IAS WHERE ";
+        $query .= "IAS.scores NOT LIKE '%-1%' AND IAS.assessmentid='$limitAid'";
+        $data =  \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }
 
 

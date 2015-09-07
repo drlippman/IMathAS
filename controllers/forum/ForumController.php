@@ -1056,6 +1056,7 @@ class ForumController extends AppController
         $this->guestUserHandler();
         $this->layout = 'master';
         $params = $this->getRequestParams();
+        $block = $this->getParamVal('block');
         $user = $this->getAuthenticatedUser();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
@@ -1365,7 +1366,7 @@ class ForumController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blockTree = array(AppConstant::NUMERIC_ZERO);
+                $blockTree = explode('-',$block);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
                     $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
@@ -1381,7 +1382,7 @@ class ForumController extends AppController
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
         'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
-        'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);
+        'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId,'block' => $block);
         return $this->renderWithData('addForum', $responseData);
     }
 

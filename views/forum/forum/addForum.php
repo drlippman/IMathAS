@@ -9,9 +9,9 @@ $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instruct
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php if ($modifyForumId){ ?>
-    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&modifyFid=<?php echo $modifyForumId; ?>">
+    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&modifyFid=<?php echo $modifyForumId;?>&block=<?php echo $block ?>">
 <?php }else{ ?>
-    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>">
+    <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&block=<?php echo $block ?>">
 <?php } ?>
     <div class="item-detail-header">
         <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>

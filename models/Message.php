@@ -293,7 +293,7 @@ class Message extends BaseImasMsgs
 
     }
 
-    /*qUERY FOR TOTAL COUNT OF MESSAGAE ON DASHBOARD*/
+    /*QUERY FOR TOTAL COUNT OF MESSAGE ON DASHBOARD*/
     public static function getMessageCount($userId)
     {
         $query  = new Query();
@@ -306,8 +306,18 @@ class Message extends BaseImasMsgs
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
 
-
+    public function insertFromUtilities($subject,$message,$msgTo,$userId,$now,$isRead,$courseId)
+    {
+        $this->title = $subject;
+        $this->message = $message;
+        $this->msgto = $msgTo;
+        $this->msgfrom = $userId;
+        $this->senddate = $now;
+        $this->isread = $isRead;
+        $this->courseid = $courseId;
+        $this->save();
     }
 }
 

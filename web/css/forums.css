@@ -353,7 +353,9 @@ margin-top: 10px;
 
 .subject-label
 {
-padding-top: 5px;
+    padding-top: 5px;
+    padding-right: 0px !important;
+    padding-left: 74px!important;
 }
 .inside-tab
 {
@@ -367,6 +369,11 @@ padding-top: 5px;
 .message-div{
     padding-bottom: 20px;
 }
+.message-label
+{
+    padding-right: 0px !important;
+    padding-left: 74px!important;
+}
 
 .btn-primary.disable-btn-not-allowed{
     pointer-events: auto;
@@ -374,6 +381,8 @@ padding-top: 5px;
 }
 .align-title{
     margin-top: 11px;
+    padding-right: 0px !important;
+    padding-left: 74px!important;
 }
 .btn-color
 {

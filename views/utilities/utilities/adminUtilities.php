@@ -180,7 +180,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/list-wrong-lib-flag');?>">List WrongLibFlags</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/update-wrong-lib-flag');?>">Update WrongLibFlags</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/block-search');?>">Search Block titles</a><br/></li>
-                        <li><a href="itemsearch.php">Search inline/linked items</a><br/></li>
+                        <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/item-search');?>">Search inline/linked items</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/update-questions-data');?>">Update question usage data (slow)</a><br/></li>
                     <?php }?>
     </div>

@@ -943,6 +943,7 @@ class CourseController extends AppController
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $modifyLinkId = $params['id'];
+        $block = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $model = new ThreadForm();
         $rubricsData = Rubrics::getByUserId($user['id']);
@@ -1229,7 +1230,7 @@ class CourseController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blocktree = array(AppConstant::NUMERIC_ZERO);
+                $blocktree = explode('-',$block);
                 $sub =& $items;
                 for ($i = AppConstant::NUMERIC_ONE; $i < count($blocktree); $i++) {
                     $sub =& $sub[$blocktree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
@@ -1245,7 +1246,7 @@ class CourseController extends AppController
         $this->includeCSS(["course/items.css"]);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'linkData' => $linkData,
-            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'defaultValues' => $defaultValues);
+            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'defaultValues' => $defaultValues,'block' => $block);
         return $this->renderWithData('addLink', $responseData);
     }
 

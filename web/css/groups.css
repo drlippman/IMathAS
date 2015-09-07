@@ -38,3 +38,42 @@ input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:
     background-position: center center;
     background-size: cover;
 }
+
+.form-control-1
+{
+    display: block;
+    width: 35%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.with-selected
+{
+    margin-right: 5px;
+}
+
+.add-grp-btn
+{
+    width: 122px;
+    margin-left: 5px;
+}
+
+.margin-left-groups
+{
+    margin-left: 143px;
+}
+.margin-left-groups-set
+{
+    margin-left: 122px;
+}

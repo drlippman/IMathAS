@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-sm-6" style="left: 35px;">
                 <div class="col-sm-5 col-sm-offset-5"> <a style="margin-left: 20px;" title="Preview this assessment" onclick="window.open('/openmath/web/assessment/assessment/show-assessment?cid=2&amp;id=10','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="/openmath/web/img/prvAssess.png">&nbsp;&nbsp;Preview Assessment</a></div>
                 <div class="col-sm-2 pull-right">
-                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>
+                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="/openmath/web/instructor/instructor/index?cid=<?php echo $course->id?>" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>
                 </div>
             </div>
         </div>

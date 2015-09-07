@@ -311,8 +311,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function insertDataFroGroups($stuList)
     {
-        $query = "SELECT FirstName,LastName FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
-
+        $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id IN ($stuList) ORDER BY LastName, FirstName";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
 
@@ -594,5 +593,24 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         Yii::$app->db->createCommand($query)->query();
 
     }
+    public static function getUserDetailsByJoin($srch)
+    {
+        $query = "SELECT DISTINCT imas_users.*,imas_courses.id AS cid,imas_groups.name AS groupname FROM imas_users JOIN imas_courses ON imas_users.id=imas_courses.ownerid JOIN imas_groups ON imas_groups.id=imas_users.groupid WHERE imas_courses.id IN ";
+        $query .= "(SELECT courseid FROM imas_inlinetext WHERE text LIKE '%$srch%') OR imas_courses.id IN ";
+        $query .= "(SELECT courseid FROM imas_linkedtext WHERE text LIKE '%$srch%' OR summary LIKE '%$srch%') ORDER BY imas_groups.name,imas_users.LastName";
+        return Yii::$app->db->createCommand($query)->query();
+
+    }
+
+    public static function getFirstNameAndLastName($toList)
+    {
+        $query = new Query();
+        $query ->select(['FirstName','LastName','email','id'])->from('imas_users')->where(['IN','id',$toList])->all();
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
+
 }
 
