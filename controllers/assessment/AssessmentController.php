@@ -1034,7 +1034,7 @@ class AssessmentController extends AppController
         $course = Course::getById($courseId);
         $isTeacherId = $this->isTeacher($user['id'],$courseId);
         if (!(isset($isTeacherId))) {
-            echo "You must be a teacher to access this page";
+            echo AppConstant::NO_TEACHER_RIGHTS;
             exit;
         }
         if (isset($params['record'])) {
@@ -1062,10 +1062,9 @@ class AssessmentController extends AppController
             }
             return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
         }
-        $pagetitle = "End of Assessment Messages";
-        $useeditor = "commonmsg";
         if (!isset($params['checked'])) {
             $query = Assessments::getByAssessmentId($params['aid']);
+            $endmsg = $query['endmsg'];
         } else {
             $endmsg = '';
             if (count($params['checked'])==AppConstant::NUMERIC_ZERO) {

@@ -5,12 +5,14 @@ use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 $this->title = 'End of Assessment Messages';
-//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-//$this->params['breadcrumbs'][] = $this->title;
 $useeditor = "commonmsg"; ?>
 
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+    <?php   if(!isset($params['checked'])){ ?>
+                 <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id.'&aid'.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$course->id] ,'page_title' => $this->title]); ?>
+    <?php  }else{ ?>
+                 <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id], 'page_title' => $this->title]); ?>
+   <?php } ?>
 </div>
 <form id="qform" method=post action="assessment-message?cid=<?php echo $course->id ?>&record=true">
     <div class = "title-container">

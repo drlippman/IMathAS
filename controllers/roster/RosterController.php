@@ -1266,11 +1266,9 @@ class RosterController extends AppController
                 array_push($studentArray, $student);
             }
             foreach ($studentArray as $student) {
-
-                $sendto = trim(ucfirst($student['LastName']) . " " . ucfirst($student['FirstName'])) . " < " . $student['email'] . ">;";
-                array_push($studentData, $sendto);
+                $studentData[] = trim(ucfirst($student['LastName']).' '.ucfirst($student['FirstName'])). ' &lt;'.$student['email'].'&gt;';
             }
-            $studentList = implode($studentData);
+            $studentList = implode('; ',$studentData);
             $responseData = array('studentData' => $studentList, 'course' => $course, 'gradebook' => $isGradebook);
             $this->includeJS(['general.js']);
             $this->includeCSS(['roster/roster.css']);

@@ -512,7 +512,6 @@ class AppController extends Controller
                     if ($studentData['locked']>AppConstant::NUMERIC_ZERO) {
                         echo "<p>You have been locked out of this course by your instructor.  Please see your instructor for more information.</p>";
                         return AppUtility::getURLFromHome('site','dashboard');
-                        exit;
                     } else {
                         $now = time();
                         if (!isset($sessionData['lastaccess'.$courseId])) {

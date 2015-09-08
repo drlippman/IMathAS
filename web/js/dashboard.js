@@ -24,7 +24,7 @@ function hidefromcourselist(courseid, el){
             },
             "Confirm": function () {
                 $(this).dialog('destroy').remove();
-                jQuerySubmit('hide-from-course-list', allMessage, 'getHideSuccess');
+                jQuerySubmit('hide-from-course-list', allMessage);
                 $(el).parent().slideUp();
                 $('#unhidelink').show();
                 return true;
@@ -32,10 +32,13 @@ function hidefromcourselist(courseid, el){
         },
         close: function (event, ui) {
             $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 
 
-}
-function getHideSuccess(response){
 }
