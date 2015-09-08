@@ -211,7 +211,7 @@ $this->params['breadcrumbs'][] = $this->title;
             New
             Diagnostic</a>
     </div>
-<?php }?>
+<?php } if($myRights >= 75) {?>
     <div class="col-lg-12 margin-left-five"><h3><?php echo $page_userBlockTitle?></h3></div>
 
     <div class='item margin-padding-admin-table padding-bottom'>
@@ -245,14 +245,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 </tr>
             <?php
             }
-            ?>
+                     ?>
 
             </tbody>
         </table>
         <a class="btn btn-primary margin-left-twenty" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/add-new-user') ?>">Add
             New User</a>
-        <?php
-        if ($myRights==100) {
+         <?php  }
+         if ($myRights == 100) {
             writeHtmlSelect ("selgrpid",$page_userSelectVal,$page_userSelectLabel,$showusers,null,null,"onchange=\"showgroupusers()\"");
         }
         ?>

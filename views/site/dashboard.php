@@ -24,7 +24,7 @@ use app\components\AppConstant;
             <?php
             if ($user->rights > AppConstant::GUEST_RIGHT) {
                 if ($user->rights > AppConstant::TEACHER_RIGHT) {
-                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);
+                    echo $this->render('_adminCourseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord, 'myRights' => $user->rights]);
 //                    echo $this->render('_courseTutoring', ['tutors' => $tutors]);
                 } elseif ($user->rights > AppConstant::STUDENT_RIGHT) {
                     echo $this->render('_courseTeaching',['teachers' => $teachers, 'msgRecord' => $msgRecord]);

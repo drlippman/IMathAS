@@ -9,6 +9,10 @@ use app\components\AppUtility;
     <div class="blockitems">
         <ul class="nomark courselist">
             <?php
+            if(count($teachers ) == 0 && $myRights >39)
+            {
+             AppUtility::t("To add a course, head to the Admin Page");
+            }else{
             foreach ($teachers as $teacher) {
                 if ($teacher) {
                     ?>
@@ -30,6 +34,7 @@ use app\components\AppUtility;
                     </li>
                 <?php
                 }
+            }
             }
             ?>
         </ul>
