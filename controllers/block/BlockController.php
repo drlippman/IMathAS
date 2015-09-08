@@ -193,7 +193,8 @@ class BlockController extends AppController
             $sub[$existingId]['fixedheight'] = $fixedHeight;
             $sub[$existingId]['grouplimit'] = $groupLimit;
         }
-        else{
+        else
+        {
             $blockItems = array();
             $blockItems['name'] = htmlentities(stripslashes($params['title']));
             $blockItems['id'] = strval($blockCnt);

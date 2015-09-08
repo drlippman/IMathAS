@@ -712,17 +712,15 @@ class CourseItemsUtility extends Component
 
 /////////////////////////////////////////////////// BLOCK //////////////////////////////////////////////////////////////////////////////////
 
-        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll)
+        public function DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit=null,$viewAll=null)
         {
             $block = $item[key($item)];
-//            AppUtility::dump($block);
             $blockId = $block['id'];
             ?>
             <input type="hidden" id="SH" value="<?php echo $block['SH']?>" >
             <input type="hidden" id="id" value="<?php echo $block['id']?>" >
             <?php $StartDate = AppUtility::formatDate($block['startdate']);?>
             <?php $endDate = AppUtility::formatDate($block['enddate']);?>
-
             <div class="block item">
                 <?php if (strlen($block['SH']) > AppConstant::NUMERIC_ONE && $block['SH'][1] == 'F') { ?>
                     <span class=left>
@@ -864,14 +862,13 @@ class CourseItemsUtility extends Component
                         <?php case '':?>
                             <?php
 
-                            //                        $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent,$cnt);
+                            //$this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent++,$cnt);
                             ?>
                             <?php break; ?>
-                        <?php endswitch; ?>
+a                        <?php endswitch; ?>
                 <?php } ?>
             <?php } ?>
             </div>
-
             <?php  $this->AddItemsDropDown();?>
             <input type="hidden" id="parent" value="<?php echo $parent.'-'.$cnt;?>">
 
@@ -970,6 +967,4 @@ class CourseItemsUtility extends Component
             });
         });
     });
-
-
 </script>
