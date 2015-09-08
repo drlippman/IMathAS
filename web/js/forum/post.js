@@ -35,6 +35,11 @@ $(document).ready(function () {
             },
             close: function (event, ui) {
                 $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
             }
         });
     });
@@ -81,7 +86,6 @@ function showall() {
     for (var i = 0; i <= postCount; i++) {
         var node = document.getElementById('item' + i);
         var buti = document.getElementById('buti' + i);
-        //console.log(node);
         node.className = "blockitems";
         buti.value = "Hide";
     }
@@ -197,7 +201,6 @@ function likepostresponse(response)
 {
     response = JSON.parse(response);
     $('#updating').remove();
-    console.log(response);
     if(response.status == 0)
     {
         window.location.reload();
@@ -237,6 +240,11 @@ function showPopup(response)
             },
             close: function (event, ui) {
                 $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
             }
         });
     }

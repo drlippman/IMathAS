@@ -106,6 +106,7 @@ class WikiController extends AppController
         $wikiId = $this->getParamVal('id');
         $course = Course::getById($courseId);
         $wiki = Wiki::getById($wikiId);
+        $block  = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
@@ -202,7 +203,7 @@ class WikiController extends AppController
             $finalArray['avail'] = $params['avail'];
             $finalArray['startdate'] = $startDate;
             $finalArray['enddate'] = $endDate;
-            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id);
+            $page_formActionTag = AppUtility::getURLFromHome('course', 'course/add-wiki?courseId=' .$course->id.'&block='.$block);
             $saveChanges = new Wiki();
             $lastWikiId = $saveChanges->createItem($finalArray);
             $saveItems = new Items();
@@ -210,7 +211,7 @@ class WikiController extends AppController
             $courseItemOrder = Course::getItemOrder($courseId);
             $itemorder = $courseItemOrder->itemorder;
             $items = unserialize($itemorder);
-            $blocktree = array(0);
+            $blocktree = explode('-',$block);
             $sub =& $items;
 
             for ($i=1;$i<count($blocktree);$i++) {

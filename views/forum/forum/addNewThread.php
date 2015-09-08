@@ -39,14 +39,14 @@ $now = $currentTime;
 <input type="hidden" id="forumId" value="<?php echo $forumData->id; ?>">
 <input type="hidden" id="courseId" value="<?php echo $course->id; ?>">
 <div class="tab-content shadowBox">
-    <div style="padding-top: 20px">
+    <div style="padding-top: 30px;margin-left: 10px;margin-right: 69px">
         <div class="col-lg-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
         <div class="col-lg-10">
             <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=name value="" class="subject">
         </div>
     </div>
     <BR class=form>
-    <div class="editor-div">
+    <div class="" style="padding-top: 20px;margin-left: 10px;margin-right: 69px">
         <div class="col-lg-2 message-label"><?php echo AppUtility::t('Message')?></div>
         <div class="col-lg-10 message-div">
             <div class=editor>
@@ -66,7 +66,7 @@ $now = $currentTime;
     </div>
     <?php if($rights > 10)
     {?>
-        <div >
+        <div style="padding-top: 30px;margin-left: 10px;margin-right: 69px">
             <span class="col-md-2 align-title"><?php echo AppUtility::t('Post Type')?></span>
             <span class="col-md-10" id="post-type-radio-list">
                  <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
@@ -83,7 +83,7 @@ $now = $currentTime;
                  <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Displayed at top and students can only see their own replies ')?></td></div></tr>
             </span>
         </div>
-        <div>
+        <div style="padding-top: 20px;margin-left: 10px;margin-right: 69px">
             <span class="col-md-2 align-title"><?php echo AppUtility::t('Always Replies')?></span>
             <span class="col-md-10" id="always-replies-radio-list">
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>

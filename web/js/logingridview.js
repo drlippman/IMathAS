@@ -163,7 +163,6 @@ function loginGridViewSuccess(response) {
     var tableString = '';
     headerArray = data.header;
     totalColumns = headerArray.length;
-    console.log(totalColumns);
     rows = data.rows;
     tableString = "<table class='login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
     for(i=0; i<headerArray.length && i < 15; i++){

@@ -69,7 +69,10 @@ function deleteItem(id,type,block,courseId) {
             var message = "Are you SURE you want to delete this text item?";
         }else if(type == 'LinkedText'){
             var message = "Are you SURE you want to delete this link item?";
-        }
+        }else if(type == 'Calendar')
+         {
+             var message = "Are you SURE you want to delete Calendar?";
+         }
         var html = '<div><p>'+message+'</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,

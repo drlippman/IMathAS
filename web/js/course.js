@@ -348,35 +348,4 @@ function playliststart(id,vidk,el) {
 	}
 }
 
-/*
-function VidlistonPlayerReady(event) {
-	
-}
-function VidlistonPlayerStateChange(event) {
-	if (event.data==0) {//end of video
-		console.log(event.target);
-		var vidurl = event.target.getVideoUrl();
-		var iframe = $('iframe[src*="'+vidurl+'"]');
-		if (iframe.length>0) {
-			var id = iframe.attr('id').substr(11);
-			console.log('id:'+id);
-			var curvidk = curvid[id];
-			if (curvidk < playlist[id].length-1) {
-				playliststart(id,curvidk+1);
-			}
-		}
-	}
-}
-$(function() {
-	if ($('.playlistbar').length>0) {
-		var tag = document.createElement('script');
-		tag.src = "https://www.youtube.com/iframe_api";
-		$('body').append(tag);
-	}
-});
-var YouTubeApiLoaded = false;
-function onYouTubeIframeAPIReady() {
-	console.log("API loaded");
-	YouTubeApiLoaded = true;
-}
-*/
+

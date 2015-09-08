@@ -97,7 +97,6 @@ function quickSearchAjax1(response) {
             focus: function (event, ui) {
 
                 $("#project").val(ui.item.label);
-                //console.log(dd);
                 return false;
             },
             select: function (event, ui) {

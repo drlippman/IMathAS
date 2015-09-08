@@ -30,10 +30,13 @@ $now = $currentTime;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
+
+        <?php if($userRights->rights > AppConstant::GUEST_RIGHT){?>
         <div class="pull-left header-btn hide-hover">
             <a href="<?php echo AppUtility::getURLFromHome('message', 'message/send-message?cid=' . $course->id . '&userid=' . $course->ownerid); ?>"
-               class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
+            class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/newzmessg.png">&nbsp;Send New Message</a>
         </div>
+        <?php } ?>
     </div>
 </div>
 <div class="item-detail-content">

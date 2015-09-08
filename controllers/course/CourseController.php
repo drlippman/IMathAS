@@ -812,6 +812,7 @@ class CourseController extends AppController
         }  else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
             $block = $block;
             $page_formActionTag = "modify-inline-text?cid=" .$cid;
+            $page_formActionTag.="&block=".$block;
             $page_formActionTag .= "&tb=$toTb";
             $calTag = $params['caltag'];
 
@@ -926,16 +927,16 @@ class CourseController extends AppController
                     $items = unserialize($itemOrder);
                     $blockTree = explode('-',$block);
                     $sub =& $items;
-
-                    for ($i=1; $i<count($blockTree); $i++) {
+                    for ($i=1; $i<count($blockTree); $i++)
+                    {
                         $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
                     }
                     if ($toTb == 'b') {
                         $sub[] = $itemid;
-                    } else if ($toTb == 't') {
+                    } else if ($toTb == 't')
+                    {
                         array_unshift($sub, $itemid);
                     }
-                    array_unshift($sub, intval($itemid));
                     $itemOrder = serialize($items);
                     $saveItemOrderIntoCourse = new Course();
                     $saveItemOrderIntoCourse->setItemOrder($itemOrder, $cid);
@@ -1087,7 +1088,10 @@ class CourseController extends AppController
                 $outcomearr = unserialize($row['outcomes']);
             }
             $outcomes = array();
-            $this->flattenarr($outcomearr);
+            if($outcomearr)
+            {
+                $this->flattenarr($outcomearr);
+            }
             $page_formActionTag .= (isset($params['id'])) ? "&id=" . $params['id'] : "";
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);

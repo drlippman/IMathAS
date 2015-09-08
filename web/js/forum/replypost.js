@@ -19,7 +19,6 @@ $(document).ready(function ()
 function replyPost(response)
 {
   response = JSON.parse(response);
-    console.log(response);
     var courseId = $(".course-id").val();
     var forumId = $(".forum-id").val();
     var threadId = $(".thread-id").val();

@@ -56,6 +56,13 @@ $(document).ready(function () {
         }
 
     });
+    $("input").keyup(function(e){
+        if(e.keyCode == 8 || e.keyCode == 46)
+        {
+            $(".subject").css('border-color', '');
+            $('#flash-message').hide();
+        }
+    });
 });
 
 

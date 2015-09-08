@@ -862,7 +862,7 @@ class CourseItemsUtility extends Component
                         <?php case '':?>
                             <?php
 
-                            //$this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent++,$cnt);
+                            $this->DisplayWholeBlock($block['items'],$currentTime,$assessment,$course,$parent++,$cnt);
                             ?>
                             <?php break; ?>
 a                        <?php endswitch; ?>
@@ -912,7 +912,7 @@ a                        <?php endswitch; ?>
                 '</div>' +
                 '</a>' +
 
-                '<a href="#"><div class="inline-text itemLink">' +
+                '<a href="../../course/course/modify-inline-text?cid='+ courseId+'&block='+block+'&tb='+tb+'"><div class="inline-text itemLink">' +
                 '<img class="icon-center icon-size" src="../../img/inlineText.png">' +
                 '<div class="item-name">Inline Text</div>'+
                 '</div></a>' +

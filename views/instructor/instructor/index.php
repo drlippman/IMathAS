@@ -101,7 +101,8 @@ $now = $currentTime;
                     $blockList[] = $i+1;
                 }
             }
-            foreach ($courseDetail as $key => $item){
+            foreach ($courseDetail as $key => $item)
+            {
                 echo AssessmentUtility::createItemOrder($key, $countCourseDetails, $parent, $blockList);
                 switch (key($item)):
                     case 'Assessment': ?>

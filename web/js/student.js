@@ -72,9 +72,7 @@ function calendar() {
                 },
                 success: function (response) {
                     var calendarResponse = JSON.parse(response);
-                    console.log(calendarResponse.data);
                     var assessmentData = calendarResponse.data;
-//                    alert(JSON.stringify(assessmentData));
                     var events = [];
                     $.each(assessmentData.assessmentArray, function (index, assessmentDetail) {
                         var eventColor = 'blue';

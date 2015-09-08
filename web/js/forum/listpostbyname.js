@@ -32,6 +32,11 @@ $(document).ready(function ()
             },
             close: function (event, ui) {
                 $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
             }
         });
     });

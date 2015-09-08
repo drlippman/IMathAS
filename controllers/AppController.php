@@ -168,7 +168,8 @@ class AppController extends Controller
         return Yii::$app->request->referrer;
     }
 
-    public function userAuthentication($user,$courseId){
+    public function userAuthentication($user,$courseId)
+    {
         if($user->rights == AppConstant::STUDENT_RIGHT){
             $student = Student::getByCourseId($courseId, $user->id);
             if ($student == ''){
@@ -176,7 +177,10 @@ class AppController extends Controller
                 $this->goBack();
                return $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);
             }
-        }else{
+        }else if($user->rights == AppConstant::GUEST_RIGHT)
+        {}
+        else
+        {
             $teacher = Teacher::getByUserId($user->id,$courseId);
             if($teacher == ''){
                 $this->setErrorFlash(AppConstant::UNAUTHORIZED_ACCESS);

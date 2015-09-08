@@ -302,6 +302,7 @@ body {
     color: #fff;
     background-color: #008E71;
 }
+
 .notification > li >ul
 {
     min-width: 100%;
@@ -495,6 +496,7 @@ margin-top: 7px;
 .margin-padding-admin-table{
     margin-left: 20px;
     padding-left: 0!important;
+
 }
 .margin-bottom-thirty {
     margin-bottom: 30px;
@@ -504,4 +506,9 @@ margin-top: 7px;
 }
 .margin-top-twenty-two {
     margin-top: 22px;
+}
+
+.navbar-nav.navbar-right:last-child
+{
+     margin-right: 0px;
 }
