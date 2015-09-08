@@ -57,20 +57,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
             </div>
         <?php } ?>
-        <div class="col-md-8" style="margin-left:-17px"><h3 style="margin-top: 15px;">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+        <div class="col-md-8"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
         <?php
             if ($itemorder == '') {
-                echo '<div class="col-md-12">';
+                echo '<div class="col-md-12 margin-bottom-thirty">';
                 echo "<p>No Questions currently in assessment</p>\n";
                 echo '<a href="#" onclick="this.style.display=\'none\';document.getElementById(\'helpwithadding\').style.display=\'block\';return false;">';
-                echo "<img src='".AppUtility::getAssetURL()."/img/help.gif' /> ";
-                echo 'How do I find questions to add?</a>';
+                echo "<i class='margin-left-zero fa fa-question fa-fw help-icon'></i>";
+                echo '<span class="margin-left-ten">How do I find questions to add?</span></a>';
                 echo '<div id="helpwithadding" class="col-md-12 help-with-adding-question">';
                     if ($sessiondata['selfrom'.$assessmentId]=='lib') {
                         echo "<p>You are currently set to select questions from the question libraries.  If you would like to select questions from ";
                         echo "assessments you've already created, click the <b>Select From Assessments</b> button below</p>";
                         echo "<p>To find questions to add from the question libraries:";
-                        echo "<ol><li>Click the <b>Select Libraries</b> button below to pop open the library selector</li>";
+                        echo "<ol><li>Click the <b>Select Libraries</b> link below to pop open the library selector</li>";
                         echo "<li>In the library selector, open up the topics of interest, and click the checkbox to select libraries to use</li>";
                         echo "<li>Scroll down in the library selector, and click the <b>Use Libraries</b> button</li> ";
                         echo "<li>On this page, click the <b>Search</b> button to list the questions in the libraries selected.<br/>  You can limit the listing by entering a sepecific search term in the box provided first, or leave it blank to view all questions in the chosen libraries</li>";
@@ -230,7 +230,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?php if ($searchall == AppConstant::NUMERIC_ZERO) { ?>
                                     <th><span onmouseover="tipshow(this,'Flag a question if it is in the wrong library')" onmouseout="tipout()"><?php AppUtility::t('Wrong Lib') ?></span></th>
                                 <?php } ?>
-                                <th><?php AppUtility::t('Action') ?></th>
+                                <th style="width: 150px;"><?php AppUtility::t('Action') ?></th>
                                 <th  style="width: 140px"></th>
                                 <th></th>
 

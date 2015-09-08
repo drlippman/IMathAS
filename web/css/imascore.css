@@ -695,3 +695,133 @@ div.multiselitem {
 margin-bottom: 23px;
 padding-top: 10px;
 }
+.margin-left-twenty-seven {
+    margin-left:27px;
+}
+.margin-left-fourty-eight {
+    margin-left:48px;
+}
+.margin-left-thirty-eight {
+    margin-left:38px;
+}
+.margin-left-sixteen {
+    margin-left: 16px;
+}
+.margin-left-ten {
+    margin-left: 10px !important;
+}
+.margin-left-eight-pt-five-per {
+    margin-left: 8.5%;
+}
+.right-ten {
+    right: 10px;
+}
+.right-five {
+    right: 5px;
+}
+.margin-left-thirty-three {
+    margin-left: 33px;
+}
+.margin-top-twenty {
+    margin-top: 20px !important;
+}
+.margin-left-minus-twenty {
+    margin-left: -20px;
+}
+.margin-left-minus-four {
+    margin-left: -4px;
+}
+.modify-data-shadow-box {
+    margin-left: 20px !important;
+    margin-top: -2px !important;
+    margin-right: 0px !important;
+}
+.margin-left-thirty-eight {
+    margin-left: 38px;
+}
+.margin-left-five-ptfour-per {
+    margin-left: 5.4%;
+}
+.margin-left-three-pt-eight-per {
+    margin-left: 3.8%;
+}
+.padding-left-zero {
+    padding-left: 0px;
+}
+.image-file-input {
+    height: 34px;
+    text-align: center;
+}
+.width-sixty-per {
+    width: 60%;
+}
+.padding-right-zero {
+    padding-right: 0px;
+}
+.left-eight {
+    left: 8px;
+}
+.width-hundread-three-per {
+    width: 103%;
+}
+.suggested-replace-id {
+Display: initial !important;
+width: 25% !important;
+}
+.reset-btn {
+    float: right;
+    margin-top: -20px !important;
+    margin-right: -15px !important;
+}
+.width-thirty-per {
+    width:30%;
+}
+.bottom-three {
+    bottom: 3px;
+}
+.width-fifty-per {
+    width:50%;
+}
+.print-test {
+padding-right: 25px;
+padding-left: 30px;
+padding-bottom: 24px;
+}
+.print-test-header {
+background-color: #E0E0E0;
+height: 60px;
+margin-right: -25px;
+margin-left: -30px;
+padding-top: 21px;
+}
+.margin-left-thirty {
+    margin-left: 30px;
+}
+.margin-left-twenty-six {
+    margin-left:26px;
+}
+.form-control-inline-textbox {
+display: inline-block !important;
+width: 20% !important;
+}
+.marrgin-left-twenty-three {
+margin-left: 23px;
+}
+.margin-left-five {
+    margin-left: 5px;
+}
+.margin-top-ten {
+    margin-top: 10px;
+}
+.margin-top-twenty-seven {
+    margin-top: 27px;
+}
+.continue-btn {
+    float: right;
+    margin-top: -7.5% !important;
+    margin-right: -26px !important;
+    z-index: 999;
+}
+.print-test-continue-btn {
+    margin-top: -15% !important;
+}

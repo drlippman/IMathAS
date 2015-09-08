@@ -495,5 +495,13 @@ margin-top: 7px;
 .margin-padding-admin-table{
     margin-left: 20px;
     padding-left: 0!important;
-
+}
+.margin-bottom-thirty {
+    margin-bottom: 30px;
+}
+.margin-left-zero {
+    margin-left: 0px;
+}
+.margin-top-twenty-two {
+    margin-top: 22px;
 }

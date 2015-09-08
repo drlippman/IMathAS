@@ -24,9 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
 </div>
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox padding-bottom-thirty">
     <br>
-    <div class="shadow-content">
+    <div class="shadow-content modify-data-shadow-box">
     <?php
     $pagetitle = "Question Editor";
     $placeinhead = '';
@@ -117,14 +117,14 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     if (isset($params['qid'])) {
-        echo "<p><a href=\"mod-data-set?id={$params['id']}&cid=$course->id&aid={$params['aid']}&template=true&makelocal={$params['qid']}\">Template this question</a> for use in this assessment.  ";
-        echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p>";
+        echo "<div class='col-md-12 margin-left-minus-four'><p><a href=\"mod-data-set?id={$params['id']}&cid=$course->id&aid={$params['aid']}&template=true&makelocal={$params['qid']}\">Template this question</a> for use in this assessment.  ";
+        echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p></div>";
     }
     if (!$myq) {
         echo "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
     }
     ?>
-    <form enctype="multipart/form-data" method=post action="mod-data-set?process=true<?php
+    <form class="margin-left-minus-twenty" enctype="multipart/form-data" method=post action="mod-data-set?process=true<?php
     if (isset($params['cid'])) {
         echo "&cid=$course->id";
     }
@@ -145,18 +145,18 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     ?>">
     <input type="hidden" name="hasimg" value="<?php echo $line['hasimg'];?>"/>
-    <div class="col-md-12">
+    <div class="col-md-12 margin-top-twenty">
        <div class="col-md-2"> Description: </div>
-        <div class="col-md-10"><textarea cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea></div>
+        <div class="col-md-10"><textarea class="form-control" cols=60 rows=4 name=description <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['description'];?></textarea></div>
     </div>
-    <div class="col-md-12">
-        <div>Author:</div>
-        <div><?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>"></div>
+    <div class="col-md-12 margin-top-twenty">
+        <div class="col-md-2">Author:</div>
+        <div class="col-md-10"><?php echo $line['author']; ?> <input type="hidden" name="author" value="<?php echo $author; ?>"></div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12 margin-top-twenty">
         <?php
         if (!isset($line['ownerid']) || isset($params['template']) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $isAdmin || ($isGrpAdmin && $line['groupid']==$groupId)) {
-            echo 'Use Rights: <select name="userights" id="userights">';
+            echo '<div class="col-md-2 select-text-margin">Use Rights:</div> <div class="col-md-10"><select class="width-sixty-per form-control" name="userights" id="userights">';
             echo "<option value=\"0\" ";
             if ($line['userights']==AppConstant::NUMERIC_ZERO) {echo "SELECTED";}
             echo ">Private</option>\n";
@@ -169,28 +169,28 @@ $this->params['breadcrumbs'][] = $this->title;
             echo "<option value=\"4\" ";
             if ($line['userights']==AppConstant::NUMERIC_FOUR) {echo "SELECTED";}
             echo ">Allow use by all and modifications by all</option>\n";
-            echo '</select><br/>'; ?>
+            echo '</select></div><br/>'; ?>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12 margin-top-twenty">
             <?php
-            echo 'License: <select name="license" id="license" onchange="checklicense()">';
+            echo '<div class="col-md-2 select-text-margin">License:</div> <div class="col-md-10"><select class="width-sixty-per form-control" name="license" id="license" onchange="checklicense()">';
             echo '<option value="0" '.($line['license']==AppConstant::NUMERIC_ZERO?'selected':'').'>Copyrighted</option>';
             echo '<option value="1" '.($line['license']==AppConstant::NUMERIC_ONE?'selected':'').'>IMathAS / WAMAP / MyOpenMath Community License (GPL + CC-BY)</option>';
             echo '<option value="2" '.($line['license']==AppConstant::NUMERIC_TWO?'selected':'').'>Public Domain</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_THREE?'selected':'').'>Creative Commons Attribution-NonCommercial-ShareAlike</option>';
             echo '<option value="3" '.($line['license']==AppConstant::NUMERIC_FOUR?'selected':'').'>Creative Commons Attribution-ShareAlike</option>';
-            echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span>';
+            echo '</select><span id="licensewarn" style="color:red;font-size:80%;"></span> </div>';
             ?>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12 margin-top-twenty">
             <?php
             if ($line['otherattribution']=='') {
-                echo '<br/><a href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
+                echo '<br/><a class="margin-left-fifteen" href="#" onclick="$(\'#addattrspan\').show();$(this).hide();return false;">Add additional attribution</a>';
                 echo '<span id="addattrspan" style="display:none;">';
             } else {
                 echo '<br/><span id="addattrspan">';
             }
-            echo 'Additional Attribution: <input type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/>';
+            echo '<div class="floatleft margin-left-fifteen select-text-margin">Additional Attribution:</div> <div class="floatleft margin-left-three-pt-eight-per"><input class="form-control" type="text" size="80" name="addattr" value="'.htmlentities($line['otherattribution']).'"/></div>';
             if ($line['otherattribution']!='') {
                 echo '<br/><span style="color:red;font-size:80%">You should only modify the attribution if you are SURE you are removing all portions of the question that require the attribution</span>';
             }
@@ -203,12 +203,12 @@ $this->params['breadcrumbs'][] = $this->title;
             var locklibs = '<?php echo $locklibs;?>';
 
         </script>
-        <div class="col-md-12">
-            My library assignments: <span id="libnames"><?php echo $lnames;?></span><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
-            <input type=button value="Select Libraries" onClick="libselect()">
+        <div class="col-md-12 margin-top-twenty">
+           <div class="col-md-2 select-text-margin"> My library assignments:</div> <div class="col-md-1 select-text-margin"><span id="libnames"><?php echo $lnames;?></span></div><input type=hidden name="libs" id="libs" size="10" value="<?php echo $inlibs;?>">
+           <div class="col-md-2"> <input type=button value="Select Libraries" onClick="libselect()"></div>
         </div>
-        <div class="col-md-12">
-            Question type: <select name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
+        <div class="col-md-12 margin-top-twenty">
+           <div class="col-md-2 select-text-margin"> Question type:</div> <div class="col-md-10"> <select class="width-sixty-per form-control" name=qtype <?php if (!$myq) echo "disabled=\"disabled\"";?>>
                 <option value="number" <?php if ($line['qtype']=="number") {echo "SELECTED";} ?>>Number</option>
                 <option value="calculated" <?php if ($line['qtype']=="calculated") {echo "SELECTED";} ?>>Calculated Number</option>
                 <option value="choices" <?php if ($line['qtype']=="choices") {echo "SELECTED";} ?>>Multiple-Choice</option>
@@ -229,70 +229,112 @@ $this->params['breadcrumbs'][] = $this->title;
                 <option value="file" <?php if ($line['qtype']=="file") {echo "SELECTED";} ?>>File Upload</option>
                 <option value="multipart" <?php if ($line['qtype']=="multipart") {echo "SELECTED";} ?>>Multipart</option>
                 <option value="conditional" <?php if ($line['qtype']=="conditional") {echo "SELECTED";} ?>>Conditional</option>
-            </select>
+            </select></div>
         </div>
-        <div class="col-md-12">
-            <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>docs/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a>
-            <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
-            Switch to:
-            <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
-            <?php if (!isset($params['id'])) {
-                echo ' <a href="mod-tutorial-question?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
-            }?>
+        <div class="col-md-12 margin-top-twenty">
+           <div class="col-md-2"> <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>docs/help.php?section=writingquestions','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Writing Questions Help</a></div>
+           <div class="col-md-3"> <a href="#" onclick="window.open('<?php echo AppUtility::getAssetURL();?>libs/libhelp.php','Help','width='+(.35*screen.width)+',height='+(.7*screen.height)+',toolbar=1,scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width*.6))">Macro Library Help</a>
+           </div>
         </div>
-        <div id=ccbox class="col-md-12">
-            Common Control: <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span>
-            <input type=submit value="Save">
-            <input type=submit name=test value="Save and Test Question"><BR>
-            <textarea style="width: 100%" cols=60 rows=<?php if ($twobx) {echo min(35,max(20,substr_count($line['control'],"\n")+1));} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea>
+        <div class="col-md-12 margin-top-twenty">
+            <div class="col-md-2 select-text-margin">Switch to:</div>
+            <div class="col-md-10">
+                <input type=button id=entrymode value="<?php if ($twobx) {echo "4-box entry";} else {echo "2-box entry";}?>" onclick="swapentrymode()" <?php if ($line['qcontrol']!='' || $line['answer']!='') echo "DISABLED"; ?>/>
+                    <?php if (!isset($params['id'])) {
+                    echo ' <a href="mod-tutorial-question?'.$_SERVER['QUERY_STRING'].'">Tutorial Style editor</a>';
+                    }?>
+            </div>
+        </div>
+        <div id=ccbox class="col-md-12 margin-top-twenty">
+          <div class="col-md-12">
+              <div class="floatleft select-text-margin"> Common Control: <span class=pointer onclick="incboxsize('control')">[+]</span><span class=pointer onclick="decboxsize('control')">[-]</span></div>
+              <div class="floatleft margin-left-thirty-eight">  <input type=submit value="Save">
+                     <input type=submit name=test value="Save and Test Question">
+              </div>
+          </div>
+        </div>
+        <div class="col-md-12 margin-top-twenty">
+         <div class="col-md-10 col-md-offset-2">  <textarea class="form-control" cols=60 rows=<?php if ($twobx) {echo min(35,max(20,substr_count($line['control'],"\n")+1));} else {echo "10";}?> id=control name=control <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['control']);?></textarea></div>
         </div>
         <div id=qcbox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
-            Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span>
-            <input type=submit value="Save">
-            <input type=submit name=test value="Save and Test Question"><BR>
-            <textarea style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea>
+                <div class="col-md-12 margin-left-sixteen margin-top-twenty">
+                   <div class="floatleft select-text-margin"> Question Control: <span class=pointer onclick="incboxsize('qcontrol')">[+]</span><span class=pointer onclick="decboxsize('qcontrol')">[-]</span></div>
+                   <div class="floatleft margin-left-thirty-eight"> <input type=submit value="Save">
+                    <input type=submit name=test value="Save and Test Question">
+                   </div>
+                </div>
+            <div class="col-md-10 col-md-offset-2 margin-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=qcontrol name=qcontrol <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['qcontrol'];?></textarea> </div>
         </div>
-        <div id=qtbox class="col-md-12">
-            Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span>
-            <input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
-            <input type=submit value="Save">
-            <input type=submit name=test value="Save and Test Question"><BR>
-            <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea>
+        <div id='qtbox' class="col-md-12 margin-top-twenty">
+           <div class="col-md-12">
+               <div class="floatleft select-text-margin">Question Text: <span class=pointer onclick="incboxsize('qtext')">[+]</span><span class=pointer onclick="decboxsize('qtext')">[-]</span></div>
+               <div class="floatleft margin-left-five-ptfour-per"><input type="button" onclick="toggleeditor('qtext')" value="Toggle Editor"/>
+                    <input type=submit value="Save">
+                    <input type=submit name=test value="Save and Test Question">
+               </div>
+           </div>
+        </div>
+        <div class="col-md-12 margin-top-twenty">
+           <div class="col-md-10 col-md-offset-2"> <textarea class="form-control" cols=60 rows=<?php echo min(35,max(10,substr_count($line['qtext'],"\n")+1));?> id="qtext" name="qtext" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['qtext']);?></textarea></div>
         </div>
         <div id=abox <?php if ($twobx) {echo "style=\"display: none;\"";}?>>
-            Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span>
-            <input type=submit value="Save">
-            <input type=submit name=test value="Save and Test Question"><BR>
-            <textarea style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea>
+            <div class="col-md-12 margin-left-sixteen margin-top-twenty">
+                <div class="floatleft select-text-margin"> Answer: <span class=pointer onclick="incboxsize('answer')">[+]</span><span class=pointer onclick="decboxsize('answer')">[-]</span></div>
+                <div class="floatleft margin-left-eight-pt-five-per">
+                    <input type=submit value="Save">
+                    <input type=submit name=test value="Save and Test Question">
+                </div>
+            </div>
+            <div class="col-md-10 col-md-offset-2 margin-top-twenty"> <textarea class="margin-left-ten form-control" style="width: 100%" cols=60 rows=10 id=answer name=answer <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo $line['answer'];?></textarea></div>
         </div>
+
         <?php
         if ($line['solution']=='') {
-            echo '<div class="col-md-12"><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();return false;">Add a detailed solution</a></div>';
+            echo '<div class="col-md-12 left-fifteen margin-top-twenty"><a href="#" onclick="$(this).parent().hide();$(\'#solutionwrapper\').show();return false;">Add a detailed solution</a></div>';
             echo '<div id="solutionwrapper" class="col-md-12" style="display:none;">';
         } else {
-            echo '<div id="solutionwrapper" class="col-md-12">';
+            echo '<div id="solutionwrapper">';
         }
         ?>
-        Detailed Solution:
-        <span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
-        <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
-        <input type=submit value="Save">
-        <input type=submit name=test value="Save and Test Question"><br/>
-        <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
-               onclick="$('#userandnote').toggle()">
-        Uses random variables from the question.
- <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
-   <i>Be sure to include the question you are solving in the text</i>
- </span><br/>
-        <input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
-        Use this as a "written example" help button<br/>
-        <input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
-        Display with the "Show Answer"<br/>
-        <textarea style="width: 100%" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
-        <?php echo '</div>' ?>
+    <div class="col-md-12 margin-top-twenty">
+       <div class="floatleft select-text-margin"> Detailed Solution:
+         <span class=pointer onclick="incboxsize('solution')">[+]</span><span class=pointer onclick="decboxsize('solution')">[-]</span>
+       </div>
+       <div class="floatleft margin-left-thirty-eight">
+            <input type="button" onclick="toggleeditor('solution')" value="Toggle Editor"/>
+            <input type=submit value="Save">
+            <input type=submit name=test value="Save and Test Question">
+       </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-10 col-md-offset-2 right-ten margin-top-twenty">
+            <input type="checkbox" name="usesrand" value="1" <?php if (($line['solutionopts']&1)==1) {echo 'checked="checked"';};?>
+                   onclick="$('#userandnote').toggle()">
+            Uses random variables from the question.
+            <span id="userandnote" <?php if (($line['solutionopts']&1)==1) {echo 'style="display:none;"';}?>>
+            <i>Be sure to include the question you are solving in the text</i>
+            </span><br/>
+            <input type="checkbox" name="useashelp" value="2" <?php if (($line['solutionopts']&2)==2) {echo 'checked="checked"';};?>>
+            Use this as a "written example" help button<br/>
+            <input type="checkbox" name="usewithans" value="4" <?php if (($line['solutionopts']&4)==4) {echo 'checked="checked"';};?>>
+            Display with the "Show Answer"<br/>
+        <textarea class="form-control margin-top-twenty width-hundread-three-per" cols=60 rows=<?php echo min(35,max(10,substr_count($line['solution'],"\n")+1));?> id="solution" name="solution" <?php if (!$myq) echo "readonly=\"readonly\"";?>><?php echo str_replace(array(">","<"),array("&gt;","&lt;"),$line['solution']);?></textarea>
+        <?php echo '</div></div></div>' ?>
+
 <div id=imgbox class="col-md-12">
     <input type="hidden" name="MAX_FILE_SIZE" value="500000" />
-    Image file: <input type="file" name="imgfile"/> assign to variable: <input type="text" name="newimgvar" size="6"/> Description: <input type="text" size="20" name="newimgalt" value=""/><br/>
+   <div class="col-md-12 margin-top-twenty right-ten">
+       <div class="col-md-2 right-five"> Image file:</div>
+       <div class="col-md-3"> <input class="image-file-input" type="file" name="imgfile"/></div>
+       <div class="col-md-3">
+           <span class="select-text-margin">assign to variable:</span>
+          <div class="col-md-6 floatright"> <input class="form-control" type="text" name="newimgvar" size="6"/></div>
+       </div>
+       <div class="col-md-4">
+            <div class="col-md-3 select-text-margin left-eight">Description:</div>
+            <div class="col-md-9 padding-right-zero"><input class="margin-left-twenty-seven form-control" type="text" size="20" name="newimgalt" value=""/></div>
+       </div>
+   </div>
     <?php
     if (isset($images['vars']) && count($images['vars'])>0) {
         echo "Images:<br/>\n";
@@ -307,11 +349,18 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
     ?>
-    Help button: Type: <select name="helptype">
-        <option value="video">Video</option>
-        <option value="read">Read</option>
-    </select>
-    URL: <input type="text" name="helpurl" size="30" /><br/>
+    <div class="col-md-12 right-ten margin-top-twenty">
+        <div class="col-md-2 right-five select-text-margin">Help button: </div>
+        <div class="col-md-4 padding-left-zero">
+            <div class="col-md-2 select-text-margin">Type:</div>
+            <div class="col-md-10"><select class="form-control" name="helptype">
+                    <option value="video">Video</option>
+                    <option value="read">Read</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4"><div class="col-md-2 select-text-margin">URL:</div> <div class="col-md-10"> <input class="form-control floatleft" type="text" name="helpurl" size="30" /></div></div>
+    </div>
     <?php
     if (count($extref)>0) {
         echo "Help buttons:<br/>";
@@ -325,22 +374,22 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
     if ($myRights==100) {
-        echo '<p>Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
+        echo '<div class="col-md-12 margin-top-twenty"><div class="floatleft select-text-margin">Mark question as deprecated and suggest alternative? <input type="checkbox" name="doreplaceby" ';
         if ($line['replaceby']!=0) {
             echo 'checked="checked"';
         }
-        echo '/> Suggested replacement ID: <input type="text" size="5" name="replaceby" value="';
+        echo '/> </div> <div class="floatleft margin-left-thirty-eight">Suggested replacement ID: <input class="form-control suggested-replace-id" type="text" size="5" name="replaceby" value="';
         if ($line['replaceby']>0) {
             echo $line['replaceby'];
         }
-        echo '"/>.  <i>Do not use this unless you know what you\'re doing</i></p>';
+        echo '"/></div>  <div class="floatleft margin-left-thirty-eight select-text-margin"> Do not use this unless you know what you\'re doing</div></div>';
     }
     if ($line['deleted']==1 && ($myRights==100 || $ownerid==$userId)) {
         echo '<p>This question is currently marked as deleted. <label><input type="checkbox" name="undelete"> Un-delete question</p>';
     }
     ?>
 </div>
-<div class="save-question">
+<div class="col-md-12 save-question margin-left-fifteen margin-top-twenty">
     <input type=submit value="Save">
     <input type=submit name=test value="Save and Test Question">
 </div>

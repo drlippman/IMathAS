@@ -23,9 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
  </div>
+   <div class="col-md-12"> <input type="button" class="reset-btn secondarybtn" value="Reset" onclick="resetcat()"/></div>
 <?php
     echo '<div class="tab-content shadowBox non-nav-tab-item">';
     echo "<form class='margin-thirty categorize-question-form' method=post action=\"categorize?aid=$aid&cid=$cid&record=true\">";
+
     echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
     echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
     echo '<table class="width-hundread-per"><thead><tr><th class="text-align-left"><input type="checkbox" name="" value=""></th><th class="text-align-left">Description</th><th class="text-align-left">Category</th></tr></thead><tbody>';
@@ -41,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
         echo "<td>{$descriptions[$qid]}</td><td>";
-        echo "<select id=\"$qid\" name=\"$qid\" class=\"qsel\">";
+        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control width-thirty-per qsel\">";
         echo "<option value=\"0\" ";
         if ($category[$qid] == 0) {
             echo "selected=1";
@@ -116,7 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
     echo "<p>Select first listed library for all uncategorized questions: <input type=button value=\"Quick Pick\" onclick=\"quickpick()\"></p>\n";
     echo "<p>Add new category to lists: <input type=type id=\"newcat\" size=40> ";
     echo "<input type=button value=\"Add Category\" onclick=\"addcategory()\"></p>\n";
-    echo '<p><input type=submit value="Record Categorizations"> and return to the course page.  <input type="button" class="secondarybtn" value="Reset" onclick="resetcat()"/></p>';
+    echo '<p><input type=submit value="Record Categorizations"> and return to the course page.</p>';
     echo "</form>\n";
 echo"</div>";
 ?>
