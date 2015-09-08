@@ -31,61 +31,25 @@ class InlineText extends BaseImasInlinetext
         return InlineText::findOne(['courseid' => $courseId]);
     }
 
-    public function saveChanges($params)
+    public function saveInlineText($params)
     {
-        $this->title = trim($params['title']);
-        $this->text = $params['text'];
-        $this->courseid = $params['courseid'];
-        $this->startdate = $params['startdate'];
-        $this->enddate = $params['enddate'];
-        $this->avail = $params['avail'];
-        $this->caltag = $params['caltag'];
-        $this->isplaylist = $params['isplaylist'];
-//        $this->oncal = $params['oncal'];
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
-
         return $this->id;
     }
 
     public function updateChanges($params, $inlineTextId)
     {
-        $endDate = AppUtility::parsedatetime($params['EndDate'], $params['end_end_time']);
-        $startDate = AppUtility::parsedatetime($params['StartDate'], $params['start_end_time']);
-        $tag = AppUtility::parsedatetime($params['Calendar'], $params['calendar_end_time']);
-
-        $updateIdArray = InlineText::find()->where(['id' => $inlineTextId])->all();
-        foreach ($updateIdArray as $key => $updateId) {
-            if ($params['hidetitle'] == 1) {
-                $params['title'] = '';
-            }
-            $updateId->title = isset($params['title']) ? $params['title'] : null;
-            $updateId->courseid = $params['courseId'];
-            $updateId->text = isset($params['inlineText']) ? $params['inlineText'] : null;
-            $updateId->avail = isset($params['avail']) ? $params['avail'] : null;
-
-            if ($params['avail'] == AppConstant::NUMERIC_ONE) {
-                if ($params['available-after'] == 0) {
-                    $startDate = 0;
-                }
-                if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
-                    $endDate = AppConstant::ALWAYS_TIME;
-                }
-                $this->startdate = $startDate;
-                $this->enddate = $endDate;
-            } else {
-                $this->startdate = AppConstant::NUMERIC_ZERO;
-                $this->enddate = AppConstant::ALWAYS_TIME;
-            }
-
-            $updateId->oncal = isset($params['oncal']) ? $params['oncal'] : null;
-            if ($params['altoncal'] == 1) {
-                $updateId->caltag = $params['altcaltag'];
-            } else {
-                $updateId->caltag = '!';
-            }
-            $updateId->isplaylist = 0;
-            $updateId->save();
+        $updateIdArray = InlineText::getById($inlineTextId);
+        if($updateIdArray)
+        {
+            $data = AppUtility::removeEmptyAttributes($params);
+            $updateIdArray->attributes = $data;
+            $updateIdArray->save();
+            return $updateIdArray->id;
         }
+
     }
 
     public static function deleteInlineTextId($itemId)
@@ -164,6 +128,16 @@ class InlineText extends BaseImasInlinetext
         $command=$connection->createCommand($query);
         $rowCount=$command->execute();
         return $rowCount;
+    }
+    public static function getFileOrder($id)
+    {
+        $query = new Query();
+        $query->select('fileorder')
+            ->from('imas_inlinetext')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
     }
 }
 

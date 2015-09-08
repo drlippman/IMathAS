@@ -13,10 +13,10 @@ class InstrFiles extends BaseImasInstrFiles
     {
         return InstrFiles::findAll(['itemid' => $itemId]);
     }
-    public function saveFile($params, $inlineText)
+    public function saveFile($params,$filename, $inlineText)
     {
         $this->description = isset($params['newfiledescr']) ? $params['newfiledescr'] : null;
-        $this->filename = isset($params['filename']) ? $params['filename'] : null;
+        $this->filename = $filename;
         $this->itemid =  $inlineText;
         $this->save();
         return $this->id;
@@ -35,12 +35,41 @@ class InstrFiles extends BaseImasInstrFiles
     public static function getFileName($itemId)
     {
         $query = new Query();
-        $query ->select(['description','filename','id'])
+        $query ->select(['id','description','filename'])
                ->from('imas_instr_files')
                 ->where(['itemid' => $itemId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
 
+    }
+
+    public static function deleteByItemId($itemId)
+    {
+        $instrFileData = InstrFiles::findOne(['itemid' => $itemId]);
+        if($instrFileData){
+            $instrFileData->delete();
+        }
+    }
+
+    public static function getByIdForFile($fileName)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+            ->from('imas_instr_files')
+            ->where(['filename' => $fileName]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function setFileDescription($id, $description)
+    {
+        $inlineData = InstrFiles::findOne(['id' => $id]);
+        if ($inlineData) {
+            $inlineData->description = $description;
+            $inlineData->save();
+            return $inlineData->id;
+        }
     }
 } 

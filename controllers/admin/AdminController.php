@@ -33,16 +33,17 @@ class AdminController extends AppController
     public function actionIndex()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $sortBy = AppConstant::FIRST_NAME;
         $order = AppConstant::ASCENDING;
         $users = User::findAllUser($sortBy, $order);
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $userId = $user->id;
-        $userName = $user->SID;
+        $showCid = $this->getParamVal('showcourses');
+       $userName = $user->SID;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
-
         if ($myRights == AppConstant::NUMERIC_HUNDREAD) {
             if (isset($_GET['showusers'])) {
                 setcookie('showusers',$_GET['showusers']);
@@ -177,9 +178,9 @@ class AdminController extends AppController
             $page_userSelectLabel[$i] = chr($let);
             $i++;
         }
-        $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css']);
+        $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css', 'course/items.css']);
         $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        return $this->renderWithData('index', ['users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights, 'page_courseList' => $page_courseList, 'resultTeacher' => $resultTeacher, 'page_diagnosticsId' => $page_diagnosticsId, 'page_diagnosticsName' => $page_diagnosticsName, 'page_diagnosticsAvailable' => $page_diagnosticsAvailable, 'page_diagnosticsPublic' => $page_diagnosticsPublic, 'page_userBlockTitle' => $page_userBlockTitle, 'showcourses' => $showcourses, 'page_teacherSelectVal' => $page_teacherSelectVal, 'page_teacherSelectLabel' => $page_teacherSelectLabel, 'userId' => $userId, 'userName' => $userName]);
+        return $this->renderWithData('index', ['showCid' => $showCid ,'users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights, 'page_courseList' => $page_courseList, 'resultTeacher' => $resultTeacher, 'page_diagnosticsId' => $page_diagnosticsId, 'page_diagnosticsName' => $page_diagnosticsName, 'page_diagnosticsAvailable' => $page_diagnosticsAvailable, 'page_diagnosticsPublic' => $page_diagnosticsPublic, 'page_userBlockTitle' => $page_userBlockTitle, 'showcourses' => $showcourses, 'page_teacherSelectVal' => $page_teacherSelectVal, 'page_teacherSelectLabel' => $page_teacherSelectLabel, 'userId' => $userId, 'userName' => $userName]);
     }
 /*
  * This method to add new user
@@ -542,6 +543,7 @@ class AdminController extends AppController
                {
                     $params['groupId'] = $groupId;
                    if ($isTeacher) {
+
                        $attr = 'courseid';
                        $attrValue = $courseId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
@@ -559,10 +561,8 @@ class AdminController extends AppController
 
                            } else{
                                ExternalTools::updateExternalTool($params,$params['groupId'],$privacy);
-
                            }
                        }
-
                    }
                }
            }
@@ -577,9 +577,8 @@ class AdminController extends AppController
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
        } else {
            if (isset($params['delete'])) {
-               $nameOfExtTool = ExternalTools::deleteExternalTool($id);
-
-
+               $extTool= $nameOfExtTool = ExternalTools::getById($id);
+               $nameOfExtTool = $extTool['name'];
            } else if (isset($_GET['id'])) {
                if ($params['id'] == 'new') {
                    $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
@@ -1050,4 +1049,587 @@ class AdminController extends AppController
         $responseData = array('nameOfDiag' => $nameOfDiag, 'params' => $params, 'diag' =>$diag, 'code_list' => $code_list);
         return $this->renderWithData('diagOneTime',$responseData);
     }
+
+    public function actionManageLib()
+    {
+        global $rights,$parents,$qcount,$ltlibs, $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $userId = $user->id;
+        $userName = $user->SID;
+        $myRights = $user['rights'];
+        $groupId= $user['groupid'];
+        $helpIcon = "";
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        $params = $this->getRequestParams();
+
+        if ($myRights < 20) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+        } elseif (isset($params['cid']) && $params['cid']=="admin" && $myRights <75) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+        } elseif (!(isset($params['cid'])) && $myRights < 75) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+        } else {
+            $cid = $params['cid'];
+            if ($cid == 'admin') {
+                if ($myRights >74 && $myRights < 100) {
+                    $isGrpAdmin = true;
+                } else if ($myRights == 100) {
+                    $isAdmin = true;
+                }
+            }
+            $now = time();
+
+            if (isset($_POST['remove'])) {
+                if (isset($_GET['confirmed'])) {
+                    if ($_POST['remove']!='') {
+                        $remlist = "'".implode("','",explode(',',$_POST['remove']))."'";
+
+                        $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist)";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        while ($row = mysql_fetch_row($result)) {
+                            $qidstocheck[] = $row[0];
+                        }
+
+                        if ($isadmin) {
+                            $query = "DELETE FROM imas_library_items WHERE libid IN ($remlist)";
+                            mysql_query($query) or die("Query failed : " . mysql_error());
+                        } else if ($isgrpadmin) {
+                            $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid='$groupid'";
+                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                            while ($row = mysql_fetch_row($result)) {
+                                $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
+                                mysql_query($query) or die("Query failed : " . mysql_error());
+                            }
+                        } else {
+                            $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid='$userid'";
+                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                            while ($row = mysql_fetch_row($result)) {
+                                $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
+                                mysql_query($query) or die("Query failed : " . mysql_error());
+                            }
+                        }
+
+                        if (isset($qidstocheck)) {
+                            $qids = implode(",",$qidstocheck);
+                            $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
+                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                            $okqids = array();
+                            while ($row = mysql_fetch_row($result)) {
+                                $okqids[] = $row[0];
+                            }
+                            $qidstofix = array_diff($qidstocheck,$okqids);
+                            if ($_POST['delq']=='yes' && count($qidstofix)>0) {
+                                $qlist = implode(',',$qidstofix);
+                                //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+                                $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
+                                mysql_query($query) or die("Query failed : " . mysql_error());
+                                /*foreach ($qidstofix as $qid) {
+                                    delqimgs($qid);
+                                }*/
+                            } else {
+                                foreach($qidstofix as $qid) {
+                                    $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
+                                    mysql_query($query) or die("Query failed : " . mysql_error());
+                                }
+                            }
+                        }
+                        $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
+                        if (!$isadmin) {
+                            $query .= " AND groupid='$groupid'";
+                        }
+                        if (!$isadmin && !$isgrpadmin) {
+                            $query .= " AND ownerid='$userid'";
+                        }
+                        mysql_query($query) or die("Query failed : " . mysql_error());
+                    }
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+                    exit;
+                } else {
+                    $pagetitle = "Confirm Removal";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Confirm Removal ";
+                    if (!isset($_POST['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    } else {
+                        $oktorem = array();
+                        for ($i=0; $i<count($_POST['nchecked']); $i++) {
+                            $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_POST['nchecked'][$i]}'";
+                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                            $libcnt= mysql_result($result,0,0);
+                            if ($libcnt == 0) {
+                                $oktorem[] = $_POST['nchecked'][$i];
+                            }
+                        }
+                        $rlist = implode(",",$oktorem);
+                        $hasChildWarning = (count($_POST['nchecked'])>count($oktorem)) ? "<p>Warning:  Some libraries selected have children, and cannot be deleted.</p>\n": "";
+                    }
+                }
+            } else if (isset($_POST['chgrights'])) {
+                if (isset($_POST['newrights'])) {
+                    if ($_POST['newrights']!='') {
+                        $llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
+                        $query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
+                        if (!$isadmin) {
+                            $query .= " AND groupid='$groupid'";
+                        }
+                        if (!$isadmin && !$isgrpadmin) {
+                            $query .= " AND ownerid='$userid'";
+                        }
+                        mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    }
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+                    exit;
+
+                } else {
+                    $pagetitle = "Change Library Rights";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Change Library Rights ";
+                    if (!isset($_POST['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    } else {
+                        $tlist = implode(",",$_POST['nchecked']);
+                        $page_libRights = array();
+                        $page_libRights['val'][0] = 0;
+                        $page_libRights['val'][1] = 1;
+                        $page_libRights['val'][2] = 2;
+
+                        $page_libRights['label'][0] = "Private";
+                        $page_libRights['label'][1] = "Closed to group, private to others";
+                        $page_libRights['label'][2] = "Open to group, private to others";
+
+                        if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+                            $page_libRights['label'][3] = "Closed to all";
+                            $page_libRights['label'][4] = "Open to group, closed to others";
+                            $page_libRights['label'][5] = "Open to all";
+                            $page_libRights['val'][3] = 4;
+                            $page_libRights['val'][4] = 5;
+                            $page_libRights['val'][5] = 8;
+                        }
+                    }
+
+                }
+
+
+
+            } else if (isset($_POST['transfer'])) {
+                if (isset($_POST['newowner'])) {
+                    if ($_POST['transfer']!='') {
+                        $translist = "'".implode("','",explode(',',$_POST['transfer']))."'";
+
+                        //added for mysql 3.23 compatibility
+                        $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        $newgpid = mysql_result($result,0,0);
+                        $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
+
+                        if (!$isadmin) {
+                            $query .= " AND groupid='$groupid'";
+                        }
+                        if (!$isadmin && !$isgrpadmin) {
+                            $query .= " AND ownerid='$userid'";
+                        }
+                        mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    }
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+                    exit;
+                } else {
+                    $pagetitle = "Confirm Transfer";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Confirm Transfer ";
+                    if (!isset($_POST['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    } else {
+                        $tlist = implode(",",$_POST['nchecked']);
+                        $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        $i=0;
+                        while ($row = mysql_fetch_row($result)) {
+                            $page_newOwnerList['val'][$i] = $row[0];
+                            $page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
+                            $i++;
+                        }
+                    }
+                }
+            } else if (isset($_POST['setparent'])) {
+                if (isset($_POST['libs'])) {
+                    if ($_POST['libs']!='') {
+                        $toset = array();
+                        $_POST['setparent'] = explode(',',$_POST['setparent']);
+                        foreach ($_POST['setparent'] as $alib) {
+                            if ($alib != $_POST['libs']) {
+                                $toset[] = $alib;
+                            }
+                        }
+                        if (count($toset)>0) {
+                            $parlist = "'".implode("','",$toset)."'";
+                            $query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
+                            if (!$isadmin) {
+                                $query .= " AND groupid='$groupid'";
+                            }
+                            if (!$isadmin && !$isgrpadmin) {
+                                $query .= " AND ownerid='$userid'";
+                            }
+                            mysql_query($query) or die("Query failed : $query " . mysql_error());
+                        }
+                    }
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+                    exit;
+                } else {
+                    $pagetitle = "Set Parent";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; Set Parent ";
+                    $parent1 = "";
+
+                    if (!isset($_POST['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    } else {
+                        $tlist = implode(",",$_POST['nchecked']);
+                    }
+                }
+            } else if (isset($_GET['remove'])) {
+                if (isset($_GET['confirmed'])) {
+                    $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid='{$_GET['remove']}'";
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    while ($row = mysql_fetch_row($result)) {
+                        $qidstocheck[] = $row[0];
+                    }
+                    $query = "DELETE FROM imas_libraries WHERE id='{$_GET['remove']}'";
+                    if (!$isadmin) {
+                        $query .= " AND groupid='$groupid'";
+                    }
+                    if (!$isadmin && !$isgrpadmin) {
+                        $query .= " AND ownerid='$userid'";
+                    }
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    if (mysql_affected_rows()>0 && count($qidstocheck)>0) {
+                        $query = "DELETE FROM imas_library_items WHERE libid='{$_GET['remove']}'";
+                        mysql_query($query) or die("Query failed : " . mysql_error());
+                        $qids = implode(",",$qidstocheck);
+                        $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        $okqids = array();
+                        while ($row = mysql_fetch_row($result)) {
+                            $okqids[] = $row[0];
+                        }
+                        $qidstofix = array_diff($qidstocheck,$okqids);
+                        if ($_POST['delq']=='yes' && count($qidstofix)>0) {
+                            $qlist = implode(',',$qidstofix);
+                            //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
+                            $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
+                            mysql_query($query) or die("Query failed : " . mysql_error());
+                            /*foreach ($qidstofix as $qid) {
+                                delqimgs($qid);
+                            }*/
+                        } else {
+                            foreach($qidstofix as $qid) {
+                                $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
+                                mysql_query($query) or die("Query failed : " . mysql_error());
+                            }
+                        }
+                    }
+
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+
+                    exit;
+                } else {
+                    $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_GET['remove']}'";
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    $libcnt= mysql_result($result,0,0);
+                    $pagetitle = ($libcnt>0) ? "Error" : "Remove Library";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
+                }
+            } else if (isset($_GET['transfer'])) {
+                if (isset($_POST['newowner'])) {
+
+                    //added for mysql 3.23 compatibility
+                    $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    $newgpid = mysql_result($result,0,0);
+
+                    //$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
+                    //$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
+                    //$query .= "imas_libraries.id='{$_GET['transfer']}'";
+                    $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='{$_GET['transfer']}'";
+                    if (!$isadmin) {
+                        $query .= " AND groupid='$groupid'";
+                    }
+                    if (!$isadmin && !$isgrpadmin) {
+                        $query .= " AND ownerid='$userid'";
+                    }
+                    mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+                    exit;
+                } else {
+                    $pagetitle = "Transfer Library";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
+                    $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    $i=0;
+                    $page_newOwnerList = array();
+                    while ($row = mysql_fetch_row($result)) {
+                        $page_newOwnerList['val'][$i] = $row[0];
+                        $page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
+                        $i++;
+                    }
+
+                }
+
+            } else if (isset($_GET['modify'])) {
+                if (isset($_POST['name']) && trim($_POST['name'])!='') {
+                    if ($_GET['modify']=="new") {
+                        $_POST['name'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['name']);
+                        $query = "SELECT * FROM imas_libraries WHERE name='{$_POST['name']}' AND parent='{$_POST['libs']}'";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        if (mysql_num_rows($result)>0) {
+                            $overwriteBody =1;
+                            $body = "Library already exists by that name with this parent.\n";
+                            $body .= "<p><a href=\"managelibs.php?cid=$cid&modify=new\">Try Again</a></p>\n";
+                        } else {
+                            $mt = microtime();
+                            $uqid = substr($mt,11).substr($mt,2,6);
+                            $query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,sortorder,parent,groupid) VALUES ";
+                            $query .= "($uqid,$now,$now,'{$_POST['name']}','$userid','{$_POST['rights']}','{$_POST['sortorder']}','{$_POST['libs']}','$groupid')";
+                            mysql_query($query) or die("Query failed : " . mysql_error());
+                            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+                            exit;
+                        }
+                    } else {
+
+                        $query = "UPDATE imas_libraries SET name='{$_POST['name']}',userights='{$_POST['rights']}',sortorder='{$_POST['sortorder']}',lastmoddate=$now";
+                        if ($_GET['modify'] != $_POST['libs']) {
+                            $query .= ",parent='{$_POST['libs']}'";
+                        }
+                        $query .= " WHERE id='{$_GET['modify']}'";
+                        if (!$isadmin) {
+                            $query .= " AND groupid='$groupid'";
+                        }
+                        if (!$isadmin && !$isgrpadmin) {
+                            $query .= " AND ownerid='$userid'";
+                        }
+                        mysql_query($query) or die("Query failed : " . mysql_error());
+
+                        header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managelibs.php?cid=$cid");
+                        exit;
+                    }
+                } else {
+                    $pagetitle = "Library Settings";
+                    $curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
+
+                    if ($_GET['modify']!="new") {
+                        $pagetitle = "Modify Library\n";
+                        $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
+                        if (!$isadmin) {
+                            $query .= " AND ownerid='$userid'";
+                        }
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        if ($row = mysql_fetch_row($result)) {
+                            $name = $row[0];
+                            $rights = $row[1];
+                            $parent = $row[2];
+                            $sortorder = $row[3];
+                        }
+                    } else {
+                        $pagetitle = "Add Library\n";
+                        if (isset($_GET['parent'])) {
+                            $parent = $_GET['parent'];
+                        }
+                    }
+                    if (!isset($name)) { $name = '';}
+                    if (!isset($rights)) {
+                        if ($isadmin || $allownongrouplibs) {
+                            $rights = 8;
+                        } else {
+                            $rights = 2;
+                        }
+                    }
+                    if (!isset($parent)) {$parent = 0;}
+                    if (!isset($sortorder)) {$sortorder = 0;}
+                    $parent1 = $parent;
+
+                    if ($parent==0) {
+                        $lnames = "Root";
+                    } else {
+                        $query = "SELECT name FROM imas_libraries WHERE id='$parent'";
+                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                        $lnames = mysql_result($result,0,0);
+                    }
+                }
+
+                $page_libRights = array();
+                $page_libRights['val'][0] = 0;
+                $page_libRights['val'][1] = 1;
+                $page_libRights['val'][2] = 2;
+
+                $page_libRights['label'][0] = "Private";
+                $page_libRights['label'][1] = "Closed to group, private to others";
+                $page_libRights['label'][2] = "Open to group, private to others";
+
+                if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+                    $page_libRights['label'][3] = "Closed to all";
+                    $page_libRights['label'][4] = "Open to group, closed to others";
+                    $page_libRights['label'][5] = "Open to all";
+                    $page_libRights['val'][3] = 4;
+                    $page_libRights['val'][4] = 5;
+                    $page_libRights['val'][5] = 8;
+                }
+
+            } else { //DEFAULT PROCESSING HERE
+
+//                $pagetitle = "Library Management";
+//                $helpicon = "&nbsp;&nbsp; <img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=managelibraries','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/>";
+//                $curBreadcrumb .= " &gt; Manage Libraries ";
+                if ($isAdmin) {
+                    $page_AdminModeMsg = "You are in Admin mode, which means actions will apply to all libraries, regardless of owner";
+                } else if ($isGrpAdmin) {
+                    $page_AdminModeMsg =  "You are in Group Admin mode, which means actions will apply to all libraries from your group, regardless of owner";
+                } else {
+                    $page_AdminModeMsg = "";
+                }
+
+                $resultLib = Libraries::getById();
+                $rights = array();
+                $sortorder = array();
+
+                foreach($resultLib as $key => $line)
+                {
+                    $id = $line['id'];
+                    $name = $line['name'];
+                    $parent = $line['parent'];
+                    $qcount[$id] = $line['count'];
+                    $ltlibs[$parent][] = $id;
+                    $parents[$id] = $parent;
+                    $names[$id] = $name;
+                    $rights[$id] = $line['userights'];
+                    $sortorder[$id] = $line['sortorder'];
+                    $ownerids[$id] = $line['ownerid'];
+                    $groupids[$id] = $line['groupid'];
+                }
+                $page_appliesToMsg = (!$isAdmin) ? "(Only applies to your libraries)" : "";
+            }
+            $setParentRights = $this->setparentrights($id);
+            foreach ($rights as $k=>$n) {
+                $this->setparentrights($k);
+            }
+
+            $qcount[0] = $this->addupchildqs(0);
+
+            $count = 0;
+
+            if (isset($ltlibs[0])) {
+                $this->printlist(0);
+            }
+        }
+        $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights);
+        return $this->renderWithData('manageLib', $responseData);
+    }
+
+    function delqimgs($qsid) {
+        $query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
+        $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+        while ($row = mysql_fetch_row($result)) {
+            $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
+            $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
+            if (mysql_num_rows($r2)==1) { //don't delete if file is used in other questions
+                unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
+            }
+            $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
+            mysql_query($query) or die("Query failed :$query " . mysql_error());
+        }
+    }
+
+    function printlist($parent) {
+        global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
+        $arr = $ltlibs[$parent];
+        if ($sortorder[$parent]==1) {
+            $orderarr = array();
+            foreach ($arr as $child) {
+                $orderarr[$child] = $names[$child];
+            }
+            natcasesort($orderarr);
+            $arr = array_keys($orderarr);
+        }
+
+        foreach ($arr as $child) {
+            //if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
+            if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
+                if (!$isadmin) {
+                    if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
+                        $rights[$child]=4;  //adjust coloring
+                    }
+                }
+                if (isset($ltlibs[$child])) { //library has children
+                    //echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
+                    echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
+                    echo "</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=hdr onClick=\"toggle($child)\"><span class=\"r{$rights[$child]}\">{$names[$child]}</span> </span>\n";
+                    //if ($isadmin) {
+                    echo " ({$qcount[$child]}) ";
+                    //}
+                    echo "<span class=op>";
+                    if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
+                        echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+                        echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
+                        echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
+                    }
+                    echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+                    echo "<ul class=hide id=$child>\n";
+                    echo "</span>";
+                    $count++;
+                    printlist($child);
+                    echo "</ul></li>\n";
+
+                } else {  //no children
+
+                    echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=\"r{$rights[$child]}\">{$names[$child]}</span> ";
+                    //if ($isadmin) {
+                    echo " ({$qcount[$child]}) ";
+                    //}
+                    echo "<span class=op>";
+                    if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
+                        echo "<a href=\"managelibs.php?cid=$cid&modify=$child\">Modify</a> | ";
+                        echo "<a href=\"managelibs.php?cid=$cid&remove=$child\">Delete</a> | ";
+                        echo "<a href=\"managelibs.php?cid=$cid&transfer=$child\">Transfer</a> | ";
+                    }
+                    if ($qcount[$child]==0) {
+                        echo "<a href=\"managelibs.php?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+                    } else {
+                        echo "<a href=\"reviewlibrary.php?cid=$cid&lib=$child\">Preview</a>";
+                    }
+                    echo "</span>";
+                    echo "</li>\n";
+
+
+                }
+            }
+        }
+        return $parent;
+    }
+
+    function setparentrights($alibid) {
+        global $rights,$parents;
+        if ($parents[$alibid]>0) {
+            if ($rights[$parents[$alibid]] < $rights[$alibid]) {
+                //if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
+                $rights[$parents[$alibid]] = $rights[$alibid];
+            }
+            $this->setparentrights($parents[$alibid]);
+        }
+        return $alibid;
+    }
+
+    function addupchildqs($p) {
+        global $qcount,$ltlibs;
+        if (isset($ltlibs[$p])) { //if library has children
+            foreach ($ltlibs[$p] as $child) {
+                $qcount[$p] += $this->addupchildqs($child);
+            }
+        }
+        return $qcount[$p];
+    }
+
 }

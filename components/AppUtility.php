@@ -2867,6 +2867,17 @@ class AppUtility extends Component
         }
 
     }
+    public static function generatemoveselect($count,$num) {
+        $num = $num+1;  //adjust indexing
+        $html = "<select id=\"ms-$num\" onchange=\"movefile($num)\">\n";
+        for ($i = 1; $i <= $count; $i++) {
+            $html .= "<option value=\"$i\" ";
+            if ($i==$num) { $html .= "selected=1";}
+            $html .= ">$i</option>\n";
+        }
+        $html .= "</select>\n";
+        return $html;
+    }
 
 
 

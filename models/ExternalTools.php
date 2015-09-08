@@ -167,8 +167,9 @@ class ExternalTools extends BaseImasExternalTools
         return $data;
     }
     public static function getByCourseAndOrderByName($courseId){
+
         $query = new Query();
-        $query ->select(['id','name'])
+        $query ->select(['id','name AS nm'])
             ->from('imas_external_tools')
             ->where(['courseid' => $courseId]);
         $query->orderBy('name');
@@ -177,10 +178,10 @@ class ExternalTools extends BaseImasExternalTools
         return $data;
     }
 
-    public static function deleteExternalTool($id)
+    public static function getById($id)
     {
-        $query = \Yii::$app->db->createCommand("SELECT name FROM imas_external_tools WHERE id='$id'")->queryOne();
-        return $query;
+        $extenalTool = ExternalTools::find()->where(['id' => $id])->one();
+        return $extenalTool;
     }
 
     public static function externalToolsDataForLink($courseId,$groupId)

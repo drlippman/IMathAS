@@ -583,7 +583,7 @@ class CourseItemsUtility extends Component
             <div class="floatright">
                 <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown" href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button" src="<?php echo AppUtility::getAssetURL()?>img/courseSettingItem.png"/></a>
                 <ul class=" select1 dropdown-menu selected-options pull-right">
-                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id)?>"><?php AppUtility::t('Modify');?></a></li>
+                    <li><a class="modify" href="<?php echo AppUtility::getURLFromHome('course','course/modify-inline-text?cid='. $course->id. '&id=' .$inline->id)?>"><?php AppUtility::t('Modify');?></a></li>
                     <li><a id="delete" href="javascript:deleteItem('<?php echo $inline->id; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Delete');?></a></li>
                     <li><a id="copy" href="javascript:copyItem('<?php echo $item['inline']['id']; ?>','<?php echo AppConstant::INLINE_TEXT?>','<?php echo $parent ;?>','<?php echo $course->id ;?>')"><?php AppUtility::t('Copy');?></a></li>
                 </ul>

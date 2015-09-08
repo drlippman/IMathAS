@@ -37,7 +37,6 @@ class Course extends BaseImasCourses {
         $course['topbar'] = AppConstant::TOPBAR_VALUE;
         $course['hideicons'] = AppConstant::HIDE_ICONS_VALUE;
         $course['itemorder'] = AppConstant::ITEM_ORDER;
-
         $course = AppUtility::removeEmptyAttributes($course);
         $this->attributes = $course;
         $this->save();
@@ -441,6 +440,17 @@ class Course extends BaseImasCourses {
             ->where(['LIKE','itemorder',$search])->limit(40);
         $command = $query->createCommand();
         $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getOutComeByCourseId($cid)
+    {
+        $query = new Query();
+        $query	->select(['outcomes'])
+            ->from('imas_courses')
+            ->where(['id' => $cid]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
         return $data;
     }
 }

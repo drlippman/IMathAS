@@ -5,6 +5,7 @@ namespace app\controllers\course;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
+use app\components\filehandler;
 use app\models\_base\BaseImasGroups;
 use app\models\AppModel;
 use app\models\AssessmentSession;
@@ -338,21 +339,21 @@ class CourseController extends AppController
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
-        $this->layout = 'master';
         $model = new CourseSettingForm();
+
         if ($model->load($this->isPostMethod())) {
             $isSuccess = false;
-            $courseData = $this->getRequestParams();
+            $bodyParams = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
             $course = new Course();
-            $courseId = $course->create($user, $courseData);
+            $courseId = $course->create($user, $bodyParams);
             if ($courseId) {
                 $teacher = new Teacher();
                 $teacherId = $teacher->create($user->id, $courseId);
                 $gbScheme = new GbScheme();
                 $gbSchemeId = $gbScheme->create($courseId);
                 if ($teacherId && $gbSchemeId) {
-                    $this->setSuccessFlash('Course added successfully. Course id: ' . $courseId . ' and Enrollment key: ' . $courseData['CourseSettingForm']['enrollmentKey']);
+                    $this->setSuccessFlash('Course added successfully. Course id: ' . $courseId . ' and Enrollment key: ' . $bodyParams['CourseSettingForm']['enrollmentKey']);
                     $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
                     $model = new CourseSettingForm();
                     $isSuccess = true;
@@ -782,156 +783,316 @@ class CourseController extends AppController
      */
     public function actionModifyInlineText()
     {
+        global $outcomes;
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
+        $userId = $user['id'];
         $params = $this->getRequestParams();
-        $courseId = $this->getParamVal('courseId');
-        $inlineId = $this->getParamVal('id');
-        $course = Course::getById($courseId);
+        $cid = $params['cid'];
+        $inlineId = $params['id'];
+        $course = Course::getById($cid);
         $inlineText = InlineText::getById($inlineId);
-        $inlineTextId = $params['id'];
-        $saveTitle = '';
-        $pageTitle = AppConstant::ADD_INLINE_TEXT;
-        $saveTitle = AppConstant::CREATE_ITEM;
-        $defaultValue = array(
-            'startDate' => time(),
-            'sDate' => date("m/d/y"),
-            'sTime' => date("g:i A"),
-            'eDate' => date("m/d/y"),
-            'eTime' => date("g:i A"),
-        );
-        if ($this->isPostMethod()) {
-            $params = $this->getRequestParams();
-            if ($inlineTextId) {
-                $updateForum = new InlineText();
-                $updateForum->updateChanges($params, $inlineTextId);
-            } else {
-                $endDate = AssessmentUtility::parsedatetime($params['edate'], $params['etime']);
-                $startDate = AssessmentUtility::parsedatetime($params['sdate'], $params['stime']);
-                $finalArray['title'] = trim($params['title']);
-                if (empty($params['text'])) {
-                    $params['text'] = ' ';
-                }
-                $finalArray['text'] = trim($params['text']);
-                $finalArray['courseid'] = $params['cid'];
-                if ($params['avail'] == AppConstant::NUMERIC_ONE) {
-                    if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
-                        $startDate = AppConstant::NUMERIC_ZERO;
-                    }
-                    if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
-                        $endDate = AppConstant::ALWAYS_TIME;
-                    }
-                    $finalArray['startdate'] = $startDate;
-                    $finalArray['enddate'] = $endDate;
-                } else {
-                    $finalArray['startdate'] = AppConstant::NUMERIC_ZERO;
-                    $finalArray['enddate'] = AppConstant::ALWAYS_TIME;
-                }
-                $finalArray['avail'] = $params['avail'];
-                $finalArray['courseid'] = $courseId;
-                $finalArray['oncal'] = $params['place-on-calendar'];
-                $finalArray['isplaylist'] = $params['isplaylist'];
-                $finalArray['caltag'] = '!';
-                $newInline = new InlineText();
-                $inlineId = $newInline->saveChanges($finalArray);
-                $itemType = 'InlineText';
-                $itemId = new Items();
-                $lastItemId = $itemId->saveItems($courseId, $inlineId, $itemType);
-                $courseItemOrder = Course::getItemOrder($courseId);
-                $itemOrder = $courseItemOrder->itemorder;
-                $items = unserialize($itemOrder);
-                $blockTree = array(AppConstant::NUMERIC_ZERO);
-                $sub =& $items;
-                for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
-                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items'];
-                }
-                array_unshift($sub, intval($lastItemId));
-                $itemOrder = serialize($items);
-                $saveItemOrderIntoCourse = new Course();
-                $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
-                /*
-                 * Upload a file into database
-                 */
-                $target_dir = "Uploads/";
-                $target_file = $target_dir . basename($_FILES["userfile"]["name"]);
-                $uploadOk = AppConstant::NUMERIC_ONE;
-                // Check if file already exists
-                if (file_exists($target_file)) {
-                    $uploadOk = AppConstant::NUMERIC_ZERO;
-                }
-                if($uploadOk == AppConstant::NUMERIC_ONE) {
-                    move_uploaded_file($_FILES["userfile"]["tmp_name"], $target_file);
-                    $fileName = basename( $_FILES["userfile"]["name"]);
-                    $insterFiles = new InstrFiles();
-                    $params['filename'] =  $fileName;
-                    $insterFiles->saveFile($params,$inlineId);
-                }
-            }
-            return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
+        $teacherId = $this->isTeacher($userId,$cid);
+        $tutorId = $this->isTutor($userId, $cid);
+        $tb = $this->getParamVal('tb');
+        $block = $this->getParamVal('block');
+        $moveFile = $this->getParamVal('movefile');
+        if (isset($tb)) {
+            $toTb = $tb;
+        } else {
+            $toTb = 'b';
         }
-        if (isset($inlineTextId)) {
-            $pageTitle = 'Modify Inline Text';
-            $saveTitle = AppConstant::SAVE_BUTTON;
-            $inlineTextData = InlineText::getById($inlineTextId);
-            $startDate = $inlineTextData['startdate'];
-            $endDate = $inlineTextData['enddate'];
-            $courseDefTime = $course['deftime'] % AppConstant::NUMERIC_TEN_THOUSAND;
-            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
-            $minutes = $courseDefTime % AppConstant::SECONDS;
-            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
-            $defTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
-            $hour = floor($courseDefTime / AppConstant::SECONDS) % AppConstant::NUMERIC_TWELVE;
-            $minutes = $courseDefTime % AppConstant::SECONDS;
-            $am = ($courseDefTime < AppConstant::NUMERIC_TWELVE * AppConstant::SECONDS) ? AppConstant::AM : AppConstant::PM;
-            $defStartTime = (($hour == AppConstant::NUMERIC_ZERO) ? AppConstant::NUMERIC_TWELVE : $hour) . ':' . (($minutes < AppConstant::NUMERIC_TEN) ? '0' : '') . $minutes . ' ' . $am;
+        if (!(isset($teacherId))) { // loaded by a NON-teacher
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to log in as a teacher to access this page";
+        } elseif (!(isset($cid))) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+            $body = "You need to access this page from the course page menu";
+        }  else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+            $block = $block;
+            $page_formActionTag = "modify-inline-text?cid=" .$cid;
+            $page_formActionTag .= "&tb=$toTb";
+            $calTag = $params['caltag'];
 
-            if ($startDate != AppConstant::NUMERIC_ZERO) {
-                $sDate = AppUtility::tzdate("m/d/Y", $startDate);
-                $sTime = AppUtility::tzdate("g:i a", $startDate);
-            } else {
-                $sDate = AppUtility::tzdate("m/d/Y", time());
-                $sTime = $defStartTime;
+            if ($params['title'] != null || $params['text'] != null || $params['sdate'] != null)
+            { //if the form has been submitted
+                if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+                    if ($params['sdatetype'] == '0')
+                    {
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
+                    }
+                    if ($params['edatetype'] == '2000000000') {
+                        $endDate = AppConstant::ALWAYS_TIME;
+                    } else {
+                        $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+                    }
+                    $oncal = $params['oncal'];
+                } else if ($params['avail'] == AppConstant::NUMERIC_TWO)
+                {
+                    if ($params['altoncal'] == AppConstant::NUMERIC_ZERO)
+                    {
+                        $startDate = AppConstant::NUMERIC_ZERO;
+                        $oncal = AppConstant::NUMERIC_ZERO;
+                    } else {
+                        $startDate = AppUtility::parsedatetime($params['cdate'], "12:00 pm");
+                        $oncal = AppConstant::NUMERIC_ONE;
+                        $calTag = $params['altcaltag'];
+                    }
+                    $endDate =  AppConstant::ALWAYS_TIME;
+                }else {
+                    $startDate = AppConstant::NUMERIC_ZERO;
+                    $endDate = AppConstant::ALWAYS_TIME;
+                    $oncal = AppConstant::NUMERIC_ZERO;
+                }
+                if (isset($params['hidetitle'])) {
+                    $params['title'] = '##hidden##';
+                }
+                if (isset($params['isplaylist'])) {
+                    $isplaylist = AppConstant::NUMERIC_ONE;
+                } else {
+                    $isplaylist = AppConstant::NUMERIC_ZERO;
+                }
+
+                $params['title'] = addslashes(htmlentities(stripslashes($params['title'])));
+
+                $params['text'] = addslashes(stripslashes($_POST['text']));
+                $outcomes = array();
+                if (isset($params['outcomes'])) {
+                    foreach ($params['outcomes'] as $o) {
+                        if (is_numeric($o) && $o>0) {
+                            $outcomes[] = intval($o);
+                        }
+                    }
+                }
+                $outcomes = implode(',', $outcomes);
+
+                $filestoremove = array();
+                if (isset($params['id'])) {  //already have id; update
+                    $tempArray = array();
+                    $tempArray['startdate'] = $startDate;
+                    $tempArray['courseid'] = $cid;
+                    $tempArray['enddate'] = $endDate;
+                    $tempArray['caltag'] = $calTag;
+                    $tempArray['outcomes'] = $outcomes;
+                    $tempArray['isplaylist'] = $isplaylist;
+                    $tempArray['oncal'] = $oncal;
+                    $tempArray['title'] = $params['title'];
+                    $tempArray['text'] = $params['text'];
+                    $tempArray['avail'] = $params['avail'];
+                    $updateResult = new InlineText();
+                    $result = $updateResult->updateChanges($tempArray, $params['id']);
+
+                    //update attached files
+                    $resultFile = InstrFiles::getFileName($params['id']);
+
+                   foreach($resultFile as $key => $row) {
+                        if (isset($params['delfile-'.$row['id']])) {
+                            $filestoremove[] = $row['id'];
+                             InstrFiles::deleteByItemId($row['id']);
+                            $r2 = InstrFiles::getByIdForFile($row['filename']);
+                            if (count($r2) == 0) {
+                                //$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+                                //unlink($uploaddir . $row[2]);
+                                filehandler::deletecoursefile($row['filename']);
+                            }
+                        } else if ($params['filedescr-'.$row['id']] != $row['description']) {
+                            $query = InstrFiles::setFileDescription($row['id'], $params['filedescr-'.$row['id']]);
+                        }
+                    }
+                    $newtextid = $params['id'];
+                } else { //add new
+                    $tempArray = array();
+                    $tempArray['cid'] = $cid;
+                    $tempArray['startdate'] = $startDate;
+                    $tempArray['enddate'] = $endDate;
+                    $tempArray['caltag'] = $calTag;
+                    $tempArray['outcomes'] = $outcomes;
+                    $tempArray['isplaylist'] = $isplaylist;
+                    $tempArray['oncal'] = $params['oncal'];
+                    $tempArray['title'] = $params['title'];
+                    $tempArray['text'] = $params['text'];
+                    $tempArray['avail'] = $params['avail'];
+
+                    $newInline = new InlineText();
+                    $newtextid = $newInline->saveInlineText($tempArray);
+                    $itemType = 'InlineText';
+                    $itemId = new Items();
+                    $itemid = $itemId->saveItems($cid, $newtextid, $itemType);
+                    $courseItemOrder = Course::getItemOrder($cid);
+                    $itemOrder = $courseItemOrder->itemorder;
+                    $items = unserialize($itemOrder);
+                    $blockTree = explode('-',$block);
+                    $sub =& $items;
+
+                    for ($i=1; $i<count($blockTree); $i++) {
+                        $sub =& $sub[$blockTree[$i]-1]['items']; //-1 to adjust for 1-indexing
+                    }
+                    if ($toTb == 'b') {
+                        $sub[] = $itemid;
+                    } else if ($toTb == 't') {
+                        array_unshift($sub, $itemid);
+                    }
+                    array_unshift($sub, intval($itemid));
+                    $itemOrder = serialize($items);
+                    $saveItemOrderIntoCourse = new Course();
+                    $saveItemOrderIntoCourse->setItemOrder($itemOrder, $cid);
+                }
+                if ($_FILES['userfile']['name']!='') {
+                    $uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
+                    $userfilename = preg_replace('/[^\w\.]/','',basename($_FILES['userfile']['name']));
+                    $filename = $userfilename;
+                    $extension = strtolower(strrchr($userfilename,"."));
+                    $badextensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                    if (in_array($extension,$badextensions)) {
+                        $overWriteBody = 1;
+                        $body = "<p>File type is not allowed</p>";
+                    } else {
+                        if (($filename = filehandler::storeuploadedcoursefile('userfile',$cid.'/'.$filename)) !== false) {
+                            if (trim($params['newfiledescr'])=='') {
+                                $params['newfiledescr'] = $filename;
+                            }
+                            $addedfileOne = new InstrFiles();
+                            $addedfile = $addedfileOne->saveFile($params,$filename, $newtextid);
+                            $params['id'] = $newtextid;
+                        } else {
+                            $overWriteBody = 1;
+                            $body = "<p>Error uploading file!</p>\n";
+                        }
+                    }
+                }
             }
-            if ($endDate != AppConstant::ALWAYS_TIME) {
-                $eDate = AppUtility::tzdate("m/d/Y", $endDate);
-                $eTime = AppUtility::tzdate("g:i a", $endDate);
-            } else {
-                $eDate = AppUtility::tzdate("m/d/Y", time() + AppConstant::WEEK_TIME);
-                $eTime = $defTime;
+            if (isset($addedfile) || count($filestoremove) > 0 || isset($params['movefile'])) {
+
+                $fileorder = InlineText::getFileOrder($params['id']);
+
+                if ($fileorder['fileorder'] == '') {
+                    $fileorder = array();
+                }
+                if (isset($addedfile)) {
+                    $fileorder[] = $addedfile;
+                }
+                if (count($filestoremove) > 0) {
+                    for ($i=0; $i<count($filestoremove); $i++) {
+                        $k = array_search($filestoremove[$i],$fileorder);
+                        if ($k!==FALSE) {
+                            array_splice($fileorder,$k,1);
+                        }
+                    }
+                }
+                if (isset($params['movefile'])) {
+                    $from = $params['movefile'];
+                    $to = $params['movefileto'];
+                    $itemtomove = $fileorder[$from-1];  //-1 to adjust for 0 indexing vs 1 indexing
+                    array_splice($fileorder,$from-1,1);
+                    array_splice($fileorder,$to-1,0,$itemtomove);
+                }
+                $fileorder = implode(',',$fileorder);
+                 InlineText::setFileOrder($params['id'],$fileorder);
             }
-            $defaultValue = array(
-                'sDate' => $sDate,
-                'sTime' => $sTime,
-                'eDate' => $eDate,
-                'eTime' => $eTime,
-                'startDate' => $startDate,
-                'endDate' => $endDate,
-            );
-            /*
-             * Upload a file into database
-             */
-            $target_dir = "Uploads/";
-            $target_file = $target_dir . basename($_FILES["userfile"]["name"]);
-            $uploadOk = AppConstant::NUMERIC_ONE;
-            /*
-             *  Check if file already exists
-             */
-            if (file_exists($target_file)) {
-                $uploadOk = AppConstant::NUMERIC_ZERO;
+            if ($params['submitbtn'] == 'Submit') {
+                return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$cid));
             }
 
-            if($uploadOk == AppConstant::NUMERIC_ONE) {
-                move_uploaded_file($_FILES["userfile"]["tmp_name"], $target_file);
-                $fileName = basename( $_FILES["userfile"]["name"]);
-                $insterFiles = new InstrFiles();
-                $params['filename'] =  $fileName;
-                $insterFiles->saveFile($params,$inlineId);
+            if (isset($params['id'])) {
+                $line = InlineText::getById($params['id']);
+                if ($line['title']=='##hidden##') {
+                    $hidetitle = true;
+                    $line['title']='';
+                }
+                $startDate = $line['startdate'];
+                $endDate = $line['enddate'];
+                $fileorder = explode(',',$line['fileorder']);
+                if ($line['avail']== 2 && $startDate > 0) {
+                    $altoncal = 1;
+                } else {
+                    $altoncal = 0;
+                }
+                if ($line['outcomes']!='') {
+                    $gradeoutcomes = explode(',',$line['outcomes']);
+                } else {
+                    $gradeoutcomes = array();
+                }
+                $savetitle = "Save Changes";
+                $pageTitle = 'Modify Inline Text';
+            } else {
+                //set defaults
+                $line['title'] = "Enter title here";
+                $line['text'] = "<p>Enter text here</p>";
+                $line['avail'] = 1;
+                $line['oncal'] = 0;
+                $line['caltag'] = '!';
+                $altoncal = 0;
+                $startDate = time();
+                $endDate = time() + 7*24*60*60;
+                $pageTitle = AppConstant::ADD_INLINE_TEXT;
+                $hidetitle = false;
+                $fileorder = array();
+                $gradeoutcomes = array();
+                $savetitle = "Create Item";
             }
+
+            if ($startDate!=0) {
+                $sdate = AppUtility::tzdate("m/d/Y",$startDate);
+                $stime = AppUtility::tzdate("g:i a",$startDate);
+            } else {
+                $sdate = AppUtility::tzdate("m/d/Y",time());
+                $stime = AppUtility::tzdate("g:i a",time());
+            }
+            if ($endDate!=2000000000) {
+                $edate = AppUtility::tzdate("m/d/Y",$endDate);
+                $etime = AppUtility::tzdate("g:i a",$endDate);
+            } else {
+                $edate = AppUtility::tzdate("m/d/Y",time()+7*24*60*60);
+                $etime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
+            }
+
+            if (isset($params['id'])) {
+                $result = InstrFiles::getFileName($inlineId);
+                $page_fileorderCount = count($fileorder);
+                $i = 0;
+                $page_FileLinks = array();
+                if (count($result) > 0) {
+                    foreach($result as $key => $row) {
+                        $filedescr[$row['id']] = $row['description'];
+                        $filenames[$row['id']] = rawurlencode($row['filename']);
+                    }
+                    foreach ($fileorder as $k=>$fid) {
+                        $page_FileLinks[$k]['link'] = $filenames[$fid];
+                        $page_FileLinks[$k]['desc'] = $filedescr[$fid];
+                        $page_FileLinks[$k]['fid'] = $fid;
+
+                    }
+                }
+            } else {
+                $stime = AppUtility::tzdate("g:i a",time());
+                $etime = AppUtility::tzdate("g:i a",time()+7*24*60*60);
+            }
+
+            $resultOutCome = Outcomes::getByCourseId($cid);
+
+            $outcomenames = array();
+           foreach($resultOutCome as $key => $row) {
+
+                $outcomenames[$row['id']] = $row['name'];
+            }
+            $result = Course::getOutComeByCourseId($cid);
+            $row = $result;
+            if ($row['outcomes']=='') {
+                $outcomearr = array();
+            } else
+            {
+                $outcomearr = unserialize($row['outcomes']);
+            }
+            $outcomes = array();
+            $this->flattenarr($outcomearr);
+            $page_formActionTag .= (isset($params['id'])) ? "&id=" . $params['id'] : "";
         }
         $this->includeJS(["course/inlineText.js", "editor/tiny_mce.js", "editor/tiny_mce_src.js", "general.js","editor.js"]);
         $this->includeCSS(['course/items.css']);
-        $responseData = array('course' => $course, 'saveTitle' => $saveTitle, 'inlineText' => $inlineText, 'pageTitle' => $pageTitle, 'defaultValue' => $defaultValue);
+        $responseData = array('page_formActionTag' => $page_formActionTag, 'savetitle' => $savetitle, 'line' => $line, 'startDate' => $startDate, 'endDate' => $endDate, 'sdate' => $sdate, 'stime' => $stime, 'edate' => $edate, 'etime' => $etime, 'outcome' => $outcomes, 'page_fileorderCount' => $page_fileorderCount, 'page_FileLinks' => $page_FileLinks, 'params' => $params, 'hidetitle' => $hidetitle, 'caltag' => $calTag, 'inlineId' => $inlineId, 'course' => $course, 'pageTitle' => $pageTitle, 'outcomenames' => $outcomenames, 'gradeoutcomes' => $gradeoutcomes);
         return $this->renderWithData('modifyInlineText', $responseData);
     }
 
@@ -1291,5 +1452,18 @@ class CourseController extends AppController
             }
         }
         return $outcomesList;
+    }
+
+    public function flattenarr($ar) {
+        global $outcomes;
+        foreach ($ar as $v)
+        {
+            if (is_array($v)) { //outcome group
+                $outcomes[] = array($v['name'], 1);
+                $this->flattenarr($v['outcomes']);
+            } else {
+                $outcomes[] = array($v, 0);
+            }
+        }
     }
 }

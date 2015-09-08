@@ -60,4 +60,13 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+    public static function getById()
+    {
+        $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.parent,imas_libraries.groupid,count(imas_library_items.id) AS count ";
+        $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id ";
+        $query .= "GROUP BY imas_libraries.id";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
+    }
 }

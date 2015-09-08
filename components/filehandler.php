@@ -131,7 +131,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 	}
 }
 
-function storeuploadedcoursefile($id,$key,$sec="public-read") {
+public static function storeuploadedcoursefile($id,$key,$sec="public-read") {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		if ($sec=="public" || $sec=="public-read") {
 			$sec = "public-read";
@@ -161,7 +161,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 			$dir = $base.dirname($key);
 			$fn = basename($key);
 			if (!is_dir($dir)) {
-				mkdir_recursive($dir);
+				filehandler::mkdir_recursive($dir);
 			} 
 			$t=0; $tfn = $fn;
 			while(file_exists($dir.'/'.$fn)){
@@ -537,7 +537,7 @@ function deleteforumfile($postid,$file) {
 	}
 }
 
-function deletecoursefile($file) {
+public static function deletecoursefile($file) {
 	if ($GLOBALS['filehandertypecfiles'] == 's3') {
 		$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 		$s3object = "cfiles/$file";
@@ -681,7 +681,7 @@ function getuserfileurl($key) {
 	global $urlmode,$imasroot;
 		return "localhost/math/web/Uploads/$key";
 }
-function getcoursefileurl($key) {
+public static function getcoursefileurl($key) {
 		return "localhost/math/web/Uploads/$key";
 	}
 public static function mkdir_recursive($pathname, $mode=0777)

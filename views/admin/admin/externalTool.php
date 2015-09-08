@@ -138,7 +138,7 @@ else{
                     <input type="hidden" id="id" value="<?php echo $row['nm']?>">
                  <?php
                     echo ' <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id']).'>Edit</a> ';
-                    echo '| <a href="#" class=confirmation-required>Delete</a> ';
+                    echo '| <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id'].'&amp;delete=ask').'>Delete</a>';
                    echo '</li>';
                 }
             }

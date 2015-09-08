@@ -13,7 +13,6 @@ class Outcomes extends BaseImasOutcomes {
 
     public  function SaveOutcomes($courseId,$outcome)
     {
-
             $this->name =$outcome;
             $this->courseid = $courseId;
             $this->save();
@@ -22,7 +21,6 @@ class Outcomes extends BaseImasOutcomes {
     }
     public static function getByCourseId($courseId)
     {
-
         $query = new Query();
         $query -> select(['id','name'])
                ->from('imas_outcomes')

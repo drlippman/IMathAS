@@ -482,3 +482,18 @@ margin-top: 7px;
     margin-left: -16px;
     margin-top: 15px;
 }
+.margin-left-twenty
+{
+    margin-left: 15px;
+}
+.margin-left-five{
+    margin-left: 5px;
+}
+.padding-bottom{
+    padding-bottom: 20px;
+}
+.margin-padding-admin-table{
+    margin-left: 20px;
+    padding-left: 0!important;
+
+}
