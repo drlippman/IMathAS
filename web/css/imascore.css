@@ -825,3 +825,9 @@ margin-left: 23px;
 .print-test-continue-btn {
     margin-top: -15% !important;
 }
+.preview-question-shadowbox {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 0px;
+    padding-top: 5px;
+}

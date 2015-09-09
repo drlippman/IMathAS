@@ -64,8 +64,16 @@ class AppConstant
     const NUMERIC_FOURTEEN = 14;
     const NUMERIC_FIFTEEN = 15;
     const NUMERIC_THIRTY = 30;
+    const NUMERIC_ONE_HUNDRED_TWENTY_SIX = 126;
+    const NUMERIC_ONE_HUNDRED_THIRTY_THREE = 133;
+    const NUMERIC_ONE_HUNDRED_AND_SIXTY = 160;
+    const NUMERIC_THREE_HUNDRED = 300;
+    const NUMERIC_ONE_THOUSAND_NINE_HUNDRED = 1900;
+    const NUMERIC_THREE_THOUSAND_FIVE_HUNDRED_NINETY_NINE = 3599;
     const NUMERIC_TEN_THOUSAND = 10000;
+    const NUMERIC_FIFTY_FIVE_THOUSAND_TWO_HUNDRED_NINETY_FIVE = 55295;
     const NUMERIC_NEGATIVE_ONE = -1;
+    const NUMERIC_NEGATIVE_THREE = -3;
     const NUMERIC_SIXTY_ONE = 61;
     const NUMERIC_THIRTY_TWO = 32;
     const TRIPLE_SEVEN = 0777;
@@ -99,6 +107,8 @@ class AppConstant
      */
     const WEEK_TIME = 604800;
     const SECONDS = 60;
+    const MINUTE = 60;
+    const HOURS = 24;
     const MINUTES = 3600;
     const DEFAULT_FEEDBACK = "This assessment contains items that are not automatically graded.  Your grade may be inaccurate until your instructor grades these items.";
     const SAVE_BUTTON = "Save Changes";
