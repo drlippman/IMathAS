@@ -392,9 +392,7 @@ class Assessments extends BaseImasAssessments
     public static function updateAssessmentData($setslist,$checkedlist)
     {
         $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)";
-        $command = $query->createCommand();
-        $data = $command->queryOne();
-        return $data;
+        Yii::$app->db->createCommand($query)->query();
     }
 
     public static function updateAssessmentForMassChange($startdate, $enddate, $reviewdate, $avail, $id)

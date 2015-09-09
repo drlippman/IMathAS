@@ -1092,7 +1092,6 @@ class ForumController extends AppController
                 $key++;
             }
         }
-
         $pageOutcomesList = array();
         $query = $course['outcomes'];
         $outcomeArray = unserialize($query);

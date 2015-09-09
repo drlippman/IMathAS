@@ -896,7 +896,6 @@ class QuestionController extends AppController
         $responseArray = array('cid' => $courseId,'aid' => $assessmentId, 'itemarr' => $itemArray, 'descriptions' => $descriptions,'category' => $category,
             'outcomes' => $outcomes, 'outcomenames' => $outcomeNames, 'questionlibs' => $questionLibs, 'libnames' => $libNames,
             'extracats' => $extraCats,'course' => $course);
-//AppUtility::dump($responseArray);
         return $this->renderWithData('categorize',$responseArray);
     }
 

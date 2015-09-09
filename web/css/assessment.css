@@ -46,3 +46,18 @@ margin-bottom: 25px;
 .end-assesment-shadowbox td, .end-assesment-shadowbox th {
 padding: 7px 0px 7px 0px;
 }
+span.hidden {
+    display: none;
+}
+
+span.show {
+    display: inline;
+}
+
+table td {
+    border-bottom: 1px solid #ccf;
+}
+
+.assessment-body{
+    margin-left: 35%;
+}

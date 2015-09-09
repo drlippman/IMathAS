@@ -110,7 +110,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             </tbody>
         </table>
-
     </fieldset>
     <div class="form-group">
         <div class="roster-submit">
@@ -120,7 +119,6 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-
 <script type="application/javascript">
     $(document).ready(function(){
         createDataTable('display-user-table');
@@ -128,6 +126,7 @@ $this->params['breadcrumbs'][] = $this->title;
     function saveStudentData() {
         var existingData = <?php echo json_encode($existingStudent ); ?>;
         var NewStudentData =  <?php echo json_encode($uniqueStudents ); ?>;
+      console.log(NewStudentData);
         var courseId = $("#course-id").val();
         if(existingData){
         var html = '<div><p>Existing students detail : </p></div><p>';
@@ -167,11 +166,12 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     function saveCsvFileSuccess(response)
     {
+        console.log(response);
         var courseId = $("#course-id").val();
 
         if(status == 0)
         {
-             window.location = "student-roster?cid="+courseId;
+//             window.location = "student-roster?cid="+courseId;
         }
     }
 

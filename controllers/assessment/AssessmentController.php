@@ -705,7 +705,7 @@ class AssessmentController extends AppController
         // SECURITY CHECK DATA PROCESSING
         if ($isTeacher != AppConstant::NUMERIC_ONE) {
             $overWriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to log in as a teacher to access this page";
+            $body = AppConstant::NO_TEACHER_RIGHTS;
         }
         if($this->isPostMethod()){
             if (isset($params['checked'])) { //if the form has been submitted
@@ -724,16 +724,16 @@ class AssessmentController extends AppController
                     }
                 }
                 if($count == AppConstant::NUMERIC_ZERO && !isset($params['removeperq']) && !isset($params['chgendmsg'])){
-                    $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
+                    $this->setWarningFlash(AppConstant::NO_SETTING);
                     return $this->redirect('change-assessment?cid='.$courseId);
                 }
                 $sets = array();
-                if (isset($params['docopyopt'])) {
+                if (isset($params['chgdocopyopt'])) {
                     $tocopy = 'password,timelimit,displaymethod,defpoints,defattempts,deffeedback,defpenalty,eqnhelper,showhints,allowlate,noprint,shuffle,gbcategory,cntingb,caltag,calrtag,minscore,exceptionpenalty,groupmax,showcat,msgtoinstr,posttoforum';
                     $row = Assessments::CommonMethodToGetAssessmentData($tocopy,$params['copyopt']);
                     $tocopyarr = explode(',', $tocopy);
-                    foreach ($row as $k => $item) {
-                        $sets[] = "$k='" . addslashes($item) . "'";
+                    foreach ($tocopyarr as $k=>$item) {
+                        $sets[] = "$item='".addslashes($row[$k])."'";
                     }
                 } else {
                     $turnonshuffle = AppConstant::NUMERIC_ZERO;
@@ -936,6 +936,7 @@ class AssessmentController extends AppController
                 }
                 if (count($sets) > AppConstant::NUMERIC_ZERO) {
                     $setslist = implode(',', $sets);
+
                     Assessments::updateAssessmentData($setslist,$checkedlist);
                 }
                 if (isset($params['removeperq'])) {
@@ -990,7 +991,7 @@ class AssessmentController extends AppController
         CopyItemsUtility::getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
         $assessments = Assessments::getByCourseId($courseId);
         if (count($assessments) == AppConstant::NUMERIC_ZERO) {
-            $page_assessListMsg = "<li>No Assessments to change</li>\n";
+            $page_assessListMsg = AppConstant::NO_ASSESSMENT_TO_CHANGE;
         } else {
             $page_assessListMsg = "";
             $i=AppConstant::NUMERIC_ZERO;
@@ -1005,22 +1006,22 @@ class AssessmentController extends AppController
         $page_forumSelect = array();
         $forums = Forums::getByCourseId($courseId);
         $page_forumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
-        $page_forumSelect['label'][0] = "None";
+        $page_forumSelect['label'][0] = AppConstant::NONE;
         foreach($forums as $forum){
             $page_forumSelect['val'][] = $forum['id'];
             $page_forumSelect['label'][] = $forum['name'];
         }
         $page_allowlateSelect = array();
         $page_allowlateSelect['val'][0] = 0;
-        $page_allowlateSelect['label'][0] = "None";
+        $page_allowlateSelect['label'][0] = AppConstant::NONE;
         $page_allowlateSelect['val'][1] = AppConstant::NUMERIC_ONE;
-        $page_allowlateSelect['label'][1] = "Unlimited";
+        $page_allowlateSelect['label'][1] = AppConstant::UNLIMITED;
         for ($k=1;$k<9;$k++) {
             $page_allowlateSelect['val'][] = $k+AppConstant::NUMERIC_ONE;
             $page_allowlateSelect['label'][] = "Up to $k";
         }
-        $this->includeJS(["general.js"]);
         $this->includeCSS(['assessment.css']);
+        $this->includeJS(["general.js","assessment/changeAssessment.js"]);
         $responaseData = array('ids' => $ids,'testtype' => $testtype,'showans' => $showans,'skippenalty' => $skippenalty,'page_assessListMsg' => $page_assessListMsg,'page_allowlateSelect' => $page_allowlateSelect,'page_forumSelect' => $page_forumSelect,'agbcats' => $agbcats,'page_assessSelect' => $page_assessSelect,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'overWriteBody' => $overWriteBody,'body' => $body,'isTeacher' => $isTeacher,'course' => $course,
             'parents' => $parents,'line' => $line,'sums' => $sums,'names' => $names,'types' => $types,'gitypeids' => $gitypeids,'prespace' => $prespace);
         return $this->renderWithData('changeAssessment',$responaseData);
