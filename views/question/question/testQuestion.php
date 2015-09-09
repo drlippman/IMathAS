@@ -19,19 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php AppUtility::t('Add/Remove Questions') ?></div>
-        </div>
-        <div class="pull-left header-btn">
-            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$course->id); ?>"
-               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting</a>
+            <div class="vertical-align title-page col-md-12"><?php AppUtility::t('Add/Remove Questions') ?></div>
         </div>
     </div>
 </div>
-<div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'roster']); ?>
-</div>
 <div class="tab-content shadowBox">
-
+<div class="col-md-12">
     <br>
     <br>
     <?php
@@ -40,22 +33,22 @@ $this->params['breadcrumbs'][] = $this->title;
     $flexwidth = true; //tells header to use non _fw stylesheet
     $placeinhead = '';
     if ($showtips==2) {
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=012810\"></script>";
+//        $placeinhead .= "<script type=\"text/javascript\" src=\"$AppU/js/eqntips.js?v=012810\"></script>";
     }
 
     if ($eqnhelper==1 || $eqnhelper==2) {
         $placeinhead .= '<script type="text/javascript">var eetype='.$eqnhelper.'</script>';
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqnhelper.js?v=030112\"></script>";
+//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/eqnhelper.js?v=030112\"></script>";
         $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
     } else if ($eqnhelper==3 || $eqnhelper==4) {
-        $placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=030212\" type=\"text/css\" />";
+//        $placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=030212\" type=\"text/css\" />";
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
             $placeinhead .= '';
         }
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
-        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
+//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=030112\"></script>";
+//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=030112\"></script>";
+//        $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=030112\"></script>";
         $placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 
     }
@@ -66,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $body;
     } else { //DISPLAY BLOCK HERE
         $useeditor = 1;
-        $brokenurl = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/savebrokenqflag.php?qsetid=".$params['qsetid'].'&flag=';
+        $brokenurl = AppUtility::getHomeURL(). "/save-brokenq-flag.?qsetid=".$params['qsetid'].'&flag=';
         ?>
         <script type="text/javascript">
             var BrokenFlagsaveurl = '<?php echo $brokenurl;?>';
@@ -112,12 +105,12 @@ $this->params['breadcrumbs'][] = $this->title;
             echo "if (window.opener && !window.opener.closed) {";
             echo $page_onlyChkMsg;
             echo "  if (prevnext[0][1]>0){
-				  document.write('<a href=\"testquestion.php?cid={$params['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
+				  document.write('<a href=\"test-question?cid={$params['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
 			  } else {
 				  document.write('Prev ');
 			  }
 			  if (prevnext[1][1]>0){
-				  document.write('<a href=\"testquestion.php?cid={$params['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
+				  document.write('<a href=\"test-question?cid={$params['cid']}$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[1][0]+'&qsetid='+prevnext[1][1]+'\">Next</a> ');
 			  } else {
 				  document.write('Next ');
 			  }
@@ -154,8 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         echo $page_scoreMsg;
-        echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
-        echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
+        echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div"); for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
         echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
         echo "<input type=hidden name=seed value=\"$seed\">\n";
         echo "<input type=hidden name=attempt value=\"$attempt\">\n";
@@ -169,14 +161,14 @@ $this->params['breadcrumbs'][] = $this->title;
         } else {
             $colors = array();
         }
-        displayq2::displayq(0,$params['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
+        displayq(0,$params['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
         echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
         echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
         echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
         echo "</form>\n";
 
         echo '<code id="qhtml" style="display:none">';
-        $message = displayq2::displayq(0,$params['qsetid'],$seed,false,false,0,true);
+        $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
         $message = printfilter(forcefiltergraph($message));
         $message = preg_replace('/(`[^`]*`)/',"<span class=\"AM\">$1</span>",$message);
         $message = str_replacE('`','\`',$message);
@@ -240,4 +232,5 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <br>
     </div>
+</div>
 

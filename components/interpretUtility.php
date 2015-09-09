@@ -526,7 +526,7 @@ class  interpretUtility extends Component
                             $thisn--; //decrease nesting depth
                             if ($thisn == 0) {
                                 //read inside of brackets, send recursively to interpreter
-                                $inside = interpretline(substr($str, $i + 1, $j - $i - 1), $anstype, $countcnt + 1);
+                                $inside = interpretUtility::interpretline(substr($str, $i + 1, $j - $i - 1), $anstype, $countcnt + 1);
                                 if ($inside == 'error') {
                                     //was an error, return error token
                                     return array(array('', 9));
@@ -612,7 +612,7 @@ class  interpretUtility extends Component
                 //if func is loadlibrary, need to do so now so allowedmacros
                 //will be expanded before reading the rest of the code
                 if ($lastsym[0] == "loadlibrary") {
-                    loadlibrary(substr($out, 1, strlen($out) - 2));
+                    interpretUtility::loadlibrary(substr($out, 1, strlen($out) - 2));
                     array_pop($syms);
                     $connecttolast = 0;
                 } else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
@@ -623,7 +623,7 @@ class  interpretUtility extends Component
                         //was an error, return error token
                         return array(array('', 9));
                     } else {
-                        //$inside = interpretline(mysql_result($result,0,0),$anstype);
+                        //$inside = interpretUtility::interpretline(mysql_result($result,0,0),$anstype);
                         $inside = interpret('control', $anstype, mysql_result($result, 0, 0), $countcnt + 1);
                         if (mysql_result($result, 0, 1) != $anstype) {
                             //echo 'Imported code question type does not match current question answer type';
@@ -662,7 +662,7 @@ class  interpretUtility extends Component
     }
 
 //loads a macro library	
-    function loadlibrary($str)
+   public static function loadlibrary($str)
     {
         $str = str_replace(array("/", ".", '"'), "", $str);
         $libs = explode(",", $str);

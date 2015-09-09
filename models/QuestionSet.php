@@ -264,4 +264,10 @@ class QuestionSet extends BaseImasQuestionset
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+    public static function getQtext($id){
+        return QuestionSet::find()->select('qtext')->where(['id' => $id])->one();
+    }
+    public static function getControlAndQType($id){
+        return QuestionSet::find()->select('control,qtype')->where(['id' => $id])->one();
+    }
 } 

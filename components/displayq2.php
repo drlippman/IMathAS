@@ -3,6 +3,7 @@ namespace app\components;
 
 
 use app\models\Exceptions;
+use app\models\Libraries;
 use app\models\QImages;
 use app\models\Questions;
 use app\models\Course;
@@ -17,6 +18,7 @@ $allowedmacros = $mathfuncs;
 //require_once("mathphp.php");
 require_once("mathphp2.php");
 require("interpretUtility.php");
+require("macros.php");
 class  displayq2 extends Component
 {
 //IMathAS:  Core of the testing engine.  Displays and grades questions
@@ -1035,7 +1037,7 @@ class  displayq2 extends Component
             } else {
                 $out .= "</ul>\n";
             }
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if ($displayformat == 'inline') {
                 $out .= "</span>";
             } else if ($displayformat != 'select') {
@@ -1147,7 +1149,7 @@ class  displayq2 extends Component
             } else {
                 $out .= "</ul>\n";
             }
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if ($displayformat == 'inline') {
                 $out .= "</span>";
             } else {
@@ -1276,7 +1278,7 @@ class  displayq2 extends Component
                 $out .= "</div>";
             }
             $out .= "<input type=hidden name=\"qn$qn\" value=\"done\" /><div class=spacer>&nbsp;</div>";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if ($colorbox != '') {$out .= '</div>';}
             //$tip = "In each box provided, type the letter (a, b, c, etc.) of the matching answer in the right-hand column";
             if ($displayformat=="select") {
@@ -1343,7 +1345,7 @@ class  displayq2 extends Component
                 $tip = '';
                 $eword = _('your answer');
             }
-            list($longtip,$shorttip) = formathint($eword,$ansformats,'calculated',(in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)), 1);
+            list($longtip,$shorttip) = displayq2::formathint($eword,$ansformats,'calculated',(in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)), 1);
             $tip .= $longtip;
 
             if ($showtips==2) { //eqntips: work in progress
@@ -1361,7 +1363,7 @@ class  displayq2 extends Component
                 $out .= "onfocus=\"showeedd('tc$qn',$useeqnhelper)\" onblur=\"hideee();hideeedd();\" ";
             }
             $out .= "/>$rightb";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
                 if (in_array('list',$ansformats) || in_array('exactlist',$ansformats) || in_array('orderedlist',$ansformats)) {
                     $out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','One or more of your answers is equivalent to the correct answer, but is not simplified or is in the wrong format');
@@ -1417,12 +1419,12 @@ class  displayq2 extends Component
                     $out .= "</tr>";
                 }
                 $out .= "</table>\n";
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
                 $tip = _('Enter each element of the matrix as  number (like 5, -3, 2.2)');
             } else {
                 $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"$la\" autocomplete=\"off\" />\n";
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
                 $out .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"AMmathpreview('qn$qn','p$qn')\" /> &nbsp;\n";
                 $out .= "<span id=p$qn></span> ";
                 $tip = _('Enter your answer as a matrix filled with numbers, like ((2,3,4),(3,4,5))');
@@ -1470,20 +1472,20 @@ class  displayq2 extends Component
                 }
                 $out .= "</table>\n";
                 $out .= '</td><td class="matrixright">&nbsp;</td></tr></table>';
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
                 if (!isset($hidepreview)) {$preview .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"matrixcalc('qn$qn','p$qn',{$answersize[0]},{$answersize[1]})\" /> &nbsp;\n";}
                 $preview .= "<span id=p$qn></span>\n";
                 $out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1; matsize[$qn]='{$answersize[0]},{$answersize[1]}';</script>\n";
-                $tip .= formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
+                $tip .= displayq2::formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
                 //$tip = "Enter each element of the matrix as  number (like 5, -3, 2.2) or as a calculation (like 5/3, 2^3, 5+4)";
             } else {
                 $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" />\n";
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
                 $out .= "<input type=button value=\"" . _('Preview') . "\" onclick=\"matrixcalc('tc$qn','p$qn')\" /> &nbsp;\n";
                 $out .= "<span id=p$qn></span> \n";
                 $out .= "<script type=\"text/javascript\">matcalctoproc[$qn] = 1;</script>\n";
                 $tip = _('Enter your answer as a matrix, like ((2,3,4),(1,4,5))');
-                $tip .= '<br/>'.formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
+                $tip .= '<br/>'.displayq2::formathint(_('each element of the matrix'),$ansformats,'calcmatrix');
             }
             $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
 
@@ -1537,7 +1539,7 @@ class  displayq2 extends Component
             $out .= "/>\n";
             $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
             $out .= "<input type=\"hidden\" id=\"qn$qn-vals\" name=\"qn$qn-vals\" />";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (!isset($GLOBALS['nocolormark']) && isset($rightanswrongformat) && (!isset($GLOBALS['noformatfeedback']) || $GLOBALS['noformatfeedback']==false)) {
                 $out .= ' '.formhoverover('<span style="color:#f60;font-size:80%">(Format)</span>','Your answer is equivalent to the correct answer, but is not simplified or is in the wrong format');
             }
@@ -1632,7 +1634,7 @@ class  displayq2 extends Component
                 $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
             }
             $out .= '/>';
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (isset($answer)) {
                 $sa = $answer;
             }
@@ -1673,7 +1675,7 @@ class  displayq2 extends Component
                 $tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5)') . "<br/>";
                 $shorttip = _('Enter an n-tuple');
             }
-            $tip .= formathint('each value',$ansformats,'calcntuple');
+            $tip .= displayq2::formathint('each value',$ansformats,'calcntuple');
 
             $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\" ";
             if ($showtips==2) { //eqntips: work in progress
@@ -1692,7 +1694,7 @@ class  displayq2 extends Component
             }
             $out .= "/>";
             $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (!isset($hidepreview)) {
                 $preview .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"ntuplecalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
             }
@@ -1732,7 +1734,7 @@ class  displayq2 extends Component
                 $out .= "onfocus=\"showehdd('qn$qn','$shorttip','$qnref')\" onblur=\"hideeh()\" ";
             }
             $out .= '/>';
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (isset($answer)) {
                 $sa = makepretty($answer);
             }
@@ -1757,7 +1759,7 @@ class  displayq2 extends Component
                 $tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5i') . "<br/>";
                 $shorttip = _('Enter a complex number');
             }
-            $tip .= formathint('each value',$ansformats,'calccomplex');
+            $tip .= displayq2::formathint('each value',$ansformats,'calccomplex');
 
             $out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=tc$qn id=tc$qn value=\"$la\" autocomplete=\"off\"  ";
             if ($showtips==2) { //eqntips: work in progress
@@ -1776,7 +1778,7 @@ class  displayq2 extends Component
             }
             $out .= "/>";
             $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (!isset($hidepreview)) {
                 $preview .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"complexcalc('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
             }
@@ -1818,7 +1820,7 @@ class  displayq2 extends Component
                     $out .= '>'.htmlentities($v).'</option>';
                 }
                 $out .= '</select>';
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
             } else {
                 $out .= "<input type=\"text\"  size=\"$sz\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" autocomplete=\"off\"  ";
 
@@ -1842,7 +1844,7 @@ class  displayq2 extends Component
                 else if ($displayformat=='alignright') { $out .= 'style="text-align: right;" ';}
                 $out .= "class=\"text $colorbox$addlclass\"";
                 $out .= '/>';
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
 
                 if ($displayformat == 'usepreview') {
                     $preview .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"stringqpreview('qn$qn','p$qn','$answerformat')\" /> &nbsp;\n";
@@ -1920,7 +1922,7 @@ class  displayq2 extends Component
                 }
 
                 $out .= filter($la);
-                $out .= getcolormark($colorbox);
+                $out .= displayq2::getcolormark($colorbox);
                 $out .= "</div>";
             } else {
                 $la = stripslashes($la);
@@ -1932,7 +1934,7 @@ class  displayq2 extends Component
                 }
                 if ($rows<2) {
                     $out .= "<input type=\"text $colorbox\" size=\"$cols\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" /> ";
-                    $out .= getcolormark($colorbox);
+                    $out .= displayq2::getcolormark($colorbox);
                 } else {
                     if ($colorbox!='') { $out .= '<div class="'.$colorbox.'">';}
                     $out .= "<textarea rows=\"$rows\" name=\"qn$qn\" id=\"qn$qn\" ";
@@ -1942,7 +1944,7 @@ class  displayq2 extends Component
                         $out .= "cols=\"$cols\" ";
                     }
                     $out .= ">$la</textarea>\n";
-                    $out .= getcolormark($colorbox);
+                    $out .= displayq2::getcolormark($colorbox);
                     if ($colorbox!='') { $out .= '</div>';}
                 }
                 if ($displayformat=='editor' && $GLOBALS['useeditor']==1) {
@@ -2020,7 +2022,7 @@ class  displayq2 extends Component
                 $out .= "onfocus=\"showeebasicdd('qn$qn',1)\" onblur=\"hideebasice();hideebasicedd();\" ";
             }
             $out .= '/>';
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (isset($answer)) {
                 if ($answerformat=='normalcurve' && $GLOBALS['sessiondata']['graphdisp']!=0) {
                     $sa .=  '<div style="position: relative; width: 500px; height:200px;padding:0px;background:#fff;">';
@@ -2074,7 +2076,7 @@ class  displayq2 extends Component
             }
             //$tip .= "Enter values as numbers (like 5, -3, 2.2) or as calculations (like 5/3, 2^3, 5+4)<br/>";
             //$tip .= "Enter DNE for an empty set, oo for Infinity";
-            $tip .= formathint(_('each value'),$ansformats,'calcinterval');
+            $tip .= displayq2::formathint(_('each value'),$ansformats,'calcinterval');
             if (isset($reqdecimals)) {
                 $tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
             }
@@ -2096,7 +2098,7 @@ class  displayq2 extends Component
             }
             $out .= '/>';
             $out .= "<input type=\"hidden\" id=\"qn$qn\" name=\"qn$qn\" />";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if (!isset($hidepreview)) {
                 $preview .= "<input type=button class='btn btn-primary assessment-btn' value=\"" . _('Preview') . "\" onclick=\"intcalculate('tc$qn','p$qn','$answerformat')\" /> &nbsp;\n";
             }
@@ -2376,7 +2378,7 @@ class  displayq2 extends Component
 
             if (strpos($snaptogrid,':')!==false) { $snaptogrid = "'$snaptogrid'";}
             $out .= '</span></div>';
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if ($colorbox!='') { $out .= '</div>';}
             $out .= "<input type=\"hidden\" name=\"qn$qn\" id=\"qn$qn\" value=\"$la\" />";
             $out .= "<script type=\"text/javascript\">canvases[$qn] = [$qn,'$bg',{$settings[0]},{$settings[1]},{$settings[2]},{$settings[3]},5,{$settings[6]},{$settings[7]},$def,$dotline,$locky,$snaptogrid];";
@@ -2493,7 +2495,7 @@ class  displayq2 extends Component
 
             if ($colorbox!='') { $out .= '<span class="'.$colorbox.'">';}
             $out .= "<input type=\"file\" name=\"qn$qn\" id=\"qn$qn\" />\n";
-            $out .= getcolormark($colorbox);
+            $out .= displayq2::getcolormark($colorbox);
             if ($colorbox!='') { $out .= '</span>';}
             if ($la!='') {
                 if (isset($GLOBALS['testsettings']) && isset($GLOBALS['sessiondata']['groupid']) && $GLOBALS['testsettings']>0 && $GLOBALS['sessiondata']['groupid']>0) {
@@ -5386,12 +5388,11 @@ class  displayq2 extends Component
         $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
         $result = mysql_query($query) or die("Query failed : " . mysql_error());
         $row = mysql_fetch_row($result);
-        if ($row[2]==null) {
-            return (array($row[0],$row[1]));
+        if ($row['name']==null) {
+            return (array($row['questionsetid'],$row['category']));
         } else {
-            return (array($row[0],$row[2]));
+            return (array($row['questionsetid'],$row['name']));
         }
-        //return mysql_fetch_row($result);	
     }
 
     function getallqsetid($questions) {
@@ -5412,7 +5413,7 @@ class  displayq2 extends Component
         return $out;
     }
 
-    function isNaN( $var ) {
+    public static function isNaN( $var ) {
         return !preg_match('/^[-]?[0-9]+([\.][0-9]+)?([eE][+\-]?[0-9]+)?$/', $var);
         //possible alternative:
         //return ($var!==$var || $var*2==$var);
@@ -5652,7 +5653,7 @@ class  displayq2 extends Component
         return true;
     }
 
-    function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false) {
+    public static function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false) {
         $tip = '';
         $shorttip = '';
         if (in_array('fraction',$ansformats)) {

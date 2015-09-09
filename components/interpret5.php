@@ -1,10 +1,10 @@
 <?php
+use app\models\QuestionSet;
 //IMathAS:  IMathAS question interpreter.  Defines how the IMathAS question
 //language works.
 //(c) 2006 David Lippman
 
 //TODO:  handle for ($i=0..2) { to handle expressions, array var, etc. for 0 and 2
-//require_once("mathphp.php");
 global $disallowedvar;
 array_push($allowedmacros,"loadlibrary","importcodefrom","includecodefrom","array","off","true","false","e","pi","null","setseed","if","for","where");
 $disallowedvar = array('$link','$qidx','$qnidx','$seed','$qdata','$toevalqtxt','$la','$laarr','$shanspt','$GLOBALS','$laparts','$anstype','$kidx','$iidx','$tips','$options','$partla','$partnum','$score','$disallowedvar','$allowedmacros','$wherecount','$countcnt');
@@ -29,14 +29,13 @@ function interpret($blockname,$anstype,$str,$countcnt=1)
 	}
 }
 
-function getquestionqtext1($m) {
-	$query = "SELECT qtext FROM imas_questionset WHERE id='{$m[2]}'";
-	$result = mysql_query($query) or die("Query failed : " . mysql_error());
-	if (mysql_num_rows($result)==0) {
+function getquestionqtext($m) {
+	$query = QuestionSet::getQtext($m[2]);
+	if (count($query)==0) {
 		echo _('bad question id in includeqtextfrom');
 		return "";
 	} else {
-		return mysql_result($result,0,0);
+		return $query['qtext'];
 	}
 }
 //interpreter some code text.  Returns a PHP code string.
@@ -575,16 +574,14 @@ function tokenize($str,$anstype,$countcnt) {
 				$connecttolast = 0;
 			} else if ($lastsym[0] == 'importcodefrom' || $lastsym[0] == 'includecodefrom') {
 				$out = intval(substr($out,1,strlen($out)-2));
-				$query = "SELECT control,qtype FROM imas_questionset WHERE id='$out'";
-				$result = mysql_query($query) or die("Query failed : " . mysql_error());
-				if (mysql_num_rows($result)==0) {
+				$query = QuestionSet::getControlAndQType($out);
+				if (count($query)==0) {
 					//was an error, return error token
 					return array(array('',9));
 				} else {
-					//$inside = interpretline(mysql_result($result,0,0),$anstype);
-					$inside = interpret('control',$anstype,mysql_result($result,0,0),$countcnt+1);
-					if (mysql_result($result,0,1)!=$anstype) {
-						//echo 'Imported code question type does not match current question answer type';
+					$inside = interpret('control',$anstype,$query['control'],$countcnt+1);
+					if ($query['qtype'] != $anstype) {
+						echo 'Imported code question type does not match current question answer type';
 					}
 				}
 				if ($inside=='error') {

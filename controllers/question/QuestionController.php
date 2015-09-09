@@ -29,7 +29,7 @@ use app\models\StuGroupSet;
 use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
-
+require("../components/displayQuestion.php");
 class QuestionController extends AppController
 {
     public function actionAddQuestions()
@@ -1665,7 +1665,6 @@ class QuestionController extends AppController
         $assessmentId = $params['aid'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
-        $pagetitle = "Test Question";
         $asid = AppConstant::NUMERIC_ZERO;
         $teacherId = $this->isTeacher($userId, $courseId);
         //CHECK PERMISSIONS AND SET FLAGS
@@ -1747,7 +1746,7 @@ class QuestionController extends AppController
             $resultLibNames = Libraries::getUserAndLibrary($params['qsetid']);
         }
         $this->includeCSS(['mathquill.css','question/question.css','course/course.css','roster/roster.css']);
-        $this->includeJS(['eqntips.js','eqnhelper.js','tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js']);
+        $this->includeJS(['eqntips.js','eqnhelper.js', 'mathquill_min.js','mathquilled.js','AMtoMQ.js','tablesorter.js','question/addquestions.js','general.js','question/addqsort.js','question/junkflag.js',' AMhelpers.js']);
         $responseArray = array('course' => $course,'params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'showtips' => $showtips,
             'eqnhelper' => $eqnhelper, 'page_onlyChkMsg' => $page_onlyChkMsg, 'chk' => $chk, 'formn' => $formn, 'onlychk' => $onlychk, 'page_scoreMsg' => $page_scoreMsg,
             'page_formAction' => $page_formAction, 'seed' => $seed, 'attempt' => $attempt, 'rawscores' => $rawscores, 'line' => $line, 'lastmod' => $lastmod,
@@ -1886,11 +1885,6 @@ class QuestionController extends AppController
         } else {
             echo "Error";
         }
-    }
-
-    public function ModQuestionGrid(){
-        return $this->layout = 'master';
-//        return $this->render('modQuestionGrid');
     }
 
     public function actionShowTest(){
