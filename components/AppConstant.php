@@ -205,4 +205,6 @@ class AppConstant
     const CONFIRMATION_MESSAGE= 'Are you SURE you want to delete this item and all associated grades from the gradebook?';
     const CONFIRM_DELETE = 'Confirm Delete';
     const DEFAULT_THEME = 'default.css';
+    const CHANGE_ASSESSMENT_SUCCESSFULLY = 'Assessment data changes successfully.';
+
 }

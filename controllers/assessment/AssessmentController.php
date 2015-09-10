@@ -692,12 +692,12 @@ class AssessmentController extends AppController
         $course = Course::getById($courseId);
         $isTeacher = $this->isTeacher($user['id'],$course['id']);
         $key = AppConstant::NUMERIC_ONE;
-        $gbcatsId[0] = AppConstant::NUMERIC_ZERO;
-        $gbcatsLabel[0] ='Default';
-        $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach ($gbcatsData as $singleGbcatsData) {
-            $gbcatsId[$key] = $singleGbcatsData['id'];
-            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+        $gbCatsId[0] = AppConstant::NUMERIC_ZERO;
+        $gbCatsLabel[0] ='Default';
+        $gbCatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbCatsData as $singleGbcatsData) {
+            $gbCatsId[$key] = $singleGbcatsData['id'];
+            $gbCatsLabel[$key] = $singleGbcatsData['name'];
             $key++;
         }
         $overWriteBody = AppConstant::NUMERIC_ZERO;
@@ -912,7 +912,6 @@ class AssessmentController extends AppController
                         }
                         $shuff .= ")";
                         $sets[] = $shuff;
-
                     }
                 }
                 if (isset($params['chgavail'])) {
@@ -949,11 +948,11 @@ class AssessmentController extends AppController
                         return $this->redirect('assessment-message?cid='.$courseId.'&aid='.$checkedlist);
                     }
                 } else {
-                    $this->setWarningFlash(' Assessment data changes successfully.');
-                    return $this->redirect('change-assessment?cid='.$courseId);
+                    $this->setWarningFlash(AppConstant::CHANGE_ASSESSMENT_SUCCESSFULLY);
+                    return $this->redirect(AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId);
                 }
             } else {
-                $this->setWarningFlash('No assessments are selected to be changed.');
+                $this->setWarningFlash(AppConstant::NO_ASSESSMENT);
                 return $this->redirect('change-assessment?cid=' . $courseId);
             }
         }
@@ -991,40 +990,40 @@ class AssessmentController extends AppController
         CopyItemsUtility::getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
         $assessments = Assessments::getByCourseId($courseId);
         if (count($assessments) == AppConstant::NUMERIC_ZERO) {
-            $page_assessListMsg = AppConstant::NO_ASSESSMENT_TO_CHANGE;
+            $pageAssessListMsg = AppConstant::NO_ASSESSMENT_TO_CHANGE;
         } else {
-            $page_assessListMsg = "";
+            $pageAssessListMsg = "";
             $i=AppConstant::NUMERIC_ZERO;
-            $page_assessSelect = array();
+            $pageAssessmentSelect = array();
             foreach($assessments as $assessment){
-                $page_assessSelect['val'][$i] = $assessment['id'];
-                $page_assessSelect['label'][$i] = $assessment['name'];
+                $pageAssessmentSelect['val'][$i] = $assessment['id'];
+                $pageAssessmentSelect['label'][$i] = $assessment['name'];
                 $agbcats[$assessment['id']] = $assessment['gbcategory'];
                 $i++;
             }
         }
-        $page_forumSelect = array();
+        $pageForumSelect = array();
         $forums = Forums::getByCourseId($courseId);
-        $page_forumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
-        $page_forumSelect['label'][0] = AppConstant::NONE;
+        $pageForumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
+        $pageForumSelect['label'][0] = AppConstant::NONE;
         foreach($forums as $forum){
-            $page_forumSelect['val'][] = $forum['id'];
-            $page_forumSelect['label'][] = $forum['name'];
+            $pageForumSelect['val'][] = $forum['id'];
+            $pageForumSelect['label'][] = $forum['name'];
         }
-        $page_allowlateSelect = array();
-        $page_allowlateSelect['val'][0] = 0;
-        $page_allowlateSelect['label'][0] = AppConstant::NONE;
-        $page_allowlateSelect['val'][1] = AppConstant::NUMERIC_ONE;
-        $page_allowlateSelect['label'][1] = AppConstant::UNLIMITED;
-        for ($k=1;$k<9;$k++) {
-            $page_allowlateSelect['val'][] = $k+AppConstant::NUMERIC_ONE;
-            $page_allowlateSelect['label'][] = "Up to $k";
+        $pageAllowLateSelect = array();
+        $pageAllowLateSelect['val'][0] = AppConstant::NUMERIC_ZERO;
+        $pageAllowLateSelect['label'][0] = AppConstant::NONE;
+        $pageAllowLateSelect['val'][1] = AppConstant::NUMERIC_ONE;
+        $pageAllowLateSelect['label'][1] = AppConstant::UNLIMITED;
+        for ($k= AppConstant::NUMERIC_ONE;$k< AppConstant::NUMERIC_NINE;$k++) {
+            $pageAllowLateSelect['val'][] = $k+AppConstant::NUMERIC_ONE;
+            $pageAllowLateSelect['label'][] = "Up to $k";
         }
         $this->includeCSS(['assessment.css']);
         $this->includeJS(["general.js","assessment/changeAssessment.js"]);
-        $responaseData = array('ids' => $ids,'testtype' => $testtype,'showans' => $showans,'skippenalty' => $skippenalty,'page_assessListMsg' => $page_assessListMsg,'page_allowlateSelect' => $page_allowlateSelect,'page_forumSelect' => $page_forumSelect,'agbcats' => $agbcats,'page_assessSelect' => $page_assessSelect,'gbcatsLabel' => $gbcatsLabel,'gbcatsId' => $gbcatsId,'overWriteBody' => $overWriteBody,'body' => $body,'isTeacher' => $isTeacher,'course' => $course,
+        $responseData = array('ids' => $ids,'testtype' => $testtype,'showans' => $showans,'skippenalty' => $skippenalty,'page_assessListMsg' => $pageAssessListMsg,'page_allowlateSelect' => $pageAllowLateSelect,'page_forumSelect' => $pageForumSelect,'agbcats' => $agbcats,'page_assessSelect' => $pageAssessmentSelect,'gbcatsLabel' => $gbCatsLabel,'gbcatsId' => $gbCatsId,'overWriteBody' => $overWriteBody,'body' => $body,'isTeacher' => $isTeacher,'course' => $course,
             'parents' => $parents,'line' => $line,'sums' => $sums,'names' => $names,'types' => $types,'gitypeids' => $gitypeids,'prespace' => $prespace);
-        return $this->renderWithData('changeAssessment',$responaseData);
+        return $this->renderWithData('changeAssessment',$responseData);
     }
 
     public function actionAssessmentMessage() {

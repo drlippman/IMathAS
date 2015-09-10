@@ -5,7 +5,10 @@ $( document ).ready(function() {
     var startDate = $("#datepicker-id input").val();
     var endDate = $("#datepicker-id1 input").val();
     todaysdate = endDate;
-
+    $('#login-table').DataTable( {
+        "scrollY": 200,
+        "scrollX": true
+    });
     $('#following-link').hide()
     $("#first-date-label").text(startDate);
     $('#last-date-label').text(endDate);
@@ -103,11 +106,6 @@ function previousWeekHandler(){
         }
         else
         {
-
-            //alert(startDate);alert(endDate);
-            //var course_id = $("#course-id").val();
-            //var transferData = {newStartDate: startDate, newEndDate: endDate, cid: course_id};
-            //jQuerySubmit('login-grid-view-ajax', transferData, 'loginGridViewSuccess');
             $('#flash-message').hide();
             finalDate = toggleDate('w0', daysInAWeek, 'deduct');
             $( "#w0").val(finalDate);
@@ -128,8 +126,10 @@ function previousWeekHandler(){
 function nextWeekHandler(){
     var daysInAWeek = 6;
     $("#following-link").click(function () {
-//"w0" is first date picker id
-//"w1" is second date picker id
+/*
+*"w0" is first date picker id
+* "w1" is second date picker id
+ */
         var startDate = $("#w0").val();
         var endDate = $("#w1").val();
         if (endDate=="" || startDate== ""){
@@ -163,8 +163,9 @@ function loginGridViewSuccess(response) {
     var tableString = '';
     headerArray = data.header;
     totalColumns = headerArray.length;
-    rows = data.rows;
-    tableString = "<table class='login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
+     rows = data.rows;
+    tableString = "<table id='login-table' class='scrollit login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
+
     for(i=0; i<headerArray.length && i < 15; i++){
         tableString = tableString + "<th>" + headerArray[i]+"</th>";
         lastColumnHeader = headerArray[i];
@@ -184,10 +185,6 @@ function loginGridViewSuccess(response) {
             tableString = tableString + "</tr>";
 
     });
-    if(totalColumns > 16){
-        $('#flash-message').show();
-        $('#flash-message').html("<div class='alert alert-danger'>Display only 2 week data</div>");
-    }
     tableString = tableString + "</tbody></table>";
     $('#table_placeholder').html(tableString);
 }
