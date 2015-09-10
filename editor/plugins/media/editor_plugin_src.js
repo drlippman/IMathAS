@@ -842,7 +842,7 @@
 				type = (lookupAttribute(object, 'clsid') || lookupAttribute(object, 'classid') || lookupAttribute(object, 'type') || {}).name;
 
 			if (embed && !type)
-				type = (lookupAttribute(embed, 'type') || lookupExtension(data.params.src) || {}).name;
+				type = (lookupAttribute(embed, 'type') || lookupExtension(data.params.src || '') || {}).name;
 
 			// for embedded audio we preserve the original specified type
 			if (embed && type == 'EmbeddedAudio') {
