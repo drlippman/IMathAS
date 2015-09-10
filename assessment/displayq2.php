@@ -3888,6 +3888,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
+			$givenans = str_replace(array('u','∪'), 'U', $givenans);
 		} else if ($anstype == 'calcinterval') {
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 			//test for correct format, if specified
@@ -3919,6 +3920,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			} else {
+				$givenans = str_replace(array('u','∪'), 'U', $givenans);
+				$_POST["tc$qn"] = str_replace(array('u','∪'), 'U', $_POST["tc$qn"]);
 				if (in_array('list',$ansformats)) {
 					$orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$_POST["tc$qn"]);
 				} else {
