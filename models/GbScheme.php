@@ -22,7 +22,6 @@ class GbScheme extends BaseImasGbscheme
         $this->defgbmode = AppConstant::GB_DEF_GB_MODE;
         $this->orderby = AppConstant::GB_ORDERED_BY;
         $this->courseid = $courseId;
-
         $this->save();
         return $this->id;
     }

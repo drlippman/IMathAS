@@ -346,7 +346,7 @@ class CourseController extends AppController
             $bodyParams = $this->getRequestParams();
             $user = $this->getAuthenticatedUser();
             $course = new Course();
-            $courseId = $course->create($user, $bodyParams);
+            $courseId = $course->create($user, $bodyParams, 1);
             if ($courseId) {
                 $teacher = new Teacher();
                 $teacherId = $teacher->create($user->id, $courseId);

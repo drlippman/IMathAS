@@ -3044,5 +3044,5 @@ function sign($a,$str=false) {
 		return ($a<0)?-1:1;
 	}
 }
-			
+
 ?>

@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
                 <td class=c><?php echo $page_courseList[$i]['id'] ?></td>
                 <td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-                <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$page_courseList[$i]['id']);?>">Settings</a></td>
+                <td class=c><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">Settings</a></td>
                 <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>">Add/Remove</a></td>
                 <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/transfer-course?cid='.$page_courseList[$i]['id']);?>">Transfer</a></td>
                 <td class=c><a class='delete-link' href='<?php echo AppUtility::getURLFromHome('course', 'course/delete-course?cid='.$page_courseList[$i]['id']) ?>"'>Delete</a></td>
@@ -87,7 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
             </tbody>
         </table>
         <div class="lg-col-2 pull-left">
-        <a class="btn btn-primary margin-left-twenty" href="<?php echo AppUtility::getURLFromHome('course', 'course/add-new-course'); ?>">Add
+        <a class="btn btn-primary margin-left-twenty" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=addcourse') ?>">Add
             New Course</a>
         </div>
 

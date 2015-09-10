@@ -5,43 +5,42 @@ namespace app\models;
 use app\components\AppUtility;
 use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
+use app\controllers\AppController;
 use Yii;
 use yii\db\Exception;
 use yii\db\Query;
 
 class Course extends BaseImasCourses {
 
-    public function create($user, $bodyParams)
+    public function create($user, $params, $blockcnt)
     {
-        $params = $bodyParams['CourseSettingForm'];
-        $course['ownerid'] = $user->id;
-        $course['name'] = $params['courseName'];
-        $course['enrollkey'] = $params['enrollmentKey'];
-        $availables = isset($params['available']) ? $params['available'] : AppConstant::AVAILABLE_NOT_CHECKED_VALUE;
-        $course['available'] = AppUtility::makeAvailable($availables);
+        $course['ownerid'] = $user;
+        $course['name'] = $params['coursename'];
+        $course['enrollkey'] = $params['ekey'];
+        $availables = isset($params['avail']) ? $params['avail'] : AppConstant::AVAILABLE_NOT_CHECKED_VALUE;
+//        $course['available'] = AppUtility::makeAvailable($availables);
+        $course['available'] = $params['avail'];
         $course['picicons'] = AppConstant::PIC_ICONS_VALUE;
         $course['allowunenroll'] = AppConstant::UNENROLL_VALUE;
-        $course['copyrights'] = $params['copycourse'];
-        $course['msgset'] = $params['messageSystem'];
-        $toolsets = isset($params['navigationLink']) ? $params['navigationLink'] : AppConstant::NAVIGATION_NOT_CHECKED_VALUE;
-        $isTemplate = isset($params['courseAsTemplate']) ? $params['courseAsTemplate'] : AppConstant::NUMERIC_ZERO;
+        $course['copyrights'] = $params['copyrights'];
+        $course['msgset'] = $params['msgset'];
+        $toolsets = isset($params['toolset']) ? $params['toolset'] : AppConstant::NAVIGATION_NOT_CHECKED_VALUE;
+        $isTemplate = isset($params['istemplate']) ? $params['istemplate'] : AppConstant::NUMERIC_ZERO;
         $course['istemplate'] = AppUtility::createIsTemplate($isTemplate);
         $course['toolset']  = AppUtility::makeToolset($toolsets);
         $course['cploc']= AppConstant::CPLOC_VALUE;
-        $course['deflatepass']= $params['latePasses'];
+        $course['deflatepass']= $params['deflatepass'];
         $course['showlatepass']= AppConstant::SHOWLATEPASS;
-        $course['theme']= $params['theme'];
-        $course['deftime'] = AppUtility::calculateTimeDefference($bodyParams['start_time'],$bodyParams['end_time']);
-        $course['end_time'] = $bodyParams['end_time'];
+        $course['theme']= AppConstant::DEFAULT_THEME;
+        $course['deftime'] = AppUtility::calculateTimeDefference($params['defstime'],$params['deftime']);
         $course['chatset'] = AppConstant::CHATSET_VALUE;
         $course['topbar'] = AppConstant::TOPBAR_VALUE;
         $course['hideicons'] = AppConstant::HIDE_ICONS_VALUE;
         $course['itemorder'] = AppConstant::ITEM_ORDER;
-        $course = AppUtility::removeEmptyAttributes($course);
-        $this->attributes = $course;
+        $course['blockcnt'] = $blockcnt;
+        $data = AppUtility::removeEmptyAttributes($course);
+        $this->attributes = $data;
         $this->save();
-
-
         return $this->id;
     }
 
@@ -452,5 +451,23 @@ class Course extends BaseImasCourses {
         $command = $query->createCommand();
         $data = $command->queryone();
         return $data;
+    }
+
+    public function updateCourse($params, $available, $toolSet, $defTime,$columnName, $columnValue)
+    {
+        $updateCourse = Course::find()->where(['id' => $params['id']])->andWhere([$columnName => $columnValue])->one();
+        if($updateCourse){
+            $updateCourse->name = $params['coursename'];
+            $updateCourse->enrollkey = $params['ekey'];
+            $updateCourse->available = $available;
+            $updateCourse->copyrights = $params['copyrights'];
+            $updateCourse->msgset = $params['msgset'];
+            $updateCourse->toolset = $toolSet;
+            $updateCourse->ltisecret = $params['ltisecret'];
+            $updateCourse->deftime = $defTime;
+            $updateCourse->deflatepass = $params['deflatepass'];
+            $updateCourse->lockaid = $params['lockaid'];
+            $updateCourse->save();
+        }
     }
 }

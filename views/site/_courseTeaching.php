@@ -1,5 +1,6 @@
 <?php
 use app\components\AppUtility;
+
 ?>
 
 <div id="homefullwidth">

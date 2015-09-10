@@ -572,7 +572,6 @@ class CourseItemsUtility extends Component
 
     public static function AddInlineText($item,$currentTime,$course,$parent)
     {
-
         $inline = $item[key($item)];
         ?>
         <input type="hidden" id="inlineText-selected-id" value="<?php echo $inline->id?>">

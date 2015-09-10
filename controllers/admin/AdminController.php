@@ -14,12 +14,14 @@ use app\models\ExternalTools;
 use app\models\Exceptions;
 use app\models\forms\ChangeRightsForm;
 use app\models\ForumView;
+use app\models\GbScheme;
 use app\models\Grades;
 use app\models\Groups;
 use app\models\Libraries;
 use app\models\Sessions;
 use app\models\Student;
 use app\models\Stugroups;
+use app\models\Teacher;
 use Yii;
 use app\models\forms\AddNewUserForm;
 use app\components\AppUtility;
@@ -622,12 +624,13 @@ class AdminController extends AppController
 
     public function actionForms()
     {
-
         $imasroot = AppUtility::getHomeURL();
+        $installname = "OpenMath";
         $params = $this->getRequestParams();
         $currentUser = $this->getAuthenticatedUser();
         $myRights = $currentUser['rights'];
         $this->layout = 'master';
+        $enablebasiclti = true;
          $action = $params['action'];
         switch($action) {
             case "delete":
@@ -643,13 +646,82 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
+            if ($params['action'] == 'modify')
+            {
+                $line = Course::getById($params['cid']);
+                $courseid = $line['id'];
+                $name = $line['name'];
+                $ekey = $line['enrollkey'];
+                $hideicons = $line['hideicons'];
+                $picicons = $line['picicons'];
+                $allowunenroll = $line['allowunenroll'];
+                $copyrights = $line['copyrights'];
+                $msgset = $line['msgset']%5;
+                $msgmonitor = (floor($line['msgset']/5))&1;
+                $msgQtoInstr = (floor($line['msgset']/5))&2;
+                $toolset = $line['toolset'];
+                $cploc = $line['cploc'];
+                $theme = $line['theme'];
+                $topbar = explode('|',$line['topbar']);
+                $topbar[0] = explode(',',$topbar[0]);
+                $topbar[1] = explode(',',$topbar[1]);
+                if ($topbar[0][0] == null) {unset($topbar[0][0]);}
+                if ($topbar[1][0] == null) {unset($topbar[1][0]);}
+                if (!isset($topbar[2])) {$topbar[2] = 0;}
+                $avail = $line['available'];
+                $lockaid = $line['lockaid'];
+                $ltisecret = $line['ltisecret'];
+                $chatset = $line['chatset'];
+                $showlatepass = $line['showlatepass'];
+                $istemplate = $line['istemplate'];
+                $deflatepass = $line['deflatepass'];
+                $deftime = $line['deftime'];
+                $assessment = Assessments::getByName($courseid);
+            } else
+            {
+                $courseid ="Will be assigned when the course is created";
+                $name = "Enter course name here";
+                $ekey = "Enter enrollment key here";
+                $hideicons = isset($CFG['CPS']['hideicons'])?$CFG['CPS']['hideicons'][0]:0;
+                $picicons = isset($CFG['CPS']['picicons'])?$CFG['CPS']['picicons'][0]:0;
+                $allowunenroll = isset($CFG['CPS']['allowunenroll'])?$CFG['CPS']['allowunenroll'][0]:0;
+                //0 no un, 1 allow un;  0 allow enroll, 2 no enroll
+                $copyrights = isset($CFG['CPS']['copyrights'])?$CFG['CPS']['copyrights'][0]:0;
+                $msgset = isset($CFG['CPS']['msgset'])?$CFG['CPS']['msgset'][0]:0;
+                $toolset = isset($CFG['CPS']['toolset'])?$CFG['CPS']['toolset'][0]:0;
+                $msgmonitor = (floor($msgset/5))&1;
+                $msgQtoInstr = (floor($msgset/5))&2;
+                $msgset = $msgset%5;
+                $cploc = isset($CFG['CPS']['cploc'])?$CFG['CPS']['cploc'][0]:1;
+                $topbar = isset($CFG['CPS']['topbar'])?$CFG['CPS']['topbar'][0]:array(array(),array(),0);
+                $chatset = isset($CFG['CPS']['chatset'])?$CFG['CPS']['chatset'][0]:0;
+                $showlatepass = isset($CFG['CPS']['showlatepass'])?$CFG['CPS']['showlatepass'][0]:0;
+                $istemplate = 0;
+                $avail = 0;
+                $lockaid = 0;
+                $deftime = isset($CFG['CPS']['deftime'])?$CFG['CPS']['deftime'][0]:600;
+                $deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
+                $ltisecret = "";
+            }
+            $defetime = $deftime%10000;
+            $hr = floor($defetime/60)%12;
+            $min = $defetime%60;
+            $am = ($defetime<12*60)?'am':'pm';
+            $deftimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+            if ($deftime>10000) {
+                $defstime = floor($deftime/10000);
+                $hr = floor($defstime/60)%12;
+                $min = $defstime%60;
+                $am = ($defstime<12*60)?'am':'pm';
+                $defstimedisp = (($hr==0)?12:$hr).':'.(($min<10)?'0':'').$min.' '.$am;
+            } else {
+                $defstimedisp = $deftimedisp;
+            }
                 break;
             case "chgteachers":
                  break;
             case "importmacros":
-
                 break;
-
             case "importqimages":
                 break;
             case "importcoursefiles":
@@ -675,20 +747,26 @@ class AdminController extends AppController
             case "removediag":
                 break;
         }
+
         $this->includeCSS(['imascore.css','assessment.css']);
         $this->includeJS(["general.js"]);
-        $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action);
+        $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
+            'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
+            'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
+            'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
+            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp, 'imasroot' => $imasroot, 'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname);
         return $this->renderWithData('forms',$responseData);
     }
 
     public function actionActions()
     {
-
         $params = $this->getRequestParams();
         $allowmacroinstall = true;
         $currentUser = $this->getAuthenticatedUser();
+        $userId = $currentUser['id'];
         $action = $params['action'];
         $myRights = $currentUser['rights'];
+        $enablebasiclti = true;
         $userid = 0;
         $groupid = 0;
         switch($action) {
@@ -735,7 +813,139 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
+            if ($myRights < 40) {
+                echo "You don't have the authority for this action";
                 break;
+            }
+
+            if (isset($CFG['CPS']['msgset']) && $CFG['CPS']['msgset'][1]==0) {
+                $msgset = $CFG['CPS']['msgset'][0];
+            } else {
+                $msgset = $_POST['msgset'];
+                if (isset($_POST['msgmonitor'])) {
+                    $msgset += 5;
+                }
+                if (isset($_POST['msgqtoinstr'])) {
+                    $msgset += 5*2;
+                }
+            }
+
+            if (isset($CFG['CPS']['chatset']) && $CFG['CPS']['chatset'][1]==0) {
+                $chatset = intval($CFG['CPS']['chatset'][0]);
+            } else {
+                if (isset($_POST['chatset'])) {
+                    $chatset = 1;
+                } else {
+                    $chatset = 0;
+                }
+            }
+
+            if (isset($CFG['CPS']['deftime']) && $CFG['CPS']['deftime'][1]==0) {
+                $deftime = $CFG['CPS']['deftime'][0];
+            } else {
+                preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['deftime'],$tmatches);
+                if (count($tmatches)==0) {
+                    preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['deftime'],$tmatches);
+                    $tmatches[3] = $tmatches[2];
+                    $tmatches[2] = 0;
+                }
+                $tmatches[1] = $tmatches[1]%12;
+                if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+                $deftime = $tmatches[1]*60 + $tmatches[2];
+
+                preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['defstime'],$tmatches);
+                if (count($tmatches)==0) {
+                    preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['defstime'],$tmatches);
+                    $tmatches[3] = $tmatches[2];
+                    $tmatches[2] = 0;
+                }
+                $tmatches[1] = $tmatches[1]%12;
+                if($tmatches[3]=="pm") {$tmatches[1]+=12; }
+                $deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
+            }
+            if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
+                $copyrights = $CFG['CPS']['copyrights'][0];
+            } else {
+                $copyrights = $params['copyrights'];
+            }
+            if (isset($CFG['CPS']['deflatepass']) && $CFG['CPS']['deflatepass'][1]==0) {
+                $deflatepass = $CFG['CPS']['deflatepass'][0];
+            } else {
+                $deflatepass = intval($_POST['deflatepass']);
+            }
+
+            if (isset($params['showlatepass']) && $params['showlatepass'][1]==0) {
+                $showlatepass = intval($params['showlatepass'][0]);
+            } else {
+                if (isset($params['showlatepass'])) {
+                    $showlatepass = 1;
+                } else {
+                    $showlatepass = 0;
+                }
+            }
+
+            $avail = 3 - $params['stuavail'] - $params['teachavail'];
+            $istemplate = 0;
+            if ($myRights == 100) {
+                if (isset($params['istemplate'])) {
+                    $istemplate += 1;
+                }
+                if (isset($params['isselfenroll'])) {
+                    $istemplate += 4;
+                }
+                if (isset($params['isguest'])) {
+                    $istemplate += 8;
+                }
+            }
+            if ($myRights >= 75) {
+                if (isset($params['isgrptemplate'])) {
+                    $istemplate += 2;
+                }
+            }
+            $params['ltisecret'] = trim($params['ltisecret']);
+
+            if ($params['action'] == 'modify') {
+                $available = $this->getSanitizedValue($params['avail'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
+                $toolSet = $this->getSanitizedValue($params['toolSet'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
+                $defTime = AppUtility::calculateTimeDefference($params['defstime'], $params['deftime']);
+                if ($myRights < 75)
+                {
+                    $columnName = 'ownerid'; $columnValue = $userId;
+                    $updateResult = new Course();
+                    $updateResult->updateCourse($params, $available, $toolSet, $defTime, $columnName, $columnValue);
+                }else{
+                    $columnName = 'id'; $columnValue = $params['id'];
+                    $updateResult = new Course();
+                    $updateResult->updateCourse($params, $available, $toolSet, $defTime, $columnName, $columnValue);
+                }
+                return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
+            } else {
+                $blockcnt = AppConstant::NUMERIC_ONE;
+                $itemorder = addslashes(serialize(array()));
+                $query = new Course();
+                $cid = $query->create($userId, $params,$blockcnt);
+
+                $queryTeacher = new Teacher();
+                $queryTeacher->create($userId, $cid);
+
+                $queryGBSchema = new GbScheme();
+                $queryGBSchema->create($cid);
+                echo '<h2>Your course has been created!</h2>';
+                echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
+                echo '<li>The course ID: <b>'.$cid.'</b></li>';
+                if (trim($params['ekey'])=='') {
+                    echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
+                    echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
+                    echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+                } else {
+                    echo '<li>The enrollment key: <b>'.$params['ekey'].'</b></li>';
+                }
+                echo '</ol></p>';
+                echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
+                echo '<a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a>';
+                exit;
+            }
+            break;
             case "delete":
                 break;
             case "remteacher":

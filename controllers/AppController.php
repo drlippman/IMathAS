@@ -144,7 +144,7 @@ class AppController extends Controller
 
     public function getSanitizedValue($key, $defaultVal = '')
     {
-        isset($key) ? $key : $defaultVal;
+        return isset($key) ? $key : $defaultVal;
     }
 
     public function isPostMethod(){

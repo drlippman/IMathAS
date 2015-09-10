@@ -1,6 +1,5 @@
 <?php
 use app\components\AppUtility;
-
 ?>
 <div id="homefullwidth">
     <div class="block">
@@ -15,9 +14,22 @@ use app\components\AppUtility;
             }else{
             foreach ($teachers as $teacher) {
                 if ($teacher) {
+
                     ?>
                     <li>
-                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $teacher->courseid) ?>"><?php echo isset($teacher->course->name) ? ucfirst($teacher->course->name) : ''; ?></a>
+                        <?php
+                        if($teacher->course->lockaid > 0)
+                        {
+                            if(isset($teacher->course->name))
+                            {?>
+                                <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $teacher->courseid) ?>"><?php echo ucfirst($teacher->course->name)?></a><?php echo '<span style="color:green;">', _(' Lockdown'), '</span> '?>
+                            <?php }else{?>
+                                <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $teacher->courseid) ?>"><?php echo " "?></a><?php echo '<span style="color:green;, Lockdown">'?>
+                            <?php }
+                        }else{?>
+                        <a href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $teacher->courseid) ?>"><?php echo ucfirst($teacher->course->name) ?>
+                        <?php }
+                        ?>
                         <a href="<?php echo AppUtility::getURLFromHome('message', 'message/index?cid='. $teacher->course->id) ?>" class="msg-notification">
                             <?php
                                 if($msgRecord){

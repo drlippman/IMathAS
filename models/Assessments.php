@@ -491,4 +491,16 @@ class Assessments extends BaseImasAssessments
     public static function getItemOrderById($assessmentId){
         return Assessments::find()->select('itemorder')->where(['id' => $assessmentId])->one();
     }
+
+    public static function getByName($courseId)
+    {
+        $query = new Query();
+        $query->select(['id','name'])
+            ->from('imas_assessments')
+            ->where(['courseid' => $courseId]);
+        $query->orderBy('name');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }
