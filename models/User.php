@@ -609,7 +609,20 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
-
+    }
+    public static function getByUserRight($myRight, $groupId)
+    {
+        $query = new Query();
+        $query ->select(['id','FirstName','LastName'])
+            ->from('imas_users')
+            ->where(['>', 'rights', '19']);
+        if ($myRight < 100) {
+            $query->andWhere(['groupid' => $groupId]);
+        }
+        $query->orderBy('LastName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 
 }

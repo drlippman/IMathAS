@@ -631,6 +631,7 @@ class AdminController extends AppController
         $myRights = $currentUser['rights'];
         $this->layout = 'master';
         $enablebasiclti = true;
+        $groupId= $currentUser['groupid'];
          $action = $params['action'];
         switch($action) {
             case "delete":
@@ -727,6 +728,7 @@ class AdminController extends AppController
             case "importcoursefiles":
                 break;
             case "transfer":
+                $queryUser = User::getByUserRight($myRights, $groupId);
                  break;
             case "deloldusers":
                 break;
@@ -754,7 +756,7 @@ class AdminController extends AppController
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
-            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp, 'imasroot' => $imasroot, 'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname);
+            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp, 'imasroot' => $imasroot, 'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser);
         return $this->renderWithData('forms',$responseData);
     }
 
@@ -1078,6 +1080,46 @@ class AdminController extends AppController
                     exit;
                 }
             case "transfer":
+                if ($myRights < 40)
+                {
+                    echo "You don't have the authority for this action"; break;
+                }
+                $exec = false;
+                if ($myRights < 75)
+                {
+                    $columnName = 'ownerid'; $columnValue = $userId;
+                    $updateResult = new Course();
+
+                    $updateResult->setOwnerId($params, $columnName, $columnValue);
+                }else
+                {
+                    $columnName = 'id'; $columnValue = $params['id'];
+                    $updateResult = new Course();
+                    $updateResult->setOwnerId($params, $columnName, $columnValue);
+                }
+                if ($myRights == 75)
+                {
+                    $resultOfQuery = Course::getCidAndUid($params, $groupid);
+                    if (count($resultOfQuery) > 0) {
+
+                        $updateResult = new Course();
+                        $affectedRow = $updateResult->setOwnerIdByExecute($params);
+                        $exec = true;
+                    }
+                    //$query = "UPDATE imas_courses,imas_users SET imas_courses.ownerid='{$_POST['newowner']}' WHERE ";
+                    //$query .= "imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
+                } else {
+//                    mysql_query($query) or die("Query failed : " . mysql_error());
+                    $exec = true;
+                }
+                if ($exec && $affectedRow > 0) {
+                    $result = Teacher::getByCourseId($params);
+                    if (count($result) == 0) {
+                        $teacherData = new Teacher();
+                        $teacherData->insertUidAndCid($params);
+                    }
+                     Teacher::deleteCidAndUid($params, $userId);
+                }
                 break;
             case "deloldusers":
                 if ($myRights <100)

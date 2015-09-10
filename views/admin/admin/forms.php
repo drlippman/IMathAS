@@ -421,20 +421,15 @@ switch($action) {
         echo '<div id="headerforms" class="pagetitle">';
         echo "<h3>Transfer Course Ownership</h3>\n";
         echo '</div>';
-        echo "<form method=post action=\"actions.php?action=transfer&id={$_GET['id']}\">\n";
+        echo "<form method=post action=\"actions?action=transfer&id={$_GET['cid']}\">\n";
         echo "Transfer course ownership to: <select name=newowner>\n";
-        $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19";
-        if ($myrights < 100) {
-            $query .= " AND groupid='$groupid'";
-        }
-        $query .= " ORDER BY LastName";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        while ($row = mysql_fetch_row($result)) {
-            echo "<option value=\"$row[0]\">$row[2], $row[1]</option>\n";
+        foreach($queryUser as $key => $row)
+        {
+            echo "<option value=\"$row[id]\">$row[LastName], $row[FirstName]</option>\n";
         }
         echo "</select>\n";
         echo "<p><input type=submit value=\"Transfer\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></p>\n";
         echo "</form>\n";
         break;
     case "deloldusers":

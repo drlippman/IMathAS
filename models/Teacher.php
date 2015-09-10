@@ -70,4 +70,31 @@ class Teacher extends BaseImasTeachers
         $query .= "AND imas_users.id<>'$user->id'";
         return Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getByCourseId($params)
+    {
+        $query = new Query();
+        $query	->select(['id'])
+            ->from('imas_teachers')
+            ->where(['courseid' => $params['id']]);
+        $query->andWhere(['userid' => $params['newowner']]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
+        return $data;
+    }
+    public function insertUidAndCid($params)
+    {
+        $this->userid = $params['id'];
+        $this->courseid = $params['courseId'];
+        $this->save();
+        return $this->id;
+    }
+
+    public static function deleteCidAndUid($params, $userId)
+    {
+        $deleteId = Teacher::find()->where(['courseid' => $params['id']])->andWhere(['userid' => $userId])->one();
+        if($deleteId){
+            $deleteId->delete();
+        }
+    }
 }

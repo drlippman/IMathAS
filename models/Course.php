@@ -470,4 +470,34 @@ class Course extends BaseImasCourses {
             $updateCourse->save();
         }
     }
+
+    public static function setOwnerId($params, $columnName, $columnValue)
+    {
+        $updateOwnerId = Course::find()->where(['id' => $params['id']])->andWhere([$columnName => $columnValue])->one();
+        if($updateOwnerId)
+        {
+            $updateOwnerId->ownerid = $params['newowner'];
+            $updateOwnerId->save();
+        }
+    }
+    public static function getCidAndUid($params, $groupId)
+    {
+        $query = new Query();
+        $query	->select(['imas_courses.id'])
+            ->from(['imas_courses', 'imas_users'])
+            ->where(['imas_courses.id' => $params['id']]);
+        $query->andWhere(['imas_courses.ownerid' => 'imas_users.id']);
+        $query->andWhere(['imas_users.groupid' => $groupId]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
+        return $data;
+    }
+
+    public static function setOwnerIdByExecute($params)
+    {
+        $query = "UPDATE imas_courses SET ownerid='{$params['newowner']}' WHERE id='{$params['id']}'";
+        $data = Yii::$app->db->createCommand()->execute();
+        return $data;
+
+    }
 }
