@@ -2071,7 +2071,7 @@ The answer is compared to a given tolerance.  Can also accept DNE, oo (Infinity)
 	will be used (even if it doesn't agree with the $reqdecimal setting).</dd>
 <dt>$reqsigfigs = a number (In Common Control)</dt>
 	<dd>Defines the significant figure accuracy required.  Use $reqsigfigs = 2 for at least 2 sig fig accuracy, or
-	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer.  This will put also a message in the answer tips stating the
+	$reqsigfigs = "=2" to require exactly 2 sig figs in the answer, or $reqsigfigs = "[2,3]" to require 2 or 3 sigfigs.  This will put also a message in the answer tips stating the
 	significant figures required.  This overrides both $reltolerance and $abstolerance.  If you use the "=2" form, it will also 
 	round your $answer if needed for the $showanswer.</dd>
 <dt>$answerformat = "list", "exactlist", or "orderedlist"</dt
