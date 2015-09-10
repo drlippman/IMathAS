@@ -129,7 +129,7 @@ public $oa = array();
         if ($course && ($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
             foreach ($itemOrders as $key => $itemOrder) {
                 $tempAray = array();
-                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
+                if (is_array($itemOrder) && count($blockItems = $itemOrder['items']))
                 {
                     $tempAray['Block'] = $itemOrder;
                     $blockItems = $itemOrder['items'];
