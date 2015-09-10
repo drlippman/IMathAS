@@ -18,6 +18,8 @@ use app\models\GbScheme;
 use app\models\Grades;
 use app\models\Groups;
 use app\models\Libraries;
+use app\models\LibraryItems;
+use app\models\QuestionSet;
 use app\models\Sessions;
 use app\models\Student;
 use app\models\Stugroups;
@@ -29,6 +31,7 @@ use app\models\User;
 use app\components\AppConstant;
 use app\models\forms\AdminDiagnosticForm;
 use tar;
+use yii\base\Exception;
 
 class AdminController extends AppController
 {
@@ -1303,6 +1306,347 @@ class AdminController extends AppController
         }
         $responseData = array('nameOfDiag' => $nameOfDiag, 'params' => $params, 'diag' =>$diag, 'code_list' => $code_list);
         return $this->renderWithData('diagOneTime',$responseData);
+    }
+
+    public function actionImportLib()
+    {
+        $this->guestUserHandler();
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $this->layout = "master";
+        $isAdmin = false;
+        $allowNonGroupLibs = false;
+        $isGrpAdmin = false;
+        $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $myRights  = $user->rights;
+        if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+
+        } elseif (isset($courseId) && $courseId == "admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::REQUIRED_ADMIN_ACCESS;
+        }
+        elseif (!(isset($courseId)) && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::ACCESS_THROUGH_MENU;
+        } else
+        {
+            $courseId = (isset($courseId)) ? $courseId : "admin" ;
+
+            if ($myRights < AppConstant::ADMIN_RIGHT)
+            {
+                $isGrpAdmin = true;
+            } else if ($myRights == AppConstant::ADMIN_RIGHT)
+            {
+                $isAdmin = true;
+            }
+            if (isset($params['process']))
+            {
+                $filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $params['filename'];
+                $libsToAdd = $params['libs'];
+                list($packName,$names,$parents,$libItems,$unique,$lastModDate) = $this->parseLibs($filename);
+                $names = array_map('addslashes_deep', $names);
+                $parents = array_map('addslashes_deep', $parents);
+                $libItems = array_map('addslashes_deep', $libItems);
+                $unique = array_map('addslashes_deep', $unique);
+                $lastModDate = array_map('addslashes_deep', $lastModDate);
+                $root = $params['parent'];
+                $libRights = $params['librights'];
+                $qRights = $params['qrights'];
+                $toUse = '';
+                $lookup = implode("','",$unique);
+                $librariesData = Libraries::dataForImportLib($lookup);
+                if($librariesData)
+                {
+                    foreach($librariesData as $row)
+                    {
+                        $exists[$row['uniqueid']] = $row['id'];
+                        $addDate[$row['id']] = $row['adddate'];
+                        $lastMod[$row['id']] = $row['lastmoddate'];
+                    }
+                }
+                $mt = microtime();
+                $updateL = AppConstant::NUMERIC_ZERO;
+                $newL = AppConstant::NUMERIC_ZERO;
+                $newLi = AppConstant::NUMERIC_ZERO;
+                $updateQ = AppConstant::NUMERIC_ZERO;
+                $newQ = AppConstant::NUMERIC_ZERO;
+                $connection = $this->getDatabase();
+                $transaction = $connection->beginTransaction();
+                try
+                {
+                    if($libsToAdd)
+                    {
+                        foreach($libsToAdd as $libId)
+                        {
+                            if ($parents[$libId]==0)
+                            {
+                                $parent = $root;
+                            }
+                            else if (isset($libs[$parents[$libId]]))
+                            {
+                                $parent = $libs[$parents[$libId]];
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            $now = time();
+                            if (isset($exists[$unique[$libId]]) && $params['merge'] == AppConstant::NUMERIC_ONE)
+                            {
+                                if ($lastModDate[$libId]>$addDate[$exists[$unique[$libId]]])
+                                {
+                                    $affectedRow = Libraries::updateLibData($isGrpAdmin, $isAdmin,$names[$libId],$now,$exists[$unique[$libId]],$user);
+
+                                    if ($affectedRow > AppConstant::NUMERIC_ZERO)
+                                    {
+                                        $updateL++;
+                                    }
+                                }
+                                $libs[$libId] = $exists[$unique[$libId]];
+                            }
+                            else if (isset($exists[$unique[$libId]]) && $params['merge']== -AppConstant::NUMERIC_ONE)
+                            {
+                                $libs[$libId] = $exists[$unique[$libId]];
+                            }
+                            else
+                            {
+                                if ($unique[$libId] == AppConstant::NUMERIC_ZERO || (isset($exists[$unique[$libId]]) && $params['merge'] == AppConstant::NUMERIC_ZERO))
+                                {
+                                    $unique[$libId] = substr($mt,11).substr($mt,2,2).$libId;
+                                }
+                                $data = new Libraries();
+                                $insertId = $data->insertData($unique[$libId],$now,$names[$libId],$user,$libRights,$parent);
+
+                                $libs[$libId] = $insertId;
+                                $newL++;
+                            }
+                            if (isset($libs[$libId]))
+                            {
+                                if ($toUse=='')
+                                {
+                                    $toUse = $libItems[$libId];
+                                }
+                                else if (isset($libItems[$libId]))
+                                {
+                                    $toUse .= ','.$libItems[$libId];
+                                }
+                            }
+                        }
+                        $qIds = $this->parseQs($filename,$toUse,$qRights);/*yet to convert it*/
+                        if(count($qIds) > AppConstant::NUMERIC_ZERO)
+                        {
+                            $qIdsToCheck = implode(',',$qIds);
+                            $qIdsToUpdate = array();
+                            $includedQs = array();
+                            $questionSetData = QuestionSet::findDataToImportLib($qIdsToCheck);
+                            if($questionSetData)
+                            {
+                                foreach($questionSetData as $row)
+                                {
+                                    $qIdsToUpdate[] = $row['id'];
+                                    if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row['control'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
+                                    {
+                                        $includedQs = array_merge($includedQs,$matches[1]);
+                                    }
+                                    if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row['qtext'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
+                                    {
+                                        $includedQs = array_merge($includedQs,$matches[1]);
+                                    }
+                                }
+                            }
+                            if (count($qIdsToUpdate) > AppConstant::NUMERIC_ZERO)
+                            {
+                                $includedBackRef = array();
+                                if (count($includedQs)> AppConstant::NUMERIC_ZERO)
+                                {
+                                    $includedList = implode(',',$includedQs);
+                                    $idAndUniqueId = QuestionSet::getUniqueId($includedList);
+                                    if($idAndUniqueId)
+                                    {
+                                        foreach($idAndUniqueId as $row)
+                                        {
+                                            $includedBackRef[$row['uniqueid']] = $row['id'];
+                                        }
+                                    }
+                                }
+                                $updateList = implode(',',$qIdsToUpdate);
+                                $data = QuestionSet::getDataToImportLib($updateList);
+                                if($data)
+                                {
+                                    foreach($data as $row)
+                                    {
+                                        $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']));
+                                        $qText = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']));
+                                        QuestionSet::updateQuestionSetToImportLib($control,$qText,$row['id']);
+                                    }
+                                }
+                            }
+                            foreach ($libsToAdd as $libId)
+                            {
+                                if (!isset($libs[$libId]))
+                                {
+                                    $libs[$libId]=0;
+                                }
+                                $query = LibraryItems::getQueSetId($libs[$libId]);
+                                $existingLib = array();
+                                foreach($query as $row)
+                                {
+                                    $existingLib[] = $row['qsetid'];
+                                }
+                                $qIdList = explode(',',$libItems[$libId]);
+                                foreach ($qIdList as $qid)
+                                {
+                                    if (isset($qIds[$qid]) && (array_search($qIds[$qid],$existingLib) === false))
+                                    {
+                                        $LibraryItems = new LibraryItems();
+                                        $LibraryItems->insertData($libs[$libId],$qIds[$qid],$user);
+                                        $newLi++;
+                                    }
+                                }
+                                unset($existingLib);
+                            }
+
+                        }
+                    }
+
+                }
+                catch (Exception $e)
+                {
+                    $transaction->rollBack();
+                    return false;
+                }
+                unlink($filename);
+                $page_uploadSuccessMsg = "Import Successful.<br>\n";
+                $page_uploadSuccessMsg .= "New Libraries: $newL.<br>";
+                $page_uploadSuccessMsg .= "New Questions: $newQ.<br>";
+                $page_uploadSuccessMsg .= "Updated Libraries: $updateL.<br>";
+                $page_uploadSuccessMsg .= "Updated Questions: $updateQ.<br>";
+                $page_uploadSuccessMsg .= "New Library items: $newLi.<br>";
+            }
+            elseif ($_FILES['userfile']['name']!='')
+            {
+                $page_fileErrorMsg = "";
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY.'importLibrary/';
+                $uploadFile = $uploadDir . basename($_FILES['userfile']['name']);
+
+                if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile))
+                {
+                    $page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadFile)."\" />\n";
+                } else
+                {
+                    $page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
+                }
+                list($packName,$names,$parents,$libItems,$unique,$lastModDate) = $this->parseLibs($uploadFile);
+                if (!isset($parents))
+                {
+                    $page_fileErrorMsg .=  "<p>This file does not appear to contain a library structure.  It may be a question set export. ";
+                    $page_fileErrorMsg .=  "Try the <a href='import.php?cid='.$courseId>Import Question Set</a> page</p>\n";
+                }
+            }
+
+        }
+        $this->includeCSS(['libtree.css']);
+     $responseData = array('overwriteBody' => $overwriteBody,'body' => $body,'page_uploadSuccessMsg' => $page_uploadSuccessMsg,'params' => $params,'page_fileErrorMsg' => $page_fileErrorMsg,
+     'page_fileHiddenInput' => $page_fileHiddenInput,'courseId' => $courseId,'packName' => $packName,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin
+     ,'myRight' => $myRights,'parent' => $parent,'names' => $names);
+        return $this->renderWithData('importLibrary');
+    }
+
+    public function parseLibs($file)
+    {
+        if (!function_exists('gzopen'))
+        {
+            $handle = fopen($file,"r");
+            $noGz = true;
+        } else
+        {
+            $noGz = false;
+            $handle = gzopen($file,"r");
+        }
+        if (!$handle) {
+            echo "eek!  handle doesn't exist";
+            exit;
+        }
+        $line = '';
+        while (((!$noGz || !feof($handle)) && ($noGz || !gzeof($handle))) && $line!="START QUESTION") {
+            if ($noGz)
+            {
+                $line = rtrim(fgets($handle, 4096));
+            }
+            else {
+                $line = rtrim(gzgets($handle, 4096));
+            }
+            if ($line=="PACKAGE DESCRIPTION")
+            {
+                $doPacked = true;
+                $packName = rtrim(fgets($handle, 4096));
+            }
+            else if ($line=="START LIBRARY")
+            {
+                $doPacked = false;
+                $libId = -1;
+            }
+            else if ($line=="ID")
+            {
+                $libId = rtrim(fgets($handle, 4096));
+            }
+            else if ($line=="UID")
+            {
+                $unique[$libId] = rtrim(fgets($handle, 4096));
+            }
+            else if ($line=="LASTMODDATE")
+            {
+                $lastModDate[$libId] = rtrim(fgets($handle, 4096));
+            }
+            else if ($line=="NAME")
+            {
+                if ($libId != -1)
+                {
+                    $names[$libId] = rtrim(fgets($handle, 4096));
+                }
+            } else if ($line=="PARENT") {
+                if ($libId != -1)
+                {
+                    $parents[$libId]= rtrim(fgets($handle, 4096));
+                }
+            }else if ($line=="START LIBRARY ITEMS")
+            {
+                $libItemId = -1;
+            }
+            else if ($line=="LIBID")
+            {
+                $libItemId = rtrim(fgets($handle, 4096));
+            }
+            else if ($line=="QSETIDS")
+            {
+                if ($libItemId!=-1)
+                {
+                    $libItems[$libItemId] = rtrim(fgets($handle, 4096));
+                }
+            } else if ($doPacked ==true) {
+                $packName .= rtrim($line);
+            }
+        }
+        if ($noGz)
+        {
+            fclose($handle);
+        } else
+        {
+            gzclose($handle);
+        }
+        return array($packName,$names,$parents,$libItems,$unique,$lastModDate);
+    }
+
+    public function parseQs($filename,$toUse,$qRights)
+    {
+
     }
 
     function delqimgs($qsid) {

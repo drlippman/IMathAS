@@ -84,4 +84,42 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function dataForImportLib($lookup)
+    {
+        $query = "SELECT id,uniqueid,adddate,lastmoddate FROM imas_libraries WHERE uniqueid IN ('$lookup')";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function updateLibData($isGrpAdmin, $isAdmin,$name,$now,$id,$user)
+    {
+        $query = "UPDATE imas_libraries SET name='{$name}',adddate=$now,lastmoddate=$now WHERE id={$id}";
+        if ($isGrpAdmin)
+        {
+            $query .= " AND groupid='$user->groupid'";
+        }
+        else if (!$isAdmin)
+        {
+            $query .= " AND (ownerid='$user->id' or userights >1)";
+        }
+        $data = \Yii::$app->db->createCommand($query)->execute();
+        return $data;
+    }
+
+    public function insertData($uniqueId,$now,$names,$user,$libRights,$parent)
+    {
+        $this->uniqueid = $uniqueId;
+        $this->adddate = $now;
+        $this->lastmoddate = $now;
+        $this->name = $names;
+        $this->ownerid = $user->id;
+        $this->userights =$libRights;
+        $this->parent = $parent;
+        $this->groupid = $user->groupid;
+        $this->save();
+        return $this->id;
+
+    }
+
+
 }

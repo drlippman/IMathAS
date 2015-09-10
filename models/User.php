@@ -605,7 +605,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getFirstNameAndLastName($toList)
     {
         $query = new Query();
-        $query ->select(['FirstName','LastName','email','id'])->from('imas_users')->where(['IN','id',$toList])->all();
+        $query ->select(['FirstName','LastName','email','id'])->from('imas_users')->where(['IN','id',$toList]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -622,6 +622,40 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $query->orderBy('LastName');
         $command = $query->createCommand();
         $data = $command->queryAll();
+        return $data;
+    }
+    public static function updateUserForPendingReq($id)
+    {
+        $user = static::findOne(['id' =>$id]);
+        if($user)
+        {
+            $user->rights = AppConstant::NUMERIC_TEN;
+            $user->save();
+        }
+    }
+
+    public static function getUserDataForUtilities($id)
+    {
+        $query = new Query();
+            $query ->select(['FirstName','SID','email'])->from('imas_users')->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+
+    }
+
+    public static function findPendingUser($offset)
+    {
+
+        $query = new Query();
+        $query ->select(['id','SID','LastName','FirstName','email'])
+            ->from('imas_users')
+            ->where(['=','rights','0'])
+            ->orWhere(['=','rights','12'])
+            ->limit(1)
+            ->offset($offset);
+        $command = $query->createCommand();
+        $data = $command->queryone();
         return $data;
     }
 

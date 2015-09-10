@@ -111,4 +111,21 @@ class LibraryItems extends BaseImasLibraryItems
         $data = \Yii::$app->db->createCommand($query)->execute();
         return $data;
     }
+
+    public static function getQueSetId($id)
+    {
+        $query = new Query();
+        $query ->select(['qsetid'])->from('imas_library_items')->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function insertData($libId,$qId,$user)
+    {
+        $this->libid = $libId;
+        $this->qsetid = $qId;
+        $this->ownerid = $user->id;
+        $this->save();
+    }
 }

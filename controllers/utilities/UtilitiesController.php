@@ -16,10 +16,12 @@ use app\models\Course;
 use app\models\DbSchema;
 use app\models\FirstScores;
 use app\models\forms\LtiUserForm;
+use app\models\Groups;
 use app\models\InlineText;
 use app\models\Items;
 use app\models\LibraryItems;
 use app\models\LinkedText;
+use app\models\Log;
 use app\models\Message;
 use app\models\QuestionSet;
 use app\models\Student;
@@ -279,6 +281,106 @@ class UtilitiesController extends AppController
         $this->layout = "master";
         $questionSetData = QuestionSet::getExternalRef();
         return $this->renderWithData('listExternalRef',['questionSetData' => $questionSetData]);
+    }
+
+    public function actionApprovePendingReq()
+    {
+        $this->guestUserHandler();
+        $this->layout = "master";
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $installName = "MyOpenMath";
+        $skipN = $this->getParamVal('skipn');
+        $go = $this->getParamVal('go');
+        if($user->rights < AppConstant::ADMIN_RIGHT)
+        {
+            $body = AppConstant::NUMERIC_ONE;
+            $message = 'You do not have access to this page';
+        }
+        if(isset($skipN))
+        {
+            $offset = intval($skipN);
+        }
+        else
+        {
+            $offset = AppConstant::NUMERIC_ZERO;
+        }
+        if(isset($go))
+        {
+            if (isset($params['skip']))
+            {
+                $offset++;
+            }
+            else if (isset($params['deny']))
+            {
+                User::updateUserForPendingReq($params['id']);
+                if (isset($CFG['GEN']['enrollonnewinstructor']))
+                {
+
+                    foreach ($CFG['GEN']['enrollonnewinstructor'] as $rCId)
+                    {
+                        unenrollstu($rCId, array(intval($_POST['id'])));
+                    }
+                }
+            }
+            else if (isset($params['approve']))
+            {
+                $group = AppConstant::NUMERIC_ZERO;
+                if ($params['group'] > -AppConstant::NUMERIC_ONE)
+                {
+                    $group = intval($params['group']);
+                }
+                else if (trim($params['newgroup'])!='')
+                {
+                    $groups = new Groups();
+                    $insertId = $groups->insertNewGroupForUtilities($params['newgroup']);
+                    $group = $insertId;
+                }
+                User::updateRights($params['id'],AppConstant::LIMITED_COURSE_CREATOR_RIGHT,$group);
+                $userData = User::getUserDataForUtilities($params['id']);
+                $headers = 'Account Approval';
+                $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.$userData['FirstName'].'</p>';
+                if ($installName == "MyOpenMath")
+                {
+                    $message .= '<p>Welcome to MyOpenMath.  Your account has been activated, and you\'re all set to log in at <a href="https://www.myopenmath.com">MyOpenMath.com</a> as an instructor using the username <b>'.$userData['SID'].'</b> and the password you provided.</p>';
+                    $message .= '<p>I\'ve signed you up as a "student" in the Support Course, which has forums in which you can ask questions, report problems, or find out about new system improvements.</p>';
+                    $message .= '<p>I\'ve also signed you up for the MyOpenMath Training Course.  This course has video tutorials and assignments that will walk you through learning how to use MyOpenMath in your classes.</p>';
+                    $message .= '<p>David Lippman<br/>admin@myopenmath.com<br/>MyOpenMath administrator</p>';
+                } else if ($installName == 'WAMAP')
+                {
+                    $message .= 'Welcome to WAMAP.  Your account has been activated, and you\'re all set to log in as an instructor using the username <b>'.$userData['SID'].'</b> and the password you provided.</p>';
+                    $message .= '<p>I\'ve signed you up as a "student" in the Support Course, which has forums in which you can ask questions, report problems, or find out about new system improvements.</p>';
+                    $message .= '<p>I\'ve also signed you up for the WAMAP Training Course.  This course has video tutorials and assignments that will walk you through learning how to use WAMAP in your classes.</p>';
+                    $message .= '<p>If you are from outside Washington State, please be aware that WAMAP.org is only intended for regular use by Washington State faculty.  You are welcome to use this site for trial purposes.  If you wish to continue using it, we ask you set up your own installation of the IMathAS software, or use MyOpenMath.com if using content built around an open textbook.</p>';
+                    $message .= '<p>David Lippman<br/>dlippman@pierce.ctc.edu<br/>Instructor, Math @ Pierce College and WAMAP administrator</p>';
+                }
+                if (isset($CFG['GEN']['useSESmail']))
+                {
+                    SESmail($userData['email'], 'MyOpenMath', $installName . ' Account Approval', $message);
+                } else
+                {
+                    AppUtility::sendMail($headers, $message, $userData['email']);
+                }
+            }
+            return $this->redirect('approve-pending-req?skipn='.$offset);
+        }
+        $findPendingUser = User::findPendingUser($offset);
+        $details = '';
+        if(count($findPendingUser) != AppConstant::NUMERIC_ZERO)
+        {
+            if($findPendingUser)
+            {
+                    $getLogDetails = Log::getLogDetails($findPendingUser['id']);
+                    if($getLogDetails)
+                    {
+                        $log = explode('::', $getLogDetails[0]['log']);
+                        $details = $log[1];
+                    }
+            }
+        }
+        $groupsName = Groups::getIdAndName();
+
+        return $this->renderWithData('approvePendingReq',['findPendingUser' => $findPendingUser,'details' => $details,'groupsName' => $groupsName,'message' => $message,'body' => $body,'offset' => $offset]);
     }
 
     public function actionListWrongLibFlag()

@@ -40,9 +40,12 @@ class GroupsController extends AppController
         $page_groupSets = array();
         $groupsData = StuGroupSet::findGroupData($courseId);
         $grpSetId =$this->getParamVal('grpSetId');
-        foreach($groupsData as $group)
+        if($groupsData)
         {
-            $page_groupSets[] = $group;
+            foreach($groupsData as $group)
+            {
+                $page_groupSets[] = $group;
+            }
         }
         if(!$this->isTeacher($user->id,$courseId))
         {
@@ -182,7 +185,7 @@ class GroupsController extends AppController
                             }
                         }
                     }
-                    if(count($alreadyGroupedStu))
+                    if(count($alreadyGroupedStu) > 0)
                     {
                         echo '<p>Some students joined a group already and were skipped:</p><p>';
                         $stuList = "'".implode("','",$alreadyGroupedStu)."'";
@@ -286,14 +289,16 @@ class GroupsController extends AppController
                 $query = new StuGroupSet();
                  $NewGrpSetId = $query->copyGroupSet($copyGrpSet,$courseId);
                 $groups = Stugroups::findByGrpSetIdForCopy($copyGrpSet);
-                if($groups){
+                if($groups)
+                {
                     foreach($groups as $group)
                     {
                         $stuGroupName = addslashes($group['name']);
                         $query = new Stugroups();
                         $newStuGrpId = $query->insertStuGrpData($stuGroupName,$NewGrpSetId);
                         $stuGroupMembersData = StuGroupMembers::findByStuGroupId($group['id']);
-                        if($stuGroupMembersData){
+                        if($stuGroupMembersData)
+                        {
                             foreach($stuGroupMembersData as $data)
                             {
                                 $query = new StuGroupMembers();
@@ -364,8 +369,8 @@ class GroupsController extends AppController
                          $singleData['name'] .= " $grpNum";
                          $grpNum++;
                      }
-                    $page_Grp[$singleData['id']] = $singleData['name'];
-                    $page_GrpMembers[$singleData['id']] = array();
+                     $page_Grp[$singleData['id']] = $singleData['name'];
+                     $page_GrpMembers[$singleData['id']] = array();
                 }
                 $grpIds = implode(',',array_keys($page_Grp));
                 natsort($page_Grp);
@@ -442,7 +447,7 @@ class GroupsController extends AppController
             }
         }
         $this->includeCSS(['groups.css']);
-        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'deleteGrp' => $deleteGrp,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'Stu_GrpSetName' => $Stu_GrpSetName,'removeAll' => $removeAll,'showImg' => $showImg]);
+        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'deleteGrp' => $deleteGrp,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'Stu_GrpSetName' => $Stu_GrpSetName,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message]);
     }
 
     public function deleteGrpSet($deleteGrpSet)

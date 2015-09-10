@@ -47,5 +47,12 @@ class Groups extends BaseImasGroups
              $group->delete();
          }
     }
+
+    public function insertNewGroupForUtilities($gpName)
+    {
+        $this->name = $gpName;
+        $this->save();
+        return $this->id;
+    }
 }
 

@@ -113,20 +113,3 @@ NavBar::end();
 </header>
 </div>
 
-<script>
-
-    $(document).ready(function(){
-
-        Id = $('#one').val();
-        $('.my-Classes').click(function(){
-
-            jQuerySubmit('get-myClasses-ajax',{id:Id},'MyClassesSuccess');
-        });
-     });
-
-    function MyClassesSuccess()
-    {
-
-    }
-
-</script>

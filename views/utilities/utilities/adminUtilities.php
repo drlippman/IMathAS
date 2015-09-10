@@ -64,7 +64,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 {
                     if(!$queryForUser)
                     {
-                        $message = 'No results found';
+                        echo '<h4>No results found</h4>';
                     }else
                     {
                         foreach($queryForUser as $user)
@@ -170,7 +170,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=lookup');?>">User lookup</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/get-student-count');?>">Get Student Count</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/get-student-detail-count');?>">Get Detailed Student Count</a><br/></li>
-                        <li> <a href="#">Approve Pending Instructor Accounts</a><br/></li>
+                        <li> <a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/approve-pending-req')?>">Approve Pending Instructor Accounts</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?debug=true');?>">Enable Debug Mode</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/replace-video');?>">Replace YouTube videos</a><br/></li>
                         <li><a href="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=rescue');?>">Recover lost items</a><br/></li>

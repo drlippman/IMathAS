@@ -146,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class=column>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/manage-lib?cid=admin') ?>">Manage Libraries</a><br>
             <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Libraries</a><BR>
-            <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Libraries</a>
+            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/import-lib?cid=admin') ?>">Import Libraries</a>
         </span>
         <?php
         if ($myRights == 100) {

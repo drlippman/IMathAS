@@ -258,16 +258,48 @@ class QuestionSet extends BaseImasQuestionset
         return $data;
 
     }
-    public static function getQuestionData($aid){
+    public static function getQuestionData($aid)
+    {
         $query = "SELECT iq.id,iq.category,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
         $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
     public static function getQtext($id){
         return QuestionSet::find()->select('qtext')->where(['id' => $id])->one();
     }
     public static function getControlAndQType($id){
         return QuestionSet::find()->select('control,qtype')->where(['id' => $id])->one();
     }
+    public static function findDataToImportLib($qIdsToCheck)
+    {
+        $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getUniqueId($includedList)
+    {
+        $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedList)";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getDataToImportLib($qIdsToCheck)
+    {
+        $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck)";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function updateQuestionSetToImportLib($control,$qText,$rowId)
+    {
+        $QuestionSet = QuestionSet::find()->where(['id' => $rowId])->one();
+        if($QuestionSet)
+        {
+            $QuestionSet->control = $control;
+            $QuestionSet->qtext = $qText;
+            $QuestionSet->save();
+        }
+    }
+
+
 } 
