@@ -488,7 +488,7 @@ margin-top: 7px;
     margin-left: 15px;
 }
 .margin-left-five{
-    margin-left: 5px;
+    margin-left: 5px !important;
 }
 .padding-bottom{
     padding-bottom: 20px;

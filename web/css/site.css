@@ -1126,7 +1126,12 @@ div.review {
 .active .grey-color-link{
      border-color: #104E88 !important;
 }
-
-.margin-top-fourty {
-    margin-top: 36px;
+.padding-top-fifteen {
+    padding-top: 15px;
+}
+.padding-bottom-ten {
+    padding-bottom: 10px;
+}
+.margin-bottom-three {
+    margin-bottom: 3px !important;
 }

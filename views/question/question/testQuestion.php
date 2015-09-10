@@ -23,12 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox preview-question-shadowbox">
 <div class="col-md-12">
-    <br>
-    <br>
     <?php
-
     $sessiondata['coursetheme'] = $coursetheme;
     $flexwidth = true; //tells header to use non _fw stylesheet
     $placeinhead = '';
@@ -99,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </script>
         <?php
         if (isset($params['formn']) && isset($params['loc'])) {
-            echo '<p>';
+            echo '<p class="padding-zero margin-top-twenty-five">';
             echo "<script type=\"text/javascript\">";
             echo "var numchked = -1;";
             echo "if (window.opener && !window.opener.closed) {";
@@ -127,8 +124,8 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         if (isset($params['checked'])) {
-            echo "<p><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
-            echo "/> Mark Question for Use</p>";
+            echo "<p class='padding-zero margin-top-ten margin-bottom-fifteen'><input type=\"checkbox\" name=\"usecheck\" id=\"usecheck\" value=\"Mark Question for Use\" onclick=\"parentcbox.checked=this.checked;togglechk(this.checked)\" ";
+            echo "/> <span class='margin-left-ten'>Mark Question for Use</span></p>";
             echo "
 		  <script type=\"text/javascript\">
 		  var parentcbox = opener.document.getElementById(\"{$params['loc']}\");
@@ -162,10 +159,13 @@ $this->params['breadcrumbs'][] = $this->title;
             $colors = array();
         }
         displayq(0,$params['qsetid'],$seed,true,true,$attempt,false,false,false,$colors);
-        echo "<input type=submit value=\"Submit\"><input type=submit name=\"regen\" value=\"Submit and Regen\">\n";
-        echo "<input type=button value=\"White Background\" onClick=\"whiteout()\"/>";
-        echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/>";
-        echo "</form>\n";
+        echo "<div class='col-md-12 margin-top-ten padding-left-zero margin-bottom-fifteen'>
+                    <div class='floatleft padding-left-zero padding-right-thirteen padding-top-ten'><input class='margin-right-ten' type=submit value=\"Submit\">
+                    <input type=submit name=\"regen\" value=\"Submit and Regen\"></div>";
+                    echo "<div class='floatleft padding-right-ten padding-top-ten'> <input class='margin-right-thirteen' type=button value=\"White Background\" onClick=\"whiteout()\"/>";
+                    echo "<input type=button value=\"Show HTML\" onClick=\"document.getElementById('qhtml').style.display='';\"/></div><div class='col-md-4 floatright'></div>";
+
+        echo "</div></form>\n";
 
         echo '<code id="qhtml" style="display:none">';
         $message = displayq(0,$params['qsetid'],$seed,false,false,0,true);
@@ -174,14 +174,15 @@ $this->params['breadcrumbs'][] = $this->title;
         $message = str_replacE('`','\`',$message);
         echo htmlentities($message);
         echo '</code>';
-
+        echo '<div class="col-md-12 background-gery clear-both preview-question-information">';
         if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-            echo "<p>Question id: {$params['qsetid']}.  <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$params['qsetid']}\" target=\"_blank\">Message owner</a> to report problems</p>";
+            echo "<div> <span>Question id</span>  <span class='margin-left-fourty-three'>{$params['qsetid']}</span> <span> <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$line['ownerid']}&title=Problem%20with%20question%20id%20{$params['qsetid']}\" target=\"_blank\">Message owner</a> <span>to report problems</span></span></div>";
         } else {
-            echo "<p>Question id: {$params['qsetid']}.  <a href=\"mailto:{$line['email']}?subject=Problem%20with%20question%20id%20{$params['qsetid']}\">E-mail owner</a> to report problems</p>";
+            echo "<div class='clear-both padding-zero margin-top-twenty'><span>Question id</span> <span class='margin-left-fourty-three'>{$params['qsetid']}</span>  <span><a href=\"mailto:{$line['email']}?subject=Problem%20with%20question%20id%20{$params['qsetid']}\">E-mail owner</a></span> <span>to report problems</span></div>";
         }
-        echo "<p>Description: {$line['description']}</p><p>Author: {$line['author']}</p>";
-        echo "<p>Last Modified: $lastmod</p>";
+        echo "<p class='padding-zero margin-top-ten'><span>Description</span> <span class='margin-left-fourty-five'>{$line['description']}</span></p>
+        <p class='padding-zero margin-top-ten'><span>Author</span> <span class='margin-left-seven'>{$line['author']}</span></p>";
+        echo "<p class='padding-zero margin-top-ten'><span>Last Modified</span> <span class='margin-left-thirty'>$lastmod</span></p>";
         if ($line['deleted']==1) {
             echo '<p style="color:red;">This question has been marked for deletion.  This might indicate there is an error in the question. ';
             echo 'It is recommended you discontinue use of this question when possible</p>';
@@ -193,17 +194,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
         echo '<p id="brokenmsgbad" style="color:red;display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
         echo 'there might be an error with this question.  Use with caution.  <a href="#" onclick="submitBrokenFlag(0);return false;">Unmark as broken</a></p>';
-        echo '<p id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a> if there appears to be an error with the question.</p>';
+        echo '<p class="padding-zero margin-top-ten" id="brokenmsgok" style="display:'.(($line['broken']==0)?"block":"none").'"><span><a href="#" onclick="submitBrokenFlag(1);return false;">Mark as broken</a></span> <span class="margin-left-nineteen">if there appears to be an error with the question</span></p>';
 
-        echo '<p>'._('License').': ';
+        echo '<p class="padding-zero margin-top-ten"> <span>'._('License').'</span>';
         $license = array('Copyrighted','IMathAS Community License','Public Domain','Creative Commons Attribution-NonCommercial-ShareAlike','Creative Commons Attribution-ShareAlike');
-        echo $license[$line['license']];
+        echo '<span class="margin-left-seven">'.$license[$line['license']].'</span>';
         if ($line['otherattribution']!='') {
             echo '<br/>Other Attribution: '.$line['otherattribution'];
         }
         echo '</p>';
 
-        echo '<p>Question is in these libraries:';
+        echo '<p class="padding-zero margin-top-ten"><span>Question is in these libraries</span>';
         echo '<ul>';
         foreach ($resultLibNames as $row) {
             echo '<li>'.$row['name'];
@@ -212,20 +213,21 @@ $this->params['breadcrumbs'][] = $this->title;
             }
             echo '</li>';
         }
-        echo '</ul></p>';
+        echo '</ul>';
 
         if ($line['ancestors']!='') {
-            echo "<p>Derived from: {$line['ancestors']}";
+            echo "<p class='padding-zero margin-top-ten'>Derived from: {$line['ancestors']}";
             if ($line['ancestorauthors']!='') {
                 echo '<br/>Created by: '.$line['ancestorauthors'];
             }
             echo "</p>";
         } else if ($line['ancestorauthors']!='') {
-            echo '<p>Derived from work by: '.$line['ancestorauthors'].'</p>';
+            echo '<p class="padding-zero margin-top-ten">Derived from work by: '.$line['ancestorauthors'].'</p>';
         }
         if ($myRights==100) {
-            echo '<p>UniqueID: '.$line['uniqueid'].'</p>';
+            echo '<p class="padding-zero margin-top-ten"><span>UniqueID</span><span class="margin-left-five-ptsix-per">'.$line['uniqueid'].'</span></p>';
         }
+        echo'</div>';
     }
 
     ?>
