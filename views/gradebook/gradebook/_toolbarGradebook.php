@@ -39,10 +39,12 @@ use app\components\AppUtility;
 
             </ul>
         </li>
+
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Options');?><span class="caret"></span></a>
             <ul class="dropdown-menu full-width">
-                <li><a href="#"><?php AppUtility::t('Lock Headers');?></a>
+
+                <li><a href="#" onclick="lockcol(1)"><?php AppUtility::t('Lock Headers');?></a>
                 <li class="divider"></li>
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/new-flag?cid='.$course->id)?>"><?php AppUtility::t('New Flag');?></a>
                 <li class="divider"></li>

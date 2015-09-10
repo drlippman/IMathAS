@@ -199,4 +199,9 @@ class AppConstant
     const PENDING_USERS = "Pending Users";
     const QUESTION_TITLE = "Add/Remove Questions";
     const NO_PAGE_ACCESS = "You need to access this page from the course page menu";
+    const ADD_OFFLINE_GRADE = 'Add Offline Grades';
+    const MODIFY_OFFLINE_GRADE = 'Modify Offline Grades';
+    const NO_AUTHORITY = "You don't have authority for this action";
+    const CONFIRMATION_MESSAGE= 'Are you SURE you want to delete this item and all associated grades from the gradebook?';
+    const CONFIRM_DELETE = 'Confirm Delete';
 }

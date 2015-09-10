@@ -171,9 +171,9 @@ table.dataTable.display tbody tr:hover.selected > .sorting_2, table.dataTable.or
 table.dataTable.display tbody tr:hover.selected > .sorting_3, table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_3 {
   background-color: #a4b2cb;
 }
-table.dataTable.no-footer {
-  border-bottom: 1px solid #111;
-}
+/*table.dataTable.no-footer {*/
+  /*border-bottom: 1px solid #111;*/
+/*}*/
 table.dataTable.nowrap th, table.dataTable.nowrap td {
   white-space: nowrap;
 }
