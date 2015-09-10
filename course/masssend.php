@@ -26,7 +26,7 @@
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			$tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$query = "SELECT FirstName,LastName,id FROM imas_users WHERE id IN ($tolist)";
+			$query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
 			
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$emailaddys = array();
@@ -35,6 +35,9 @@
 					$fullnames[$row[2]] = $row[1]. ', '.$row[0];
 					$firstnames[$row[2]] = addslashes($row[0]);
 					$lastnames[$row[2]] = addslashes($row[1]);
+					if ($row[3]==1) {
+						$emailaddys[$row[2]] = "{$row[0]} {$row[1]} <{$row[4]}>";
+					}
 				}
 			}
 			
@@ -46,12 +49,32 @@
 				$isread = 4;
 			}
 			
+			$query = "SELECT FirstName,LastName FROM imas_users WHERE id='$userid'";
+			$result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+			$from = mysql_result($result,0,0).' '.mysql_result($result,0,1);
+			$headers  = 'MIME-Version: 1.0' . "\r\n";
+			$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+			$headers .= "From: $sendfrom\r\n";
+			$messagep1 = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
+			$messagep1 .= "<p>You've received a new message</p><p>From: $from<br />Course: $coursename.</p>\r\n";
+			$messagep1 .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
+			$messagep1 .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/msgs/viewmsg.php?cid=$cid&msgid=";
+			$messagep2 = "\">";
+			$messagep2 .= "View Message</a></p>\r\n";
+			$messagep2 .= "<p>If you do not wish to receive email notification of new messages, please ";
+			$messagep2 .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . $imasroot . "/forms.php?action=chguserinfo\">click here to change your ";
+			$messagep2 .= "user preferences</a></p>\r\n";
+			
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
 					mysql_query($query) or die("Query failed : " . mysql_error());
+					$msgid = mysql_insert_id();
+					if (isset($emailaddys[$msgto])) {
+						mail($emailaddys[$msgto],'New message notification',$messagep1.$msgid.$messagep2,$headers);
+					}
 				}
 			}
 			

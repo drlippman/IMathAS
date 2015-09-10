@@ -110,7 +110,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				$headers .= "From: $sendfrom\r\n";
 				$message  = "<h4>This is an automated message.  Do not respond to this email</h4>\r\n";
 				$message .= "<p>You've received a new message</p><p>From: $from<br />Course: $cname.</p>\r\n";
-				$message .= "<p>Subject:".stripslashes($_POST['subject'])."</p>";
+				$message .= "<p>Subject: ".stripslashes($_POST['subject'])."</p>";
 				$message .= "<a href=\"http://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/viewmsg.php?cid=$cid&msgid=$msgid\">";
 				$message .= "View Message</a></p>\r\n";
 				$message .= "<p>If you do not wish to receive email notification of new messages, please ";

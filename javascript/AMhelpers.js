@@ -4,10 +4,10 @@
 function normalizemathunicode(str) {
 	str = str.replace(/\u2013|\u2014|\u2015|\u2212/g, "-");
 	str = str.replace(/\u2044|\u2215/g, "/");
-	str = str.replace("∞","oo").replace("≤","<=").replace("≥",">=");
-	str = str.replace("±","+-").replace("÷","/");
-	str = str.replace("√","sqrt").replace("∛","root(3)");
-	str = str.replace("²","^2").replace("³","^3");
+	str = str.replace(/∞/g,"oo").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/∪/g,"U");
+	str = str.replace(/±/g,"+-").replace(/÷/g,"/").replace(/·|✕|×|⋅/g,"*");
+	str = str.replace(/√/g,"sqrt").replace(/∛/g,"root(3)");
+	str = str.replace(/²/g,"^2").replace(/³/g,"^3");
 	return str;
 }
 
