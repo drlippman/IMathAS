@@ -70,8 +70,6 @@ class Libraries extends BaseImasLibraries
     }
 
     public static function getByQuestionId($questionid){
-//        $query = Libraries::find()->select('imas_questions.questionsetid,imas_questions.category,imas_libraries.name')->from('imas_questions,imas_libraries')
-//            ->where(['imas_questions.category=imas_libraries.id'])->andWhere(['imas_questions.id' => $questionid]);
         $query = "SELECT imas_questions.questionsetid,imas_questions.category,imas_libraries.name FROM imas_questions LEFT JOIN imas_libraries ";
         $query .= "ON imas_questions.category=imas_libraries.id WHERE imas_questions.id='$questionid'";
         $data = \Yii::$app->db->createCommand($query)->queryAll();

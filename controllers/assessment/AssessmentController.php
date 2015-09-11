@@ -988,7 +988,7 @@ class AssessmentController extends AppController
         global $parents,$sums,$names,$types,$gitypeids,$ids,$prespace;
         $agbcats = array();
         CopyItemsUtility::getsubinfo($items,'0','','Assessment','&nbsp;&nbsp;');
-        $assessments = Assessments::getByCourseId($courseId);
+        $assessments = Assessments::getByCourseId($courseId); //retrieved all assessment from course
         if (count($assessments) == AppConstant::NUMERIC_ZERO) {
             $pageAssessListMsg = AppConstant::NO_ASSESSMENT_TO_CHANGE;
         } else {
@@ -1003,7 +1003,7 @@ class AssessmentController extends AppController
             }
         }
         $pageForumSelect = array();
-        $forums = Forums::getByCourseId($courseId);
+        $forums = Forums::getByCourseId($courseId);//retrieved all forum from course
         $pageForumSelect['val'][0] = AppConstant::NUMERIC_ZERO;
         $pageForumSelect['label'][0] = AppConstant::NONE;
         foreach($forums as $forum){

@@ -1,7 +1,7 @@
 <?php
 //IMathAS:  Core randomizers and display macros
 //(c) 2006 David Lippman
-use app\components\displayq2;
+//use app\components\displayq2;
 
 array_push($allowedmacros,"exp","sec","csc","cot","sech","csch","coth","nthlog","sinn","cosn","tann","secn","cscn","cotn","rand","rrand","rands","rrands","randfrom","randsfrom","jointrandfrom","diffrandsfrom","nonzerorand","nonzerorrand","nonzerorands","nonzerorrands","diffrands","diffrrands","nonzerodiffrands","nonzerodiffrrands","singleshuffle","jointshuffle","makepretty","makeprettydisp","showplot","addlabel","showarrays","horizshowarrays","showasciisvg","listtoarray","arraytolist","calclisttoarray","sortarray","consecutive","gcd","lcm","calconarray","mergearrays","sumarray","dispreducedfraction","diffarrays","intersectarrays","joinarray","unionarrays","count","polymakepretty","polymakeprettydisp","makexpretty","makexprettydisp","calconarrayif","in_array","prettyint","prettyreal","prettysigfig","arraystodots","subarray","showdataarray","arraystodoteqns","array_flip","arrayfindindex","fillarray","array_reverse","root","getsnapwidthheight","is_numeric","sign","prettynegs");
 array_push($allowedmacros,"numtowords","randname","randmalename","randfemalename","randnames","randmalenames","randfemalenames","randcity","randcities","prettytime","definefunc","evalfunc","safepow","arrayfindindices","stringtoarray","strtoupper","strtolower","ucfirst","makereducedfraction","makereducedmixednumber","stringappend","stringprepend","textonimage","addplotborder","addlabelabs","makescinot","today","numtoroman","sprintf","arrayhasduplicates","addfractionaxislabels","decimaltofraction","ifthen","multicalconarray","htmlentities","formhoverover","formpopup","connectthedots","jointsort","stringpos","stringlen","stringclean","substr","substr_count","str_replace","makexxpretty","makexxprettydisp","forminlinebutton","makenumberrequiretimes","comparenumbers","comparefunctions","getnumbervalue","showrecttable","htmldisp","getstuans","checkreqtimes","stringtopolyterms","getfeedbacktxt","getfeedbacktxtessay","getfeedbacktxtnumber","explode","gettwopointlinedata","getdotsdata","gettwopointdata","getlinesdata","adddrawcommand","array_unique","ABarray","scoremultiorder","scorestring","randstate","randstates");
@@ -327,7 +327,7 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 				$fy[$i] = $y;
 			}
 			
-			if (displayq2::isNaN($y)) {
+			if (isNaN($y)) {
 				continue;
 			}
 			if ($py===null) { //starting line
@@ -1883,30 +1883,30 @@ function prettytime($time,$in,$out) {
 
 function definefunc($func,$varlist) {
 	$vars = explode(',',$varlist);
-	/*$toparen = implode('|',$vars);
+	$toparen = implode('|',$vars);
 	if ($toparen != '') {
 		$reg = "/(" . $toparen . ")(" . $toparen . ')$/';
-		  $func= preg_replace($reg,"($1)($2)",$func);	
+		  $func= preg_replace($reg,"($1)($2)",$func);
 		  $reg = "/(" . $toparen . ")(sqrt|ln|log|sin|cos|tan|sec|csc|cot|abs)/";
-		  $func= preg_replace($reg,"($1)$2",$func);	
+		  $func= preg_replace($reg,"($1)$2",$func);
 		  $reg = "/(" . $toparen . ")(" . $toparen . ')([^a-df-zA-Z\(])/';
-		  $func= preg_replace($reg,"($1)($2)$3",$func);	
+		  $func= preg_replace($reg,"($1)($2)$3",$func);
 		  $reg = "/([^a-zA-Z])(" . $toparen . ")([^a-zA-Z])/";
-		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  $func= preg_replace($reg,"$1($2)$3",$func);
 		  //need second run through to catch x*x
-		  $func= preg_replace($reg,"$1($2)$3",$func);	
+		  $func= preg_replace($reg,"$1($2)$3",$func);
 		  $reg = "/^(" . $toparen . ")([^a-zA-Z])/";
 		  $func= preg_replace($reg,"($1)$2",$func);
 		  $reg = "/([^a-zA-Z])(" . $toparen . ")$/";
 		  $func= preg_replace($reg,"$1($2)",$func);
 		  $reg = "/^(" . $toparen . ")$/";
 		  $func= preg_replace($reg,"($1)",$func);
-		  
+
 		  $reg = "/\(\((" . $toparen . ")\)\)/";
 		  $func= preg_replace($reg,"($1)",$func);
-		  $func= preg_replace($reg,"($1)",$func);  
+		  $func= preg_replace($reg,"($1)",$func);
 	}
-	*/
+
 	return array($func,$varlist);
 }
 
@@ -2649,8 +2649,8 @@ function comparefunctions($a,$b,$vars='x',$tol='.001',$domain='-10,10') {
 		$ansa = @eval("return ($a);");
 		$ansb = @eval("return ($b);");
 		//echo "real: $ansa, my: $ansb <br/>";
-		if (displayq2::isNaN($ansa)) {$cntnana++; if (displayq2::isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
-		if (displayq2::isNaN($ansb)) {$cntnanb++; continue;}
+		if (isNaN($ansa)) {$cntnana++; if (isNaN($ansb)) {$cntnanb++;}; continue;} //avoid NaN problems
+		if (isNaN($ansb)) {$cntnanb++; continue;}
 		
 		if ($type=='equation') {
 			if (abs($ansa)>.000001 && is_numeric($ansb)) {

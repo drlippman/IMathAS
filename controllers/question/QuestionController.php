@@ -953,7 +953,7 @@ class QuestionController extends AppController
         $userId = $user['id'];
         $userFullName = $user['FirstName'] . ' ' . $user['LastName'];
         $groupId = $user['groupid'];
-        $userdeflib = $user['deflib'];
+        $userDefLib = $user['deflib'];
         $params = $this->getRequestParams();
         $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
@@ -1285,7 +1285,7 @@ class QuestionController extends AppController
                 }
             }
             if (!isset($params['aid'])) {
-                $outputmsg .= "<a href=".AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId).">Return to Question Set Management</a>\n";
+                $outputmsg .= "<a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$courseId).">Return to Question Set Management</a>\n";
             } else {
                 if ($frompot==AppConstant::NUMERIC_ONE) {
                     $outputmsg .=  "<a href=".AppUtility::getURLFromHome('question','question/mod-question?qsetid='.$questionSetId.'&cid='.$courseId.'&aid='.$params['aid'].'&process=true&usedef=true').">Add Question to Assessment using Defaults</a> | \n";
@@ -1300,7 +1300,7 @@ class QuestionController extends AppController
                 $outputmsg .= "</script>";
             } else {
                 if ($errmsg == '' && !isset($params['aid'])) {
-                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-qset?cid='.$courseId));
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$courseId));
                 } else if ($errmsg == '' && $frompot==AppConstant::NUMERIC_ZERO) {
                     return $this->redirect(AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$params['aid']));
                 } else {
@@ -1420,7 +1420,7 @@ class QuestionController extends AppController
             } else if (isset($sessionData['lastsearchlibs'.$courseId])) {
                 $inlibs = $sessionData['lastsearchlibs'.$courseId];
             } else {
-                $inlibs = $userdeflib;
+                $inlibs = $userDefLib;
             }
             $locklibs='';
             $images = array();
@@ -1640,7 +1640,7 @@ class QuestionController extends AppController
                     $pageBeenTakenMsg = "<h3>Warning</h3>\n";
                     $pageBeenTakenMsg .= "<p>This assessment has already been taken.  Altering the points or penalty will not change the scores of students who already completed this question. ";
                     $pageBeenTakenMsg .= "If you want to make these changes, or add additional copies of this question, you should clear all existing assessment attempts</p> ";
-                    $pageBeenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='add-questions.php?cid=$courseId&aid=$assessmentId&clearattempts=ask'\"></p>\n";
+                    $pageBeenTakenMsg .= "<p><input type=button value=\"Clear Assessment Attempts\" onclick=\"window.location='add-questions?cid=$courseId&aid=$assessmentId&clearattempts=ask'\"></p>\n";
                     $beenTaken = true;
                 } else {
                     $beenTaken = false;
@@ -1978,5 +1978,729 @@ class QuestionController extends AppController
 
     public function actionPrintLayoutBare(){
         return $this->renderWithData('printLayoutBare');
+    }
+
+    public function actionManageQuestionSet(){
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $userId = $user['id'];
+        $myRights = $user['rights'];
+        $groupId = $user['groupid'];
+        $userDefLib = $user['deflib'];
+        $this->layout = 'master';
+        $tempLibArray = array();
+        $sessionId = $this->getSessionId();
+        $sessionData  = $this->getSessionData($sessionId);
+        $overwriteBody = 0;
+        $body = "";
+        $curBreadcrumb = "";
+        $pagetitle = "Manage Question Sets";
+        $helpicon = "";
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        //CHECK PERMISSIONS AND SET FLAGS
+        if ($myRights < 20) {
+            $overwriteBody = 1;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        } elseif (isset($params['cid']) && $params['cid']=="admin" && $myRights <75) {
+            $overwriteBody = 1;
+            $body = "You need to log in as an admin to access this page";
+        } elseif (!(isset($params['cid'])) && $myRights < 75) {
+            $overwriteBody = 1;
+            $body = "Please access this page from the menu links only.";
+        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
+
+            $cid = $params['cid'];
+            if ($cid=='admin') {
+                if ($myRights >74 && $myRights<100) {
+                    $isGrpAdmin = true;
+                } else if ($myRights == 100) {
+                    $isAdmin = true;
+                }
+            }
+            if (isset($params['remove'])) {
+                if (isset($params['confirmed'])) {
+                    if ($params['remove']!='') {
+                        $removeList = explode(',',$params['remove']);
+                        if ($isAdmin) {
+                            LibraryItems::DeleteByIds($removeList);
+                        } else if ($isGrpAdmin) {
+                            $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
+                            foreach ($query as $row) {
+                                LibraryItems::deleteByQsetId($row['id']);
+                            }
+                        } else {
+                            $query = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
+                            foreach ($query as $row) {
+                                LibraryItems::deleteByQsetId($row['id']);
+                            }
+                        }
+                        if ($isGrpAdmin) {
+                            $query = $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
+                            foreach ($query as $row) {
+                                QuestionSet::setDeletedById($row['id']);
+                            }
+                        } else {
+                            if (!$isAdmin) {
+                                QuestionSet::setDeletedByIdsAndOwnerId($removeList, $userId);
+                            } else{
+                                QuestionSet::setDeletedByIds($removeList);
+                            }
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    }
+                    $pagetitle = "Confirm Delete";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Confirm Delete";
+
+                    $rlist = implode(",",$params['nchecked']);
+                }
+            } else if (isset($params['transfer'])) {
+                if (isset($params['newowner'])) {
+                    if ($params['transfer']!='') {
+                        $translist = explode(',',$params['transfer']);
+
+                        if ($isGrpAdmin) {
+                            $query = QuestionSet::getByQSetIdAndGroupId($translist, $groupId);
+                            foreach ($query as $row) {
+                                QuestionSet::setOwnerIdById($row['id'], $params['newowner']);
+                            }
+                        } else {
+                            if (!$isAdmin) {
+                                QuestionSet::setOwnerIdByIdsAndOwnerId($translist, $userId, $params['newowner']);
+                            }else{
+                                QuestionSet::setOwnerIdByIds($translist, $params['newowner']);
+                            }
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+
+                    $pagetitle ="Transfer Ownership";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Transfer QSet";
+
+                    $tlist = implode(",",$params['nchecked']);
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    }
+                    $query = User::getUserGraterThenTeacherRights();
+                    $i=AppConstant::NUMERIC_ZERO;
+                    $page_transferUserList = array();
+                    foreach ($query as $row) {
+                        $page_transferUserList['val'][$i] = $row['id'];
+                        $page_transferUserList['label'][$i] = $row['LastName'] . ", " . $row['FirstName'];
+                        $i++;
+                    }
+                }
+            } else if (isset($params['chglib'])) {
+                if (isset($params['qtochg'])) {
+                    if ($params['chglib']!='') {
+                        $newlibs = $params['libs']; //array is sanitized later
+                        if ($params['libs']=='') {
+                            $newlibs = array();
+                        } else {
+                            if ($newlibs[0]==0 && count($newlibs)>1) { //get rid of unassigned if checked and others are checked
+                                array_shift($newlibs);
+                            }
+                        }
+
+                        $libarray = explode(',',$params['qtochg']); //qsetids to change
+                        if ($params['qtochg']=='') {
+                            $libarray = array();
+                        }
+                        $chglist = "'".implode("','",$libarray)."'";
+
+                        $alllibs = array();
+                        $query = LibraryItems::getByList($libarray);
+                        foreach ($query as $row) {
+                            $alllibs[$row['qsetid']][] = $row['libid'];
+                        }
+                        if ($isGrpAdmin) {
+                            $query = LibraryItems::getByLibAndUserTable($groupId, $libarray);
+                        } else {
+                            $query = LibraryItems::getByListAndOwnerId($isAdmin, $chglist, $userId);
+                        }
+                        $mylibs = array();
+                        foreach ($query as $row) {
+                            $mylibs[$row['qsetid']][] = $row['libid'];
+                        }
+
+                        if ($params['action'] == AppConstant::NUMERIC_ZERO) {//add, keep existing
+                            /*
+                             * get list of existing library assignments, remove any additions that already exist and add to new libraries
+                             */
+                            foreach ($libarray as $qsetid) { //for each question
+                                //determine which checked libraries it's not already in
+                                $toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
+                                //and add them
+                                foreach($toadd as $libid) {
+                                    if ($libid == AppConstant::NUMERIC_ZERO) { continue;} //no need to add to unassigned using "keep existing"
+                                    $tempLibArray['libid'] = $libid;
+                                    $tempLibArray['qsetid'] = $qsetid;
+                                    $tempLibArray['userid'] = $userId;
+                                    $library = new LibraryItems();
+                                    $library->createLibraryItems($tempLibArray);
+                                }
+                                if (count($toadd) > AppConstant::NUMERIC_ONE || (count($toadd) > AppConstant::NUMERIC_ZERO && $toadd[0] != AppConstant::NUMERIC_ZERO)) {
+                                    LibraryItems::deleteLibraryItems(AppConstant::NUMERIC_ZERO,$qsetid);
+                                }
+                            }
+                        } else if ($params['action'] == AppConstant::NUMERIC_ONE) { //add, remove existing
+                            /*
+                             *get list of existing library assignments, rework existing to new libs, remove any excess existing and add to any new
+                             */
+                            foreach ($libarray as $qsetid) { //for each question determine which checked libraries it's not already in.
+                                $toadd = array_diff($newlibs,$alllibs[$qsetid]);
+                                //and add them
+                                foreach($toadd as $libid) {
+                                    $tempLibArray['libid'] = $libid;
+                                    $tempLibArray['qsetid'] = $qsetid;
+                                    $tempLibArray['userid'] = $userId;
+                                    $library = new LibraryItems();
+                                    $library->createLibraryItems($tempLibArray);
+                                }
+                                //determine which libraries to remove from; my lib assignments - newlibs
+                                if (isset($mylibs[$qsetid])) {
+                                    $toremove = array_diff($mylibs[$qsetid],$newlibs);
+                                    foreach($toremove as $libid) {
+                                        LibraryItems::deleteLibraryItems($libid, $qsetid);
+                                    }
+                                    //check for unassigneds
+                                    $query = LibraryItems::getIdByQid($qsetid);
+                                    if (count($query) == AppConstant::NUMERIC_ZERO) {
+                                        $tempLibArray['libid'] = AppConstant::NUMERIC_ZERO;
+                                        $tempLibArray['qsetid'] = $qsetid;
+                                        $tempLibArray['userid'] = $userId;
+                                        $library = new LibraryItems();
+                                        $library->createLibraryItems($tempLibArray);
+                                    }
+                                }
+                            }
+                        } else if ($params['action'] == AppConstant::NUMERIC_TWO) { //remove
+                            /*
+                             * get list of exisiting assignments, if not in checked list, remove
+                             */
+                            foreach ($libarray as $qsetid) {
+                            /*
+                             * for each question determine which libraries to remove from; my lib assignments - newlibs
+                             */
+                                if (isset($mylibs[$qsetid])) {
+                                    $toremove = array_diff($mylibs[$qsetid],$newlibs);
+                                    foreach($toremove as $libid) {
+                                        LibraryItems::deleteLibraryItems($libid, $qsetid);
+                                    }
+                                    //check for unassigneds
+                                    $query = LibraryItems::getIdByQid($qsetid);
+                                    if (count($query) == AppConstant::NUMERIC_ZERO) {
+                                        $tempLibArray['libid'] = AppConstant::NUMERIC_ZERO;
+                                        $tempLibArray['qsetid'] = $qsetid;
+                                        $tempLibArray['userid'] = $userId;
+                                        $library = new LibraryItems();
+                                        $library->createLibraryItems($tempLibArray);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                    $pagetitle = "Modify Library Assignments";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Modify Assignments";
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    } else {
+                        $query = LibraryItems::getDistinctLibId($params['nchecked']);
+                        foreach ($query as $row) {
+                            $checked[] = $row['libid'];
+                        }
+                        $params['selectrights'] = AppConstant::NUMERIC_ONE;;
+                    }
+                }
+            } else if (isset($params['template'])) {
+                if (isset($params['qtochg'])) {
+                    if (!isset($params['libs'])) {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;;
+                        $body = "<html><body>No library selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a></body></html>\n";
+                    }
+                    $lib = $params['libs'];
+                    $qtochg = explode(',',$params['qtochg']);
+                    $now = time();
+                    $myname = $user['lastName'].','.$user['firstName'];
+                    $userfullname = $user['firstName'].','.$user['lastName'];
+                    foreach ($qtochg as $k=>$qid) {
+                        $ancestors = ''; $ancestorauthors = '';
+                        $row = QuestionSet::getSelectedDataByQuesSetId($qid);
+                        $lastauthor = array_pop($row);
+                        $ancestors = $row['ancestors'];
+                        $ancestorauthors = $row['ancestorauthors'];
+                        if ($ancestors!='') {
+                            $ancestors = $qid . ','. $ancestors;
+                        } else {
+                            $ancestors = $qid;
+                        }
+                        if ($ancestorauthors!='') {
+                            $ancestorauthors = $lastauthor.'; '.$ancestorauthors;
+                        } else {
+                            $ancestorauthors = $lastauthor;
+                        }
+                        $row['ancestors'] = $ancestors;
+                        $row['ancestorauthors'] = $ancestorauthors;
+                        $row['description'] .= " (copy by $userfullname)";
+                        $mt = microtime();
+                        $uqid = substr($mt, AppConstant::NUMERIC_ELEVEN).substr($mt, AppConstant::NUMERIC_TWO, AppConstant::NUMERIC_THREE).$k;
+                        $tempQuestionArray = array();
+                        $tempQuestionArray['uniqueid'] = $uqid;
+                        $tempQuestionArray['adddate'] = $now;
+                        $tempQuestionArray['lastmoddate'] = $now;
+                        $tempQuestionArray['ownerid'] = $userId;
+                        $tempQuestionArray['author'] = $myname;
+                        $tempQuestionArray['description'] = $row['description'];
+                        $tempQuestionArray['userights'] = $row['userights'];
+                        $tempQuestionArray['qtype'] = $row['qtype'];
+                        $tempQuestionArray['control'] = $row['control'];
+                        $tempQuestionArray['qcontrol'] = $row['qcontrol'];
+                        $tempQuestionArray['qtext'] = $row['qtext'];
+                        $tempQuestionArray['answer'] = $row['answer'];
+                        $tempQuestionArray['hasimg'] = $row['hasimg'];
+                        $tempQuestionArray['ancestors'] = $row['ancestors'];
+                        $tempQuestionArray['ancestorauthors'] = $row['ancestorauthors'];
+                        $tempQuestionArray['license'] = $row['license'];
+                        $question = new QuestionSet();
+                        $nqid = $question->createQuestionSet($tempQuestionArray);
+                        $tempLibArray['libid'] = $lib;
+                        $tempLibArray['qsetid'] = $nqid;
+                        $tempLibArray['userid'] = $userId;
+                        $library = new LibraryItems();
+                        $library->createLibraryItems($tempLibArray);
+                        $qImageData = QImages::getByQuestionSetId($qid);
+                        $QImgArray = array();
+                        $QImgArray['var'] = $row['var'];
+                        $QImgArray['filename'] = $row['filename'];
+                        $QImgArray['alttext'] = $row['alttext'];
+                        foreach ($qImageData as $row) {
+                            $QImage = new QImages();
+                            $QImage->createQImages($nqid, $QImgArray);
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                    $pagetitle = "Template Questions";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Template Questions";
+
+                    $clist = implode(",",$params['nchecked']);
+                    $selecttype = "radio";
+
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    }
+                }
+
+            } else if (isset($params['license'])) {
+                if (isset($params['qtochg'])) {
+                    $qtochg = explode(',',$params['qtochg']);
+                    foreach ($qtochg as $k=>$qid) {
+                        $qtochg[$k] = intval($qid);
+                    }
+                    if ($params['sellicense']!=-1) {
+                        $selLicense = intval($params['sellicense']);
+                        if (!$isAdmin) {
+                            QuestionSet::setLicenseByUserId($selLicense, $qtochg, $userId);
+                        }else{
+                            QuestionSet::setLicense($selLicense, $qtochg);
+                        }
+                    }
+                    if ($params['otherattribtype'] != AppConstant::NUMERIC_NEGATIVE_ONE) {
+                        if ($params['otherattribtype'] == AppConstant::NUMERIC_ZERO) {
+                            if (!$isAdmin) {
+                                QuestionSet::setOtherAttributionByUserId($params['addattr'], $qtochg, $userId);
+                            }else{
+                                QuestionSet::setOtherAttribution($params['addattr'], $qtochg);
+                            }
+                        } else {
+                            if (!$isAdmin) {
+                                $query = QuestionSet::getIdByQidAndOwnerId($qtochg, $userId);
+                            }else {
+                                $query = QuestionSet::getByIdUsingInClause($qtochg);
+                            }
+                            foreach ($query as $row) {
+                                $attr = addslashes($row['otherattribution']) . $params['addattr'];
+                                QuestionSet::setOtherAttributionById($attr, $row['id']);
+                            }
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+
+                } else {
+                    $pagetitle = _("Change Question License/Attribution");
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; "._("Change Question License/Attribution");
+
+                    $clist = implode(",",$params['nchecked']);
+
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    }
+                }
+
+            } else if (isset($params['chgrights'])) {
+                if (isset($params['qtochg'])) {
+                    if ($isGrpAdmin) {
+                        $query = QuestionSet::getByQSetIdAndGroupId($libarray, $groupId);
+                        $tochg = array();
+                        foreach ($query as $row) {
+                            $tochg[] = $row['id'];
+                        }
+                        if (count($tochg) > AppConstant::NUMERIC_ZERO) {
+                            $chglist = implode(',',$tochg);
+                            QuestionSet::setUserRightsByList($tochg,$params['newrights']);
+                        }
+                    } else {
+                        $chglist = "'".implode("','",explode(',',$params['qtochg']))."'";
+
+                        if (!$isAdmin) {
+                            QuestionSet::setUserRightsByListAndUserId(explode(',',$params['qtochg']),$params['newrights'], $userId);
+                        }else{
+                            QuestionSet::setUserRightsByList(explode(',',$params['qtochg']),$params['newrights']);
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                    $pagetitle = "Change Question Rights";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Change Question Rights";
+
+                    $clist = implode(",",$params['nchecked']);
+
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = 1;
+                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                    }
+                }
+            } else if (isset($params['remove'])) {
+                if (isset($params['confirmed'])) {
+                    if ($isGrpAdmin) {
+                        $query = QuestionSet::getQidByQSetIdAndGroupId($params['remove'], $groupId);
+                        if (count($query) > AppConstant::NUMERIC_ZERO) {
+                            QuestionSet::setDeletedById($params['remove']);
+                        } else {
+                            return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                          }
+
+                    } else {
+                        if (!$isAdmin) {
+                            QuestionSet::setDeletedByIdAndOwnerId($params['remove'], $userId);
+                        } else{
+                            QuestionSet::setDeletedById($params['remove']);
+                        }
+                    }
+                    if (mysql_affected_rows($link)>0) {
+                        LibraryItems::deleteByQsetId($params['remove']);
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                    $pagetitle = "Confirm Delete";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Confirm Delete";
+                }
+            } else if (isset($params['transfer'])) {
+                if (isset($params['newowner'])) {
+
+                    if ($isGrpAdmin) {
+                        $query = QuestionSet::getQidByQSetIdAndGroupId($params['transfer'], $groupId);
+                        if (count($query) > AppConstant::NUMERIC_ZERO) {
+                            QuestionSet::setOwnerIdById($params['transfer'], $params['newowner']);
+                        }
+                    } else {
+                        if (!$isAdmin) {
+                            QuestionSet::setOwnerIdByIdAndOwnerId($params['transfer'], $userId, $params['newowner']);
+                        }else{
+                            QuestionSet::setOwnerIdById($params['transfer'], $params['newowner']);
+                        }
+                    }
+                    return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
+                } else {
+                     $pagetitle = "Transfer Ownership";
+                    $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
+                    $curBreadcrumb .= " &gt; Transfer QSet";
+                    $query = User::getUserGraterThenTeacherRights();
+                    $i = AppConstant::NUMERIC_ZERO;
+                    $page_transferUserList = array();
+                   foreach ($query as $row) {
+                        $page_transferUserList['val'][$i] = $row['id'];
+                        $page_transferUserList['label'][$i] = $row['LastName'] . ", " . $row['FirstName'];
+                        $i++;
+                    }
+                }
+            } else { //DEFAULT DATA MANIPULATION
+                $curBreadcrumb .= " &gt; Manage Question Set";
+                if ($isAdmin) {
+                    $page_adminMsg =  "You are in Admin mode, which means actions will apply to all questions, regardless of owner";
+                } else if ($isGrpAdmin) {
+                    $page_adminMsg = "You are in Group Admin mode, which means actions will apply to all group's questions, regardless of owner";
+                } else {
+                    $page_adminMsg = "";
+                }
+                //load filter.  Need earlier than usual header.php load
+                $curdir = rtrim(dirname(__FILE__), '/\\');
+                require_once (Yii::$app->basePath."/filter/filter.php");
+
+                //remember search
+                if (isset($params['search'])) {
+                    $safesearch = $params['search'];
+                    $safesearch = str_replace(' and ', ' ',$safesearch);
+                    $search = stripslashes($safesearch);
+                    $search = str_replace('"','&quot;',$search);
+                    $sessionData['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
+                    if (isset($params['searchmine'])) {
+                        $searchmine = 1;
+                    } else {
+                        $searchmine = 0;
+                    }
+                    $sessionData['searchmine'.$cid] = $searchmine;
+                    if (isset($params['searchall'])) {
+                        $searchall = 1;
+                    } else {
+                        $searchall = 0;
+                    }
+                    $sessionData['searchall'.$cid] = $searchall;
+                    if ($searchall==1 && trim($search)=='' && $searchmine==0) {
+                        $overwriteBody = 1;
+                        $body = "Must provide a search term when searching all libraries <a href=\"manage-question-set\">Try again</a>";
+                        $searchall = 0;
+                    }
+                    if ($isAdmin) {
+                        if (isset($params['hidepriv'])) {
+                            $hidepriv = 1;
+                        } else {
+                            $hidepriv = 0;
+                        }
+                        $sessionData['hidepriv'.$cid] = $hidepriv;
+                    }
+
+                    $this->writesessiondata($sessionData,$sessionId);
+                } else if (isset($sessionData['lastsearch'.$cid])) {
+                    $safesearch = $sessionData['lastsearch'.$cid]; //str_replace("+"," ",$sessionData['lastsearch'.$cid]);
+                    $search = stripslashes($safesearch);
+                    $search = str_replace('"','&quot;',$search);
+                    $searchall = $sessionData['searchall'.$cid];
+                    $searchmine = $sessionData['searchmine'.$cid];
+                    if ($isAdmin) {
+                        $hidepriv = $sessionData['hidepriv'.$cid];
+                    }
+                } else {
+                    $search = '';
+                    $searchall = 0;
+                    $searchmine = 0;
+                    $safesearch = '';
+                }
+                if (trim($safesearch)=='') {
+                    $searchlikes = '';
+                } else {
+                    if (substr($safesearch,0,6)=='regex:') {
+                        $safesearch = substr($safesearch,6);
+                        $searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
+                    } else if ($safesearch=='isbroken') {
+                        $searchlikes = "imas_questionset.broken=1 AND ";
+                    } else if (substr($safesearch,0,7)=='childof') {
+                        $searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch,8)."[[:>:]]' AND ";
+                    } else {
+                        $searchterms = explode(" ",$safesearch);
+                        $searchlikes = '';
+                        foreach ($searchterms as $k=>$v) {
+                            if (substr($v,0,5) == 'type=') {
+                                $searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+                                unset($searchterms[$k]);
+                            }
+                        }
+                        $searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
+                        if (substr($safesearch,0,3)=='id=') {
+                            $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+                        } else if (is_numeric($safesearch)) {
+                            $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
+                        } else {
+                            $searchlikes .= ") AND";
+                        }
+                    }
+                }
+
+                if (isset($params['libs'])) {
+                    if ($params['libs']=='') {
+                        $params['libs'] = $userDefLib;
+                    }
+                    $searchlibs = $params['libs'];
+                    //$sessionData['lastsearchlibs'] = implode(",",$searchlibs);
+                    $sessionData['lastsearchlibs'.$cid] = $searchlibs;
+                    $this->writesessiondata($sessionData,$sessionId);
+                } else if (isset($params['listlib'])) {
+                    $searchlibs = $params['listlib'];
+                    $sessionData['lastsearchlibs'.$cid] = $searchlibs;
+                    $searchall = 0;
+                    $sessionData['searchall'.$cid] = $searchall;
+                    $sessionData['lastsearch'.$cid] = '';
+                    $searchlikes = '';
+                    $search = '';
+                    $safesearch = '';
+                    $this->writesessiondata($sessionData,$sessionId);
+                }else if (isset($sessionData['lastsearchlibs'.$cid])) {
+                    //$searchlibs = explode(",",$sessionData['lastsearchlibs']);
+                    $searchlibs = $sessionData['lastsearchlibs'.$cid];
+                } else {
+                    $searchlibs = $userDefLib;
+                }
+
+                $llist = "'".implode("','",explode(',',$searchlibs))."'";
+
+                $libsortorder = array();
+                if (substr($searchlibs,0,1)=="0") {
+                    $lnamesarr[0] = "Unassigned";
+                    $libsortorder[0] = 0;
+                }
+
+                $query = Libraries::getById($llist);
+                foreach ($query as $row) {
+                    $lnamesarr[$row['id']] = $row['name'];
+                    $libsortorder[$row['id']] = $row['sortorder'];
+                }
+                if (count($lnamesarr) > 0) {
+                    $lnames = implode(", ",$lnamesarr);
+                } else {$lnames = '';}
+                $resultLibs = QuestionSet::getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId);
+                $page_questionTable = array();
+                $page_libstouse = array();
+                $page_libqids = array();
+                $lastlib = -1;
+                $ln=1;
+
+                foreach ($resultLibs as $line) {
+                    if (isset($page_questionTable[$line['id']])) {
+                        continue;
+                    }
+                    if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
+                        $page_libstouse[] = $line['libid'];
+                        $lastlib = $line['libid'];
+                        $page_libqids[$line['libid']] = array();
+                    }
+                    if ($libsortorder[$line['libid']]==1) { //alpha
+                        $page_libqids[$line['libid']][$line['id']] = trim($line['description']);
+                    } else { //id
+                        $page_libqids[$line['libid']][] = $line['id'];
+                    }
+                    $i = $line['id'];
+
+                    $page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    if ($line['userights']==0) {
+                        $page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
+                    } else if ($line['replaceby']>0 || $line['junkflag']>0) {
+                        $page_questionTable[$i]['desc'] = '<span style="color:#ccc"><i>'.filter($line['description']).'</i></span>';
+                    } else {
+                        $page_questionTable[$i]['desc'] = filter($line['description']);
+                    }
+
+                    if ($line['extref']!='') {
+                        $page_questionTable[$i]['cap'] = 0;
+                        $extref = explode('~~',$line['extref']);
+                        $hasvid = false;  $hasother = false; $hascap = false;
+                        foreach ($extref as $v) {
+                            if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
+                                $hasvid = true;
+                                if (strpos($v,'!!1')!==false) {
+                                    $page_questionTable[$i]['cap'] = 1;
+                                }
+                            } else {
+                                $hasother = true;
+                            }
+                        }
+                        $page_questionTable[$i]['extref'] = '';
+                        if ($hasvid) {
+                            $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/video_tiny.png'.">";
+                        }
+                        if ($hasother) {
+                            $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/html_tiny.png'.">";
+                        }
+                    }
+
+
+                    $page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
+                    $page_questionTable[$i]['type'] = $line['qtype'];
+                    if ($searchall==1) {
+                        $page_questionTable[$i]['lib'] = "<a href=\"manage-question-set?cid=$cid&listlib={$line['libid']}\">List lib</a>";
+                    } else {
+                        $page_questionTable[$i]['junkflag'] = $line['junkflag'];
+                        $page_questionTable[$i]['libitemid'] = $line['libitemid'];
+                    }
+                    $page_questionTable[$i]['times'] = 0;
+
+                    if ($isAdmin || $isGrpAdmin) {
+                        $page_questionTable[$i]['mine'] = $line['lastName'] . ',' . substr($line['firstName'],0,1);
+                        if ($line['userights']==0) {
+                            $page_questionTable[$i]['mine'] .= ' <i>Priv</i>';
+                        }
+                    } else if ($line['ownerid']==$userId) {
+                        if ($line['userights']==0) {
+                            $page_questionTable[$i]['mine'] = '<i>Priv</i>';
+                        } else {
+                            $page_questionTable[$i]['mine'] = 'Yes';
+                        }
+                    } else {
+                        $page_questionTable[$i]['mine'] = '';
+                    }
+                    $page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
+                    if ($isAdmin || ($isGrpAdmin && $line['groupid']==$groupId) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $line['userights']>3) {
+                        $page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
+                    } else {
+                        $page_questionTable[$i]['action'] .= '<option value="mod">View Code</option>';
+                    }
+                    $page_questionTable[$i]['action'] .= '<option value="temp">Template (copy)</option>';
+                    if ($isAdmin || ($isGrpAdmin && $line['groupid']==$groupId) || $line['ownerid']==$userId) {
+                        $page_questionTable[$i]['action'] .= '<option value="del">Delete</option>';
+                        $page_questionTable[$i]['action'] .= '<option value="tr">Transfer</option>';
+                    }
+                    $page_questionTable[$i]['action'] .= '</select>';
+
+
+                    $page_questionTable[$i]['lastmod'] =  date("m/d/y",$line['lastmoddate']);
+                    $page_questionTable[$i]['add'] = "<a href=\"mod-question?qsetid={$line['id']}&cid=$cid\">Add</a>";
+                    $ln++;
+                }
+                //pull question useage data
+                if (count($page_questionTable)>0) {
+                    $allusedqids = implode(',', array_keys($page_questionTable));
+                    $query = Questions::getByQuestionSetId($allusedqids);
+                    foreach ($query as $row) {
+                        $page_questionTable[$row[0]]['times'] = $row[1];
+                    }
+                }
+
+                //sort alpha sorted libraries
+                foreach ($page_libstouse as $libid) {
+                    if ($libsortorder[$libid]==1) {
+                        natcasesort($page_libqids[$libid]);
+                        $page_libqids[$libid] = array_keys($page_libqids[$libid]);
+                    }
+                }
+                if ($searchall==1) {
+                    $page_libstouse = array_keys($page_libqids);
+                }
+            }
+        }
+        $this->includeJS(['general.js','tablesorter.js','question/junkflag.js','question/libtree2.js']);
+        $renderData = array('params' => $params,'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchlibs, 'curBreadcrumb' => $curBreadcrumb,
+            'pagetitle' => $pagetitle, 'helpicon' => $helpicon, 'cid' => $cid, 'rlist' => $rlist, 'tlist' => $tlist, 'page_transferUserList' => $page_transferUserList,
+        'clist' => $clist, 'page_adminMsg' => $page_adminMsg, 'lnames' => $lnames, 'search' => $search, 'searchall' => $searchall, 'searchmine' => $searchmine,
+            'isadmin' => $isAdmin, 'hidepriv' => $hidepriv, 'isgrpadmin' => $isGrpAdmin,'page_libstouse' => $page_libstouse, 'lnamesarr' => $lnamesarr,
+            'page_libqids' => $page_libqids, 'page_questionTable' => $page_questionTable);
+        return $this->renderWithData('manageQuestionSet', $renderData);
     }
 }

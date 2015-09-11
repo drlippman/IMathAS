@@ -168,15 +168,6 @@ class QuestionSet extends BaseImasQuestionset
         $query  = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questionset.id AS qid,imas_questions.withdrawn,imas_questionset.qtype,imas_questionset.control,imas_questions.showhints,imas_questionset.extref ";
 		$query .= "FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
 		$query .= " AND imas_questions.id IN ($questionList)";
-//        $query	->select(['imas_questionset.description','imas_questions.id','imas_questions.points','imas_questionset.id','imas_questions.withdrawn','imas_questionset.qtype','imas_questionset.control','imas_questions.showhints','imas_questionset.extref'])
-//            ->from('imas_questionset')
-//            ->join(	'INNER JOIN',
-//                'imas_questions',
-//                'imas_questionset.id=imas_questions.questionsetid'
-//            )
-//            ->where(['IN','imas_questions.id',$questionList]);
-//        $command = $query->createCommand();
-//        $data = $command->queryAll();
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
@@ -272,6 +263,7 @@ class QuestionSet extends BaseImasQuestionset
     public static function getControlAndQType($id){
         return QuestionSet::find()->select('control,qtype')->where(['id' => $id])->one();
     }
+
     public static function findDataToImportLib($qIdsToCheck)
     {
         $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qIdsToCheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
@@ -300,6 +292,217 @@ class QuestionSet extends BaseImasQuestionset
             $QuestionSet->save();
         }
     }
+    public static function getByQSetIdAndGroupId($list, $groupId){
+        $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
+                ->where(['IN','imas_questionset.id', $list])->andWhere('imas_questionset.ownerid=imas_users.id')
+                ->andWhere(['imas_users.groupid' => $groupId])->all();
+        return $data;
+    }
 
+    public static function setDeletedById($id){
+        $data = QuestionSet::findOne(['id' => $id]);
+        if($data){
+            $data->deleted = AppConstant::NUMERIC_ONE;
+            $data->save();
+        }
+    }
 
-} 
+    public static function getIdByIDAndOwnerId($removeList, $userId){
+        return QuestionSet::find()->select('id')->where(['IN', 'id', $removeList])->andWhere(['ownerid' => $userId])->all();
+    }
+
+    public static function setDeletedByIds($removeList){
+        $data = QuestionSet::getByIdUsingInClause($removeList);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->deleted = AppConstant::NUMERIC_ONE;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setDeletedByIdsAndOwnerId($removeList, $userId){
+        $data = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->deleted = AppConstant::NUMERIC_ONE;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setOwnerIdById($id, $ownerId){
+        $data = QuestionSet::findOne(['id' => $id]);
+        if($data){
+            $data->ownerid = $ownerId;
+            $data->save();
+        }
+    }
+
+    public static function setOwnerIdByIds($removeList, $ownerId){
+        $data = QuestionSet::getByIdUsingInClause($removeList);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->ownerid = $ownerId;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setOwnerIdByIdsAndOwnerId($removeList, $userId, $ownerId){
+        $data = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->ownerid = $ownerId;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function getSelectedDataByQuesSetId($id)
+    {
+        return QuestionSet::find()->select('description,userights,qtype,control,qcontrol,qtext,answer,hasimg,ancestors,ancestorauthors,license,author')->where(['id' => $id])->one();
+    }
+
+    public static function setLicense($selLicense, $qtochg){
+        $data = QuestionSet::getByIdUsingInClause($qtochg);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->license = $selLicense;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setLicenseByUserId($selLicense, $qtochg, $userId){
+        $data = QuestionSet::getIdByQidAndOwnerId($qtochg, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->license = $selLicense;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function getIdByQidAndOwnerId($removeList, $userId){
+        return QuestionSet::find()->where(['IN', 'id', $removeList])->andWhere(['ownerid' => $userId])->all();
+    }
+
+    public static function setOtherAttribution($attribute, $qtochg){
+        $data = QuestionSet::getByIdUsingInClause($qtochg);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->otherattribution = $attribute;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setOtherAttributionByUserId($attribute, $qtochg, $userId){
+        $data = QuestionSet::getIdByQidAndOwnerId($qtochg, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->otherattribution = $attribute;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setOtherAttributionById($attr, $id){
+        $data = QuestionSet::getByQuesSetId($id);
+        if($data){
+            $data->otherattribution = $attr;
+            $data->save();
+        }
+    }
+
+    public static function setUserRightsByList($ids, $rights){
+        $data = QuestionSet::getByIdUsingInClause($ids);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->userights = $rights;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function setUserRightsByListAndUserId($qtochg, $rights, $userId){
+        $data = QuestionSet::getIdByQidAndOwnerId($qtochg, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->userights = $rights;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function getQidByQSetIdAndGroupId($id, $groupId){
+        $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
+            ->where(['imas_questionset.id' => $id])->andWhere('imas_questionset.ownerid=imas_users.id')
+            ->andWhere(['imas_users.groupid' => $groupId])->all();
+        return $data;
+    }
+
+    public static function setDeletedByIdAndOwnerId($id, $userId){
+        $data = QuestionSet::getIdByQidAndOwner($id, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->deleted = AppConstant::NUMERIC_ONE;
+                $singleData->save();
+            }
+        }
+    }
+    public static function getIdByQidAndOwner($id, $userId){
+        return QuestionSet::find()->where(['id' => $id])->andWhere(['ownerid' => $userId])->all();
+    }
+
+    public static function setOwnerIdByIdAndOwnerId($id, $userId, $ownerId){
+        $data = QuestionSet::getIdByQidAndOwner($id, $userId);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->ownerid = $ownerId;
+                $singleData->save();
+            }
+        }
+    }
+
+    public static function getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId){
+        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
+        $query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
+        $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";
+        $query .= "imas_library_items.qsetid=imas_questionset.id AND imas_questionset.ownerid=imas_users.id ";
+
+        if ($isAdmin) {
+            if ($searchall==0) {
+                $query .= "AND imas_library_items.libid IN ($llist)";
+            }
+            if ($hidepriv==1) {
+                $query .= " AND imas_questionset.userights>0";
+            }
+            if ($searchmine==1) {
+                $query .= " AND imas_questionset.ownerid='$userId'";
+            }
+        } else if ($isGrpAdmin) {
+            $query .= "AND (imas_users.groupid='$groupId' OR imas_questionset.userights>0) ";
+            $query .= "AND (imas_library_items.libid > 0 OR imas_users.groupid='$groupId')";
+            if ($searchall==0) {
+                $query .= " AND imas_library_items.libid IN ($llist)";
+            }
+            if ($searchmine==1) {
+                $query .= " AND imas_questionset.ownerid='$userId'";
+            }
+        } else {
+            $query .= "AND (imas_questionset.ownerid='$userId' OR imas_questionset.userights>0) ";
+            $query .= "AND (imas_library_items.libid > 0 OR imas_questionset.ownerid='$userId')";
+            if ($searchall==0) {
+                $query .= " AND imas_library_items.libid IN ($llist)";
+            }
+            if ($searchmine==1) {
+                $query .= " AND imas_questionset.ownerid='$userId'";
+            }
+        }
+        $query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id LIMIT 500";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+}

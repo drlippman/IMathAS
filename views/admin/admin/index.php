@@ -139,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
     <div class='cp item margin-left-twenty padding-bottom'>
         <span class=column>
-            <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Manage Question Set</a><BR>
+            <a href="<?php echo AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=admin') ?>">Manage Question Set</a><BR>
             <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Question Set</a><BR>
             <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Import Question Set</a><BR>
         </span>

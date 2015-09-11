@@ -28,22 +28,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		$nosabutton = false;
 	}
-	
-	/*if (func_num_args()>5 && func_get_arg(5)==true) {
-		$returnqtxt = true;
-	} else {
-		$returnqtxt = false;
-	}
-	if (func_num_args()>6 && func_get_arg(6)==true) {
-		$clearla = true;
-	} else {
-		$clearla = false;
-	}
-	if (func_num_args()>7 && func_get_arg(7)==true) {
-		$seqinactive = true;
-	} else {
-		$seqinactive = false;
-	}*/
 
     $qdata = QuestionSet::getByQuesSetId($qidx);
 

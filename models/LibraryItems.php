@@ -69,6 +69,10 @@ class LibraryItems extends BaseImasLibraryItems
         return LibraryItems::findAll(['qsetid' => $qSetId]);
     }
 
+    public static function getIdByQid($qSetId){
+        return LibraryItems::find()->select('id')->where(['qsetid' => $qSetId])->all();
+    }
+
     public static function getDestinctLibIdByIdAndOwner($groupId,$qSetId,$userId,$isGrpAdmin,$isAdmin){
         if ($isGrpAdmin) {
             $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
@@ -127,5 +131,45 @@ class LibraryItems extends BaseImasLibraryItems
         $this->qsetid = $qId;
         $this->ownerid = $user->id;
         $this->save();
+    }
+
+    public static function DeleteByIds($list){
+        $data = LibraryItems::getByList($list);
+        if($data){
+            foreach($data as $singleData){
+                $singleData->delete();
+            }
+        }
+    }
+
+    public static function deleteByQsetId($id){
+        LibraryItems::deleteAll(['qsetid' => $id]);
+    }
+
+    public static function getByList($list){
+        return LibraryItems::find()->where(['IN', 'qsetid', $list])->all();
+    }
+
+    public static function getByLibAndUserTable($groupId,$list){
+        $data = LibraryItems::find()->select('imas_library_items.qsetid, imas_library_items.libid')
+            ->from('imas_library_items,imas_users')->where('imas_library_items.ownerid=imas_users.id')
+            ->andWhere(['imas_users.groupid' => $groupId] or ['imas_library_items.libid' => AppConstant::NUMERIC_ZERO])
+            ->andWhere(['IN', 'imas_library_items.qsetid',$list])->all();
+        return $data;
+    }
+
+    public static function getByListAndOwnerId($isAdmin, $chgList, $userId){
+        $query = "SELECT ili.qsetid,ili.libid FROM imas_library_items AS ili LEFT JOIN imas_libraries AS il ON ";
+        $query .= "ili.libid=il.id WHERE ili.qsetid IN ($chgList)";
+        if (!$isAdmin) {
+            //unassigned, or owner and lib not closed or mine
+            $query .= " AND ((ili.ownerid='$userId' AND (il.ownerid='$userId' OR il.userights%3<>1)) OR ili.libid=0)";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getDistinctLibId($list){
+        return LibraryItems::find()->select('libid')->distinct()->where(['IN', 'qsetid', $list])->all();
     }
 }
