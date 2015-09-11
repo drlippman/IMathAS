@@ -746,7 +746,7 @@ function showqinfobar($qn,$inreview,$single,$showqnum=0) {
 		if ($showqnum==1) {
 			echo _('Question').' '.($qn+1).'. ';
 		} else if ($showqnum==2) {
-			echo sprintf(_('Question %d of %d'), $qn+1, count($questions)+1).'<br/>';
+			echo sprintf(_('Question %d of %d'), $qn+1, count($questions)).'<br/>';
 		}
 		if ($qi[$questions[$qn]]['withdrawn']==1) {
 			echo '<span class="red">', _('Question Withdrawn'), '</span> ';

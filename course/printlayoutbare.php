@@ -303,6 +303,7 @@ require("../footer.php");
 
 function printq($qn,$qsetid,$seed,$pts,$showpts) {
 	global $isfinal,$imasroot,$urlmode;
+	$isbareprint = true;
 	srand($seed);
 
 	$query = "SELECT qtype,control,qcontrol,qtext,answer,hasimg FROM imas_questionset WHERE id='$qsetid'";

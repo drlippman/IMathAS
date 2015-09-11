@@ -4,6 +4,7 @@
 
 	/*** master php includes *******/
 	require("../config.php");
+	require("../i18n/i18n.php");
 	require("courseshowitems.php");
 	$ispublic = true;
 	$cid = $_GET['cid'];
