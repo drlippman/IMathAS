@@ -2131,6 +2131,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
+				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['background'][$qn])) { $backg = $options['background'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
@@ -4068,6 +4069,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
+				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 			if (isset($options['partweights'][$qn])) {$partweights = $options['partweights'][$qn];}
