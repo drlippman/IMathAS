@@ -705,7 +705,7 @@ padding-top: 10px;
     margin-left:38px;
 }
 .margin-left-sixteen {
-    margin-left: 16px;
+    margin-left: 16px !important;
 }
 .margin-left-ten {
     margin-left: 10px !important;
@@ -910,4 +910,40 @@ margin-left: 23px;
 }
 .margin-left-fifty {
     margin-left: 50px !important;
+}
+.margin-top-six {
+    margin-top: 6px;
+}
+.add-offline-grades-form {
+    padding: 30px 0px 20px 0px;
+}
+.width-fourty-per {
+    width: 40%;
+}
+.width-thirty-three-per {
+    width: 33%;
+}
+.width-thirty-five-per {
+    width: 35%;
+}
+.width-seventy-seven {
+    width: 77px !important;
+}
+.padding-top-twenty {
+    padding-top: 20px;
+}
+.assessment-name select{
+    width: 38.6%;
+}
+.width-six-per {
+    width: 6%;
+}
+.margin-top-thirty-eight {
+    margin-top: 38px;
+}
+.margin-top-minus-ten {
+    margin-top: -10px;
+}
+.padding-left-thirty {
+    padding-left: 30px;
 }

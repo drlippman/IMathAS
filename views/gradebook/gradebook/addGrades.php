@@ -18,12 +18,10 @@ if ($params['gbitem'] == 'new') {
     $this->title = AppConstant::MODIFY_OFFLINE_GRADE;
 }
 ?>
-<div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]); ?>
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
-<form id="mainform" method=post xmlns="http://www.w3.org/1999/html"
-      action="add-grades?stu=<?php echo $params['stu']; ?>&cid=<?php echo $course->id ?>&gbmode=<?php echo $params['gbmode'] ?>&cid=<?php echo $params['cid'] ?>&gbitem=<?php echo $params['gbitem'] ?>&grades=<?php echo $params['grades'] ?>"
-      onsubmit="return valform();">
+<form id="mainform" method=post action="add-grades?stu=<?php echo $params['stu']; ?>&cid=<?php echo $course->id ?>&gbmode=<?php echo $params['gbmode'] ?>&gbitem=<?php echo $params['gbitem'] ?>&grades=<?php echo $params['grades'] ?>" onsubmit="return valform();">
     <div class="title-container">
         <div class="row">
             <div class="pull-left page-heading">
@@ -36,12 +34,15 @@ if ($params['gbitem'] == 'new') {
         </div>
     </div>
     <div class="tab-content shadowBox non-nav-tab-item">
+    <div class="col-md-12 add-offline-grades-form">
         <?php
-        if ($istutor && $isTutorEdit) {
-                echo AppConstant::NO_AUTHORITY;
-        } else if (!$isteacher) {
-            echo AppConstant::NO_TEACHER_RIGHTS;
-        }else{
+            if ($istutor) {
+                if($isTutorEdit) {
+                    echo AppConstant::NO_AUTHORITY;
+                }
+            } else if (!$isteacher) {
+                echo AppConstant::NO_TEACHER_RIGHTS;
+            }
             if (isset($params['del']) && $isteacher) {
                 if ($isDelete) { ?>
                     <p><?php AppConstant::CONFIRMATION_MESSAGE;?></p>
@@ -70,121 +71,193 @@ if ($params['gbitem'] == 'new') {
                     $rubric_vals[] = $rubricsId;
                     $rubric_names[] = $rubricsLabel;
                     ?>
-        <span ><?php AppUtility::t('Name:')?></span><span class><input type=text name="name" value="<?php echo $name; ?>"/></span><br class="form"/>
-        <br>
-        <span><?php AppUtility::t('Points:')?></span><span class><input type=text name="points" size=3 value="<?php echo $points; ?>"/></span><br class="form"/>
 
-        <div class=col-lg-2><?php AppUtility::t('Show grade to students after:') ?></div>
-        <div class=col-lg-10>
-            <input type=radio name="available-after" class="pull-left" value="0"  /><span class="pull-left padding-left"><?php AppUtility::t('Always until end date') ?></span>
-            <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="available-after" class="pull-left" checked value="1" ?></label>
-            <?php
-                    echo '<div class = "time-input pull-left col-lg-4">';
-                    echo DatePicker::widget([
-                        'name' => 'sdate',
-                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                        'value' => $defaultValuesArray['sdate'],
-                        'removeButton' => false,
-                        'pluginOptions' => [
-                            'autoclose' => true,
-                            'format' => 'mm/dd/yyyy']
-                    ]);
-                    echo '</div>'; ?>
+                        <div class="col-md-12">
+                            <div class="col-md-2 select-text-margin">
+                                <?php AppUtility::t('Name')?>
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" type=text name="name" value="<?php echo $name; ?>"/>
+                            </div>
+                        </div>
+                        <div class="col-md-12 margin-top-fifteen">
+                            <div class="col-md-2 select-text-margin">
+                                <?php AppUtility::t('Points')?>
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" type=text name="points" size=3 value="<?php echo $points; ?>"/>
+                            </div>
+                        </div>
+                        <div class="col-md-12 margin-top-fifteen">
+                            <div class="col-md-2">
+                                <?php AppUtility::t('Show grade to students after:') ?>
+                            </div>
+                            <div class="col-md-5 padding-left-zero">
+                                <div class="col-md-12">
+                                    <input type=radio name="available-after" value="0"  />
+                                    <span class="padding-left">
+                                        <?php AppUtility::t('Always until end date') ?>
+                                    </span>
+                                </div>
+                                <div class="col-md-12 margin-top-ten">
+                                    <label class="non-bold floatleft">
+                                        <input type=radio name="available-after" checked value="1" ?>
+                                    </label>
+                                    <?php
+                                        echo '<div class="floatleft width-thirty-three-per margin-left-twenty time-input">';
+                                        echo DatePicker::widget([
+                                            'name' => 'sdate',
+                                            'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                                            'value' => $defaultValuesArray['sdate'],
+                                            'removeButton' => false,
+                                            'pluginOptions' => [
+                                                'autoclose' => true,
+                                                'format' => 'mm/dd/yyyy']
+                                        ]);
+                                        echo '</div>';
+                                    ?>
+                                    <?php
+                                        echo '<label class="margin-left-ten end pull-left non-bold select-text-margin"> at </label>';
+                                        echo '<div class="floatleft margin-left-twenty width-fifty-per">';
+                                        echo TimePicker::widget([
+                                            'name' => 'stime',
+                                            'value' => $defaultValuesArray['stime'],
+                                            'pluginOptions' => [
+                                                'showSeconds' => false,
+                                                'class' => 'time'
+                                            ]
+                                        ]);
+                                        echo '</div>';
+                                        ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 margin-top-fifteen">
+                            <div class="col-md-2 select-text-margin">
+                                <?php AppUtility::t('Gradebook Category');?>
+                            </div>
+                            <div class="col-md-4">
+                                <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbcatsId, $gbcatsLabel, 0, "Default", 0); ?>
+                            </div>
+                        </div>
+                        <div class="col-md-12 margin-top-fifteen">
+                            <div class="col-md-2 margin-top-thirty-eight">
+                                <?php AppUtility::t('Count');?>
+                            </div>
+                            <div class="col-md-10 padding-left-zero">
+                                <div class="col-md-12 ">
+                                    <input type=radio name="cntingb" checked value="1" />
+                                    <span class="margin-left-five"><?php AppUtility::t('Count in Gradebook');?></span>
+                                </div>
+                                <div class="col-md-12 margin-top-five">
+                                    <input type=radio name="cntingb" value="0" />
+                                    <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total and hide from students")?></span>
+                                </div>
+                                <div class="col-md-12 margin-top-five">
+                                <input type=radio name="cntingb" value="3" />
+                                <span class="margin-left-five"><?php AppUtility::t("Don't count in grade total")?></span>
+                                </div>
+                                <div class="col-md-12 margin-top-five">
+                                <input type=radio name="cntingb" value="2"/>
+                                <span class="margin-left-five"><?php AppUtility::t('Count as Extra Credit');?></span>
+                                </div>
+                            </div>
+                        </div>
                     <?php
-                    echo '<label class="end pull-left non-bold"> at </label>';
-                    echo '<div class="pull-left col-lg-4">';
-                    echo TimePicker::widget([
-                        'name' => 'stime',
-                        'value' => $defaultValuesArray['stime'],
-                        'pluginOptions' => [
-                            'showSeconds' => false,
-                            'class' => 'time'
-                        ]
-                    ]);
-                    echo '</div>'; ?>
-        </div><BR class=form><BR class=form>
-
-        <div class="item-alignment">
-            <div class=col-lg-2><?php AppUtility::t('Gradebook Category:');?></div>
-            <div class=col-lg-10>
-                <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbcatsId, $gbcatsLabel, 0, "Default", 0); ?>
-            </div>
-            <br class=form>
-
-        </div><BR class=form>
-        <span class=form><?php AppUtility::t('Count:');?> </span>
-        <span class="formright">
-				<input type=radio name="cntingb" checked
-                       value="1" /> <?php AppUtility::t('Count in Gradebook');?><br/>
-				<input type=radio name="cntingb"
-                       value="0" /> <?php AppUtility::t("Don't count in grade total and hide from students")?><br/>
-				<input type=radio name="cntingb"
-                       value="3" /> <?php AppUtility::t("Don't count in grade total")?><br/>
-				<input type=radio name="cntingb"
-                       value="2"/> <?php AppUtility::t('Count as Extra Credit');?>
-			</span><br class=form>
-
-        <?php $page_tutorSelect['label'] = array("No access to scores", "View Scores", "View and Edit Scores");
-                    $page_tutorSelect['val'] = array(2, 0, 1); ?>
-
-</span>
-        <br class=form>
-<span >Tutor Access:</span>
-<span >
-	<?php
-                    AssessmentUtility::writeHtmlSelect("tutoredit", $page_tutorSelect['val'], $page_tutorSelect['label'], $checkboxesValues['tutoredit']);
-                    echo '<input type="hidden" name="gradesecret" value="' . $checkboxesValues['gradesecret'] . '"/>';
+                          $page_tutorSelect['label'] = array("No access to scores", "View Scores", "View and Edit Scores");
+                          $page_tutorSelect['val'] = array(2, 0, 1);
                     ?>
-			</span><br class="form"/>
-        <br class=form>
-<div class="item-alignment">
-    <div class="col-lg-2"><?php AppUtility::t('Use Scoring Rubric')?></div>
-    <div class=col-lg-10>
-        <?php AssessmentUtility::writeHtmlSelect('rubric', $rubricsId, $rubricsLabel, 0, 'None', 0); ?>
-        <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id) ?>">Add
-            <?php AppUtility::t('new rubric')?></a> | <a
-            href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid=' . $course->id) ?>"><?php AppUtility::t('Edit rubrics')?></a>
-    </div>
-    <br class=form>
-</div>
-<div class="item-alignment">
-    <?php if (count($pageOutcomesList) > 0) { ?>
-                        <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes:')?></div>
-                        <div class="col-lg-10">
-                        <?php
-                        $gradeoutcomes = array();
-                        AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...'); ?>
-                        <br class="form"/>
-                    <?php } ?>
-        <br class=form>
-    </div>
-</div>
-<?php
-                     if ($params['gbitem'] != 'new') { ?>
-                        <br class=form /><div class="submit"><input type=submit value="Submit"/> <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid'].'&del='.$params['gbitem'])?>">Delete Item</a> </div><br class=form />
+                    <div class="col-md-12 margin-top-fifteen">
+                        <div class="col-md-2 select-text-margin">Tutor Access:</div>
+                        <div class="col-md-4">
+                            <?php
+                                AssessmentUtility::writeHtmlSelect("tutoredit", $page_tutorSelect['val'], $page_tutorSelect['label'], $checkboxesValues['tutoredit']);
+                                echo '<input type="hidden" name="gradesecret" value="' . $checkboxesValues['gradesecret'] . '"/>';
+                            ?>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 margin-top-fifteen">
+                        <div class="col-md-2 select-text-margin">
+                            <?php AppUtility::t('Use Scoring Rubric')?>
+                        </div>
+                        <div class=col-md-4>
+                            <div class="col-md-12 padding-zero">
+                                <?php AssessmentUtility::writeHtmlSelect('rubric', $rubricsId, $rubricsLabel, 0, 'None', 0); ?>
+                            </div>
+                            <div class="col-md-12 padding-zero margin-top-ten">
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id) ?>">
+                                <?php AppUtility::t('Add new rubric')?></a> |
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid=' . $course->id) ?>">
+                                <?php AppUtility::t('Edit rubrics')?>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-alignment">
+                        <?php if (count($pageOutcomesList) > 0) { ?>
+                            <div class="col-lg-2"><?php AppUtility::t('Associate Outcomes')?></div>
+                            <div class="col-lg-10">
+                                <?php
+                                    $gradeoutcomes = array();
+                                    AssessmentUtility::writeHtmlMultiSelect('outcomes', $pageOutcomesList, $pageOutcomes, $gradeoutcomes, 'Select an outcome...');
+                                ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                    <?php if ($params['gbitem'] != 'new') { ?>
+                                <div class="col-md-12 margin-top-ten">
+                                    <div class="col-md-4 col-md-offset-2">
+                                    <input type=submit value="Submit"/>
+                                        <a class="margin-left-fifteen" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$params['stu'].'&gbmode='.$params['gbmode'].'&cid='.$params['cid'].'&del='.$params['gbitem'])?>">Delete Item</a>
+                                    </div>
+                                </div>
                     <?php } else { ?>
-                      <span class=form><?php AppUtility::t('Upload grades?');?></span><span class=formright><input type=checkbox name="doupload" /> <input type=submit value="Submit"/></span><br class=form />
-                   <?php }
+                                <div class="col-md-12 margin-top-fifteen">
+                                    <div class="col-md-2 select-text-margin">
+                                        <span><?php AppUtility::t('Upload grades?');?></span>
+                                    </div>
+                                    <div class="col-md-10">
+                                          <input type=checkbox name="doupload" />
+                                          <input class="margin-left-thirty" type=submit value="Submit"/>
+                                    </div>
+                                </div>
+                    <?php }
                     if ($params['gbitem'] == 'new') { ?>
-                         <span class="form"><?php AppUtility::t('Assessment snapshot?')?></span><span class="formright">
-                        <?php echo '<input type="checkbox" name="assesssnapaid" onclick="if(this.checked){this.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/>';
-                        echo '<span style="display:none;"><br/>';
-                        AssessmentUtility::writeHtmlSelect('assessment', $assessmentId, $assessmentLabel, 0); ?>
-                         <?php AppUtility::t('Grade type:')?><br/> <input type="radio" name="assesssnaptype" value="0" checked="checked"><?php AppUtility::t('Current score')?>
-                         <br/><input type="radio" name="assesssnaptype" value="1"><?php AppUtility::t('Participation: give full credit if')?>
-                         <input type="text" name="assesssnapatt" value="100" size="3">% <?php AppUtility::t('of problems attempted and')?>
-                         <input type="text" name="assesssnappts" value="0" size="3"> <?php AppUtility::t('points earned')?>
-                         <br/><input type=submit value="Submit"/></span><br class="form" />
-                         </span>
+                        <div class="col-md-12 margin-top-fifteen">
+                            <div class="col-md-2">
+                                <?php AppUtility::t('Assessment snapshot?')?>
+                            </div>
+                            <div class="col-md-10 padding-left-zero">
+                                <?php echo '<input class="margin-left-sixteen" type="checkbox" name="assesssnapaid" onclick="if(this.checked){this.nextSibling.style.display=\'\';document.getElementById(\'gradeboxes\').style.display=\'none\';}else{this.nextSibling.style.display=\'none\';document.getElementById(\'gradeboxes\').style.display=\'\';}"/>';
+                                      echo '<span style="display:none;"> <div class="col-md-12 margin-top-fifteen"><span class="assessment-name">';
+                                               AssessmentUtility::writeHtmlSelect('assessment', $assessmentId, $assessmentLabel, 0);
+                                                echo '</span></div>';
+                                ?>
+                                                <div class="col-md-12 margin-top-fifteen">
+                                                    <?php AppUtility::t('Grade type:')?>
+                                                    <input class="margin-left-five" type="radio" name="assesssnaptype" value="0" checked="checked">
+                                                </div>
+                                                <div class="col-md-12 margin-top-fifteen">
+                                                    <?php AppUtility::t('Current score')?>
+                                                    <input class="margin-left-five" type="radio" name="assesssnaptype" value="1">
+                                                </div>
+                                                <div class="col-md-12 margin-top-fifteen">
+                                                    <?php AppUtility::t('Participation give full credit if')?>
+                                                    <input class="width-six-per form-control display-inline-block margin-left-five" type="text" name="assesssnapatt" value="100" size="3"><span class="margin-left-five"> % </span> <?php AppUtility::t('of problems attempted and')?>
+                                                    <input class="width-six-per form-control display-inline-block margin-left-five" type="text" name="assesssnappts" value="0" size="3"><span class="margin-left-five"> <?php AppUtility::t('points earned')?></span>
+                                                </div>
+                                                <div class="col-md-12 margin-top-fifteen"><input type=submit value="Submit"/></div>
+                                            </span>
+                            </div>
                     <?php }
                 } else {
                     echo '<h3>$gbItems[\'name\']</h3>';
                     $rubric = $gbItems['rubric'];
                     $points = $gbItems['points'];
-
                 }
             } else { ?>
-                <h3><?php echo $gbItems['name']; ?></h3>
+                <h3 class="padding-left-thirty margin-top-minus-ten"><?php echo $gbItems['name']; ?></h3>
                 <?php $rubric = $gbItems['rubric'];
                 $points = $gbItems['points'];
             }
@@ -194,81 +267,118 @@ if ($params['gbitem'] == 'new') {
                 }
             }
             if ($params['grades'] == 'all' && $params['gbitem'] != 'new' && $isteacher) { ?>
-                 <p><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/upload-grades?gbmode='.$params['gbmode'].'&cid='.$params.'&gbitem='.$params['gbitem'])?>">Upload Grades</a></p>
+                 <div class="col-md-12"><div class="col-md-2"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/upload-grades?gbmode='.$params['gbmode'].'&cid='.$params.'&gbitem='.$params['gbitem'])?>">Upload Grades</a></div></div>
             <?php }
 
             echo '<div id="gradeboxes">';
-            echo '<input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> ';
-            echo '<button type="button" id="useqa" onclick="togglequickadd(this)">' . "Use Quicksearch Entry" . '</button>';
+                        echo '<div class="col-md-12 margin-top-fifteen">';
+                                echo '<div class="col-md-offset-2 col-md-2"><input type=button value="Expand Feedback Boxes" onClick="togglefeedback(this)"/> </div>';
+                                echo '<div class="col-md-3"><button type="button" id="useqa" onclick="togglequickadd(this)">' . "Use Quicksearch Entry" . '</button></div>';
+                        echo '</div>';
 
-            if ($hassection) {
-                echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
-            }
+                        if ($hassection) {
+                            echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+                        }
+                        if ($params['grades'] == 'all') {
+                            echo '<div class="col-md-12 margin-top-fifteen">';
+                                        echo "<div class='col-md-2'>Add/Replace to all grades</div>
+                                        <div class='col-md-10'>
+                                            <div class='floatleft'>
+                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>
+                                            </div>";
+                                            echo '<div class="floatleft margin-left-fifteen">';
+                                                        echo ' <input class="width-seventy-seven" type=button value="Add" onClick="sendtoall(0,0);"/>
+                                                   </div>
+                                            <div class="floatleft margin-left-fifteen">
+                                            <input type=button class="width-seventy-seven" value="Multiply" onclick="sendtoall(0,1)"/>
+                                            </div>
+                                            <div class="floatleft  margin-left-fifteen">
+                                            <input class="width-seventy-seven" type=button value="Replace" onclick="sendtoall(0,2)"/>
+                                            </div>
+                                        </div>';
+                            echo '</div>';
 
-            if ($params['grades'] == 'all') {
-                echo "<br/><span class=form>Add/Replace to all grades:</span><span class=formright><input type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>";
-                echo ' <input type=button value="Add" onClick="sendtoall(0,0);"/> <input type=button value="Multiply" onclick="sendtoall(0,1)"/> <input type=button value="Replace" onclick="sendtoall(0,2)"/></span><br class="form"/>';
-                echo "<span class=form>Add/Replace to all feedback:</span><span class=formright><input type=text size=40 id=\"toallfeedback\"/>";
-                echo ' <input type=button value="Append" onClick="sendtoall(1,0);"/> <input type=button value="Prepend" onclick="sendtoall(1,1)"/> <input type=button value="Replace" onclick="sendtoall(1,2)"/></span><br class="form"/>';
-            }
+                            echo '<div class="col-md-12 margin-top-fifteen">';
+                                    echo "<div class='col-md-2'> Add/Replace to all feedback</div>
+                                    <div class='col-md-4'>
+                                         <div class=''> <input class='floatleft form-control' type=text size=40 id=\"toallfeedback\"/></div>";
+                                         echo '<div class="margin-top-fifteen clear-both padding-top-twenty"><input class="floatleft" type=button value="Append" onClick="sendtoall(1,0);"/>
+                                          <input class="floatleft margin-left-fifteen" type=button value="Prepend" onclick="sendtoall(1,1)"/>
+                                          <input class="floatleft margin-left-fifteen" type=button value="Replace" onclick="sendtoall(1,2)"/>
+                                          </div>
+                                     </div>';
+                            echo '</div>';
+                        }
+//                        echo '<div class="clear"></div>';
+            echo '<div class="col-md-12 margin-top-fifteen">';
+                        echo "<table style='width: 97.5%;margin-left: 15px' class='' id=myTable>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>";
+                                            if ($hassection) {
+                                                echo '<th>Section</th>';
+                                            }
+                                            echo "<th>Grade</th>
+                                            <th>Feedback</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>";
+                                            echo '<tr id="quickadd" style="display:none;">
+                                                        <td><input class="form-control" type="text" id="qaname" /></td>';
+                                                        if ($hassection) {
+                                                            echo '<td></td>';
+                                                        }
+                                                        echo '<td><input class="form-control" type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
+                                                        echo '<td><textarea class="form-control floatleft width-sixty-per" id="qafeedback" rows="1" cols="40"></textarea>';
+                                                        echo '<input class="form-control floatleft width-ten-per margin-left-fifteen"  type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
+                                                        if ($params['gbitem'] != "new") {
+                                                            foreach ($gradeData as $row) {
+                                                                if ($row['score'] != null) {
+                                                                    $score[$row['userid']] = $row['score'];
+                                                                } else {
+                                                                    $score[$row['userid']] = '';
+                                                                }
+                                                                $feedback[$row['userid']] = $row['feedback'];
 
-            echo '<div class="clear"></div>';
-            echo "<table id=myTable><thead><tr><th>Name</th>";
-            if ($hassection) {
-                echo '<th>Section</th>';
-            }
-            echo "<th>Grade</th><th>Feedback</th></tr></thead><tbody>";
-            echo '<tr id="quickadd" style="display:none;"><td><input type="text" id="qaname" /></td>';
-            if ($hassection) {
-                echo '<td></td>';
-            }
-            echo '<td><input type="text" id="qascore" size="3" onblur="this.value = doonblur(this.value);" onkeydown="return qaonenter(event,this);" /></td>';
-            echo '<td><textarea id="qafeedback" rows="1" cols="40"></textarea>';
-            echo '<input type="button" value="Next" onfocus="addsuggest()" /></td></tr>';
-            if ($params['gbitem'] != "new") {
-                foreach ($gradeData as $row) {
-                    if ($row['score'] != null) {
-                        $score[$row['userid']] = $row['score'];
-                    } else {
-                        $score[$row['userid']] = '';
-                    }
-                    $feedback[$row['userid']] = $row['feedback'];
+                                                            }
+                                                        }
+                                        foreach ($finalStudentArray as $studentInfo) {
 
-                }
-            }
-            foreach ($finalStudentArray as $studentInfo) {
+                                            if ($studentInfo[4] > 0) {
+                                                echo '<tr><td style="text-decoration: line-through;">';
+                                            } else {
+                                                echo '<tr><td>';
+                                            }
+                                            echo "{$studentInfo[1]}, {$studentInfo[2]}";
+                                            echo '</td>';
+                                            if ($hassection) {
+                                                echo "<td>{$studentInfo[3]}</td>";
+                                            }
+                                            if (isset($score[$studentInfo[0]])) {
+                                                echo "<td><input class='form-control'  type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
+                                                echo $score[$studentInfo[0]];
+                                            } else {
+                                                echo "<td><input class='form-control'  type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
+                                            }
 
-                if ($studentInfo[4] > 0) {
-                    echo '<tr><td style="text-decoration: line-through;">';
-                } else {
-                    echo '<tr><td>';
-                }
-                echo "{$studentInfo[1]}, {$studentInfo[2]}";
-                echo '</td>';
-                if ($hassection) {
-                    echo "<td>{$studentInfo[3]}</td>";
-                }
-                if (isset($score[$studentInfo[0]])) {
-                    echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"score[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
-                    echo $score[$studentInfo[0]];
-                } else {
-                    echo "<td><input type=\"text\" size=\"3\" autocomplete=\"off\" name=\"newscore[{$studentInfo[0]}]\" id=\"score{$studentInfo[0]}\" value=\"";
-                }
+                                            echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
+                                            if ($rubric != 0) {
+                                                echo printrubriclink($rubric, $points, "score{$studentInfo[0]}", "feedback{$studentInfo[0]}");
+                                            }
+                                            echo "</td>";
+                                            echo "<td><textarea class='form-control'  cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea></td>";
+                                            echo "</tr>";
+                                        }
 
-                echo "\" onkeypress=\"return onenter(event,this)\" onkeyup=\"onarrow(event,this)\" onblur=\"this.value = doonblur(this.value);\" />";
-                if ($rubric != 0) {
-                    echo printrubriclink($rubric, $points, "score{$studentInfo[0]}", "feedback{$studentInfo[0]}");
-                }
-                echo "</td>";
-                echo "<td><textarea cols=60 rows=1 id=\"feedback{$studentInfo[0]}\" name=\"feedback[{$studentInfo[0]}]\">{$feedback[$studentInfo[0]]}</textarea></td>";
-                echo "</tr>";
-            }
-
-            echo "</tbody></table>";
+                              echo "</tbody>
+                        </table>
+            </div>";
             if ($hassection) {
                 echo "<script> initSortTable('myTable',Array('S','S',false,false),false);</script>";
             }
-        } ?>
+            ?>
+         </div>
+    </div>
     </div>
 </form>
 

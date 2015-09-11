@@ -7,14 +7,12 @@ $this->title = AppUtility::t(' Add Questions',false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,AppUtility::t('Add/Remove Questions',false),AppUtility::t('Modify Questions',false)],
-        'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,
-            AppUtility::getHomeURL() . 'question/question/add-questions?cid=' . $course->id.'&aid='.$params['aid']]]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$course->id.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $addMode ?><?php echo AppUtility::t(' QuestionSet Question:',false);?></div>
+            <div class="vertical-align title-page"><?php echo $addMode ?><?php echo AppUtility::t(' QuestionSet Question',false);?></div>
         </div>
         <div class="pull-left header-btn hide-hover">
 <!--            <a href="#"id="mess" class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="--><?php //echo AppUtility::getAssetURL()?><!--img/newzmessg.png">&nbsp;Send Message</a>-->

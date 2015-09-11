@@ -53,9 +53,9 @@ function showStudentInformation(students)
         "<li><a class ='roster-make-exception' href='make-exception?cid="+courseId+"&student-data="+ student.id +"&section-data="+ student.section +"'><i class='fa fa-plus-square fa-fw'></i>&nbsp;Exception</a></li>" +
         "<li><a href='change-student-information?cid=" + courseId + "&uid=" + student.id + "'><i class='fa fa-pencil fa-fw'></i>&nbsp;Change Information</a></li>";
         if (student.locked == 0) {
-            html += "<li><a  href='#' onclick='lockUnlockStudent(false," + student.id + ")'><i class='fa fa-lock fa-fw'></i>&nbsp;Lock</a></li>";
+            html += "<li><a  href='javascript: lockUnlockStudent(false," + student.id + ")'><i class='fa fa-lock fa-fw'></i>&nbsp;Lock</a></li>";
         } else {
-            html += "<li><a href='#' onclick='lockUnlockStudent(true," + student.id + ")'><i class='fa fa-unlock'></i>&nbsp;Unlock</a></li>";
+            html += "<li><a href='javascript: lockUnlockStudent(true," + student.id + ")'><i class='fa fa-unlock'></i>&nbsp;Unlock</a></li>";
         }
         html += "</ul></div></td>";
     });

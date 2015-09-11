@@ -497,6 +497,10 @@ function onarrow(e,field) {
         return true;
     }
 }
+$(document).ready(function () {
+    togglefeedback(btn)
+
+});
 function togglefeedback(btn) {
     var form = document.getElementById("mainform");
     for (i = 0; i < form.elements.length; i++) {

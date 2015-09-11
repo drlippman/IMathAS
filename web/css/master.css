@@ -431,7 +431,7 @@ i.fa-home{
 }
 
 .margin-left-fifteen {
-    margin-left: 15px;
+    margin-left: 15px !important;
 }
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus .grey-color-link {
     border: none;

@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Get current time-->
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $courseId]]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id] ,'page_title' => $this->title]); ?>
 </div>
 <!--Course name-->
 <div class="title-container">
