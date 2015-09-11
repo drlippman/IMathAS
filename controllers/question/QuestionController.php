@@ -1983,6 +1983,7 @@ class QuestionController extends AppController
     public function actionManageQuestionSet(){
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
+        $cid = $params['cid'];
         $userId = $user['id'];
         $myRights = $user['rights'];
         $groupId = $user['groupid'];
@@ -1991,30 +1992,29 @@ class QuestionController extends AppController
         $tempLibArray = array();
         $sessionId = $this->getSessionId();
         $sessionData  = $this->getSessionData($sessionId);
-        $overwriteBody = 0;
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
+        $bodyMessage = AppConstant::NO_QUESTION_SELECTED."  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
         $curBreadcrumb = "";
         $pagetitle = "Manage Question Sets";
         $helpicon = "";
         $isAdmin = false;
         $isGrpAdmin = false;
         //CHECK PERMISSIONS AND SET FLAGS
-        if ($myRights < 20) {
-            $overwriteBody = 1;
+        if ($myRights < AppConstant::TEACHER_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
             $body = AppConstant::NO_TEACHER_RIGHTS;
-        } elseif (isset($params['cid']) && $params['cid']=="admin" && $myRights <75) {
-            $overwriteBody = 1;
-            $body = "You need to log in as an admin to access this page";
-        } elseif (!(isset($params['cid'])) && $myRights < 75) {
-            $overwriteBody = 1;
-            $body = "Please access this page from the menu links only.";
+        } elseif (isset($params['cid']) && $params['cid'] == "admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::REQUIRED_ADMIN_ACCESS;
+        } elseif (!(isset($params['cid'])) && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::ACCESS_THROUGH_MENU;
         } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-
-            $cid = $params['cid'];
-            if ($cid=='admin') {
-                if ($myRights >74 && $myRights<100) {
+            if ($cid == 'admin') {
+                if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $myRights < AppConstant::ADMIN_RIGHT) {
                     $isGrpAdmin = true;
-                } else if ($myRights == 100) {
+                } else if ($myRights == AppConstant::ADMIN_RIGHT) {
                     $isAdmin = true;
                 }
             }
@@ -2051,8 +2051,8 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
                 } else {
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = $bodyMessage;
                     }
                     $pagetitle = "Confirm Delete";
                     $curBreadcrumb .= " &gt; <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Manage Question Set </a>";
@@ -2087,8 +2087,8 @@ class QuestionController extends AppController
 
                     $tlist = implode(",",$params['nchecked']);
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = $bodyMessage;
                     }
                     $query = User::getUserGraterThenTeacherRights();
                     $i=AppConstant::NUMERIC_ZERO;
@@ -2106,11 +2106,10 @@ class QuestionController extends AppController
                         if ($params['libs']=='') {
                             $newlibs = array();
                         } else {
-                            if ($newlibs[0]==0 && count($newlibs)>1) { //get rid of unassigned if checked and others are checked
+                            if ($newlibs[0]==AppConstant::NUMERIC_ZERO && count($newlibs)>AppConstant::NUMERIC_ONE) { //get rid of unassigned if checked and others are checked
                                 array_shift($newlibs);
                             }
                         }
-
                         $libarray = explode(',',$params['qtochg']); //qsetids to change
                         if ($params['qtochg']=='') {
                             $libarray = array();
@@ -2136,9 +2135,8 @@ class QuestionController extends AppController
                             /*
                              * get list of existing library assignments, remove any additions that already exist and add to new libraries
                              */
-                            foreach ($libarray as $qsetid) { //for each question
-                                //determine which checked libraries it's not already in
-                                $toadd = array_values(array_diff($newlibs,$alllibs[$qsetid]));
+                            foreach ($libarray as $qsetid) { //for each question determine which checked libraries it's not already in
+                                $toadd = array_values(array_diff($newlibs, $alllibs[$qsetid]));
                                 //and add them
                                 foreach($toadd as $libid) {
                                     if ($libid == AppConstant::NUMERIC_ZERO) { continue;} //no need to add to unassigned using "keep existing"
@@ -2149,7 +2147,7 @@ class QuestionController extends AppController
                                     $library->createLibraryItems($tempLibArray);
                                 }
                                 if (count($toadd) > AppConstant::NUMERIC_ONE || (count($toadd) > AppConstant::NUMERIC_ZERO && $toadd[0] != AppConstant::NUMERIC_ZERO)) {
-                                    LibraryItems::deleteLibraryItems(AppConstant::NUMERIC_ZERO,$qsetid);
+                                    LibraryItems::deleteLibraryItems(AppConstant::NUMERIC_ZERO, $qsetid);
                                 }
                             }
                         } else if ($params['action'] == AppConstant::NUMERIC_ONE) { //add, remove existing
@@ -2157,7 +2155,7 @@ class QuestionController extends AppController
                              *get list of existing library assignments, rework existing to new libs, remove any excess existing and add to any new
                              */
                             foreach ($libarray as $qsetid) { //for each question determine which checked libraries it's not already in.
-                                $toadd = array_diff($newlibs,$alllibs[$qsetid]);
+                                $toadd = array_diff($newlibs, $alllibs[$qsetid]);
                                 //and add them
                                 foreach($toadd as $libid) {
                                     $tempLibArray['libid'] = $libid;
@@ -2168,7 +2166,7 @@ class QuestionController extends AppController
                                 }
                                 //determine which libraries to remove from; my lib assignments - newlibs
                                 if (isset($mylibs[$qsetid])) {
-                                    $toremove = array_diff($mylibs[$qsetid],$newlibs);
+                                    $toremove = array_diff($mylibs[$qsetid], $newlibs);
                                     foreach($toremove as $libid) {
                                         LibraryItems::deleteLibraryItems($libid, $qsetid);
                                     }
@@ -2216,7 +2214,7 @@ class QuestionController extends AppController
                     $curBreadcrumb .= " &gt; Modify Assignments";
                     if (!isset($params['nchecked'])) {
                         $overwriteBody = AppConstant::NUMERIC_ONE;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $body = $bodyMessage;
                     } else {
                         $query = LibraryItems::getDistinctLibId($params['nchecked']);
                         foreach ($query as $row) {
@@ -2229,7 +2227,7 @@ class QuestionController extends AppController
                 if (isset($params['qtochg'])) {
                     if (!isset($params['libs'])) {
                         $overwriteBody = AppConstant::NUMERIC_ONE;;
-                        $body = "<html><body>No library selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a></body></html>\n";
+                        $body = "No library selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
                     }
                     $lib = $params['libs'];
                     $qtochg = explode(',',$params['qtochg']);
@@ -2237,7 +2235,6 @@ class QuestionController extends AppController
                     $myname = $user['lastName'].','.$user['firstName'];
                     $userfullname = $user['firstName'].','.$user['lastName'];
                     foreach ($qtochg as $k=>$qid) {
-                        $ancestors = ''; $ancestorauthors = '';
                         $row = QuestionSet::getSelectedDataByQuesSetId($qid);
                         $lastauthor = array_pop($row);
                         $ancestors = $row['ancestors'];
@@ -2301,8 +2298,8 @@ class QuestionController extends AppController
                     $selecttype = "radio";
 
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = $bodyMessage;
                     }
                 }
 
@@ -2349,8 +2346,8 @@ class QuestionController extends AppController
                     $clist = implode(",",$params['nchecked']);
 
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = $bodyMessage;
                     }
                 }
 
@@ -2384,8 +2381,8 @@ class QuestionController extends AppController
                     $clist = implode(",",$params['nchecked']);
 
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No questions selected.  <a href=".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid).">Go back</a>\n";
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = $bodyMessage;
                     }
                 }
             } else if (isset($params['remove'])) {
@@ -2405,7 +2402,7 @@ class QuestionController extends AppController
                             QuestionSet::setDeletedById($params['remove']);
                         }
                     }
-                    if (mysql_affected_rows($link)>0) {
+                    if (count($link) > AppConstant::NUMERIC_ZERO) {
                         LibraryItems::deleteByQsetId($params['remove']);
                     }
                     return $this->redirect(AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid));
@@ -2464,27 +2461,27 @@ class QuestionController extends AppController
                     $search = str_replace('"','&quot;',$search);
                     $sessionData['lastsearch'.$cid] = $safesearch; //str_replace(" ","+",$safesearch);
                     if (isset($params['searchmine'])) {
-                        $searchmine = 1;
+                        $searchmine = AppConstant::NUMERIC_ONE;
                     } else {
-                        $searchmine = 0;
+                        $searchmine = AppConstant::NUMERIC_ZERO;
                     }
                     $sessionData['searchmine'.$cid] = $searchmine;
                     if (isset($params['searchall'])) {
-                        $searchall = 1;
+                        $searchall = AppConstant::NUMERIC_ONE;
                     } else {
-                        $searchall = 0;
+                        $searchall = AppConstant::NUMERIC_ZERO;
                     }
                     $sessionData['searchall'.$cid] = $searchall;
-                    if ($searchall==1 && trim($search)=='' && $searchmine==0) {
-                        $overwriteBody = 1;
+                    if ($searchall==AppConstant::NUMERIC_ONE && trim($search)=='' && $searchmine==AppConstant::NUMERIC_ZERO) {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
                         $body = "Must provide a search term when searching all libraries <a href=\"manage-question-set\">Try again</a>";
-                        $searchall = 0;
+                        $searchall = AppConstant::NUMERIC_ZERO;
                     }
                     if ($isAdmin) {
                         if (isset($params['hidepriv'])) {
-                            $hidepriv = 1;
+                            $hidepriv = AppConstant::NUMERIC_ONE;
                         } else {
-                            $hidepriv = 0;
+                            $hidepriv = AppConstant::NUMERIC_ZERO;
                         }
                         $sessionData['hidepriv'.$cid] = $hidepriv;
                     }
@@ -2501,32 +2498,32 @@ class QuestionController extends AppController
                     }
                 } else {
                     $search = '';
-                    $searchall = 0;
-                    $searchmine = 0;
+                    $searchall = AppConstant::NUMERIC_ZERO;
+                    $searchmine = AppConstant::NUMERIC_ZERO;
                     $safesearch = '';
                 }
                 if (trim($safesearch)=='') {
                     $searchlikes = '';
                 } else {
-                    if (substr($safesearch,0,6)=='regex:') {
-                        $safesearch = substr($safesearch,6);
+                    if (substr($safesearch,AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_SIX) == 'regex:') {
+                        $safesearch = substr($safesearch, AppConstant::NUMERIC_SIX);
                         $searchlikes = "imas_questionset.description REGEXP '$safesearch' AND ";
-                    } else if ($safesearch=='isbroken') {
+                    } else if ($safesearch == 'isbroken') {
                         $searchlikes = "imas_questionset.broken=1 AND ";
-                    } else if (substr($safesearch,0,7)=='childof') {
-                        $searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch,8)."[[:>:]]' AND ";
+                    } else if (substr($safesearch,AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_SEVEN) == 'childof') {
+                        $searchlikes = "imas_questionset.ancestors REGEXP '[[:<:]]".substr($safesearch, AppConstant::NUMERIC_EIGHT)."[[:>:]]' AND ";
                     } else {
                         $searchterms = explode(" ",$safesearch);
                         $searchlikes = '';
                         foreach ($searchterms as $k=>$v) {
-                            if (substr($v,0,5) == 'type=') {
-                                $searchlikes .= "imas_questionset.qtype='".substr($v,5)."' AND ";
+                            if (substr($v,AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FIVE) == 'type=') {
+                                $searchlikes .= "imas_questionset.qtype='".substr($v, AppConstant::NUMERIC_FIVE)."' AND ";
                                 unset($searchterms[$k]);
                             }
                         }
                         $searchlikes .= "((imas_questionset.description LIKE '%".implode("%' AND imas_questionset.description LIKE '%",$searchterms)."%') ";
-                        if (substr($safesearch,0,3)=='id=') {
-                            $searchlikes = "imas_questionset.id='".substr($safesearch,3)."' AND ";
+                        if (substr($safesearch,AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_THREE) == 'id=') {
+                            $searchlikes = "imas_questionset.id='".substr($safesearch, AppConstant::NUMERIC_THREE)."' AND ";
                         } else if (is_numeric($safesearch)) {
                             $searchlikes .= "OR imas_questionset.id='$safesearch') AND ";
                         } else {
@@ -2536,17 +2533,16 @@ class QuestionController extends AppController
                 }
 
                 if (isset($params['libs'])) {
-                    if ($params['libs']=='') {
+                    if ($params['libs'] == '') {
                         $params['libs'] = $userDefLib;
                     }
                     $searchlibs = $params['libs'];
-                    //$sessionData['lastsearchlibs'] = implode(",",$searchlibs);
                     $sessionData['lastsearchlibs'.$cid] = $searchlibs;
                     $this->writesessiondata($sessionData,$sessionId);
                 } else if (isset($params['listlib'])) {
                     $searchlibs = $params['listlib'];
                     $sessionData['lastsearchlibs'.$cid] = $searchlibs;
-                    $searchall = 0;
+                    $searchall = AppConstant::NUMERIC_ZERO;
                     $sessionData['searchall'.$cid] = $searchall;
                     $sessionData['lastsearch'.$cid] = '';
                     $searchlikes = '';
@@ -2554,45 +2550,41 @@ class QuestionController extends AppController
                     $safesearch = '';
                     $this->writesessiondata($sessionData,$sessionId);
                 }else if (isset($sessionData['lastsearchlibs'.$cid])) {
-                    //$searchlibs = explode(",",$sessionData['lastsearchlibs']);
                     $searchlibs = $sessionData['lastsearchlibs'.$cid];
                 } else {
                     $searchlibs = $userDefLib;
                 }
-
                 $llist = "'".implode("','",explode(',',$searchlibs))."'";
-
                 $libsortorder = array();
-                if (substr($searchlibs,0,1)=="0") {
+                if (substr($searchlibs,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE)=="0") {
                     $lnamesarr[0] = "Unassigned";
-                    $libsortorder[0] = 0;
+                    $libsortorder[0] = AppConstant::NUMERIC_ZERO;
                 }
-
                 $query = Libraries::getById($llist);
                 foreach ($query as $row) {
                     $lnamesarr[$row['id']] = $row['name'];
                     $libsortorder[$row['id']] = $row['sortorder'];
                 }
-                if (count($lnamesarr) > 0) {
+                if (count($lnamesarr) > AppConstant::NUMERIC_ZERO) {
                     $lnames = implode(", ",$lnamesarr);
                 } else {$lnames = '';}
                 $resultLibs = QuestionSet::getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId);
                 $page_questionTable = array();
                 $page_libstouse = array();
                 $page_libqids = array();
-                $lastlib = -1;
-                $ln=1;
+                $lastlib = AppConstant::NUMERIC_NEGATIVE_ONE;
+                $ln=AppConstant::NUMERIC_ONE;
 
                 foreach ($resultLibs as $line) {
                     if (isset($page_questionTable[$line['id']])) {
                         continue;
                     }
-                    if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==1)) {
+                    if ($lastlib!=$line['libid'] && (isset($lnamesarr[$line['libid']]) || $searchall==AppConstant::NUMERIC_ONE)) {
                         $page_libstouse[] = $line['libid'];
                         $lastlib = $line['libid'];
                         $page_libqids[$line['libid']] = array();
                     }
-                    if ($libsortorder[$line['libid']]==1) { //alpha
+                    if ($libsortorder[$line['libid']]==AppConstant::NUMERIC_ONE) { //alpha
                         $page_libqids[$line['libid']][$line['id']] = trim($line['description']);
                     } else { //id
                         $page_libqids[$line['libid']][] = $line['id'];
@@ -2600,23 +2592,23 @@ class QuestionController extends AppController
                     $i = $line['id'];
 
                     $page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
-                    if ($line['userights']==0) {
+                    if ($line['userights']==AppConstant::NUMERIC_ZERO) {
                         $page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
-                    } else if ($line['replaceby']>0 || $line['junkflag']>0) {
+                    } else if ($line['replaceby']>AppConstant::NUMERIC_ZERO || $line['junkflag']>AppConstant::NUMERIC_ZERO) {
                         $page_questionTable[$i]['desc'] = '<span style="color:#ccc"><i>'.filter($line['description']).'</i></span>';
                     } else {
                         $page_questionTable[$i]['desc'] = filter($line['description']);
                     }
 
                     if ($line['extref']!='') {
-                        $page_questionTable[$i]['cap'] = 0;
+                        $page_questionTable[$i]['cap'] = AppConstant::NUMERIC_ZERO;
                         $extref = explode('~~',$line['extref']);
                         $hasvid = false;  $hasother = false; $hascap = false;
                         foreach ($extref as $v) {
-                            if (strtolower(substr($v,0,5))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
+                            if (strtolower(substr($v,AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FIVE))=="video" || strpos($v,'youtube.com')!==false || strpos($v,'youtu.be')!==false) {
                                 $hasvid = true;
                                 if (strpos($v,'!!1')!==false) {
-                                    $page_questionTable[$i]['cap'] = 1;
+                                    $page_questionTable[$i]['cap'] = AppConstant::NUMERIC_ONE;
                                 }
                             } else {
                                 $hasother = true;
@@ -2630,25 +2622,23 @@ class QuestionController extends AppController
                             $page_questionTable[$i]['extref'] .= "<img src=".AppUtility::getHomeURL().'img/html_tiny.png'.">";
                         }
                     }
-
-
                     $page_questionTable[$i]['preview'] = "<input type=button value=\"Preview\" onClick=\"previewq('selform',$ln,{$line['id']})\"/>";
                     $page_questionTable[$i]['type'] = $line['qtype'];
-                    if ($searchall==1) {
+                    if ($searchall==AppConstant::NUMERIC_ONE) {
                         $page_questionTable[$i]['lib'] = "<a href=\"manage-question-set?cid=$cid&listlib={$line['libid']}\">List lib</a>";
                     } else {
                         $page_questionTable[$i]['junkflag'] = $line['junkflag'];
                         $page_questionTable[$i]['libitemid'] = $line['libitemid'];
                     }
-                    $page_questionTable[$i]['times'] = 0;
+                    $page_questionTable[$i]['times'] = AppConstant::NUMERIC_ZERO;
 
                     if ($isAdmin || $isGrpAdmin) {
-                        $page_questionTable[$i]['mine'] = $line['lastName'] . ',' . substr($line['firstName'],0,1);
-                        if ($line['userights']==0) {
+                        $page_questionTable[$i]['mine'] = $line['lastName'] . ',' . substr($line['firstName'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ONE);
+                        if ($line['userights']==AppConstant::NUMERIC_ZERO) {
                             $page_questionTable[$i]['mine'] .= ' <i>Priv</i>';
                         }
                     } else if ($line['ownerid']==$userId) {
-                        if ($line['userights']==0) {
+                        if ($line['userights']==AppConstant::NUMERIC_ZERO) {
                             $page_questionTable[$i]['mine'] = '<i>Priv</i>';
                         } else {
                             $page_questionTable[$i]['mine'] = 'Yes';
@@ -2657,7 +2647,7 @@ class QuestionController extends AppController
                         $page_questionTable[$i]['mine'] = '';
                     }
                     $page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
-                    if ($isAdmin || ($isGrpAdmin && $line['groupid']==$groupId) || $line['ownerid']==$userId || ($line['userights']==3 && $line['groupid']==$groupId) || $line['userights']>3) {
+                    if ($isAdmin || ($isGrpAdmin && $line['groupid'] == $groupId) || $line['ownerid'] == $userId || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['userights'] > AppConstant::NUMERIC_THREE) {
                         $page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
                     } else {
                         $page_questionTable[$i]['action'] .= '<option value="mod">View Code</option>';
@@ -2675,22 +2665,21 @@ class QuestionController extends AppController
                     $ln++;
                 }
                 //pull question useage data
-                if (count($page_questionTable)>0) {
+                if (count($page_questionTable)>AppConstant::NUMERIC_ZERO) {
                     $allusedqids = implode(',', array_keys($page_questionTable));
                     $query = Questions::getByQuestionSetId($allusedqids);
                     foreach ($query as $row) {
                         $page_questionTable[$row[0]]['times'] = $row[1];
                     }
                 }
-
                 //sort alpha sorted libraries
                 foreach ($page_libstouse as $libid) {
-                    if ($libsortorder[$libid]==1) {
+                    if ($libsortorder[$libid]==AppConstant::NUMERIC_ONE) {
                         natcasesort($page_libqids[$libid]);
                         $page_libqids[$libid] = array_keys($page_libqids[$libid]);
                     }
                 }
-                if ($searchall==1) {
+                if ($searchall==AppConstant::NUMERIC_ONE) {
                     $page_libstouse = array_keys($page_libqids);
                 }
             }

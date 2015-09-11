@@ -207,5 +207,6 @@ class AppConstant
     const CONFIRM_DELETE = 'Confirm Delete';
     const DEFAULT_THEME = 'default.css';
     const CHANGE_ASSESSMENT_SUCCESSFULLY = 'Assessment data changes successfully.';
+    const NO_QUESTION_SELECTED = 'No questions selected';
 
 }
