@@ -292,6 +292,7 @@ class QuestionSet extends BaseImasQuestionset
             $QuestionSet->save();
         }
     }
+
     public static function getByQSetIdAndGroupId($list, $groupId){
         $data = QuestionSet::find()->select('imas_questionset.id')->from('imas_questionset,imas_users')
                 ->where(['IN','imas_questionset.id', $list])->andWhere('imas_questionset.ownerid=imas_users.id')
@@ -321,6 +322,96 @@ class QuestionSet extends BaseImasQuestionset
         }
     }
 
+    public static function getLastModDateAndId($UId)
+    {
+        $data = new Query();
+        $data->select(['id', 'adddate','lastmoddate'])
+            ->from(['imas_questionset'])
+            ->where(['uniqueid' => $UId]);
+        $command = $data->createCommand();
+        $data = $command->queryAll();
+        return $data;
+
+    }
+
+    public static function getQSetAndUserData($qSetId,$groupId)
+    {
+        $data = new Query();
+        $data->select(['imas_questionset.id'])
+            ->from(['imas_questionset','imas_users'])
+            ->where(['imas_questionset.id' => $qSetId])
+            ->andWhere(['imas_questionset.ownerid=imas_users.id'])
+            ->andWhere(['imas_users.groupid' => $groupId]);
+        $command = $data->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function UpdateQuestionsetData($qd,$hasImg,$now,$qSetId)
+    {
+        $QuestionSet = QuestionSet::find()->where(['id' => $qSetId])->one();
+        if($QuestionSet)
+        {
+            $QuestionSet->description = $qd['description'];
+            $QuestionSet->author= $qd['author'];
+            $QuestionSet->qtype= $qd['qtype'];
+            $QuestionSet->control = $qd['control'];
+            $QuestionSet->qcontrol = $qd['qcontrol'];
+            $QuestionSet->qtext = $qd['qtext'];
+            $QuestionSet->answer = $qd['answer'];
+            $QuestionSet->extref = $qd['extref'];
+            $QuestionSet->license = $qd['license'];
+            $QuestionSet->ancestorauthors = $qd['ancestorauthors'];
+            $QuestionSet->otherattribution = $qd['otherattribution'];
+            $QuestionSet->solution = $qd['solution'];
+            $QuestionSet->solutionopts = $qd['solutionopts'];
+            $QuestionSet->adddate= $now;
+            $QuestionSet->lastmoddate = $now;
+            $QuestionSet->hasimg = $hasImg;
+            $QuestionSet->save();
+        }
+
+    }
+
+    public static function UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin)
+    {
+        $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
+        $query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
+        $query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
+        $query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+        if (!$isAdmin)
+        {
+            $query .= " AND ownerid=$user->id";
+        }
+        $data = \Yii::$app->db->createCommand($query)->execute();
+        return $data;
+    }
+    public function InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights)
+    {
+        $this->uniqueid = $qd['uqid'];
+        $this->adddate  =$now;
+        $this->lastmoddate = $now;
+        $this->ownerid = $user->id;
+        $this->userights = $rights;
+        $this->description = $qd['description'];
+        $this->author = $qd['author'];
+        $this->qtype = $qd['qtype'];
+        $this->control = $qd['control'];
+        $this->qcontrol = $qd['qcontrol'];
+        $this->qtext = $qd['qtext'];
+        $this->answer = $qd['answer'];
+        $this->solution = $qd['solution'];
+        $this->extref = $qd['extref'];
+        $this->solutionopts = $qd['solutionopts'];
+        $this->license = $qd['license'];
+        $this->ancestorauthors = $qd['ancestorauthors'];
+        $this->otherattribution = $qd['otherattribution'];
+        $this->importuid = $importUIdVal;
+        $this->hasimg = $hasImg;
+        $this->save();
+        return $this->id;
+    }
+
     public static function setDeletedByIdsAndOwnerId($removeList, $userId){
         $data = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
         if($data){
@@ -330,7 +421,6 @@ class QuestionSet extends BaseImasQuestionset
             }
         }
     }
-
     public static function setOwnerIdById($id, $ownerId){
         $data = QuestionSet::findOne(['id' => $id]);
         if($data){
@@ -466,7 +556,8 @@ class QuestionSet extends BaseImasQuestionset
         }
     }
 
-    public static function getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId){
+    public static function getQuestionSetDataByJoin($searchlikes, $isAdmin, $searchall, $hidepriv, $llist, $searchmine, $isGrpAdmin, $userId, $groupId)
+        {
         $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.ownerid,imas_questionset.description,imas_questionset.userights,imas_questionset.lastmoddate,imas_questionset.extref,imas_questionset.replaceby,";
         $query .= "imas_questionset.qtype,imas_users.firstName,imas_users.lastName,imas_users.groupid,imas_library_items.libid,imas_library_items.junkflag, imas_library_items.id AS libitemid ";
         $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.deleted=0 AND $searchlikes ";

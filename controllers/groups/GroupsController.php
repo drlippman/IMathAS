@@ -226,15 +226,6 @@ class GroupsController extends AppController
                     $this->removeGrpMember($remove,$grpId);
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
                 }
-                else
-                {
-                    $query = User::userDataForGroups($remove);
-                    $stuNameToBeRemoved = $query[0]['LastName'].','.$query[0]['FirstName'];
-                    $query = Stugroups::getById($grpId);
-                    $Stu_GrpName = $query['name'];
-                    $query = StuGroupSet::getByGrpSetId($grpSetId);
-                    $Stu_GrpSetName = $query['name'];
-                }
             }
             $removeAll = $this->getParamVal('removeall');
             if(isset($removeAll))
@@ -244,10 +235,6 @@ class GroupsController extends AppController
                 {
                     $this->removeAllGrpMember($removeAll);
                     return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
-                }else
-                {
-                    $query = Stugroups::getById($removeAll);
-                    $Stu_GrpName = $query['name'];
                 }
             }
             if(isset($addGrpSet))
@@ -312,40 +299,11 @@ class GroupsController extends AppController
             $deleteGrpSet = $this->getParamVal('deleteGrpSet');
             if(isset($deleteGrpSet))
             {
-                $used = '';
-                $assessmentData = Assessments::getByGroupSetId($deleteGrpSet);
-                if($assessmentData)
-                {
-                    foreach($assessmentData as $data)
-                    {
-                        $used .= "Assessment: {$data['name']}<br/>";
-                    }
-                }
-                $forumData = Forums::getByGroupSetId($deleteGrpSet);
-                if($forumData)
-                {
-                    foreach($forumData as $data)
-                    {
-                        $used .= "Forum: {$data['name']}<br/>";
-                    }
-                }
-                $wikiData = Wiki::getByGroupSetId($deleteGrpSet);
-                if($wikiData)
-                {
-                    foreach($wikiData as $data)
-                    {
-                        $used .= "Wiki: {$data['name']}<br/>";
-                    }
-                }
                 $confirm = $this->getParamVal('confirm');
                 if(isset($confirm))
                 {
                     $this->deleteGrpSet($deleteGrpSet);
                     return $this->redirect('manage-student-groups?cid='.$course->id);
-                }else
-                {
-                    $query= StuGroupSet::getByGrpSetId($deleteGrpSet);
-                    $deleteGrpName = $query['name'];
                 }
             }
             if(isset($addGrp))
@@ -427,29 +385,105 @@ class GroupsController extends AppController
                     $grpSetName = $query['name'];
                 }
             }
-            $deleteGrp = $this->getParamVal('deleteGrp');
-            if(isset($deleteGrp))
-            {
-                $confirm = $this->getParamVal('confirm');
-                $params = $this->getRequestParams();
-                $delPost = $params['delpost'];
-                if(isset($confirm))
-                {
-                    $this->deleteGroup($deleteGrp,$delPost= AppConstant::NUMERIC_ONE);
-                    return $this->redirect('manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId);
-                }else
-                {
-                    $query = Stugroups::getById($deleteGrp);
-                    $currGrpNameToDlt = $query['name'];
-                    $query = StuGroupSet::getByGrpSetId($grpSetId);
-                    $currGrpSetNameToDlt = $query['name'];
-                }
-            }
         }
         $this->includeCSS(['groups.css']);
         return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'deleteGrp' => $deleteGrp,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'Stu_GrpSetName' => $Stu_GrpSetName,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message]);
     }
 
+    /*Ajax Call to delete group set*/
+    public function actionDeleteGrpSetAjax()
+    {
+        $params = $this->getRequestParams();
+        $deleteGrpSet = $params['deleteId'];
+        $cid = $params['cid'];
+        $used = '';
+        $assessmentData = Assessments::getByGroupSetId($deleteGrpSet);
+        if($assessmentData)
+        {
+            foreach($assessmentData as $data)
+            {
+                $used .= "Assessment: {$data['name']}<br/>";
+            }
+        }
+        $forumData = Forums::getByGroupSetId($deleteGrpSet);
+        if($forumData)
+        {
+            foreach($forumData as $data)
+            {
+                $used .= "Forum: {$data['name']}<br/>";
+            }
+        }
+        $wikiData = Wiki::getByGroupSetId($deleteGrpSet);
+        if($wikiData)
+        {
+            foreach($wikiData as $data)
+            {
+                $used .= "Wiki: {$data['name']}<br/>";
+            }
+        }
+        $query= StuGroupSet::getByGrpSetId($deleteGrpSet);
+        $deleteGrpName = $query['name'];
+        $responseData = array('used' => $used,'deleteGrpName' => $deleteGrpName,'deleteGrpSet' => $deleteGrpSet,'cid' => $cid);
+        return $this->successResponse($responseData);
+    }
+    /*Ajax Call to delete group*/
+    public function actionRemoveAjax()
+    {
+        $params = $this->getRequestParams();
+        $remove = $params['removeId'];
+        $cid = $params['cid'];
+        $grpId = $params['grpId'];
+        $grpSetId = $params['grpSetId'];
+        $query = User::userDataForGroups($remove);
+        $stuNameToBeRemoved = $query[0]['LastName'].','.$query[0]['FirstName'];
+        $query = Stugroups::getById($grpId);
+        $Stu_GrpName = $query['name'];
+        $query = StuGroupSet::getByGrpSetId($grpSetId);
+        $Stu_GrpSetName = $query['name'];
+        $responseData = array('stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'cid' => $cid,'grpSetId' => $grpSetId,'remove' => $remove,'Stu_GrpSetName' => $Stu_GrpSetName,'grpId' => $grpId);
+        return $this->successResponse($responseData);
+    }
+
+    /*Ajax Call to delete group*/
+    public function actionDeleteGrpAjax()
+    {
+        $params = $this->getRequestParams();
+        $deleteGrp = $params['deleteId'];
+        $cid = $params['cid'];
+        $grpSetId = $params['grpId'];
+        $query = Stugroups::getById($deleteGrp);
+        $currGrpNameToDlt = $query['name'];
+        $query = StuGroupSet::getByGrpSetId($grpSetId);
+        $currGrpSetNameToDlt = $query['name'];
+        $responseData = array('currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'cid' => $cid,'grpSetId' => $grpSetId,'deleteGrp' => $deleteGrp);
+        return $this->successResponse($responseData);
+    }
+    /*Ajax Call to delete group On confirmation*/
+    public function actionDeleteOnConfirmationAjax()
+    {
+        $params = $this->getRequestParams();
+        $delPost = $params['selected'];
+        $deleteGrp = $params['deleteGrp'];
+        $grpSetId = $params['grpSetId'];
+        $cid = $params['cid'];
+        $this->deleteGroup($deleteGrp,$delPost= AppConstant::NUMERIC_ONE);
+        $responseData = array('deleteGrp ' => $deleteGrp ,'cid' => $cid,'grpSetId' => $grpSetId);
+        return $this->successResponse($responseData);
+    }
+    /*Ajax Call to Remove all Group Member*/
+    public function actionRemoveAllAjax()
+    {
+        $params = $this->getRequestParams();
+        $removeAll = $params['removeId'];
+        $grpSetId = $params['grpSetId'];
+        $cid = $params['cid'];
+        $query = Stugroups::getById($removeAll);
+        $Stu_GrpName = $query['name'];
+        $responseData = array('removeAll' => $removeAll ,'cid' => $cid,'grpSetId' => $grpSetId,'Stu_GrpName' => $Stu_GrpName);
+        return $this->successResponse($responseData);
+    }
+
+        /*function to delete Group Set*/
     public function deleteGrpSet($deleteGrpSet)
     {
         $query = Stugroups::findByGrpSetIdToDlt($deleteGrpSet);
@@ -465,7 +499,7 @@ class GroupsController extends AppController
         Forums::updateForumForGroups($deleteGrpSet);
         Wiki::updateWikiForGroups($deleteGrpSet);
     }
-
+    /*function to delete Group*/
     public function deleteGroup($grpId,$delPosts=true)
     {
         $this->removeAllGrpMember($grpId);
@@ -505,7 +539,6 @@ class GroupsController extends AppController
             /*Remaining*/
         }
     }
-
     public function removeGrpMember($uid,$grpId)
     {
         StuGroupMembers::removeGrpMember($uid,$grpId);

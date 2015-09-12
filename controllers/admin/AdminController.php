@@ -32,6 +32,7 @@ use app\models\Libraries;
 use app\models\LibraryItems;
 use app\models\LinkedText;
 use app\models\Questions;
+use app\models\QImages;
 use app\models\QuestionSet;
 use app\models\Sessions;
 use app\models\Student;
@@ -1494,6 +1495,7 @@ class AdminController extends AppController
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
         $this->layout = "master";
+        global $isAdmin,$isGrpAdmin,$user,$params;
         $isAdmin = false;
         $allowNonGroupLibs = false;
         $isGrpAdmin = false;
@@ -1528,14 +1530,15 @@ class AdminController extends AppController
             }
             if (isset($params['process']))
             {
-                $filename = rtrim(dirname(__FILE__), '/\\') .'/import/' . $params['filename'];
+                $filename = AppConstant::UPLOAD_DIRECTORY.'importLibrary/' . $params['filename'];
                 $libsToAdd = $params['libs'];
+
                 list($packName,$names,$parents,$libItems,$unique,$lastModDate) = $this->parseLibs($filename);
-                $names = array_map('addslashes_deep', $names);
-                $parents = array_map('addslashes_deep', $parents);
-                $libItems = array_map('addslashes_deep', $libItems);
-                $unique = array_map('addslashes_deep', $unique);
-                $lastModDate = array_map('addslashes_deep', $lastModDate);
+                $names = array_map(array($this,'addslashes_deep'),$names);
+                $parents = array_map(array($this,'addslashes_deep'), $parents);
+                $libItems = array_map(array($this,'addslashes_deep'), $libItems);
+                $unique = array_map(array($this,'addslashes_deep'), $unique);
+                $lastModDate = array_map(array($this,'addslashes_deep'), $lastModDate);
                 $root = $params['parent'];
                 $libRights = $params['librights'];
                 $qRights = $params['qrights'];
@@ -1551,6 +1554,7 @@ class AdminController extends AppController
                         $lastMod[$row['id']] = $row['lastmoddate'];
                     }
                 }
+                global $updateQ,$newQ;
                 $mt = microtime();
                 $updateL = AppConstant::NUMERIC_ZERO;
                 $newL = AppConstant::NUMERIC_ZERO;
@@ -1565,7 +1569,7 @@ class AdminController extends AppController
                     {
                         foreach($libsToAdd as $libId)
                         {
-                            if ($parents[$libId]==0)
+                            if ($parents[$libId] == 0)
                             {
                                 $parent = $root;
                             }
@@ -1603,13 +1607,12 @@ class AdminController extends AppController
                                 }
                                 $data = new Libraries();
                                 $insertId = $data->insertData($unique[$libId],$now,$names[$libId],$user,$libRights,$parent);
-
                                 $libs[$libId] = $insertId;
                                 $newL++;
                             }
                             if (isset($libs[$libId]))
                             {
-                                if ($toUse=='')
+                                if ($toUse == '')
                                 {
                                     $toUse = $libItems[$libId];
                                 }
@@ -1619,7 +1622,7 @@ class AdminController extends AppController
                                 }
                             }
                         }
-                        $qIds = $this->parseQs($filename,$toUse,$qRights);/*yet to convert it*/
+                        $qIds = $this->parseQs($filename,$toUse,$qRights);
                         if(count($qIds) > AppConstant::NUMERIC_ZERO)
                         {
                             $qIdsToCheck = implode(',',$qIds);
@@ -1732,11 +1735,11 @@ class AdminController extends AppController
             }
 
         }
-        $this->includeCSS(['libtree.css']);
+     $this->includeCSS(['libtree.css']);
      $responseData = array('overwriteBody' => $overwriteBody,'body' => $body,'page_uploadSuccessMsg' => $page_uploadSuccessMsg,'params' => $params,'page_fileErrorMsg' => $page_fileErrorMsg,
      'page_fileHiddenInput' => $page_fileHiddenInput,'courseId' => $courseId,'packName' => $packName,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin
-     ,'myRight' => $myRights,'parent' => $parent,'names' => $names);
-        return $this->renderWithData('importLibrary');
+     ,'myRight' => $myRights,'parentsData' => $parents,'namesData' => $names);
+        return $this->renderWithData('importLibrary',$responseData);
     }
 
     public function parseLibs($file)
@@ -1824,9 +1827,266 @@ class AdminController extends AppController
         return array($packName,$names,$parents,$libItems,$unique,$lastModDate);
     }
 
-    public function parseQs($filename,$toUse,$qRights)
+    function parseQs($file,$toUse,$rights)
     {
+        function writeQ($qd,$rights,$qn)
+        {
+            global $user,$isAdmin,$updateQ,$newQ,$isGrpAdmin,$params;
+            $now = time();
+            $QuestionSetData = QuestionSet::getLastModDateAndId($qd['uqid']);
+            if ($QuestionSetData)
+            {
+                $qSetId = $QuestionSetData[0]['id'];
+                $addDate = $QuestionSetData[0]['adddate'];
+                $lastModDate = $QuestionSetData[0]['adddate'];
+                $exists = true;
+            } else
+            {
+                $exists = false;
+            }
+            if ($exists && ($params['merge']==1 || $params['merge']==2))
+            {
+                if ($qd['lastmod']>$addDate || $params['merge']==2)
+                {
+                    if (!empty($qd['qimgs']))
+                    {
+                        $hasImg = 1;
+                    } else
+                    {
+                        $hasImg = 0;
+                    }
+                    if ($isGrpAdmin)
+                    {
+                        $QuestionSetId = QuestionSet::getQSetAndUserData($qSetId,$user->groupid);
+                        if ($QuestionSetId)
+                        {
+                            QuestionSet::UpdateQuestionsetData($qd,$hasImg,$now,$qSetId);
+                        }
+                        else
+                        {
+                            return $qSetId;
+                        }
+                    }
+                    else
+                    {
+                       $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin);
+                    }
+                    if ($affectedRow > 0)
+                    {
+                        $updateQ++;
+                        if (!empty($qd['qimgs']))
+                        {
+                            QImages::deleteByQsetId($qSetId);
+                            $qImages = explode("\n",trim($qd['qimgs']));
+                            if($qImages)
+                            {
+                                foreach($qImages as $qimg)
+                                {
+                                    $p = explode(',',$qimg);
+                                    if (count($p) < 2)
+                                    {
+                                        continue;
+                                    }
+                                    $QImages = new QImages();
+                                    $QImages->insertFilename($qSetId,$p);
+                                }
 
+                            }
+                        }
+                    }
+                }
+                return $qSetId;
+            } else if ($exists && $params['merge']==-1)
+            {
+                return $qSetId;
+            } else
+            {
+                $importUIdStr = '';
+                $importUIdVal = '';
+                if ($qd['uqid']=='0' || ($exists && $params['merge']==0))
+                {
+                    $importUIdStr  = 'importuid';
+                    $importUIdVal = $qd['uqid'];
+                    $mt = microtime();
+                    $qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
+                }
+                if (!empty($qd['qimgs']))
+                {
+                    $hasImg = 1;
+                }
+                else
+                {
+                    $hasImg = 0;
+                }
+                $insert = new QuestionSet();
+                $insertId = $insert->InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights);
+                $newQ++;
+                $qSetId = $insertId;
+                if(!empty($qd['qimgs']))
+                {
+                    $qImages = explode("\n",$qd['qimgs']);
+                    if($qImages)
+                    {
+                        foreach($qImages as $qimg)
+                        {
+                            $p = explode(',',$qimg);
+                            $QImages = new QImages();
+                            $QImages->insertFilename($qSetId,$p);
+                        }
+                    }
+
+                }
+                return $qSetId;
+            }
+        }
+        $toUse = explode(',',$toUse);
+        $qNum = -1;
+        $part = '';
+        if (!function_exists('gzopen'))
+        {
+            $handle = fopen($file,"r");
+            $nogz = true;
+        }
+        else
+        {
+            $nogz = false;
+            $handle = gzopen($file,"r");
+        }
+        $line = '';
+        while ((!$nogz || !feof($handle)) && ($nogz || !gzeof($handle)))
+        {
+            if ($nogz) {
+                $line = rtrim(fgets($handle, 4096));
+            } else {
+                $line = rtrim(gzgets($handle, 4096));
+            }
+            if ($line == "START QUESTION")
+            {
+                $part = '';
+                if ($qNum > -1)
+                {
+                    foreach($qdata as $k=>$val)
+                    {
+                        $qdata[$k] = rtrim($val);
+                    }
+                    if (in_array($qdata['qid'],$toUse))
+                    {
+                        $qid = writeQ($qdata,$rights,$qNum);
+                        if ($qid!==false)
+                        {
+                            $qIds[$qdata['qid']] = $qid;
+                        }
+                    }
+                    unset($qdata);
+                }
+                $qNum++;
+                continue;
+            }
+            else if ($line == "DESCRIPTION")
+            {
+                $part = 'description';
+                continue;
+            }
+            else if ($line == "QID")
+            {
+                $part = 'qid';
+                continue;
+            }
+            else if ($line == "UQID")
+            {
+                $part = 'uqid';
+                continue;
+            }
+            else if ($line == "LASTMOD")
+            {
+                $part = 'lastmod';
+                continue;
+            }
+            else if ($line == "AUTHOR")
+            {
+                $part = 'author';
+                continue;
+            }
+            else if ($line == "CONTROL")
+            {
+                $part = 'control';
+                continue;
+            }
+            else if ($line == "QCONTROL")
+            {
+                $part = 'qcontrol';
+                continue;
+            }
+            else if ($line == "QTEXT")
+            {
+                $part = 'qtext';
+                continue;
+            }
+            else if ($line == "QTYPE")
+            {
+                $part = 'qtype';
+                continue;
+            }
+            else if ($line == "ANSWER")
+            {
+                $part = 'answer';
+                continue;
+            } else if ($line == "SOLUTION")
+            {
+                $part = 'solution';
+                continue;
+            } else if ($line == "SOLUTIONOPTS")
+            {
+                $part = 'solutionopts';
+                continue;
+            } else if ($line == "EXTREF")
+            {
+                $part = 'extref';
+                continue;
+            } else if ($line == "LICENSE")
+            {
+                $part = 'license';
+                continue;
+            } else if ($line == "ANCESTORAUTHORS")
+            {
+                $part = 'ancestorauthors';
+                continue;
+            } else if ($line == "OTHERATTRIBUTION")
+            {
+                $part = 'otherattribution';
+                continue;
+            } else if ($line == "QIMGS")
+            {
+                $part = 'qimgs';
+                continue;
+            } else
+            {
+                if ($part=="qtype")
+                {
+                    $qdata['qtype'] .= $line;
+                } else if ($qNum>-1)
+                {
+                    $qdata[$part] .= $line . "\n";
+                }
+            }
+        }
+        if ($nogz)
+        {
+            fclose($handle);
+        } else {
+            gzclose($handle);
+        }
+        foreach($qdata as $k=>$val) {
+            $qdata[$k] = rtrim($val);
+        }
+        if (in_array($qdata['qid'],$toUse)) {
+            $qid = writeq($qdata,$rights,$qNum);
+            if ($qid!==false)
+            {
+                $qIds[$qdata['qid']] = $qid;
+            }
+        }
+        return $qIds;
     }
 
     function delqimgs($qsid) {
@@ -1842,8 +2102,13 @@ class AdminController extends AppController
             mysql_query($query) or die("Query failed :$query " . mysql_error());
         }
     }
+    function addslashes_deep($value=null)
+    {
+        return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
+    }
 
-    function printlist($parent) {
+    function printlist($parent)
+    {
         global $names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin;
         $arr = $ltlibs[$parent];
         if ($sortorder[$parent]==1) {

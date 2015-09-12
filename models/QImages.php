@@ -44,5 +44,23 @@ class QImages extends BaseImasQimages {
         $this->alttext = $params['alttext'];
         $this->save();
     }
+    public static function deleteByQsetId($qSetId)
+    {
+        $QuestionSetData = QImages::find()->where(['qsetid' => $qSetId])->all();
+        if($QuestionSetData)
+        {
+            foreach($QuestionSetData as $data)
+            {
+                $data->delete();
+            }
+        }
+    }
 
+    public function insertFilename($qSetId,$p)
+    {
+        $this->qsetid = $qSetId;
+        $this->var = $p[0];
+        $this->filename = $p[1];
+        $this->save();
+    }
 }

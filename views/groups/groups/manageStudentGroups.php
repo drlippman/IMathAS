@@ -67,20 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
              <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
              </form>
         <?php }elseif(isset($deleteGrpSet)){?>
-                <h4>Delete student group set</h4>
-                <p>Are you SURE you want to delete the set of student groups <b><?php echo $deleteGrpName ;?></b> and all the groups contained within it?
-                <?php if ($used != '')
-                {
-                        echo '<p>This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted</p><p>';
-                        echo "$used</p>";
-                 } else
-                 {
-                        echo '<p>This set of groups is not currently being used</p>';
-                 }?>
-                 <p>
-                    <input type=button value="Yes, Delete" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&deleteGrpSet='.$deleteGrpSet.'&confirm=true')?>'" />
-                    <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" />
-                </p>
         <?php }elseif(isset($renameGrp)){?>
             <h4>Rename student group </h4>
                 <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&renameGrp='.$renameGrp)?>">
@@ -89,12 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId'.$grpSetId)?>'" /></p>
             </form>
         <?php }elseif(isset($deleteGrp)){?>
-            <h4>Delete student group</h4>
-                <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&deleteGrp='.$deleteGrp.'&confirm=true')?>" >
-                <p>Are you SURE you want to delete the student group <b><?php echo $currGrpNameToDlt;?></b>?</p>
-                <p>Any wiki page content for this group will be deleted.</p>
-                <p><input type="radio" name="delpost" value="1" checked="checked" /> Delete group forum posts
-                <input type="radio" name="delpost" value="0" /> Make group forum posts non-group-specific posts</p>
+                <form id="deleteGrp" method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&deleteGrp='.$deleteGrp.'&confirm=true')?>" >
                 <p><input type="submit" value="Yes, Delete">
                 <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
                 </form>
@@ -112,15 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 </form>
         <?php }elseif(isset($remove) && isset($grpId)){?>
-            <h4>Remove group member</h4>
-            <p>Are you SURE you want to remove <b><?php echo $stuNameToBeRemoved;?></b> from the student group <b><?php echo $Stu_GrpName;?></b>?</p>
-             <p><input type=button value="Yes, Remove" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&remove='.$remove.'&grpId='.$grpId.'&confirm=true')?>'" />
-             <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
         <?php }elseif(isset($removeAll)){?>
-            <h4>Remove ALL group members</h4>
-                <p>Are you SURE you want to remove <b>ALL</b> members of the student group <b><?php echo $Stu_GrpName;?></b>?</p>
-            <p><input type=button value="Yes, Remove" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&removeall='.$removeAll.'&confirm=true')?>'" />
-                <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>'" /></p>
         <?php }elseif(isset($grpSetId)){?>
         <input type="hidden" id="grpSetId"  value="<?php echo $grpSetId;?>">
             <h3>Managing groups in set <?php echo $grpSetName?></h3>
@@ -137,8 +110,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 {
                     echo "<br><b>Group: $grpName</b>&nbsp;&nbsp;";
                     echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
-                    echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&deleteGrp={$grpId}'>Delete</a>] ";
-                    echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&removeall={$grpId}'>Remove all members</a>]";
+                    echo "<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>[Delete]</a>";
+                    echo "<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>[Remove all members]</a>";
                     echo '<ul>';
                     if (count($page_GrpMembers[$grpId])==0)
                     {
@@ -161,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                <?php }
 
                             }
-                            echo "$name | <a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&remove={$uid}&grpId={$grpId}'>Remove from group</a></li>";
+                            echo "$name | <a href='javascript:remove($course->id,$grpId,$grpSetId,$uid)'>Remove from group</a></li>";
                         }
                     }
                     echo '</ul>';
@@ -224,9 +197,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo "<div class='col-sm-12'><td class='col-sm-8'><a href='manage-student-groups?cid=$course->id&grpSetId={$gs['id']}'>{$gs['name']}</a></td><td class='small col-sm-4'></div>";
                         echo "<a href='manage-student-groups?cid=$course->id&renameGrpSet={$gs['id']}'>Rename</a> | ";
                         echo "<a href='manage-student-groups?cid=$course->id&copyGrpSet={$gs['id']}'>Copy</a> | ";
-                        echo "<a href='manage-student-groups?cid=$course->id&deleteGrpSet={$gs['id']}'>Delete</a>";
+                        $deleteGrpSet = $gs['id'];
+                        $nameGrpSet = $gs['id'];
+                    echo "<a href='javascript:deleteGrpSet($course->id,$deleteGrpSet,$nameGrpSet)'>Delete</a>";
                         echo '</td></tr>';
-            }
+                }
             echo '</body></table>';
         }
         ?>
@@ -280,5 +255,218 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
             }
+        }
+
+        function deleteGrpSet(cid,deleteId,name)
+        {
+            jQuerySubmit('delete-grp-set-ajax', {cid: cid, deleteId: deleteId},'deleteResponseSuccess');
+        }
+
+        function deleteResponseSuccess(response)
+        {
+            response = JSON.parse(response);
+            var deleteGrpName = response.data.deleteGrpName;
+            var cid = response.data.cid;
+            var used = response.data.used;
+            var deleteGrpSet = response.data.deleteGrpSet;
+            if(response.status == 0)
+            {
+                var message ='';
+                message+='Are you SURE you want to delete the set of student groups <b>'+deleteGrpName+'</b> and all the groups contained within it?';
+                if(used !='')
+                {
+                    message+='This set of groups is currently used in the assessments, wikis, and/or forums below.  These items will be set to non-group if this group set is deleted';
+                    message+=''+used+'';
+                }
+                else
+                {
+                    message+='<p>This set of groups is not currently being used</p>';
+                }
+                var html = '<div><p>'+message+'</p></div>';
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Delete student group set', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Nevermind": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "Yes,Delete": function ()
+                        {
+                            window.location ="manage-student-groups?cid="+cid+"&deleteGrpSet="+deleteGrpSet+"&confirm=true";
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    },
+                    open: function(){
+                        jQuery('.ui-widget-overlay').bind('click',function(){
+                            jQuery('#dialog').dialog('close');
+                        })
+                    }
+                });
+            }
+        }
+        function deleteGrp(cid,deleteId,grpId)
+        {
+
+            jQuerySubmit('delete-grp-ajax', {cid: cid, deleteId: deleteId, grpId:grpId},'deleteGrpResponseSuccess');
+        }
+
+        function deleteGrpResponseSuccess(response)
+        {
+            response = JSON.parse(response);
+            var currGrpNameToDlt = response.data.currGrpNameToDlt;
+            var currGrpSetNameToDlt = response.data.currGrpSetNameToDlt;
+            var cid = response.data.cid;
+            var deleteGrp = response.data.deleteGrp;
+            var grpSetId = response.data.grpSetId;
+            if(response.status == 0)
+            {
+                var message ='';
+                message+='Are you SURE you want to delete the student group<b>'+currGrpNameToDlt+'</b>?';
+                message+='<p>Any wiki page content for this group will be deleted.</p>';
+                message+='<span id="post-type-radio-list"><input type="radio" name="delpost" value="1" checked="checked"/> Delete group forum posts&nbsp;';
+                message+='<input type="radio" name="delpost" value="0" /> Make group forum posts non-group-specific posts</span>';
+                var html = '<div>'+message+'</div>';
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Delete student group', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Nevermind": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "Yes,Delete": function ()
+                        {
+                            var sel = $("#post-type-radio-list input[type='radio']:checked");
+                            var selected = sel.val();
+                            jQuerySubmit('delete-on-confirmation-ajax', {cid: cid, deleteGrp: deleteGrp, grpSetId: grpSetId,selected:selected},'responseSuccess');
+                            $(this).dialog('destroy').remove();
+                            return true;
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    },
+                    open: function(){
+                        jQuery('.ui-widget-overlay').bind('click',function(){
+                            jQuery('#dialog').dialog('close');
+                        })
+                    }
+                });
+            }
+
+        }
+        function responseSuccess(response)
+        {
+            response = JSON.parse(response);
+
+            var cid = response.data.cid;
+            var grpSetId = response.data.grpSetId;
+            if(response.status == 0)
+            {
+                window.location ="manage-student-groups?cid="+cid+"&grpSetId="+grpSetId;
+            }
+        }
+
+        function removeAllMember(cid,removeId,grpSetId)
+        {
+            jQuerySubmit('remove-all-ajax', {cid: cid, removeId: removeId,grpSetId:grpSetId},'removeResponseSuccess');
+        }
+
+        function removeResponseSuccess(response)
+        {
+            response = JSON.parse(response);
+            var Stu_GrpName = response.data.Stu_GrpName;
+            var cid = response.data.cid;
+            var removeAll = response.data.removeAll;
+            var grpSetId = response.data.grpSetId;
+            if(response.status == 0)
+            {
+                var message ='';
+                message+='Are you SURE you want to remove <b>ALL</b> members of the student group <b>'+Stu_GrpName+'</b>?';
+                var html = '<div><p>'+message+'</p></div>';
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Remove ALL group members', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Nevermind": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "Yes, Remove": function ()
+                        {
+                            window.location ="manage-student-groups?cid="+cid+"&grpSetId="+grpSetId+"&removeall="+removeAll+"&confirm=true";
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    },
+                    open: function(){
+                        jQuery('.ui-widget-overlay').bind('click',function(){
+                            jQuery('#dialog').dialog('close');
+                        })
+                    }
+                });
+            }
+
+        }
+        function remove(cid,grpId,grpSetId,removeId)
+        {
+            jQuerySubmit('remove-ajax', {cid: cid, removeId: removeId,grpSetId:grpSetId,grpId:grpId},'removeResponseSuccessAjax');
+        }
+
+        function removeResponseSuccessAjax(response)
+        {
+            response = JSON.parse(response);
+            var stuNameToBeRemoved = response.data.stuNameToBeRemoved;
+            var cid = response.data.cid;
+            var grpId = response.data.grpId;
+            var remove = response.data.remove;
+            var grpSetId = response.data.grpSetId;
+            var Stu_GrpSetName = response.data.Stu_GrpSetName;
+            var Stu_GrpName = response.data.Stu_GrpName;
+            if(response.status == 0)
+            {
+                var message ='';
+                message+='Are you SURE you want to remove <b>'+stuNameToBeRemoved+'</b> from the student group <b>'+Stu_GrpName+'</b>?';
+                var html = '<div><p>'+message+'</p></div>';
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Remove group member', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons:
+                    {
+                        "Nevermind": function ()
+                        {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "Yes, Remove": function ()
+                        {
+                            window.location ="manage-student-groups?cid="+cid+"&grpSetId="+grpSetId+"&remove="+remove+"&grpId="+grpId+"&confirm=true";
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    },
+                    open: function(){
+                        jQuery('.ui-widget-overlay').bind('click',function(){
+                            jQuery('#dialog').dialog('close');
+                        })
+                    }
+                });
+            }
+
         }
     </script>

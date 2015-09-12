@@ -5,9 +5,13 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = 'Import Library';
 $this->params['breadcrumbs'][] = $this->title;
+global $parents;
+global $names;
+$names = $namesData;
+$parents = $parentsData;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false),AppUtility::t('Admin', false),AppUtility::t('Util', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index',AppUtility::getHomeURL() . 'admin/admin/index',AppUtility::getHomeURL() . 'utilities/utilities/admin-utilities']]);?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false),AppUtility::t('Admin', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index',AppUtility::getHomeURL() . 'admin/admin/index']]);?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -27,20 +31,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
         }else
         {
-            if(isset($params['process']))
-            {
-                echo $page_uploadSuccessMsg;
-            }
+            if(isset($params['process'])){?>
+                <div class="align-success-message">
+                    <?php echo $page_uploadSuccessMsg;?>
+                </div>
+            <?php }
             else {?>
-                <form enctype="multipart/form-data" method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/import-library?cid='.$courseId)?>">
-            <?php }?>
+                <form enctype="multipart/form-data" method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/import-lib?cid='.$courseId)?>">
                     <?php
                     if ($_FILES['userfile']['name']=='')
                     {?>
                         <input type="hidden" name="MAX_FILE_SIZE" value="9000000" />
-                        <span class=form>Import file: </span>
-                        <span class=formright><input name="userfile" type="file" /></span><br class=form>
-                        <div class=submit><input type=submit value="Submit"></div>
+                        Import file:<input name="userfile" type="file" />
+                        <br/>
+                        <input type=submit value="Submit">
                     <?php }else{?>
                                     <?php if (strlen($page_fileErrorMsg)>1)
                                     {
@@ -59,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                 <p>
                                     Set Question Use Rights to:
-                                    <select name=qrights>
+                                    <select class="form-control-import" name=qrights>
                                         <option value="0">Private</option>
                                         <option value="2" SELECTED>Allow use, use as template, no modifications</option>
                                         <option value="3">Allow use and modifications</option>
@@ -67,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </p>
                                 <p>
                                     Set Library Use Rights to:
-                                    <select name="librights">
+                                    <select class="form-control-import" name="librights">
                                         <option value="0">Private</option>
                                         <option value="1">Closed to group, private to others</option>
                                         <option value="2" SELECTED>Open to group, private to others</option>
@@ -86,28 +90,32 @@ $this->params['breadcrumbs'][] = $this->title;
                             </p>
 
                             <p>If a library or question already exists on this system, do you want to:<br/>
-                                <input type=radio name=merge value="1" CHECKED>Update existing,
-                                <input type=radio name=merge value="0">import as new, or
-                                <input type=radio name=merge value="-1">Keep existing
+                                <input type=radio name=merge value="1" CHECKED>Update existing
+                                <br><input type=radio name=merge value="0">import as new
+                                <br><input type=radio name=merge value="-1">Keep existing<br>
                                 <?php if ($myRights == 100){echo '<input type=radio name=merge value="2">Force update';}?>
                                 <br/>
                                 Note that updating existing libraries will not place those imported libraries
                                 in the parent selected above.
                             </p>Base
                             <ul class=base>
-                                <?php printlist(0,$parent,$names); ?>
+                                <?php printlist(0);?>
+                                </ul>
                                 <p><input type=submit name="process" value="Import Libraries"></p>
                       <?php }?>
                     <?php }?>
                     </form>
+            <?php }?>
       <?php }?>
     </div>
 </div>
 
+
 <?php
-function printlist($parent,$parents=null,$names=null)
+function printlist($parent)
 {
-    $children = array_keys($parents,$parent);
+   global $parents,$names;
+   $children = array_keys($parents,$parent);
     foreach ($children as $child)
     {
         if (!in_array($child,$parents)) { //if no children
@@ -123,33 +131,33 @@ function printlist($parent,$parents=null,$names=null)
     }
 }
 ?>
-<!--<script type="text/javascript">-->
-<!--    var curlibs = '0';-->
-<!--    function libselect()-->
-<!--    {-->
-<!--        window.open('../course/libtree.php?libtree=popup&cid=--><?php //echo $cid ?><!--&selectrights=1&select=parent&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));-->
-<!--    }-->
-<!--    function setlib(libs)-->
-<!--    {-->
-<!--        document.getElementById("parent").value = libs;-->
-<!--        curlibs = libs;-->
-<!--    }-->
-<!--    function setlibnames(libn)-->
-<!--    {-->
-<!--        document.getElementById("libnames").innerHTML = libn;-->
-<!--    }-->
-<!---->
-<!--    function toggle(id)-->
-<!--    {-->
-<!--        node = document.getElementById(id);-->
-<!--        button = document.getElementById('b'+id);-->
-<!--        if (node.className == "show") {-->
-<!--            node.className = "hide";-->
-<!--            button.innerHTML = "+";-->
-<!--        } else-->
-<!--        {-->
-<!--            node.className = "show";-->
-<!--            button.innerHTML = "-";-->
-<!--        }-->
-<!--    }-->
-<!--</script>-->
+<script type="text/javascript">
+    var curlibs = '0';
+    function libselect()
+    {
+        window.open('../course/libtree.php?libtree=popup&cid=<?php echo $cid ?>&selectrights=1&select=parent&type=radio&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
+    }
+    function setlib(libs)
+    {
+        document.getElementById("parent").value = libs;
+        curlibs = libs;
+    }
+    function setlibnames(libn)
+    {
+        document.getElementById("libnames").innerHTML = libn;
+    }
+
+    function toggle(id)
+    {
+        node = document.getElementById(id);
+        button = document.getElementById('b'+id);
+        if (node.className == "show") {
+            node.className = "hide";
+            button.innerHTML = "+";
+        } else
+        {
+            node.className = "show";
+            button.innerHTML = "-";
+        }
+    }
+</script>
