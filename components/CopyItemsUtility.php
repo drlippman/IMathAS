@@ -23,9 +23,7 @@ use app\models\Rubrics;
 use app\models\Teacher;
 use app\models\Wiki;
 use \yii\base\Component;
-use app\components\AppUtility;
-use app\components\AppConstant;
-global $reqscoretrack,$assessnewid,$forumtrack,$posttoforumtrack,$exttooltrack,$userid,$groupid,$qrubrictrack,$frubrictrack;
+global $qrubrictrack,$frubrictrack;
 $qrubrictrack = array();
 $frubrictrack = array();
 class CopyItemsUtility extends Component
@@ -44,7 +42,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     if (!isset($outcomes)) {
         $outcomes = array();
     }
-    if (strlen($params['append']) > 0 && $params['append']{0} != ' ') {
+    if (strlen($params['append']) > AppConstant::NUMERIC_ZERO && $params['append']{0} != ' ') {
         $params['append'] = ' ' . $params['append'];
     }
     $now = time();
@@ -66,7 +64,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             'fileorder' => $inlineTextData['fileorder'],
         );
         if ($sethidden) {
-            $row['avail'] = 0;
+            $row['avail'] = AppConstant::NUMERIC_ZERO;
         }
         $row['title'] .= stripslashes($params['append']);
         $fileorder = $row['fileorder'];
@@ -87,7 +85,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             $newInstrFileId = $instrFile->saveFile($singleData, $newtypeid);
             $addedfiles[$curid] = $newInstrFileId;
         }
-        if (count($addedfiles) > 0)
+        if (count($addedfiles) > AppConstant::NUMERIC_ZERO)
         {
             $addedfilelist = array();
             foreach ((explode(',', $fileorder)) as $fid)
@@ -100,18 +98,18 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         }
     } elseif ($itemtype == "LinkedText") {
         $query = LinkedText::getById($typeid);
-        $istool = (substr($query['text'], 0, 8) == 'exttool:');
+        $istool = (substr($query['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_EIGHT) == 'exttool:');
         if ($istool) {
-            $tool = explode('~~', substr($query['text'], 8));
+            $tool = explode('~~', substr($query['text'], AppConstant::NUMERIC_EIGHT));
             if (isset($tool[3]) && isset($gbcats[$tool[3]])) {
                 $tool[3] = $gbcats[$tool[3]];
             } else if ($params['ctc'] != $cid) {
-                $tool[3] = 0;
+                $tool[3] = AppConstant::NUMERIC_ZERO;
             }
             $query['text'] = 'exttool:' . implode('~~', $tool);
         }
         if ($sethidden) {
-            $query['avail'] = 0;
+            $query['avail'] = AppConstant::NUMERIC_ZERO;
         }
         $query['title'] .= stripslashes($params['append']);
         if ($query['outcomes'] != '') {
@@ -133,12 +131,12 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     {
         $ForumData = Forums::getById($typeid);
         if ($sethidden) {
-            $ForumData['avail'] = 0;
+            $ForumData['avail'] = AppConstant::NUMERIC_ZERO;
         }
         if (isset($gbcats[$ForumData['gbcategory']])) {
             $ForumData['gbcategory'] = $gbcats[$ForumData['gbcategory']];
         } else if ($params['ctc'] != $cid) {
-            $ForumData['gbcategory'] = 0;
+            $ForumData['gbcategory'] = AppConstant::NUMERIC_ZERO;
         }
         $rubric = $ForumData['rubric'];
         $ForumData['name'] .= stripslashes($params['append']);
@@ -158,7 +156,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         {
             $forumtrack[$typeid] = $newtypeid;
         }
-        if ($rubric != 0) {
+        if ($rubric != AppConstant::NUMERIC_ZERO) {
             $frubrictrack[$newtypeid] = $rubric;
         }
         if ($copystickyposts) {
@@ -191,7 +189,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
     } elseif ($itemtype == "Wiki") {
         $row = Wiki::getById($typeid);
         if ($sethidden) {
-            $row['avail'] = 0;
+            $row['avail'] = AppConstant::NUMERIC_ZERO;
         }
         $row['name'] .= stripslashes($params['append']);
         $wiki = new Wiki();
@@ -201,17 +199,17 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $assessmentData = Assessments::getByAssessmentId($typeid);
         if ($sethidden)
         {
-            $assessmentData['avail'] = 0;
+            $assessmentData['avail'] = AppConstant::NUMERIC_ZERO;
         }
         if (isset($gbcats[$assessmentData['gbcategory']])) {
             $assessmentData['gbcategory'] = $gbcats[$assessmentData['gbcategory']];
         } else if ($params['ctc'] != $params['courseId']) {
-            $assessmentData['gbcategory'] = 0;
+            $assessmentData['gbcategory'] = AppConstant::NUMERIC_ZERO;
         }
         if (isset($outcomes[$assessmentData['defoutcome']])) {
             $assessmentData['defoutcome'] = $outcomes[$assessmentData['defoutcome']];
         } else {
-            $assessmentData['defoutcome'] = 0;
+            $assessmentData['defoutcome'] = AppConstant::NUMERIC_ZERO;
         }
         if ($assessmentData['ancestors'] == '')
         {
@@ -228,10 +226,10 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
         $assessmentData['name'] .= stripslashes($params['append']);
         $assessment = new Assessments();
         $newtypeid = $assessment->copyAssessment($assessmentData);
-        if ($reqscoreaid > 0) {
+        if ($reqscoreaid > AppConstant::NUMERIC_ZERO) {
             $reqscoretrack[$newtypeid] = $reqscoreaid;
         }
-        if ($params['ctc'] != $cid && $forumtopostto > 0) {
+        if ($params['ctc'] != $cid && $forumtopostto > AppConstant::NUMERIC_ZERO) {
             $posttoforumtrack[$newtypeid] = $forumtopostto;
         }
         $assessnewid[$typeid] = $newtypeid;
@@ -244,8 +242,8 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
             $inss = array();
             $insorder = array();
             foreach ($query as $singleData) {
-                if ($singleData['withdrawn'] > 0 && $removewithdrawn) {
-                    $thiswithdrawn[$singleData['id']] = 1;
+                if ($singleData['withdrawn'] > AppConstant::NUMERIC_ZERO && $removewithdrawn) {
+                    $thiswithdrawn[$singleData['id']] = AppConstant::NUMERIC_ONE;
                     continue;
                 }
                 if (isset($replacebyarr[$singleData['questionsetid']])) {
@@ -255,7 +253,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                     if (isset($outcomes[$singleData['category']])) {
                         $singleData['category'] = $outcomes[$singleData['category']];
                     } else {
-                        $singleData['category'] = 0;
+                        $singleData['category'] = AppConstant::NUMERIC_ZERO;
                     }
                 }
                 $rubric[$singleData['id']] = $singleData['rubric'];
@@ -263,7 +261,7 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                 array_push($inss, $singleData);
             }
             $idtoorder = array_flip($insorder);
-            if (count($inss) > 0) {
+            if (count($inss) > AppConstant::NUMERIC_ZERO) {
                 $question = new Questions();
                 $questionIdArray = array();
                 foreach ($inss as $in) {
@@ -277,30 +275,30 @@ public  static function copyitem($itemid, $gbcats, $params,$sethidden = false)
                         if (isset($thiswithdrawn[$aitem])) {
                             continue;
                         }
-                        if ($rubric[$aitem] != 0) {
+                        if ($rubric[$aitem] != AppConstant::NUMERIC_ZERO) {
                             $qrubrictrack[$firstnewid + $idtoorder[$aitem]] = $rubric[$aitem];
                         }
                         $newaitems[] = $firstnewid + $idtoorder[$aitem];
                     } else {
                         $sub = explode('~', $aitem);
                         $newsub = array();
-                        $front = 0;
+                        $front = AppConstant::NUMERIC_ZERO;
                         if (strpos($sub[0], '|') !== false) { //true except for bwards compat
                             $newsub[] = array_shift($sub);
-                            $front = 1;
+                            $front = AppConstant::NUMERIC_ONE;
                         }
                         foreach ($sub as $subi) {
                             if (isset($thiswithdrawn[$subi])) {
                                 continue;
                             }
-                            if ($rubric[$subi] != 0) {
+                            if ($rubric[$subi] != AppConstant::NUMERIC_ZERO) {
                                 $qrubrictrack[$firstnewid + $idtoorder[$subi]] = $rubric[$subi];
                             }
                             $newsub[] = $firstnewid + $idtoorder[$subi];
                         }
                         if (count($newsub) == $front) {
 
-                        } else if (count($newsub) == $front + 1) {
+                        } else if (count($newsub) == $front + AppConstant::NUMERIC_ONE) {
                             $newaitems[] = $newsub[$front];
                         } else {
                             $newaitems[] = implode('~', $newsub);
@@ -325,7 +323,7 @@ public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden 
     global $newItems;
     foreach ($items as $k => $item) {
         if (is_array($item)) {
-            if (array_search($parent . '-' . ($k + 1), $checked) !== FALSE)
+            if (array_search($parent . '-' . ($k + AppConstant::NUMERIC_ONE), $checked) !== FALSE)
             { //copy block
                 $newBlock = array();
                 $newBlock['name'] = $item['name'] . stripslashes($_POST['append']);
@@ -333,23 +331,23 @@ public static function copySub($items, $parent, &$addtoarr, $gbCats, $sethidden 
                 $blockCnt++;
                 $newBlock['startdate'] = $item['startdate'];
                 $newBlock['enddate'] = $item['enddate'];
-                $newBlock['avail'] = $sethidden ? 0 : $item['avail'];
+                $newBlock['avail'] = $sethidden ? AppConstant::NUMERIC_ZERO : $item['avail'];
                 $newBlock['SH'] = $item['SH'];
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         $newBlock['colors'] = $item['colors'];
                 $newBlock['public'] = $item['public'];
                 $newBlock['fixedheight'] = $item['fixedheight'];
                 $newBlock['grouplimit'] = $item['grouplimit'];
                 $newBlock['items'] = array();
-                if (count($item['items']) > 0) {
-                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$checked,$blockCnt);
+                if (count($item['items']) > AppConstant::NUMERIC_ZERO) {
+                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + AppConstant::NUMERIC_ONE), $newBlock['items'], $gbCats, $sethidden,$params,$checked,$blockCnt);
                 }
                 $addToArr[] = $newBlock;
                 $newItems = $addToArr;
             }else
             {
-                if(count($item['items']) > 0)
+                if(count($item['items']) > AppConstant::NUMERIC_ZERO)
                 {
-                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + 1), $addtoarr, $gbCats, false,$params,$checked,$blockCnt);
+                    CopyItemsUtility::copysub($item['items'], $parent . '-' . ($k + AppConstant::NUMERIC_ONE), $addtoarr, $gbCats, false,$params,$checked,$blockCnt);
                 }
             }
         }else
@@ -373,7 +371,7 @@ public  static function doaftercopy($sourceCid,$courseId)
     } else {
         $sameCourse = false;
     }
-    if (count($reqscoretrack) > 0)
+    if (count($reqscoretrack) > AppConstant::NUMERIC_ZERO)
     {
         foreach ($reqscoretrack as $newid => $oldreqaid) {
             if (isset($assessnewid[$oldreqaid]))
@@ -385,7 +383,7 @@ public  static function doaftercopy($sourceCid,$courseId)
             }
         }
     }
-    if (count($posttoforumtrack) > 0)
+    if (count($posttoforumtrack) > AppConstant::NUMERIC_ZERO)
     {
         foreach ($posttoforumtrack as $newaid => $oldforumid)
         {
@@ -407,7 +405,7 @@ public  static function doaftercopy($sourceCid,$courseId)
 
 public function copyAllSub($items, $parent, &$addToArr, $gbCats, $sethidden = false,$params,$blockCnt)
 {
-    if (strlen($params['append']) > 0 && $params['append']{0} != ' ') {
+    if (strlen($params['append']) > AppConstant::NUMERIC_ZERO && $params['append']{0} != ' ') {
         $params['append'] = ' ' . $params['append'];
     }
     foreach ($items as $k => $item)
@@ -419,20 +417,20 @@ public function copyAllSub($items, $parent, &$addToArr, $gbCats, $sethidden = fa
             $blockCnt++;
             $newBlock['startdate'] = $item['startdate'];
             $newBlock['enddate'] = $item['enddate'];
-            $newBlock['avail'] = $sethidden ? 0 : $item['avail'];
+            $newBlock['avail'] = $sethidden ? AppConstant::NUMERIC_ZERO : $item['avail'];
             $newBlock['SH'] = $item['SH'];
             $newBlock['public'] = $item['public'];
             $newBlock['fixedheight'] = $item['fixedheight'];
             $newBlock['grouplimit'] = $item['grouplimit'];
             $newBlock['items'] = array();
-            if (count($item['items']) > 0) {
-                $this->copyAllSub($item['items'], $parent . '-' . ($k + 1), $newBlock['items'], $gbCats, $sethidden,$params,$blockCnt);
+            if (count($item['items']) > AppConstant::NUMERIC_ZERO) {
+                $this->copyAllSub($item['items'], $parent . '-' . ($k + AppConstant::NUMERIC_ONE), $newBlock['items'], $gbCats, $sethidden,$params,$blockCnt);
             }
             $addToArr[] = $newBlock;
             $newItems = $addToArr;
         } else
         {
-            if ($item != null && $item != 0)
+            if ($item != null && $item != AppConstant::NUMERIC_ZERO)
             {
                 $addToArr[] = CopyItemsUtility::copyitem($item, $gbCats,$params,$sethidden);
                 $newItems = $addToArr;
@@ -445,7 +443,7 @@ public  static function getiteminfo($itemid)
 {
     $items  = Items::getById($itemid);
 
-    if (count($items) == 0) {
+    if (count($items) == AppConstant::NUMERIC_ZERO) {
         echo "Uh oh, item #$itemid doesn't appear to exist";
     }
     $itemtype = $items['itemtype'] ;
@@ -492,15 +490,15 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
     }
     foreach ($items as $k => $item) {
         if (is_array($item)) {
-            $ids[] = $parent . '-' . ($k + 1);
+            $ids[] = $parent . '-' . ($k + AppConstant::NUMERIC_ONE);
             $types[] = "Block";
             $names[] = stripslashes($item['name']);
             $prespace[] = $pre;
             $parents[] = $parent;
             $gitypeids[] = '';
             $sums[] = '';
-            if (count($item['items']) > 0) {
-                CopyItemsUtility::getsubinfo($item['items'], $parent . '-' . ($k + 1), $pre . $spacer, $itemtypelimit, $spacer);
+            if (count($item['items']) > AppConstant::NUMERIC_ZERO) {
+                CopyItemsUtility::getsubinfo($item['items'], $parent . '-' . ($k + AppConstant::NUMERIC_ONE), $pre . $spacer, $itemtypelimit, $spacer);
             }
         } else {
             if ($item == null || $item == '') {
@@ -517,8 +515,8 @@ public  static function getsubinfo($items, $parent, $pre, $itemtypelimit = false
             $prespace[] = $pre;
             $gitypeids[] = $arr[3];
             $arr[2] = strip_tags($arr[2]);
-            if (strlen($arr[2]) > 100) {
-                $arr[2] = substr($arr[2], 0, 97) . '...';
+            if (strlen($arr[2]) > AppConstant::NUMERIC_HUNDREAD) {
+                $arr[2] = substr($arr[2], AppConstant::NUMERIC_ZERO, AppConstant::NINETY_SEVEN) . '...';
             }
             $sums[] = $arr[2];
         }
@@ -532,9 +530,9 @@ public  static function buildexistblocks($items, $parent,$pre = '')
 
     foreach ($items as $k => $item) {
         if (is_array($item)) {
-            $existBlocks[$parent . '-' . ($k + 1)] = $pre . $item['name'];
-            if (count($item['items']) > 0) {
-               CopyItemsUtility::buildexistblocks($item['items'], $parent . '-' . ($k + 1), $pre . '&nbsp;&nbsp;');
+            $existBlocks[$parent . '-' . ($k + AppConstant::NUMERIC_ONE)] = $pre . $item['name'];
+            if (count($item['items']) > AppConstant::NUMERIC_ZERO) {
+               CopyItemsUtility::buildexistblocks($item['items'], $parent . '-' . ($k + AppConstant::NUMERIC_ONE), $pre . '&nbsp;&nbsp;');
             }
         }
     }
@@ -544,7 +542,7 @@ public  static function buildexistblocks($items, $parent,$pre = '')
 public static function copyrubrics($offlinerubrics = array(),$userid=false,$groupid = false)
 {
     global $qrubrictrack, $frubrictrack;
-    if (count($qrubrictrack) == 0 && count($frubrictrack) == 0 && count($offlinerubrics) == 0)
+    if (count($qrubrictrack) == AppConstant::NUMERIC_ZERO && count($frubrictrack) == AppConstant::NUMERIC_ZERO && count($offlinerubrics) == AppConstant::NUMERIC_ZERO)
     {
         return;
     }
@@ -554,19 +552,19 @@ public static function copyrubrics($offlinerubrics = array(),$userid=false,$grou
     foreach($rubricData as $singleData)
     {
         $qfound = array_keys($qrubrictrack, $singleData['id']);
-        if (count($qfound) > 0) {
+        if (count($qfound) > AppConstant::NUMERIC_ZERO) {
             foreach ($qfound as $qid) {
                 Questions::setRubric($qid,$singleData['id']);
             }
         }
         $ofound = array_keys($offlinerubrics, $singleData['id']);
-        if (count($ofound) > 0) {
+        if (count($ofound) > AppConstant::NUMERIC_ZERO) {
             foreach ($ofound as $oid) {
                 GbItems::setRubric($oid,$singleData['id']);
             }
         }
         $ffound = array_keys($frubrictrack, $singleData['id']);
-        if (count($ffound) > 0)
+        if (count($ffound) > AppConstant::NUMERIC_ZERO)
         {
             foreach ($ffound as $fid)
             {
@@ -586,28 +584,28 @@ public static function copyrubrics($offlinerubrics = array(),$userid=false,$grou
             $rubrow = AppUtility::addslashes_deep($rubric);
             $rubricItems = Rubrics::getByUserIdAndGroupIdAndRubric($rubrow[2],$userid,$groupid);
 
-            if ($rubricItems > 0) {
+            if ($rubricItems > AppConstant::NUMERIC_ZERO) {
                 $newid = $rubricItems['id'];
             } else {
                 $rub = "'" . implode("','", $rubrow) . "'";
                 $temp = new Rubrics();
-                $rubricId = $temp->createNewEntry($userid,-1,$rub);
+                $rubricId = $temp->createNewEntry($userid,AppConstant::NUMERIC_NEGATIVE_ONE,$rub);
                 $newid = $rubricId;
             }
             $qfound = array_keys($qrubrictrack, $singleData['id']);
-            if (count($qfound) > 0) {
+            if (count($qfound) > AppConstant::NUMERIC_ZERO) {
                 foreach ($qfound as $qid) {
                     Questions::setRubric($qid,$newid);
                 }
             }
             $ffound = array_keys($frubrictrack, $singleData['id']);
-            if (count($ffound) > 0) {
+            if (count($ffound) > AppConstant::NUMERIC_ZERO) {
                 foreach ($ffound as $fid) {
                     Forums::setRubric($fid,$newid);
                 }
             }
             $ofound = array_keys($offlinerubrics, $singleData['id']);
-            if (count($ofound) > 0) {
+            if (count($ofound) > AppConstant::NUMERIC_ZERO) {
                 foreach ($ofound as $oid) {
                     GbItems::setRubric($oid,$newid);
                 }
@@ -619,12 +617,12 @@ public static function copyrubrics($offlinerubrics = array(),$userid=false,$grou
 public static function handleextoolcopy($sourcecid,$courseId)
 {
     global $userid, $groupid, $exttooltrack;
-    if (count($exttooltrack) == 0) {
+    if (count($exttooltrack) == AppConstant::NUMERIC_ZERO) {
         return;
     }
     $toolmap = array();
     $teacherData = Teacher::getByUserId($userid,$courseId);
-    if (count($teacherData) > 0)
+    if (count($teacherData) > AppConstant::NUMERIC_ZERO)
     {
         $oktocopycoursetools = true;
     }
@@ -636,7 +634,7 @@ public static function handleextoolcopy($sourcecid,$courseId)
         if (!isset($toolmap[$row['id']]))
         {
             $query  = ExternalTools::getId($courseId,$row['url']);
-            if(count($query) > 0)
+            if(count($query) > AppConstant::NUMERIC_ZERO)
             {
                 $toolmap[$row['id']] = $query[0]['id'];
             }
@@ -646,16 +644,16 @@ public static function handleextoolcopy($sourcecid,$courseId)
 
             $doremap = true;
         }
-        else if ($row['courseid'] > 0 && $oktocopycoursetools)
+        else if ($row['courseid'] > AppConstant::NUMERIC_ZERO && $oktocopycoursetools)
         {
             //do copy
-            $rowsub = array_slice($row, 3);
+            $rowsub = array_slice($row, AppConstant::NUMERIC_THREE);
             $insert = new ExternalTools();
             $insertId = $insert ->insertData($courseId,$groupid,$rowsub);
             $toolmap[$row['id']] = $insertId;
             $doremap = true;
         }
-        else if ($row['courseid'] == 0 && ($row['groupid'] == 0 || $row['groupid'] == $groupid))
+        else if ($row['courseid'] == AppConstant::NUMERIC_ZERO && ($row['groupid'] == AppConstant::NUMERIC_ZERO || $row['groupid'] == $groupid))
         {
 
         }

@@ -215,7 +215,7 @@ span.right {
 	float:right;
 }
 .floatleft {
-	float:left;
+	float:left !important;
 }
 span.padright {
 	float:right;
@@ -946,4 +946,29 @@ margin-left: 23px;
 }
 .padding-left-thirty {
     padding-left: 30px;
+}
+.margin-right-minus-eleven-per {
+    margin-right: -11% !important;
+}
+.width-seventy-eight-per {
+    width: 78%;
+}
+.display-flex {
+display: flex !important;
+}
+.width-sixty-four-per {
+    width: 64%;
+}
+.course-setting-submit-btn {
+float: right;
+margin-top: -6% !important;
+}
+.padding-bottom-twenty-five {
+    padding-bottom: 25px;
+}
+.text-align-center {
+    text-align: center;
+}
+.margin-left-twelve {
+    margin-left: 12px !important;
 }

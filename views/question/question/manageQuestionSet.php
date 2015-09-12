@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox manage-question-set-shadowbox">
     <?php
     $address = AppUtility::getHomeURL().'question/question';
 
@@ -323,8 +323,16 @@ $this->params['breadcrumbs'][] = $this->title;
         } else if ($isgrpadmin) {
             echo "<br/>(Delete and Transfer only apply to group's questions)\n";
         }
-        echo "<table id=myTable class=gb><thead>\n";
-        echo "<tr><th>&nbsp;</th><th>Description</th><th>&nbsp;</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
+        echo "<table class='width-hundread-per' id=myTable><thead>\n";
+        echo "<tr>
+                   <th>
+                   <div class='checkbox override-hidden'>
+                        <label>
+                            <input type='checkbox' name='' value=''>
+                                <span class='cr'><i class='cr-icon fa fa-check'></i></span>
+                        </label>
+                   </div></th>
+                   <th>Description</th><th>&nbsp;</th><th>&nbsp;</th><th>Action</th><th>Type</th><th>Times Used</th><th>Last Mod</th>";
         if ($isadmin || $isgrpadmin) { echo "<th>Owner</th>";} else {echo "<th>Mine</th>";}
         if ($searchall==1) {
             echo "<th>Library</th>";
@@ -341,12 +349,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 echo '<td></td>';
                 echo '<td colspan="8">';
                 echo '<b>'.$lnamesarr[$page_libstouse[$j]].'</b>';
-                echo '</td></tr>';
+                echo '</td><td></td></tr>';
             }
             for ($i=0;$i<count($page_libqids[$page_libstouse[$j]]); $i++) {
                 $qid =$page_libqids[$page_libstouse[$j]][$i];
                 if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
-                echo '<td>'.$page_questionTable[$qid]['checkbox'].'</td>';
+                    echo '<td class="text-align-center">'.$page_questionTable[$qid]['checkbox'].'</td>';
                 echo '<td>'.$page_questionTable[$qid]['desc'].'</td>';
                 echo '<td class="nowrap"><div';
                 if ($page_questionTable[$qid]['cap']) {echo ' class="ccvid"';}

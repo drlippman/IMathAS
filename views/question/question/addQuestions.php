@@ -419,7 +419,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <h3>Potential Questions</h3>
                 <div><h4>Choose assessments to take questions from</h4></div>
-                <table cellpadding=5 id=myTable class="question-table">
+                <table cellpadding=5 id=myTable class="floatleft question-table">
                     <thead >
                     <tr><th></th><th>Assessment</th><th>Summary</th></tr>
                     </thead>

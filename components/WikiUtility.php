@@ -1,9 +1,11 @@
 <?php
 namespace app\components;
+
 use app\models\Wiki;
 use app\models\WikiRevision;
 use Yii;
 use yii\base\Component;
+
 require_once("diff.php");
 require_once("JSON.php");
 require_once("../filter/filter.php");
@@ -85,7 +87,7 @@ class WikiUtility extends Component
             }
         }
         if ($overWriteBody == AppConstant::NUMERIC_ONE) {
-            $responseBody =  $body;
+            $responseBody = $body;
         } else {
             $out = array('o' => $text, 'h' => $revisionhistory, 'u' => $users);
             if (function_exists('json_encode')) {

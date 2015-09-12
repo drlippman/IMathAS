@@ -2590,8 +2590,7 @@ class QuestionController extends AppController
                         $page_libqids[$line['libid']][] = $line['id'];
                     }
                     $i = $line['id'];
-
-                    $page_questionTable[$i]['checkbox'] = "<input type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
+                    $page_questionTable[$i]['checkbox'] = "<input class='margin-left-twelve' type=checkbox name='nchecked[]' value='" . $line['id'] . "' id='qo$ln'>";
                     if ($line['userights']==AppConstant::NUMERIC_ZERO) {
                         $page_questionTable[$i]['desc'] = '<span class="red">'.filter($line['description']).'</span>';
                     } else if ($line['replaceby']>AppConstant::NUMERIC_ZERO || $line['junkflag']>AppConstant::NUMERIC_ZERO) {
@@ -2646,7 +2645,7 @@ class QuestionController extends AppController
                     } else {
                         $page_questionTable[$i]['mine'] = '';
                     }
-                    $page_questionTable[$i]['action'] = "<select onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
+                    $page_questionTable[$i]['action'] = "<select class='form-control-for-question' onchange=\"doaction(this.value,{$line['id']})\"><option value=\"0\">Action..</option>";
                     if ($isAdmin || ($isGrpAdmin && $line['groupid'] == $groupId) || $line['ownerid'] == $userId || ($line['userights'] == AppConstant::NUMERIC_THREE && $line['groupid'] == $groupId) || $line['userights'] > AppConstant::NUMERIC_THREE) {
                         $page_questionTable[$i]['action'] .= '<option value="mod">Modify Code</option>';
                     } else {
@@ -2684,6 +2683,7 @@ class QuestionController extends AppController
                 }
             }
         }
+        $this->includeCSS(['question/question.css']);
         $this->includeJS(['general.js','tablesorter.js','question/junkflag.js','question/libtree2.js']);
         $renderData = array('params' => $params,'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchlibs, 'curBreadcrumb' => $curBreadcrumb,
             'pagetitle' => $pagetitle, 'helpicon' => $helpicon, 'cid' => $cid, 'rlist' => $rlist, 'tlist' => $tlist, 'page_transferUserList' => $page_transferUserList,
