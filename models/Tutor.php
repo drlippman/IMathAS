@@ -67,4 +67,11 @@ class Tutor extends BaseImasTutors
         $data = $command->queryAll();
         return $data;
     }
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = Tutor::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 } 

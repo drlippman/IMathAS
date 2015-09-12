@@ -141,4 +141,17 @@ class Wiki extends BaseImasWikis
         $query = Wiki::find()->where(['courseid' => $courseId])->all();
         return $query;
     }
+
+    public static function getByCourseIdAll($courseId)
+    {
+        return Wiki::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteCourseId($courseId)
+    {
+        $wikiData = Wiki::find()->where(['courseid' => $courseId])->one();
+        if($wikiData){
+            $wikiData->delete();
+        }
+    }
 } 

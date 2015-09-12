@@ -80,4 +80,12 @@ class GbScheme extends BaseImasGbscheme
             $query->save();
         }
     }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = GbScheme::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

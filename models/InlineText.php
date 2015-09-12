@@ -139,5 +139,18 @@ class InlineText extends BaseImasInlinetext
         $data = $command->queryOne();
         return $data;
     }
+
+    public static function getByCourseIdAll($courseId)
+    {
+        return InlineText::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteCourseId($courseId)
+    {
+        $inlineData = InlineText::find()->where(['courseid' => $courseId])->one();
+        if($inlineData){
+            $inlineData->delete();
+        }
+    }
 }
 

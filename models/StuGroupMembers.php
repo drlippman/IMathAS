@@ -83,4 +83,12 @@ class StuGroupMembers extends BaseImasStugroupmembers{
             }
         }
     }
+
+    public static function deleteByStudGrpId($stugroupid)
+    {
+        $courseData = StuGroupMembers::findOne(['stugroupid',$stugroupid]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

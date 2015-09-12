@@ -117,4 +117,17 @@ class Stugroups extends BaseImasStugroups
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getByGrpSetId($groupsetId)
+    {
+        return Stugroups::find()->select('id')->where(['groupsetid' => $groupsetId])->all();
+    }
+
+    public static function deleteByStudGrpId($groupsetId)
+    {
+        $courseData = Stugroups::findOne(['groupsetid',$groupsetId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

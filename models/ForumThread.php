@@ -41,7 +41,6 @@ class ForumThread extends BaseImasForumThreads
         }
     }
 
-
     public static function findThreadCount($forumId)
     {
         $thread = ForumThread::findAll(['forumid' => $forumId]);
@@ -82,6 +81,14 @@ class ForumThread extends BaseImasForumThreads
                 $data->stugroupid = AppConstant::NUMERIC_ZERO;
                 $data->save();
             }
+        }
+    }
+
+    public static function deleteByForumId($forumId)
+    {
+        $entry = ForumThread::findOne(['forumid' => $forumId]);
+        if ($entry) {
+            $entry->delete();
         }
     }
 }

@@ -157,4 +157,29 @@ class LinkedText extends BaseImasLinkedtext
         $rowCount=$command->execute();
         return $rowCount;
     }
+
+    public static function getByTextAndId($courseId)
+    {
+        $query = new Query();
+        $query ->select(['text','points','id'])
+            ->from('imas_linkedtext')
+            ->where(['courseid' => $courseId]);
+        $query->andWhere(['LIKE','text','file:%']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getByIdForFile($safetext)
+    {
+        return LinkedText::find()->select('id')->where(['text' => $safetext])->all();
+    }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = LinkedText::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

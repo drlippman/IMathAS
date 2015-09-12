@@ -152,5 +152,12 @@ class GbCats extends BaseImasGbcats
         return $data;
     }
 
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = GbCats::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 
 }

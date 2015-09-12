@@ -93,4 +93,13 @@ class Exceptions extends BaseImasExceptions
             $exception->delete();
         }
     }
+
+    public static function deleteByAssessmentId($id)
+    {
+        $assessmentData = Exceptions::findOne(['assessmentid',$id]);
+        if($assessmentData){
+            $assessmentData->delete();
+        }
+    }
+
 }

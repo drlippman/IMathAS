@@ -42,7 +42,7 @@ class DiagOneTime extends BaseImasDiagOnetime
     public  static function deleteDiagOneTime($diag)
     {
         $diagOneTime = DiagOneTime::find()->where(['diag' => $diag])->all();
-       foreach($diagOneTime as $key => $single){
+        foreach($diagOneTime as $key => $single){
            $single->delete();
         }
     }

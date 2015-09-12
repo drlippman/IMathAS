@@ -72,4 +72,14 @@ class InstrFiles extends BaseImasInstrFiles
             return $inlineData->id;
         }
     }
-} 
+    public static function getByName($itemid)
+    {
+        return InstrFiles::find()->select('filename')->where(['itemid' => $itemid])->all();
+    }
+
+    public static function getIdName($safefn)
+    {
+        return InstrFiles::find()->select('id')->where(['filename' => $safefn])->all();
+    }
+
+}

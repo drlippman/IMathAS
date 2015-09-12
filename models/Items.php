@@ -86,4 +86,12 @@ class Items extends BaseImasItems
         $query->bindValue('item', $item);
         return $query->queryOne();
     }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = Items::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

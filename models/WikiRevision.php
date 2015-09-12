@@ -75,4 +75,12 @@ class WikiRevision extends BaseImasWikiRevisions
             }
         }
     }
+
+    public static function deleteByWikiRevisionId($itemId)
+    {
+        $instrFileData = WikiRevision::findOne(['wikiid' => $itemId]);
+        if($instrFileData){
+            $instrFileData->delete();
+        }
+    }
 }

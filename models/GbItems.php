@@ -186,4 +186,17 @@ class GbItems extends BaseImasGbitems
         $this->save();
         return $this->id;
     }
+
+    public static function getByCourseIdAll($courseId)
+    {
+        return Forums::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteByCId($courseId)
+    {
+        $courseData = GbItems::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

@@ -87,9 +87,19 @@ class StuGroupSet extends BaseImasStugroupset {
 
                 $dlt->delete();
             }
-
         }
-
     }
 
+    public static function getByCid($courseId)
+    {
+        return StuGroupSet::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = StuGroupSet::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

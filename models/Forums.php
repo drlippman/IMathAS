@@ -281,4 +281,17 @@ class Forums extends BaseImasForums {
         $query = Forums::find()->where(['courseid' => $courseId])->all();
         return $query;
     }
+
+    public static function getByCid($courseId)
+    {
+        return Forums::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = Forums::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

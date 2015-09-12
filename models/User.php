@@ -581,7 +581,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         {
             $user->delete();
         }
-
     }
     public static function updatePassword($md5pw,$id,$myRights,$groupid)
     {
@@ -661,6 +660,21 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
 
     public static function getUserGraterThenTeacherRights(){
         return User::find()->select('id, FirstName, LastName')->where(['>=','rights', AppConstant::TEACHER_RIGHT])->orderBy('LastName,FirstName')->all();
+    }
+    public static function getByUserIdASDiagnoId($params)
+    {
+
+        $query = new Query();
+        $query ->select(['imas_users.id', 'imas_users.groupid'])
+            ->from('imas_users')
+            ->join(	'JOIN',
+                'imas_diags',
+                'imas_users.id=imas_diags.ownerid'
+            )
+         ->andWhere(['imas_diags.id' => $params['id']]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;    
     }
 }
 

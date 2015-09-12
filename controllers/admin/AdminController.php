@@ -7,23 +7,42 @@ use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
 use app\models\_base\BaseImasDiags;
 use app\models\Assessments;
+use app\models\AssessmentSession;
+use app\models\CalItem;
+use app\models\ContentTrack;
 use app\models\Course;
 use app\models\DiagOneTime;
 use app\models\Diags;
 use app\models\ExternalTools;
 use app\models\Exceptions;
 use app\models\forms\ChangeRightsForm;
+use app\models\ForumPosts;
+use app\models\Forums;
+use app\models\ForumThread;
 use app\models\ForumView;
+use app\models\GbCats;
+use app\models\GbItems;
 use app\models\GbScheme;
 use app\models\Grades;
 use app\models\Groups;
+use app\models\InlineText;
+use app\models\InstrFiles;
+use app\models\Items;
 use app\models\Libraries;
 use app\models\LibraryItems;
+use app\models\LinkedText;
+use app\models\Questions;
 use app\models\QuestionSet;
 use app\models\Sessions;
 use app\models\Student;
+use app\models\StuGroupMembers;
 use app\models\Stugroups;
+use app\models\StuGroupSet;
 use app\models\Teacher;
+use app\models\Tutor;
+use app\models\Wiki;
+use app\models\WikiRevision;
+use app\models\WikiView;
 use Yii;
 use app\models\forms\AddNewUserForm;
 use app\components\AppUtility;
@@ -635,7 +654,7 @@ class AdminController extends AppController
         $this->layout = 'master';
         $enablebasiclti = true;
         $groupId= $currentUser['groupid'];
-         $action = $params['action'];
+        $action = $params['action'];
         switch($action) {
             case "delete":
                 $course = Course::getById($params['id']);
@@ -952,6 +971,157 @@ class AdminController extends AppController
             }
             break;
             case "delete":
+                $connection = $this->getDatabase();
+                $transaction = $connection->beginTransaction();
+                try{
+                if ($myRights < 40)
+                {
+                    echo "You don't have the authority for this action";
+                    break;
+                }
+                if (isset($CFG['GEN']['doSafeCourseDelete']) && $CFG['GEN']['doSafeCourseDelete']==true) {
+                    $oktodel = false;
+                    if ($myRights < 75) {
+                        $result = Course::getByIdandOwnerIdByAll($params['id'], $userId);
+                        if (count($result) > 0) {
+                            $oktodel = true;
+                        }
+                    } else if ($myRights == 75) {
+                        $result = Course::getCidAndUid($params, $groupid);
+                        if (count($result) > 0) {
+                            $oktodel = true;
+                        }
+                    } else if ($myRights == 100) {
+
+                        $oktodel = true;
+                    }
+                    if ($oktodel) {
+                        Course::setAvailable($params);
+                    }
+                } else {
+                    $affectedRowsData = Course::deleteByCourseId($params, $myRights, $userId);
+                    if ($myRights == 75)
+                    {
+                        $result = Course::getCidAndUid($params, $groupid);
+                        if (count($result) > AppConstant::NUMERIC_ZERO) {
+                           Course::deleteById($params);
+                        } else {
+                            break;
+                        }
+                    }
+                    if ($affectedRowsData == 0) { break;}
+
+                    $result = Assessments::getByAssId($params['id']);
+                    if($result){
+                    foreach($result as $key => $line){
+                         filehandler::deleteallaidfiles($line['id']);
+                         Questions::deleteByAssessmentId($line['id']);
+                         AssessmentSession::deleteByAssessmentId($line['id']);
+                         Exceptions::deleteByAssessmentId($line['id']);
+                    }
+                     Assessments::deleteByCourseId($params['id']);
+                    }
+                    /**
+                     * Forum
+                     */
+                    $result = Forums::getByCid($params['id']);
+                    if($result){
+                    foreach($result as $key => $row) {
+                        $r2 = ForumPosts::getByForumPostId($row['id']);
+                        foreach($r2 as $row1) {
+                            filehandler::deleteallpostfiles($row1['id']);
+                        }
+                         ForumView::deleteByForumId($row['id']);
+                         ForumPosts::deleteForumPost($row['id']);
+                         ForumThread::deleteByForumId($row['id']);
+                    }
+                     Forums::deleteByCourseId($params['id']);
+                    }
+                     /**
+                      * delete wiki
+                      */
+                    $r2 = Wiki::getByCourseIdAll($params['id']);
+                    if($r2){
+                    foreach($r2 as $key => $wid)
+                    {
+                           WikiRevision::deleteByWikiRevisionId($wid['id']);
+                           WikiView::deleteWikiId($wid['id']);
+                    }
+                     Wiki::deleteCourseId($params['id']);
+                    }
+
+                    /**
+                     * delete inline text files
+                     */
+                    $r3 = InlineText::getByCourseIdAll($params['id']);
+                    if($r3){
+                        foreach($r3 as $key => $ilid)
+                        {
+                            $result = InstrFiles::getByName($ilid['id']);
+                            $uploaddir = rtrim(dirname(__FILE__), '/\\') .'/../course/files/';
+                            foreach($result as $key1 => $row) {
+                                $safefn = $row['filename'];
+                                $r2 = InstrFiles::getIdName($safefn);
+                                if (count($r2) == 1) {
+                                    filehandler::deletecoursefile($row['filename']);
+                                }
+                            }
+                            InstrFiles::deleteByItemId($ilid['id']);
+                        }
+                        InlineText::deleteCourseId($params['id']);
+                    }
+                    /**
+                     * delete linked text files
+                     */
+                    $result = LinkedText::getByTextAndId($params['id']);
+                    foreach($result as $key => $row) {
+                        $safetext = $row['text'];
+                        $r2 = LinkedText::getByIdForFile($safetext);
+                        if (count($r2) == 1) {
+                            $filename = substr($row['text'],5);
+                            filehandler::deletecoursefile($filename);
+                        }
+                        if ($row['points'] > 0)
+                        {
+                            Grades::deleteById($row['id']);
+                        }
+                    }
+
+                   LinkedText::deleteByCourseId($params['id']);
+                   Items::deleteByCourseId($params['id']);
+                   Teacher::deleteByCourseId($params['id']);
+                   Student::deleteByCourseId($params['id']);
+                   Tutor::deleteByCourseId($params['id']);
+
+                    $result = GbItems::getByCourseIdAll($params['id']);
+                    foreach($result as $key => $row){
+                        Grades::deleteByGradeId($row['id']);
+                    }
+
+                    GbItems::deleteByCId($params['id']);
+                    GbScheme::deleteByCourseId($params['id']);
+                    GbCats::deleteByCourseId($params['id']);
+                    CalItem::deleteByCourseIdOne($params['id']);
+
+                    $result = StuGroupSet::getByCid($params['id']);
+                     foreach($result as $key => $row)
+                     {
+                       $r2 = Stugroups::getByGrpSetId($row['id']);
+                       foreach($r2 as $key1 => $row2)
+                       {
+                            StuGroupMembers::deleteByStudGrpId($row2['id']);
+                       }
+                       Stugroups::deleteByStudGrpId($row['id']);
+                    }
+                    StuGroupSet::deleteByCourseId($params['id']);
+                    ExternalTools::deleteByCourseId($params['id']);
+                    ContentTrack::deleteByCourseId($params['id']);
+                }
+                $transaction->commit();
+                }catch (Exception $e){
+                    $transaction->rollBack();
+                    return false;
+                }
                 break;
             case "remteacher":
                 exit;
@@ -1206,6 +1376,16 @@ class AdminController extends AppController
                 User::deleteUserById($params['id']);
                 break;
             case "removediag";
+                if ($myRights < 60)
+                {
+                    echo "You don't have the authority for this action";
+                    break;
+                }
+                $row = User::getByUserIdASDiagnoId($params);
+                if (($myRights < 75 && $row['id'] == $userId) || ($myRights == 75 && $row['groupid'] == $groupid) || $myRights == 100) {
+                     Diags::deleteDiagno($params);
+                     DiagOneTime::deleteDiagOneTime($params);
+                }
                 break;
         }
         session_write_close();

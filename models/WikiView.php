@@ -35,4 +35,13 @@ class WikiView extends BaseImasWikiViews
             }
         }
     }
+
+    public static function deleteWikiId($wid)
+    {
+        $query = WikiView::find()->where(['wikiid'=> $wid])->one();
+        if($query)
+        {
+            $query->delete();
+        }
+    }
 } 

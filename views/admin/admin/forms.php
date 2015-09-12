@@ -20,12 +20,9 @@ if (isset($params['cid'])) {
 <?php
 switch($action) {
     case "delete":
-        $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        $name = mysql_result($result,0,0);
         echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
         echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
-        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=delete&id={$_GET['id']}'\">\n";
+        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
         echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
         break;
     case "deladmin":
@@ -640,9 +637,9 @@ switch($action) {
         break;
     case "removediag":
         echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
-        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=removediag&id={$_GET['id']}'\">\n";
+        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\">\n";
         echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
         break;
 }
 ?>
-</div>
+     </div>

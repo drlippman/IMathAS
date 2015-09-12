@@ -191,4 +191,12 @@ class ExternalTools extends BaseImasExternalTools
         $groupNames  = \Yii::$app->db->createCommand($query)->queryAll();
         return $groupNames;
     }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = ExternalTools::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }

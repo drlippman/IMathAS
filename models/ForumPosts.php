@@ -275,4 +275,15 @@ class ForumPosts extends BaseImasForumPosts
         $query  = "SELECT id FROM imas_forum_posts WHERE forumid='$forumId' AND parent=0 AND userid='$userId' LIMIT 1";
         return Yii::$app->db->createCommand($query)->queryOne();
     }
+    public static function getByForumPostId($forumId)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+            ->from('imas_forum_posts ')
+            ->where(['forumid' => $forumId]);
+        $query->andWhere(['<>', 'files', '" "']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

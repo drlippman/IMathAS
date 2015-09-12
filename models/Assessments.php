@@ -503,4 +503,18 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getByAssId($courseId)
+    {
+        return Assessments::find()->select('id')->where(['courseid' => $courseId])->all();
+    }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $deleteId = Assessments::find()->where(['courseid' => $courseId])->one();
+        if($deleteId)
+        {
+            $deleteId->delete();
+        }
+    }
 }

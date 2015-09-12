@@ -199,5 +199,13 @@ class ForumView extends BaseImasForumViews
             $view->delete();
         }
     }
+
+    public static function deleteByForumId($forumId)
+    {
+        $query = "DELETE imas_forum_views FROM imas_forum_views JOIN ";
+        $query .= "imas_forum_threads ON imas_forum_views.threadid=imas_forum_threads.id ";
+        $query .= "WHERE imas_forum_threads.forumid='{$forumId}'";
+        Yii::$app->db->createCommand($query)->execute();
+    }
 }
 

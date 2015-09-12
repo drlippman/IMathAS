@@ -132,5 +132,16 @@ class Grades extends BaseImasGrades
             $grade->delete();
         }
     }
+
+    public static function deleteById($id)
+    {
+        $query = "DELETE FROM imas_grades WHERE gradetypeid={$id} AND gradetype='exttool'";
+        Yii::$app->db->createCommand($query)->execute();
+    }
+    public static function deleteByGradeId($id)
+    {
+        $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid={$id}";
+        Yii::$app->db->createCommand($query)->execute();
+    }
 }
 

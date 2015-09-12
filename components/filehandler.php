@@ -547,8 +547,8 @@ public static function deletecoursefile($file) {
 			return false;
 		}
 	} else {
-		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/course/files';
-		if (unlink($base."/$file")) {
+		$base = AppConstant::UPLOAD_DIRECTORY;
+		if (unlink($base."$file")) {
 			return true;
 		} else {
 			return false;

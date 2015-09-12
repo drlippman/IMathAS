@@ -85,6 +85,14 @@ class ContentTrack extends BaseImasContentTrack
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = ContentTrack::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }
 
 //$query = ;

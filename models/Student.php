@@ -498,5 +498,12 @@ class Student extends BaseImasStudents {
         return \Yii::$app->db->createCommand($query)->queryAll();
 
     }
+    public static function deleteByCourseId($courseId)
+    {
+        $courseData = Student::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
+    }
 }
 

@@ -87,19 +87,27 @@ class CalItem extends BaseImasCalitems
         $data = $query->queryAll();
 
     }
-    public static function getCalItemDetails($ctc)
+//    public static function getCalItemDetails($ctc)
+//    {
+//        $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+//
+//        $query  = new Query();
+//        $query->select(['id','date','tag','title'])
+//                ->from('imas_calitems')
+//                ->where(['courseid' => $ctc])
+//                ->orderBy(['date']);
+//        $command = $query->createCommand();
+//        $data = $command->queryAll();
+//        return $data;
+//
+//    }
+
+    public static function deleteByCourseIdOne($courseId)
     {
-        $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-
-        $query  = new Query();
-        $query->select(['id','date','tag','title'])
-                ->from('imas_calitems')
-                ->where(['courseid' => $ctc])
-                ->orderBy(['date']);
-        $command = $query->createCommand();
-        $data = $command->queryAll();
-        return $data;
-
+        $courseData = CalItem::findOne(['courseid',$courseId]);
+        if($courseData){
+            $courseData->delete();
+        }
     }
 
 }

@@ -496,8 +496,41 @@ class Course extends BaseImasCourses {
     public static function setOwnerIdByExecute($params)
     {
         $query = "UPDATE imas_courses SET ownerid='{$params['newowner']}' WHERE id='{$params['id']}'";
-        $data = Yii::$app->db->createCommand()->execute();
+        $data = Yii::$app->db->createCommand($query)->execute();
         return $data;
 
     }
+
+    public static function getByIdandOwnerIdByAll($id, $ownerId)
+    {
+        return static::findAll(['id' =>$id, 'ownerid' => $ownerId]);
+    }
+
+    public static function setAvailable($params)
+    {
+        $updateAvail = Course::find()->where(['id' => $params['id']])->one();
+        if($updateAvail){
+            $updateAvail->available = AppConstant::NUMERIC_FOUR;
+            $updateAvail->save();
+        }
+    }
+    public static function deleteByCourseId($params, $myRights, $userId)
+    {
+        $query = "DELETE FROM imas_courses WHERE id='{$params['id']}'";
+        if ($myRights < 75)
+        {
+            $query .= " AND ownerid='$userId'";
+        }
+       return Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function deleteById($params)
+    {
+        $deleteId = Course::find()->where(['id' => $params['id']])->one();
+        if($deleteId)
+        {
+            $deleteId->delete();
+        }
+    }
+
 }
