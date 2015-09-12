@@ -216,7 +216,7 @@ addLoadEvent(setupFormLimiters);
 
 var GB_loaded = false;
 //based on greybox redux, http://jquery.com/demo/grey/
-function GB_show(caption,url,width,height) {alert(url);
+function GB_show(caption,url,width,height) {
 	if (GB_loaded == false) {
 		var gb_overlay = document.createElement("div");
 		gb_overlay.id = "GB_overlay";

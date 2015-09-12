@@ -2735,4 +2735,9 @@ class AppUtility extends Component
         return $html;
     }
 
+    public static function writesessiondata($sessionData,$sessionId)
+    {
+            $enc = base64_encode(serialize($sessionData));
+            Sessions::setSessionId($sessionId,$enc);
+    }
 }

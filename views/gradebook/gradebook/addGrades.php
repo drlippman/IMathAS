@@ -185,10 +185,11 @@ if ($params['gbitem'] == 'new') {
                             <div class="col-md-12 padding-zero">
                                 <?php AssessmentUtility::writeHtmlSelect('rubric', $rubricsId, $rubricsLabel, 0, 'None', 0); ?>
                             </div>
+
                             <div class="col-md-12 padding-zero margin-top-ten">
-                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id) ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&id=new&from=addg&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Add new rubric')?></a> |
-                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid=' . $course->id) ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid=' . $course->id.'&from=addg&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Edit rubrics')?>
                                 </a>
                             </div>

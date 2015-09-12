@@ -17,7 +17,7 @@ if($defaultValuesArray['studentId'] > 0){
 //$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 //$this->params['breadcrumbs'][] = ['label' => 'Gradebook', 'url' => ['/gradebook/gradebook/gradebook?cid=' . $course->id]];
 
-$this->params['breadcrumbs'][] = $this->title;
+ $this->params['breadcrumbs'][] = $this->title;
    //show student view
 $gradebook = $totalData['gradebook'];
 $hidenc = $defaultValuesArray['hidenc'];
@@ -25,10 +25,15 @@ $cid = $defaultValuesArray['hidenc'];
 $gbmode =  ' ';
 $availshow= $defaultValuesArray['availshow'];
 $catfilter = $defaultValuesArray['catfilter'];
-//$canviewall = ' ';
+$showpics = $defaultValuesArray['showpics'];
+$hidelocked = $defaultValuesArray['hidelocked'];
+$totonleft = $defaultValuesArray['totonleft'];
+$avgontop = $defaultValuesArray['avgontop'];
+$links = $defaultValuesArray['links'];
 $urlmode =  'http://';
 $includeduedate = $defaultValuesArray['includeduedate'];
 $includelastchange = $defaultValuesArray['includelastchange'];
+$lastlogin = $defaultValuesArray['lastlogin'];
 $latepasshrs = $course['latepasshrs'];
 $isteacher = false;
 $canviewall = false;
@@ -41,9 +46,17 @@ $istutor = false;
 if($totalData['isTutor']){
     $istutor = true;
     $canviewall = true;
-}?>
+}
+?>
+<input type="hidden" id="course-id" value="<?php echo $course->id ?>">
+<input type="hidden" id="student-id" value="<?php echo $studentId ?>">
+<input type="hidden" id="totonleft" value="<?php echo $totonleft ?>">
+<input type="hidden" id="avgontop" value="<?php echo $avgontop?>">
+<input type="hidden" id="includelastchange" value="<?php echo $includelastchange?>">
+<input type="hidden" id="lastlogin" value="<?php echo $lastlogin?>">
+<input type="hidden" id="includeduedate" value="<?php echo $includeduedate?>">
 <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 </div>
 <div class = "title-container">
     <div class = "row">
@@ -53,11 +66,92 @@ if($totalData['isTutor']){
     </div>
 </div>
 <div class="item-detail-content">
-    <?php  echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'gradebook']);?>
+    <?php if($currentUser['rights'] > 10) {
+        echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+    } elseif($currentUser['rights'] == 10){
+        echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+    }?>
 </div>
-<?php if ($canviewall) { ?>
+
+<div class="tab-content shadowBox">
+    <div class="inner-content-gradebook">
+<div class="button-container col-lg-12 padding-zero">
+
+    <span class="inner-page-options col-lg-6 padding-zero pull-left">
+        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu with-selected">
+                    <li>
+                            <input type="hidden" id="student-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                        <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email">
+                                <i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
+                    </li>
+
+                    <li>
+                            <input type="hidden" id="message-id" name="student-data" value=""/>
+                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                        <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message">
+                             <i class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
+
+                    </li>
+
+                    <li>
+                        <form action="make-exception?cid=<?php echo $course->id ?>" id="make-exception-form"
+                              method="post">
+                            <input type="hidden" id="exception-id" name="student-data" value=""/>
+                            <input type="hidden" id="section-name" name="section-data" value=""/>
+                            <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$StudentData->userid.'&section-data='.$StudentData['section'])?>"><i
+                                    class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
+                            </a>
+                        </form>
+                    </li>
+
+                    <li>
+
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$StudentData->userid)?>"><i
+                                    class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Change Info'); ?></a>
+
+                    </li>
+
+
+                    <li>
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Login Log'); ?></a>
+
+
+                    </li>
+
+
+                    <li>
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Activity Log'); ?></a>
+
+                    </li>
+
+                    <li>
+                         <a href="#" onclick="makeofflineeditable(this); return false;">
+<!--                            <a class="with-selected-list" href="javascript: studentCopyEmail()">-->
+                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Edit Offline Score'); ?></a>
+
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+    </span>
+</div><br/>
+
+</div>
+
+
+<?php if ($canviewall) {  ?>
     <div class=cpmid>
-    <?php AppUtility::t('Save Changes')?>('Category'), ': <select id="filtersel" onchange="chgfilter()">';
+    <?php AppUtility::t('Category')?>
+        <select id="filtersel" onchange="chgfilter()">
     <option value="-1"
    <?php if ($catfilter==-1) {echo "selected=1";}
     echo '>', _('All'), '</option>';
@@ -66,9 +160,9 @@ if($totalData['isTutor']){
     echo '>',AppUtility::t('Default'), '</option>';
      foreach($gbCatsData as $gbCats){
 
-        echo '<option value="'.$gbCatsData[0].'"';
-        if ($catfilter==$gbCatsData[0]) {echo "selected=1";}
-        echo '>'.$gbCatsData[1].'</option>';
+        echo '<option value="'.$gbCats['id'].'"';
+        if ($catfilter==$gbCats['id']) {echo "selected=1";}
+        echo '>'.$gbCats['name'].'</option>';
     }
     echo '<option value="-2" ';
     if ($catfilter==-2) {echo "selected=1";}
@@ -101,7 +195,7 @@ if ($studentId>0) {
     $showlatepass = $course['showlatepass'];
   $latepasshrs = $course['latepasshrs'];
 }
-
+//AppUtility::dump($totalData);
 if ($studentId>0) {
 
 echo '<div style="font-size:1.1em;font-weight:bold">';
@@ -191,7 +285,7 @@ if ($isteacher) { ?>
 //TODO i18n
 if ($showlatepass==1) {
 if ($latepasses==0) { $latepasses = 'No';}
-if ($isteacher || $istutor) {echo ']<br/>';}
+if ($isteacher || $istutor) {echo '<br/>';}
 $lpmsg = "$latepasses LatePass".($latepasses!=1?"es":"").' available';
 }
 if (!$isteacher && !$istutor) {
@@ -200,12 +294,9 @@ echo $lpmsg;
 
 }
 ?>
-<!-- <form method=\"post\" id=\"qform\" action=\"gradebook.php?{$_SERVER['QUERY_STRING']}&uid=$studentId\">-->
  <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
  <?php if ($isteacher && $studentId>0) {
-     ?>
-    <button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button>
-     <?php
+     echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
     echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
@@ -243,13 +334,18 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
             }
             echo '</thead><tbody>';
         if ($catfilter>-2) {
-        for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
+
+for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
+
         if (!$isteacher && !$istutor && $gradebook[0][1][$i][4]==0) { //skip if hidden
-        continue;
+
+            continue;
         }
         if ($hidenc==1 && $gradebook[0][1][$i][4]==0) { //skip NC
+
         continue;
         } else if ($hidenc==2 && ($gradebook[0][1][$i][4]==0 || $gradebook[0][1][$i][4]==3)) {//skip all NC
+
         continue;
         }
         if ($gradebook[0][1][$i][3]>$availshow) {
@@ -286,10 +382,11 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
 
                 echo '</td>';
             echo '<td>';
-
                 if ($gradebook[0][1][$i][4]==0 || $gradebook[0][1][$i][4]==3) {
-                echo $gradebook[0][1][$i][2].'&nbsp;',AppUtility::t('pts'), ' ',AppUtility::t('(Not Counted)');
+
+                    echo $gradebook[0][1][$i][2].'&nbsp;',AppUtility::t('pts'), ' ',AppUtility::t('(Not Counted)');
                 } else {
+
                 echo $gradebook[0][1][$i][2].'&nbsp;',AppUtility::t('pts');
                 if ($gradebook[0][1][$i][4]==2) {
                 echo ' (EC)';
@@ -312,14 +409,14 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
                     }
                     } else {
                     if (isset($gradebook[1][1][$i][0])) { //has score
-                    echo "<a href=\"gb-viewasid.php?stu=$studentId&cid=$cid&asid={$gradebook[1][1][$i][4]}&uid={$gradebook[1][4][0]}\"";
+                    echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$cid&asid={$gradebook[1][1][$i][4]}&uid={$gradebook[1][4][0]}\"";
                              if ($afterduelatepass) {
                              echo ' onclick="return confirm(\''._('If you view this assignment, you will not be able to use a LatePass on it').'\');"';
                     }
                     echo ">";
                     $haslink = true;
                     } else if ($isteacher) {
-                    echo "<a href=\"gb-viewasid.php?stu=$studentId&cid=$cid&asid=new&aid={$gradebook[0][1][$i][7]}&uid={$gradebook[1][4][0]}\">";
+                    echo "<a href=\"gradebook-view-assessment-details?stu=$studentId&cid=$cid&asid=new&aid={$gradebook[0][1][$i][7]}&uid={$gradebook[1][4][0]}\">";
                         $haslink = true;
                         }
                         }
@@ -331,7 +428,7 @@ Item pointer" onclick="return showhideallfb(this);">', AppUtility::t('Show Feedb
                             $haslink = true;
                             }
                             } else { ?>
-                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/manage-add-grades?stu='.$studentId.'&cid='.$cid.'&grades='.$gradebook[1][4][0].'&gbitem='.$gradebook[0][1][$i][7])?> ">
+                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$studentId.'&cid='.$cid.'&grades='.$gradebook[1][4][0].'&gbitem='.$gradebook[0][1][$i][7])?> ">
                             <?php    $haslink = true;
                                 }
                                 }
@@ -591,7 +688,7 @@ echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
 }
 */
 echo "<p>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
-?>
+                            echo '</div>';?>
  <script type="text/javascript">
     function showhidefb(el,n) {
         el.style.display="none";
@@ -612,9 +709,74 @@ echo "<p>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions),
                 els[i].style.display="inline";
             }
         }
-
     }
 
- </script>
+    function chgfilter() {
+        var cat = document.getElementById("filtersel").value;
+        var studentId = $("#student-id").val();
+        var courseId = $("#course-id").val();
+        window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+studentId+"&catfilter=" + cat;
+    }
 
+     function chgtoggle() {
 
+         var totonleft = $("#totonleft").val();
+         var avgontop = $("#avgontop").val();
+         var studentId = $("#student-id").val();
+         var courseId = $("#course-id").val();
+         var includelastchange = $("#includelastchange").val();
+         var lastlogin = $("#lastlogin").val();
+         var includeduedate = $("#includeduedate").val();
+         var altgbmode = 10000 * document.getElementById("toggle4").value + 1000 * parseInt(totonleft) + parseInt(avgontop) + 100 * (document.getElementById("toggle1").value * 1 + document.getElementById("toggle5").value * 1) + 10 * document.getElementById("toggle2").value + 1 * document.getElementById("toggle3").value;
+         if (includelastchange) {
+             altgbmode += 40;
+         }
+         if (lastlogin) {
+             altgbmode += 4000;
+         }
+         if (includeduedate) {
+             altgbmode += 400;
+         }
+         window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+studentId+"&gbmode="+altgbmode;
+     }
+     function chgstu(el)
+     {
+//         $('#updatingicon').show();
+         var courseId = $("#course-id").val();
+         window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+el.value;
+
+     }
+    function makeofflineeditable(el) {
+        var anchors = document.getElementsByTagName("a");
+        for (var i=0;i<anchors.length;i++) {
+            if (bits=anchors[i].href.match(/add-grades.*gbitem=(\d+)/)) {
+                if (anchors[i].innerHTML.match("-")) {
+                    type = "newscore";
+                } else {
+                    type = "score";
+                }
+                anchors[i].style.display = "none";
+                var newinp = document.createElement("input");
+                newinp.size = 4;
+                if (type=="newscore") {
+                    newinp.name = "newscore["+bits[1]+"]";
+
+                } else {
+                    newinp.name = "score["+bits[1]+"]";
+                    newinp.value = anchors[i].innerHTML;
+
+                }
+                anchors[i].parentNode.appendChild(newinp);
+                var newtxta = document.createElement("textarea");
+                newtxta.name = "feedback["+bits[1]+"]";
+                newtxta.cols = 50;
+                var feedbtd = anchors[i].parentNode.nextSibling.nextSibling.nextSibling;
+                newtxta.value = feedbtd.innerHTML;
+                feedbtd.innerHTML = "";
+                feedbtd.appendChild(newtxta);
+            }
+        }
+        document.getElementById("savechgbtn").style.display = "";
+        el.onclick = null;
+    }
+  </script>

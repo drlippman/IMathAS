@@ -101,8 +101,14 @@ class Diags extends BaseImasDiags
     public static function deleteDiagno($params)
     {
         $deleteId = Diags::find()->where(['id' => $params['id']])->one();
-        if($deleteId){
+        if ($deleteId)
+        {
             $deleteId->delete();
         }
+    }
+
+    public  static  function findByCourseID($courseId)
+    {
+        return Diags::find()->where(['cid' => $courseId])->one();
     }
 }

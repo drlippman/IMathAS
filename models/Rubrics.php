@@ -52,7 +52,7 @@ class Rubrics extends BaseImasRubrics
     public static function getById($id)
     {
         $query = new Query();
-        $query ->select(['name','rubrictype','rubric'])
+        $query ->select(['name','rubrictype','rubric','groupid'])
                 ->from('imas_rubrics')
                 ->where(['id' => $id]);
         $command = $query->createCommand();
@@ -66,21 +66,14 @@ class Rubrics extends BaseImasRubrics
         return $rubricsData;
     }
 
-    public static function updateRubrics($params, $currentUserId, $rubricTextDataArray,$rubricId)
+    public static function updateRubrics($params,$rubgrp,$rubricstring, $rubricId)
     {
-        $rubricsData = Rubrics::find()->where(['ownerid' => $currentUserId])->Andwhere(['id' => $rubricId])->one();
-        $ShareWithGroup = -1;
-        if(isset($params['ShareWithGroup'])){
-            $ShareWithGroup = 0;
-        }
-        $rubricsData ->groupid = $ShareWithGroup;
-        if($params['AddRubricForm']['Name']){
-            $rubricsData ->name =  $params['AddRubricForm']['Name'];
-        }else{
-            $rubricsData ->name ='null';
-        }
+
+        $rubricsData = Rubrics::find()->where(['id' => $rubricId])->one();
+        $rubricsData ->name = $params['rubname'];
         $rubricsData ->rubrictype = $params['rubtype'];
-        $rubricsData ->rubric = $rubricTextDataArray;
+        $rubricsData ->groupid = $rubgrp;
+        $rubricsData ->rubric = $rubricstring;
         $rubricsData ->save();
     }
 
@@ -88,5 +81,20 @@ class Rubrics extends BaseImasRubrics
         $rubricsData = Rubrics::find()->where('ownerid = :ownerid',[':ownerid' => $userId])
             ->orWhere( 'groupid = :groupid',[':groupid' => $groupId])->orderBy('name')->all();
         return $rubricsData;
+    }
+
+    public function insertInToRubric($currentUserId,$params,$rubgrp,$rubricstring)
+    {
+        $this->ownerid = $currentUserId;
+        $this->name = $params['rubname'];
+        $this->rubrictype = $params['rubtype'];
+        $this->groupid = $rubgrp;
+        $this->rubric = $rubricstring;
+        $this->save();
+    }
+
+    public static function getByOwnerId($userId,$groupId)
+    {
+        return Rubrics::find()->select('id,name')->where(['ownerid' => $userId])->orWhere(['groupid' => $groupId])->orderBy('name')->all();
     }
 }

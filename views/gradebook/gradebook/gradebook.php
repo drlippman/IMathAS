@@ -44,7 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="inner-content-gradebook">
 <div class="button-container col-lg-12 padding-zero">
 
-    <span class="col-lg-6 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a></span>
+    <span class="col-lg-6 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a>
+   <?php
+    if ($data['isDiagnostic']) { ?>
+     &nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a>
+   <?php } ?>
+        </span>
     <span class="inner-page-options col-lg-6 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
@@ -146,7 +151,6 @@ echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
 
 
 <div class="gradebook-div">
-
     <table id="gradebook-table" class="gradebook-table table table-bordered table-striped table-hover data-table">
         <thead>
         <?php

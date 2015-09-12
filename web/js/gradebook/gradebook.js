@@ -22,11 +22,11 @@ function fetchDataSuccess(response){
     var result = JSON.parse(response);
     GradebookData = result.data.gradebook;
 }
-function chgtoggle(){
-    showPics = $('#toggle4').val();
-    $('.gradebook-table').remove();
-    displayGradebook();
-}
+//function chgtoggle(){
+//    showPics = $('#toggle4').val();
+//    $('.gradebook-table').remove();
+//    displayGradebook();
+//}
 function selectCheckBox() {
     $('.check-all').click(function () {
         $('.gradebook-table-body input:checkbox').each(function () {
