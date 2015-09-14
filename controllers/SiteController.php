@@ -113,6 +113,7 @@ class SiteController extends AppController
         $diagId = $this->getParamVal('id');
         $params = $this->getRequestParams();
         $imasroot = AppUtility::getHomeURL();
+        $installname = AppUtility::getHomeURL();
         session_start();
         $sessionid = session_id();
 
@@ -370,7 +371,8 @@ class SiteController extends AppController
 
             return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
         }
-        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot);
+        $this->includeJS(['jstz_min.js']);
+        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname);
         return $this->renderWithData('diagnostics', $responseData);
     }
 

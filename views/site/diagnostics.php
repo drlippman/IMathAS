@@ -12,7 +12,7 @@ if (!isset($params['id']))
     $nologo = true;
     $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
     $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
-    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/jstz_min.js\" ></script>";
+    $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/jstz_min.js\" ></script>";
     $pagetitle = "Diagnostics";
 //    require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
     echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\"/>
@@ -34,6 +34,17 @@ if (!isset($params['id']))
 echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
 exit;
 } ?>
+
+<?php if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
+//require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
+} else {
+$nologo = true;
+$infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
+$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/jstz_min.js\" ></script>";
+$pagetitle =$line['name'];
+//require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
+?>
 
 <div class="tab-content shadowBox non-nav-tab-item">
     <br>
@@ -118,4 +129,30 @@ exit;
     }
     ?>
 </form>
+<div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
 </div>
+<script type="text/javascript">
+    function determinesetup() {
+        document.getElementById("submit").style.display = "block";
+        if (MathJaxCompatible && !ASnoSVG) {
+            document.getElementById("bsetup").innerHTML = "Browser setup OK";
+        } else {
+            document.getElementById("bsetup").innerHTML = "Using image-based display";
+        }
+        if (MathJaxCompatible) {
+            document.getElementById("mathdisp").value = "1";
+        }
+        if (!ASnoSVG) {
+            document.getElementById("graphdisp").value = "1";
+        }
+    }
+    var existingonload = window.onload;
+    if (existingonload) {
+        window.onload = function() {existingonload(); determinesetup();}
+    } else {
+        window.onload = determinesetup;
+    }
+</script>
+<?php
+}
+?>
