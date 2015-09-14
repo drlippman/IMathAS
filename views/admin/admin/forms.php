@@ -8,6 +8,10 @@ if (isset($params['cid'])) {
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
 </div>
+<?php } else { ?>
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+</div>
 <?php } ?>
 <div class="title-container">
     <div class="row">
@@ -19,6 +23,22 @@ if (isset($params['cid'])) {
     <div class="tab-content shadowBox non-nav-tab-item ">
 <?php
 switch($action) {
+    case "addnewcourse":
+        echo '<br>';
+        echo '<div class="col-lg-10"><h2>Your course has been created!</h2></div>';
+        echo '<div class="col-lg-10">For students to enroll in this course, you will need to provide them two things</div><ol>';
+        echo '<div class=col-lg-10><li>The course ID: <b>'.$cid.'</b></li></div>';
+        if (trim($params['ekey'])=='') {
+            echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
+            echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
+            echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
+        } else {
+            echo '<div class=col-lg-10><li>The enrollment key: <b>'.$params['ekey'].'</b></li></div>';
+        }
+        echo '</ol></p><BR class=form><br>';
+        echo '<div class="col-lg-10">If you forget these later, you can find them by viewing your course settings.</div><BR class=form><br>';
+        echo '<div class=col-lg-10><a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a></div>';
+    break;
     case "delete":
         echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
         echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
@@ -61,7 +81,7 @@ switch($action) {
             $oldrights = $line['rights'];
 
         }
-        echo "<BR><span class=form><img src=\"$imasroot/img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
+        echo "<BR><span class=form><img src=\"".AppUtility::getHomeURL()."img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
         echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
         if ($oldrights == 5) {echo "CHECKED";}
         echo "> Guest User <BR>\n";
@@ -110,6 +130,7 @@ switch($action) {
         break;
     case "modify":
     case "addcourse":
+
         if (isset($params['cid'])) {
             $cid = $params['cid'];
 //            echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
@@ -327,7 +348,7 @@ switch($action) {
             echo '<button class="margin-left-ten" type="button" onclick="document.getElementById(\'ltiurl\').style.display=\'\';this.parentNode.removeChild(this);">'._('Show LTI key and URL').'</button>';
             echo '<span id="ltiurl" style="display:none;">';
             if (isset($params['cid'])) {
-                echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].$imasroot.'/bltilaunch.php<br/>';
+                echo '<br/>URL: '.$urlmode.$_SERVER['HTTP_HOST'].AppUtility::getHomeURL().'bltilaunch.php<br/>';
                 echo 'Key: placein_'.$params['cid'].'_0 (to allow students to login directly to '.$installname.') or<br/>';
                 echo 'Key: placein_'.$params['cid'].'_1 (to only allow access through the LMS )';
             } else {
@@ -398,7 +419,7 @@ switch($action) {
             echo '<script type="text/javascript"> function templatepreviewupdate(el) {';
             echo '  var outel = document.getElementById("templatepreview");';
             echo '  if (el.value>0) {';
-            echo '  outel.innerHTML = "<a href=\"'.$imasroot.'/course/course.php?cid="+el.value+"\" target=\"preview\">Preview</a>";';
+            echo '  outel.innerHTML = "<a href=\"'.AppUtility::getHomeURL().'course/course.php?cid="+el.value+"\" target=\"preview\">Preview</a>";';
             echo '  } else {outel.innerHTML = "";}';
             echo '}</script>';
         } ?>
@@ -638,7 +659,7 @@ switch($action) {
     case "removediag":
         echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
         echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></p>\n";
         break;
 }
 ?>
