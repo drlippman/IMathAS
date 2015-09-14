@@ -4017,7 +4017,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					if ($anssm!=$ganssm || $ansem!=$gansem) {
 						continue;
 					}
-					if (strpos($anssn,'oo')!==false) {
+					if (strpos($anssn,'oo')!==false || !is_numeric($ganssn)) {
 						$anssn = trim($anssn);
 						if (($anssn=='oo' || $anssn=='+oo') && ($ganssn=='oo' || $ganssn=='+oo')) {
 							
@@ -4032,7 +4032,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					} else {
 						if (abs($anssn - $ganssn)/(abs($anssn)+.0001) < $reltolerance+ 1E-12) {} else {continue;}
 					}
-					if (strpos($ansen,'oo')!==false) {
+					if (strpos($ansen,'oo')!==false || !is_numeric($gansen)) {
 						$ansen = trim($ansen);
 						if (($ansen=='oo' || $ansen=='+oo') && ($gansen=='oo' || $gansen=='+oo')) {
 							
