@@ -2131,6 +2131,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
+				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['background'][$qn])) { $backg = $options['background'][$qn];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
@@ -2548,7 +2549,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 						$out .= " <br/><img id=\"img$qn\" style=\"display:none;max-width:80%;\" src=\"$url\" />";
 					} else if (in_array(strtolower($extension),array('doc','docx','pdf','xls','xlsx','ppt','pptx'))) {
 						$out .= " <span class=\"clickable\" id=\"filetog$qn\" onclick=\"toggleinlinebtn('fileprev$qn','filetog$qn');\">[+]</span>";
-						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" src=\"http://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
+						$out .= " <br/><iframe id=\"fileprev$qn\" style=\"display:none;\" src=\"https://docs.google.com/viewer?url=".urlencode($url)."&embedded=true\" width=\"80%\" height=\"600px\"></iframe>";
 					}
 					
 				}
@@ -4068,6 +4069,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) {
 			if (isset($options['grid'][$qn])) { $grid = $options['grid'][$qn];}
 			if (isset($options['snaptogrid'][$qn])) { $snaptogrid = $options['snaptogrid'][$qn];}
+				else if (isset($options['snaptogrid'])) { $snaptogrid = $options['snaptogrid'];}
 			if (isset($options['answers'][$qn])) {$answers = $options['answers'][$qn];}
 				else if (isset($options['answer'][$qn])) {$answers = $options['answer'][$qn];} 
 			if (isset($options['partweights'][$qn])) {$partweights = $options['partweights'][$qn];}

@@ -21,7 +21,7 @@ if (strpos($url,'youtube.com/watch')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
 		$timestart .= '&'.$m[0];
 	} else if (strpos($url,'t=')!==false) {
-		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+		preg_match('/\Wt=((\d+)m)?((\d+)s)?/',$url,$m);
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	}
 	
@@ -47,7 +47,7 @@ if (strpos($url,'youtu.be/')!==false) {
 		preg_match('/start=(\d+)/',$url,$m);
 		$timestart .= '&'.$m[0];
 	} else if (strpos($url,'t=')!==false) {
-		preg_match('/t=((\d+)m)?((\d+)s)?/',$url,$m);
+		preg_match('/\Wt=((\d+)m)?((\d+)s)?/',$url,$m);
 		$timestart .= '&start='.((empty($m[2])?0:$m[2]*60) + (empty($m[4])?0:$m[4]*1));	
 	}
 	
