@@ -1,11 +1,25 @@
 <?php
 use \app\components\AppUtility;
+$this->title = 'Diagnostic Setup';
+//$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+</div>
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
 <?php 	if (isset($_GET['step']) && $_GET['step']==2) {  //STEP 2 DISPLAY
 ?>
-<div id="headerdiagsetup" class="pagetitle"><h2>Diagnostic Setup</h2></div>
-<h4>Second-level Selector - extra information</h4>
-<form method=post action="diagnostics?step=3">
+
+<div class="col-lg-10"><h4>Second-level Selector - extra information</h4></div><BR class=form><br>
+<form method=post action="diagnostics?step=3"><BR class=form>
 
 <input type=hidden name="sel1list" value="<?php echo $sel1list ?>"/>
 <input type=hidden name="iplist" value="<?php echo $iplist ?>"/>
@@ -19,12 +33,13 @@ use \app\components\AppUtility;
 <input type=hidden name="public" value="<?php echo $public ?>"/>
 <input type=hidden name="reentrytime" value="<?php echo $params['reentrytime'] ?>"/>
 <input type=hidden name="id" value="<?php echo $page_updateId ?>" >
-<p>Second-level selector name:
-    <input type=text name=sel2name value="<?php echo $sel2name ?>"/>
-    'Select your ______'</p>
-<p>For each of the first-level selectors, select which assessment should be delivered,
-    and provide options for the second-level selector</p>
-<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
+<div class="col-lg-2">Second-level selector name</div>
+<div class="col-lg-6"><input type=text name=sel2name value="<?php echo $sel2name ?>"/>
+    'Select your ______'</div><BR class=form><br>
+<div class="col-lg-10">For each of the first-level selectors, select which assessment should be delivered,
+    and provide options for the second-level selector</div><BR class=form><br>
+<div class="col-lg-2">Alphabetize selectors on submit?</div>
+<div class="col-lg-6"><input type="checkbox" name="alpha" value="1" /></div><BR class=form><br>
 <?php
 foreach($sel1 as $k=>$s1) {
     ?>
@@ -77,67 +92,70 @@ foreach($sel1 as $k=>$s1) {
     </div>
 
 <?php
-}
+} ?>
 
-echo '<input type=submit value="Continue">';
+<div class="col-lg-2"> <?php echo '<input type=submit value="Continue"></div>';
 echo '<form>';
 
 } elseif (isset($_GET['step']) && $_GET['step']==3) {  //STEP 3 DISPLAY
     echo $page_successMsg;
     echo $page_diagLink;
     echo $page_publicLink;
-    echo "<a href=".AppUtility::getURLFromHome('admin', 'admin/index').">Return to Admin Page</a>\n";
+    echo "<div class=col-lg-10><a href=".AppUtility::getURLFromHome('admin', 'admin/index').">Return to Admin Page</a></div>\n";
 } else {
 //STEP 1 DISPLAY
 ?>
-<form method=post action=diagnostics?step=2>
+<form method=post action=diagnostics?step=2><BR class=form>
 
 <?php echo (isset($params['id'])) ? "	<input type=hidden name=id value=\"{$params['id']}\"/>" : ""; ?>
 
-	<p>Diagnostic Name:
-        <input type=text size=50 name="diagname" value="<?php echo $diagname; ?>"/></p>
+	<div class="col-lg-2">Diagnostic Name</div>
+    <div class="col-lg-8"><input type=text size=50 name="diagname" value="<?php echo $diagname; ?>"/></div><BR class=form><br>
 
-	<p>Term designator (e.g. F06):  <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>>Use Month
+	<div class="col-lg-2">Term designator (e.g. F06)</div>
+    <div class="col-lg-6">
+        <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>>Use Month
         <input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>>Use Day
-        <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/></p>
-
-	<p>Linked with course:
-        <?php
+        <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/>
+    </div><BR class=form><br>
+	<div class="col-lg-2">Linked with course</div>
+      <div class="col-lg-4">  <?php
         AppUtility::writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>
-    </p>
+      </div>
+<BR class=form><br>
 
-	<p>Available? (Can be taken)?
-        <input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked(1,($public&1),0); ?> /> Yes
+	<div class="col-lg-2">Available? (Can be taken)?</div>
+        <div class="col-lg-6"><input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked(1,($public&1),0); ?> /> Yes
         <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked(1,($public&1),1); ?> /> No
-    </p>
-	<p>Include in public listing?
-        <input type=radio name="public" value="1" <?php AppUtility::writeHtmlChecked(2,($public&2),0); ?> /> Yes
+    </div><BR class=form><br>
+	<div class="col-lg-2">Include in public listing?</div>
+      <div class="col-lg-6">  <input type=radio name="public" value="1" <?php AppUtility::writeHtmlChecked(2,($public&2),0); ?> /> Yes
         <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /> No
-    </p>
-	<p>Allow reentry (continuation of test at later date)?
-        <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /> No
+      </div><BR class=form><br>
+	<div class="col-lg-2">Allow reentry (continuation of test at later date)?</div>
+       <div class="col-lg-6"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /> No
 
         <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> Yes, within
         <input type="text" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)
-    </p>
+    </div><BR class=form><br>
 
-	<p>Unique ID prompt: <input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></p>
+	<div class="col-lg-2">Unique ID prompt</div><div class="col-lg-6"><input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></div><BR class=form><br>
 
-	<p>Attach first level selector to ID: <input type="checkbox" name="entrynotunique" value="1" <?php AppUtility::writeHtmlChecked($entrynotunique,true); ?> /></p>
+	<div class="col-lg-2">Attach first level selector to ID</div><div class="col-lg-6"><input type="checkbox" name="entrynotunique" value="1" <?php AppUtility::writeHtmlChecked($entrynotunique,true); ?> /></div><BR class=form><br>
 
-	<p>ID entry format:
-        <?php
+	<div class="col-lg-2">ID entry format</div>
+    <div class="col-lg-6">   <?php
         AppUtility::writeHtmlSelect("entrytype",$page_entryType['val'],$page_entryType['label'],$page_entryTypeSelected);
         ?>
-    </p>
-	<p>ID entry number of characters?:
-        <?php
+    </div><BR class=form><br>
+	<div class="col-lg-2">ID entry number of characters?</div>
+    <div class="col-lg-6">    <?php
         AppUtility::writeHtmlSelect("entrydig",$page_entryNums['val'],$page_entryNums['label'],$page_entryNumsSelected);
         ?>
-    </p>
-	<p>
-        Allow access without password from computer with these IP addresses.  Use * for wildcard, e.g. 134.39.*<br/>
-        Enter IP address: <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
+    </div><BR class=form><br>
+	<div class="col-lg-10">
+        Allow access without password from computer with these IP addresses.  Use * for wildcard, e.g. 134.39.*</div><br/>
+        <div class="col-lg-2">Enter IP address</div><div class="col-lg-6"> <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additem('ipin','ipout')"/>
 
 	<table>
@@ -171,12 +189,11 @@ echo '<form>';
             echo "<script> cnt['ipout'] = 0;</script>";
         }
 	?>
-	</p>
+	</div><BR class=form><br>
 
-
-	<p>From other computers, a password will be required to access the diagnostic.<br/>
-        Enter Password:
-        <input type=text id="pwin"  onkeypress="return onenter(event,'pwin','pwout')">
+	<div class="col-lg-10">From other computers, a password will be required to access the diagnostic.</div><br/>
+     <div class="col-lg-2">   Enter Password</div>
+     <div class="col-lg-6">   <input type=text id="pwin"  onkeypress="return onenter(event,'pwin','pwout')">
         <input type=button value="Add" onclick="additem('pwin','pwout')"/>
 
 	<table>
@@ -212,10 +229,10 @@ echo '<form>';
             echo "	<script> cnt['pwout'] = 0;</script>";
         }
 ?>
-	</p>
-	<p>Super passwords will override testing window limits.<br/>
-        Enter Password:
-        <input type=text id="pwsin"  onkeypress="return onenter(event,'pwsin','pwsout')">
+	</div><BR class=form><br>
+	<div class="col-lg-10">Super passwords will override testing window limits.</div><br/>
+    <div class="col-lg-2">Enter Password</div>
+     <div class="col-lg-6">   <input type=text id="pwsin"  onkeypress="return onenter(event,'pwsin','pwsout')">
         <input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
 
 	<table>
@@ -251,13 +268,13 @@ echo '<form>';
             echo "	<script> cnt['pwsout'] = 0;</script>";
         }
 ?>
-	</p>
+	</div><BR class=form><br>
 
-	<h4>First-level selector - selects assessment to be delivered</h4>
-	<p>Selector name:  <input name="sel" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</p>
-	<p>Alphabetize selectors on submit? <input type="checkbox" name="alpha" value="1" /></p>
-	<p>Enter new selector option:
-        <input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')">
+	<div class="col-lg-10"><h4>First-level selector - selects assessment to be delivered</h4></div><BR class=form><br>
+	<div class="col-lg-2">Selector name</div> <div class="col-lg-6"> <input name="sel" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</div><BR class=form><br>
+	<div class="col-lg-2">Alphabetize selectors on submit?</div> <div class="col-lg-6"><input type="checkbox" name="alpha" value="1" /></div><BR class=form><br>
+	<div class="col-lg-2">Enter new selector option:</div>
+    <div class="col-lg-6">    <input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')">
         <input type=button value="Add" onclick="additem('sellist','selout')"/>
 
 
@@ -293,10 +310,11 @@ echo '<form>';
             echo "<script> cnt['selout'] = 0;</script>";
         }
 ?>
-	</p>
+	</div><BR class=form><br>
 
-	<p><input type=submit value="Continue Setup"/></p>
+	<div class="col-lg-2"><input type=submit value="Continue Setup"/></div><BR class=form><br>
 	</form>
 <?php
 }
 ?>
+    </div>

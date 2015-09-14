@@ -295,6 +295,7 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $userId = $user->id;
         $userName = $user->SID;
         $myRights = $user['rights'];
@@ -425,10 +426,10 @@ class AdminController extends AppController
             } else {
                 $query = new Diags();
                 $id = $query->saveDiagnostic($params, $userId);
-                $page_successMsg = "<p>Diagnostic Added</p>\n";
+                $page_successMsg = "<BR class=form><div class='col-lg-2'>Diagnostic Added</div><BR class=form><br>\n";
             }
-            $page_diagLink = "<p>Direct link to diagnostic:  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></p>";
-            $page_publicLink = ($_POST['public']&2) ? "<p>Diagnostic is listed on the public listing at: <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></p>\n" : ""  ;
+            $page_diagLink = "<div class=col-lg-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
+            $page_publicLink = ($_POST['public']&2) ? "<div class=col-lg-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
 
         } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
             if (isset($params['id'])) {
