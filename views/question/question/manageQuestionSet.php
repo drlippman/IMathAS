@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
     <script type="text/javascript">
         function previewq(formn,loc,qn) {
-            var addr = '<?php AppUtility::getHomeURL() ?>question/question/test-question?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
+            var addr = '<?php AppUtility::getHomeURL() ?>test-question?cid=<?php echo $cid ?>&checked=0&qsetid='+qn+'&loc=qo'+loc+'&formn='+formn;
             previewpop = window.open(addr,'Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20));
             previewpop.focus();
         }
@@ -147,7 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 chgliblaststate = val;
             }
         </script>
-        <form method=post action="manageqset.php?cid=<?php echo $cid ?>">
+        <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=chglib value="true">
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
             What do you want to do with these questions?<br/>
@@ -158,7 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 Select libraries to add these questions to.
             </p>
 
-            <?php $libtreeshowchecks = false; include("libtree2.php"); ?>
+            <?php $libtreeshowchecks = false; include("questionLibraries.php"); ?>
 
 
             <p>
@@ -307,7 +307,6 @@ $this->params['breadcrumbs'][] = $this->title;
         echo "<input type=button value=\"Add New Question\" onclick=\"window.location='mod-data-set?cid=$cid'\">\n";
         echo "</form>";
 
-//        echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js?v=082913\"></script>\n";
         echo "<form id=\"selform\" method=post action=\"manage-question-set?cid=$cid\">\n";
         //echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
         echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
@@ -380,7 +379,7 @@ $this->params['breadcrumbs'][] = $this->title;
         }
 
         echo "</tbody></table>\n";
-        echo "<script type=\"text/javascript\">\n";
+        echo "<script type=\"javascript\">\n";
         echo "initSortTable('myTable',Array(false,'S',false,false,false,'S','N','D'";
         echo ",'S',false";
         echo "),true);\n";
@@ -390,4 +389,5 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     }
     ?>
+    <input type="hidden" id="junk-flag" value="<?php echo AppUtility::getURLFromHome('question','question/save-lib-assign-flag'); ?>"/>
 </div>

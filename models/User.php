@@ -658,7 +658,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $data;
     }
 
-    public static function getUserGraterThenTeacherRights(){
+    public static function getUserGreaterThenTeacherRights(){
         return User::find()->select('id, FirstName, LastName')->where(['>=','rights', AppConstant::TEACHER_RIGHT])->orderBy('LastName,FirstName')->all();
     }
     public static function getByUserIdASDiagnoId($params)

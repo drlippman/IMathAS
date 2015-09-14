@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 use app\components\AppConstant;
+use app\models\Libraries;
 
 $libtreeshowchecks = false;
 
@@ -45,7 +46,7 @@ if (isset($params['selectrights'])) {
     $selectrights = 0;
 }
 $allsrights = 2+3*$selectrights;
-
+$libraryData = Libraries::getAllLibrariesByJoin();
 $rights = array();
 $sortorder = array();
 foreach ($libraryData as $line)  {
