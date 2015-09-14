@@ -533,17 +533,41 @@ function doonblur(value) {
     }
 }
 
+
+var quickaddshowing = false;
+function togglequickadd(el) {
+    if (!quickaddshowing) {
+        document.getElementById("quickadd").style.display = "";
+        $(el).html(_("Hide Quicksearch Entry"));
+        quickaddshowing = true
+    } else {
+        document.getElementById("quickadd").style.display = "none";
+        $(el).html(_("Show Quicksearch Entry"));
+        quickaddshowing = false;
+    }
+}
+
 //w:  0: score, 1: feedback
 function sendtoall(w,type) {
     var form=document.getElementById("mainform");
-    if (type==2) {
-        if (w==0 && document.getElementById("toallgrade").value == "" && !confirm("Clear all scores?")) {
-            return;
-        }
-        if (w==1 && document.getElementById("toallfeedback").value == "" && !confirm("Clear all feedback?")) {
-            return;
-        }
+    a =document.getElementById("toallgrade").value;
+    if(w==0 && a.match(/^[a-zA-Z]+$/)){
+        var message = " Enter only integer value.";
+        CommonPopUp(message);
+        return;
+    }else if(w==0 && a.length== 0 && type!=2)
+    {
+        var message = " 'Text' field should not be empty.";
+        CommonPopUp(message);
+        return;
     }
+    if (type==2 && w==0 && document.getElementById("toallgrade").value == "" && !confirm("Clear all Score?")) {
+         return;
+    }
+    if (type==2 && w==1 && document.getElementById("toallfeedback").value == "" && !confirm("Clear all feedback?")) {
+            return;
+        }
+
     for (var e = 0; e<form.elements.length; e++) {
         var el = form.elements[e];
         if (w==1) {
@@ -569,17 +593,3 @@ function sendtoall(w,type) {
     document.getElementById("toallfeedback").value = '';
     document.getElementById("toallgrade").value = '';
 }
-
-var quickaddshowing = false;
-function togglequickadd(el) {
-    if (!quickaddshowing) {
-        document.getElementById("quickadd").style.display = "";
-        $(el).html(_("Hide Quicksearch Entry"));
-        quickaddshowing = true
-    } else {
-        document.getElementById("quickadd").style.display = "none";
-        $(el).html(_("Show Quicksearch Entry"));
-        quickaddshowing = false;
-    }
-}
-

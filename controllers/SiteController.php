@@ -566,7 +566,6 @@ class SiteController extends AppController
 
     public function actionLogout()
     {
-        AppUtility::dump("asdasd");
         if ($this->getAuthenticatedUser()) {
             $sessionId = Yii::$app->session->getId();
             Sessions::deleteBySessionId($sessionId);

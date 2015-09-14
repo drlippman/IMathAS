@@ -2352,35 +2352,35 @@ class GradebookController extends AppController
         $params = $this->getRequestParams();
         $this->layout = 'master';
         $currentUser = $this->getAuthenticatedUser();
-        $overwriteBody = 0;
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
-        $cid = $params['cid'];
-        $course = Course::getById($cid);
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
         $from = $params['from'];
-        $isTeacher = $this->isTeacher($currentUser['id'],$cid);
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
         if ($from=='modq') {
-            $fromstr = '&from=modq&aid='.$params['aid'].'&qid='.$params['qid'];
+            $fromString = '&from=modq&aid='.$params['aid'].'&qid='.$params['qid'];
         } else if ($from=='addg') {
-            $fromstr = '&from=addg&gbitem='.$params['gbitem'];
+            $fromString = '&from=addg&gbitem='.$params['gbitem'];
         } else if ($from=='addf') {
-            $fromstr = '&from=addf&fid='.$params['fid'];
+            $fromString = '&from=addf&fid='.$params['fid'];
         }
         if (!$isTeacher) { // loaded by a NON-teacher
-            $overwriteBody=1;
-            $body = "You need to log in as a teacher to access this page";
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
         } elseif (!(isset($params['cid']))) {
-            $overwriteBody=1;
-            $body = "You need to access this page from the course page menu";
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_PAGE_ACCESS;
         } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 
             if (isset($params['rubname'])) { //FORM SUBMITTED, DATA PROCESSING
                 if (isset($params['rubisgroup'])) {
                     $rubgrp = $currentUser['groupid'];
                 } else {
-                    $rubgrp = -1;
+                    $rubgrp = AppConstant::NUMERIC_NEGATIVE_ONE;
                 }
                 $rubric = array();
-                for ($i=0;$i<15; $i++) {
+                for ($i = AppConstant::NUMERIC_ZERO; $i < AppConstant::NUMERIC_FIFTEEN; $i++) {
                     if (!empty($params['rubitem'.$i])) {
                         $rubric[] = array(stripslashes($params['rubitem'.$i]), stripslashes($params['rubnote'.$i]), floatval($params['rubscore'.$i]));
                     }
@@ -2392,15 +2392,15 @@ class GradebookController extends AppController
                     $rubricEntry = new Rubrics();
                     $rubricEntry->insertInToRubric($currentUser['id'],$params,$rubgrp,$rubricstring);
                 }
-                $fromstr = str_replace('&amp;','&',$fromstr);
-                return $this->redirect('add-rubric?cid='.$cid.$fromstr);
+                $fromString = str_replace('&amp;','&',$fromString);
+                return $this->redirect('add-rubric?cid='.$courseId.$fromString);
             } else { //INITIAL LOAD DATA PROCESS
                 if (isset($params['id'])) { //MODIFY
                     if ($params['id']=='new') {//NEW
                         $rubric = array();
                         $rubname = "New Rubric";
-                        $rubgrp = -1;
-                        $rubtype = 1;
+                        $rubgrp = AppConstant::NUMERIC_NEGATIVE_ONE;
+                        $rubtype = AppConstant::NUMERIC_ONE;
                         $savetitle = _('Create Rubric');
                     } else {
                         $rubid = intval($params['id']);
@@ -2418,7 +2418,7 @@ class GradebookController extends AppController
         $rubricsName = Rubrics::getByOwnerId($currentUser['id'],$currentUser['groupid']);
         $this->includeJS('gradebook/rubric.js');
         $this->includeCSS(['gradebook.css']);
-        $responseData = array('from' => $from,'body' => $body,'fromstr' => $fromstr,'overwriteBody' => $overwriteBody,'savetitle' => $savetitle,'course' => $course,'rubricsName' => $rubricsName,'rubtype' => $rubtype,'rubgrp' => $rubgrp,'params' => $params,'rubric' => $rubric,'rubname' => $rubname,'isTeacher' => $isTeacher);
+        $responseData = array('from' => $from,'body' => $body,'fromstr' => $fromString,'overwriteBody' => $overwriteBody,'savetitle' => $savetitle,'course' => $course,'rubricsName' => $rubricsName,'rubtype' => $rubtype,'rubgrp' => $rubgrp,'params' => $params,'rubric' => $rubric,'rubname' => $rubname,'isTeacher' => $isTeacher);
         return $this->renderWithData('addRubric', $responseData);
     }
 

@@ -189,7 +189,7 @@ if ($params['gbitem'] == 'new') {
                             <div class="col-md-12 padding-zero margin-top-ten">
                                 <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&id=new&from=addg&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Add new rubric')?></a> |
-                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/edit-rubric?cid=' . $course->id.'&from=addg&gbitem='.$params['gbitem']) ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&from=addg&id=&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Edit rubrics')?>
                                 </a>
                             </div>
@@ -285,7 +285,7 @@ if ($params['gbitem'] == 'new') {
                                         echo "<div class='col-md-2'>Add/Replace to all grades</div>
                                         <div class='col-md-10'>
                                             <div class='floatleft'>
-                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>
+                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblhhhur(this.value);\"/>
                                             </div>";
                                             echo '<div class="floatleft margin-left-fifteen">';
                                                         echo ' <input class="width-seventy-seven" type=button value="Add" onClick="sendtoall(0,0);"/>

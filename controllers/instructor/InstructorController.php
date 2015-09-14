@@ -130,7 +130,7 @@ public $oa = array();
             foreach ($itemOrders as $key => $itemOrder)
             {
                 $tempAray = array();
-                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
+                if (is_array($itemOrder))
                 {
                     $tempAray['Block'] = $itemOrder;
                     $blockItems = $itemOrder['items'];
