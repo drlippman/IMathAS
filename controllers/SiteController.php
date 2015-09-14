@@ -228,6 +228,7 @@ class SiteController extends AppController
                 echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
                 exit;
             }
+            $pws = array();
             $pws = explode(';',$line['pws']);
             if (trim($pws[0])!='') {
                 $basicpw = explode(',',$pws[0]);
@@ -249,7 +250,7 @@ class SiteController extends AppController
             $diagSID = $params['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
             if ($entrynotunique)
             {
-                $diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
+                $diagSID .= '~'.preg_replace('/\W/','',$sel1[$params['course']]);
             }
             if (!$noproctor)
             {
@@ -372,7 +373,7 @@ class SiteController extends AppController
             return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
         }
         $this->includeJS(['jstz_min.js']);
-        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname);
+        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot, 'installname' => $installname, 'sel1' => $sel1, 'noproctor' => $noproctor, 'pws' => $pws);
         return $this->renderWithData('diagnostics', $responseData);
     }
 
