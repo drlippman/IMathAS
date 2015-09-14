@@ -647,7 +647,6 @@ class AdminController extends AppController
 
     public function actionForms()
     {
-        $imasroot = AppUtility::getHomeURL();
         $installname = "OpenMath";
         $params = $this->getRequestParams();
         $currentUser = $this->getAuthenticatedUser();
@@ -668,7 +667,10 @@ class AdminController extends AppController
             case "chgrights":
             case "newadmin":
                 break;
+            case "addnewcourse":
+                break;
             case "modify":
+
             case "addcourse":
             if ($params['action'] == 'modify')
             {
@@ -772,14 +774,13 @@ class AdminController extends AppController
             case "removediag":
                 break;
         }
-
         $this->includeCSS(['imascore.css','assessment.css']);
         $this->includeJS(["general.js"]);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
-            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp, 'imasroot' => $imasroot, 'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser);
+            'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser);
         return $this->renderWithData('forms',$responseData);
     }
 
@@ -787,6 +788,7 @@ class AdminController extends AppController
     {
         $params = $this->getRequestParams();
         $allowmacroinstall = true;
+        $this->layout = 'master';
         $currentUser = $this->getAuthenticatedUser();
         $userId = $currentUser['id'];
         $action = $params['action'];
@@ -838,6 +840,7 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
+
             if ($myRights < 40) {
                 echo "You don't have the authority for this action";
                 break;
@@ -945,6 +948,7 @@ class AdminController extends AppController
                 }
                 return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
             } else {
+
                 $blockcnt = AppConstant::NUMERIC_ONE;
                 $itemorder = addslashes(serialize(array()));
                 $query = new Course();
@@ -955,20 +959,8 @@ class AdminController extends AppController
 
                 $queryGBSchema = new GbScheme();
                 $queryGBSchema->create($cid);
-                echo '<h2>Your course has been created!</h2>';
-                echo '<p>For students to enroll in this course, you will need to provide them two things:<ol>';
-                echo '<li>The course ID: <b>'.$cid.'</b></li>';
-                if (trim($params['ekey'])=='') {
-                    echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
-                    echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
-                    echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
-                } else {
-                    echo '<li>The enrollment key: <b>'.$params['ekey'].'</b></li>';
-                }
-                echo '</ol></p>';
-                echo '<p>If you forget these later, you can find them by viewing your course settings.</p>';
-                echo '<a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a>';
-                exit;
+                $responseData = array('params' => $params, 'cid' => $cid, 'action' => 'addnewcourse');
+                return $this->renderWithData('forms', $responseData);
             }
             break;
             case "delete":
@@ -2198,5 +2190,6 @@ class AdminController extends AppController
         }
         return $qcount[$p];
     }
+
 
 }
