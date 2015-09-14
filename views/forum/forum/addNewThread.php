@@ -18,6 +18,7 @@ $now = $currentTime;
         echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
     }?>
 </div>
+<form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/add-new-thread')?>" method="post">
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
@@ -25,6 +26,7 @@ $now = $currentTime;
         </div>
         <div class="pull-left header-btn">
             <a href="#"class="btn btn-primary pull-right add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
+<!--            <input type="submit" value="Create Thread">-->
         </div>
     </div>
 </div>
@@ -42,7 +44,7 @@ $now = $currentTime;
     <div style="padding-top: 30px;margin-left: 10px;margin-right: 69px">
         <div class="col-lg-2 subject-label"><?php echo AppUtility::t('Subject')?></div>
         <div class="col-lg-10">
-            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=name value="" class="subject">
+            <input type=text size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;" name=subject value="" class="subject">
         </div>
     </div>
     <BR class=form>
@@ -62,6 +64,9 @@ $now = $currentTime;
 <!--        File: <input type='file' name="newfile-0" /><br/>-->
 <!--        <br><a href="#" onclick="addnewfile(this);return false;">Add another file</a><br>-->
 <!--        <br><input type=submit name="submitbtn" class="btn btn-primary add-new-thread" value="Add / Update Files"/>-->
+            <input name="file[]" type="file" id="uplaod-file" /><br>
+            <button class="add-more">Add More Files</button>
+
 <?php }?>
     </div>
     <?php if($rights > 10)
@@ -127,9 +132,11 @@ $now = $currentTime;
     <?php }elseif($rights == 10 && ($forumData['settings'] & 1 == 1)){?>
         <div>
             <div class="col-md-2"><b><?php echo AppUtility::t('Post Anonymously')?></b></div>
-            <div class="col-md-8"><input id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
+            <div class="col-md-8"><input name="settings" id="post-anonymously" value="post-anonymously" type="checkbox" ></div>
         </div>
     <?php } ?>
 </div>
+</form>
+
 
 

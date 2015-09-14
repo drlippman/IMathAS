@@ -127,9 +127,10 @@ public $oa = array();
          * Display Items
          */
         if ($course && ($itemOrders = unserialize($course->itemorder)) &&!isset($courseData['tb']) && !isset($courseData['remove'])) {
-            foreach ($itemOrders as $key => $itemOrder) {
+            foreach ($itemOrders as $key => $itemOrder)
+            {
                 $tempAray = array();
-                if (is_array($itemOrder) && count($blockItems = $itemOrder['items']))
+                if (is_array($itemOrder) || count($blockItems = $itemOrder['items']))
                 {
                     $tempAray['Block'] = $itemOrder;
                     $blockItems = $itemOrder['items'];
@@ -171,14 +172,16 @@ public $oa = array();
                         }
                     $tempAray['itemList'] = $tempItemList;
                     array_push($responseData, $tempAray);
-                } else {
+                } else
+                {
                     $item = Items::getById($itemOrder);
                     switch ($item->itemtype) {
                         case 'Assessment':
                             $assessment = Assessments::getByAssessmentId($item->typeid);
                             $exceptionData = Exceptions::getByAssessmentId($item->typeid);
                             $exceptions = array();
-                            foreach ($exceptionData as $data) {
+                            foreach ($exceptionData as $data)
+                            {
                                 $exceptions[$data['userid']] = array($data['enddate'],$data['islatepass']);
                             }
                             $nothidden = true;

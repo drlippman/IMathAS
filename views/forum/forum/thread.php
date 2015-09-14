@@ -80,7 +80,7 @@ $now = $currentTime;
     <input type="hidden" id="settings" value="<?php echo $forumData['settings']?>">
     <input type="hidden" id="un-read" value="<?php echo $unRead ?>">
     <div id="data">
-        <table id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
+        <table style="float: left" id="forum-table displayforum" class="forum-table table table-bordered table-striped table-hover data-table" bPaginate="false">
             <thead>
             <th><?php echo AppUtility::t('Topic')?></th>
             <?php if($forumData['groupsetid'] > 0 && $users['rights'] > 10){ ?>

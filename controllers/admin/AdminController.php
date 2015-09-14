@@ -1,7 +1,6 @@
 <?php
 
 namespace app\controllers\admin;
-
 use app\components\filehandler;
 use app\controllers\AppController;
 use app\controllers\PermissionViolationException;
@@ -2175,7 +2174,8 @@ class AdminController extends AppController
         return $parent;
     }
 
-    function setparentrights($alibid) {
+    function setparentrights($alibid)
+    {
         global $rights,$parents;
         if ($parents[$alibid]>0) {
             if ($rights[$parents[$alibid]] < $rights[$alibid]) {
@@ -2187,7 +2187,8 @@ class AdminController extends AppController
         return $alibid;
     }
 
-    function addupchildqs($p) {
+    function addupchildqs($p)
+    {
         global $qcount,$ltlibs;
         if (isset($ltlibs[$p])) { //if library has children
             foreach ($ltlibs[$p] as $child) {

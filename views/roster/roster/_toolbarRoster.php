@@ -3,7 +3,7 @@ use app\components\AppUtility;
 ?>
 <div class="roster-nav-tab">
     <ul class="nav nav-tabs aligned roster-menu-bar-nav">
-        <li><a href="#"><?php AppUtility::t('Groups');?></a></li>
+        <li><a href="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id);?>"><?php AppUtility::t('Groups');?></a></li>
         <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'login-grid-view?cid='.$course->id); ?>"><?php AppUtility::t('View Login Grid');?></a></li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Manage');?><span class="caret"></span></a>

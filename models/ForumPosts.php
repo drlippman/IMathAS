@@ -112,14 +112,15 @@ class ForumPosts extends BaseImasForumPosts
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
         $this->id = $maxid;
-        $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
+        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->threadid = isset($maxid) ? $maxid : null;
-        if (empty($params['subject'])) {
+        if (empty($params['subject']))
+        {
             $params['subject'] = '(None)';
         }
         $this->subject = trim($params['subject']);
         $this->userid = isset($userId) ? $userId : null;
-        $this->message = isset($params['body']) ? $params['body'] : null;
+        $this->message = isset($params['message']) ? $params['message'] : null;
             $postdate = strtotime(date('F d, o g:i a'));
             $this->postdate = $postdate;
             $this->posttype = $postType;

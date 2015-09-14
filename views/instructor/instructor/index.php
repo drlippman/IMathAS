@@ -45,9 +45,6 @@ $now = $currentTime;
             <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('outcomes');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
-            <a href="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id);?>"><?php AppUtility::t('Groups');?></a>
-        </div>
-        <div class="col-md-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('CopyCourse');?></a>
         </div>
         <div class="col-md-2 course-top-menu">

@@ -773,11 +773,61 @@ class ForumController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $forumData = Forums::getById($forumId);
+        if($this->isPostMethod())
+        {
+            $params = $this->getRequestParams();
+            $postType = AppConstant::NUMERIC_ZERO;
+            $alwaysReplies = null;
+            $isNonValue = AppConstant::NUMERIC_ZERO;
+            if ($user->rights > AppConstant::NUMERIC_TEN)
+            {
+                $postType = $params['post-type'];
+                $date = strtotime($params['endDate'] . ' ' . $params['startTime']);
+            }else
+            {
+                $isNonValue = $params['settings'];
+            }
+            $alwaysReplies = $params['always-replies'];
+            $newThread = new ForumPosts();
+            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date , $isNonValue);
+            $newThread = new ForumThread();
+            $newThread->createThread($params, $user->id, $threadId);
+            $views = new ForumView();
+            $views->createThread($user->id, $threadId);
+            $contentTrackRecord = new ContentTrack();
+            if($this->getAuthenticatedUser()->rights == AppConstant::STUDENT_RIGHT)
+            {
+                $contentTrackRecord->insertForumData($user->id,$params['cid'],$params['forumid'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
+            }
+            $filesToUpload = $this->reArrayFiles($_FILES['file']);
+            $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+            foreach($filesToUpload as $file)
+            {
+
+            }
+            return $this->redirect('thread?cid='.$params['cid'].'&forumid='.$params['forumid']);
+        }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/addnewthread.js']);
         $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
         return $this->renderWithData('addNewThread', $responseData);
     }
+
+    function reArrayFiles(&$file)
+    {
+        $file_ary = array();
+        $file_count = count($file['name']);
+        $file_keys = array_keys($file);
+        for ($i=0; $i<$file_count; $i++)
+        {
+            foreach ($file_keys as $key)
+            {
+                $file_ary[$i][$key] = $file[$key][$i];
+            }
+        }
+        return $file_ary;
+    }
+
     /*
      * Controller Action To Save The Newly Added Thread In Database
      */
@@ -788,7 +838,8 @@ class ForumController extends AppController
             $postType = AppConstant::NUMERIC_ZERO;
             $alwaysReplies = null;
             $isNonValue = AppConstant::NUMERIC_ZERO;
-            if ($this->getAuthenticatedUser()->rights > AppConstant::NUMERIC_TEN) {
+            if ($this->getAuthenticatedUser()->rights > AppConstant::NUMERIC_TEN)
+            {
                 $postType = $params['postType'];
                 $date = strtotime($params['date'] . ' ' . $params['time']);
             }else{
