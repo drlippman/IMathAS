@@ -1,6 +1,4 @@
 <?php
-//IMathAS:  Assessment Session utility functions
-//(c) 2007 David Lippman
 namespace app\components;
 
 function generateAssessmentData($itemorder,$shuffle,$aid,$arrayout=false) {

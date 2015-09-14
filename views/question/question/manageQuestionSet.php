@@ -312,7 +312,8 @@ $this->params['breadcrumbs'][] = $this->title;
         //echo "Check/Uncheck All: <input type=\"checkbox\" name=\"ca2\" value=\"1\" onClick=\"chkAll(this.form, 'nchecked[]', this.checked)\">\n";
         echo 'Check: <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'selform\',\'nchecked[]\',false)">None</a> ';
 
-        echo "With Selected: <input type=submit name=\"transfer\" value=\"Transfer\" title=\"Transfer question ownership\">\n";
+        echo "With Selected:
+        <input type=submit name=\"transfer\" value=\"Transfer\" title=\"Transfer question ownership\">\n";
         echo "<input type=submit name=\"remove\" value=\"Delete\">\n";
         echo "<input type=submit name=\"chglib\" value=\"Library Assignment\" title=\"Change library assignments\">\n";
         echo "<input type=submit name=\"chgrights\" value=\"Change Rights\" title=\"Change use rights\">\n";

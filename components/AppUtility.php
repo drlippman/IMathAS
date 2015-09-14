@@ -11,6 +11,7 @@ use app\models\QuestionSet;
 use app\models\User;
 use Yii;
 use yii\base\Component;
+
 require_once("../filter/filter.php");
 
 class AppUtility extends Component
@@ -119,8 +120,7 @@ class AppUtility extends Component
 
     public static function removeEmptyAttributes($params)
     {
-        if (!empty($params) && is_array($params))
-        {
+        if (!empty($params) && is_array($params)) {
             if (is_object($params)) {
                 $params = (array)$params;
             }
@@ -426,9 +426,9 @@ class AppUtility extends Component
         return mktime($tmatches[1], $tmatches[2], AppConstant::NUMERIC_ZERO, $dmatches[1], $dmatches[2], $dmatches[3]);
     }
 
-/*
- * Displays only time
- */
+    /*
+     * Displays only time
+     */
     public static function parsetime($time)
     {
         $tzoffset = self::getTimezoneOffset();
@@ -719,7 +719,7 @@ class AppUtility extends Component
                     }
                     $exceptionduedate = $row->enddate;
                 } else { //has no exception
-                    if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) {//outside normal dates
+                    if ($now < $testsettings['startdate'] || $testsettings['enddate'] < $now) { //outside normal dates
                         if ($now > $testsettings['startdate'] && $now < $testsettings['reviewdate']) {
                             $isreview = true;
                         } else {
@@ -738,7 +738,6 @@ class AppUtility extends Component
                     $bestrawscores[$i] = AppConstant::NUMERIC_ONE;
                 }
             }
-            //global $showtips;
             $allowregen = (!$superdone && ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework"));
             $showeachscore = ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "AsGo" || $testsettings['testtype'] == "Homework");
             $showansduring = (($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework") && is_numeric($testsettings['showans']));
@@ -823,7 +822,6 @@ class AppUtility extends Component
                     if (!$superdone && $showeachscore && hasreattempts($qn)) {
                         if (!(($regenonreattempt && $qi[$questions[$toclear]]['regen'] == AppConstant::NUMERIC_ZERO) || $qi[$questions[$toclear]]['regen'] == AppConstant::NUMERIC_ONE)) {
                             if (!in_array($qn, $reattempting)) {
-                                //$reattempting[] = $qn;
                                 $immediatereattempt = true;
                             }
                         }
@@ -898,7 +896,6 @@ class AppUtility extends Component
                         }
                         $responseString .= ', is displayed below</p>';
                         if (!$noraw && $showeachscore && $GLOBALS['questionmanualgrade'] != true) {
-                            //$colors = scorestocolors($rawscores[$qn], '', $qi[$questions[$qn]]['answeights'], $noraw);
                             if (strpos($rawscores[$qn], '~') !== false) {
                                 $colors = explode('~', $rawscores[$qn]);
                             } else {
@@ -921,7 +918,7 @@ class AppUtility extends Component
                         $next = $qn;
                         if (isset($intropieces)) {
                             foreach ($introdividers as $k => $v) {
-                                if ($v[1] <= $next + AppConstant::NUMERIC_ONE && $next + AppConstant::NUMERIC_ONE <= $v[2]) {//right divider
+                                if ($v[1] <= $next + AppConstant::NUMERIC_ONE && $next + AppConstant::NUMERIC_ONE <= $v[2]) { //right divider
                                     if ($next + AppConstant::NUMERIC_ONE == $v[1]) {
                                         $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;">Hide Question Information</a></div>';
                                         $responseString .= '<div class="intro" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
@@ -956,7 +953,7 @@ class AppUtility extends Component
                     $responseString .= "<div class=inset>\n";
                     if (isset($intropieces)) {
                         foreach ($introdividers as $k => $v) {
-                            if ($v[1] <= $next + AppConstant::NUMERIC_ONE && $next + AppConstant::NUMERIC_ONE <= $v[2]) {//right divider
+                            if ($v[1] <= $next + AppConstant::NUMERIC_ONE && $next + AppConstant::NUMERIC_ONE <= $v[2]) { //right divider
                                 if ($next + AppConstant::NUMERIC_ONE == $v[1]) {
                                     $responseString .= '<div><a href="#" id="introtoggle' . $k . '" onclick="toggleintroshow(' . $k . '); return false;"> Hide Question Information</a></div>';
                                     $responseString .= '<div class="intro" id="intropiece' . $k . '">' . filter($intropieces[$k]) . '</div>';
@@ -968,7 +965,7 @@ class AppUtility extends Component
                             }
                         }
                     }
-                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=".$assessmentId."&amp;cid=".$courseId."&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
+                    $responseString .= "<form id=\"qform\" method=\"post\" enctype=\"multipart/form-data\" action=\"show-assessment?id=" . $assessmentId . "&amp;cid=" . $courseId . "&amp;action=skip&amp;score=$next\" onsubmit=\"return doonsubmit(this)\">\n";
                     $responseString .= "<a name=\"beginquestions\"></a>\n";
                     basicshowq($next);
                     showqinfobar($next, true, true);
@@ -1002,7 +999,7 @@ class AppUtility extends Component
                     if ($lefttodo == AppConstant::NUMERIC_ZERO) {
                         $responseString .= "<a href=\"showtest.php?action=skip&amp;done=true\">When you are done, click here to see a summary of your score</a>\n";
                     }
-                    if (!$reattemptsremain && $testsettings['showans'] != 'N') {// && $showeachscore) {
+                    if (!$reattemptsremain && $testsettings['showans'] != 'N') { // && $showeachscore) {
                         $responseString .= "<p>Question with last attempt is displayed for your review only</p>";
                         if (!$noraw && $showeachscore) {
                             if (strpos($rawscores[$next], '~') !== false) {
@@ -1280,14 +1277,15 @@ class AppUtility extends Component
             $lastanswers = explode("~", $line['reviewlastanswers']);
         }
         $responseString .= "<h4 class='padding-zero' style=\"float:right;\"><b>Name:</b> $userfullname </h4>";
-        $responseString .= "<h3 class='margin-top-zero'>".$testsettings['name']."</h3>";
-        $allowregen = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework");
-        $showeachscore = ($testsettings['testtype']=="Practice" || $testsettings['testtype']=="AsGo" || $testsettings['testtype']=="Homework");
-        $showansduring = (($testsettings['testtype']=="Practice" || $testsettings['testtype']=="Homework") && $testsettings['showans']!='N');
-        $GLOBALS['useeditor']='reviewifneeded';
+        $responseString .= "<h3 class='margin-top-zero'>" . $testsettings['name'] . "</h3>";
+        $allowregen = ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework");
+        $showeachscore = ($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "AsGo" || $testsettings['testtype'] == "Homework");
+        $showansduring = (($testsettings['testtype'] == "Practice" || $testsettings['testtype'] == "Homework") && $testsettings['showans'] != 'N');
+        $GLOBALS['useeditor'] = 'reviewifneeded';
         $responseString .= "<div class=breadcrumbPrintVersion>Print Ready Version</div><br>";
-        $endtext = '';  $intropieces = array();
-        if (strpos($testsettings['intro'], '[QUESTION')!==false) {
+        $endtext = '';
+        $intropieces = array();
+        if (strpos($testsettings['intro'], '[QUESTION') !== false) {
             //embedded type
             $intro = preg_replace('/<p>((<span|<strong|<em)[^>]*>)?\[QUESTION\s+(\d+)\s*\]((<\/span|<\/strong|<\/em)[^>]*>)?<\/p>/', '[QUESTION $3]', $testsettings['intro']);
             $introsplit = preg_split('/\[QUESTION\s+(\d+)\]/', $intro, AppConstant::NUMERIC_NEGATIVE_ONE, PREG_SPLIT_DELIM_CAPTURE);
@@ -1480,7 +1478,7 @@ class AppUtility extends Component
                 }
             }
         }
-        $C['elements'] = &$e;
+        $C['elements'] = & $e;
 // config attrs
         $x = !empty($C['deny_attribute']) ? str_replace(array("\n", "\r", "\t", ' '), '', $C['deny_attribute']) : '';
         $x = array_flip((isset($x[0]) && $x[0] == '*') ? explode('-', $x) : explode(',', $x . (!empty($C['safe']) ? ',on*' : '')));
@@ -2600,31 +2598,30 @@ class AppUtility extends Component
         }
     }
 
-    public function printOutcomes($arr,$individual,$finalData=null,$cnt=null,$n=null,$type=null,$outcomeInfo=null)
+    public function printOutcomes($arr, $individual, $finalData = null, $cnt = null, $n = null, $type = null, $outcomeInfo = null)
     {
-        foreach ($arr as $oi)
-        {
-            if ($cnt%AppConstant::NUMERIC_TWO==AppConstant::NUMERIC_ZERO) {
+        foreach ($arr as $oi) {
+            if ($cnt % AppConstant::NUMERIC_TWO == AppConstant::NUMERIC_ZERO) {
                 $class = "even";
             } else {
                 $class = "odd";
             }
             $cnt++;
             if (is_array($oi)) { //is outcome group
-                echo '<tr class="'.$class.'"><td colspan="'.$n.'"><span class="ind'.$individual.'"><b>'.$oi['name'].'</b></span></td></tr>';
-                $this->printOutcomes($oi['outcomes'],$individual+AppConstant::NUMERIC_ONE);
-            }else {
-                echo '<tr class="'.$class.'">';
-                echo '<td><span class="ind'.$individual.'">'.$outcomeInfo[$oi].'</span></td>';
+                echo '<tr class="' . $class . '"><td colspan="' . $n . '"><span class="ind' . $individual . '"><b>' . $oi['name'] . '</b></span></td></tr>';
+                $this->printOutcomes($oi['outcomes'], $individual + AppConstant::NUMERIC_ONE);
+            } else {
+                echo '<tr class="' . $class . '">';
+                echo '<td><span class="ind' . $individual . '">' . $outcomeInfo[$oi] . '</span></td>';
                 if (isset($finalData[1][3][$type]) && isset($finalData[1][3][$type][$oi])) {
-                    echo '<td>'.round(AppConstant::NUMERIC_HUNDREAD*$finalData[1][3][$type][$oi],AppConstant::NUMERIC_ONE).'%</td>';
+                    echo '<td>' . round(AppConstant::NUMERIC_HUNDREAD * $finalData[1][3][$type][$oi], AppConstant::NUMERIC_ONE) . '%</td>';
                 } else {
                     echo '<td>-</td>';
                 }
-                for ($i=AppConstant::NUMERIC_ZERO;$i<count($finalData[0][2]);$i++) {
-                    if (isset($finalData[1][2][$i]) && isset($finalData[1][2][$i][2*$type+1][$oi])) {
-                        if ($finalData[1][2][$i][2*$type+1][$oi]>AppConstant::NUMERIC_ZERO) {
-                            echo '<td>'.round(AppConstant::NUMERIC_HUNDREAD*$finalData[1][2][$i][2*$type][$oi]/$finalData[1][2][$i][2*$type+1][$oi],AppConstant::NUMERIC_ONE).'%</td>';
+                for ($i = AppConstant::NUMERIC_ZERO; $i < count($finalData[0][2]); $i++) {
+                    if (isset($finalData[1][2][$i]) && isset($finalData[1][2][$i][2 * $type + 1][$oi])) {
+                        if ($finalData[1][2][$i][2 * $type + 1][$oi] > AppConstant::NUMERIC_ZERO) {
+                            echo '<td>' . round(AppConstant::NUMERIC_HUNDREAD * $finalData[1][2][$i][2 * $type][$oi] / $finalData[1][2][$i][2 * $type + 1][$oi], AppConstant::NUMERIC_ONE) . '%</td>';
                         } else {
                             echo '<td>0%</td>';
                         }
@@ -2635,60 +2632,55 @@ class AppUtility extends Component
                 echo '</tr>';
             }
 
+        }
+
+    }
+
+    public function printItems($items, $assessNames, $forumNames, $offNames, $linkNames, $inlineNames)
+    {
+        foreach ($items as $i => $item) {
+            if ($i != AppConstant::NUMERIC_ZERO) {
+                echo '<br/>';
+            }
+            if ($item[0] == 'link') {
+                echo '<span class="icon iconlink" >L</span> ' . $linkNames[$item[1]];
+            } else if ($item[0] == 'inline') {
+                echo '<span class="icon iconinline" >I</span> ' . $inlineNames[$item[1]];
+            } else if ($item[0] == 'assess') {
+                echo '<span class="icon iconassess" >A</span> ' . $assessNames[$item[1]];
+            } else if ($item[0] == 'forum') {
+                echo '<span class="icon iconforum" >F</span> ' . $forumNames[$item[1]];
+            } else if ($item[0] == 'offline') {
+                echo '<span class="icon iconoffline" >O</span> ' . $offNames[$item[1]];
             }
 
         }
+    }
 
-   public function printItems($items,$assessNames,$forumNames,$offNames,$linkNames,$inlineNames)
-   {
-       foreach ($items as $i=>$item)
-       {
-           if ($i!=AppConstant::NUMERIC_ZERO) { echo '<br/>';}
-           if ($item[0]=='link') {
-               echo '<span class="icon iconlink" >L</span> '.$linkNames[$item[1]];
-           } else if ($item[0]=='inline') {
-               echo '<span class="icon iconinline" >I</span> '.$inlineNames[$item[1]];
-           }else if ($item[0]=='assess') {
-               echo '<span class="icon iconassess" >A</span> '.$assessNames[$item[1]];
-           } else if ($item[0]=='forum') {
-               echo '<span class="icon iconforum" >F</span> '.$forumNames[$item[1]];
-           } else if ($item[0]=='offline') {
-               echo '<span class="icon iconoffline" >O</span> '.$offNames[$item[1]];
-           }
-
-       }
-   }
-
-    public function printOutcomesForMap($arr,$ind,$outcomeAssoc=null,$outcomeInfo=null,$catNames=null,$n=null,$cnt=null,$items=null,$assessNames=null,$forumNames=null,$offNames=null,$linkNames=null,$inlineNames=null)
+    public function printOutcomesForMap($arr, $ind, $outcomeAssoc = null, $outcomeInfo = null, $catNames = null, $n = null, $cnt = null, $items = null, $assessNames = null, $forumNames = null, $offNames = null, $linkNames = null, $inlineNames = null)
     {
-        foreach ($arr as $oi)
-        {
-            if ($cnt%AppConstant::NUMERIC_TWO==AppConstant::NUMERIC_ZERO) {
+        foreach ($arr as $oi) {
+            if ($cnt % AppConstant::NUMERIC_TWO == AppConstant::NUMERIC_ZERO) {
                 $class = "even";
             } else {
                 $class = "odd";
             }
             $cnt++;
-            if (is_array($oi))
-            { //is outcome group
-                echo '<tr class="'.$class.'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.$oi['name'].'</b></span></td></tr>';
-                $this->printOutcomesForMap($oi['outcomes'],$ind+AppConstant::NUMERIC_ONE,$outcomeAssoc,$outcomeInfo,$catNames,$n,$cnt,$items,$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
-            }else
-            {
-                echo '<tr class="'.$class.'">';
-                echo '<td><span class="ind'.$ind.'">'.$outcomeInfo[$oi].'</span></td><td>';
-                if (isset($outcomeAssoc[$oi]['UG']))
-                {
-                    $this->printItems($outcomeAssoc[$oi]['UG'],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+            if (is_array($oi)) { //is outcome group
+                echo '<tr class="' . $class . '" colspan="' . $n . '"><td><span class="ind' . $ind . '"><b>' . $oi['name'] . '</b></span></td></tr>';
+                $this->printOutcomesForMap($oi['outcomes'], $ind + AppConstant::NUMERIC_ONE, $outcomeAssoc, $outcomeInfo, $catNames, $n, $cnt, $items, $assessNames, $forumNames, $offNames, $linkNames, $inlineNames);
+            } else {
+                echo '<tr class="' . $class . '">';
+                echo '<td><span class="ind' . $ind . '">' . $outcomeInfo[$oi] . '</span></td><td>';
+                if (isset($outcomeAssoc[$oi]['UG'])) {
+                    $this->printItems($outcomeAssoc[$oi]['UG'], $assessNames, $forumNames, $offNames, $linkNames, $inlineNames);
                 }
                 echo '</td>';
-                if($catNames){
-                    foreach ($catNames as $id=>$cn)
-                    {
+                if ($catNames) {
+                    foreach ($catNames as $id => $cn) {
                         echo '<td>';
-                        if (isset($outcomeAssoc[$oi][$id]))
-                        {
-                            $this->printItems($outcomeAssoc[$oi][$id],$assessNames,$forumNames,$offNames,$linkNames,$inlineNames);
+                        if (isset($outcomeAssoc[$oi][$id])) {
+                            $this->printItems($outcomeAssoc[$oi][$id], $assessNames, $forumNames, $offNames, $linkNames, $inlineNames);
                         }
                         echo '</td>';
                     }
@@ -2698,37 +2690,38 @@ class AppUtility extends Component
         }
     }
 
-    public function printOutcomesData($arr,$outcomeInfo,$cnt)
+    public function printOutcomesData($arr, $outcomeInfo, $cnt)
     {
-        foreach ($arr as $item)
-        {
-            if (is_array($item))
-            { //is outcome group
-                echo '<li class="blockli" id="grp'.$cnt.'"><span class=icon style="background-color:#66f">G</span> ';
-                echo '<input class="outcome" type="text" size="60" id="g'.$cnt.'" value="'.htmlentities($item['name']).'" onkeyup="txtchg()"> ';
-                echo '<a href="#" onclick="removeoutcomegrp(this);return false">'._("Delete").'</a>';
+        foreach ($arr as $item) {
+            if (is_array($item)) { //is outcome group
+                echo '<li class="blockli" id="grp' . $cnt . '"><span class=icon style="background-color:#66f">G</span> ';
+                echo '<input class="outcome" type="text" size="60" id="g' . $cnt . '" value="' . htmlentities($item['name']) . '" onkeyup="txtchg()"> ';
+                echo '<a href="#" onclick="removeoutcomegrp(this);return false">' . _("Delete") . '</a>';
                 $cnt++;
-                if (count($item['outcomes'])>AppConstant::NUMERIC_ZERO) {
+                if (count($item['outcomes']) > AppConstant::NUMERIC_ZERO) {
                     echo '<ul class="qview">';
-                   $this->printoutcomesData($item['outcomes'],$outcomeInfo,$cnt);
+                    $this->printoutcomesData($item['outcomes'], $outcomeInfo, $cnt);
                     echo '</ul>';
                 }
                 echo '</li>';
-            } else
-            { //individual outcome
-                echo '<li id="'.$item.'"><span class=icon style="background-color:#0f0">O</span> ';
-                echo '<input class="outcome" type="text" size="60" id="o'.$item.'" value="'.htmlentities($outcomeInfo[$item]).'" onkeyup="txtchg()"> ';
-                echo '<a href="#" onclick="removeoutcome(this);return false">'._("Delete").'</a></li>';
+            } else { //individual outcome
+                echo '<li id="' . $item . '"><span class=icon style="background-color:#0f0">O</span> ';
+                echo '<input class="outcome" type="text" size="60" id="o' . $item . '" value="' . htmlentities($outcomeInfo[$item]) . '" onkeyup="txtchg()"> ';
+                echo '<a href="#" onclick="removeoutcome(this);return false">' . _("Delete") . '</a></li>';
             }
         }
 
     }
-    public static function generatemoveselect($count,$num) {
-        $num = $num+AppConstant::NUMERIC_ONE;  //adjust indexing
+
+    public static function generatemoveselect($count, $num)
+    {
+        $num = $num + AppConstant::NUMERIC_ONE; //adjust indexing
         $html = "<select id=\"ms-$num\" onchange=\"movefile($num)\">\n";
         for ($i = AppConstant::NUMERIC_ONE; $i <= $count; $i++) {
             $html .= "<option value=\"$i\" ";
-            if ($i==$num) { $html .= "selected=1";}
+            if ($i == $num) {
+                $html .= "selected=1";
+            }
             $html .= ">$i</option>\n";
         }
         $html .= "</select>\n";

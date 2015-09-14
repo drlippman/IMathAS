@@ -83,3 +83,46 @@ tr#quickadd td {
 {
     display: none;
 }
+.margin-top-minus-fourty {
+    margin-top:-40px !important;
+}
+.margin-right-minus-fifteen {
+    margin-right: -15px !important;
+}
+.add-rubic-form {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    padding-top: 30px;
+    padding-bottom: 25px;
+}
+.margin-top-minus-nine-pt-five {
+    margin-top: -9.5% !important;
+}
+
+#rubic-form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.edit-rubric-form {
+    background-color: #E0E0E0;
+    min-height: 305px !important;
+    width: 95% !important;
+    margin-left: 30px !important;
+}
+.padding-top-twenty-five {
+    padding-top: 25px;
+}

@@ -4,10 +4,6 @@ namespace app\models;
 
 use app\models\_base\BaseImasContentTrack;
 use Yii;
-use yii\db\Exception;
-use app\components\AppUtility;
-use app\components\AppConstant;
-use app\models\_base\BaseImasLoginLog;
 
 class ActivityLog extends BaseImasContentTrack
 {

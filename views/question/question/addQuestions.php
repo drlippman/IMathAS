@@ -421,9 +421,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div><h4>Choose assessments to take questions from</h4></div>
                 <table cellpadding=5 id=myTable class="floatleft question-table">
                     <thead >
-                    <tr><th></th><th>Assessment</th><th>Summary</th></tr>
+                    <tr>
+                        <th>
+                            <div class="checkbox override-hidden">
+                                <label>
+                                    <input type="checkbox" name="potentialq-header-checked" value="">
+                                    <span class="cr">
+                                        <i class="cr-icon fa fa-check"></i>
+                                    </span>
+                                </label>
+                            </div>
+                        </th>
+                        <th>Assessment</th>
+                        <th>Summary</th>
+                    </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="potential-question-assessment-information-table">
                     <?php
 
                     $alt=0;

@@ -1,13 +1,10 @@
 <?php
 namespace app\models;
 
-
 use app\components\AppConstant;
-use app\components\AppUtility;
 use app\models\_base\BaseImasAssessments;
 use yii\db\Query;
 use Yii;
-use yii\debug\components\search\matchers\GreaterThan;
 
 class Assessments extends BaseImasAssessments
 {
@@ -27,22 +24,20 @@ class Assessments extends BaseImasAssessments
         $this->save();
     }
 
-    public static function findAllAssessmentForGradebook($courseId, $canviewall, $istutor, $isteacher, $catfilter, $time){
+    public static function findAllAssessmentForGradebook($courseId, $canviewall, $istutor, $isteacher, $catfilter, $time)
+    {
         $query = new Query();
-        $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
+        $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
             ->where(['courseid' => $courseId])
-            ->andWhere(['>', 'avail', 0]);
-        if(!$canviewall){
-           $query->andWhere(['>', 'cntingb', 0]);
+            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
+        if (!$canviewall) {
+            $query->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO]);
         }
-        if($istutor){
-            $query->andWhere(['<', 'tutoredit', 2]);
+        if ($istutor) {
+            $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if(!$isteacher){
-//            $query->andWhere(['<', 'startdate', $time]);
-        }
-        if($catfilter > -1){
+        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
@@ -56,19 +51,19 @@ class Assessments extends BaseImasAssessments
         return Assessments::find()->select('id,name')->where(['courseid' => $courseId])->orderBy('name')->all();
     }
 
-    public static function outcomeData($courseId,$istutor,$catfilter)
+    public static function outcomeData($courseId, $istutor, $catfilter)
     {
         $query = new Query();
-        $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'defoutcome'])
+        $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'defoutcome'])
             ->from('imas_assessments')
             ->where(['courseid' => $courseId])
-            ->andWhere(['>', 'avail', 0])
-            ->andWhere(['>', 'cntingb', 0])
-            ->andWhere(['<', 'cntingb', 3]);
-        if($istutor){
-            $query->andWhere(['<', 'tutoredit', 2]);
+            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO])
+            ->andWhere(['>', 'cntingb', AppConstant::NUMERIC_ZERO])
+            ->andWhere(['<', 'cntingb', AppConstant::NUMERIC_THREE]);
+        if ($istutor) {
+            $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if($catfilter > -1){
+        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
@@ -76,7 +71,9 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryAll();
         return $data;
     }
-    public function createAssessment($params){
+
+    public function createAssessment($params)
+    {
         $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
         $this->name = isset($params['name']) ? $params['name'] : null;
         $this->summary = isset($params['summary']) ? $params['summary'] : null;
@@ -122,10 +119,11 @@ class Assessments extends BaseImasAssessments
         return $this->id;
     }
 
-    public static function updateAssessment($params,$timeLimit,$isGroup,$showHints,
-                                            $tutorEdit,$defFeedback,$shuffle,$calTag,
-                                            $calrtag,$defFeedbackText,$isTutorial,$endMsg,
-                                            $startDate,$endDate,$reviewDate){
+    public static function updateAssessment($params, $timeLimit, $isGroup, $showHints,
+                                            $tutorEdit, $defFeedback, $shuffle, $calTag,
+                                            $calrtag, $defFeedbackText, $isTutorial, $endMsg,
+                                            $startDate, $endDate, $reviewDate)
+    {
         $assessment = Assessments::findOne(['id' => $params['id']]);
         $assessment->name = trim($params['name']);
         $assessment->summary = $params['summary'];
@@ -163,11 +161,11 @@ class Assessments extends BaseImasAssessments
         if (isset($params['defpoints'])) {
             $assessment->defpoints = $params['defpoints'];
             $assessment->defpenalty = $params['defpenalty'];
-           }
+        }
         if (isset($params['copyendmsg'])) {
             $assessment->endmsg = $endMsg;
         }
-        if ($params['avail']==1) {
+        if ($params['avail'] == AppConstant::NUMERIC_ONE) {
             $assessment->startdate = $startDate;
             $assessment->enddate = $endDate;
             $assessment->reviewdate = $reviewDate;
@@ -175,17 +173,20 @@ class Assessments extends BaseImasAssessments
         $assessment->save();
     }
 
-    public static function deleteAssessmentById($assessmentId){
-        $assessmentData = Assessments::findOne(['id',$assessmentId]);
-        if($assessmentData){
+    public static function deleteAssessmentById($assessmentId)
+    {
+        $assessmentData = Assessments::findOne(['id', $assessmentId]);
+        if ($assessmentData) {
             $assessmentData->delete();
         }
     }
-    public static function updateGbCat($catList){
 
-        foreach($catList as $category){
+    public static function updateGbCat($catList)
+    {
+
+        foreach ($catList as $category) {
             $query = Assessments::findOne(['gbcategory' => $category]);
-            if($query){
+            if ($query) {
                 $query->gbcategory = AppConstant::NUMERIC_ZERO;
                 $query->save();
             }
@@ -240,26 +241,27 @@ class Assessments extends BaseImasAssessments
         $this->save();
         return $this->id;
     }
-    public static function setItemOrder($itemOrder,$id){
+
+    public static function setItemOrder($itemOrder, $id)
+    {
         $assessmentData = Assessments::findOne(['id' => $id]);
-        if($assessmentData){
+        if ($assessmentData) {
             $assessmentData->itemorder = $itemOrder;
             $assessmentData->save();
         }
     }
-    public static function findOneAssessmentDataForGradebook($courseId,$istutor, $isteacher, $catfilter){
+
+    public static function findOneAssessmentDataForGradebook($courseId, $istutor, $isteacher, $catfilter)
+    {
         $query = new Query();
-        $query->select(['id', 'name','defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
+        $query->select(['id', 'name', 'defpoints', 'deffeedback', 'timelimit', 'minscore', 'startdate', 'enddate', 'itemorder', 'gbcategory', 'cntingb', 'avail', 'groupsetid', 'allowlate'])
             ->from('imas_assessments')
             ->where(['courseid' => $courseId])
-            ->andWhere(['>', 'avail', 0]);
-        if($istutor){
-            $query->andWhere(['<', 'tutoredit', 2]);
+            ->andWhere(['>', 'avail', AppConstant::NUMERIC_ZERO]);
+        if ($istutor) {
+            $query->andWhere(['<', 'tutoredit', AppConstant::NUMERIC_TWO]);
         }
-        if(!$isteacher){
-//           $query->andWhere(['<', 'startdate', $time]);
-        }
-        if($catfilter > -1){
+        if ($catfilter > AppConstant::NUMERIC_NEGATIVE_ONE) {
             $query->andWhere(['gbcategory' => $catfilter]);
         }
         $query->orderBy('enddate, name');
@@ -267,9 +269,11 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryAll();
         return $data;
     }
-    public static function setVidData($itemOrder,$viddata,$aid){
+
+    public static function setVidData($itemOrder, $viddata, $aid)
+    {
         $assessmentData = Assessments::findOne(['id' => $aid]);
-        if($assessmentData){
+        if ($assessmentData) {
             $assessmentData->itemorder = $itemOrder;
             $assessmentData->viddata = $viddata;
             $assessmentData->save();
@@ -283,66 +287,71 @@ class Assessments extends BaseImasAssessments
         return Assessments::find()->where(['IN', 'id', $assessmentIdList])->all();
     }
 
-    public static function setStartDate($shift,$typeId)
+    public static function setStartDate($shift, $typeId)
     {
-        $date = Assessments::find()->where(['id'=>$typeId])->andWhere(['>','startdate','0'])->one();
-        if($date) {
+        $date = Assessments::find()->where(['id' => $typeId])->andWhere(['>', 'startdate', AppConstant::ZERO_VALUE])->one();
+        if ($date) {
             $date->startdate = $date->startdate + $shift;
             $date->save();
         }
 
     }
 
-    public static function setEndDate($shift,$typeId)
+    public static function setEndDate($shift, $typeId)
     {
-        $date = Assessments::find()->where(['id'=>$typeId])->andWhere(['<','enddate','2000000000'])->one();
-        if($date) {
+        $date = Assessments::find()->where(['id' => $typeId])->andWhere(['<', 'enddate', '2000000000'])->one();
+        if ($date) {
             $date->enddate = $date->enddate + $shift;
             $date->save();
         }
     }
-    public static function selectItemOrder($todoaid){
-        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (".implode(',',$todoaid).')';
+
+    public static function selectItemOrder($todoaid)
+    {
+        $query = "SELECT id,itemorder FROM imas_assessments WHERE id IN (" . implode(',', $todoaid) . ')';
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
     public static function UpdateItemOrder($newItemList, $id)
     {
-        $data = Assessments::findOne(['id'=>$id]);
-        if($data){
+        $data = Assessments::findOne(['id' => $id]);
+        if ($data) {
             $data->itemorder = $newItemList;
             $data->save();
         }
     }
-    public static  function assessmentDataForOutcomes($courseId)
+
+    public static function assessmentDataForOutcomes($courseId)
     {
         $query = new Query();
-        $query->select(['ia.name', 'ia.gbcategory','ia.defoutcome', 'ia.id', 'iq.category'])
+        $query->select(['ia.name', 'ia.gbcategory', 'ia.defoutcome', 'ia.id', 'iq.category'])
             ->from('imas_assessments AS ia')
-            ->join('JOIN','imas_questions AS iq',
+            ->join('JOIN', 'imas_questions AS iq',
                 'ia.id=iq.assessmentid')
             ->where(['ia.courseid' => $courseId])
-            ->andWhere(['>','ia.defoutcome','0'])
-            ->orWhere(['<>','iq.category','0']);
+            ->andWhere(['>', 'ia.defoutcome', AppConstant::ZERO_VALUE])
+            ->orWhere(['<>', 'iq.category', AppConstant::ZERO_VALUE]);
 
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
 
     }
-   public static function getByCourseIdJoinWithSessionData($assessmentId,$userId,$isteacher,$istutor)
+
+    public static function getByCourseIdJoinWithSessionData($assessmentId, $userId, $isteacher, $istutor)
     {
-         $query = new Query();
-        $query->select(['imas_assessments.name', 'imas_assessments.timelimit','imas_assessments.defpoints', 'imas_assessments.tutoredit', 'imas_assessments.defoutcome',
+        $query = new Query();
+        $query->select(['imas_assessments.name', 'imas_assessments.timelimit', 'imas_assessments.defpoints', 'imas_assessments.tutoredit', 'imas_assessments.defoutcome',
             'imas_assessments.showhints', 'imas_assessments.deffeedback', 'imas_assessments.enddate', 'imas_assessment_sessions.*'])
             ->from('imas_assessments')
-            ->join(	'INNER JOIN',
+            ->join('INNER JOIN',
                 'imas_assessment_sessions',
                 'imas_assessments.id=imas_assessment_sessions.assessmentid'
             )
             ->where(['imas_assessment_sessions.id' => $assessmentId]);
         if (!$isteacher && !$istutor) {
-            $query ->andWhere(['imas_assessment_sessions.userid' => $userId]);
+            $query->andWhere(['imas_assessment_sessions.userid' => $userId]);
         }
         $command = $query->createCommand();
         $data = $command->queryOne();
@@ -352,22 +361,21 @@ class Assessments extends BaseImasAssessments
 
     public static function getByGroupSetId($deleteGrpSet)
     {
-        return Assessments::find()->where(['>','isgroup','0'])->andWhere(['groupsetid' => $deleteGrpSet])->all();
+        return Assessments::find()->where(['>', 'isgroup', AppConstant::ZERO_VALUE])->andWhere(['groupsetid' => $deleteGrpSet])->all();
     }
 
     public static function updateAssessmentForGroups($deleteGrpSet)
     {
         $query = Assessments::find()->where(['groupsetid' => $deleteGrpSet])->all();
-        if($query)
-        {
-            foreach($query as $singleData)
-            {
+        if ($query) {
+            foreach ($query as $singleData) {
                 $singleData->isgroup = AppConstant::NUMERIC_ZERO;
                 $singleData->groupsetid = AppConstant::NUMERIC_ZERO;
                 $singleData->save();
             }
         }
     }
+
     public static function getIdForGroups($grpSetId)
     {
         $query = new Query();
@@ -379,7 +387,8 @@ class Assessments extends BaseImasAssessments
         return $data;
 
     }
-    public static function CommonMethodToGetAssessmentData($toCopy,$id)
+
+    public static function CommonMethodToGetAssessmentData($toCopy, $id)
     {
         $query = new Query();
         $query->select($toCopy)
@@ -389,7 +398,8 @@ class Assessments extends BaseImasAssessments
         $data = $command->queryOne();
         return $data;
     }
-    public static function updateAssessmentData($setslist,$checkedlist)
+
+    public static function updateAssessmentData($setslist, $checkedlist)
     {
         $query = "UPDATE imas_assessments SET $setslist WHERE id IN ($checkedlist)";
         Yii::$app->db->createCommand($query)->query();
@@ -411,22 +421,20 @@ class Assessments extends BaseImasAssessments
         return $query;
     }
 
-    public static function  updateOutcomes($courseId,$unusedList)
+    public static function  updateOutcomes($courseId, $unusedList)
     {
         $query = "UPDATE imas_assessments SET defoutcome=0 WHERE courseid='$courseId' AND defoutcome IN ($unusedList)";
         \Yii::$app->db->createCommand()->queryAll($query);
     }
-    public static function updateAssessmentForCopyCourse($assessNewId,$newId,$num)
+
+    public static function updateAssessmentForCopyCourse($assessNewId, $newId, $num)
     {
         $query = Assessments::find()->where(['id' => $newId])->one();
-        if($query)
-        {
-            if($num == AppConstant::NUMERIC_ZERO)
-            {
+        if ($query) {
+            if ($num == AppConstant::NUMERIC_ZERO) {
                 $query->reqscoreaid = $assessNewId;
                 $query->save();
-            }else
-            {
+            } else {
                 $query->reqscoreaid = AppConstant::NUMERIC_ZERO;
                 $query->save();
             }
@@ -434,17 +442,14 @@ class Assessments extends BaseImasAssessments
         }
     }
 
-    public static function updatePostToForum($assessNewId,$newId,$num)
+    public static function updatePostToForum($assessNewId, $newId, $num)
     {
         $query = Assessments::find()->where(['id' => $newId])->one();
-        if($query)
-        {
-            if($num == AppConstant::NUMERIC_ZERO)
-            {
+        if ($query) {
+            if ($num == AppConstant::NUMERIC_ZERO) {
                 $query->posttoforum = $assessNewId;
                 $query->save();
-            }else
-            {
+            } else {
                 $query->posttoforum = AppConstant::NUMERIC_ZERO;
                 $query->save();
             }
@@ -460,42 +465,46 @@ class Assessments extends BaseImasAssessments
     public static function setEndMessage($id, $msgstr)
     {
         $data = Assessments::getByAssessmentId($id);
-        if($data){
+        if ($data) {
             $data->endmsg = $msgstr;
             $data->save();
         }
     }
+
     public static function getByCId($cid)
     {
         $query = Yii::$app->db->createCommand("SELECT id,name FROM imas_assessments WHERE courseid='$cid'")->queryAll();
         return $query;
     }
-    public static function updateVideoId($from,$to)
+
+    public static function updateVideoId($from, $to)
     {
         $query = "UPDATE imas_assessments SET intro=REPLACE(intro,'$from','$to') WHERE intro LIKE '%$from%'";
-        $connection=\Yii::$app->db;
-        $command=$connection->createCommand($query);
-        $rowCount=$command->execute();
+        $connection = \Yii::$app->db;
+        $command = $connection->createCommand($query);
+        $rowCount = $command->execute();
         return $rowCount;
     }
-    public static function updateSummary($from,$to)
+
+    public static function updateSummary($from, $to)
     {
         $query = "UPDATE imas_assessments SET summary=REPLACE(summary,'$from','$to') WHERE summary LIKE '%$from%'";
-        $connection=\Yii::$app->db;
-        $command=$connection->createCommand($query);
-        $rowCount=$command->execute();
+        $connection = \Yii::$app->db;
+        $command = $connection->createCommand($query);
+        $rowCount = $command->execute();
         return $rowCount;
 
     }
 
-    public static function getItemOrderById($assessmentId){
+    public static function getItemOrderById($assessmentId)
+    {
         return Assessments::find()->select('itemorder')->where(['id' => $assessmentId])->one();
     }
 
     public static function getByName($courseId)
     {
         $query = new Query();
-        $query->select(['id','name'])
+        $query->select(['id', 'name'])
             ->from('imas_assessments')
             ->where(['courseid' => $courseId]);
         $query->orderBy('name');
@@ -512,8 +521,7 @@ class Assessments extends BaseImasAssessments
     public static function deleteByCourseId($courseId)
     {
         $deleteId = Assessments::find()->where(['courseid' => $courseId])->one();
-        if($deleteId)
-        {
+        if ($deleteId) {
             $deleteId->delete();
         }
     }

@@ -2350,6 +2350,7 @@ class GradebookController extends AppController
     public function actionAddRubric()
     {
         $params = $this->getRequestParams();
+        $this->layout = 'master';
         $currentUser = $this->getAuthenticatedUser();
         $overwriteBody = 0;
         $body = "";
@@ -2416,6 +2417,7 @@ class GradebookController extends AppController
         }
         $rubricsName = Rubrics::getByOwnerId($currentUser['id'],$currentUser['groupid']);
         $this->includeJS('gradebook/rubric.js');
+        $this->includeCSS(['gradebook.css']);
         $responseData = array('from' => $from,'body' => $body,'fromstr' => $fromstr,'overwriteBody' => $overwriteBody,'savetitle' => $savetitle,'course' => $course,'rubricsName' => $rubricsName,'rubtype' => $rubtype,'rubgrp' => $rubgrp,'params' => $params,'rubric' => $rubric,'rubname' => $rubname,'isTeacher' => $isTeacher);
         return $this->renderWithData('addRubric', $responseData);
     }
@@ -2423,9 +2425,11 @@ class GradebookController extends AppController
     public function actionEditRubric()
     {
         $currentUser = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $rubicData = Rubrics::getByUserId($currentUser['id']);
+        $this->includeCSS(['gradebook.css']);
         $responseData = array('rubicData' => $rubicData, 'course' => $course);
         return $this->renderWithData('editRubric', $responseData);
 

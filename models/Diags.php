@@ -1,13 +1,9 @@
 <?php
 namespace app\models;
 
-
-use app\components\AppUtility;
 use app\components\AppConstant;
-use app\models\_base\BaseImasCourses;
 use app\models\_base\BaseImasDiags;
 use Yii;
-use yii\db\Exception;
 use yii\db\Query;
 
 
@@ -16,15 +12,15 @@ class Diags extends BaseImasDiags
     public static function getDiagnostic($myRights, $userId, $groupId)
     {
         $query = new Query();
-        $query	->select(['imas_diags.id','imas_diags.name','imas_diags.public'])
-        ->from('imas_diags')
+        $query->select(['imas_diags.id', 'imas_diags.name', 'imas_diags.public'])
+            ->from('imas_diags')
             ->join('JOIN',
                 'imas_users',
                 'imas_users.id=imas_diags.ownerid'
             );
-        if ($myRights<75) {
+        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
             $query->andWhere(['imas_diags.ownerid' => $userId]);
-        } else if ($myRights<100) {
+        } else if ($myRights < AppConstant::NUMERIC_HUNDREAD) {
             $query->andWhere(['imas_users.groupid=' => $groupId]);
         }
         $query->orderBy('imas_diags.name');
@@ -38,6 +34,7 @@ class Diags extends BaseImasDiags
         $query = \Yii::$app->db->createCommand("SELECT sel1list,sel2name,sel2list,aidlist,forceregen FROM imas_diags WHERE id='$id'")->queryOne();
         return $query;
     }
+
     public function saveDiagnostic($params, $userId)
     {
         $this->ownerid = $userId;
@@ -49,16 +46,13 @@ class Diags extends BaseImasDiags
         $this->pws = $params['pwlist'];
         $this->idprompt = $params['idprompt'];
         $this->sel1name = $params['sel1name'];
-//        $this->sel1list = $params['sel1list'];
-//        $this->aidlist = $params['aidlist'];
         $this->sel2name = $params['sel2name'];
-//        $this->sel2list = $params['sel2list'];
         $this->entryformat = $params['entryformat'];
-//        $this->forceregen = $params['forceregen'];
         $this->reentrytime = $params['reentrytime'];
         $this->save();
         return $this->id;
     }
+
     public static function getByDiagnoId($id)
     {
         $query = \Yii::$app->db->createCommand("SELECT name,term,cid,public,idprompt,ips,pws,sel1name,sel1list,entryformat,forceregen,reentrytime,ownerid FROM imas_diags WHERE id='$id'")->queryOne();
@@ -90,7 +84,7 @@ class Diags extends BaseImasDiags
     public static function getNameById($id)
     {
         $query = new Query();
-        $query	->select(['name'])
+        $query->select(['name'])
             ->from('imas_diags')
             ->where(['id' => $id]);
         $command = $query->createCommand();
@@ -101,13 +95,12 @@ class Diags extends BaseImasDiags
     public static function deleteDiagno($params)
     {
         $deleteId = Diags::find()->where(['id' => $params['id']])->one();
-        if ($deleteId)
-        {
+        if ($deleteId) {
             $deleteId->delete();
         }
     }
 
-    public  static  function findByCourseID($courseId)
+    public static function findByCourseID($courseId)
     {
         return Diags::find()->where(['cid' => $courseId])->one();
     }

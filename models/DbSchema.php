@@ -1,10 +1,7 @@
 <?php
 
 namespace app\models;
-
-
 use app\components\AppConstant;
-use app\components\AppUtility;
 use app\models\_base\BaseImasDbschema;
 use yii\db\Query;
 
@@ -17,7 +14,7 @@ class DbSchema extends BaseImasDbschema {
     public static function setById($id){
         $dbData = DbSchema::getById($id);
         if($dbData){
-            $dbData->ver += 1;
+            $dbData->ver += AppConstant::NUMERIC_ONE;
             $dbData->save();
         }
     }
@@ -27,8 +24,8 @@ class DbSchema extends BaseImasDbschema {
         $query = new Query();
         $query ->select(['id','ver'])
                 ->from('imas_dbschema')
-                ->where(['id' => 3])
-                ->orWhere(['id' => 4]);
+                ->where(['id' => AppConstant::NUMERIC_THREE])
+                ->orWhere(['id' => AppConstant::NUMERIC_FOUR]);
         $command = $query->createCommand();
         return $command->queryAll();
 
@@ -36,6 +33,7 @@ class DbSchema extends BaseImasDbschema {
     public static function insertData($lastFirstUpdate,$lastUpdate)
     {
         $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastUpdate),(4,$lastFirstUpdate)";
+        \Yii::$app->db->createCommand($query)->query();
     }
 
     public static function updateData($update,$id)

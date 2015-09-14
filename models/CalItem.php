@@ -1,10 +1,7 @@
 <?php
 namespace app\models;
 
-
-use app\components\AppUtility;
 use app\models\_base\BaseImasCalitems;
-use yii\db\Query;
 
 class CalItem extends BaseImasCalitems
 {
@@ -18,10 +15,10 @@ class CalItem extends BaseImasCalitems
         return CalItem::find()->where(['courseid' => $courseId])->orderBy('date')->all();
     }
 
-    public static function setEvent($date,$tag,$title,$id)
+    public static function setEvent($date, $tag, $title, $id)
     {
         $eventData = CalItem::findOne(['id' => $id]);
-        if($eventData){
+        if ($eventData) {
             $eventData->date = $date;
             $eventData->tag = $tag;
             $eventData->title = $title;
@@ -29,7 +26,8 @@ class CalItem extends BaseImasCalitems
         }
     }
 
-    public function createEvent($newdate,$tag,$title,$courseId){
+    public function createEvent($newdate, $tag, $title, $courseId)
+    {
         $this->date = $newdate;
         $this->tag = $tag;
         $this->title = $title;
@@ -37,10 +35,10 @@ class CalItem extends BaseImasCalitems
         $this->save();
     }
 
-    public static function deleteByCourseId($id,$courseId)
+    public static function deleteByCourseId($id, $courseId)
     {
-        $eventData = CalItem::getById($id,$courseId);
-        if($eventData){
+        $eventData = CalItem::getById($id, $courseId);
+        if ($eventData) {
             $eventData->delete();
         }
     }
@@ -50,33 +48,31 @@ class CalItem extends BaseImasCalitems
         return CalItem::findOne(['id' => $id, 'courseid' => $courseId]);
     }
 
-    public static function setDateByCourseId($shift,$courseId)
+    public static function setDateByCourseId($shift, $courseId)
     {
 
         $date = CalItem::find()->where(['id' => $courseId])->one();
-       if($date) {
-           $date->date = $date->date + $shift;
-           $date->save();
-       }
+        if ($date) {
+            $date->date = $date->date + $shift;
+            $date->save();
+        }
 
     }
 
     public static function deleteForCopyCourse($courseId)
     {
         $data = CalItem::find()->where(['courseid' => $courseId])->all();
-        if($data)
-        {
-            foreach($data as $singleCalItem)
-            {
+        if ($data) {
+            foreach ($data as $singleCalItem) {
                 $singleCalItem->delete();
             }
         }
     }
 
-    public static function getDataForCopyCourse($chkList,$ctc)
+    public static function getDataForCopyCourse($chkList, $ctc)
     {
         $query = \Yii::$app->db->createCommand("SELECT date,tag,title FROM imas_calitems WHERE id IN ($chkList) AND courseid= :ctc");
-        $query->bindValue('ctc',$ctc);
+        $query->bindValue('ctc', $ctc);
         $data = $query->queryAll();
         return $data;
     }
@@ -87,25 +83,11 @@ class CalItem extends BaseImasCalitems
         $data = $query->queryAll();
 
     }
-//    public static function getCalItemDetails($ctc)
-//    {
-//        $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-//
-//        $query  = new Query();
-//        $query->select(['id','date','tag','title'])
-//                ->from('imas_calitems')
-//                ->where(['courseid' => $ctc])
-//                ->orderBy(['date']);
-//        $command = $query->createCommand();
-//        $data = $command->queryAll();
-//        return $data;
-//
-//    }
 
     public static function deleteByCourseIdOne($courseId)
     {
-        $courseData = CalItem::findOne(['courseid',$courseId]);
-        if($courseData){
+        $courseData = CalItem::findOne(['courseid', $courseId]);
+        if ($courseData) {
             $courseData->delete();
         }
     }

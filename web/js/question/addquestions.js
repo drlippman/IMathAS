@@ -2,6 +2,7 @@ $(document).ready(function () {
     selectCheckBox();
     selectCheckBox1();
     $('input[name = "header-checked"]:checked').prop('checked', false);
+    $('input[name = "potentialq-header-checked"]:checked').prop('checked', false);
     $('input[name = "header-checked1"]:checked').prop('checked', false);
 });
 
@@ -15,6 +16,18 @@ function selectCheckBox() {
         }
         else if($(this).prop("checked") == false){
             $('#potential-question-information-table input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
+    $('.question-table input[name = "potentialq-header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('#potential-question-assessment-information-table input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('#potential-question-assessment-information-table input:checkbox').each(function () {
                 $(this).prop('checked', false);
             })
         }

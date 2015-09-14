@@ -6,7 +6,6 @@
  * Time: 8:27 PM
  */
 namespace app\models;
-use app\components\AppUtility;
 use app\models\_base\BaseImasBookmarks;
 use Yii;
 

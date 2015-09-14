@@ -141,16 +141,7 @@ class AssessmentController extends AppController
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
         $assessmentArray = array();
-        if (isset($params['from'])) {
-            $from = $params['from'];
-        } else {
-            $from = 'cp';
-        }
-        if (isset($params['tb'])) {
-            $filter = $params['tb'];
-        } else {
-            $filter = 'b';
-        }
+        list($params, $from, $filter) = $this->blockFilter($params);
         if ($courseId) {
             $assessmentData = Assessments::getByAssessmentId($assessmentId);
             if (isset($params['clearattempts'])) {
@@ -651,17 +642,7 @@ class AssessmentController extends AppController
         }
         $this->includeCSS(['course/items.css', 'course/course.css']);
         $this->includeJS(["editor/tiny_mce.js", "course/assessment.js", "general.js", "assessment/addAssessment.js"]);
-        return $this->renderWithData('addAssessment', ['course' => $course, 'assessmentData' => $assessmentData,
-            'saveTitle' => $saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
-            'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType, 'skipPenalty' => $skipPenalty,
-            'showAnswer' => $showAnswer, 'startDate' => $startDate, 'endDate' => $endDate, 'pageForumSelect' => $pageForumSelect,
-            'pageAllowLateSelect' => $pageAllowLateSelect, 'pageGradebookCategorySelect' => $pageGradebookCategorySelect,
-            'gradebookCategory' => $gradebookCategory, 'countInGradebook' => $countInGb, 'pointCountInGradebook' => $pointCountInGb,
-            'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
-            'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets, 'pageOutcomesList' => $pageOutcomesList,
-            'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,
-            'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
-            'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle,'block' => $block]);
+        return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block);
     }
 
     public function flatArray($outcomesData)
@@ -1085,5 +1066,77 @@ class AssessmentController extends AppController
         $this->includeJS(['editor/tiny_mce.js','assessment/addAssessment.js','general.js']);
         $responseData = array('course' => $course,'params' => $params,'endmsg'=>$endmsg);
         return $this->renderWithData('assessmentMessage',$responseData);
+    }
+
+    /**
+     * @param $course
+     * @param $assessmentData
+     * @param $saveTitle
+     * @param $pageCopyFromSelect
+     * @param $timeLimit
+     * @param $assessmentSessionData
+     * @param $testType
+     * @param $skipPenalty
+     * @param $showAnswer
+     * @param $startDate
+     * @param $endDate
+     * @param $pageForumSelect
+     * @param $pageAllowLateSelect
+     * @param $pageGradebookCategorySelect
+     * @param $gradebookCategory
+     * @param $countInGb
+     * @param $pointCountInGb
+     * @param $pageTutorSelect
+     * @param $minScoreType
+     * @param $useDefFeedback
+     * @param $defFeedback
+     * @param $pageGroupSets
+     * @param $pageOutcomesList
+     * @param $pageOutcomes
+     * @param $showQuestionCategory
+     * @param $sDate
+     * @param $sTime
+     * @param $eDate
+     * @param $eTime
+     * @param $reviewDate
+     * @param $reviewTime
+     * @param $title
+     * @param $pageTitle
+     * @param $block
+     * @return string
+     */
+    public function addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block)
+    {
+        return $this->renderWithData('addAssessment', ['course' => $course, 'assessmentData' => $assessmentData,
+            'saveTitle' => $saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
+            'assessmentSessionData' => $assessmentSessionData, 'testType' => $testType, 'skipPenalty' => $skipPenalty,
+            'showAnswer' => $showAnswer, 'startDate' => $startDate, 'endDate' => $endDate, 'pageForumSelect' => $pageForumSelect,
+            'pageAllowLateSelect' => $pageAllowLateSelect, 'pageGradebookCategorySelect' => $pageGradebookCategorySelect,
+            'gradebookCategory' => $gradebookCategory, 'countInGradebook' => $countInGb, 'pointCountInGradebook' => $pointCountInGb,
+            'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
+            'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets, 'pageOutcomesList' => $pageOutcomesList,
+            'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,
+            'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
+            'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle, 'block' => $block]);
+    }
+
+    /**
+     * @param $params
+     * @return array
+     */
+    public function blockFilter($params)
+    {
+        if (isset($params['from'])) {
+            $from = $params['from'];
+        } else {
+            $from = 'cp';
+        }
+        if (isset($params['tb'])) {
+            $filter = $params['tb'];
+            return array($params, $from, $filter);
+        } else {
+            $filter = 'b';
+            return array($params, $from, $filter);
+        }
     }
 }

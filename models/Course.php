@@ -1,11 +1,8 @@
 <?php
 namespace app\models;
-
-
 use app\components\AppUtility;
 use app\components\AppConstant;
 use app\models\_base\BaseImasCourses;
-use app\controllers\AppController;
 use Yii;
 use yii\db\Exception;
 use yii\db\Query;
@@ -18,7 +15,6 @@ class Course extends BaseImasCourses {
         $course['name'] = $params['coursename'];
         $course['enrollkey'] = $params['ekey'];
         $availables = isset($params['avail']) ? $params['avail'] : AppConstant::AVAILABLE_NOT_CHECKED_VALUE;
-//        $course['available'] = AppUtility::makeAvailable($availables);
         $course['available'] = $params['avail'];
         $course['picicons'] = AppConstant::PIC_ICONS_VALUE;
         $course['allowunenroll'] = AppConstant::UNENROLL_VALUE;
@@ -190,6 +186,7 @@ class Course extends BaseImasCourses {
     public static function getByAvailable($params){
         if(isset($params['cid'])){
             $courseId = intval($params['cid']);
+
             return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4 AND id= $courseId")->queryAll();
         }else{
             return Yii::$app->db->createCommand("SELECT id FROM imas_courses WHERE (istemplate&8)=8 AND available<4")->queryAll();
@@ -319,10 +316,10 @@ class Course extends BaseImasCourses {
         if($myRights > AppConstant::ADMIN_RIGHT){
             $query->andWhere(['imas_courses.available<4']);
         }
-        if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==0){
+        if (($myRights >= AppConstant::LIMITED_COURSE_CREATOR_RIGHT && $myRights < AppConstant::GROUP_ADMIN_RIGHT) || $showcourses==AppConstant::NUMERIC_ZERO){
             $query->andWhere(['imas_courses.ownerid' => $userId]);
         }
-        if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > 0)
+        if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT && $showcourses > AppConstant::NUMERIC_ZERO)
         {
             $query->andWhere(['imas_courses.ownerid' => $showcourses]);
             $query->orderBy('imas_users.LastName,imas_courses.name');
@@ -436,7 +433,7 @@ class Course extends BaseImasCourses {
         $query = new Query();
         $query	->select(['id','itemorder','name'])
             ->from('imas_courses')
-            ->where(['LIKE','itemorder',$search])->limit(40);
+            ->where(['LIKE','itemorder',$search])->limit(AppConstant::LIMITED_COURSE_CREATOR_RIGHT);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -517,7 +514,7 @@ class Course extends BaseImasCourses {
     public static function deleteByCourseId($params, $myRights, $userId)
     {
         $query = "DELETE FROM imas_courses WHERE id='{$params['id']}'";
-        if ($myRights < 75)
+        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
         {
             $query .= " AND ownerid='$userId'";
         }

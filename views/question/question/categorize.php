@@ -14,7 +14,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
  <div class="item-detail-header">
      <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Add/Remove Questions'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL() . 'question/question/add-questions?aid='.$aid.'&cid='.$cid]]); ?>
-<!--        --><?php //echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
  </div>
  <div class = "title-container">
         <div class="row">
@@ -30,20 +29,34 @@ $this->params['breadcrumbs'][] = $this->title;
 
     echo 'Check: <a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',true);return false;">All</a> ';
     echo '<a href="#" onclick="$(\'input[type=checkbox]\').prop(\'checked\',false);return false;">None</a>';
-    echo '<table class="width-hundread-per"><thead><tr><th class="text-align-left"><input type="checkbox" name="" value=""></th><th class="text-align-left">Description</th><th class="text-align-left">Category</th></tr></thead><tbody>';
+    echo '<table class="width-hundread-per categorize-question-table"><thead><tr>
+    <th class="text-align-left">
+        <div class="checkbox override-hidden">
+            <label>
+                <input type="checkbox" name="categorize-question-header-checked" value="">
+                <span class="cr">
+                    <i class="cr-icon fa fa-check"></i>
+                </span>
+            </label>
+        </div>
+    </th>
+    <th class="text-align-left">Description</th>
+    <th class="text-align-left">Category</th>
+    </tr>
+    </thead><tbody id="categorize-question-information-table">';
     $alt = AppConstant::NUMERIC_ZERO;
     foreach($itemarr as $qid) {
         if ($alt == AppConstant::NUMERIC_ZERO) {
-        echo "<tr class='even'><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+        echo "<tr class='even'><td class='padding-left-twenty-six'><input type=\"checkbox\" id=\"c$qid\"/></td>";
             $alt = AppConstant::NUMERIC_ONE;
         }else{
-            echo "<tr class='odd'><td><input type=\"checkbox\" id=\"c$qid\"/></td>";
+            echo "<tr class='odd'><td class='padding-left-twenty-six'><input type=\"checkbox\" id=\"c$qid\"/></td>";
             $alt = AppConstant::NUMERIC_ZERO;
         }
 
 
         echo "<td>{$descriptions[$qid]}</td><td>";
-        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control width-thirty-per qsel\">";
+        echo "<select id=\"$qid\" name=\"$qid\" class=\"form-control width-fifty-per qsel\">";
         echo "<option value=\"0\" ";
         if ($category[$qid] == 0) {
             echo "selected=1";
@@ -98,7 +111,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     echo "</tbody></table>\n";
     if (count($outcomes)>0) {
-        echo '<p>Apply outcome to selected: <select id="masssel">';
+        echo '<p>Apply outcome to selected: <select class="form-control width-twenty-per display-inline-block" id="masssel">';
         $ingrp = false;
         $issel = false;
         foreach ($outcomes as $oc) {
