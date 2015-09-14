@@ -29,7 +29,7 @@ switch($action) {
         echo '<div class="col-lg-10">For students to enroll in this course, you will need to provide them two things</div><ol>';
         echo '<div class=col-lg-10><li>The course ID: <b>'.$cid.'</b></li></div>';
         if (trim($params['ekey'])=='') {
-            echo '<li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
+            echo '<div class="col-lg-10"><li>Tell them to leave the enrollment key blank, since you didn\'t specify one.  The enrollment key acts like a course ';
             echo 'password to prevent random strangers from enrolling in your course.  If you want to set an enrollment key, ';
             echo '<a href="forms.php?action=modify&id='.$cid.'">modify your course settings</a></li>';
         } else {
