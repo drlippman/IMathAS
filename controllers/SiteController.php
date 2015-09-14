@@ -3,7 +3,10 @@
 namespace app\controllers;
 
 use app\components\AppConstant;
+use app\models\AssessmentSession;
 use app\models\Course;
+use app\models\DiagOneTime;
+use app\models\Diags;
 use app\models\forms\ChangeUserInfoForm;
 use app\models\forms\DiagnosticForm;
 use app\models\forms\ForgotPasswordForm;
@@ -104,7 +107,271 @@ class SiteController extends AppController
      */
     public function actionDiagnostics()
     {
-        return $this->renderWithData('diagnostics');
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $diagId = $this->getParamVal('id');
+        $params = $this->getRequestParams();
+        $imasroot = AppUtility::getHomeURL();
+        session_start();
+        $sessionid = session_id();
+
+        if (!isset($params['id']))
+        {
+            $displayDiagnostics = Diags::getByIdAndName();
+        }
+        $line = Diags::getAllDataById($diagId);
+        $pcid = $line['cid'];
+        $diagid = $line['id'];
+        if ($line['term'] == '*mo*') {
+            $diagqtr = date("M y");
+        } else if ($line['term'] == '*day*') {
+            $diagqtr = date("M j y");
+        } else {
+            $diagqtr = $line['term'];
+        }
+        $sel1 = explode(',',$line['sel1list']);
+        $userip = $_SERVER['REMOTE_ADDR'];
+        $noproctor = false;
+        if ($line['ips'] != '')
+        {
+            foreach (explode(',',$line['ips']) as $ip) {
+                if ($ip=='*') {
+                    $noproctor = true;
+                    break;
+                } else if (strpos($ip,'*')!==FALSE) {
+                    $ip = substr($ip,0,strpos($ip,'*'));
+                    if ($ip == substr($userip,0,strlen($ip))) {
+                        $noproctor = true;
+                        break;
+                    }
+                } else if ($ip==$userip) {
+                    $noproctor = true;
+                    break;
+                }
+            }
+        }
+        $sessionIdData = Sessions::getBySessionId($sessionid);
+        if (count($sessionIdData) > AppConstant::NUMERIC_ZERO) {
+            Sessions::deleteBySessionId($sessionid);
+            $sessiondata = array();
+            if (isset($_COOKIE[session_name()])) {
+                setcookie(session_name(), '', time()-42000, '/');
+            }
+            session_destroy();
+//            return $this->redirect('site', 'diagnostics?id=' .$diagId);
+        }
+
+        if (isset($params['SID']))
+        {
+            $params['SID'] = trim(str_replace('-','',$params['SID']));
+
+            if (trim($params['SID']) == '' || trim($params['firstname']) == '' || trim($params['lastname']) == '')
+            {
+                echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
+                exit;
+            }
+            $result = Diags::getByDiagId($diagId);
+            $entryformat = $result[0]['entryformat'];
+            $sel1 = explode(',',$result[0]['sel1list']);
+            $entrytype = substr($entryformat,0,1); //$entryformat{0};
+            $entrydig = substr($entryformat,1); //$entryformat{1};
+            $entrynotunique = false;
+            if ($entrytype == 'A' || $entrytype == 'B')
+            {
+                $entrytype = chr(ord($entrytype) + 2);
+                $entrynotunique = true;
+            }
+            $pattern = '/^';
+            if ($entrytype == 'C')
+            {
+                $pattern .= '\w';
+            } else if ($entrytype == 'D')
+            {
+                $pattern .= '\d';
+            } else if ($entrytype == 'E')
+            {
+                $pattern .= '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}';
+            }
+
+            if ($entrytype != 'E')
+            {
+                if ($entrydig == 0)
+                {
+                    $pattern .= '+';
+                } else {
+                    $pattern .= '{'.$entrydig.'}';
+                }
+            }
+            $pattern .= '$/i';
+
+            if (!preg_match($pattern, $params['SID']))
+            {
+                echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
+                if ($entrydig > 0 && $entrytype != 'E') {
+                    echo $entrydig.' ';
+                }
+                if ($entrytype=='C')
+                {
+                    echo _('letters or numbers');
+                } else if ($entrytype=='D') {
+                    echo _('numbers');
+                } else if ($entrytype=='E') {
+                    echo _('an email address');
+                }
+                echo "<a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
+            }
+
+            if ($params['course'] == -1)
+            {
+                echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
+                exit;
+            }
+            $pws = explode(';',$line['pws']);
+            if (trim($pws[0])!='') {
+                $basicpw = explode(',',$pws[0]);
+            } else {
+                $basicpw = array();
+            }
+            if (count($pws)>1 && trim($pws[1])!='') {
+                $superpw = explode(',',$pws[1]);
+            } else {
+                $superpw = array();
+            }
+            //$pws = explode(',',$line['pws']);
+            foreach ($basicpw as $k=>$v) {
+                $basicpw[$k] = strtolower($v);
+            }
+            foreach ($superpw as $k=>$v) {
+                $superpw[$k] = strtolower($v);
+            }
+            $diagSID = $params['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
+            if ($entrynotunique)
+            {
+                $diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
+            }
+            if (!$noproctor)
+            {
+                if (!in_array(strtolower($params['passwd']),$basicpw) && !in_array(strtolower($params['passwd']),$superpw)) {
+                    $password = strtoupper($params['passwd']);
+                    $result = DiagOneTime::getByCode($password, $diagId);
+                    $passwordnotfound = false;
+                    if (count($result) > 0)
+                    {
+                        $row = count($result); //[0] = id, [1] = goodfor
+                        if ($row['goodfor'] == 0)
+                        {  //onetime
+                            DiagOneTime::deleteById($row['id']);
+                        } else
+                        { //set time expiry
+                            $now = time();
+                            if ($row['goodfor'] < 100000000)
+                            { //is time its good for - not yet used
+                                $expiry = $now + $row['goodfor']*60;
+                                DiagOneTime::setGoodFor($row['id'], $expiry);
+                            } else if ($now < $row['goodfor'])
+                            {//is expiry time and we're within it
+                                //alls good
+                            } else { //past expiry
+                                DiagOneTime::deleteById($row['id']);
+                                $passwordnotfound = true;
+                            }
+                        }
+                    } else {
+                        $passwordnotfound = true;
+                    }
+                    if ($passwordnotfound) {
+                        $result = User::getPassword($diagSID);
+                        if (count($result) > 0 && strtoupper(mysql_result($result,0,0))==strtoupper($params['passwd'])) {
+
+                        } else {
+                            echo "<html><body>", _('Error, password incorrect or expired.'), "
+                            <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
+                            exit;
+                        }
+                    }
+                }
+            }
+            $cnt = 0;
+            $now = time();
+
+            $result = User::getBySId($diagSID);
+            if (count($result) > 0)
+            {
+                $userid = $result[0]['id'];
+                $allowreentry = ($line['public']&4);
+                if (!in_array(strtolower($params['passwd']),$superpw) && (!$allowreentry || $line['reentrytime'] > 0))
+                {
+                    $aids = explode(',',$line['aidlist']);
+                    $paid = $aids[$params['course']];
+                    $r2 = AssessmentSession::getByIdAndStartTime($userid, $paid);
+                    if (count($r2) > 0) {
+                        if (!$allowreentry) {
+                            echo _("You've already taken this diagnostic."), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
+                            exit;
+                        } else {
+                            $d = count($r2);
+                            $now = time();
+                            if ($now - $d[1] > 60*$line['reentrytime']) {
+                                echo _('Your window to complete this diagnostic has expired.'), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
+                                exit;
+                            }
+                        }
+                    }
+                }
+
+                $sessiondata['mathdisp'] = $params['mathdisp'];//1;
+                $sessiondata['graphdisp'] = $params['graphdisp'];//1;
+                $sessiondata['useed'] = 1;
+                $sessiondata['isdiag'] = $diagid;
+                $enc = base64_encode(serialize($sessiondata));
+                if (!empty($params['tzname']))
+                {
+                    $tzname = $params['tzname'];
+                } else {
+                    $tzname = '';
+                }
+                $session = new Sessions();
+                $session->createSession('c', $userid, $now,$params['tzoffset'],$tzname,$enc);
+                $aids = explode(',',$line['aidlist']);
+                $paid = $aids[$_POST['course']];
+                if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
+                   AssessmentSession::deleteData($userid,$paid);
+                }
+
+                User::setLastAccess($now, $userid);
+                return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
+            }
+
+            $eclass = $sel1[$params['course']] . '@' . $params['teachers'];
+
+            $ten = AppConstant::NUMERIC_TEN;
+            $userData = new User();
+            $userid = $userData->addUser($diagSID,$params['passwd'],$ten,$params['firstname'],$params['lastname'],$eclass,$now);
+
+            $teacher = $params['teachers'];
+            $studentData = new Student();
+
+            $sessiondata['mathdisp'] = $params['mathdisp'];//1;
+            $sessiondata['graphdisp'] = $params['graphdisp'];//1;
+            $sessiondata['useed'] = 1;
+            $sessiondata['isdiag'] = $diagid;
+            $enc = base64_encode(serialize($sessiondata));
+            if (!empty($params['tzname'])) {
+                $tzname = $params['tzname'];
+            } else {
+                $tzname = '';
+            }
+            $sessionEntryData = new Sessions();
+            $sessionEntryData->createSession($sessionid, $userid, $now, $params['tzoffset'], $tzname, $enc);
+
+            $aids = explode(',',$line['aidlist']);
+            $paid = $aids[$_POST['course']];
+
+            return $this->redirect('assessment', 'assessment/show-assessment?cid='.$pcid.'&id='.$paid);
+        }
+        $responseData = array('line' => $line, 'diagid' => $diagid, 'params' => $params, 'displayDiagnostics' => $displayDiagnostics, 'imasroot' => $imasroot);
+        return $this->renderWithData('diagnostics', $responseData);
     }
 
     /**
@@ -296,6 +563,7 @@ class SiteController extends AppController
 
     public function actionLogout()
     {
+        AppUtility::dump("asdasd");
         if ($this->getAuthenticatedUser()) {
             $sessionId = Yii::$app->session->getId();
             Sessions::deleteBySessionId($sessionId);

@@ -46,4 +46,36 @@ class DiagOneTime extends BaseImasDiagOnetime
            $single->delete();
         }
     }
+
+    public static function getByCode($password, $diagid)
+    {
+        $query = new Query();
+        $query	->select(['id','goodfor'])
+            ->from('imas_diag_onetime')
+            ->where(['code' => $password]);
+        $query->andWhere(['diag' => $diagid]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function deleteById($diagId)
+    {
+        $diagOneTime = DiagOneTime::find()->where(['id' => $diagId])->one();
+        if($diagOneTime)
+        {
+           $diagOneTime->delete();
+        }
+    }
+
+    public static function setGoodFor($id, $expiry)
+    {
+        $setGood = static::findOne(['id' =>$id]);
+        if($setGood)
+        {
+            $setGood->goodfor = $expiry;
+            $setGood->save();
+        }
+    }
+
 } 

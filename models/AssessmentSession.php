@@ -384,6 +384,24 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $data =  \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getByIdAndStartTime($userid, $paid)
+    {
+        $query = new Query();
+        $query->select(['id','starttime'])
+            ->from('imas_assessment_sessions')
+            ->where(['userid',$userid])
+            ->andWhere(['assessmentid',$paid]);
+        $command = $query->createCommand();
+        $items = $command->queryAll();
+        return $items;
+    }
+
+    public static function deleteData($userid,$paid)
+    {
+        $query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid' LIMIT 1";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
 }
 
 

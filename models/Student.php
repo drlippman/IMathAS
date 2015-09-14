@@ -505,5 +505,13 @@ class Student extends BaseImasStudents {
             $courseData->delete();
         }
     }
+
+    public function insertByUserData($userId, $pcid, $teacher)
+    {
+        $this->userid = $userId;
+        $this->courseid = $pcid;
+        $this->section = $teacher;
+        $this->save();
+    }
 }
 

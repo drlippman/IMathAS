@@ -111,4 +111,31 @@ class Diags extends BaseImasDiags
     {
         return Diags::find()->where(['cid' => $courseId])->one();
     }
+    public static function getByIdAndName()
+    {
+        $query = new Query();
+        $query	->select(['id','name'])
+            ->from('imas_diags')
+            ->where(['public' => AppConstant::NUMERIC_THREE]);
+        $query->orWhere(['public' => AppConstant::NUMERIC_SEVEN]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getAllDataById($diagid)
+    {
+        return static::find()->where(['id' => $diagid])->one();
+    }
+
+    public static function getByDiagId($diagId)
+    {
+        $query = new Query();
+        $query	->select(['entryformat','sel1list'])
+            ->from('imas_diags')
+            ->where(['id' => $diagId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

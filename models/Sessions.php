@@ -65,4 +65,9 @@ class Sessions extends BaseImasSessions {
             $sessionData->save();
         }
     }
+
+    public static function getBySessionId($sessionid)
+    {
+       return Sessions::find()->where(['sessionid' => $sessionid])->all();
+    }
 }

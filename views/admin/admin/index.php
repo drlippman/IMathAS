@@ -118,15 +118,6 @@ $this->params['breadcrumbs'][] = $this->title;
      <?php   }
         ?>
     </div>
-
-
-    <div class="col-lg-12 margin-left-five"><h3>Administration</h3></div>
-
-        <div class='cp item margin-left-twenty'>
-            <span class=column><a HREF="<?php echo AppUtility::getURLFromHome('site', 'change-password') ?>">Change my password</a></span>
-            <span class=column><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Help</a></span>
-            <span class=column><a HREF="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress')  ?>">Log Out</a></span><BR>
-        </div>
     <?php
     if($myRights < 75 && isset($CFG['GEN']['allowteacherexport'])) {
     ?>
@@ -240,7 +231,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?php echo $page_userDataType[$i] ?></td>
                 <td><?php echo $page_userDataLastAccess[$i] ?></td>
                 <td class=c><a href=<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id='.$page_userDataId[$i])?>>Change</a></td>
-                <td class=c><a href="#">Reset</a></td>
+                <td class=c><a href="<?php echo AppUtility::getURLFromHome('site', 'change-password?id='.$page_userDataId[$i]) ?>">Reset</a></td>
                 <td class=c><a href="#">Delete</a></td>
                 </tr>
             <?php
@@ -355,7 +346,7 @@ $this->params['breadcrumbs'][] = $this->title;
             html += "<td>"+users.rights+"</td>";
             html += "<td>"+users.lastaccess+"</td>";
             html += "<td><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?id=') ?>'"+users.id+"'>Reset</a></td>";
+            html += "<td><a href='<?php echo AppUtility::getURLFromHome('site', 'change-password?id=') ?>'"+users.id+"'>Reset</a></td>";
             html += "<td ><a href='<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?id=') ?>'"+users.id+"'>Delete</a></td></tr>";
         });
         $(".user-table-body").append(html);

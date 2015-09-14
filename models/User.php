@@ -663,7 +663,6 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     }
     public static function getByUserIdASDiagnoId($params)
     {
-
         $query = new Query();
         $query ->select(['imas_users.id', 'imas_users.groupid'])
             ->from('imas_users')
@@ -674,7 +673,38 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
          ->andWhere(['imas_diags.id' => $params['id']]);
         $command = $query->createCommand();
         $data = $command->queryOne();
-        return $data;    
+        return $data;
     }
+
+    public static function getPassword($diagSID)
+    {
+        return User::find()->select('password')->where(['SID' => $diagSID])->all();
+    }
+
+    public static function getBySId($diagSID)
+    {
+        return User::find()->select('id')->where(['SID' => $diagSID])->all();
+    }
+
+    public static function setLastAccess($now, $userid)
+    {
+        $user = static::findOne(['id' =>$userid]);
+        $user->lastaccess = $now;
+        $user->save();
+    }
+
+    public function addUser($diagSID,$passwd,$ten,$firstname,$lastname,$eclass,$now)
+    {
+        $this->SID = $diagSID;
+        $this->password = $passwd;
+        $this->rights = $ten;
+        $this->FirstName = $firstname;
+        $this->LastName = $lastname;
+        $this->email = $eclass;
+        $this->lastaccess = $now;
+        $this->save();
+        return $this->id;
+    }
+
 }
 
