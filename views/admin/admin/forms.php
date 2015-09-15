@@ -208,7 +208,7 @@ switch($action) {
                     <div class='col-md-3 select-text-margin'>
                             Default start/end time for new items
                     </div>
-                    <div class=col-md-6>";
+                    <div class=col-md-8>";
                             echo '<span class="floatleft non-bold select-text-margin">Start</span>';
 
                             echo '<div class ="floatleft width-fourty-per margin-left-fifteen margin-right-minus-eleven-per margin-left-fifteen time-input">';

@@ -24,7 +24,7 @@ $now = $currentTime;
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
         <div class="pull-left header-btn">
-            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid='.$course->id); ?>"
+            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
                class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting</a>
         </div>
     </div>
