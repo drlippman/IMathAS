@@ -136,9 +136,9 @@ class AppConstant
     const MIN_LATEPASS = "These students all have %u latepasses.";
     const MIN_MAX_LATEPASS="These students have %u-%u latepasses.";
     const ASSESSMENT_ALREADY_STARTED = "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
-    const DEFAULT_ASSESSMENT_INTRO = "Enter intro/instructions";
+    const DEFAULT_ASSESSMENT_INTRO = "<p>Enter intro/instructions</p>";
     const DEFAULT_ASSESSMENT_NAME = "Enter assessment name";
-    const DEFAULT_ASSESSMENT_SUMMARY = "Enter summary here (shows on course page)";
+    const DEFAULT_ASSESSMENT_SUMMARY = "<p>Enter summary here (shows on course page)</p>";
     const MODIFY_ASSESSMENT ="Modify Assessment";
     const MODIFY_BlOCK ="Modify Block";
     const ADD_ASSESSMENT ="Add Assessment";

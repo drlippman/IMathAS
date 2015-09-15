@@ -15,14 +15,12 @@ use app\models\GbCats;
 use app\models\Items;
 use app\models\Outcomes;
 use app\models\Questions;
-
 use app\models\SetPassword;
 use app\models\Student;
 use app\models\StuGroupSet;
 use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
-
 class AssessmentController extends AppController
 {
     public function actionShowAssessment()
@@ -328,22 +326,18 @@ class AssessmentController extends AppController
                 }
                 $calTag = $params['caltagact'];
                 $calrTag = $params['caltagrev'];
+                require_once("../components/htmLawed.php");
                 $params['name'] = htmlentities(stripslashes($params['name']));
+                $htmlawedconfig = array('elements'=>'*-script');
                 if ($params['summary'] == AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
                     $params['summary'] = '';
                 } else {
-                    $params['summary'] = '';
-                    /*
-                     * HtmLawed in progress
-                     */
+                    $params['summary'] = htmLawed(stripslashes($_POST['summary']),$htmlawedconfig);
                 }
                 if ($params['intro'] == AppConstant::DEFAULT_ASSESSMENT_INTRO) {
                     $params['intro'] = '';
                 } else {
-
-                    /*
-                     * HtmLawed in progress
-                     */
+                    $params['intro'] = htmLawed(stripslashes($_POST['intro']),$htmlawedconfig);
                 }
                 $assessmentArray['courseid'] = $params['cid'];
                 $assessmentArray['name'] = $params['name'];
@@ -396,7 +390,8 @@ class AssessmentController extends AppController
                               *NOT ALLOWED CURRENTLY
                               */
                     }
-                    Assessments::updateAssessment($params, $timeLimit, $isGroup, $showHints, $tutorEdit, $defFeedback, $shuffle, $calTag, $calrTag, $defFeedbackText, $isTutorial, $endMsg, $startDate, $endDate, $reviewDate);
+                    $assessmentArray['id'] = $params['id'];
+                    Assessments::updateAssessment($assessmentArray);
                     if ($from == 'gb') {
                         return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $courseId));
                     } else if ($from == 'mcd') {
@@ -457,8 +452,10 @@ class AssessmentController extends AppController
                         $defFeedback = $assessmentData['deffeedbacktext'];
                     }
                     if ($assessmentData['summary'] == '') {
+                        $assessmentData['summary'] = AppConstant::DEFAULT_ASSESSMENT_SUMMARY;
                     }
                     if ($assessmentData['intro'] == '') {
+                        $assessmentData['intro'] = AppConstant::DEFAULT_ASSESSMENT_INTRO;
                     }
                     $saveTitle = AppConstant::SAVE_BUTTON;
                 } else {//page load in add mode set default values
@@ -641,7 +638,7 @@ class AssessmentController extends AppController
             }
         }
         $this->includeCSS(['course/items.css', 'course/course.css']);
-        $this->includeJS(["editor/tiny_mce.js", "course/assessment.js", "general.js", "assessment/addAssessment.js"]);
+        $this->includeJS(["editor/tiny_mce.js","assessment/addAssessment.js", "general.js"]);
         return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block);
     }
 

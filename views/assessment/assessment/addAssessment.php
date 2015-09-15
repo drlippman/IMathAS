@@ -73,16 +73,17 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="editor-summary">
        <div class="col-lg-2"><?php AppUtility::t('Summary')?></div>
         <div class="col-lg-10">
-            <?php echo "<div class='editor'>
-                <textarea cols=5 rows=12 id=description name=description style='width: 100%'>$assessmentData->summary</textarea></div><br>"; ?>
+            <div class='editor'>
+                <textarea cols=5 rows=12 id=summary name=summary style='width: 100%'><?php echo $assessmentData["summary"];?></textarea>
+            </div><br>
         </div>
     </div><BR class=form>
 
     <div class="editor-summary">
         <div class="col-lg-2"><?php AppUtility::t('Intro/Instructions')?></div>
         <div class="col-lg-10">
-            <?php echo "<div class='editor'>
-            <textarea cols=5 rows=12 id='intro' name='intro' style='width: 100%'>$assessmentData->intro</textarea></div><br>"; ?>
+            <div class='editor'>
+            <textarea cols=5 rows=12 id='intro' name='intro' style='width: 100%'><?php echo $assessmentData["intro"];?></textarea></div><br>
         </div>
     </div><BR class=form>
         <div class=col-lg-2><?php AppUtility::t('Visibility')?></div>

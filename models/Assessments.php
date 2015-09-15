@@ -81,58 +81,14 @@ class Assessments extends BaseImasAssessments
         return $this->id;
     }
 
-    public static function updateAssessment($params, $timeLimit, $isGroup, $showHints,
-                                            $tutorEdit, $defFeedback, $shuffle, $calTag,
-                                            $calrtag, $defFeedbackText, $isTutorial, $endMsg,
-                                            $startDate, $endDate, $reviewDate)
+    public static function updateAssessment($params)
     {
         $assessment = Assessments::findOne(['id' => $params['id']]);
-        $assessment->name = trim($params['name']);
-        $assessment->summary = $params['summary'];
-        $assessment->intro = $params['intro'];
-        $assessment->timelimit = $timeLimit;
-        $assessment->minscore = $params['minscore'];
-        $assessment->isgroup = $isGroup;
-        $assessment->showhints = $showHints;
-        $assessment->tutoredit = $tutorEdit;
-        $assessment->eqnhelper = $params['eqnhelper'];
-        $assessment->showtips = $params['showtips'];
-        $assessment->displaymethod = $params['displaymethod'];
-        $assessment->defattempts = $params['defattempts'];
-        $assessment->deffeedback = $defFeedback;
-        $assessment->shuffle = $shuffle;
-        $assessment->gbcategory = $params['gbcat'];
-        $assessment->password = $params['assmpassword'];
-        $assessment->cntingb = $params['cntingb'];
-        $assessment->showcat = $params['showqcat'];
-        $assessment->caltag = $calTag;
-        $assessment->calrtag = $calrtag;
-        $assessment->reqscore = $params['reqscore'];
-        $assessment->reqscoreaid = $params['reqscoreaid'];
-        $assessment->noprint = $params['noprint'];
-        $assessment->avail = $params['avail'];
-        $assessment->groupmax = $params['groupmax'];
-        $assessment->allowlate = $params['allowlate'];
-        $assessment->exceptionpenalty = $params['exceptionpenalty'];
-        $assessment->ltisecret = $params['ltisecret'];
-        $assessment->deffeedback = $defFeedbackText;
-        $assessment->msgtoinstr = $params['msgtoinstr'];
-        $assessment->posttoforum = $params['posttoforum'];
-        $assessment->istutorial = $isTutorial;
-        $assessment->defoutcome = $params['defoutcome'];
-        if (isset($params['defpoints'])) {
-            $assessment->defpoints = $params['defpoints'];
-            $assessment->defpenalty = $params['defpenalty'];
+        if($assessment){
+            $data = AppUtility::removeEmptyAttributes($params);
+            $assessment->attributes = $data;
+            $assessment->save();
         }
-        if (isset($params['copyendmsg'])) {
-            $assessment->endmsg = $endMsg;
-        }
-        if ($params['avail'] == AppConstant::NUMERIC_ONE) {
-            $assessment->startdate = $startDate;
-            $assessment->enddate = $endDate;
-            $assessment->reviewdate = $reviewDate;
-        }
-        $assessment->save();
     }
 
     public static function deleteAssessmentById($assessmentId)

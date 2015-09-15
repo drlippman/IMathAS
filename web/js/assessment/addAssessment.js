@@ -1,5 +1,7 @@
 $(document).ready(function () {
     initEditor();
+    tinyMCE.triggerSave();
+
 });
 function chgfb() {
     if (document.getElementById("deffeedback").value=="Practice" || document.getElementById("deffeedback").value=="Homework") {
