@@ -4,6 +4,16 @@ use app\components\AppUtility;
 $this->title = 'Diagnostics';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+    <div class="item-detail-header">
+        <?php echo $this->render("../itemHeader/_indexWithLeftContent", ['link_title' => ['Home'], 'link_url' => [AppUtility::getHomeURL() . 'site/index'], 'page_title' => $this->title]); ?>
+    </div>
+    <div class="title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+        </div>
+    </div>
 <?php
 
 if (!isset($params['id']))
@@ -14,7 +24,6 @@ if (!isset($params['id']))
     $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
     $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/jstz_min.js\" ></script>";
     $pagetitle = "Diagnostics";
-//    require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
     echo "<img class=\"floatleft\" src=\"$imasroot/img/ruler.jpg\"/>
 		<div class=\"content\">
 		<div id=\"headerdiagindex\" class=\"pagetitle\"><h2>", _('Available Diagnostics'), "</h2></div>
@@ -27,35 +36,30 @@ if (!isset($params['id']))
         <a href=".AppUtility::getURLFromHome('site', 'diagnostics?id='.$row['id']).">".$row['name']."</a></li>";
     }
     echo "</ul></div>";
-    exit;
+
 }?>
 
 <?php if (!($line['public']&1)) {
 echo "<html><body>", _('This diagnostic is not currently available to be taken'), "</body></html>";
-exit;
+    exit;
 } ?>
 
 <?php if (file_exists((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php")) {
-//require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'')."diag$diagid.php");
 } else {
 $nologo = true;
 $infopath = isset($CFG['GEN']['directaccessincludepath'])?$CFG['GEN']['directaccessincludepath']:'';
 $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/{$infopath}infopages.css\" type=\"text/css\">\n";
 $placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/js/jstz_min.js\" ></script>";
 $pagetitle =$line['name'];
-//require((isset($CFG['GEN']['diagincludepath'])?$CFG['GEN']['diagincludepath']:'../')."infoheader.php");
 ?>
 
 <div class="tab-content shadowBox non-nav-tab-item">
     <br>
 <form method=post action="diagnostics?id=<?php echo $diagid; ?>">
-<!--    <span class=form>--><?php //echo $line['idprompt']; ?><!--</span> <input class=form type=text size=12 name=SID><BR class=form>-->
     <div class=col-lg-2><?php echo $line['idprompt']; ?></div>
     <div class="col-lg-6"><input class=form type=text size=12 name=SID></div><BR class=form>
-<!--    <span class=form>--><?php //echo _('Enter First Name:'); ?><!--</span> <input class=form type=text size=20 name=firstname><BR class=form>-->
     <div class=col-lg-2><?php echo _('Enter First Name'); ?></div>
     <div class="col-lg-6"><input class=form type=text size=20 name=firstname></div><BR class=form>
-<!--    <span class=form>--><?php //echo _('Enter Last Name:'); ?><!--</span> <input class=form type=text size=20 name=lastname><BR class=form>-->
     <div class=col-lg-2><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class=form type=text size=20 name=lastname></div><BR class=form>
 
     <script type="text/javascript">
@@ -93,7 +97,6 @@ $pagetitle =$line['name'];
     ?>
 </select></div><br class=form><br class=form>
 
-<!--    <span class=form>--><?php //printf(_('Select your %s'), $line['sel2name']); ?><!--</span><span class=formright>-->
     <div class=col-lg-2><?php printf(_('Select your %s'), $line['sel2name']); ?></div>
     <div class=col-lg-4>
         <select name="teachers" class="form-control" id="teachers">
@@ -104,7 +107,6 @@ $pagetitle =$line['name'];
     <?php
     if (!$noproctor) {
         echo "<b><div class='col-lg-12'>", _('This test can only be accessed from this location with an access password'), "</div></b></br>\n";
-//        echo "<span class=form>", _('Access password:'), "</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
         echo "<div class=col-lg-2>", _('Access password'), "</div>  <div class='col-lg-4'><input class=form type=password size=40 name=passwd></div><BR class=form>";
     }
     ?>

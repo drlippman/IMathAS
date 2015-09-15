@@ -116,8 +116,75 @@ class Libraries extends BaseImasLibraries
         $this->groupid = $user->groupid;
         $this->save();
         return $this->id;
-
     }
 
+    public static function getByNameParents($name, $parents)
+    {
+        $query = new Query();
+        $query	->select(['*'])
+            ->from('imas_libraries')
+            ->where(['name' => $name]);
+        $query->andWhere(['parent' => $parents]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public function insertDataWithSort($uqid,$now, $now,$params,$userId,$groupId)
+    {
+        $this->uniqueid = $uqid;
+        $this->adddate = $now;
+        $this->lastmoddate = $now;
+        $this->name = $params['name'];
+        $this->ownerid = $userId;
+        $this->userights = $params['rights'];
+        $this->sortorder = $params['sortorder'];
+        $this->parent = $params['libs'];
+        $this->groupid = $groupId;
+        $this->save();
+        return $this->id;
+    }
 
+    public static function getByLibraryId($id)
+    {
+        $query = new Query();
+        $query	->select(['name','userights','parent','sortorder'])
+            ->from('imas_libraries')
+            ->where(['id' => $id]);
+
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getByModifyId($id, $isAdmin, $userId)
+    {
+        $query = new Query();
+        $query	->select(['name','userights','parent','sortorder'])
+            ->from('imas_libraries')
+            ->where(['id' => $id]);
+        if(!$isAdmin)
+        {
+            $query->andWhere(['ownerid' => $userId]);
+        }
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
+
+    public static function updateById($params,$isadmin,$groupid,$isgrpadmin,$userid,$now)
+    {
+
+        $query = "UPDATE imas_libraries SET name='{$params['name']}',userights='{$params['rights']}',sortorder='{$params['sortorder']}',lastmoddate=$now";
+        if ($params['modify'] != $params['libs']) {
+            $query .= ",parent='{$params['libs']}'";
+        }
+        $query .= " WHERE id='{$_GET['modify']}'";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
 }

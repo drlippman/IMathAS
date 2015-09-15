@@ -162,7 +162,6 @@ class SiteController extends AppController
             session_destroy();
 //            return $this->redirect('site', 'diagnostics?id=' .$diagId);
         }
-
         if (isset($params['SID']))
         {
             $params['SID'] = trim(str_replace('-','',$params['SID']));
@@ -170,7 +169,7 @@ class SiteController extends AppController
             if (trim($params['SID']) == '' || trim($params['firstname']) == '' || trim($params['lastname']) == '')
             {
                 echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=$diagid\">", _('Try Again'), "</a>\n";
-                exit;
+//                exit;
             }
             $result = Diags::getByDiagId($diagId);
             $entryformat = $result[0]['entryformat'];
@@ -205,7 +204,6 @@ class SiteController extends AppController
                 }
             }
             $pattern .= '$/i';
-
             if (!preg_match($pattern, $params['SID']))
             {
                 echo "<html><body>", _('Your ID is not valid.  It should contain'), " ";
@@ -226,7 +224,7 @@ class SiteController extends AppController
             if ($params['course'] == -1)
             {
                 echo "<html><body>", sprintf(_('Please select a %1$s and %2$s.'), $line['sel1name'], $line['sel2name']), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-                exit;
+//                exit;
             }
             $pws = array();
             $pws = explode(';',$line['pws']);
@@ -289,7 +287,7 @@ class SiteController extends AppController
                         } else {
                             echo "<html><body>", _('Error, password incorrect or expired.'), "
                             <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Try Again'), "</a>\n";
-                            exit;
+//                            exit;
                         }
                     }
                 }
@@ -310,13 +308,13 @@ class SiteController extends AppController
                     if (count($r2) > 0) {
                         if (!$allowreentry) {
                             echo _("You've already taken this diagnostic."), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-                            exit;
+//                            exit;
                         } else {
                             $d = count($r2);
                             $now = time();
                             if ($now - $d[1] > 60*$line['reentrytime']) {
                                 echo _('Your window to complete this diagnostic has expired.'), "  <a href='".AppUtility::getURLFromHome('site', 'diagnostics?id='.$diagId)."'>" , _('Back'), "</a>\n";
-                                exit;
+//                                exit;
                             }
                         }
                     }

@@ -661,6 +661,7 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     public static function getUserGreaterThenTeacherRights(){
         return User::find()->select('id, FirstName, LastName')->where(['>=','rights', AppConstant::TEACHER_RIGHT])->orderBy('LastName,FirstName')->all();
     }
+
     public static function getByUserIdASDiagnoId($params)
     {
         $query = new Query();
@@ -706,5 +707,14 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         return $this->id;
     }
 
+    public static function getByIdOrdered()
+    {
+        return User::find()->select('id, FirstName, LastName')->where(['>=','rights', 19])->orderBy('LastName,FirstName')->all();
+    }
+
+    public static function getByGroupId($id)
+    {
+        return User::find()->select('groupid')->where(['id' => $id])->all();
+    }
 }
 

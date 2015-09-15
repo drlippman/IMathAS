@@ -40,10 +40,12 @@ switch($action) {
         echo '<div class=col-lg-10><a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a></div>';
     break;
     case "delete":
-        echo '<div id="headerforms" class="pagetitle"><h2>Delete Course</h2></div>';
-        echo "<p>Are you sure you want to delete the course <b>$name</b>?</p>\n";
-        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
+        echo '<div id="headerforms" class="pagetitle col-lg-10"><h2>Delete Course</h2></div>';
+        echo '<div>';
+        echo "<div class='col-lg-10'>Are you sure you want to delete the course <b>$name</b>?</div><br>\n";
+        echo "<div class='col-lg-10'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></div>\n";
+        echo "</div>";
         break;
     case "deladmin":
         echo "<p>Are you sure you want to delete this user?</p>\n";
@@ -531,17 +533,20 @@ switch($action) {
         break;
     case "transfer":
         echo '<div id="headerforms" class="pagetitle">';
-        echo "<h3>Transfer Course Ownership</h3>\n";
+        echo '<div>';
+        echo "<div class='col-lg-10'><h3>Transfer Course Ownership</h3></div>\n";
         echo '</div>';
         echo "<form method=post action=\"actions?action=transfer&id={$_GET['cid']}\">\n";
-        echo "Transfer course ownership to: <select name=newowner>\n";
+        echo "<div class='col-lg-3'>Transfer course ownership to</div>
+         <div class='col-lg-4'><select name=newowner class='form-control'>\n";
         foreach($queryUser as $key => $row)
         {
             echo "<option value=\"$row[id]\">$row[LastName], $row[FirstName]</option>\n";
         }
-        echo "</select>\n";
-        echo "<p><input type=submit value=\"Transfer\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></p>\n";
+        echo "</select></div>\n";
+        echo "<div class='col-lg-10'><input type=submit value=\"Transfer\">\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin'\"></div>\n";
+        echo "</div>";
         echo "</form>\n";
         break;
     case "deloldusers":

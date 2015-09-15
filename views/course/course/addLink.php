@@ -6,7 +6,6 @@ use kartik\date\DatePicker;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\AppConstant;
-
 $this->title = 'Add Link';
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
