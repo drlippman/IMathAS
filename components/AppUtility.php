@@ -9,10 +9,10 @@ use app\models\QImages;
 use app\models\Questions;
 use app\models\Course;
 use app\models\QuestionSet;
+use app\models\Sessions;
 use app\models\User;
 use Yii;
 use yii\base\Component;
-use app\models\Sessions;
 
 require_once("../filter/filter.php");
 
@@ -2736,7 +2736,6 @@ class AppUtility extends Component
             Sessions::setSessionId($sessionId,$enc);
     }
 
-
     public static function printq($qn,$qsetid,$seed,$pts,$showpts) {
         global $isfinal,$imasroot,$urlmode,$displayformat,$anstypes,$evaledqtext;
         srand($seed);
@@ -2842,4 +2841,71 @@ class AppUtility extends Component
         }
     }
 
+    public static function printlist($parent,$names = null,$ltlibs = null,$count = null, $qcount = null, $cid = null, $rights = null, $sortorder = null, $ownerids = null, $userid = null, $isadmin = null, $groupids = null, $groupid = null, $isgrpadmin = null)
+    {
+        $arr = $ltlibs[$parent];
+        if ($sortorder[$parent]==1) {
+            $orderarr = array();
+            foreach ($arr as $child) {
+                $orderarr[$child] = $names[$child];
+            }
+            natcasesort($orderarr);
+            $arr = array_keys($orderarr);
+        }
+
+        foreach ($arr as $child) {
+            //if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
+            if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
+                if (!$isadmin) {
+                    if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
+                        $rights[$child]=4;  //adjust coloring
+                    }
+                }
+                if (isset($ltlibs[$child])) { //library has children
+                    //echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
+                    echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
+                    echo "</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=hdr onClick=\"toggle($child)\"><span class=\"r{$rights[$child]}\">{$names[$child]}</span> </span>\n";
+                    //if ($isadmin) {
+                    echo " ({$qcount[$child]}) ";
+                    //}
+                    echo "<span class=op>";
+
+                    if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
+                        echo "<a href=\"manage-lib?cid=$cid&modify=$child\">Modify</a> | ";
+                        echo "<a href=\"manage-lib?cid=$cid&remove=$child\">Delete</a> | ";
+                        echo "<a href=\"manage-lib?cid=$cid&transfer=$child\">Transfer</a> | ";
+                    }
+                    echo "<a href=\"manage-lib?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+                    echo "<ul class=hide id=$child>\n";
+                    echo "</span>";
+                    $count++;
+                    printlist($child,$names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin);
+                    echo "</ul></li>\n";
+
+                } else {  //no children
+
+                    echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=\"r{$rights[$child]}\">{$names[$child]}</span> ";
+                    //if ($isadmin) {
+                    echo " ({$qcount[$child]}) ";
+                    //}
+                    echo "<span class=op>";
+
+                    if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
+
+                        echo "<a href=\"manage-lib?cid=$cid&modify=$child\">Modify</a> | ";
+                        echo "<a href=\"manage-lib?cid=$cid&remove=$child\">Delete</a> | ";
+                        echo "<a href=\"manage-lib?cid=$cid&transfer=$child\">Transfer</a> | ";
+                    }
+                    if ($qcount[$child]==0) {
+                        echo "<a href=\"manage-lib?cid=$cid&modify=new&parent=$child\">Add Sub</a> ";
+                    } else {
+                        echo "<a href=\"review-library?cid=$cid&lib=$child\">Preview</a>";
+                    }
+                    echo "</span>";
+                    echo "</li>\n";
+                }
+            }
+        }
+        return $parent;
+    }
 }
