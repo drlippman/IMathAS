@@ -1,0 +1,21 @@
+{
+    "name": "serhatozles/yii2-htmlawed",
+    "description": "htmLawed",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","htmlawed","html formatter"],
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "serhatozles",
+            "email": "serhatozles@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "serhatozles\\htmlawed\\": ""
+        }
+    }
+}

@@ -1,6 +1,7 @@
 <?php
 use app\components\AppUtility;
 $this->title = $course->name;
+use serhatozles\htmlawed\htmLawed;
 require_once("../filter/filter.php");
 ?>
 <div class="item-detail-header">
