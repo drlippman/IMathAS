@@ -4,8 +4,7 @@ use yii\bootstrap\ActiveForm;
 use yii\widgets\FileInput;
 use app\components\AppUtility;
 use app\components\AppConstant;
-use kartik\date\DatePicker;
-use kartik\time\TimePicker;
+
 use app\components\AssessmentUtility;
 
 if($defaultValuesArray['studentId'] > 0){
@@ -56,8 +55,16 @@ if($totalData['isTutor']){
 <input type="hidden" id="lastlogin" value="<?php echo $lastlogin?>">
 <input type="hidden" id="includeduedate" value="<?php echo $includeduedate?>">
 <div class="item-detail-header">
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
+<?php if(isset($params['listusers']))
+{ ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
+<?php }else{ ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Roster'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL().'roster/roster/student-roster?cid=' . $course->id]]); ?>
+<?php } ?>
+
+
 </div>
+
 <div class = "title-container">
     <div class = "row">
         <div class = "pull-left page-heading">
@@ -74,84 +81,15 @@ if($totalData['isTutor']){
 </div>
 
 <div class="tab-content shadowBox">
-    <div class="inner-content-gradebook">
-<div class="button-container col-lg-12 padding-zero">
-
-    <span class="inner-page-options col-lg-6 padding-zero pull-left">
-        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
-
-            <li class="dropdown">
-                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
-                   href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
-                <ul class="dropdown-menu with-selected">
-                    <li>
-                            <input type="hidden" id="student-id" name="student-data" value=""/>
-                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                        <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email">
-                                <i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
-                    </li>
-
-                    <li>
-                            <input type="hidden" id="message-id" name="student-data" value=""/>
-                            <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                        <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message">
-                             <i class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
-
-                    </li>
-
-                    <li>
-                        <form action="make-exception?cid=<?php echo $course->id ?>" id="make-exception-form"
-                              method="post">
-                            <input type="hidden" id="exception-id" name="student-data" value=""/>
-                            <input type="hidden" id="section-name" name="section-data" value=""/>
-                            <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$StudentData->userid.'&section-data='.$StudentData['section'])?>"><i
-                                    class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
-                            </a>
-                        </form>
-                    </li>
-
-                    <li>
-
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$StudentData->userid)?>"><i
-                                    class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Change Info'); ?></a>
-
-                    </li>
-
-
-                    <li>
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
-                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Login Log'); ?></a>
-
-
-                    </li>
-
-
-                    <li>
-                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
-                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Activity Log'); ?></a>
-
-                    </li>
-
-                    <li>
-                         <a href="#" onclick="makeofflineeditable(this); return false;">
-<!--                            <a class="with-selected-list" href="javascript: studentCopyEmail()">-->
-                                <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Edit Offline Score'); ?></a>
-
-                    </li>
-
-                </ul>
-            </li>
-        </ul>
-    </span>
-</div><br/>
-
-</div>
-
 
 <?php if ($canviewall) {  ?>
-    <div class=cpmid>
+    <br><div class=col-lg-12>
+        <div class="">
+            <span class="pull-left select-text-margin">
     <?php AppUtility::t('Category')?>
-        <select id="filtersel" onchange="chgfilter()">
+                </span>
+    <div class="col-sm-3">
+        <select id="filtersel" class="form-control " onchange="chgfilter()">
     <option value="-1"
    <?php if ($catfilter==-1) {echo "selected=1";}
     echo '>', _('All'), '</option>';
@@ -167,52 +105,65 @@ if($totalData['isTutor']){
     echo '<option value="-2" ';
     if ($catfilter==-2) {echo "selected=1";}
     echo '>',AppUtility::t('Category Totals'), '</option>';
-    echo '</select> | ';
-    echo _('Not Counted:'), " <select id=\"toggle2\" onchange=\"chgtoggle()\">";
+    echo '</select>
+    </div></div>';
+   echo '<div class=" "><span class="pull-left select-text-margin">';
+    echo _('Not Counted:'), " </span><div class='col-sm-2 drop-down-width'><select id=\"toggle2\" class='form-control  ' onchange=\"chgtoggle()\">";
     echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($hidenc,0); echo ">",AppUtility::t('Show all'), "</option>";
     echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($hidenc,1); echo ">",AppUtility::t('Show stu view'), "</option>";
     echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($hidenc,2); echo ">",AppUtility::t('Hide all'), "</option>";
-    echo "</select>";
-    echo " | ", _('Show:'), " <select id=\"toggle3\" onchange=\"chgtoggle()\">";
+    echo "</select></div></div>";
+
+    echo '<div class=" "><span class="pull-left select-text-margin">', _('Show:'), " </span><div class='col-sm-2 drop-down-width'><select class='form-control  ' id=\"toggle3\" onchange=\"chgtoggle()\">";
     echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($availshow,0); echo ">",AppUtility::t('Past due'), "</option>";
     echo "<option value=3 "; AssessmentUtility::writeHtmlSelected($availshow,3); echo ">",AppUtility::t('Past &amp; Attempted'), "</option>";
     echo "<option value=4 "; AssessmentUtility::writeHtmlSelected($availshow,4); echo ">",AppUtility::t('Available Only'), "</option>";
     echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($availshow,1); echo ">",AppUtility::t('Past &amp; Available'), "</option>";
-    echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($availshow,2); echo ">",AppUtility::t('All'), "</option></select>";
-    echo " | ", _('Links:'), " <select id=\"toggle1\" onchange=\"chgtoggle()\">";
+    echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($availshow,2); echo ">",AppUtility::t('All'), "</option></select></div></div>";
+    echo '<div class=" "><span class="pull-left select-text-margin">', _('Links:'), " </span><div class='col-sm-2 '><select class='form-control link-drop-down ' id=\"toggle1\" onchange=\"chgtoggle()\">";
     echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($links,0); echo ">",AppUtility::t('View/Edit'), "</option>";
     echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($links,1); echo ">",AppUtility::t ('Scores'), "</option></select>";
     echo '<input type="hidden" id="toggle4" value="'.$showpics.'" />';
     echo '<input type="hidden" id="toggle5" value="'.$hidelocked.'" />';
-    echo "</div>";
+   ?>
+     </div></div></div>
+    <?php
 }
+?>
+  <br><br>           <div class="inner-content-gradebook">
+                <div class="button-container col-lg-12 padding-zero">
 
+<span class="col-lg-9">
+
+        <?php
 if ($availshow==4) {
 $availshow=1;
 $hidepast = true;
 }
 if ($studentId>0) {
     $showlatepass = $course['showlatepass'];
-  $latepasshrs = $course['latepasshrs'];
+    $latepasshrs = $course['latepasshrs'];
 }
-//AppUtility::dump($totalData);
 if ($studentId>0) {
-
-echo '<div style="font-size:1.1em;font-weight:bold">';
-    if ($isteacher || $istutor) {
+?>
+ <div style="font-size:1.1em;font-weight:bold">
+   <?php  if ($isteacher || $istutor) {
     if ($gradebook[1][0][1] != '') {
         $usersort = $stugbmode['usersort'];
     } else {
     $usersort = 1;
     }
+   echo '<div>';
     if ($gradebook[1][4][2]==1) {
     if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
     echo "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/cfiles/userimg_sm{$gradebook[1][4][0]}.jpg\" onclick=\"togglepic(this)\" class=\"mida\"/> ";
-    } else {
-    echo "<img src=\"$imasroot/course/files/userimg_sm{$gradebook[1][4][0]}.jpg\" style=\"float: left; padding-right:5px;\" onclick=\"togglepic(this)\" class=\"mida\"/>";
-    }
-    }
-    echo '<select id="userselect" style="border:0;font-size:1.1em;font-weight:bold" onchange="chgstu(this)">';
+    } else { ?>
+ <img src=" <?php AppUtility::getAssetURL().AppConstant::UPLOAD_DIRECTORY.$gradebook[1][4][0].'jpg' ?>" style="float: left; padding-right:5px;" onclick="togglepic(this)" class="mida">
+   <?php }
+    } ?>
+     </div>
+   <div class="col-lg-4"> <?php
+    echo '<select id="userselect" class="form-control"   onchange="chgstu(this)">';
         $lastsec = '';
         foreach($allStudentsinformation as $studiinfo) {
 
@@ -229,6 +180,10 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
             }
             if ($lastsec!='') {echo '</optgroup>';}
         echo '</select>';
+       ?>
+       </div>
+    <div class="section pull-left ">
+       <?php
     echo '<img id="updatingicon" style="display:none" src="'.$imasroot.'/img/updating.gif"/>';
     echo ' <span class="small">('.$gradebook[1][0][1].')</span>';
     } else {
@@ -253,28 +208,82 @@ echo '<div style="font-size:1.1em;font-weight:bold">';
     <span class="small">Section: <?php echo $stusection ?></span>
    <?php } ?>
     <span class="small">Last Login: <?php echo AppUtility::tzdate('D n/j/y g:ia', $lastaccess);?></span>
-    </div>
+    </div></div>
+    </span>
 <?php if ($isteacher) { ?>
-   <div style="clear:both;display:inline-block" class="cpmid secondary">
-    <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email"><?php AppUtility::t('Email')?></a> |
-    <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message"><?php AppUtility::t('Message')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$studentId.'&section-data='.$stusection)?>"><?AppUtility::t('Make Exception')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$studentId)?>"><?php AppUtility::t('Change Info')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$studentId. '&from=gb')?>"><?php AppUtility::t('Login Log')?></a> |
-    <a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$studentId. '&from=gb')?>"><?php AppUtility::t('Activity Log')?></a> |
-    <a href="#" onclick="makeofflineeditable(this); return false;"><?php AppUtility::t('Edit Offline Scores')?></a>
-    </div>
-<?php } else if ($istutor) {
+    <span class="inner-page-options col-lg-3 padding-zero pull-right">
+        <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
+
+            <li class="dropdown">
+                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
+                   href="#"><?php AppUtility::t('With selected'); ?><span class="caret right-aligned"></span></a>
+                <ul class="dropdown-menu with-selected">
+                    <li>
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                            <i class="fa fa-clock-o"></i>&nbsp;<?php AppUtility::t('Activity Log'); ?></a>
+                    </li>
+
+                    <li>
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/change-student-information?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                            <i class='fa fa-pencil fa-fw'></i>&nbsp;<?php AppUtility::t('Change Info'); ?></a>
+                    </li>
+
+                    <li>
+                        <a href="#" onclick="makeofflineeditable(this); return false;">
+                            <!--                            <a class="with-selected-list" href="javascript: studentCopyEmail()">-->
+                            <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Edit Offline Score'); ?></a>
+
+                    </li>
+
+                    <li>
+                        <input type="hidden" id="student-id" name="student-data" value=""/>
+                        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                        <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email">
+                            <i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
+                    </li>
+
+                    <li>
+                        <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/login-log?cid='.$course->id.'&uid='.$StudentData->userid)?>">
+                            <i class="fa fa-clipboard fa-fw"></i>&nbsp;<?php AppUtility::t('Login Log'); ?></a>
+                    </li>
+
+                    <li>
+                        <form action="make-exception?cid=<?php echo $course->id ?>" id="make-exception-form"
+                              method="post">
+                            <input type="hidden" id="exception-id" name="student-data" value=""/>
+                            <input type="hidden" id="section-name" name="section-data" value=""/>
+                            <a class="with-selected-list" href="<?php echo AppUtility::getURLFromHome('roster','roster/make-exception?cid='.$course->id.'&student-data='.$StudentData->userid.'&section-data='.$StudentData['section'])?>"><i
+                                    class='fa fa-plus-square fa-fw'></i>&nbsp;<?php AppUtility::t('Make Exception'); ?>
+                            </a>
+                        </form>
+                    </li>
+
+
+                    <li>
+                        <input type="hidden" id="message-id" name="student-data" value=""/>
+                        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+                        <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message">
+                            <i class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
+
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </span>
+<?php } else if ($istutor) { ?>
+    <?php
 echo '<div style="clear:both;display:inline-block" class="cpmid">';
     echo "<a href=\"viewloginlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Login Log'), "</a> | ";
     echo "<a href=\"viewactionlog.php?cid={$_GET['cid']}&uid=$stu&from=gb\">", _('Activity Log'), "</a>";
-    echo '</div>';
+  ?> </div><br/>
+    </div>  </div> <?php
 }
+echo '<br><br><br>';
 if (trim($gbcomment)!='' || $isteacher) {
 if ($isteacher) { ?>
  <form method=post action="grade-book-student-detail?cid=<?php echo $course->id?>&studentId=<?php echo $studentId?>">
-     Gradebook Comment: <input type=submit value="Update Comment"><br/><br/>
-  <textarea name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
+    Gradebook Comment: <input type=submit value="Update Comment"><br/><br/>
+  <textarea class="text-area-padding" name="user-comments" rows=3 cols=60><?php echo $gbcomment;?></textarea>
      </form>
     <?php
 } else { ?>
@@ -294,13 +303,15 @@ echo $lpmsg;
 
 }
 ?>
+<br>
  <form method=post action="grade-book-student-detail?cid='<?php echo $course->id?>'&studentId='<?php echo $studentId?>">
  <?php if ($isteacher && $studentId>0) {
      echo '<button type="submit" value="Save Changes" style="display:none"; id="savechgbtn">', _('Save Changes'), '</button> ';
     echo _('Check:'), ' <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',true)">All</a> <a href="#" onclick="return chkAllNone(\'qform\',\'assesschk[]\',false)">', _('None'), '</a> ';
     echo _('With selected:'), ' <button type="submit" value="Make Exception" name="posted">',_('Make Exception'),'</button> '.$lpmsg.'';
     } ?>
-    <table id="myTable" class="table table-bordered table-striped table-hover data-table" style="position:relative;">
+     <br><br>
+          <table id="myTable" class="table table-bordered table-striped table-hover data-table" style="position:relative;">
     <?php
         echo '<thead>';
             $sarr = array();
@@ -677,7 +688,7 @@ for ($i=0;$i<count($gradebook[0][1]);$i++) { //assessment headers
 
     echo "</form>";
 
-echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
+echo "<script class='javascript'>initSortTable('myTable',Array($sarr),false);</script>\n";
 /*
 if ($hidepast) {
 echo "<script>initSortTable('myTable',Array($sarr),false);</script>\n";
@@ -687,7 +698,7 @@ echo "<script>initSortTable('myTable',Array($sarr),false,-3);</script>\n";
 echo "<script>initSortTable('myTable',Array($sarr),false,-2);</script>\n";
 }
 */
-echo "<p>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
+echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sub>d</sub> Dropped score.  <sup>e</sup> Has exception <sup>LP</sup> Used latepass'), "  </p>\n";
                             echo '</div>';?>
  <script type="text/javascript">
     function showhidefb(el,n) {

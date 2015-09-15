@@ -215,3 +215,8 @@ span.form.select-text-margin{
     margin-right: 30px;
     margin-bottom: 30px;
 }
+.myScrollTable
+{
+    overflow-x: scroll;
+}
+

@@ -529,13 +529,13 @@ class QuestionController extends AppController
                         $libSortOrder[0] = AppConstant::NUMERIC_ZERO;
                     }
 
-                    $query = Libraries::getByIdList($lList);
+                    $query = Libraries::getByIdList(explode(',', $searchLibs));
                     foreach ($query as $row) {
                         $lNamesArray[$row['id']] = $row['name'];
                         $libSortOrder[$row['id']] = $row['sortorder'];
                     }
-                    $lNames = implode(", ", $lNamesArray);
 
+                    $lNames = implode(", ", $lNamesArray);
                     $pageLibRowHeader = ($searchAll == AppConstant::NUMERIC_ONE) ? "<th>Library</th>" : "";
 
                     if (isset($search)) {

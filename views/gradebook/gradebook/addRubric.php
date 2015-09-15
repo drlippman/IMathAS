@@ -4,7 +4,7 @@ use app\components\AssessmentUtility;
 ?>
 <div class="item-detail-header"> <?php
 
-    if (isset($params['id'])) {
+    if (isset($params['id']) || isset($params['nomanage'])) {
         if ($from=='modq') {
             $breadcrumb = $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Modify Question Settings','Manage Rubrics'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' .$course->id , AppUtility::getHomeURL() .'gradebook/gradebook/modify-question?cid=' . $course->id.'aid='.$params['aid'].'id='.$params['qid'],AppUtility::getHomeURL() .'gradebook/gradebook/add-rubric?cid='.$course->id]]);
         } else if ($from=='addg') {
@@ -27,14 +27,25 @@ use app\components\AssessmentUtility;
     echo $breadcrumb;
     echo '</div>';
 ?>
-<div class = "title-container">
-    <div class="row">
-        <div class="pull-left page-heading">
-            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+    <form method="post" action="add-rubric?cid=<?php echo $course->id ?>&id=<?php echo $params['id']?><?php echo $fromstr?>">
+    <div class = "title-container">
+        <div class="row">
+            <div class="pull-left page-heading">
+                <div class="vertical-align title-page"><?php echo $this->title ?></div>
+            </div>
+            <?php    if (isset($params['id'])) {?>
+            <div class="pull-left header-btn">
+                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $savetitle ?></button>
+            </div>
+            <?php } ?>
         </div>
     </div>
-</div>
-<div class="tab-content shadowBox margin-top-fourty">
+    <div class="item-detail-content">
+        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']); ?>
+    </div>
+<div class="tab-content shadowBox">
+
+
     <div class="col-md-12 add-rubic-form">
 
 <?php
@@ -69,8 +80,8 @@ if ($overwriteBody==1) {
         */
         $rubtypeval = array(1,0,3,4,2);
         $rubtypelabel = array('Score breakdown, record score and feedback','Score breakdown, record score only','Score total, record score and feedback','Score total, record score only','Feedback only'); ?>
-    <form method="post" action="add-rubric?cid=<?php echo $course->id ?>&id=<?php echo $params['id']?><?php echo $fromstr?>">
-            <?php echo '<input class="floatright margin-top-minus-nine-pt-five" type="submit" value="'.$savetitle.'"/><div class="col-md-12"><div class="col-md-2 select-text-margin">Name</div><div class="col-md-4">  <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
+
+            <?php echo '<div class="col-md-12"><div class="col-md-2 select-text-margin">Name</div><div class="col-md-4">  <input class="form-control" type="text" size="70" name="rubname" value="'.str_replace('"','\\"',$rubname).'"/></div></div>';
 
         echo '<div class="col-md-12 margin-top-fifteen"><div class="col-md-2 select-text-margin">Rubric Type</div> <div class="col-md-4">';
         AssessmentUtility::writeHtmlSelect('rubtype',$rubtypeval,$rubtypelabel,$rubtype,null,null,'onchange="imasrubric_chgtype()"');

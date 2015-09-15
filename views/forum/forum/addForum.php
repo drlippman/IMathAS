@@ -304,7 +304,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?php AssessmentUtility::writeHtmlSelect('rubric',$rubricsId,$rubricsLabel,$defaultValue['rubric']); ?>
                                 <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id=new&from=addf&fid'.$modifyForumId) ?>">
                                 <?php AppUtility::t('Add new rubric')?></a> |
-                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&id=&from=addf&fid='.$modifyForumId) ?>"><?php AppUtility::t('Edit rubrics')?></a>
+                            <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-rubric?cid='.$course->id.'&nomanage=&from=addf&fid='.$modifyForumId) ?>"><?php AppUtility::t('Edit rubrics')?></a>
                           </div>
                           <br class=form>
                     </div>

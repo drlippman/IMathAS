@@ -63,8 +63,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left">
             <input type="submit" id="go-button"  name="daterange" value="<?php AppUtility::t('Go')?>"/>
         </div>
-        <div id="table_placeholder" class="clear" style='width:100px overflow: ;:auto'></div>
-
+        <div id="table_placeholder " class="clear myScrollTable" >
+        <table id='login-log' class='scrollit login-grid-table table table-striped table-hover datatable' bPaginate='false'>
+            </table>
+        </div>
         <p><?php AppUtility::t('Note: Be aware that login sessions last for 24 hours, so if a student logins in Wednesday at 7pm and never
         closes their browser, they can continue using the same session on the same computer until 7pm Thursday.');?></p>
         <div class="clear"></div>
@@ -72,6 +74,3 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="footerwrapper"></div>
 </div>
 </div>
-
-
-

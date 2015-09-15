@@ -79,7 +79,7 @@ class CourseItemsUtility extends Component
                     <ul class=" select1 dropdown-menu selected-options">
                         <li><a class="question" href="#"><?php AppUtility::t('Questions'); ?></a></li>
                         <li><a class="modify"
-                               href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Setting'); ?></a>
+                               href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
                         </li>
                         <li><a id="delete"
                                href="javascript:deleteItem('<?php echo $assessment->id; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>

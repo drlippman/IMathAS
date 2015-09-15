@@ -2887,9 +2887,9 @@ class GradebookController extends AppController
             }
             $this->redirect('grade-book-student-detail?cid=' . $courseId . '&studentId=' . $userId);
         }
-        $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css']);
+        $this->includeCSS(['dataTables.bootstrap.css', 'dashboard.css','gradebook.css']);
         $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js','dataTables.bootstrap.js', 'gradebook/gradebookstudentdetail.js']);
-        $responseData = array('totalData' => $totalData, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
+        $responseData = array('totalData' => $totalData,"params" => $params, 'course' => $course, 'currentUser' => $currentUser, 'StudentData' => $StudentData[0], 'defaultValuesArray' => $defaultValuesArray, 'contentTrackData' => $contentTrackData, 'stugbmode' => $stugbmode['stugbmode'], 'gbCatsData' => $gbCatsData, 'stugbmode' => $stugbmode, 'allStudentsinformation' => $allStudentsinformation);
         return $this->renderWithData('gradeBookStudentDetail', $responseData);
     }
 

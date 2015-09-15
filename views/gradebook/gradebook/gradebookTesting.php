@@ -72,7 +72,6 @@ echo "</select>";
 echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
 echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
 echo "</div>";
-AppUtility::dump($gradebookData);
 $gbt = gbinstrdisp();
 echo "</form>";
 echo "</div>";

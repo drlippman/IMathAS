@@ -5,10 +5,6 @@ $( document ).ready(function() {
     var startDate = $("#datepicker-id input").val();
     var endDate = $("#datepicker-id1 input").val();
     todaysdate = endDate;
-    $('#login-table').DataTable( {
-        "scrollY": 200,
-        "scrollX": true
-    });
     $('#following-link').hide()
     $("#first-date-label").text(startDate);
     $('#last-date-label').text(endDate);
@@ -164,9 +160,9 @@ function loginGridViewSuccess(response) {
     headerArray = data.header;
     totalColumns = headerArray.length;
      rows = data.rows;
-    tableString = "<table id='login-table' class='scrollit login-grid-table table table-striped table-hover datatable' bPaginate='false'><thead>";
+    tableString = "<thead>";
 
-    for(i=0; i<headerArray.length && i < 15; i++){
+    for(i=0; i<headerArray.length; i++){
         tableString = tableString + "<th>" + headerArray[i]+"</th>";
         lastColumnHeader = headerArray[i];
     }
@@ -185,6 +181,6 @@ function loginGridViewSuccess(response) {
             tableString = tableString + "</tr>";
 
     });
-    tableString = tableString + "</tbody></table>";
-    $('#table_placeholder').html(tableString);
+    tableString = tableString + "</tbody>";
+    $('#login-log').html(tableString);
 }

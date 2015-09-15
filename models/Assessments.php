@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasAssessments;
 use yii\db\Query;
 use Yii;
@@ -74,47 +75,8 @@ class Assessments extends BaseImasAssessments
 
     public function createAssessment($params)
     {
-        $this->courseid = isset($params['courseid']) ? $params['courseid'] : null;
-        $this->name = isset($params['name']) ? $params['name'] : null;
-        $this->summary = isset($params['summary']) ? $params['summary'] : null;
-        $this->intro = isset($params['intro']) ? $params['intro'] : null;
-        $this->startdate = isset($params['startdate']) ? $params['startdate'] : null;
-        $this->enddate = isset($params['enddate']) ? $params['enddate'] : null;
-        $this->reviewdate = isset($params['reviewdate']) ? $params['reviewdate'] : null;
-        $this->timelimit = isset($params['timelimit']) ? $params['timelimit'] : null;
-        $this->minscore = isset($params['minscore']) ? $params['minscore'] : null;
-        $this->displaymethod = isset($params['displaymethod']) ? $params['displaymethod'] : null;
-        $this->defpoints = isset($params['defpoints']) ? $params['defpoints'] : null;
-        $this->defattempts = isset($params['defattempts']) ? $params['defattempts'] : null;
-        $this->defpenalty = isset($params['defpenalty']) ? $params['defpenalty'] : null;
-        $this->deffeedback = isset($params['deffeedback']) ? $params['deffeedback'] : null;
-        $this->shuffle = isset($params['shuffle']) ? $params['shuffle'] : null;
-        $this->gbcategory = isset($params['gbcategory']) ? $params['gbcategory'] : null;
-        $this->password = isset($params['password']) ? $params['password'] : null;
-        $this->cntingb = isset($params['cntingb']) ? $params['cntingb'] : null;
-        $this->tutoredit = isset($params['tutoredit']) ? $params['tutoredit'] : null;
-        $this->showcat = isset($params['showcat']) ? $params['showcat'] : null;
-        $this->eqnhelper = isset($params['eqnhelper']) ? $params['eqnhelper'] : null;
-        $this->showtips = isset($params['showtips']) ? $params['showtips'] : null;
-        $this->caltag = isset($params['caltag']) ? $params['caltag'] : null;
-        $this->calrtag = isset($params['calrtag']) ? $params['calrtag'] : null;
-        $this->isgroup = isset($params['isgroup']) ? $params['isgroup'] : null;
-        $this->groupmax = isset($params['groupmax']) ? $params['groupmax'] : null;
-        $this->groupsetid = isset($params['groupsetid']) ? $params['groupsetid'] : null;
-        $this->showhints = isset($params['showhints']) ? $params['showhints'] : null;
-        $this->reqscore = isset($params['reqscore']) ? $params['reqscore'] : null;
-        $this->reqscoreaid = isset($params['reqscoreaid']) ? $params['reqscoreaid'] : null;
-        $this->noprint = isset($params['noprint']) ? $params['noprint'] : null;
-        $this->avail = isset($params['avail']) ? $params['avail'] : null;
-        $this->allowlate = isset($params['allowlate']) ? $params['allowlate'] : null;
-        $this->exceptionpenalty = isset($params['exceptionpenalty']) ? $params['exceptionpenalty'] : null;
-        $this->ltisecret = isset($params['ltisecret']) ? $params['ltisecret'] : null;
-        $this->endmsg = isset($params['endmsg']) ? $params['endmsg'] : null;
-        $this->deffeedbacktext = isset($params['deffeedbacktext']) ? $params['deffeedbacktext'] : null;
-        $this->msgtoinstr = isset($params['msgtoinstr']) ? $params['msgtoinstr'] : null;
-        $this->posttoforum = isset($params['posttoforum']) ? $params['posttoforum'] : null;
-        $this->istutorial = isset($params['istutorial']) ? $params['istutorial'] : null;
-        $this->defoutcome = isset($params['defoutcome']) ? $params['defoutcome'] : null;
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
         return $this->id;
     }

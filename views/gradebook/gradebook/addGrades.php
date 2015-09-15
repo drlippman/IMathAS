@@ -33,7 +33,10 @@ if ($params['gbitem'] == 'new') {
             </div>
         </div>
     </div>
-    <div class="tab-content shadowBox non-nav-tab-item">
+    <div class="item-detail-content">
+        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']); ?>
+    </div>
+    <div class="tab-content shadowBox">
     <div class="col-md-12 add-offline-grades-form">
         <?php
             if ($istutor) {
@@ -189,7 +192,7 @@ if ($params['gbitem'] == 'new') {
                             <div class="col-md-12 padding-zero margin-top-ten">
                                 <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&id=new&from=addg&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Add new rubric')?></a> |
-                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&from=addg&id=&gbitem='.$params['gbitem']) ?>">
+                                <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-rubric?cid=' . $course->id.'&from=addg&nomanage=&gbitem='.$params['gbitem']) ?>">
                                 <?php AppUtility::t('Edit rubrics')?>
                                 </a>
                             </div>

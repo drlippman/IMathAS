@@ -126,3 +126,20 @@ tr#quickadd td {
 .padding-top-twenty-five {
     padding-top: 25px;
 }
+
+.section
+{
+    margin-top: 4px;
+}
+.text-area-padding
+{
+    margin-bottom: 15px;
+}
+.drop-down-width
+{
+    width: 19%!important;
+}
+
+.link-drop-down{
+    width: 178px!important;
+}
