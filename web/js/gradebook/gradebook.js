@@ -189,3 +189,14 @@ function createStudentList(){
     return markArray;
 }
 
+ function chgexport() {
+     var courseId = $("#course-id").val();
+     var studentId = $("#student-id").val();
+ var type = document.getElementById("exportsel").value;
+ if (type==1) { toopen = '&export=true';}
+ if (type==2) { toopen =  '&emailgb=me';}
+ 	if (type==3) { toopen = '&emailgb=ask';}
+ 	if (type==0) { return false;}
+  	//window.location = toopen;
+     window.location = "gradebook-export?cid="+courseId+"&stu="+studentId+toopen;
+ }

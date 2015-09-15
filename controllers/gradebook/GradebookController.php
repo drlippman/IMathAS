@@ -65,7 +65,7 @@ class GradebookController extends AppController
         $this->setSessionData('postCount', $countPost);
         $course = Course::getById($courseId);
         $gradebookData = $this->gbtable($user->id, $courseId);
-        $this->includeCSS(['course/course.css', 'jquery.dataTables.css']);
+        $this->includeCSS(['course/course.css', 'jquery.dataTables.css','gradebook.css']);
         $this->includeJS(['general.js', 'gradebook/gradebook.js','gradebook/tablescroller2.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('course' => $course, 'user' => $user, 'gradebook' => $gradebookData['gradebook'], 'data' => $gradebookData);
         return $this->renderWithData('gradebook', $responseData);
@@ -87,6 +87,7 @@ class GradebookController extends AppController
                 }
             }
         }
+        $istutor = false;
         if (isset($teacherid)) {
             $isteacher = true;
         }
@@ -96,7 +97,7 @@ class GradebookController extends AppController
         /*
          * Assign tutor value false temparary
          */
-        $istutor = false;
+
 
         if ($isteacher || $istutor) {
             $canviewall = true;
@@ -424,7 +425,6 @@ class GradebookController extends AppController
         }
 
 //Pull Offline Grade item info
-        $istutor = false;
         $gbItems = GbItems::findAllOfflineGradeItem($courseId, $canviewall, $istutor, $isteacher, $catfilter, $now);
         if ($gbItems) {
             foreach ($gbItems as $item) {
@@ -4052,6 +4052,32 @@ class GradebookController extends AppController
 
         $responseData = array('gradebookData' => $gradebookData,'isTeacher' => $isTeacher,'isTutor' => $isTutor,'course' => $course);
         return $this->renderWithData('gradebookTesting',$responseData);
+    }
+
+    public function actionGradebookExport()
+    {
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
+        $currentUser = $this->getAuthenticatedUser();
+        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
+        $canviewall = true;
+        if (isset($sessiondata[$courseId.'gbmode'])) {
+            $gbmode =  $sessiondata[$courseId.'gbmode'];
+        } else {
+            $gbScheme = GbScheme::getByCourseId($courseId);
+            $gbmode = $gbScheme['defgbmode'];
+        }
+        if (isset($params['stu']) && $params['stu']!='') {
+            $stu = $params['stu'];
+        } else {
+            $stu = AppConstant::NUMERIC_ZERO;
+        }
+        $studentData = Student::getByCourse($courseId);
+        $totalData = $this->gbtable($currentUser['id'], $course['id'], $stu);
+        $this->includeCSS('imascore.css','modern.css');
+        $responseData = array('studentData' => $studentData,'currentUser' => $currentUser,'canviewall' => $canviewall,'totalData' => $totalData,'gbmode' => $gbmode,'stu' => $stu,'params' => $params,'isteacher' => $isTeacher,'course' => $course);
+        return $this->renderWithData('gradebookExport',$responseData);
     }
 }
 

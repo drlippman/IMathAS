@@ -7,9 +7,10 @@ if (($course['newflag']&1)==1) {
     $this->title = AppUtility::t('Gradebook', false);
 }
 $this->params['breadcrumbs'][] = $this->title;
-?>
+ ?>
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
 <input type="hidden" class="user-info" name="user-info" value="<?php echo $user->id; ?>"/>
+<input type="hidden" id="student-id"  value="<?php echo $data['defaultValuesArray']['studentId']; ?>"/>
 <input type="hidden" id="gradebook-id" name="gradebook-data" value=""/>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
@@ -44,13 +45,13 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="inner-content-gradebook">
 <div class="button-container col-lg-12 padding-zero">
 
-    <span class="col-lg-6 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a>
+    <span class="col-lg-4 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a>
    <?php
     if ($data['isDiagnostic']) { ?>
      &nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a>
    <?php } ?>
         </span>
-    <span class="inner-page-options col-lg-6 padding-zero pull-left">
+    <span class="inner-page-options col-lg-8 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
@@ -145,6 +146,18 @@ echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
 
                 </ul>
             </li>
+
+
+
+
+
+            <li class="dropdown">
+                         <?php echo '<select  class="form-control export-to-height" id="exportsel" onchange="chgexport()">';
+                            echo '<option value="0">', _('Export to...'), '</option>';
+                            echo '<option value="1">', _('... file'), '</option>';
+                            echo '<option value="2">', _('... my email'), '</option>';
+                            echo '<option value="3">', _('... other email'), '</option></select>  '; ?>
+             </li>
         </ul>
     </span>
 </div><br/>
@@ -752,3 +765,9 @@ for ($i = 1; $i < count($gradebook); $i++) {
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>
 
+<script>
+    function a(r)
+    {
+        alert(r);
+    }
+</script>

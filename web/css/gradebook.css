@@ -143,3 +143,8 @@ tr#quickadd td {
 .link-drop-down{
     width: 178px!important;
 }
+
+.export-to-height
+{
+    height: 42px !important;
+}

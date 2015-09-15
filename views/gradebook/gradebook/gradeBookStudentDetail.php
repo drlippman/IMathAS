@@ -55,7 +55,7 @@ if($totalData['isTutor']){
 <input type="hidden" id="lastlogin" value="<?php echo $lastlogin?>">
 <input type="hidden" id="includeduedate" value="<?php echo $includeduedate?>">
 <div class="item-detail-header">
-<?php if(isset($params['listusers']))
+<?php if(!isset($params['from']))
 { ?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name,'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id,AppUtility::getHomeURL().'gradebook/gradebook/gradebook?cid=' . $course->id]]); ?>
 <?php }else{ ?>
