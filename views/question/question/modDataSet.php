@@ -4,10 +4,14 @@ use app\components\AppUtility;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 $this->title = AppUtility::t(' Add Questions',false);
+$cname= $course->name;
+if($courseId == 'admin') {
+   $cname = 'Admin';
+}
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$course->id.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -115,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
     }
 
     if (isset($params['qid'])) {
-        echo "<div class='col-md-12 margin-left-minus-four'><p><a href=\"mod-data-set?id={$params['id']}&cid=$course->id&aid={$params['aid']}&template=true&makelocal={$params['qid']}\">Template this question</a> for use in this assessment.  ";
+        echo "<div class='col-md-12 margin-left-minus-four'><p><a href=\"mod-data-set?id={$params['id']}&cid=$courseId&aid={$params['aid']}&template=true&makelocal={$params['qid']}\">Template this question</a> for use in this assessment.  ";
         echo "This will let you modify the question for this assessment only without affecting the library version being used in other assessments.</p></div>";
     }
     if (!$myq) {
@@ -124,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
     <form class="margin-left-minus-twenty" enctype="multipart/form-data" method=post action="mod-data-set?process=true<?php
     if (isset($params['cid'])) {
-        echo "&cid=$course->id";
+        echo "&cid=$courseId";
     }
     if (isset($params['aid'])) {
         echo "&aid={$params['aid']}";

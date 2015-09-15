@@ -3,6 +3,7 @@ $(document).ready(function () {
     selectCheckBox1();
     $('input[name = "header-checked"]:checked').prop('checked', false);
     $('input[name = "potentialq-header-checked"]:checked').prop('checked', false);
+    $('input[name = "manage-question-header-checked"]:checked').prop('checked', false);
     $('input[name = "header-checked1"]:checked').prop('checked', false);
 });
 

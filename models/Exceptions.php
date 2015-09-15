@@ -1,15 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 15/5/15
- * Time: 5:58 PM
- */
-
 namespace app\models;
 
-
-use app\components\AppUtility;
 use app\models\_base\BaseImasExceptions;
 use yii\db\Query;
 
@@ -33,7 +24,7 @@ class Exceptions extends BaseImasExceptions
 
     public static function modifyExistingException($userId, $assessmentId, $startdate, $enddate, $waivereqscore)
     {
-        $exception = Exceptions::getByAssessmentIdAndUserId($userId,$assessmentId);
+        $exception = Exceptions::getByAssessmentIdAndUserId($userId, $assessmentId);
         $exception->startdate = $startdate;
         $exception->enddate = $enddate;
         $exception->waivereqscore = $waivereqscore;
@@ -48,8 +39,8 @@ class Exceptions extends BaseImasExceptions
     public static function deleteExceptionById($id)
     {
         $exception = Exceptions::getById($id);
-        if($exception){
-        $exception->delete();
+        if ($exception) {
+            $exception->delete();
         }
     }
 
@@ -58,11 +49,13 @@ class Exceptions extends BaseImasExceptions
         $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')")->queryOne();
         return $query;
     }
-    public static function findExceptions($courseId){
+
+    public static function findExceptions($courseId)
+    {
         $query = new Query();
-        $query	->select(['imas_exceptions.assessmentid', 'imas_exceptions.userid', 'imas_exceptions.enddate', 'imas_exceptions.islatepass'])
+        $query->select(['imas_exceptions.assessmentid', 'imas_exceptions.userid', 'imas_exceptions.enddate', 'imas_exceptions.islatepass'])
             ->from('imas_exceptions')
-            ->join(	'INNER JOIN',
+            ->join('INNER JOIN',
                 'imas_assessments',
                 'imas_exceptions.assessmentid = imas_assessments.id'
             )
@@ -71,10 +64,12 @@ class Exceptions extends BaseImasExceptions
         $data = $command->queryAll();
         return $data;
     }
-    public static function deleteByAssessmentIdAndUid($aidlist, $stulist){
+
+    public static function deleteByAssessmentIdAndUid($aidlist, $stulist)
+    {
         $query = Exceptions::find()->where(['IN', 'assessmentid', $aidlist])->andWhere(['IN', 'userid', $stulist])->all();
-        if($query){
-            foreach($query as $exception){
+        if ($query) {
+            foreach ($query as $exception) {
                 $exception->delete();
             }
         }
@@ -85,19 +80,19 @@ class Exceptions extends BaseImasExceptions
         $query = \Yii::$app->db->createCommand("SELECT items.id,ex.startdate,ex.enddate,ex.islatepass FROM imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment')")->queryAll();
         return $query;
     }
+
     public static function deleteByUserId($userId)
     {
         $exceptions = Exceptions::find()->where(['userid' => $userId])->all();
-        foreach($exceptions as $exception)
-        {
+        foreach ($exceptions as $exception) {
             $exception->delete();
         }
     }
 
     public static function deleteByAssessmentId($id)
     {
-        $assessmentData = Exceptions::findOne(['assessmentid',$id]);
-        if($assessmentData){
+        $assessmentData = Exceptions::findOne(['assessmentid', $id]);
+        if ($assessmentData) {
             $assessmentData->delete();
         }
     }

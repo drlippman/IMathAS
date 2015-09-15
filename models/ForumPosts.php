@@ -5,11 +5,8 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumPosts;
-
-use app\models\forms\ForumForm;
 use Yii;
 use yii\db\Query;
-use yii\db\Exception;
 
 
 class ForumPosts extends BaseImasForumPosts
@@ -58,7 +55,7 @@ class ForumPosts extends BaseImasForumPosts
             }else {
                 $replyBy = $params['always-replies'];
             }
-        $isANonValue = 0;
+        $isANonValue = AppConstant::NUMERIC_ZERO;
             if($params['post-anonymously']){
                 $isANonValue = $params['post-anonymously'];
             }
@@ -206,7 +203,7 @@ class ForumPosts extends BaseImasForumPosts
     }
 
     public static function getByForumId($forumId){
-        return ForumPosts::find()->where(['forumid' => $forumId])->andWhere(['>','posttype', 0])->all();
+        return ForumPosts::find()->where(['forumid' => $forumId])->andWhere(['>','posttype', AppConstant::NUMERIC_ZERO])->all();
 
     }
 

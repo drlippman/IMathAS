@@ -1,16 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 24/6/15
- * Time: 1:07 PM
- */
 
 namespace app\models;
 
-
 use app\components\AppConstant;
-use app\components\AppUtility;
 use app\models\_base\BaseImasForumLikes;
 use yii\db\Query;
 

@@ -1,11 +1,7 @@
 <?php
 
-
 namespace app\models;
 
-
-use app\components\AppConstant;
-use app\components\AppUtility;
 use Yii;
 use app\models\_base\BaseImasForumSubscriptions;
 
