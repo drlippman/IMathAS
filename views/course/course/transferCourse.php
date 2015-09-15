@@ -46,7 +46,7 @@ $( document ).ready(function() {
     });
 });
 
-function updateSuccess(response) {alert('jkj');
+function updateSuccess(response) {
     var data = response;alert(response);
     if (data.status==0) {
         $("#flash-message").html('<div class="alert alert-success">Ownership transferred successfully.</div>');

@@ -557,11 +557,17 @@ class CourseController extends AppController
             $params = $this->getRequestParams();
             $courseId = $params['cid'];
             $usersIds = json_decode($params['usersId']);
-            for ($i = AppConstant::NUMERIC_ZERO; $i < count($usersIds); $i++) {
-                $teacher = new Teacher();
-                $teacher->removeTeacher($usersIds[$i], $courseId);
+            $teachers = Teacher::getTeachersById($courseId);
+            if (count($teachers) == count($usersIds)) {
+                $this->setWarningFlash('You can not remove all Teachers, atleast one teacher is required for the course');
+            }else {
+                for ($i = AppConstant::NUMERIC_ZERO; $i < count($usersIds); $i++) {
+                    $teacher = new Teacher();
+                    $teacher->removeTeacher($usersIds[$i], $courseId);
+                }
             }
             return $this->successResponse();
+
         }
     }
 

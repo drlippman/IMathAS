@@ -32,5 +32,4 @@ $this->params['breadcrumbs'][] = $this->title;
                onclick='addAllAsTeacher()'>Add as Teacher </a>&nbsp;&nbsp;
         </table>
     </div>
-
-        </div>
+</div>
