@@ -975,3 +975,21 @@ margin-top: -6% !important;
 .padding-left-twenty-six {
     padding-left: 26px;
 }
+.margin-top-minus-three {
+    margin-top: -3px;
+}
+.margin-bottom-twenty {
+    margin-bottom:20px;
+}
+.margin-left-minus-ten {
+    margin-left: -10px;
+}
+.margin-right-minus-fourty {
+    margin-right: -40px;
+}
+.padding-bottom-fifteen {
+    padding-bottom: 15px !important;
+}
+.text-background-color {
+    background-color: #F8f8f8;
+}

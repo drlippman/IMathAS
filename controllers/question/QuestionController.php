@@ -973,7 +973,7 @@ class QuestionController extends AppController
         $userDefLib = $user['deflib'];
         $params = $this->getRequestParams();
         $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
+        $courseId = $params['cid'];
         $sessionData = $this->getSessionData($this->getSessionId());
         $teacherId = $this->isTeacher($userId, $courseId);
         if ($myRights < AppConstant::TEACHER_RIGHT) {
@@ -1474,7 +1474,7 @@ class QuestionController extends AppController
         $this->includeJS(['general.js', 'question/modDataSet.js', 'editor/tiny_mce.js', 'ASCIIMathTeXImg_min.js']);
         $renderData = array('course' => $course, 'addMode' => $addmod, 'params' => $params, 'inusecnt' => $inusecnt, 'line' => $line, 'myq' => $myq,
             'frompot' => $frompot, 'author' => $author, 'userId' => $userId, 'groupId' => $groupId, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin,
-            'inlibs' => $inlibs, 'locklibs' => $locklibs, 'lnames' => $lNames, 'twobx' => $twobx, 'images' => $images, 'extref' => $extRef,
+            'inlibs' => $inlibs, 'locklibs' => $locklibs, 'lnames' => $lNames, 'twobx' => $twobx, 'images' => $images, 'extref' => $extRef,'courseId' => $courseId,
             'myRights' => $myRights, 'sessionData' => $sessionData);
         return $this->renderWithData('modDataSet', $renderData);
     }
@@ -2150,9 +2150,7 @@ class QuestionController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                     }
                     $pagetitle = "Confirm Delete";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Confirm Delete";
-
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if(is_array($params['nchecked'])){
                         $rlist = implode(",", $params['nchecked']);
                     }else{
@@ -2181,8 +2179,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Transfer Ownership";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Transfer QSet";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if(is_array($params['nchecked'])){
                         $tlist = implode(",", $params['nchecked']);
                     }else{
@@ -2315,8 +2312,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Modify Library Assignments";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Modify Assignments";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if (!isset($params['nchecked'])) {
                         $this->setErrorFlash('No Questions Selected');
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
@@ -2396,8 +2392,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Template Questions";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Template Questions";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if(is_array($params['nchecked'])){
                         $clist = implode(",", $params['nchecked']);
                     }else{
@@ -2447,9 +2442,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = _("Change Question License/Attribution");
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; " . _("Change Question License/Attribution");
-
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if(is_array($params['nchecked'])){
                         $clist = implode(",", $params['nchecked']);
                     }else{
@@ -2486,8 +2479,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Change Question Rights";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Change Question Rights";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     if(is_array($params['nchecked'])){
                         $clist = implode(",", $params['nchecked']);
                     }else{
@@ -2521,8 +2513,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Confirm Delete";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Confirm Delete";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                 }
             } else if (isset($params['transfer'])) {
                 if (isset($params['newowner'])) {
@@ -2542,8 +2533,7 @@ class QuestionController extends AppController
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Transfer Ownership";
-                    $curBreadcrumb .= " &gt; <a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    $curBreadcrumb .= " &gt; Transfer QSet";
+                    $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
                     $query = User::getUserGreaterThenTeacherRights();
                     $i = AppConstant::NUMERIC_ZERO;
                     $page_transferUserList = array();
@@ -2554,7 +2544,6 @@ class QuestionController extends AppController
                     }
                 }
             } else { //DEFAULT DATA MANIPULATION
-                $curBreadcrumb .= " &gt; Manage Question Set";
                 if ($isAdmin) {
                     $page_adminMsg = "You are in Admin mode, which means actions will apply to all questions, regardless of owner";
                 } else if ($isGrpAdmin) {
@@ -2797,9 +2786,9 @@ class QuestionController extends AppController
                 }
             }
         }
-        $this->includeCSS(['question/question.css']);
-        $this->includeJS(['general.js', 'tablesorter.js', 'question/junkflag.js', 'question/libtree2.js']);
-        $renderData = array('params' => $params, 'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchlibs, 'curBreadcrumb' => $curBreadcrumb,
+        $this->includeCSS(['question/question.css','question/libtree.css']);
+        $this->includeJS(['general.js','tablesorter.js','question/junkflag.js','question/libtree2.js','question/manageQuestionSet.js']);
+        $renderData = array('params' => $params,'overwriteBody' => $overwriteBody, 'body' => $body, 'searchlibs' => $searchlibs, 'curBreadcrumb' => $curBreadcrumb,
             'pagetitle' => $pagetitle, 'helpicon' => $helpicon, 'cid' => $cid, 'rlist' => $rlist, 'tlist' => $tlist, 'page_transferUserList' => $page_transferUserList,
             'clist' => $clist, 'page_adminMsg' => $page_adminMsg, 'lnames' => $lnames, 'search' => $search, 'searchall' => $searchall, 'searchmine' => $searchmine,
             'isadmin' => $isAdmin, 'hidepriv' => $hidepriv, 'isgrpadmin' => $isGrpAdmin, 'page_libstouse' => $page_libstouse, 'lnamesarr' => $lnamesarr,

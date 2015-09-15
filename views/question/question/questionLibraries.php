@@ -1,5 +1,4 @@
 <?php
-use app\components\AppUtility;
 use app\components\AppConstant;
 use app\models\Libraries;
 
@@ -203,7 +202,7 @@ echo "</script>";  //end tree definition script
 if (isset($_GET['base'])) {
     $base = $_GET['base'];
 }
-echo "<input type=button value=\"Uncheck all\" onclick=\"uncheckall(this.form)\"/><br>";
+echo "<div class='col-md-12 padding-left-zero margin-top-fifteen'><input type=button value=\"Uncheck all\" onclick=\"uncheckall(this.form)\"/></div>";
 
 if (isset($base)) {
     echo "<input type=hidden name=\"rootlib\" value=$base>{$names[$base]}</span>";
@@ -211,12 +210,12 @@ if (isset($base)) {
     if ($select == "parent") {
         echo "<input type=radio name=\"libs\" value=0 ";
         if (in_array(0,$checked)) { echo "CHECKED";	}
-        echo "> <span id=\"n0\" class=\"r8\">Root</span>";
+        echo "> <span  id=\"n0\" class='r8 margin-top-ten padding-left-zero'>Root</span>";
     } else {
-        echo "<span class=\"r8\">Root</span>";
+        echo "<div class='r8 col-md-12 margin-top-ten padding-left-zero'>Root</div>";
     }
 }
-echo "<div id=tree></div>";
+echo "<div class='col-md-12 padding-left-zero' id=tree></div>";
 echo "<script type=\"text/javascript\">\n";
 echo "function initlibtree(showchecks) {";
 echo "showlibtreechecks = showchecks;";
@@ -268,13 +267,13 @@ if (isset($libtreeshowchecks) && $libtreeshowchecks == false) {
 echo "}";
 echo "</script>\n";
 
-$colorcode =  "<p><b>Color Code</b><br/>";
-$colorcode .= "<span class=r8>Open to all</span><br/>\n";
-$colorcode .= "<span class=r4>Closed</span><br/>\n";
-$colorcode .= "<span class=r5>Open to group, closed to others</span><br/>\n";
-$colorcode .= "<span class=r2>Open to group, private to others</span><br/>\n";
-$colorcode .= "<span class=r1>Closed to group, private to others</span><br/>\n";
-$colorcode .= "<span class=r0>Private</span></p>\n";
+$colorcode =  "<div class='col-md-12 padding-left-zero margin-top-ten'><div><b>Color Code</b></div>";
+$colorcode .= "<div class='margin-top-ten'><span class=r8>Open to all</span></div>";
+$colorcode .= "<div class='margin-top-five'><span class=r4>Closed</span></div>";
+$colorcode .= "<div class='margin-top-five'><span class=r5>Open to group, closed to others</span></div>";
+$colorcode .= "<div class='margin-top-five'><span class=r2>Open to group, private to others</span></div>";
+$colorcode .= "<div class='margin-top-five'><span class=r1>Closed to group, private to others</span></div>";
+$colorcode .= "<div class='margin-top-five'><span class=r0>Private</span></div></div>";
 if (isset($_GET['libtree']) && $_GET['libtree']=="popup") {
     echo <<<END
 <input type=button value="Use Libraries" onClick="setlib(this.form)">

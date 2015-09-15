@@ -7,9 +7,6 @@
  */
 namespace app\models;
 
-
-use app\components\AppConstant;
-use app\components\AppUtility;
 use app\models\_base\BaseImasDrillassessSessions;
 
 class DrillassessSessions extends BaseImasDrillassessSessions
@@ -17,8 +14,8 @@ class DrillassessSessions extends BaseImasDrillassessSessions
     public static function deleteDrillSession($drills, $toUnEnroll)
     {
         $query = DrillassessSessions::find()->where(['IN', 'drillassessid', $drills])->andWhere(['IN', 'userid', $toUnEnroll])->all();
-        if($query){
-            foreach($query as $drillSession){
+        if ($query) {
+            foreach ($query as $drillSession) {
                 $drillSession->delete();
             }
         }

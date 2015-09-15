@@ -132,7 +132,7 @@ margin-bottom: 15px;
 margin-left: -15px;
 }
 .manage-question-set-shadowbox {
-    padding:30px 30px 15px 30px;
+    padding:25px 30px 15px 30px;
 }
 .form-control-for-question {
     display: block;
@@ -151,4 +151,26 @@ margin-left: -15px;
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 
+}
+.manage-question-with-selected-dropdown li  a {
+    border-bottom: none !important;
+    border: 1px solid #ddd !important;
+}
+.manage-question-with-selected-dropdown {
+    background: #f8f8f8;
+}
+.manage-question-with-selected-dropdown li ul li input {
+width: 100%;
+background-color: white;
+color: black;
+border: 0px;
+text-align: left;
+}
+.manage-question-with-selected-dropdown li ul li input:hover  {
+    color: #ffffff;
+}
+.background-text-padding {
+    padding-left: 20px !important;
+    padding-top: 15px;
+    padding-bottom: 5px;
 }

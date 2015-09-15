@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
-use app\components\AppUtility;
+
+use app\components\AppConstant;
 use app\models\_base\BaseImasExternalTools;
 use yii\db\Query;
 
@@ -14,7 +15,7 @@ class ExternalTools extends BaseImasExternalTools
 
     public function updateExternalToolsData($params)
     {
-        if($params['tool']) {
+        if ($params['tool']) {
             $toolsData = ExternalTools::findOne(['id' => $params['tool']]);
             $toolsData->custom = $params['toolcustom'];
             $toolsData->url = $params['toolcustomurl'];
@@ -27,31 +28,32 @@ class ExternalTools extends BaseImasExternalTools
         $query = \Yii::$app->db->createCommand("SELECT id,courseid,groupid,name,url,ltikey,secret,custom,privacy FROM imas_external_tools WHERE id IN ($toolidlist)")->queryAll();
         return $query;
     }
-    public static function getId($courseId,$url)
+
+    public static function getId($courseId, $url)
     {
-        $query  = \Yii::$app->db->createCommand("SELECT id FROM imas_external_tools WHERE url='" . addslashes($url) . "' AND courseid='$courseId'")->queryAll();
+        $query = \Yii::$app->db->createCommand("SELECT id FROM imas_external_tools WHERE url='" . addslashes($url) . "' AND courseid='$courseId'")->queryAll();
         return $query;
     }
 
-    public function insertData($courseId,$groupid,$rowsub)
+    public function insertData($courseId, $groupid, $rowsub)
     {
-           $this->courseid = $courseId;
-           $this->groupid =  $groupid;
-           $this->name =  $rowsub['name'];
-           $this->url =  $rowsub['url'];
-           $this->ltikey = $rowsub['ltikey'];
-           $this->secret = $rowsub['secret'];
-           $this->custom = $rowsub['custom'];
-           $this->privacy = $rowsub['privacy'];
-           $this->save();
+        $this->courseid = $courseId;
+        $this->groupid = $groupid;
+        $this->name = $rowsub['name'];
+        $this->url = $rowsub['url'];
+        $this->ltikey = $rowsub['ltikey'];
+        $this->secret = $rowsub['secret'];
+        $this->custom = $rowsub['custom'];
+        $this->privacy = $rowsub['privacy'];
+        $this->save();
         return $this->id;
 
     }
 
-    public function saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGroupAdmin, $isAdmin, $privacy)
+    public function saveExternalTool($courseId, $groupId, $params, $isTeacher, $isGroupAdmin, $isAdmin, $privacy)
     {
-        $this->name =  $params['tname'];
-        $this->url =  $params['url'];
+        $this->name = $params['tname'];
+        $this->url = $params['url'];
         $this->ltikey = $params['key'];
         $this->secret = $params['secret'];
         $this->custom = $params['custom'];
@@ -59,32 +61,30 @@ class ExternalTools extends BaseImasExternalTools
         if ($isTeacher) {
             $this->groupid = $groupId;
             $this->courseid = $courseId;
-        } else if ($isGroupAdmin || ($isAdmin && $params['scope'] == 1)) {
+        } else if ($isGroupAdmin || ($isAdmin && $params['scope'] == AppConstant::NUMERIC_ONE)) {
             $this->groupid = $groupId;
-            $this->courseid = 0;
+            $this->courseid = AppConstant::NUMERIC_ZERO;
         } else {
-            $this->groupid = 0;
-            $this->courseid = 0;
+            $this->groupid = AppConstant::NUMERIC_ZERO;
+            $this->courseid = AppConstant::NUMERIC_ZERO;
         }
         $this->save();
     }
-    public static function updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy)
+
+    public static function updateExternalToolByAdmin($params, $isAdmin, $attrValue, $attr, $privacy)
     {
         $updateExtTool = ExternalTools::find()->where(['id' => $params['id']])->andWhere([$attr => $attrValue])->one();
-        if($updateExtTool)
-        {
-            $updateExtTool->name =  $params['tname'];
-            $updateExtTool->url =  $params['url'];
+        if ($updateExtTool) {
+            $updateExtTool->name = $params['tname'];
+            $updateExtTool->url = $params['url'];
             $updateExtTool->ltikey = $params['key'];
             $updateExtTool->secret = $params['secret'];
             $updateExtTool->custom = $params['custom'];
             $updateExtTool->privacy = $privacy;
-            if($isAdmin)
-            {
-                if($params['scope'] == 0)
-                {
-                    $updateExtTool->groupid = 0;
-                } else{
+            if ($isAdmin) {
+                if ($params['scope'] == AppConstant::NUMERIC_ZERO) {
+                    $updateExtTool->groupid = AppConstant::NUMERIC_ZERO;
+                } else {
                     $updateExtTool->groupid = $params['groupId'];
                 }
             }
@@ -92,13 +92,13 @@ class ExternalTools extends BaseImasExternalTools
         }
         $updateExtTool->save();
     }
-    public static function updateExternalTool($params,$attr, $privacy)
+
+    public static function updateExternalTool($params, $attr, $privacy)
     {
         $updateExtTool = ExternalTools::find()->where(['id' => $params['id']])->one();
-        if($updateExtTool)
-        {
-            $updateExtTool->name =  $params['tname'];
-            $updateExtTool->url =  $params['url'];
+        if ($updateExtTool) {
+            $updateExtTool->name = $params['tname'];
+            $updateExtTool->url = $params['url'];
             $updateExtTool->ltikey = $params['key'];
             $updateExtTool->secret = $params['secret'];
             $updateExtTool->custom = $params['custom'];
@@ -111,13 +111,12 @@ class ExternalTools extends BaseImasExternalTools
     public static function deleteById($id, $isTeacher, $isGrpAdmin, $courseId, $groupId)
     {
         $externalTool = ExternalTools::findOne($id);
-        if($externalTool)
-        {
+        if ($externalTool) {
             $externalTool->delete();
             if ($isTeacher) {
                 $externalTool->courseid = $courseId;
             } else if ($isGrpAdmin) {
-               $externalTool->groupid = $groupId;
+                $externalTool->groupid = $groupId;
             }
         }
     }
@@ -125,7 +124,7 @@ class ExternalTools extends BaseImasExternalTools
     public static function getByRights($id, $isTeacher, $courseId, $isGrpAdmin, $groupId)
     {
         $query = new Query();
-        $query	->select(['name','url','ltikey','secret','custom','privacy','groupid'])
+        $query->select(['name', 'url', 'ltikey', 'secret', 'custom', 'privacy', 'groupid'])
             ->from('imas_external_tools')
             ->where(['id' => $id]);
         if ($isTeacher) {
@@ -141,13 +140,13 @@ class ExternalTools extends BaseImasExternalTools
     public static function getByCourseId($courseId)
     {
         $query = new Query();
-        $query ->select(['imas_external_tools.id','imas_external_tools.name AS nm' ,'imas_groups.name'])
+        $query->select(['imas_external_tools.id', 'imas_external_tools.name AS nm', 'imas_groups.name'])
             ->from('imas_external_tools')
             ->Join('LEFT JOIN',
                 'imas_groups',
                 'imas_external_tools.groupid=imas_groups.id'
             )
-        ->where(['imas_external_tools.courseid' => $courseId]);
+            ->where(['imas_external_tools.courseid' => $courseId]);
         $query->orderBy('imas_external_tools.groupid,imas_external_tools.name');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -157,19 +156,21 @@ class ExternalTools extends BaseImasExternalTools
     public static function getByGroupId($courseId, $groupId)
     {
         $query = new Query();
-        $query ->select(['id','name'])
-        ->from('imas_external_tools')
-        ->where(['courseid' => $courseId])
-        ->andWhere(['groupid' => $groupId]);
+        $query->select(['id', 'name'])
+            ->from('imas_external_tools')
+            ->where(['courseid' => $courseId])
+            ->andWhere(['groupid' => $groupId]);
         $query->orderBy('name');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
-    public static function getByCourseAndOrderByName($courseId){
+
+    public static function getByCourseAndOrderByName($courseId)
+    {
 
         $query = new Query();
-        $query ->select(['id','name AS nm'])
+        $query->select(['id', 'name AS nm'])
             ->from('imas_external_tools')
             ->where(['courseid' => $courseId]);
         $query->orderBy('name');
@@ -184,18 +185,18 @@ class ExternalTools extends BaseImasExternalTools
         return $extenalTool;
     }
 
-    public static function externalToolsDataForLink($courseId,$groupId)
+    public static function externalToolsDataForLink($courseId, $groupId)
     {
         $query = "SELECT id,name FROM imas_external_tools WHERE courseid= '$courseId' ";
         $query .= "OR (courseid=0 AND (groupid='$groupId' OR groupid=0)) ORDER BY name";
-        $groupNames  = \Yii::$app->db->createCommand($query)->queryAll();
+        $groupNames = \Yii::$app->db->createCommand($query)->queryAll();
         return $groupNames;
     }
 
     public static function deleteByCourseId($courseId)
     {
-        $courseData = ExternalTools::findOne(['courseid',$courseId]);
-        if($courseData){
+        $courseData = ExternalTools::findOne(['courseid', $courseId]);
+        if ($courseData) {
             $courseData->delete();
         }
     }
