@@ -5,12 +5,14 @@ namespace app\components;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Exceptions;
+use app\models\QImages;
 use app\models\Questions;
 use app\models\Course;
 use app\models\QuestionSet;
 use app\models\User;
 use Yii;
 use yii\base\Component;
+use app\models\Sessions;
 
 require_once("../filter/filter.php");
 
@@ -2733,4 +2735,111 @@ class AppUtility extends Component
             $enc = base64_encode(serialize($sessionData));
             Sessions::setSessionId($sessionId,$enc);
     }
+
+
+    public static function printq($qn,$qsetid,$seed,$pts,$showpts) {
+        global $isfinal,$imasroot,$urlmode,$displayformat,$anstypes,$evaledqtext;
+        srand($seed);
+        $qdata = QuestionSet::getSelectedDataByQuesSetId($qsetid);
+        if ($qdata['hasimg'] > AppConstant::NUMERIC_ZERO) {
+            $query = QImages::getByQuestionSetId($qsetid);
+            foreach ($query as $row) {
+                if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
+                    ${$row['var']} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+                } else {
+                    ${$row['var']} = "<img src=\"$imasroot/Uploads/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+                }
+            }
+        }
+        eval(interpret('control',$qdata['qtype'],$qdata['control']));
+        eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+        $toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+        $toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
+        $toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
+        srand($seed + AppConstant::NUMERIC_ONE);
+        eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+        srand($seed + AppConstant::NUMERIC_ONE);
+        $la = '';
+
+        if (isset($choices) && !isset($questions)) {
+            $questions =& $choices;
+        }
+        if (isset($variable) && !isset($variables)) {
+            $variables =& $variable;
+        }
+        if ($displayformat=="select") {
+            unset($displayformat);
+        }
+
+        //pack options
+        if (isset($ansprompt)) {$options['ansprompt'] = $ansprompt;}
+        if (isset($displayformat)) {$options['displayformat'] = $displayformat;}
+        if (isset($answerformat)) {$options['answerformat'] = $answerformat;}
+        if (isset($questions)) {$options['questions'] = $questions;}
+        if (isset($answers)) {$options['answers'] = $answers;}
+        if (isset($answer)) {$options['answer'] = $answer;}
+        if (isset($questiontitle)) {$options['questiontitle'] = $questiontitle;}
+        if (isset($answertitle)) {$options['answertitle'] = $answertitle;}
+        if (isset($answersize)) {$options['answersize'] = $answersize;}
+        if (isset($variables)) {$options['variables'] = $variables;}
+        if (isset($domain)) {$options['domain'] = $domain;}
+        if (isset($answerboxsize)) {$options['answerboxsize'] = $answerboxsize;}
+        if (isset($hidepreview)) {$options['hidepreview'] = $hidepreview;}
+        if (isset($matchlist)) {$options['matchlist'] = $matchlist;}
+        if (isset($noshuffle)) {$options['noshuffle'] = $noshuffle;}
+        if (isset($reqdecimals)) {$options['reqdecimals'] = $reqdecimals;}
+        if (isset($grid)) {$options['grid'] = $grid;}
+        if (isset($background)) {$options['background'] = $background;}
+
+        if ($qdata['qtype']=="multipart") {
+            if (!is_array($anstypes)) {
+                $anstypes = explode(",",$anstypes);
+            }
+            $laparts = explode("&",$la);
+            foreach ($anstypes as $kidx=>$anstype) {
+                list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+            }
+        } else {
+            list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+        }
+
+        echo "<div class=q>";
+        if ($isfinal) {
+            echo "<div class=\"trq$qn\">\n";
+        } else {
+            echo "<div class=m id=\"trq$qn\">\n";
+        }
+        if ($showpts) {
+            echo ($qn+1).'. ('.$pts.' pts) ';
+        }
+        echo "<div>\n";
+        eval("\$evaledqtext = \"$toevalqtxt\";");
+        echo printfilter(filter($evaledqtext));
+        echo "</div>\n"; //end question div
+
+        if (strpos($toevalqtxt,'$answerbox')===false) {
+            if (is_array($answerbox)) {
+                foreach($answerbox as $iidx=>$abox) {
+                    echo printfilter(filter("<div>$abox</div>\n"));
+                    echo "<div class=spacer>&nbsp;</div>\n";
+                }
+            } else {  //one question only
+                echo printfilter(filter("<div>$answerbox</div>\n"));
+            }
+
+
+        }
+
+
+        echo "</div>";//end m div
+
+        echo "&nbsp;";
+        echo "</div>\n"; //end q div
+        if (!isset($showanswer)) {
+            return $shans;
+        } else {
+            return $showanswer;
+        }
+    }
+
 }

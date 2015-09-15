@@ -4,16 +4,11 @@
 namespace app\controllers\question;
 
 use app\components\AppUtility;
-use app\components\AssessmentUtility;
 use app\components\filehandler;
 use app\controllers\AppController;
-use app\models\_base\BaseImasLibraryItems;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
-use app\models\Exceptions;
-use app\models\Forums;
-use app\models\GbCats;
 use app\models\Items;
 use app\models\Libraries;
 use app\models\LibraryItems;
@@ -23,10 +18,6 @@ use app\models\Questions;
 use app\models\Rubrics;
 use app\models\User;
 use app\models\QuestionSet;
-use app\models\SetPassword;
-use app\models\Student;
-use app\models\StuGroupSet;
-use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
 
@@ -960,7 +951,7 @@ class QuestionController extends AppController
         $this->includeCSS(['question/libtree.css']);
         $this->includeJS(['general.js', 'tablesorter.js', 'question/addquestions.js', 'question/addqsort.js', 'question/junkflag.js', 'question/libtree2.js']);
         $renderData = array('myRights' => $myRights, 'params' => $params, 'libraryData' => $libraryData);
-        return $this->renderWithData('questionLibraries', $renderData);
+        return $this->renderWithData('http://tudip.steersimple.com/issues/23128', $renderData);
     }
 
     public function actionModDataSet()
@@ -2012,48 +2003,125 @@ class QuestionController extends AppController
 
     public function actionPrintLayoutBare()
     {
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $assessmentId = $params['aid'];
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $course = Course::getById($courseId);
         $this->layout = 'master';
-        $overwriteBody = 0;
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
-        $pagetitle = "Print Layout";
-
-
-        //CHECK PERMISSIONS AND SET FLAGS
-        if (!(isset($teacherid))) {
-            $overwriteBody = 1;
-            $body = "You need to log in as a teacher to access this page";
-        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
         }
-
-        if (isset($_POST['versions'])) {
-
-            $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
+        if (isset($params['versions'])) {
+            $this->includeCSS(['print.css']);
         }
 
         $nologo = true;
-        $cid = $_GET['cid'];
-        $aid = intval($_GET['aid']);
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
-            $sessiondata['mathdisp'] = 0;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='text') {
+            $sessionData['mathdisp'] = AppConstant::NUMERIC_ZERO;
         } else {
-            $sessiondata['mathdisp'] = 2;
+            $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO;
         }
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
-            $sessiondata['texdisp'] = true;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='tex') {
+            $sessionData['texdisp'] = true;
         }
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
-            $printtwice = 2;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='textandimg') {
+            $printtwice = AppConstant::NUMERIC_TWO;
         } else {
-            $printtwice = 1;
+            $printtwice = AppConstant::NUMERIC_ONE;
         }
 
-        $sessiondata['graphdisp'] = 2;
-        if (isset($_POST['versions'])) {
+        $sessionData['graphdisp'] = AppConstant::NUMERIC_TWO;
+        if (!isset($params['versions'])) {
 
+        }else{
+            $line = Assessments::getByAssessmentId($assessmentId);
+            $ioquestions = explode(",",$line['itemorder']);
+            $aname = $line['name'];
+            $questions = array();
+            foreach($ioquestions as $k=>$q) {
+                if (strpos($q,'~')!==false) {
+                    $sub = explode('~',$q);
+                    if (strpos($sub[0],'|')===false) { //backwards compat
+                        $questions[] = $sub[array_rand($sub,1)];
+                    } else {
+                        $grpqs = array();
+                        $grpparts = explode('|',$sub[0]);
+                        array_shift($sub);
+                        if ($grpparts[1]==1) { // With replacement
+                            for ($i=0; $i<$grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub,1)];
+                            }
+                        } else if ($grpparts[1]==0) { //Without replacement
+                            shuffle($sub);
+                            for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
+                                $questions[] = $sub[$i];
+                            }
+                            //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
+                            if ($grpparts[0]>count($sub)) { //fix stupid inputs
+                                for ($i=count($sub); $i<$grpparts[0]; $i++) {
+                                    $questions[] = $sub[array_rand($sub,1)];
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $questions[] = $q;
+                }
+            }
+
+            $points = array();
+            $qn = array();
+            $query = Questions::getPointsAndQsetId($questions);
+            foreach ($query as $row) {
+                if ($row['points'] == AppConstant::QUARTER_NINE) {
+                    $points[$row['id']] = $line['defpoints'];
+                } else {
+                    $points[$row['id']] = $row['points'];
+                }
+                $qn[$row['id']] = $row['questionsetid'];
+            }
+            if (is_numeric($params['versions'])) {
+                $copies = $params['versions'];
+            } else {
+                $copies = AppConstant::NUMERIC_ONE;
+            }
+
+            $seeds = array();
+            global $shuffle;
+            for ($j=0; $j<$copies; $j++) {
+                $seeds[$j] = array();
+                if ($line['shuffle']&2) {  //all questions same random seed
+                    if ($shuffle&4) { //all students same seed
+                        $seeds[$j] = array_fill(0,count($questions),$assessmentId+$j);
+                    } else {
+                        $seeds[$j] = array_fill(0,count($questions),rand(1,9999));
+                    }
+                } else {
+                    if ($shuffle&4) { //all students same seed
+                        for ($i = 0; $i<count($questions);$i++) {
+                            $seeds[$j][] = $assessmentId + $i + $j;
+                        }
+                    } else {
+                        for ($i = 0; $i<count($questions);$i++) {
+                            $seeds[$j][] = rand(1,9999);
+                        }
+                    }
+                }
+            }
+            $numq = count($questions);
         }
-
-        return $this->renderWithData('printLayoutBare');
+        $this->includeCSS(['default.css','handheld.css','print.css']);
+        $renderData = array('sessiondata' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $nologo, 'numq' => $numq,
+            'printtwice' => $printtwice, ' course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
+            'qn' => $qn, 'courseId' => $courseId);
+        return $this->renderWithData('printLayoutBare', $renderData);
     }
 
     public function actionManageQuestionSet()

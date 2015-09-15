@@ -438,7 +438,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			echo filter(" <div id=\"soln$qnidx\" class=\"hidden review\" style=\"margin-top:5px;margin-bottom:5px;\">$evaledsoln </div></div>\n");
 		}
 	}
-
 	echo "</div>\n";
 	if ($qdata['qtype']=="multipart" ) {
 		return $anstypes;

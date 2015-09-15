@@ -525,4 +525,8 @@ class Assessments extends BaseImasAssessments
             $deleteId->delete();
         }
     }
+
+    public static function getSelectedData($id){
+        return Assessments::find()->select('itemorder,shuffle,defpoints,name,intro')->where(['id' => $id])->all();
+    }
 }

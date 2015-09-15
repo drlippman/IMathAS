@@ -284,4 +284,12 @@ class Questions extends BaseImasQuestions
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getPointsAndQsetId($qid)
+    {
+        $query = Questions::find()->select('id,points,questionsetid')->where(['IN', 'id', $qid])->all();
+        return $query;
+
+    }
+
 }
