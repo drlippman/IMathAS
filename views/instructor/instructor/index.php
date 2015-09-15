@@ -14,7 +14,6 @@ $now = $currentTime;
 
 <input type="hidden" class="calender-course-id" id="courseIdentity" value="<?php echo $course->id ?>">
 <input type="hidden" class="courseId" value="<?php echo $course->id?>">
-
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false)], 'link_url' => [AppUtility::getHomeURL() . 'site/index']]); ?>
 </div>

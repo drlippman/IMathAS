@@ -201,7 +201,6 @@ switch($action) {
                         </div>
             </div>';
         }
-
         if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
             echo "
             <div class='col-md-12 margin-top-twenty'>

@@ -199,8 +199,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </table>
 
         <a class="btn btn-primary margin-left-twenty" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics') ?>">Add
-            New
-            Diagnostic</a>
+            New Diagnostic</a>
     </div>
 <?php } if($myRights >= 75) {?>
     <div class="col-lg-12 margin-left-five"><h3><?php echo $page_userBlockTitle?></h3></div>
