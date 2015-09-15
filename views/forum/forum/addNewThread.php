@@ -26,7 +26,6 @@ $now = $currentTime;
         </div>
         <div class="pull-left header-btn">
             <a href="#"class="btn btn-primary pull-right add-new-thread" id="addNewThread"><i class="fa fa-share"></i>&nbsp;Create Thread</a>
-<!--            <input type="submit" value="Create Thread">-->
         </div>
     </div>
 </div>
@@ -59,13 +58,9 @@ $now = $currentTime;
     </div>
     <div style="margin-left: 18%">
     <?php if($forumData['forumtype'] == 1)
-    {?>
-<!--        Description:<br><input type="text" size=0 style='width: 30%;height: 30px; border: #6d6d6d 1px solid;' name="newfiledesc-0" /><br>-->
-<!--        File: <input type='file' name="newfile-0" /><br/>-->
-<!--        <br><a href="#" onclick="addnewfile(this);return false;">Add another file</a><br>-->
-<!--        <br><input type=submit name="submitbtn" class="btn btn-primary add-new-thread" value="Add / Update Files"/>-->
-            <input name="file[]" type="file" id="uplaod-file" /><br>
-            <button class="add-more">Add More Files</button>
+    { ?>
+            <input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
+            <br><button class="add-more">Add More Files</button><br>
 
 <?php }?>
     </div>

@@ -214,7 +214,27 @@ $currentLevel = AppConstant::NUMERIC_ZERO;
                           onclick=countPopup(<?php echo $data['id'] ?>,<?php echo $data['threadId'] ?>,<?php echo $data['postType'] ?>)><label><?php echo $data['likeCnt'] ?></label></span>
                 <?php } ?>
             </div>
-            <div class="blockitems" id="item<?php echo $index ?>"><p><?php echo $data['message'] ?></p></div>
+            <div class="blockitems" id="item<?php echo $index ?>">
+                <?php if($data['fileType'])
+                {
+                    if($data['files'])
+                    {
+                        $fl = explode('@@',$data['files']);
+                        if (count($fl)>2)
+                        {
+                            echo '<p><b>Files:</b> ';
+                        }else
+                        {
+                            echo '<p><b>File:</b> ';
+                        }
+                        for ($i=0;$i<count($fl)/2;$i++){?>
+                            <a href="<?php echo AppUtility::getAssetURL()?>Uploads/forumFiles/<?php echo $fl[2*$i+1]?>" target="_blank"><?php echo $fl[2*$i];?></a>
+                      <?php }
+                    }
+
+                }?>
+                <p><?php echo $data['message'] ?></p>
+            </div>
 
             <?php
             if ($index == count($postdata) - AppConstant::NUMERIC_ONE)

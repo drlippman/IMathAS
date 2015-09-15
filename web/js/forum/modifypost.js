@@ -27,14 +27,14 @@ $(document).ready(function () {
             $('#flash-message').hide();
         }
     });
+    var i = 1;
+    $('.add-more').click(function(e){
+        e.preventDefault();
+        $(this).before('<input name="file-'+i+'" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-'+i+'" placeholder="Description"><br>');
+        i++;
+    });
 });
-var filecnt = 1;
-function addnewfile(t) {
-    var s = document.createElement("span");
-    s.innerHTML ="Description:<br/><input type='text' size=0 style='width: 30%;height: 30px; border: #6d6d6d 1px solid;' name='newfiledesc-\"+filecnt+\"' value='' class='subject'><br/>File: <input type='file' name='newfile-\"+filecnt+\"' /><br/>";
-    t.parentNode.insertBefore(s,t);
-    filecnt++;
-}
+
 
 
 

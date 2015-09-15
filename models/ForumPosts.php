@@ -41,29 +41,36 @@ class ForumPosts extends BaseImasForumPosts
         return $ForumPost;
     }
 
-    public static function modifyPost($params)
+    public static function modifyPost($params,$fileName)
     {
         $threadPost = ForumPosts::findOne(['id' => $params['threadId']]);
-        $threadPost->subject = $params['subject'];
+        $threadPost->subject = trim($params['subject']);
         $threadPost->message = $params['message'];
 
-            if($params['always-replies'] == AppConstant::NUMERIC_THREE) {
+            if($params['always-replies'] == AppConstant::NUMERIC_THREE)
+            {
                 $replyBy = AppUtility::parsedatetime($params['startDate'], $params['startTime']);
                 $threadPost->replyby = $replyBy;
-            }else if($params['always-replies'] == AppConstant::NUMERIC_ONE){
+            }
+            else if($params['always-replies'] == AppConstant::NUMERIC_ONE)
+            {
                 $threadPost->replyby = 'null';
-            }else {
+            }
+            else
+            {
                 $replyBy = $params['always-replies'];
             }
-        $isANonValue = AppConstant::NUMERIC_ZERO;
-            if($params['post-anonymously']){
+            $isANonValue = AppConstant::NUMERIC_ZERO;
+            if($params['post-anonymously'])
+            {
                 $isANonValue = $params['post-anonymously'];
             }
             $threadPost->isanon = $isANonValue;
             $threadPost->replyby = $replyBy;
             $threadPost->posttype = $params['post-type'];
+            $threadPost->files = $fileName;
             $threadPost->save();
-        return $threadPost->threadid;
+            return $threadPost->threadid;
     }
 
     public static function removeThread($threadId, $parentId)
@@ -91,20 +98,21 @@ class ForumPosts extends BaseImasForumPosts
         }
     }
 
-    public function createReply($params, $user)
+    public function createReply($params, $user,$fileName)
     {
         $this->threadid = isset($params['threadId']) ? $params['threadId'] : null;
-        $this->forumid = isset($params['forumId']) ? $params['forumId'] : null;
-        $this->subject = isset($params['subject']) ? $params['subject'] : null;
+        $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
+        $this->subject = isset($params['Subject']) ? $params['Subject'] : null;
         $this->userid = isset($user->id) ? $user->id : null;
         $this->parent = $params['parentId'];
-        $this->message = isset($params['body']) ? $params['body'] : null;
+        $this->message = isset($params['post-reply']) ? $params['post-reply'] : null;
         $postdate = strtotime(date('F d, o g:i a'));
         $this->postdate = $postdate;
+        $this->files = $fileName;
         $this->save();
     }
 
-    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue)
+    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue,$fileName)
     {
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
@@ -121,16 +129,24 @@ class ForumPosts extends BaseImasForumPosts
             $postdate = strtotime(date('F d, o g:i a'));
             $this->postdate = $postdate;
             $this->posttype = $postType;
-            if ($alwaysReplies == AppConstant::NUMERIC_ONE) {
+            if ($alwaysReplies == AppConstant::NUMERIC_ONE)
+            {
                 $this->replyby = AppConstant::ALWAYS_TIME;
-            } elseif ($alwaysReplies == AppConstant::NUMERIC_TWO) {
+            }
+            elseif ($alwaysReplies == AppConstant::NUMERIC_TWO)
+            {
                 $this->replyby = AppConstant::NUMERIC_ZERO;
-            } elseif ($alwaysReplies == AppConstant::NUMERIC_THREE) {
+            }
+            elseif ($alwaysReplies == AppConstant::NUMERIC_THREE)
+            {
                 $this->replyby = $date;
-            }else{
+            }
+            else
+            {
                 $this->replyby = null;
             }
         $this->isanon = $isNonValue;
+        $this->files = $fileName;
         $this->save();
         return ($this->threadid);
 
@@ -282,6 +298,17 @@ class ForumPosts extends BaseImasForumPosts
         $query->andWhere(['<>', 'files', '" "']);
         $command = $query->createCommand();
         $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getFileDetails($modifyId)
+    {
+        $query = new Query();
+        $query ->select(['files'])
+            ->from('imas_forum_posts ')
+            ->where(['id' => $modifyId]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
         return $data;
     }
 }

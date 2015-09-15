@@ -205,11 +205,12 @@ function threadSuccess(response)
                         {
                             html += "<tr> <td><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"<br> </a>"+ thread.name+"</td>";
                         }
-                    }else
+                    }
+                    else
                     {
                         if((thread .postdate >= thread.lastview || thread.lastview==0 ) && thread.currentUserId != thread.postUserId)
                         {
-                            html += "<tr> <td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br>Anonymous </td>";
+                            html += "<tr><td><div class='main-name-div'><div class='user-name pull-left'><a href='post?courseid="+courseId+"&threadid="+thread.threadId+"&forumid="+fid+"'>" + (thread.subject) +"</a></div><div class='new-tag pull-right '>New</div></div><br>Anonymous</td>";
                             newCount++;
                         }else
                         {

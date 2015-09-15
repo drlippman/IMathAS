@@ -480,8 +480,10 @@ class ForumController extends AppController
         $thread = ThreadForm::thread($forumId);
         $threadArray = array();
         $this->includeJS(["editor/tiny_mce.js", 'editor/tiny_mce_src.js', 'general.js', 'forum/modifypost.js']);
-        foreach ($thread as $data) {
-            if (($data['id']) == $threadId) {
+        foreach ($thread as $data)
+        {
+            if (($data['id']) == $threadId)
+            {
                 $tempArray = array(
                     'threadId' => $data['threadid'],
                     'subject' => $data['subject'],
@@ -489,6 +491,7 @@ class ForumController extends AppController
                     'postType'=> $data['posttype'],
                     'replyBy' => $data['replyby'],
                     'isANon'  => $data['isanon'],
+                    'files' => $data['files']
                 );
                 array_push($threadArray, $tempArray);
             }
@@ -498,22 +501,94 @@ class ForumController extends AppController
         if($this->isPostMethod())
         {
             $params = $this->getRequestParams();
-            if(strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO) {
-                $threadIdOfPost = ForumPosts::modifyPost($params);
+            $files = ForumPosts::getFileDetails($params['threadId']);
+            if ($files=='')
+            {
+                $files = array();
+            } else
+            {
+                $files = explode('@@',$files['files']);
+            }
+            if($params['file'])
+            {
+                foreach ($params['file'] as $i=>$v)
+                {
+                    $files[2*$i] = str_replace('@@','@',$v);
+
+                }
+                for ($i=count($files)/2-1;$i>=0;$i--)
+                {
+                    if(isset($params['fileDel'][$i]))
+                    {
+                        if($this->deleteForumFile($files[2*$i+1]))
+                        {
+                            array_splice($files,2*$i,2);
+                        }
+                    }
+                }
+            }
+            if($_FILES['file-0'])
+            {
+                $j=0;
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+                $badExtensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                while(isset($_FILES['file-'.$j]) && is_uploaded_file($_FILES['file-'.$j]['tmp_name']))
+                {
+                    $uploadFile = $uploadDir . basename($_FILES['file-'.$j]['name']);
+                    $userFileName = basename($_FILES['file-'.$j]['name']);
+                    if(trim($params['description-'.$j]) == '')
+                    {
+                        $params['description-'.$j] = $userFileName;
+                    }
+                    $params['description-'.$j] = str_replace('@@','@',$params['description-'.$j]);
+                    $extension = strtolower(strrchr($userFileName,"."));
+                    if(!in_array($extension,$badExtensions))
+                    {
+                        $files[] = stripslashes($params['description-'.$j]);
+                        $files[] = $userFileName;
+                        move_uploaded_file($_FILES['file-'.$j]['tmp_name'], $uploadFile);
+                    }else
+                    {
+                        $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
+                        return $this->redirect('add-new-thread?forumid='.$forumId.'&cid='.$courseId);
+                    }
+                    $j++;
+                }
+                $fileName = implode('@@',$files);
+            }
+            if(strlen(trim($params['subject'])) > AppConstant::NUMERIC_ZERO)
+            {
+                $threadIdOfPost = ForumPosts::modifyPost($params,$fileName);
                 $contentTrackRecord  = new ContentTrack();
                 if($currentUser->rights == AppConstant::STUDENT_RIGHT)
                 {
                     $contentTrackRecord->insertForumData($currentUser->id,$courseId,$forumId,$threadId,$threadIdOfPost,$type=AppConstant::NUMERIC_TWO);
                 }
                 $this->redirect('thread?cid='.$courseId.'&forumid='.$forumId);
-            }else{
-                $this->setSuccessFlash("Subject cannot be blank");
             }
         }
         $this->setReferrer();
         $this->includeCSS(['forums.css']);
         $responseData = array('threadId' => $threadId, 'forumId' => $forumId, 'course' => $course, 'thread' => $threadArray, 'currentUser' => $currentUser,'threadCreatedUserData' => $threadCreatedUserData,'forumData' => $forumData,'forumPostData' => $forumPostData );
         return $this->renderWithData('modifyPost', $responseData);
+    }
+    function deleteForumFile($file)
+    {
+        if ($GLOBALS['filehandertype'] == 's3')
+        {
+            /*for amazon*/
+        }
+        else
+        {
+            $base = $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+            if (unlink($base."$file"))
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        }
     }
     /*
     * Controller Action To Redirect To Post Page
@@ -579,7 +654,8 @@ class ForumController extends AppController
             {
                 $isReplies = AppConstant::NUMERIC_ONE;
             }
-            foreach ($likeCnt as $like) {
+            foreach ($likeCnt as $like)
+            {
                 $Rights = User::getById($like['userid']);
                 if ($Rights->rights == AppConstant::STUDENT_RIGHT) {
                     $studentCount = $studentCount + AppConstant::NUMERIC_ONE;
@@ -618,6 +694,8 @@ class ForumController extends AppController
             $tempArray['message'] = $postData['message'];
             $tempArray['level'] = $titleLevel['level'];
             $tempArray['parent'] = $postData['parent'];
+            $tempArray['files'] = $postData['files'];
+            $tempArray['fileType'] = $forumData['forumtype'];
             $tempArray['isReplies'] = $isReplies;
             if($postData['parent'] != AppConstant::NUMERIC_ZERO){
                 if(substr($postData['subject'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FOUR) !== 'Re: '){
@@ -636,7 +714,8 @@ class ForumController extends AppController
         $likeCount = $Count->findCOunt($threadId);
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
-        foreach($this->totalPosts as $key=>$threadArray){
+        foreach($this->totalPosts as $key=>$threadArray)
+        {
             if($threadArray){
                 foreach($this->totalPosts as $singleThread) {
                     if($threadArray['parent'] == $singleThread['id'])
@@ -723,6 +802,7 @@ class ForumController extends AppController
         $course = Course::getById($courseId);
         $threadArray = array();
         $forumId = $this->getParamVal('forumid');
+        $forumData = Forums::getById($forumId);
         $Id = $this->getParamVal('id');
         $threadId = $this->getParamVal('threadId');
         $userData = $this->getAuthenticatedUser();
@@ -732,33 +812,71 @@ class ForumController extends AppController
         {
             $contentTrackRecord->insertForumData($userData->id,$courseId,$forumId,$Id,$threadId,$type=AppConstant::NUMERIC_ONE);
         }
-        foreach ($threadData as $data) {
+        foreach ($threadData as $data)
+        {
             $tempArray = array
             (
                 'subject' => $data['subject'],
                 'userName' => $data->user->FirstName . ' ' . $data->user->LastName,
                 'message' => $data['message'],
+                'forumType' => $forumData['forumtype'],
+                'files' => $data['files'],
                 'postDate' => date('F d, o g:i a', $data['postdate']),
             );
             array_push($threadArray, $tempArray);
+        }
+        if($this->isPostMethod())
+        {
+            $files = array();
+            $params = $this->getRequestParams();
+            if($_FILES['file-0'])
+            {
+                $j=0;
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+                $badExtensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                while(isset($_FILES['file-'.$j]) && is_uploaded_file($_FILES['file-'.$j]['tmp_name']))
+                {
+                    $uploadFile = $uploadDir . basename($_FILES['file-'.$j]['name']);
+                    $userFileName = preg_replace('/[^\w\.]/','',basename($_FILES['file-'.$j]['name']));
+                    if(trim($params['description-'.$j]) == '')
+                    {
+                        $params['description-'.$j] = $userFileName;
+                    }
+                    $params['description-'.$j] = str_replace('@@','@',$params['description-'.$j]);
+                    $extension = strtolower(strrchr($userFileName,"."));
+                    if(!in_array($extension,$badExtensions))
+                    {
+                        $files[] = stripslashes($params['description-'.$j]);
+                        $files[] = $userFileName;
+                        move_uploaded_file($_FILES['file-'.$j]['tmp_name'], $uploadFile);
+                    }
+                    else
+                    {
+                        $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
+                        return $this->redirect('reply-post?forumid='.$forumId.'&cid='.$courseId);
+                    }
+                    $j++;
+                }
+            }
+            $fileName = implode('@@',$files);
+            $isPost = $params['isPost'];
+            $user = $this->getAuthenticatedUser();
+            $reply = new ForumPosts();
+            $reply->createReply($params, $user,$fileName);
+            if(isset($isPost))
+            {
+                return $this->redirect('list-post-by-name?cid='.$params['courseid'].'&forumid='.$params['forumid']);
+            }
+            else
+            {
+                return $this->redirect('post?courseid='.$params['courseid'].'&threadid='.$params['threadId'].'&forumid='.$params['forumid']);
+            }
+
         }
         $this->includeCSS(['forums.css']);
         $this->includeJS(['editor/tiny_mce.js', 'editor/tiny_mce_src.js', 'general.js', 'forum/replypost.js']);
         $responseData = array('reply' => $threadArray, 'course' => $course, 'forumId' => $forumId, 'threadId' => $threadId, 'parentId' => $Id,'isPost' => $isPost);
         return $this->renderWithData('replyPost', $responseData);
-    }
-
-    public function actionReplyPostAjax()
-    {
-        $this->guestUserHandler();
-        if ($this->isPostMethod()) {
-            $params = $this->getRequestParams();
-            $isPost = $params['isPost'];
-            $user = $this->getAuthenticatedUser();
-            $reply = new ForumPosts();
-            $reply->createReply($params, $user);
-            return $this->successResponse($isPost);
-        }
     }
     /*
      * Controller Action To Redirect To New Thread Page
@@ -773,6 +891,7 @@ class ForumController extends AppController
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $forumData = Forums::getById($forumId);
+        $files = array();
         if($this->isPostMethod())
         {
             $params = $this->getRequestParams();
@@ -787,9 +906,40 @@ class ForumController extends AppController
             {
                 $isNonValue = $params['settings'];
             }
+            if($_FILES['file-0'])
+            {
+                $j=0;
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
+                $badExtensions = array(".php",".php3",".php4",".php5",".bat",".com",".pl",".p");
+                while(isset($_FILES['file-'.$j]))
+                {
+                    $uploadFile = $uploadDir . basename($_FILES['file-'.$j]['name']);
+                    $userFileName = preg_replace('/[^\w\.]/','',basename($_FILES['file-'.$j]['name']));
+                    if(trim($params['description-'.$j]) == '')
+                    {
+                        $params['description-'.$j] = $userFileName;
+                    }
+                    $params['description-'.$j] = str_replace('@@','@',$params['description-'.$j]);
+                    $extension = strtolower(strrchr($userFileName,"."));
+                    if(!in_array($extension,$badExtensions))
+                    {
+                        $files[] = stripslashes($params['description-'.$j]);
+                        $files[] = $userFileName;
+                        move_uploaded_file($_FILES['file-'.$j]['tmp_name'], $uploadFile);
+                    }
+                    else
+                    {
+                        $this->setErrorFlash("File with (.php,.php3,.php4,.php5,.bat,.com,.pl,.p) are not allowed");
+                        return $this->redirect('add-new-thread?forumid='.$forumId.'&cid='.$courseId);
+                    }
+                    $j++;
+                }
+
+            }
+            $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
             $newThread = new ForumPosts();
-            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date , $isNonValue);
+            $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date , $isNonValue,$fileName);
             $newThread = new ForumThread();
             $newThread->createThread($params, $user->id, $threadId);
             $views = new ForumView();
@@ -799,12 +949,6 @@ class ForumController extends AppController
             {
                 $contentTrackRecord->insertForumData($user->id,$params['cid'],$params['forumid'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
             }
-            $filesToUpload = $this->reArrayFiles($_FILES['file']);
-            $uploadDir = AppConstant::UPLOAD_DIRECTORY.'forumFiles/';
-            foreach($filesToUpload as $file)
-            {
-
-            }
             return $this->redirect('thread?cid='.$params['cid'].'&forumid='.$params['forumid']);
         }
         $this->includeCSS(['forums.css']);
@@ -812,55 +956,9 @@ class ForumController extends AppController
         $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
         return $this->renderWithData('addNewThread', $responseData);
     }
-
-    function reArrayFiles(&$file)
-    {
-        $file_ary = array();
-        $file_count = count($file['name']);
-        $file_keys = array_keys($file);
-        for ($i=0; $i<$file_count; $i++)
-        {
-            foreach ($file_keys as $key)
-            {
-                $file_ary[$i][$key] = $file[$key][$i];
-            }
-        }
-        return $file_ary;
-    }
-
     /*
      * Controller Action To Save The Newly Added Thread In Database
      */
-    public function actionAddNewThreadAjax()
-    {
-        $this->guestUserHandler();
-            $params = $this->getRequestParams();
-            $postType = AppConstant::NUMERIC_ZERO;
-            $alwaysReplies = null;
-            $isNonValue = AppConstant::NUMERIC_ZERO;
-            if ($this->getAuthenticatedUser()->rights > AppConstant::NUMERIC_TEN)
-            {
-                $postType = $params['postType'];
-                $date = strtotime($params['date'] . ' ' . $params['time']);
-            }else{
-                $isNonValue = $params['settings'];
-            }
-            $alwaysReplies = $params['alwaysReplies'];
-            $userId = $this->getUserId();
-            $newThread = new ForumPosts();
-            $threadId = $newThread->createThread($params, $userId, $postType, $alwaysReplies, $date , $isNonValue);
-            $newThread = new ForumThread();
-            $newThread->createThread($params, $userId, $threadId);
-            $views = new ForumView();
-            $views->createThread($userId, $threadId);
-            $contentTrackRecord = new ContentTrack();
-            if($this->getAuthenticatedUser()->rights == AppConstant::STUDENT_RIGHT)
-            {
-                 $contentTrackRecord->insertForumData($this->getAuthenticatedUser()->id,$params['courseId'],$params['forumId'],$threadId,$threadIdOfPost=null,$type=AppConstant::NUMERIC_ZERO);
-            }
-        return $this->successResponse();
-    }
-
     /*Controller Action To Toggle The Flag Image On Click*/
     public function actionChangeImageAjax()
     {

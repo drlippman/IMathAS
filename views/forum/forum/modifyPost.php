@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 ?>
-<form method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
+<form enctype="multipart/form-data" method="post" action="modify-post?forumId=<?php echo $forumId ?>&courseId=<?php echo $course->id ?>&threadId=<?php echo $threadId ?>">
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
@@ -39,7 +39,7 @@ $now = $currentTime;
     <div style="padding-top: 20px">
         <div class="col-sm-2 subject-label"><?php echo AppUtility::t('Subject');?></div>
         <div class="col-sm-10">
-            <input type=text  value="&nbsp;&nbsp;<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;"  name=subject class="subject textbox 3">
+            <input type=text  value="<?php echo $thread[0]['subject'] ?>" size=0 style="width: 100%;height: 40px; border: #6d6d6d 1px solid;"  name=subject class="subject textbox 3">
         </div>
     </div>
     <BR class=form>
@@ -54,12 +54,30 @@ $now = $currentTime;
             </div>
         </div>
     </div>
+      <div style="margin-left: 18%">
     <?php if($forumData['forumtype'] == 1){?>
-
+        <?php if($thread[0]['files'] != '')
+        {
+            $files = explode('@@',$thread[0]['files']);
+            for ($i=0;$i<count($files)/2;$i++){?>
+                <br><input type="text" name="file[<?php echo $i;?>]" value="<?php echo $files[2*$i]?>"/>
+                <?php if ($GLOBALS['filehandertype'] == 's3')
+                    {
+                       /*PATH TO AMAZON IMAGE */
+                    }
+                    else{?>
+                       <a href="<?php echo AppUtility::getAssetURL()?>Uploads/forumFiles/<?php echo $files[2*$i+1]?>" target="_blank">View</a>
+                    <?php }?>
+                        Delete? <input type="checkbox" name="fileDel[<?php echo $i;?>]" value="1"/><br/>
+            <?php }?>
+        <?php }?>
+        <br><input name="file-0" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-0" placeholder="Description"><br>
+        <br><button class="add-more">Add More Files</button><br>
     <?php }?>
+     </div>
     <?php if($currentUser['rights'] > 10)
     {?>
-        <div >
+        <div>
             <span class="col-sm-2 align-title"><?php echo AppUtility::t('Post Type');?></span>
             <span class="col-sm-10" id="post-type-radio-list">
                  <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
@@ -77,9 +95,10 @@ $now = $currentTime;
             </span>
         </div><br><br>
         <?php if ($thread[0]['replyBy'] === null) {
-        $thread[0]['replyBy'] = 1;
-    }
-        if ($thread[0]['replyBy'] != 3) {
+        $thread[0]['replyBy'] = 0;
+        }
+        if ($thread[0]['replyBy'] != 3)
+        {
             $date = date('m/d/y');
             $time = date("G:i");
         }
@@ -88,12 +107,12 @@ $now = $currentTime;
             $time = date("G:i", $thread[0]['replyBy']);
             $thread[0]['replyBy'] = 3;
         }
-        ?>
+         ?>
         <div>
-            <span class="col-sm-2 align-title"><?php echo AppUtility::t('Always Replies');?></span>
+            <span class="col-sm-2 align-title"><?php echo AppUtility::t('Allow Replies');?></span>
             <span class="col-sm-10" id="always-replies-radio-list">
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
-                                <input type='radio' checked  name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], AppConstant::NUMERIC_ZERO);?>>
+                                <input type='radio' checked  name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'],0);?>>
                                 <span class='cr'><i class='cr-icon fa fa-check align-check'></i></span></label></td><td ><?php echo AppUtility::t('Use default');?></td></div></tr>
                 <tr><div class='radio student-enroll override-hidden'><label class='checkbox-size'><td>
                                 <input type='radio' name='always-replies' value='1'<?php AssessmentUtility::writeHtmlChecked($thread[0]['replyBy'], 1);?> >

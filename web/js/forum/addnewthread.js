@@ -17,27 +17,7 @@ $(document).ready(function () {
         }
         else
         {
-            document.getElementById("addNewThread").disabled = 'true';
-            var date = $( "#datepicker-id input" ).val();
-            var time = $("#w1").val();
-            var postType = "";
-            var selected = $("#post-type-radio-list input[type='radio']:checked");
-            if (selected.length > 0) {
-                postType = selected.val();
-            }
-            var alwaysReplies = "";
-            var selected = $("#always-replies-radio-list input[type='radio']:checked");
-            if (selected.length > 0) {
-                alwaysReplies = selected.val();
-            }
-            var body = $("#message").val();
-            var settings = 0;
-            var status = $('#post-anonymously').is(':checked');
-            if(status == true){
-                settings = 1;
-            }
-            var threadDetails = {forumId:forumId,subject:subject,body:body,postType:postType,alwaysReplies:alwaysReplies,date : date ,time :time,settings:settings,courseId :courseId };
-            jQuerySubmit('add-new-thread-ajax',threadDetails,'newThreadSuccess');
+            document.forms["add-thread"].submit();
         }
     });
     $("input").keypress(function(e){
@@ -54,6 +34,10 @@ $(document).ready(function () {
             $(".subject").css('border-color', '');
             $('#flash-message').hide();
         }
+        $('.add_more').click(function(e){
+            e.preventDefault();
+            $(this).before("<input name='file[]' type='file'/>");
+        });
 
     });
     $("input").keyup(function(e){
@@ -63,25 +47,12 @@ $(document).ready(function () {
             $('#flash-message').hide();
         }
     });
+    var i=1;
+    $('.add-more').click(function(e){
+        e.preventDefault();
+        $(this).before('<input name="file-'+i+'" type="file" id="uplaod-file" /><br><input type="text" size="20" name="description-'+i+'" placeholder="Description"><br>');
+        i++;
+    });
 });
 
 
-function newThreadSuccess(response)
-{
-    var forumId = $("#forumId").val();
-    var courseId = $('#courseId').val();
-    response = JSON.parse(response);
-    if (response.status == 0)
-    {
-        document.getElementById("addNewThread").disabled = 'false';
-        window.location = "thread?cid="+courseId+"&forumid="+forumId;
-    }
-}
-
-var filecnt = 1;
-function addnewfile(t) {
-    var s = document.createElement("span");
-    s.innerHTML ="Description:<br/><input type='text' size=0 style='width: 30%;height: 30px; border: #6d6d6d 1px solid;' name='newfiledesc-\"+filecnt+\"' value='' class='subject'><br/>File: <input type='file' name='newfile-\"+filecnt+\"' /><br/>";
-    t.parentNode.insertBefore(s,t);
-    filecnt++;
-}
