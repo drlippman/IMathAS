@@ -106,17 +106,16 @@ echo '<form>';
 //STEP 1 DISPLAY
 ?>
 <form method=post action=diagnostics?step=2><BR class=form>
-
 <?php echo (isset($params['id'])) ? "	<input type=hidden name=id value=\"{$params['id']}\"/>" : ""; ?>
 
 	<div class="col-lg-2">Diagnostic Name</div>
-    <div class="col-lg-8"><input type=text size=50 name="diagname" value="<?php echo $diagname; ?>"/></div><BR class=form><br>
+    <div class="col-lg-6"><input type=text size=60 name="diagname" class="form-control" maxlength="60" required="Please fill out this field" value="<?php echo $diagname; ?>"/></div><BR class=form><br>
 
 	<div class="col-lg-2">Term designator (e.g. F06)</div>
-    <div class="col-lg-6">
-        <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>>Use Month
-        <input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>>Use Day
-        <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>>Use: <input type=text size=7 name="term" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/>
+    <div class="col-lg-3">
+        <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>><span class="padding-left-five">Use Month</span>
+        <input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>><span class="padding-left-five">Use Day</span>
+       <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>><span class="padding-left-five">Use</span></div><div class="col-lg-2"><input type=text size=7 name="term" class="form-control" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/>
     </div><BR class=form><br>
 	<div class="col-lg-2">Linked with course</div>
       <div class="col-lg-4">  <?php
@@ -133,23 +132,23 @@ echo '<form>';
         <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /> No
       </div><BR class=form><br>
 	<div class="col-lg-2">Allow reentry (continuation of test at later date)?</div>
-       <div class="col-lg-6"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /> No
+       <div class="col-lg-2"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /> No
+        <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> Yes, within</div>
+        <div class="col-lg-1"><input type="text" class="form-control" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /></div> minutes (0 for no limit)
+    <BR class=form><br>
 
-        <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> Yes, within
-        <input type="text" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)
-    </div><BR class=form><br>
-
-	<div class="col-lg-2">Unique ID prompt</div><div class="col-lg-6"><input type=text size=60 name="idprompt" value="<?php echo $idprompt; ?>" /></div><BR class=form><br>
+	<div class="col-lg-2">Unique ID prompt</div><div class="col-lg-6">
+    <input type=text size=60 name="idprompt" class="form-control" value="<?php echo $idprompt; ?>" /></div><BR class=form><br>
 
 	<div class="col-lg-2">Attach first level selector to ID</div><div class="col-lg-6"><input type="checkbox" name="entrynotunique" value="1" <?php AppUtility::writeHtmlChecked($entrynotunique,true); ?> /></div><BR class=form><br>
 
 	<div class="col-lg-2">ID entry format</div>
-    <div class="col-lg-6">   <?php
+    <div class="col-lg-4">   <?php
         AppUtility::writeHtmlSelect("entrytype",$page_entryType['val'],$page_entryType['label'],$page_entryTypeSelected);
         ?>
     </div><BR class=form><br>
 	<div class="col-lg-2">ID entry number of characters?</div>
-    <div class="col-lg-6">    <?php
+    <div class="col-lg-4">    <?php
         AppUtility::writeHtmlSelect("entrydig",$page_entryNums['val'],$page_entryNums['label'],$page_entryNumsSelected);
         ?>
     </div><BR class=form><br>

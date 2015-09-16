@@ -273,23 +273,12 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <script type="text/javascript">
      $(document).ready(function () {
-        jQuerySubmit('get-all-course-user-ajax',{},'getAllCourseSuccess');
+         $('.course-table').DataTable();
     });
      function showgroupusers() {
          var grpid=document.getElementById("selgrpid").value;
          window.location= 'index?showusers='+grpid;
          }
-    function getAllCourseSuccess(response)
-    {
-        var courseData = JSON.parse(response);
-        if(courseData.status == 0)
-        {
-            var courses = courseData.data.courses;
-            var users = courseData.data.users;
-            createCourseTable(courses);
-            createUsersTable(users);
-        }
-    }
 
     function bindEvent(){
         //Show pop dialog for delete the course.
@@ -319,38 +308,7 @@ $this->params['breadcrumbs'][] = $this->title;
         });
 
     }
-    function createCourseTable(courses)
-    {
-        var html = "";
-        $.each(courses, function(index, course){
-            html += "<tr> <td><a href='<?php echo AppUtility::getURLFromHome('instructor', 'instructor/index?cid=')?>"+course.courseid+"'>"+capitalizeFirstLetter(course.name)+"</a></td>";
-            html += "<td>"+course.courseid+"</td>";
-            html += "<td>"+capitalizeFirstLetter(course.FirstName)+" "+capitalizeFirstLetter(course.LastName)+"</td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/course-setting?cid=')?>"+course.courseid+"'>Setting</a></td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid=') ?>"+course.courseid+"'>Add/Remove</a></td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('course', 'course/transfer-course?cid=') ?>"+course.courseid+"'>Transfer</a></td>";
-            html += "<td id='delete-link'><a class='delete-link' href='<?php echo AppUtility::getURLFromHome('course', 'course/delete-course?cid=') ?>"+course.courseid+"'>Delete</a></td></tr>";
-        });
-        $(".course-table-body").append(html);
-        $('.course-table').DataTable();
-        bindEvent();
-    }
 
-    function createUsersTable(users)
-    { var html = "";
-        $.each(users, function(index, users){
-            html += "<tr> <td>"+capitalizeFirstLetter(users.FirstName)+" "+capitalizeFirstLetter(users.LastName)+"</td>";
-            html += "<td>"+users.SID+"</td>";
-            html += "<td>"+users.email+"</td>";
-            html += "<td>"+users.rights+"</td>";
-            html += "<td>"+users.lastaccess+"</td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id=')?>"+users.id+"'>Change</a></td>";
-            html += "<td><a href='<?php echo AppUtility::getURLFromHome('site', 'change-password?id=') ?>'"+users.id+"'>Reset</a></td>";
-            html += "<td ><a href='<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?id=') ?>'"+users.id+"'>Delete</a></td></tr>";
-        });
-        $(".user-table-body").append(html);
-        $('.user-table').DataTable();
-    }
      function showcourses() {
            var uid = $("#showCid ").val();
          alert(uid);

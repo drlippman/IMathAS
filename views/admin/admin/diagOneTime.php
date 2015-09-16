@@ -17,14 +17,13 @@ $this->params['breadcrumbs'] = $this->title;
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
 <?php
-        echo'<br>';
         echo '<span class=col-lg-4><b>'.$nameOfDiag['name'].'</b></span><br/><br/>';
         if (isset($params['generate']))
         {
             if (isset($params['n'])) {
 
                 echo "<span class=col-lg-3>Newly generated passwords</b></span> <span class=col-lg-2><a href=".AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$diag.'&view=true').">View all</a></span><br><br/>";
-                echo '<table class="table table-bordered table-striped table-hover data-table">
+                echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
                 <thead>
                     <tr>
                     <th>Codes</th>
@@ -35,14 +34,12 @@ $this->params['breadcrumbs'] = $this->title;
                 foreach ($code_list as $code) {
                     echo "<tr><td>{$code['code']}</td><td>{$code['goodfor']}</td></tr>";
                 }
-                echo '</tbody></table>';
+                echo '</tbody></table></div>';
             } else
             {
-
                 echo "<form method='post' action='diag-one-time?id=$diag&generate=true'>";
-                echo '<br>';
-                echo '<span class="col-lg-4">Generate <input type="text" size="1" value="1" name="n" /> passwords </span><br/>';
-                echo '<span class="col-lg-10">Allow multi-use within <input type="text" size="1" value="0" name="multi" /> minutes (0 for one-time-only use)</span>';
+                echo '<div class="col-lg-6"><div class="col-lg-2 padding-top-five">Generate</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="1" name="n" /></div><div class="col-lg-1 padding-left-zero padding-top-five">passwords </div><br/><br>';
+                echo '<div class="col-lg-12"><div class="col-lg-4 padding-left-zero padding-top-five">Allow multi-use within</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="0" name="multi" /></div><div class="col-lg-6 padding-left-zero padding-top-five"> minutes (0 for one-time-only use)</div></div>';
                 echo '<span class="col-lg-6"><input type="submit" value="Go" /></span>';
                 echo '</form>';
             }
@@ -53,7 +50,7 @@ $this->params['breadcrumbs'] = $this->title;
         } else {
             echo "<div class=col-lg-3><b>All one-time passwords</b></div> <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$diag.'&generate=true')." ?>Generate</a></div>
              <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin','admin/diag-one-time?id=' .$diag.'&delete=check').">Delete All</a></div><br/><br/>";
-            echo '<table class="table table-bordered table-striped table-hover data-table">
+            echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
                     <thead>
                         <tr>
                             <th>Codes</th>
@@ -69,7 +66,7 @@ $this->params['breadcrumbs'] = $this->title;
                         <td>{$row['time']}</td>
                     </tr>";
             }
-            echo '</tbody></table>';
+            echo '</tbody></table></div>';
         }
         ?>
  </div>

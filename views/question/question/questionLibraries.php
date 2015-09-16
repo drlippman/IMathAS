@@ -3,7 +3,6 @@ use app\components\AppConstant;
 use app\models\Libraries;
 
 $libtreeshowchecks = false;
-
 if (isset($params['libtree']) && $params['libtree']=="popup") {
     $isAdmin = false;
     $isGrpAdmin = false;
@@ -18,13 +17,23 @@ if (isset($params['libtree']) && $params['libtree']=="popup") {
         }
     }
     echo <<<END
+    <!DOCTYPE html>
+<html>
+<head>
+<title>IMathAS Library Selection</title>
 END;
 
     echo <<<END
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
 <form id="libselectform">
 END;
 }
+
+?>
+<input type="hidden" id="lib-data" value="<?php echo $libraryData;?>">
+<?php
 echo "<script type=\"text/javascript\">";
 if (isset($params['select'])) {
     $select = $params['select'];
@@ -39,6 +48,7 @@ if (isset($params['type'])) {
     echo "var treebox = 'checkbox';\n";
 }
 
+
 if (isset($params['selectrights'])) {
     $selectrights = $params['selectrights'];
 } else {
@@ -46,6 +56,7 @@ if (isset($params['selectrights'])) {
 }
 $allsrights = 2+3*$selectrights;
 $libraryData = Libraries::getAllLibrariesByJoin();
+
 $rights = array();
 $sortorder = array();
 foreach ($libraryData as $line)  {
@@ -199,6 +210,7 @@ function printlist($parent) {
 
 echo "}";
 echo "</script>";  //end tree definition script
+
 if (isset($_GET['base'])) {
     $base = $_GET['base'];
 }

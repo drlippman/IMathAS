@@ -2,7 +2,7 @@
 use app\components\AppUtility;
 use kartik\time\TimePicker;
 use app\components\AppConstant;
-$this->title = AppUtility::t('Course Settings',false);
+//$this->title = AppUtility::t('Course Settings',false);
 if (isset($params['cid'])) {
 ?>
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
@@ -661,9 +661,11 @@ switch($action) {
         echo "</form>\n";
         break;
     case "removediag":
-        echo "<p>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</p>\n";
-        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></p>\n";
+        echo '<div class=""><br>';
+        echo "<div class='col-lg-10'>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</div><br>\n";
+        echo "<br><div class='col-lg-10'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\">\n";
+        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div>\n";
+        echo '</div>';
         break;
 }
 ?>

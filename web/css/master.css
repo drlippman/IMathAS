@@ -537,3 +537,11 @@ margin-top: 7px;
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+
+.padding-left-five
+{
+    padding-left: 5px;
+}
+.padding-right-zero{
+    padding-right: 0;
+}

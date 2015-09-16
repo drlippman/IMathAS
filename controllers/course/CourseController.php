@@ -339,6 +339,7 @@ class CourseController extends AppController
     public function actionAddNewCourse()
     {
         $this->guestUserHandler();
+        
         $model = new CourseSettingForm();
 
         if ($model->load($this->isPostMethod())) {
