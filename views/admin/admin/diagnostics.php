@@ -17,8 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
 <?php 	if (isset($_GET['step']) && $_GET['step']==2) {  //STEP 2 DISPLAY
 ?>
-
-<div class="col-lg-10"><h4>Second-level Selector - extra information</h4></div><BR class=form><br>
+<div class="col-lg-10"><h4>Second-level Selector - extra information</h4></div><BR class=form>
 <form method=post action="diagnostics?step=3"><BR class=form>
 
 <input type=hidden name="sel1list" value="<?php echo $sel1list ?>"/>
@@ -34,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <input type=hidden name="reentrytime" value="<?php echo $params['reentrytime'] ?>"/>
 <input type=hidden name="id" value="<?php echo $page_updateId ?>" >
 <div class="col-lg-2">Second-level selector name</div>
-<div class="col-lg-6"><input type=text name=sel2name value="<?php echo $sel2name ?>"/>
+<div class="col-lg-8"><input type=text class="form-control-1" name=sel2name value="<?php echo $sel2name ?>"/>
     'Select your ______'</div><BR class=form><br>
 <div class="col-lg-10">For each of the first-level selectors, select which assessment should be delivered,
     and provide options for the second-level selector</div><BR class=form><br>
@@ -108,41 +107,45 @@ echo '<form>';
 <form method=post action=diagnostics?step=2><BR class=form>
 <?php echo (isset($params['id'])) ? "	<input type=hidden name=id value=\"{$params['id']}\"/>" : ""; ?>
 
-	<div class="col-lg-2">Diagnostic Name</div>
+	<div class="col-lg-2 padding-top-five">Diagnostic Name</div>
     <div class="col-lg-6"><input type=text size=60 name="diagname" class="form-control" maxlength="60" required="Please fill out this field" value="<?php echo $diagname; ?>"/></div><BR class=form><br>
 
 	<div class="col-lg-2">Term designator (e.g. F06)</div>
-    <div class="col-lg-3">
-        <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>><span class="padding-left-five">Use Month</span>
-        <input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>><span class="padding-left-five">Use Day</span>
-       <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>><span class="padding-left-five">Use</span></div><div class="col-lg-2"><input type=text size=7 name="term" class="form-control" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/>
-    </div><BR class=form><br>
-	<div class="col-lg-2">Linked with course</div>
+    <div class="col-lg-8">
+        <input type=radio name="termtype" value="mo" <?php if ($term=="*mo*") {echo 'checked="checked"';}?>><span class="padding-left-five padding-right">Use Month</span>
+        <input type=radio name="termtype" value="day" <?php if ($term=="*day*") {echo 'checked="checked"';}?>><span class="padding-left-five padding-right">Use Day</span>
+       <input type=radio name="termtype" value="cu" <?php if ($term!="*mo*" && $term!="*day*"  ) {echo 'checked="checked"';}?>><span class="padding-left-five padding-right">Use</span>
+        <input type=text size=7 name="term" class="form-control-1" value="<?php if ($term!="*mo*" && $term!="*day*" ) {echo $term; }?>"/>
+    </div>
+        <div class="col-lg-2">
+        </div>
+<BR class=form><br>
+	<div class="col-lg-2 padding-top-five">Linked with course</div>
       <div class="col-lg-4">  <?php
         AppUtility::writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>
       </div>
 <BR class=form><br>
 
 	<div class="col-lg-2">Available? (Can be taken)?</div>
-        <div class="col-lg-6"><input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked(1,($public&1),0); ?> /> Yes
-        <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked(1,($public&1),1); ?> /> No
+        <div class="col-lg-6"><input type=radio name="avail" value="1" <?php AppUtility::writeHtmlChecked(1,($public&1),0); ?> /><span class="padding-left-three padding-right"> Yes</span>
+        <input type=radio name="avail" value="0" <?php AppUtility::writeHtmlChecked(1,($public&1),1); ?> /> <span class="padding-left-three padding-right">No</span>
     </div><BR class=form><br>
 	<div class="col-lg-2">Include in public listing?</div>
-      <div class="col-lg-6">  <input type=radio name="public" value="1" <?php AppUtility::writeHtmlChecked(2,($public&2),0); ?> /> Yes
-        <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /> No
+      <div class="col-lg-6">  <input type=radio name="public" value="1" <?php AppUtility::writeHtmlChecked(2,($public&2),0); ?> /> <span class="padding-left-three padding-right">Yes</span>
+        <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /><span class="padding-left-three padding-right">No</span>
       </div><BR class=form><br>
 	<div class="col-lg-2">Allow reentry (continuation of test at later date)?</div>
-       <div class="col-lg-2"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /> No
-        <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> Yes, within</div>
-        <div class="col-lg-1"><input type="text" class="form-control" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /></div> minutes (0 for no limit)
+       <div class="col-lg-8"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /><span class="padding-left-three padding-right">No</span>
+        <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> <span class="padding-left-three padding-right">Yes, within</span>
+       <input type="text" class="form-control-1" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)</div>
     <BR class=form><br>
 
-	<div class="col-lg-2">Unique ID prompt</div><div class="col-lg-6">
+	<div class="col-lg-2 padding-top-five">Unique ID prompt</div><div class="col-lg-6">
     <input type=text size=60 name="idprompt" class="form-control" value="<?php echo $idprompt; ?>" /></div><BR class=form><br>
 
 	<div class="col-lg-2">Attach first level selector to ID</div><div class="col-lg-6"><input type="checkbox" name="entrynotunique" value="1" <?php AppUtility::writeHtmlChecked($entrynotunique,true); ?> /></div><BR class=form><br>
 
-	<div class="col-lg-2">ID entry format</div>
+	<div class="col-lg-2 padding-top-five">ID entry format</div>
     <div class="col-lg-4">   <?php
         AppUtility::writeHtmlSelect("entrytype",$page_entryType['val'],$page_entryType['label'],$page_entryTypeSelected);
         ?>
@@ -154,7 +157,7 @@ echo '<form>';
     </div><BR class=form><br>
 	<div class="col-lg-10">
         Allow access without password from computer with these IP addresses.  Use * for wildcard, e.g. 134.39.*</div><br/>
-        <div class="col-lg-2">Enter IP address</div><div class="col-lg-6"> <input type=text id="ipin" onkeypress="return onenter(event,'ipin','ipout')">
+        <div class="col-lg-2 padding-top-five">Enter IP address</div> <div class="col-lg-8"> <input type=text id="ipin" class="form-control-1" onkeypress="return onenter(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additem('ipin','ipout')"/>
 
 	<table>
@@ -191,8 +194,8 @@ echo '<form>';
 	</div><BR class=form><br>
 
 	<div class="col-lg-10">From other computers, a password will be required to access the diagnostic.</div><br/>
-     <div class="col-lg-2">   Enter Password</div>
-     <div class="col-lg-6">   <input type=text id="pwin"  onkeypress="return onenter(event,'pwin','pwout')">
+     <div class="col-lg-2 padding-top-five">Enter Password</div>
+     <div class="col-lg-8"><input type=text id="pwin" class="form-control-1" onkeypress="return onenter(event,'pwin','pwout')">
         <input type=button value="Add" onclick="additem('pwin','pwout')"/>
 
 	<table>
@@ -230,8 +233,8 @@ echo '<form>';
 ?>
 	</div><BR class=form><br>
 	<div class="col-lg-10">Super passwords will override testing window limits.</div><br/>
-    <div class="col-lg-2">Enter Password</div>
-     <div class="col-lg-6">   <input type=text id="pwsin"  onkeypress="return onenter(event,'pwsin','pwsout')">
+    <div class="col-lg-2 padding-top-five">Enter Password</div>
+     <div class="col-lg-8"><input type=text id="pwsin" class="form-control-1" onkeypress="return onenter(event,'pwsin','pwsout')">
         <input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
 
 	<table>
@@ -269,14 +272,12 @@ echo '<form>';
 ?>
 	</div><BR class=form><br>
 
-	<div class="col-lg-10"><h4>First-level selector - selects assessment to be delivered</h4></div><BR class=form><br>
-	<div class="col-lg-2">Selector name</div> <div class="col-lg-6"> <input name="sel" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</div><BR class=form><br>
+	<div class="col-lg-10"><h4>First-level selector - selects assessment to be delivered</h4></div><BR class=form>
+	<div class="col-lg-2">Selector name</div> <div class="col-lg-8"> <input name="sel" class="form-control-1" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</div><BR class=form><br>
 	<div class="col-lg-2">Alphabetize selectors on submit?</div> <div class="col-lg-6"><input type="checkbox" name="alpha" value="1" /></div><BR class=form><br>
 	<div class="col-lg-2">Enter new selector option:</div>
-    <div class="col-lg-6">    <input type=text id="sellist"  onkeypress="return onenter(event,'sellist','selout')">
+    <div class="col-lg-8"><input type=text id="sellist" class="form-control-1" onkeypress="return onenter(event,'sellist','selout')">
         <input type=button value="Add" onclick="additem('sellist','selout')"/>
-
-
 		<table>
             <tbody id="selout">
             <?php
