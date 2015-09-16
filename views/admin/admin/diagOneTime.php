@@ -17,7 +17,7 @@ $this->params['breadcrumbs'] = $this->title;
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
 <?php
-        echo '<span class=col-lg-4><b>'.$nameOfDiag['name'].'</b></span><br/><br/>';
+        echo '<span class=col-lg-4><b>'.$nameOfDiag['name'].'</b></span><br/>';
         if (isset($params['generate']))
         {
             if (isset($params['n'])) {
@@ -44,9 +44,9 @@ $this->params['breadcrumbs'] = $this->title;
                 echo '</form>';
             }
         } else if (isset($_GET['delete'])) {
-            echo "<span class=col-lg-10>".AppUtility::t('Are you sure you want to delete all one-time passwords for this diagnostic?')."</span>\n";
-            echo "<p><input type=button value=\"Delete\" onclick=\"window.location='diag-one-time?id=$diag&delete=true'\">\n";
-            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></p>\n";
+            echo "<div class='col-lg-10'>Are you sure you want to delete all one-time passwords for this diagnostic?</div>\n<br>";
+            echo "<br><div class='col-lg-10'><input type=button value=\"Delete\" onclick=\"window.location='diag-one-time?id=$diag&delete=true'\">\n";
+            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div>\n";
         } else {
             echo "<div class=col-lg-3><b>All one-time passwords</b></div> <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$diag.'&generate=true')." ?>Generate</a></div>
              <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin','admin/diag-one-time?id=' .$diag.'&delete=check').">Delete All</a></div><br/><br/>";
