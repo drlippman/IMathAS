@@ -6,25 +6,37 @@ use app\components\AppUtility;
 $this->title = 'Enroll in a course';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+</div>
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="tab-content shadowBox non-nav-tab-item">
 <div class="site-login">
     <?php $form = ActiveForm::begin([
         'options' => ['class' => 'form-horizontal'],
         'fieldConfig' => [
             'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-2 control-label'],
+            'labelOptions' => ['class' => 'col-lg-2 padding-left-fifteen'],
         ],
     ]); ?>
+    <br>
+   <div class="padding-left-fifteen"><?php echo $form->field($model, 'selectCourse')->dropDownList(['1' => 'Self study courses'],['prompt'=>'My teacher gave me a course ID (enter below)'], ['class' => 'form-alignment-dropDown-list']) ?></div>
+   <div class="padding-left-fifteen"><?php echo $form->field($model, 'courseId') ?></div>
+   <div class="padding-left-fifteen"><?php echo $form->field($model, 'enrollmentKey') ?></div>
 
-    <?= $form->field($model, 'selectCourse')->dropDownList(['1' => 'Self study courses'],['prompt'=>'My teacher gave me a course ID (enter below)'], ['class' => 'form-alignment-dropDown-list']) ?>
-    <?= $form->field($model, 'courseId') ?>
-    <?= $form->field($model, 'enrollmentKey') ?>
-
-    <div class="form-group">
-        <div class="col-lg-offset-2 col-lg-11">
-            <?= Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?>
-            <a class="btn btn-primary back-button" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a>
+    <div class="form-group" >
+        <div class="col-lg-6" style="text-align: center">
+          <div class="col-lg-2">  <?php echo Html::submitButton('Sign Up', ['class' => 'btn btn-primary','id'=>'enroll-btn', 'name' => 'login-button']) ?></div>
+          <div class="col-lg-2"> <a class="btn btn-primary back-button" style="margin-top: 0" href="<?php echo AppUtility::getURLFromHome('site', 'dashboard')  ?>">Back</a></div>
         </div>
     </div>
 
     <?php ActiveForm::end(); ?>
+</div>
 </div>

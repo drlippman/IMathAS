@@ -16,6 +16,7 @@ class StudentController extends AppController
     public function actionStudentEnrollCourse()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $model = new StudentEnrollCourseForm();
         if ($model->load($this->isPostMethod())) {
             $param = $this->getRequestParams();

@@ -73,7 +73,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
                 <td class=c><?php echo $page_courseList[$i]['id'] ?></td>
                 <td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-                <td style="text-align: center"><div class='btn-group'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">
+                <td style="text-align: center">
+                    <div class='btn-group settings'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">
                         <i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
                     <ul class='dropdown-menu'>
                         <li>

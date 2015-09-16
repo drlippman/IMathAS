@@ -552,3 +552,10 @@ margin-top: 7px;
 .setting-btn{
     width: 130px;
 }
+.btn-group.settings {
+    display: inline-flex;
+}
+.padding-left-fifteen
+{
+    padding-left: 15px;
+}
