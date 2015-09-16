@@ -46,8 +46,8 @@ $this->params['breadcrumbs'] = $this->title;
             }
         } else if (isset($_GET['delete'])) {
             echo "<div class='col-lg-10'>Are you sure you want to delete all one-time passwords for this diagnostic?</div>\n<br>";
-            echo "<br><div class='col-lg-10'><input type=button value=\"Delete\" onclick=\"window.location='diag-one-time?id=$diag&delete=true'\">\n";
-            echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div>\n";
+            echo "<br><div class='col-lg-10'><div class='col-lg-1 padding-left-zero'><input type=button value=\"Delete\" onclick=\"window.location='diag-one-time?id=$diag&delete=true'\"></div>\n";
+            echo "<div class='col-lg-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
         } else {
             echo "<div class=col-lg-3><b>All one-time passwords</b></div> <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$diag.'&generate=true')." ?>Generate</a></div>
              <div class=col-lg-1><a href=".AppUtility::getURLFromHome('admin','admin/diag-one-time?id=' .$diag.'&delete=check').">Delete All</a></div><br/><br/>";
