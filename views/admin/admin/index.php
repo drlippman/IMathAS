@@ -37,9 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th STYLE="text-align: center">Course ID</th>
                 <th >Owner</th>
                 <th STYLE="text-align: center" >Settings</th>
-                <th STYLE="text-align: center">Teachers</th>
-                <th STYLE="text-align: center">Transfer</th>
-                <th STYLE="text-align: center">Delete</th>
 
             </tr>
             </thead>
@@ -76,11 +73,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 </td>
                 <td class=c><?php echo $page_courseList[$i]['id'] ?></td>
                 <td><?php echo $page_courseList[$i]['LastName'] ?>, <?php echo $page_courseList[$i]['FirstName'] ?></td>
-                <td class=c><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">Settings</a></td>
-                <td class=c><a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>">Add/Remove</a></td>
-                <td class=c><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=transfer&cid='.$page_courseList[$i]['id']);?>">Transfer</a></td>
-                <td class=c><a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?>'>Delete</a></td>
-                </tr>
+                <td style="text-align: center"><div class='btn-group'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">
+                        <i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
+                    <ul class='dropdown-menu'>
+                        <li>
+                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-pencil"></i>&nbsp;Add/Remove</a>
+                        </li>
+                        <li>
+                            <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=transfer&cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-exchange"></i>&nbsp;Transfer</a>
+                        </li>
+                        <li>
+                            <a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?>'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>
+                        </li>
+                    </ul></div>
+                </td>
             <?php
             }
             ?>
@@ -174,9 +180,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Name</th>
                 <th STYLE="text-align: center">Available</th>
                 <th STYLE="text-align: center">Public</th>
-                <th>Modify</th>
-                <th>Remove</th>
-                <th>One-time Passwords</th>
+                <th style="text-align: center">Modify</th>
             </tr>
             </thead>
             <tbody>
@@ -188,10 +192,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics?id='.$page_diagnosticsId[$i])?>"><?php echo $page_diagnosticsName[$i] ?></a></td>
                 <td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
                 <td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
-                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">Modify</a></td>
-                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=removediag&id='.$page_diagnosticsId[$i]);?>">Remove</a></td>
-                <td><a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$page_diagnosticsId[$i])?>">One-time Passwords</a></td>
-                </tr>
+                <td style="text-align: center"><div class='btn-group padding-left-forty'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">
+                            <i class="fa fa-pencil"></i> Modify</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
+                        <ul class='dropdown-menu'>
+                            <li>
+                                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=removediag&id='.$page_diagnosticsId[$i]);?>"><i class='fa fa-trash-o'></i>&nbsp;Remove</a>
+                            </li>
+                            <li>
+                                <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$page_diagnosticsId[$i])?>"><i class="fa fa-key"></i>&nbsp;One-time Passwords</a>
+                            </li>
+                        </ul></div>
+                </td>
             <?php
             }
             ?>
@@ -272,7 +283,8 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 </div>
 <script type="text/javascript">
-     $(document).ready(function () {
+     $(document).ready(function ()
+     {
          $('.course-table').DataTable();
     });
      function showgroupusers() {
