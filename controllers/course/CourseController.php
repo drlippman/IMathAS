@@ -478,6 +478,7 @@ class CourseController extends AppController
     public function actionAddRemoveCourse()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $cid = $this->getParamVal('cid');
         $this->includeJS(['course/addremovecourse.js']);
         $returnData = array('cid' => $cid);
