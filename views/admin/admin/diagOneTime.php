@@ -16,8 +16,9 @@ $this->params['breadcrumbs'] = $this->title;
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
+    <br/>
 <?php
-        echo '<span class=col-lg-4><b>'.$nameOfDiag['name'].'</b></span><br/>';
+        echo '<span class=col-lg-4><b>'.$nameOfDiag['name'].'</b></span><br/><br/>';
         if (isset($params['generate']))
         {
             if (isset($params['n'])) {
@@ -26,13 +27,13 @@ $this->params['breadcrumbs'] = $this->title;
                 echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
                 <thead>
                     <tr>
-                    <th>Codes</th>
-                    <th>Good For</th>
+                    <th style="text-align: center">Codes</th>
+                    <th style="text-align: center">Good For</th>
                     </tr>
                 </thead>
                 <tbody>';
                 foreach ($code_list as $code) {
-                    echo "<tr><td>{$code['code']}</td><td>{$code['goodfor']}</td></tr>";
+                    echo "<tr><td style='text-align: center'> {$code['code']}</td><td style='text-align: center'>{$code['goodfor']}</td></tr>";
                 }
                 echo '</tbody></table></div>';
             } else
@@ -40,7 +41,7 @@ $this->params['breadcrumbs'] = $this->title;
                 echo "<form method='post' action='diag-one-time?id=$diag&generate=true'>";
                 echo '<div class="col-lg-6"><div class="col-lg-2 padding-top-five">Generate</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="1" name="n" /></div><div class="col-lg-1 padding-left-zero padding-top-five">passwords </div><br/><br>';
                 echo '<div class="col-lg-12"><div class="col-lg-4 padding-left-zero padding-top-five">Allow multi-use within</div><div class="col-lg-2 padding-left-zero"><input type="text" class="form-control" size="1" value="0" name="multi" /></div><div class="col-lg-6 padding-left-zero padding-top-five"> minutes (0 for one-time-only use)</div></div>';
-                echo '<span class="col-lg-6"><input type="submit" value="Go" /></span>';
+                echo '<br/><span class="col-lg-6"><input type="submit" value="Go" /></span>';
                 echo '</form>';
             }
         } else if (isset($_GET['delete'])) {
@@ -53,17 +54,17 @@ $this->params['breadcrumbs'] = $this->title;
             echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
                     <thead>
                         <tr>
-                            <th>Codes</th>
-                            <th>Good For</th>
-                            <th>Created</th>
+                            <th style="text-align: center">Codes</th>
+                            <th style="text-align: center">Good For</th>
+                            <th style="text-align: center">Created</th>
                         </tr>
                     </thead>
                     <tbody  >';
             foreach ($code_list as $row) {
                 echo "<tr>
-                        <td>{$row['code']}</td>
-                        <td>{$row['goodfor']}</td>
-                        <td>{$row['time']}</td>
+                        <td style='text-align: center'>{$row['code']}</td>
+                        <td style='text-align: center'>{$row['goodfor']}</td>
+                        <td style='text-align: center'>{$row['time']}</td>
                     </tr>";
             }
             echo '</tbody></table></div>';
