@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <table class="display course-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
-                <th>Name</th>
+                <th style="max-width: 400px">Name</th>
                 <th STYLE="text-align: center">Course ID</th>
                 <th >Owner</th>
                 <th STYLE="text-align: center" >Settings</th>

@@ -150,19 +150,19 @@ switch($action) {
                         <div class=col-md-4>$courseid</div>
                     </div>";
         echo "<div class='col-md-12 margin-top-fifteen'>
-                <div class=col-md-3>Enter Course name</div>
+                <div class='col-md-3 padding-top-five'>Enter Course name</div>
                 <div class=col-md-4>
-                    <input class='form-control' type=text size=80 name=\"coursename\" value=\"$name\">
+                    <input class='form-control' required='please fill out this field' type=text size=80 name=\"coursename\" value=\"$name\">
                 </div>
               </div>";
         echo "<div class='col-md-12 margin-top-fifteen'>
-                    <div class=col-md-3>Enter Enrollment key</div>
+                    <div class='col-md-3 padding-top-five'>Enter Enrollment key</div>
                     <div class=col-md-4>
                         <input class='form-control' type=text size=30 name=\"ekey\" value=\"$ekey\">
                     </div>
               </div>";
         echo '<div class="col-md-12 margin-top-fifteen">
-                    <div class=col-md-3>Available?</div>
+                    <div class="col-md-3 padding-top-five">Available?</div>
                     <div class="col-md-4 padding-left-zero">';
                        echo '<div class="col-md-12">';
                                 echo '<input type="checkbox" name="stuavail" value="1" ';
@@ -182,7 +182,7 @@ switch($action) {
               </div>';
         if ($params['action']=="modify") {
             echo '<div class="col-md-12 margin-top-fifteen">
-                        <div class="col-md-3">Lock for assessment</div>
+                        <div class="col-md-3 padding-top-five">Lock for assessment</div>
                         <div class="col-md-4">
                             <select class="form-control" name="lockaid">';
                              echo '<option value="0" ';
@@ -331,7 +331,7 @@ switch($action) {
         if (!isset($CFG['CPS']['deflatepass']) || $CFG['CPS']['deflatepass'][1]==1) {
             echo '
             <div class="col-md-12 margin-top-fifteen">
-                <div class=col-md-3>Auto-assign LatePasses on course enroll</div>
+                <div class="col-md-3 padding-top-five">Auto-assign LatePasses on course enroll</div>
                 <div class="col-md-5 display-flex">';
                     echo '<input class="width-seventy-eight-per form-control" type="text" size="3" name="deflatepass" value="'.$deflatepass.'"/>
                     <span class="margin-left-ten select-text-margin">LatePasses<span>
@@ -341,7 +341,7 @@ switch($action) {
         if (isset($enablebasiclti) && $enablebasiclti==true && isset($params['cid'])) {
             echo '
             <div class="col-md-12 margin-top-fifteen">
-            <div class=col-md-3>LTI access secret (max 10 chars; blank to not use)</div>';
+            <div class="col-md-3">LTI access secret (max 10 chars; blank to not use)</div>';
             echo '
 
             <div class=col-md-6>
@@ -490,7 +490,8 @@ switch($action) {
         while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
             if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
             if ($used[$line['id']]!=true) {
-                //if ($line['rights']<20) { $type = "Tutor/TA/Proctor";} else {$type = "Teacher";}
+
+
                 echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
                 echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
                 echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
