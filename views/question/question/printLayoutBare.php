@@ -2,68 +2,129 @@
 
 use app\components\AppUtility;
 use app\components\AppConstant;
+
 $this->title = AppUtility::t('Print Test', false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<!--Get current time-->
-<input type="hidden" class="" value="<?php echo $courseId?>">
+<input type="hidden" class="" value="<?php echo $courseId ?>">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$course->name], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$course->id] ,'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course['name']], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
-<!--Course name-->
 <div class="title-container">
     <div class="row">
         <div class="col-sm-11">
             <div class=" col-sm-6" style="right: 30px;">
                 <div class="vertical-align title-page">Print Test</div>
             </div>
-            <div class="col-sm-6"">
-                    <div class="col-sm-2 pull-right">
-<!--                                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>-->
-                    </div>
+            <div class="col-sm-6"
+            ">
+            <div class="col-sm-2 pull-right">
+                <!--                                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>-->
             </div>
         </div>
     </div>
 </div>
+</div>
 <div class="tab-content shadowBox print-test margin-top-fourty">
-    <?php
+<?php
 if (isset($params['versions'])) {
 //    $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
 }
 
 $nologo = true;
 
-if ($overwriteBody==1) {
+if ($overwriteBody == 1) {
     echo $body;
-} if (!isset($params['versions'])) {
+}
+if (!isset($params['versions'])) {
 
-    echo '<div class="cpmid"><a href="print-test?cid='.$courseId.'&aid='.$assessmentId.'">Generate for in-browser printing</a>';
+    echo '<div class="print-test-header"><div class="col-md-12 margin-left-fifteen"><a href="print-test?cid=' . $courseId . '&aid=' . $assessmentId . '">Generate for in-browser printing</a></div>';
     if (isset($CFG['GEN']['pandocserver'])) {
-        echo ' | <a href="print-layout-word?cid='.$courseId.'&amp;aid='.$assessmentId.'">Generate for Word</a>';
+        echo ' |<div class="col-md-12"> <a href="print-layout-word?cid=' . $courseId . '&amp;aid=' . $assessmentId . '">Generate for Word</a></div>';
     }
-    echo '</div>';
+    echo '</div>
+        <div class="col-md-12 padding-left-zero padding-bottom-five">
+            <form method=post action="print-layout-bare?cid=$courseId&aid=$assessmentId">
+                <div class="col-md-12 margin-top-fifteen padding-left-zero padding-right-zero">
+                    <input class="print-layout-bare-continue-btn" type=submit value="Continue">
+                </div>
+            <h4>Copy-and-Paste Print Version</h4>
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+                <span>This page will help you create a copy of this assessment that you should be able to cut and
+                paste into Word or another word processor and adjust layout for printing</span>
+            </div>
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+                <span class="col-md-3 padding-left-zero">Number of different versions to generate:</span>
+                <span class="col-md-9 margin-top-five">
+                    <input class="form-control width-fifty-per" type=text name=versions value="1" size="3">
+                </span>
+            </div>
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+                <span class="col-md-3 padding-left-zero">Format?</span>
+                <span class="col-md-9">
+                    <span>
+                        <input type="radio" name="format" value="trad" checked="checked" />
+                        <span class="margin-left-ten">Form A &nbsp; 1&nbsp; 2&nbsp; 3,</span>
+                    </span>
+                    <span class="margin-left-five">Form B&nbsp; 1&nbsp; 2&nbsp; 3</span>
+                    <span class="margin-left-thirty">
+                        <input type="radio" name="format" value="inter"/>
+                        <span class="margin-left-five">&nbsp;1a &nbsp; 1b &nbsp;  2a &nbsp; 2b</span>
+                    </span>
+                </span>
+            </div>
 
-    echo "<h2>Copy-and-Paste Print Version</h2>";
+            <div class="col-md-12 padding-left-zero margin-top-twenty">
+            <span class="col-md-3 padding-left-zero">Generate answer keys?</span>
+            <span class="col-md-9">
+                <span>
+                    <input type=radio name=keys value=1 checked=1>
+                    <span class="margin-left-ten">Yes</span>
+                </span>
+                <span class="margin-left-thirty">
+                <input type=radio name=keys value=0><span class="margin-left-fifteen">No</span>
+                </span>
+            </span>
+            </div>
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+            <span class="col-md-3 padding-left-zero select-text-margin">Question separator</span>
+            <span class="col-md-9">
+                <input class="form-control width-fifty-per" type=text name="qsep" value="" />
+            </span>
+            </div>
+            <div class="col-md-12 margin-top-twenty-five padding-left-zero">
+            <span class="col-md-3 padding-left-zero select-text-margin">Version separator</span>
+            <span class="col-md-9">
+                <input class="form-control width-fifty-per" type=text name="vsep" value="+++++++++++++++" />
+            </span>
+            </div>
 
-    echo '<p>This page will help you create a copy of this assessment that you should be able to cut and ';
-    echo 'paste into Word or another word processor and adjust layout for printing</p>';
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+            <span class="col-md-3 padding-left-zero">Math display</span>
+            <span class="col-md-9">
+                <input type="radio" name="mathdisp" value="img" checked="checked" /><span class="margin-left-ten">Images</span>
+                   <span class="margin-left-thirty"><input type="radio" name="mathdisp" value="text"/><span class="margin-left-ten">Text</span></span>
+                   <span class="margin-left-thirty"><input type="radio" name="mathdisp" value="tex"/><span class="margin-left-ten">TeX</span></span>
+                   <span class="margin-left-thirty"><input type="radio" name="mathdisp" value="textandimg"/><span class="margin-left-ten">Images,&nbsp; then again in text</span></span>
+            </span>
+            </div>
 
-    echo "<form method=post action=\"print-layout-bare?cid=$courseId&aid=$assessmentId\">\n";
-    echo '<span class="form">Number of different versions to generate:</span><span class="formright"><input type=text name=versions value="1" size="3"></span><br class="form"/>';
-    echo '<span class="form">Format?</span><span class="formright"><input type="radio" name="format" value="trad" checked="checked" /> Form A: 1 2 3, Form B: 1 2 3<br/><input type="radio" name="format" value="inter"/> 1a 1b 2a 2b</span><br class="form"/>';
-    echo '<span class="form">Generate answer keys?</span><span class="formright"> <input type=radio name=keys value=1 checked=1>Yes <input type=radio name=keys value=0>No</span><br class="form"/>';
-    echo '<span class="form">Question separator:</span><span class="formright"><input type=text name="qsep" value="" /></span><br class="form"/>';
-    echo '<span class="form">Version separator:</span><span class="formright"><input type=text name="vsep" value="+++++++++++++++" /> </span><br class="form"/>';
-    echo '<span class="form">Math display:</span><span class="formright"><input type="radio" name="mathdisp" value="img" checked="checked" /> Images <input type="radio" name="mathdisp" value="text"/> Text <input type="radio" name="mathdisp" value="tex"/> TeX <input type="radio" name="mathdisp" value="textandimg"/> Images, then again in text</span><br class="form"/>';
-    echo '<span class="form">Include question numbers and point values:</span><span class="formright"><input type="checkbox" name="showqn" checked="checked" /> </span><br class="form"/>';
-    echo '<span class="form">Hide text entry lines?</span><span class="formright"><input type=checkbox name=hidetxtboxes ></span><br class="form"/>';
-
-    echo '<div class="submit"><input type=submit value="Continue"></div></form>';
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+            <span class="col-md-3 padding-left-zero">Include question numbers and point values:</span>
+            <span class="col-md-9">
+                <input type="checkbox" name="showqn" checked="checked" />
+            </span>
+            </div>
+            <div class="col-md-12 margin-top-twenty padding-left-zero">
+            <span class="col-md-3 padding-left-zero">Hide text entry lines?</span>
+            <span class="col-md-9">
+                <input type=checkbox name=hidetxtboxes >
+            </span>
+            </div>
+    </form>
+    </div>';
 
 } else {
-
-
-
 
 
     ?>
@@ -72,15 +133,18 @@ if ($overwriteBody==1) {
             padding: 0px;
             margin: 0px;
         }
+
         form {
             padding: 0px;
             margin: 0px;
         }
+
         div.maintest {
             position: absolute;
             top: 0px;
             left: 0px;
         }
+
         .pageb {
             clear: both;
             padding: 0px;
@@ -88,36 +152,29 @@ if ($overwriteBody==1) {
             page-break-after: always;
             border-bottom: 1px dashed #aaa;
         }
+
         div.mainbody {
             margin: 0px;
             padding: 0px;
         }
     </style>
-
     <?php
-
-
-
-
-    //add interlace output
-    //add prettyprint along with text-based output option
-
-
-    for ($pt=0;$pt<$printtwice;$pt++) {
-        if ($pt==1) {
+    for ($pt = 0; $pt < $printtwice; $pt++) {
+        if ($pt == 1) {
             $sessionData['mathdisp'] = 0;
-            echo $params['vsep'].'<br/>';;
-
+            echo $params['vsep'] . '<br/>';;
         }
 
-        if ($params['format']=='trad') {
-            for ($j=0; $j<$copies; $j++) {
-                if ($j>0) { echo $params['vsep'].'<br/>';}
+        if ($params['format'] == 'trad') {
+            for ($j = 0; $j < $copies; $j++) {
+                if ($j > 0) {
+                    echo $params['vsep'] . '<br/>';
+                }
 
                 $headerleft = '';
                 $headerleft .= $line['name'];
-                if ($copies>1) {
-                    $headerleft .= ' - Form ' . ($j+1);
+                if ($copies > 1) {
+                    $headerleft .= ' - Form ' . ($j + 1);
                 }
                 if ((isset($params['iname']) || isset($params['cname'])) && isset($params['aname'])) {
                     $headerleft .= "<br/>";
@@ -132,34 +189,33 @@ if ($overwriteBody==1) {
                 echo "</div>\n";
 
 
-                for ($i=0; $i<$numq; $i++) {
-                    if ($i>0) { echo $params['qsep'];}
-                    $sa[$j][$i] = AppUtility::printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($params['showqn']));
+                for ($i = 0; $i < $numq; $i++) {
+                    if ($i > 0) {
+                        echo $params['qsep'];
+                    }
+                    $sa[$j][$i] = AppUtility::printq($i, $qn[$questions[$i]], $seeds[$j][$i], $points[$questions[$i]], isset($params['showqn']));
                 }
 
             }
 
-            if ($params['keys']>0) { //print answer keys
-                for ($j=0; $j<$copies; $j++) {
-                    echo $params['vsep'].'<br/>';
-                    echo '<b>Key - Form ' . ($j+1) . "</b>\n";
+            if ($params['keys'] > 0) { //print answer keys
+                for ($j = 0; $j < $copies; $j++) {
+                    echo $params['vsep'] . '<br/>';
+                    echo '<b>Key - Form ' . ($j + 1) . "</b>\n";
                     echo "<ol>\n";
-                    for ($i=0; $i<$numq; $i++) {
+                    for ($i = 0; $i < $numq; $i++) {
                         echo '<li>';
                         if (is_array($sa[$j][$i])) {
-                            echo printfilter(filter(implode(' ~ ',$sa[$j][$i])));
+                            echo printfilter(filter(implode(' ~ ', $sa[$j][$i])));
                         } else {
                             echo printfilter(filter($sa[$j][$i]));
                         }
                         echo "</li>\n";
                     }
                     echo "</ol>\n";
-                    //if ($params['keys']==2) {
-                    //	echo "<p class=pageb>&nbsp;</p>\n";
-                    //}
                 }
             }
-        } else if ($params['format']=='inter') {
+        } else if ($params['format'] == 'inter') {
 
             $headerleft = '';
             $headerleft .= $line['name'];
@@ -174,21 +230,25 @@ if ($overwriteBody==1) {
             echo "<div id=intro>{$line['intro']}</div>\n";
             echo "</div>\n";
             echo "</div>\n";
-            for ($i=0; $i<$numq; $i++) {
-                if ($i>0) { echo $params['qsep'];}
-                for ($j=0; $j<$copies;$j++) {
-                    if ($j>0) { echo $params['qsep'];}
-                    $sa[] = AppUtility::printq($i,$qn[$questions[$i]],$seeds[$j][$i],$points[$questions[$i]],isset($params['showqn']));
+            for ($i = 0; $i < $numq; $i++) {
+                if ($i > 0) {
+                    echo $params['qsep'];
+                }
+                for ($j = 0; $j < $copies; $j++) {
+                    if ($j > 0) {
+                        echo $params['qsep'];
+                    }
+                    $sa[] = AppUtility::printq($i, $qn[$questions[$i]], $seeds[$j][$i], $points[$questions[$i]], isset($params['showqn']));
                 }
             }
-            if ($params['keys']>0) { //print answer keys
-                echo $params['vsep'].'<br/>';
+            if ($params['keys'] > 0) { //print answer keys
+                echo $params['vsep'] . '<br/>';
                 echo "<b>Key</b>\n";
                 echo "<ol>\n";
-                for ($i=0; $i<count($sa); $i++) {
+                for ($i = 0; $i < count($sa); $i++) {
                     echo '<li>';
                     if (is_array($sa[$i])) {
-                        echo printfilter(filter(implode(' ~ ',$sa[$i])));
+                        echo printfilter(filter(implode(' ~ ', $sa[$i])));
                     } else {
                         echo printfilter(filter($sa[$i]));
                     }
@@ -198,14 +258,10 @@ if ($overwriteBody==1) {
             }
         }
     }
-    $licurl = AppUtility::getURLFromHome('question','question/show-license?id='.implode('-',$qn));
-    echo '<hr/><p style="font-size:70%">License info at: <a href="'.$licurl.'">'.$licurl.'</a></p>';
+    $licurl = AppUtility::getURLFromHome('question', 'question/show-license?id=' . implode('-', $qn));
+    echo '<hr/><p style="font-size:70%">License info at: <a href="' . $licurl . '">' . $licurl . '</a></p>';
 
-    echo "<div class=cbutn><a href=".AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId).">Return to course page</a></div>\n";
-
-
-
+    echo "<div class=cbutn><a href=" . AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId) . ">Return to course page</a></div>\n";
 }
-
 ?>
 </div>

@@ -199,7 +199,7 @@ span.form.select-text-margin{
     list-style-type: none;
 }
 .padding-top-five{
-    padding-top: 5px;
+    padding-top: 5px !important;
 }
 .radio label.padding-left-zero, .checkbox label.padding-left-zero{
     padding-left: 0;
@@ -220,3 +220,7 @@ span.form.select-text-margin{
     overflow-x: scroll;
 }
 
+.roster-email-shadowbox-padding {
+    padding: 20px 30px 25px 30px;
+
+}

@@ -957,7 +957,7 @@ class CourseItemsUtility extends Component
                                                  <li><a class="modify"
                                                         href="#"><?php AppUtility::t('Edit Content'); ?></a></li>
                                                  <li><a class="modify"
-                                                        href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                                  </li>
                                                  <li><a id="delete"
                                                         href="javascript:deleteItem('<?php echo $parent . '-' . $cnt ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -979,7 +979,7 @@ class CourseItemsUtility extends Component
                                                         href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' . $course->id . "&blockId=" . $blockId) ?>"><?php AppUtility::t('Isolate'); ?></a>
                                                  </li>
                                                  <li><a class="modify"
-                                                        href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress?cid=' . $course->id); ?>"><?php AppUtility::t('Modify'); ?></a>
+                                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                                  </li>
                                                  <li><a id="delete"
                                                         href="javascript:deleteItem('<?php echo $parent . '-' . $cnt ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -1005,7 +1005,7 @@ class CourseItemsUtility extends Component
                                                         href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' . $course->id . "&blockId=" . $blockId) ?>"><?php AppUtility::t('Isolate'); ?></a>
                                                  </li>
                                                  <li><a class="modify"
-                                                        href="echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id);?>"><?php AppUtility::t('Modify'); ?></a>
+                                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                                  </li>
                                                  <li><a id="delete"
                                                         href="javascript:deleteItem('<?php echo $parent . '-' . $cnt ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>
@@ -1032,7 +1032,7 @@ class CourseItemsUtility extends Component
                                                         href="<?php echo AppUtility::getURLFromHome('course', 'course/block-isolate?cid=' . $course->id . "&blockId=" . $blockId) ?>"><?php AppUtility::t('Isolate'); ?></a>
                                                  </li>
                                                  <li><a class="modify"
-                                                        href="echo AppUtility::getURLFromHome('site','work-in-progress?cid='. $course->id);?>"><?php AppUtility::t('Modify'); ?></a>
+                                                        href= "<?php echo AppUtility::getURLFromHome('block','block/add-block?courseId='.$course->id.'&id='.$parent.'-'.$cnt.'&modify=1')?>"><?php AppUtility::t('Modify'); ?></a>
                                                  </li>
                                                  <li><a id="delete"
                                                         href="javascript:deleteItem('<?php echo $parent . '-' . $cnt ?>','<?php echo AppConstant::BLOCK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Delete'); ?></a>

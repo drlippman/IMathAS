@@ -359,7 +359,7 @@ $this->params['breadcrumbs'][] = $this->title;
         } else if ($isgrpadmin) {
             echo "<br/>(Delete and Transfer only apply to group's questions)\n";
         }
-        echo "<table class='width-hundread-per manage-question-table' id=myTable><thead>\n";
+        echo "<table class='col-md-12 manage-question-table' id=myTable><thead>\n";
         echo "<tr>
                    <th>
                    <div class='checkbox override-hidden'>

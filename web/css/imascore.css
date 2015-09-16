@@ -811,7 +811,7 @@ margin-left: 23px;
     margin-left: 5px !important;
 }
 .margin-top-ten {
-    margin-top: 10px;
+    margin-top: 10px !important;
 }
 .margin-top-twenty-seven {
     margin-top: 27px;
@@ -900,7 +900,7 @@ margin-left: 23px;
     margin-top: 7px;
 }
 .margin-top-five {
-    margin-top: 5px;
+    margin-top: 5px !important;
 }
 .width-sixty-three-per {
     width: 63%;
@@ -945,7 +945,7 @@ margin-left: 23px;
     margin-top: -10px;
 }
 .padding-left-thirty {
-    padding-left: 30px;
+    padding-left: 30px !important;
 }
 .margin-right-minus-eleven-per {
     margin-right: -11% !important;
@@ -964,7 +964,7 @@ float: right;
 margin-top: -6% !important;
 }
 .padding-bottom-twenty-five {
-    padding-bottom: 25px;
+    padding-bottom: 25px !important;
 }
 .text-align-center {
     text-align: center;
@@ -992,4 +992,25 @@ margin-top: -6% !important;
 }
 .text-background-color {
     background-color: #F8f8f8;
+}
+.padding-left-fifteen {
+    padding-left: 15px !important;
+}
+.padding-left-ten {
+    padding-left: 10px;
+}
+.padding-left-five {
+    padding-left: 5px !important;
+}
+.margin-left-minus-six {
+    margin-left: -6px;
+}
+.width-fourty {
+    width: 40px;
+}
+.padding-bottom-five {
+    padding-bottom: 5px;
+}
+.padding-left-twenty {
+    padding-left: 20px;
 }

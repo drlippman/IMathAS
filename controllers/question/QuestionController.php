@@ -2119,7 +2119,7 @@ class QuestionController extends AppController
         }
         $this->includeCSS(['default.css','handheld.css','print.css']);
         $renderData = array('sessiondata' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $nologo, 'numq' => $numq,
-            'printtwice' => $printtwice, ' course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
+            'printtwice' => $printtwice, 'course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
             'qn' => $qn, 'courseId' => $courseId);
         return $this->renderWithData('printLayoutBare', $renderData);
     }

@@ -40,9 +40,10 @@ class ChangeUserInfoForm extends Model
     public function rules()
     {
         return [
-            [['email'], 'required', 'message' => AppUtility::t('email field cannot be blank', false)],
-            [['LastName'], 'required', 'message' => AppUtility::t('Last name field cannot be blank', false)],
-            [['FirstName'], 'required', 'message' => AppUtility::t('First name field cannot be blank', false)],
+            [['SID'], 'required', 'message' => AppUtility::t('User name cannot be blank', false)],
+            [['email'], 'required', 'message' => AppUtility::t('Email cannot be blank', false)],
+            [['LastName'], 'required', 'message' => AppUtility::t('Last name cannot be blank', false)],
+            [['FirstName'], 'required', 'message' => AppUtility::t('First name cannot be blank', false)],
             ['rePassword', 'compare', 'compareAttribute'=>'password'],
             [['FirstName', 'LastName','oldPassword'], 'string'],
             ['email','email'],
@@ -66,7 +67,7 @@ class ChangeUserInfoForm extends Model
             'FirstName' => AppUtility::t('Enter First Name', false),
             'LastName' => AppUtility::t('Enter Last Name', false),
             'email' => AppUtility::t('Enter Email', false),
-            'SID' => AppUtility::t('Enter User Name (login name)', false),
+            'SID' => AppUtility::t('Enter User Name', false),
             'NotifyMeByEmailWhenIReceiveANewMessage'=>AppUtility::t('Notify me by email when I receive a new message', false),
             'file'=>AppUtility::t('Picture', false),
             'message'=> AppUtility::t('Messages/Posts per page', false),

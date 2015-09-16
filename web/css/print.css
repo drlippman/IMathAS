@@ -33,3 +33,8 @@ div.nobreak {
 .drawtools {
 	display:none;
 }
+.print-layout-bare-continue-btn {
+    float: right;
+    margin-top: -15.2% !important;
+    margin-right: -40px !important;
+}

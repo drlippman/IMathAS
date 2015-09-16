@@ -40,11 +40,11 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
         <?php $form = ActiveForm::begin([
             'id' => 'login-form',
-            'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
+            'options' => ['class' => 'margin-left-five form-horizontal', 'enctype' => 'multipart/form-data'],
             'action' => 'change-student-information?cid='.$courseId.'&uid='.$userId,
             'fieldConfig' => [
-                'template' => "{label}\n<div class=\"col-sm-3\">{input}</div>\n<div class=\"col-sm-9 col-sm-offset-3\">{error}</div>",
-                'labelOptions' => ['class' => 'col-sm-3 select-text-margin'],
+                'template' => "{label}\n<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-sm-10 col-sm-offset-2\">{error}</div>",
+                'labelOptions' => ['class' => 'col-sm-2 select-text-margin'],
             ],
         ]); ?>
         <?php echo $form->field($model, 'SID')->textInput(); ?>
@@ -54,8 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $form->field($model, 'LastName')->textInput() ?>
 
         <?php echo $form->field($model, 'email') ?>
-        <br>
-        <div class="col-sm-offset-3 user-image">
+        <div class="col-sm-offset-2 padding-left-five user-image">
             <?php
             if($user['hasuserimg']==0)
             {?>
@@ -76,11 +75,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $form->field($model, 'section')->textInput(); ?>
         <?php echo $form->field($model, 'code')->textInput(); ?>
         <?php echo $form->field($model, 'timelimitmult')->textInput(); ?>
-        <div class="col-sm-offset-3 div-change-student-info" >
+        <div class="col-sm-offset-2 div-change-student-info" >
             <?php echo $form->field($model, 'locked')->checkbox(); ?>
             <?php echo $form->field($model, 'hidefromcourselist')->checkbox(); ?>
         </div>
-        <div class="col-sm-offset-3 password_checkbox" style="margin-left: 27%">
+        <div class="col-sm-offset-2 padding-left-twenty password_checkbox" style="">
             <?php echo $form->field($model, 'changePassword')->checkbox(['id' => 'pwd']) ?>
         </div>
         <div class="change-password-content">
@@ -89,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <br>
      <div class="form-group">
-        <div class=" col-sm-9 col-sm-offset-3 display_field">
+        <div class=" col-sm-10 col-sm-offset-2 padding-left-fifteen display_field">
             <?php echo Html::submitButton(AppUtility::t('Save', false), ['class' => 'btn btn-primary col-sm-1', 'name' => 'login-button']) ?>
             <a class="btn btn-primary back-button-change-student-info col-sm-1"  href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-roster?cid='.$courseId) ?>"><?php echo AppUtility::t('Back')?></a>
         </div>
