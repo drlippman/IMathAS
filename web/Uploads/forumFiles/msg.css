@@ -1,0 +1,42 @@
+
+message.css 
+
+.textbox
+{
+    width: 100%;
+}
+.body
+{
+    width: 100%;
+    
+
+}
+
+#message-link
+{
+
+    padding-left: 15px;
+}
+
+.message-second-level{
+    margin: 0;
+
+    padding-top:8px;
+}
+#limit-to-tag-link{
+    padding-right: 17px;
+}
+#sent-message{
+    /*padding-left: 5px;*/
+    padding-left: 20px;
+}
+#by-Sender
+{
+
+    padding-right: 6px;
+}
+.second-level-message-navigation{
+    height: 50px;
+    background-color: #F8f8f8;
+
+}

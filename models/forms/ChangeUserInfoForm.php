@@ -108,9 +108,9 @@ class ChangeUserInfoForm extends Model
 
     public function checkPassword()
     {
-        if (!$this->validate()) {
+        if (!$this->validate())
+        {
             $errors = $this->getErrors();
-
             if(isset($errors['invalid'][0]))
             {
                 $error = $errors['invalid'][0];

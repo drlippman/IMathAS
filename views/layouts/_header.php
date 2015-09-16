@@ -73,7 +73,8 @@ echo Nav::widget([
 /*
  * My Classes Drop-Down For Teacher
  */
-if($user->rights >= AppConstant::TEACHER_RIGHT){
+if($user['rights'] >= AppConstant::TEACHER_RIGHT)
+{
 echo Nav::widget([
     'options' =>['class' => 'navbar-nav myclasses margin-left'],
     'encodeLabels' => false,
@@ -91,7 +92,7 @@ echo Nav::widget([
 /*
  * My Classes Drop-Down For Student
  */
-elseif($user->rights == AppConstant::STUDENT_RIGHT)
+elseif($user['rights'] == AppConstant::STUDENT_RIGHT)
 {
     echo Nav::widget([
         'options' =>['class' => 'navbar-nav myclasses margin-left'],
@@ -109,7 +110,6 @@ elseif($user->rights == AppConstant::STUDENT_RIGHT)
 }
 NavBar::end();
 ?>
-    <input type="hidden" id="one" value="<?php echo $user->id;?>">
 </header>
 </div>
 

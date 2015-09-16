@@ -3,6 +3,7 @@
 namespace app\models;
 use app\components\AppConstant;
 use app\models\_base\BaseImasDbschema;
+use app\components\AppUtility;
 use yii\db\Query;
 
 class DbSchema extends BaseImasDbschema {
@@ -32,6 +33,7 @@ class DbSchema extends BaseImasDbschema {
     }
     public static function insertData($lastFirstUpdate,$lastUpdate)
     {
+
         $query = "INSERT INTO imas_dbschema (id,ver) VALUES (3,$lastUpdate),(4,$lastFirstUpdate)";
         \Yii::$app->db->createCommand($query)->query();
     }

@@ -116,6 +116,7 @@ class Libraries extends BaseImasLibraries
         $this->groupid = $user->groupid;
         $this->save();
         return $this->id;
+
     }
 
     public static function getByNameParents($name, $parents)
@@ -198,5 +199,46 @@ class Libraries extends BaseImasLibraries
             $query .= " AND ownerid='$userid'";
         }
         \Yii::$app->db->createCommand($query)->execute();
+
+    }
+
+    public static function getLibraryData($rootLibs,$nonPrivate)
+    {
+
+        $query = new Query();
+        $query ->select(['id','name','parent','uniqueid','lastmoddate'])
+                ->from('imas_libraries')
+                ->where(['IN','id',$rootLibs]);
+        if($nonPrivate)
+        {
+            $query->andWhere(['>','userights','0']);
+        }
+        $query ->orderBy('uniqueid');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function getDataByParent($lib,$nonPrivate)
+    {
+        $query = new Query();
+        $query ->select(['id','name','uniqueid','lastmoddate'])
+            ->from('imas_libraries')
+            ->where(['parent' => $lib]);
+        if($nonPrivate)
+        {
+            $query->andWhere(['>','userights','0']);
+        }
+        $query ->orderBy('uniqueid');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function getDataForLibTree()
+    {
+        $query = "SELECT imas_libraries.id,imas_libraries.name,imas_libraries.parent,imas_libraries.ownerid,imas_libraries.userights,imas_libraries.sortorder,imas_libraries.groupid,COUNT(imas_library_items.id) AS count ";
+        $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+
     }
 }

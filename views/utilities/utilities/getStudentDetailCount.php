@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
     <br>
-    <div class="align-copy-course">
+    <div class="align-copy-course back-ground-display">
     <h2><?php echo AppUtility::t('Enrollments from ');?><?php echo date('M j, Y',$start)?> to <?php echo date('M j, Y',$end)?></h2>
     <p><?php echo AppUtility::t('This will contain list all students who last accessed the course between those dates.');?></p>
     <p><?php echo AppUtility::t('Courses marked with');?><sup>*</sup><?php echo AppUtility::t(' have more than one instructor, and the enrollments have already been counted earlier so will be omitted.');?></p>

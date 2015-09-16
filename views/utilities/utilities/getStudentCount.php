@@ -17,9 +17,9 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <div class="item-detail-content"></div>
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox" style="padding-bottom: 30px; padding-top: 14px">
     <br>
-    <div class="align-copy-course">
+    <div class="align-copy-course back-ground">
         <?php
         if($body == AppConstant::NUMERIC_ONE)
         {

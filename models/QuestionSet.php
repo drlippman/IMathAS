@@ -349,39 +349,24 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function UpdateQuestionsetData($qd,$hasImg,$now,$qSetId)
     {
-        $QuestionSet = QuestionSet::find()->where(['id' => $qSetId])->one();
-        if($QuestionSet)
-        {
-            $QuestionSet->description = $qd['description'];
-            $QuestionSet->author= $qd['author'];
-            $QuestionSet->qtype= $qd['qtype'];
-            $QuestionSet->control = $qd['control'];
-            $QuestionSet->qcontrol = $qd['qcontrol'];
-            $QuestionSet->qtext = $qd['qtext'];
-            $QuestionSet->answer = $qd['answer'];
-            $QuestionSet->extref = $qd['extref'];
-            $QuestionSet->license = $qd['license'];
-            $QuestionSet->ancestorauthors = $qd['ancestorauthors'];
-            $QuestionSet->otherattribution = $qd['otherattribution'];
-            $QuestionSet->solution = $qd['solution'];
-            $QuestionSet->solutionopts = $qd['solutionopts'];
-            $QuestionSet->adddate= $now;
-            $QuestionSet->lastmoddate = $now;
-            $QuestionSet->hasimg = $hasImg;
-            $QuestionSet->save();
-        }
-
+        $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
+        $query.= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
+        $query.= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
+        $query.= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',";
+        $query.= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+        $data = \Yii::$app->db->createCommand($query)->execute();
+        return $data;
     }
 
     public static function UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin)
     {
         $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
-        $query .= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
-        $query .= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
-        $query .= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+        $query.= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
+        $query.= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
+        $query.= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
         if (!$isAdmin)
         {
-            $query .= " AND ownerid=$user->id";
+            $query.= " AND ownerid=$user->id";
         }
         $data = \Yii::$app->db->createCommand($query)->execute();
         return $data;
@@ -594,6 +579,35 @@ class QuestionSet extends BaseImasQuestionset
         }
         $query.= " ORDER BY imas_library_items.libid,imas_library_items.junkflag,imas_questionset.replaceby,imas_questionset.id LIMIT 500";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getDataToExportLib($qList,$nonPrivate,$call)
+    {
+        $query = "SELECT * FROM imas_questionset WHERE id IN ($qList)";
+        if ($nonPrivate)
+        {
+            $query.= " AND userights>0";
+        }
+        if($call == 0)
+        {
+            $query.= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+        }
+        else if($call == 1)
+        {
+            $query.= " ORDER BY uniqueid";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+    public static function getUniqueIdToExportLib($includedGs)
+    {
+        $query = new Query();
+        $query ->select(['id','uniqueid'])
+            ->from('imas_questionset')
+            ->where(['IN','id',$includedGs]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
         return $data;
     }
 }

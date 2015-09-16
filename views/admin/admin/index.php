@@ -2,7 +2,6 @@
 /* @var $this yii\web\View */
 use app\components\AppUtility;
 use app\components\AppConstant;
-
 $this->title = 'OpenMath Administration';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -142,7 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </span>
         <span class=column>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/manage-lib?cid=admin') ?>">Manage Libraries</a><br>
-            <a href="<?php echo AppUtility::getURLFromHome('site', 'work-in-progress') ?>">Export Libraries</a><BR>
+            <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/export-lib?cid=admin') ?>">Export Libraries</a><BR>
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/import-lib?cid=admin') ?>">Import Libraries</a>
         </span>
         <?php

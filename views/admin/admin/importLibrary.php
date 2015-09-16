@@ -93,7 +93,10 @@ $parents = $parentsData;
                                 <input type=radio name=merge value="1" CHECKED>Update existing
                                 <br><input type=radio name=merge value="0">import as new
                                 <br><input type=radio name=merge value="-1">Keep existing<br>
-                                <?php if ($myRights == 100){echo '<input type=radio name=merge value="2">Force update';}?>
+                                <?php if ($myRights == 100)
+                                {
+                                    echo '<input type=radio name=merge value="2">Force update';
+                                }?>
                                 <br/>
                                 Note that updating existing libraries will not place those imported libraries
                                 in the parent selected above.

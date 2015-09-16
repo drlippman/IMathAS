@@ -1524,7 +1524,6 @@ class AdminController extends AppController
             {
                 $filename = AppConstant::UPLOAD_DIRECTORY.'importLibrary/' . $params['filename'];
                 $libsToAdd = $params['libs'];
-
                 list($packName,$names,$parents,$libItems,$unique,$lastModDate) = $this->parseLibs($filename);
                 $names = array_map(array($this,'addslashes_deep'),$names);
                 $parents = array_map(array($this,'addslashes_deep'), $parents);
@@ -1730,10 +1729,278 @@ class AdminController extends AppController
      $this->includeCSS(['libtree.css']);
      $responseData = array('overwriteBody' => $overwriteBody,'body' => $body,'page_uploadSuccessMsg' => $page_uploadSuccessMsg,'params' => $params,'page_fileErrorMsg' => $page_fileErrorMsg,
      'page_fileHiddenInput' => $page_fileHiddenInput,'courseId' => $courseId,'packName' => $packName,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin
-     ,'myRight' => $myRights,'parentsData' => $parents,'namesData' => $names);
+     ,'myRights' => $myRights,'parentsData' => $parents,'namesData' => $names);
         return $this->renderWithData('importLibrary',$responseData);
     }
 
+    public function actionExportLib()
+    {
+        $this->guestUserHandler();
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $this->layout = "master";
+        $isAdmin = false;
+        $allowNonGroupLibs = false;
+        $isGrpAdmin = false;
+        $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $myRights  = $user->rights;
+        if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+
+        } elseif (isset($courseId) && $courseId == "admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::REQUIRED_ADMIN_ACCESS;
+        }
+        elseif (!(isset($courseId)) && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::ACCESS_THROUGH_MENU;
+        }
+        else
+        {
+            $courseId = (isset($courseId)) ? $courseId : "admin" ;
+
+            if ($myRights < AppConstant::ADMIN_RIGHT)
+            {
+                $isGrpAdmin = true;
+            } else if ($myRights == AppConstant::ADMIN_RIGHT)
+            {
+                $isAdmin = true;
+            }
+            elseif(!isset($teacherId))
+            {
+                $isAdminPage = true;
+            }
+
+            if(isset($params['submit']) && $params['submit'] == 'Export')
+            {
+                if (count($params['libs'])== 0)
+                {
+                    $this->setErrorFlash('No libraries selected');
+                  return $this->redirect('export-lib?cid='.$courseId);
+                }
+                header('Content-type: text/imas');
+                header("Content-Disposition: attachment; filename='imasexport.imas'");
+                echo "PACKAGE DESCRIPTION\n";
+                echo $params['packdescription'];
+                echo "\n";
+                $rootLibs = $params['libs'];
+                if (isset($params['rootlib']))
+                {
+                    array_unshift($rootLibs,$params['rootlib']);
+                }
+                global $libCnt,$libs,$nonPrivate;
+                $libCnt = AppConstant::NUMERIC_ONE;
+                $libs = Array();
+                $parents = Array();
+                $names = Array();
+                $nonPrivate = isset($_POST['nonpriv']);
+                $libraryData = Libraries::getLibraryData($rootLibs,$nonPrivate);
+                if($libraryData)
+                {
+                    foreach($libraryData as $row)
+                    {
+                        if (!in_array($row['parent'],$rootLibs))
+                        {
+                            $libs[$row['id']] = $libCnt;
+                            $parents[$libCnt] = 0;
+                            echo "\nSTART LIBRARY\n";
+                            echo "ID\n";
+                            echo rtrim($libCnt) . "\n";
+                            echo "UID\n";
+                            echo rtrim($row['uniqueid']) . "\n";
+                            echo "LASTMODDATE\n";
+                            echo rtrim($row['lastmoddate']) . "\n";
+                            echo "NAME\n";
+                            echo rtrim($row['name']) . "\n";
+                            echo "PARENT\n";
+                            echo "0\n";
+                            $libCnt++;
+                        }
+                    }
+                }
+                if($rootLibs)
+                {
+                    foreach ($rootLibs as $k=>$rootLib)
+                    {
+                        $this->getchildlibs($rootLib);
+                    }
+                }
+                $library = array_keys($libs);
+                foreach($library as $k=>$v)
+                {
+                    $library[$k] = "'".$v."'";
+                }
+                $libList = implode(',',$library);
+                $libraryItemData = LibraryItems::getDataToExportLib($libList,$nonPrivate);
+                $qAssoc = Array();
+                $libItems = Array();
+                $qCnt = 0;
+                if($libraryItemData)
+                {
+                    foreach($libraryItemData as $row)
+                    {
+                        if (!isset($qAssoc[$row['qsetid']]))
+                        {
+                            $qAssoc[$row['qsetid']] = $qCnt;
+                            $qCnt++;
+                        }
+                        $libItems[$libs[$row['libid ']]][] = $qAssoc[$row['qsetid']];
+                    }
+                }
+                if($libs)
+                {
+                    foreach ($libs as $newId)
+                    {
+                        if (isset($libItems[$newId]))
+                        {
+                            echo "\nSTART LIBRARY ITEMS\n";
+                            echo "LIBID\n";
+                            echo rtrim($newId) . "\n";
+                            echo "QSETIDS\n";
+                            echo rtrim(implode(',',$libItems[$newId])) . "\n";
+                        }
+                    }
+                }
+                $imgFiles = array();
+                $qList = implode(',',array_unique(array_keys($qAssoc)));
+                $questionSetData = QuestionSet::getDataToExportLib($qList,$nonPrivate,AppConstant::NUMERIC_ZERO);
+                $includedGs = array();
+                if($questionSetData)
+                {
+                    foreach($questionSetData as $line)
+                    {
+                        if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0)
+                        {
+                            $includedGs = array_merge($includedGs,$matches[1]);
+                        }
+                        if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0)
+                        {
+                            $includedGs = array_merge($includedGs,$matches[1]);
+                        }
+                    }
+                }
+                $includedBackRef = array();
+                if(count($includedGs) > 0)
+                {
+                    $data = QuestionSet::getUniqueIdToExportLib($includedGs);
+                    if($data)
+                    {
+                        foreach($data as $row)
+                        {
+                            $includedBackRef[$row['id']] = $row['uniqueid'];
+                        }
+                    }
+                }
+                $questionData = QuestionSet::getDataToExportLib($qList,$nonPrivate,AppConstant::NUMERIC_ONE);
+                if($questionData)
+                {
+                    foreach($questionData as $line)
+                    {
+                        $line['control']  = preg_replace_callback('/^( +)/', function($matches){return str_repeat("&nbsp;", strlen($matches["$1"]));},$line['control']);
+                        $line['qtext']  = preg_replace_callback('/^( +)/', function($matches){return str_repeat("&nbsp;", strlen($matches["$1"]));},$line['qtext']);
+                        echo "\nSTART QUESTION\n";
+                        echo "QID\n";
+                        echo rtrim($qAssoc[$line['id']]) . "\n";
+                        echo "\nUQID\n";
+                        echo rtrim($line['uniqueid']) . "\n";
+                        echo "\nLASTMOD\n";
+                        echo rtrim($line['lastmoddate']) . "\n";
+                        echo "\nDESCRIPTION\n";
+                        echo rtrim($line['description']) . "\n";
+                        echo "\nAUTHOR\n";
+                        echo rtrim($line['author']) . "\n";
+                        echo "\nCONTROL\n";
+                        echo rtrim($line['control']) . "\n";
+                        echo "\nQCONTROL\n";
+                        echo rtrim($line['qcontrol']) . "\n";
+                        echo "\nQTYPE\n";
+                        echo rtrim($line['qtype']) . "\n";
+                        echo "\nQTEXT\n";
+                        echo rtrim($line['qtext']) . "\n";
+                        echo "\nANSWER\n";
+                        echo rtrim($line['answer']) . "\n";
+                        echo "\nSOLUTION\n";
+                        echo rtrim($line['solution']) . "\n";
+                        echo "\nSOLUTIONOPTS\n";
+                        echo rtrim($line['solutionopts']) . "\n";
+                        echo "\nEXTREF\n";
+                        echo rtrim($line['extref']) . "\n";
+                        echo "\nLICENSE\n";
+                        echo rtrim($line['license']) . "\n";
+                        echo "\nANCESTORAUTHORS\n";
+                        echo rtrim($line['ancestorauthors']) . "\n";
+                        echo "\nOTHERATTRIBUTION\n";
+                        echo rtrim($line['otherattribution']) . "\n";
+                        if ($line['hasimg']==1)
+                        {
+                            echo "\nQIMGS\n";
+                            $QImages = QImages::dataForExportLib($line['id']);
+                            if($QImages)
+                            {
+                                foreach($QImages as $row)
+                                {
+                                    $row['filename'] = trim($row['filename']);
+                                    echo $row['var'].','.$row['filename']. "\n";
+                                    if ($GLOBALS['filehandertypecfiles'] == 's3')
+                                    {
+                                        copyqimage($row['filename'],realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row['filename']);
+                                    }
+                                    $imgFiles[] =AppConstant::UPLOAD_DIRECTORY.'exportLibrary/'.DIRECTORY_SEPARATOR.$row['filename'];
+                                }
+                            }
+                        }
+                    }
+                    require dirname(__FILE__) . '/tar.class.php';
+                    if (file_exists(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz"))
+                    {
+                        unlink(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz");
+                    }
+                    $tar = new tar();
+                    $tar->addFiles($imgFiles);
+                    $tar->toTar(AppConstant::UPLOAD_DIRECTORY."Qimages.tar.gz",TRUE);
+                }
+            }
+        }
+        $this->includeCSS(['libtree.css']);
+        $this->includeJS(['libtree.js']);
+        $responseData = array('courseId' => $courseId,'overwriteBody' => $overwriteBody,'body' => $body,'params' => $params,'myRights' => $myRights,'nonPrivate' => $nonPrivate);
+        return $this->renderWithData('exportLibrary',$responseData);
+    }
+    function getChildLibs($lib)
+    {
+        global $libCnt,$libs,$nonPrivate;
+        $parentData = Libraries::getDataByParent($lib,$nonPrivate);
+        if($parentData)
+        {
+            foreach($parentData as $row)
+            {
+                if (!isset($libs[$row[0]]))
+                {
+                    $libs[$row['id']] = $libCnt;
+                    $parents[$libCnt] = $libs[$lib];
+                    echo "\nSTART LIBRARY\n";
+                    echo "ID\n";
+                    echo rtrim($libCnt) . "\n";
+                    echo "UID\n";
+                    echo rtrim($row['uniqueid']) . "\n";
+                    echo "LASTMODDATE\n";
+                    echo rtrim($row['lastmoddate']) . "\n";
+                    echo "NAME\n";
+                    echo rtrim($row['name']) . "\n";
+                    echo "PARENT\n";
+                    echo rtrim($libs[$lib]) . "\n";
+                    $libCnt++;
+                    $this->getchildlibs($row['id']);
+                }
+            }
+        }
+    }
     public function parseLibs($file)
     {
         if (!function_exists('gzopen'))
@@ -1821,116 +2088,7 @@ class AdminController extends AppController
 
     function parseQs($file,$toUse,$rights)
     {
-        function writeQ($qd,$rights,$qn)
-        {
-            global $user,$isAdmin,$updateQ,$newQ,$isGrpAdmin,$params;
-            $now = time();
-            $QuestionSetData = QuestionSet::getLastModDateAndId($qd['uqid']);
-            if ($QuestionSetData)
-            {
-                $qSetId = $QuestionSetData[0]['id'];
-                $addDate = $QuestionSetData[0]['adddate'];
-                $lastModDate = $QuestionSetData[0]['adddate'];
-                $exists = true;
-            } else
-            {
-                $exists = false;
-            }
-            if ($exists && ($params['merge']==1 || $params['merge']==2))
-            {
-                if ($qd['lastmod']>$addDate || $params['merge']==2)
-                {
-                    if (!empty($qd['qimgs']))
-                    {
-                        $hasImg = 1;
-                    } else
-                    {
-                        $hasImg = 0;
-                    }
-                    if ($isGrpAdmin)
-                    {
-                        $QuestionSetId = QuestionSet::getQSetAndUserData($qSetId,$user->groupid);
-                        if ($QuestionSetId)
-                        {
-                            QuestionSet::UpdateQuestionsetData($qd,$hasImg,$now,$qSetId);
-                        }
-                        else
-                        {
-                            return $qSetId;
-                        }
-                    }
-                    else
-                    {
-                       $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin);
-                    }
-                    if ($affectedRow > 0)
-                    {
-                        $updateQ++;
-                        if (!empty($qd['qimgs']))
-                        {
-                            QImages::deleteByQsetId($qSetId);
-                            $qImages = explode("\n",trim($qd['qimgs']));
-                            if($qImages)
-                            {
-                                foreach($qImages as $qimg)
-                                {
-                                    $p = explode(',',$qimg);
-                                    if (count($p) < 2)
-                                    {
-                                        continue;
-                                    }
-                                    $QImages = new QImages();
-                                    $QImages->insertFilename($qSetId,$p);
-                                }
 
-                            }
-                        }
-                    }
-                }
-                return $qSetId;
-            } else if ($exists && $params['merge']==-1)
-            {
-                return $qSetId;
-            } else
-            {
-                $importUIdStr = '';
-                $importUIdVal = '';
-                if ($qd['uqid']=='0' || ($exists && $params['merge']==0))
-                {
-                    $importUIdStr  = 'importuid';
-                    $importUIdVal = $qd['uqid'];
-                    $mt = microtime();
-                    $qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
-                }
-                if (!empty($qd['qimgs']))
-                {
-                    $hasImg = 1;
-                }
-                else
-                {
-                    $hasImg = 0;
-                }
-                $insert = new QuestionSet();
-                $insertId = $insert->InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights);
-                $newQ++;
-                $qSetId = $insertId;
-                if(!empty($qd['qimgs']))
-                {
-                    $qImages = explode("\n",$qd['qimgs']);
-                    if($qImages)
-                    {
-                        foreach($qImages as $qimg)
-                        {
-                            $p = explode(',',$qimg);
-                            $QImages = new QImages();
-                            $QImages->insertFilename($qSetId,$p);
-                        }
-                    }
-
-                }
-                return $qSetId;
-            }
-        }
         $toUse = explode(',',$toUse);
         $qNum = -1;
         $part = '';
@@ -1963,7 +2121,7 @@ class AdminController extends AppController
                     }
                     if (in_array($qdata['qid'],$toUse))
                     {
-                        $qid = writeQ($qdata,$rights,$qNum);
+                        $qid = $this->writeQ($qdata,$rights,$qNum);
                         if ($qid!==false)
                         {
                             $qIds[$qdata['qid']] = $qid;
@@ -2071,14 +2229,126 @@ class AdminController extends AppController
         foreach($qdata as $k=>$val) {
             $qdata[$k] = rtrim($val);
         }
-        if (in_array($qdata['qid'],$toUse)) {
-            $qid = writeq($qdata,$rights,$qNum);
+        if (in_array($qdata['qid'],$toUse))
+        {
+            $qid =$this->writeq($qdata,$rights,$qNum);
             if ($qid!==false)
             {
                 $qIds[$qdata['qid']] = $qid;
             }
         }
-        return $qIds;
+        return $qid;
+    }
+    function writeQ($qd,$rights,$qn)
+    {
+        global $user,$isAdmin,$updateQ,$newQ,$isGrpAdmin,$params;
+        $now = time();
+        $QuestionSetData = QuestionSet::getLastModDateAndId($qd['uqid']);
+        if ($QuestionSetData)
+        {
+            $qSetId = $QuestionSetData[0]['id'];
+            $addDate = $QuestionSetData[0]['adddate'];
+            $lastModDate = $QuestionSetData[0]['adddate'];
+            $exists = true;
+        } else
+        {
+            $exists = false;
+        }
+        if ($exists && ($params['merge']==1 || $params['merge']==2))
+        {
+            if ($qd['lastmod']>$addDate || $params['merge']==2)
+            {
+                if (!empty($qd['qimgs']))
+                {
+                    $hasImg = 1;
+                } else
+                {
+                    $hasImg = 0;
+                }
+                if ($isGrpAdmin)
+                {
+                    $QuestionSetId = QuestionSet::getQSetAndUserData($qSetId,$user->groupid);
+
+                    if($QuestionSetId)
+                    {
+                        $affectedRow = QuestionSet::UpdateQuestionsetData($qd,$hasImg,$now,$qSetId);
+                    }
+                    else
+                    {
+                        return $qSetId;
+                    }
+                }
+                else
+                {
+                    $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin);
+                }
+                if ($affectedRow > 0)
+                {
+                    $updateQ++;
+                    if (!empty($qd['qimgs']))
+                    {
+                        QImages::deleteByQsetId($qSetId);
+                        $qImages = explode("\n",trim($qd['qimgs']));
+                        if($qImages)
+                        {
+                            foreach($qImages as $qimg)
+                            {
+                                $p = explode(',',$qimg);
+                                if (count($p) < 2)
+                                {
+                                    continue;
+                                }
+                                $QImages = new QImages();
+                                $QImages->insertFilename($qSetId,$p);
+                            }
+
+                        }
+                    }
+                }
+            }
+            return $qSetId;
+        } else if ($exists && $params['merge']==-1)
+        {
+            return $qSetId;
+        } else
+        {
+            $importUIdStr = '';
+            $importUIdVal = '';
+            if ($qd['uqid']=='0' || ($exists && $params['merge']==0))
+            {
+                $importUIdStr  = 'importuid';
+                $importUIdVal = $qd['uqid'];
+                $mt = microtime();
+                $qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
+            }
+            if (!empty($qd['qimgs']))
+            {
+                $hasImg = 1;
+            }
+            else
+            {
+                $hasImg = 0;
+            }
+            $insert = new QuestionSet();
+            $insertId = $insert->InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights);
+            $newQ++;
+            $qSetId = $insertId;
+            if(!empty($qd['qimgs']))
+            {
+                $qImages = explode("\n",$qd['qimgs']);
+                if($qImages)
+                {
+                    foreach($qImages as $qimg)
+                    {
+                        $p = explode(',',$qimg);
+                        $QImages = new QImages();
+                        $QImages->insertFilename($qSetId,$p);
+                    }
+                }
+
+            }
+            return $qSetId;
+        }
     }
 
     function delqimgs($qsid) {

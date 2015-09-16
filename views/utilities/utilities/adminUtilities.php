@@ -50,15 +50,12 @@ $this->params['breadcrumbs'][] = $this->title;
         {
         if($form == 'emu'){?>
         <form method="post" action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=emulateuser');?>">
-            <?php echo AppUtility::t('Emulate user with userid:', false)?><input type="text" size="30" name="uid"/>
-            <input type="submit" style="width: 60px; height: 26px" value="Go"/>
-
+            <?php echo AppUtility::t('Emulate user with userid', false)?><input style="margin-left: 5px" class="form-control-utility" type="text" size="30" name="uid"/>
+            <input type="submit" style="width: 60px; height: 32px; border-radius: 2px;margin-left: 5px" value="Go"/>
             <?php }elseif($form == 'rescue'){?>
-
             <form method="post" action="<?php echo AppUtility::getURLFromHome('utilities','utilities/rescue-course')?>">
-                <?php echo AppUtility::t('Recover lost items in course ID: ', false)?><input type="text" size="30" name="cid"/>
-                <input type="submit" style="width: 60px; height: 26px" value="Go"/>
-
+                <?php echo AppUtility::t('Recover lost items in course ID', false)?><input style="margin-left: 5px" class="form-control-utility" type="text" size="30" name="cid"/>
+                <input type="submit" style="width: 60px; height: 32px; border-radius: 2px;margin-left: 5px" value="Go"/>
                 <?php }elseif($form == 'lookup'){?>
                 <?php if(!empty($params['LastName']) || !empty($params['FirstName']) || !empty($params['SID']) || !empty($params['email']))
                 {
@@ -81,7 +78,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             echo '<li>Email: '.$user['email'].'</li>';
                             echo '<li>Last Login: '.AppUtility::tzdate("n/j/y g:ia", $user['lastaccess']).'</li>';
                             echo '<li>Rights: '.$user['rights'].'</li>';
-                            echo '<li>Reset Password to <input type="text" name="newpw"/> <input type="submit" style="width: 60px; height: 26px" value="Go"/></li>';?>
+                            echo '<li>Reset Password to <input type="text" name="newpw"/> <input class="form-control-utility" type="submit" style="width: 60px; height: 32px; border-radius: 2px; margin-left: 5px" value="Go"/></li>';?>
                             <?php
                             if(count($queryForCourse)>0)
                             {
@@ -155,11 +152,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <form method="post" action="<?php echo AppUtility::getURLFromHome('utilities','utilities/admin-utilities?form=lookup');?>">
                     <?php echo AppUtility::t('Look up user:', false)?>
-                    <p></p><div class="align-lookup"><input type="text" size="30" placeholder="LastName" name="LastName"></div>
-                    <div class="align-lookup"><input type="text" size="30" placeholder="FirstName" name="FirstName"></div>
-                    <div class="align-lookup"><input type="text" size="30" placeholder="UserName" name="SID"></div>
-                    <div class="align-lookup"><input type="text" size="30" placeholder="Email" name="email"></div>
-                    <div class="align-lookup"><input type="submit" style="width: 60px; height: 26px" value="Go"></div>
+                    <p></p><div class="align-lookup">
+                     <input class="form-control-utility" type="text" size="30" placeholder="LastName" name="LastName"></div>
+                    <div class="align-lookup">
+                     <input class="form-control-utility" type="text" size="30" placeholder="FirstName" name="FirstName"></div>
+                    <div class="align-lookup">
+                        <input class="form-control-utility" type="text" size="30" placeholder="UserName" name="SID"></div>
+                    <div class="align-lookup">
+                    <input class="form-control-utility" type="text" size="30" placeholder="Email" name="email"></div>
+                    <div class="align-lookup">
+                    <input class="form-control-utility" type="submit" style="width: 60px; height: 26px" value="Go"></div>
                     <?php }?>
                     <?php } ?>
                     <?php }else{

@@ -44,8 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <h3><?php echo AppUtility::t('Replace video links');?></h3>
             <p><?php echo AppUtility::t('This will replace video links or question button links anywhere on the system');?></p>
             <form method="post">
-            <p><?php echo AppUtility::t('Replace video ID')?>&nbsp;<input type="text" name="from" size="11"/>
-             <?php echo AppUtility::t('with video ID ')?>&nbsp;<input type="text" name="to" size="11"/></p>
+            <p><?php echo AppUtility::t('Replace video ID')?>&nbsp;<input class="form-control-utility" type="text" name="from" size="11"/>
+            <?php echo AppUtility::t('with video ID ')?>&nbsp;<input class="form-control-utility" type="text" name="to" size="11"/></p>
             <p><input type="submit" value="<?php echo AppUtility::t('Replace');?>"/></p>
             </form>
     <?php }?>

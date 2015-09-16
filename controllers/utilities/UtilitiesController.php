@@ -94,6 +94,7 @@ class UtilitiesController extends AppController
 
                 }
         }
+        $this->includeCSS(['utilities.css']);
         $responseData = array('form' => $form,'debug' => $debug,'body' => $body,'message' => $message,'queryForCourse' => $queryForCourse,'queryFromCourseForTutor' => $queryFromCourseForTutor,'queryFromCourseForTeacher' => $queryFromCourseForTeacher,'queryForLtiUser' => $queryForLtiUser,'params' => $params,'queryForUser' => $queryForUser);
         return $this->render('adminUtilities',$responseData);
     }
@@ -150,9 +151,8 @@ class UtilitiesController extends AppController
             $itemOrder = serialize($items);
             Course::UpdateItemOrderAndBlockCnt($itemOrder,$blockCnt,$courseId,AppConstant::NUMERIC_ONE);
         }
-
+        $this->includeCSS(['utilities.css']);
         return $this->renderWithData('rescueCourse',['items' => $items,'recoveredItems' => $recoveredItems]);
-
     }
     public function actionGetStudentCount()
     {
@@ -202,6 +202,7 @@ class UtilitiesController extends AppController
         {
             $userEmail = User::getUserEmail($user);
         }
+        $this->includeCSS(['utilities.css']);
         $responseData = array('studentCount' => $studentCount,'stuCount' => $stuCount,'queryForStu' => $queryForStu,'teacherCnt' => $teacherCnt,'stuName' => $stuName,'queryByDistinctCnt' => $queryByDistinctCnt,'userEmail' => $userEmail,'days' => $days,'email' => $email,'user' => $user,'body' => $body,'message' => $message );
         return $this->renderWithData('getStudentCount',$responseData);
     }
@@ -242,6 +243,7 @@ class UtilitiesController extends AppController
                 $end = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
             }
         }
+        $this->includeCSS(['utilities.css']);
         $query = Student::getstuDetails($start,$now,$end);
         return $this->renderWithData('getStudentDetailCount',['query' => $query,'start' => $start,'end'=> $end,'body' => $body,'message' => $message]);
     }
@@ -273,6 +275,7 @@ class UtilitiesController extends AppController
                 $updatedQuestionSet = QuestionSet::updateVideoId($from,$to);
             }
         }
+        $this->includeCSS(['utilities.css']);
         return $this->renderWithData('replaceVideo',['updatedInlineText' => $updatedInlineText,'updatedLinkedText' => $updatedLinkedText,'updatedLinkedTextSummary' => $updatedLinkedTextSummary,'updatedAssessment' => $updatedAssessment,'updatedAssessmentSummary' => $updatedAssessmentSummary,'updatedQuestionSet' => $updatedQuestionSet,'params' => $params,'body' => $body,'message' => $message,'from' => $from,'to' => $to]);
     }
     public function actionListExternalRef()
@@ -280,6 +283,7 @@ class UtilitiesController extends AppController
         $this->guestUserHandler();
         $this->layout = "master";
         $questionSetData = QuestionSet::getExternalRef();
+        $this->includeCSS(['utilities.css']);
         return $this->renderWithData('listExternalRef',['questionSetData' => $questionSetData]);
     }
 
@@ -379,7 +383,7 @@ class UtilitiesController extends AppController
             }
         }
         $groupsName = Groups::getIdAndName();
-
+        $this->includeCSS(['utilities.css']);
         return $this->renderWithData('approvePendingReq',['findPendingUser' => $findPendingUser,'details' => $details,'groupsName' => $groupsName,'message' => $message,'body' => $body,'offset' => $offset]);
     }
 
@@ -393,6 +397,7 @@ class UtilitiesController extends AppController
             $body = AppConstant::NUMERIC_ONE;
             $message = 'You do not have access to this page';
         }
+        $this->includeCSS(['utilities.css']);
         $data = QuestionSet::getWrongLibFlag();
         return $this->renderWithData('listWrongLibFlag',['body ' => $body,'message' => $message,'data' => $data ]);
     }
@@ -429,6 +434,7 @@ class UtilitiesController extends AppController
                 $tot += $this->doQuery($valArray);
             }
         }
+        $this->includeCSS(['utilities.css']);
         $responseData = array('tot' => $tot,'message' => $message,'body' => $body,'params' => $params);
         return $this->renderWithData('updateWrongLibFlag',$responseData);
     }
@@ -480,6 +486,7 @@ class UtilitiesController extends AppController
             }
 
         }
+        $this->includeCSS(['utilities.css']);
         $responseData = array('questions' => $questions,'info' => $info,'extRef' => $extRef,'params' => $params,'body' => $body,'message' => $message);
         return $this->renderWithData('updateExternalRef',$responseData);
     }
@@ -509,6 +516,7 @@ class UtilitiesController extends AppController
             }
         }
         $this->layout = 'master';
+        $this->includeCSS(['utilities.css']);
         $responseData = array('params' => $params,'body' => $body,'message' => $message,'blockTitles' => $blockTitles,'det' => $det);
         return $this->renderWithData('blockSearch',$responseData);
     }
@@ -532,20 +540,23 @@ class UtilitiesController extends AppController
         ini_set("memory_limit", "712857600");
         $start = microtime(true);
         $data = DbSchema::getData();
-        if(count($data) > 0)
+        if(count($data) == 0)
         {
             $lastUpdate = 0;
             $lastFirstUpdate = 0;
         }
         else
         {
-            foreach($data as  $result)
+            if($data)
             {
-                if ($result['id']== 3)
+                foreach($data as  $result)
                 {
-                    $lastUpdate = $result['ver'];
-                } else {
-                    $lastFirstUpdate = $result['ver'];
+                    if ($result['id']== 3)
+                    {
+                        $lastUpdate = $result['ver'];
+                    } else {
+                        $lastFirstUpdate = $result['ver'];
+                    }
                 }
             }
         }
@@ -654,17 +665,21 @@ class UtilitiesController extends AppController
         $toTn = array_sum($n);
         if ($lastFirstUpdate == AppConstant::NUMERIC_ZERO)
         {
-            foreach ($n as $qsId=>$nval)
+            if($n)
             {
-                if ($dosLowMethod) {
-                    $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
-                }
-                else
+                foreach ($n as $qsId=>$nval)
                 {
-                    $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                    if ($dosLowMethod) {
+                        $avg = addslashes($avgTime[$qsId].','.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                    }
+                    else
+                    {
+                        $avg = addslashes('0,'.$avgFirstTime[$qsId].','.$avgFirstScore[$qsId].','.$n[$qsId]);
+                    }
+                    QuestionSet::updateAvgTime($avg,$qsId);
                 }
-                QuestionSet::updateAvgTime($avg,$qsId);
             }
+
         }
         else
         {
@@ -719,6 +734,7 @@ class UtilitiesController extends AppController
                 DbSchema::updateData($lastUpdate,3);
             }
         }
+        $this->includeCSS(['utilities.css']);
         return $this->renderWithData('updateQuestionUsage',['nq' => $nq,'toTn' => $toTn,'start' => $start]);
     }
 
@@ -744,6 +760,7 @@ class UtilitiesController extends AppController
         {
                 $searchResult = User::getUserDetailsByJoin($search);
         }
+        $this->includeCSS(['utilities.css']);
         $responseData = array('params' => $params,'body' => $body,'message' => $message,'searchResult' => $searchResult);
         return $this->renderWithData('itemSearch',$responseData);
     }
@@ -924,6 +941,7 @@ class UtilitiesController extends AppController
                 $detailsOfUser = User::insertDataFroGroups($toList);
             }
         }
+        $this->includeCSS(['utilities.css']);
     $responseData = array('params' => $params,'assessmentData' => $assessmentData,'detailsOfUser' => $detailsOfUser,'calledFrom' => $calledFrom,'aid' => $aid,'id' => $id);
     return $this->renderWithData('massEnd',$responseData);
     }

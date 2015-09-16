@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         }?>
                         <p><?php AppUtility::t('Group: ');?>
-                            <select name="group"><option value="-1"><?php AppUtility::t('New Group');?></option>
+                            <select  name="group"><option value="-1"><?php AppUtility::t('New Group');?></option>
                                 <?php
                                 if($groupsName)
                                 {
@@ -60,9 +60,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ?>
                             </select><br><br>
                             <?php echo AppUtility::t('New group:',false)?>
-                            <input type="text" name="newgroup" size="40"/></p>
+                            <input class="form-control-utility" type="text" name="newgroup" size="40"/></p>
                             <br>
-                            <p><input type="submit" name="approve" value="Approve" /> <input type="submit" name="deny" value="Deny" /> <input type="submit" name="skip" value="Skip" /></p>
+                            <p><input class="form-control-utility" type="submit" name="approve" value="Approve" /> <input type="submit" name="deny" value="Deny" /> <input type="submit" name="skip" value="Skip" /></p>
                     </form>
             <?php }?>
     <?php  }?>

@@ -169,7 +169,21 @@ class LibraryItems extends BaseImasLibraryItems
         return $data;
     }
 
-    public static function getDistinctLibId($list){
+    public static function getDistinctLibId($list)
+    {
         return LibraryItems::find()->select('libid')->distinct()->where(['IN', 'qsetid', $list])->all();
+    }
+
+    public static function getDataToExportLib($libList,$nonPrivate)
+    {
+        $query = "SELECT imas_library_items.qsetid,imas_library_items.libid FROM imas_library_items ";
+        $query .= "JOIN imas_questionset ON imas_library_items.qsetid=imas_questionset.id ";
+        $query .= "WHERE imas_library_items.libid IN ($libList) AND imas_library_items.junkflag=0 AND imas_questionset.deleted=0 ";
+        if ($nonPrivate)
+        {
+            $query .= " AND imas_questionset.userights>0";
+        }
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
     }
 }

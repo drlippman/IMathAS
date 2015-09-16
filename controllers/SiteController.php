@@ -652,7 +652,10 @@ class SiteController extends AppController
         $userid = $this->getUserId();
         $user = User::findByUserId($userid);
         $model = new ChangeUserInfoForm();
-        if ($model->load($this->isPostMethod()) && $model->checkPassword()) {
+        $r = $model->checkPassword();
+        AppUtility::dump($r);
+        if ($model->load($this->isPostMethod()) && $model->checkPassword())
+        {
             $params = $this->getRequestParams();
             $params = $params['ChangeUserInfoForm'];
             $model->file = UploadedFile::getInstance($model, 'file');
