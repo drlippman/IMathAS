@@ -173,12 +173,24 @@ class Libraries extends BaseImasLibraries
 
     public static function updateById($params,$isadmin,$groupid,$isgrpadmin,$userid,$now)
     {
-
         $query = "UPDATE imas_libraries SET name='{$params['name']}',userights='{$params['rights']}',sortorder='{$params['sortorder']}',lastmoddate=$now";
         if ($params['modify'] != $params['libs']) {
             $query .= ",parent='{$params['libs']}'";
         }
         $query .= " WHERE id='{$_GET['modify']}'";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function updateByGrpIdUserId($params, $newgpid,$isadmin,$groupid, $isgrpadmin, $userid, $translist)
+    {
+        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
+
         if (!$isadmin) {
             $query .= " AND groupid='$groupid'";
         }

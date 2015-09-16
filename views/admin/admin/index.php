@@ -67,7 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (($page_courseList[$i]['available']&2)==2 || ($page_courseList[$i]['available']&4)==4) {
                             echo '</span>';
                         }
-
                         ?>
                     </a>
                 </td>
@@ -193,7 +192,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><a href="<?php echo AppUtility::getURLFromHome('site', 'diagnostics?id='.$page_diagnosticsId[$i])?>"><?php echo $page_diagnosticsName[$i] ?></a></td>
                 <td class=c><?php echo $page_diagnosticsAvailable[$i] ?></td>
                 <td class=c><?php echo $page_diagnosticsPublic[$i] ?></td>
-                <td style="text-align: center"><div class='btn-group padding-left-forty'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">
+                <td style="text-align: center">
+                    <div class='btn-group settings'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diagnostics?id='.$page_diagnosticsId[$i])?>">
                             <i class="fa fa-pencil"></i> Modify</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
                         <ul class='dropdown-menu'>
                             <li>

@@ -121,7 +121,8 @@ echo '<form>';
         </div>
 <BR class=form><br>
 	<div class="col-lg-2 padding-top-five">Linked with course</div>
-      <div class="col-lg-4">  <?php
+      <div class="col-lg-4">
+          <?php
         AppUtility::writeHtmlSelect ("cid",$page_courseSelectList['val'],$page_courseSelectList['label'],$page_courseSelected); ?>
       </div>
 <BR class=form><br>
@@ -132,12 +133,12 @@ echo '<form>';
     </div><BR class=form><br>
 	<div class="col-lg-2">Include in public listing?</div>
       <div class="col-lg-6">  <input type=radio name="public" value="1" <?php AppUtility::writeHtmlChecked(2,($public&2),0); ?> /> <span class="padding-left-three padding-right">Yes</span>
-        <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /><span class="padding-left-three padding-right">No</span>
+        <input type=radio name="public" value="0" <?php AppUtility::writeHtmlChecked(2,($public&2),1); ?> /><span class="padding-left-five padding-right">No</span>
       </div><BR class=form><br>
 	<div class="col-lg-2">Allow reentry (continuation of test at later date)?</div>
-       <div class="col-lg-8"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /><span class="padding-left-three padding-right">No</span>
-        <input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> <span class="padding-left-three padding-right">Yes, within</span>
-       <input type="text" class="form-control-1" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)</div>
+       <div class="col-lg-8"> <input type=radio name="reentry" value="0" <?php AppUtility::writeHtmlChecked(4,($public&4),1); ?> /><span class="padding-left-five padding-right">No</span>
+        <span style="padding-left: 5px"><input type=radio name="reentry" value="1" <?php AppUtility::writeHtmlChecked(4,($public&4),0); ?> /> <span class="padding-left-three padding-right">Yes, within</span>
+       <input type="text" class="form-control-1" name="reentrytime" value="<?php echo $reentrytime; ?>" size="4" /> minutes (0 for no limit)</span></div>
     <BR class=form><br>
 
 	<div class="col-lg-2 padding-top-five">Unique ID prompt</div><div class="col-lg-6">
@@ -275,7 +276,7 @@ echo '<form>';
 	<div class="col-lg-10"><h4>First-level selector - selects assessment to be delivered</h4></div><BR class=form>
 	<div class="col-lg-2">Selector name</div> <div class="col-lg-8"> <input name="sel" class="form-control-1" type=text value="<?php echo $sel; ?>"/> "Please select your _______"</div><BR class=form><br>
 	<div class="col-lg-2">Alphabetize selectors on submit?</div> <div class="col-lg-6"><input type="checkbox" name="alpha" value="1" /></div><BR class=form><br>
-	<div class="col-lg-2">Enter new selector option:</div>
+	<div class="col-lg-2">Enter new selector option</div>
     <div class="col-lg-8"><input type=text id="sellist" class="form-control-1" onkeypress="return onenter(event,'sellist','selout')">
         <input type=button value="Add" onclick="additem('sellist','selout')"/>
 		<table>

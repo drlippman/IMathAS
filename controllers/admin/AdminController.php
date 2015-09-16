@@ -2284,15 +2284,8 @@ class AdminController extends AppController
                         $translist = "'".implode("','",explode(',',$params['transfer']))."'";
                         $newgroup = User::getByGroupId($params['newowner']);
                         $newgpid = $newgroup[0]['groupid'];
-                        $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
-
-                        if (!$isadmin) {
-                            $query .= " AND groupid='$groupid'";
-                        }
-                        if (!$isadmin && !$isgrpadmin) {
-                            $query .= " AND ownerid='$userid'";
-                        }
-                        mysql_query($query) or die("Query failed : $query " . mysql_error());
+                        $libraryUpdate = new Libraries();
+                        $libraryUpdate->updateByGrpIdUserId($params, $newgpid,$isAdmin,$groupId, $isGrpAdmin, $userId, $translist);
                     }
                     return $this->redirect('manage-lib?cid='.$cid);
                 } else {
