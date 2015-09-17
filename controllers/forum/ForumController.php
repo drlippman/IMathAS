@@ -938,6 +938,13 @@ class ForumController extends AppController
             }
             $fileName = implode('@@',$files);
             $alwaysReplies = $params['always-replies'];
+            if($user['rights'] == AppConstant::STUDENT_RIGHT)
+            {
+                $alwaysReplies = 0;
+                $postType = 0;
+                $isNonValue = 0;
+
+            }
             $newThread = new ForumPosts();
             $threadId = $newThread->createThread($params, $user->id, $postType, $alwaysReplies, $date , $isNonValue,$fileName);
             $newThread = new ForumThread();

@@ -423,6 +423,11 @@ i.fa-home{
     color: #ffffff;
 }
 
+.user-menu >.nav .open > a, .nav .open > a:hover, .nav .open > a:focus
+{
+    border: 0px;
+}
+
 .help-img{
     width: 32px;
     height: 34px;

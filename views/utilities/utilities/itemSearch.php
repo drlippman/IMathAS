@@ -30,11 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
         else
         {
             echo '<h4>Search through inline and link text items</h4>';
-            echo '<form method="post"><p>Search: <input type="text" name="search" size="40" value="'.htmlentities(stripslashes($params['search'])).'"> <input type="submit" value="Search"/></p>';
+            echo '<form method="post"><p>Search <input class="form-control-utility" type="text" name="search" size="40" value="'.htmlentities(stripslashes($params['search'])).'"> <input style="border-radius: 2px; height: 32px" type="submit" value="Search"/></p>';
             if(isset($params['search']))
             {
                 echo '<p>';
-                echo '<input type="submit" name="submit" value="Message"></p><p>';
+                echo '<input type="submit" style="border-radius: 2px; height: 32px" name="submit" value="Message"></p><p>';
                 echo "Count: ".count($searchResult);
                 $lastPerson = '';
                 if($searchResult)

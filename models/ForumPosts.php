@@ -112,7 +112,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->save();
     }
 
-    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue,$fileName)
+    public function createThread($params, $userId, $postType, $alwaysReplies, $date, $isNonValue,$fileName=null)
     {
         $maxid = $this->find()->max('id');
         $maxid = $maxid + AppConstant::NUMERIC_ONE;
