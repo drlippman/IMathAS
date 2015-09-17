@@ -7,11 +7,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid='.$course->id]]); ?>
 </div>
-
+<form id="qform" method="post" action="change-block?cid=<?php echo $course->id ?>">
 <div class = "title-container">
     <div class="row">
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit">
+                <i class="fa fa-share header-right-btn"></i><?php echo _('Apply Changes'); ?></button>
         </div>
     </div>
 </div>
@@ -20,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course]); ?>
 </div>
 <div class="tab-content shadowBox">
-<form id="qform" method="post" action="change-block?cid=<?php echo $course->id ?>">
+
     <div style="padding-top: 10px">
         <div class="col-lg-1"><?php AppUtility::t('Check')?></div>
         <div class="col-lg-4">
@@ -31,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="clear-both"></div>
 
 <ul class="nomark padding-left">
-    <?php
+    <?php echo '<div class="col-lg-10 padding-left-zero"><b>Block in this course are</b></div><br/>';
     foreach ($existblocks as $pos=>$name) {
         echo '<li><input type="checkbox" name="checked[]" value="'.$existblockids[$pos].'"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
         $n = substr_count($pos,"-")-1;
@@ -86,7 +90,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </tr>
     </tbody>
 </table>
-<div class=submit><input type=submit value="<?php echo _('Apply Changes')?>"></div><br/>
 </form>
 </div>
 
