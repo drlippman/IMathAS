@@ -12,6 +12,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="pull-left page-heading">
                 <div class="vertical-align title-page"><?php echo $this->title ?></div>
             </div>
+            <div class="pull-left header-btn">
+                <div id="submit" class="submit pull-right page-settings">
+                   <input type=submit value='<?php echo 'Access Diagnostic' ?>'>
+                </div>
+<!--                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit">-->
+<!--                    <i class="fa fa-share header-right-btn"></i>--><?php //echo $defaultValues['saveButtonTitle']; ?><!--</button>-->
+            </div>
+
         </div>
     </div>
 <?php
@@ -57,10 +65,10 @@ $pagetitle =$line['name'];
     <br>
 <form method=post action="diagnostics?id=<?php echo $diagid; ?>">
     <div class=col-lg-2><?php echo $line['idprompt']; ?></div>
-    <div class="col-lg-6"><input class=form type=text size=12 name=SID></div><BR class=form>
+    <div class="col-lg-6"><input class="form form-control-1" type=text  size=12 name=SID></div><BR class=form>
     <div class=col-lg-2><?php echo _('Enter First Name'); ?></div>
-    <div class="col-lg-6"><input class=form type=text size=20 name=firstname></div><BR class=form>
-    <div class=col-lg-2><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class=form type=text size=20 name=lastname></div><BR class=form>
+    <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=firstname></div><BR class=form>
+    <div class=col-lg-2><?php echo _('Enter Last Name'); ?></div> <div class="col-lg-6"><input class="form form-control-1" type=text size=20 name=lastname></div><BR class=form>
 
     <script type="text/javascript">
         var teach = new Array();
@@ -107,7 +115,7 @@ $pagetitle =$line['name'];
     <?php
     if (!$noproctor) {
         echo "<b><div class='col-lg-12'>", _('This test can only be accessed from this location with an access password'), "</div></b></br>\n";
-        echo "<div class=col-lg-2>", _('Access password'), "</div>  <div class='col-lg-4'><input class=form type=password size=40 name=passwd></div><BR class=form>";
+        echo "<div class=col-lg-2>", _('Access password'), "</div>  <div class='col-lg-4'><input class='form form-control-1' type=password size=40 name=passwd></div><BR class=form>";
     }
     ?>
     <input type="hidden" id="tzoffset" name="tzoffset" value="">
@@ -118,8 +126,7 @@ $pagetitle =$line['name'];
         var tz = jstz.determine();
         document.getElementById("tzname").value = tz.name();
     </script>
-    <div id="submit" class="submit">
-        <input type=submit value='<?php echo 'Access Diagnostic' ?>'></div>
+
     <input type=hidden name="mathdisp" id="mathdisp" value="2" />
     <input type=hidden name="graphdisp" id="graphdisp" value="2" />
     <?php
@@ -127,11 +134,11 @@ $pagetitle =$line['name'];
     $pws = explode(';',$line['pws']);
     if ($noproctor && count($pws)>1 && trim($pws[1])!='' && (!$allowreentry || $line['reentrytime']>0)) {
         echo "<p>", _('No access code is required for this diagnostic.  However, if your testing window has expired, a proctor can enter a password to allow reaccess to this test.'), "</br>\n";
-        echo "<span class=form>", _('Override password'), ":</span>  <input class=form type=password size=40 name=passwd><BR class=form>";
+        echo "<span class=form>", _('Override password'), ":</span>  <input class='form form-control-1' type=password size=40 name=passwd><BR class=form>";
     }
     ?>
 </form>
-<div id="bsetup">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div>
+<div id="bsetup" class="col-lg-10">JavaScript is not enabled. JavaScript is required for <?php echo $installname; ?>. Please enable JavaScript and reload this page</div><br>
 </div>
 <script type="text/javascript">
     function determinesetup() {
