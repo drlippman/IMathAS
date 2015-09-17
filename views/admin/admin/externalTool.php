@@ -54,9 +54,10 @@ else{
             <input type="hidden" id="name-external-tool" value="<?php echo $extName;?> ">
 
          <?php
-            echo '<p>Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</p>';
+            echo '<br/>';
+            echo '<div class="col-lg-12">Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</div><br/><br/>';
             echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'&amp;delete=true">';
-            echo '<input type=submit value="Yes, I\'m Sure">';
+            echo '<div class="col-lg-2"><input type=submit value="Yes, I\'m Sure"></div>';
             echo '</form>';
 
         } else if (isset($params['id'])) {
