@@ -1049,3 +1049,12 @@ background-color: #f8f8f8;
 .width-eighty-two-pt-eight-per {
     width: 82.8%;
 }
+.margin-right-fifteen {
+    margin-right: 15px !important;
+}
+.margin-bottom-twenty-five {
+    margin-bottom: 25px;
+}
+.margin-left-minus-thirty {
+    margin-left: -30px !important;
+}

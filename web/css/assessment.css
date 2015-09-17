@@ -29,7 +29,7 @@ table.assesment-msg-table thead th {
     width: 100%;
 }
 .margin-left-minus-thirty {
-    margin-left: -30px;
+    margin-left: -30px !important;
 }
 .padding-left-fifteen {
 padding-left: 15px !important;

@@ -36,8 +36,8 @@ $this->params['breadcrumbs'][] = $this->title;
         if (count($pageCopyFromSelect['val'])>AppConstant::NUMERIC_ZERO) {
             ?>
             <div class="padding-top-twenty">
-                <div class='col-md-2 select-text-margin'><?php AppUtility::t('Copy Options From')?></div>
-                <div class='col-md-5'>
+                <div class='col-md-2 select-text-margin margin-left-fifteen'><?php AppUtility::t('Copy Options From')?></div>
+                <div class='col-md-5 padding-left-ten'>
                     <?php
                     AssessmentUtility::writeHtmlSelect ("copyfrom",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],AppConstant::NUMERIC_ZERO,"None - use settings below",AppConstant::NUMERIC_ZERO," onChange=\"chgcopyfrom()\"");
                     ?>
@@ -110,7 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 padding-left-zero">
         <div class=col-md-2><?php AppUtility::t('Visibility')?></div>
         <div class=col-md-10>
-            <input type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class="padding-left"><?php AppUtility::t('Show By Dates')?></span>
+            <input class="margin-left-two" type=radio name="avail" value="1" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ONE);?> onclick="document.getElementById('datediv').style.display='block';"/><span class="padding-left"><?php AppUtility::t('Show By Dates')?></span>
             <label class="non-bold" style="padding-left: 79px"><input type=radio name="avail" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['avail'],AppConstant::NUMERIC_ZERO);?> onclick="document.getElementById('datediv').style.display='none';"/><span class="padding-left"><?php AppUtility::t('Hide')?></span></label><br>
         </div><br class="form"/>
     </div>
@@ -118,7 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 padding-left-zero margin-top-twenty">
             <div class=col-md-2 ><?php AppUtility::t('Available After')?></div>
                 <div class=col-md-10>
-                    <label class="pull-left non-bold"><input type=radio name="sdatetype" class="pull-left margin-top-two" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
+                    <label class="pull-left non-bold"><input type=radio name="sdatetype" class="margin-left-two pull-left margin-top-two" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
                     <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
                     echo '<div class = "margin-top-minus-five time-input pull-left col-md-4">';
@@ -151,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12 padding-left-zero margin-top-twenty-five">
             <div class=col-md-2><?php AppUtility::t('Available Until')?></div>
                 <div class=col-md-10>
-                    <label class='pull-left non-bold'><input type=radio name="edatetype" class="pull-left margin-top-two" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/><span class="padding-left"></span><?php AppUtility::t('Always after start date')?></span></label>
+                    <label class='pull-left non-bold'><input type=radio name="edatetype" class="margin-left-two pull-left margin-top-two" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/><span class="padding-left"></span><?php AppUtility::t('Always after start date')?></span></label>
                     <label class='pull-left non-bold' style="padding-left: 33px"><input type=radio name="edatetype"  value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/></label>
                     <?php
                     echo '<div class = "margin-top-minus-five pull-left col-md-4 time-input">';
@@ -185,11 +185,11 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2"><?php AppUtility::t('Keep open as review')?></div>
             <div class="col-md-10">
                 <div class="col-md-12 padding-left-zero">
-                    <label class=''><input type=radio name="doreview" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>></label><span class="padding-left"><?php AppUtility::t('Never')?></span>
+                    <label class=''><input class="margin-left-two" type=radio name="doreview" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO); ?>></label><span class="padding-left"><?php AppUtility::t('Never')?></span>
                     <label style="padding-left: 137px"><input type=radio name="doreview" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($assessmentData['reviewdate'],2000000000,AppConstant::NUMERIC_ZERO); ?>></label><span class="padding-left"><?php AppUtility::t('Always after due date')?></span>
                 </div>
                 <div class="col-md-12 padding-left-zero margin-top-fifteen">
-                    <label class='pull-left select-text-margin'><input type=radio name="doreview" class="pull-left " value="1" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>></label>
+                    <label class='pull-left select-text-margin'><input type=radio name="doreview" class="margin-left-two pull-left " value="1" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>></label>
                     <?php
                     echo '<label class="select-text-margin end pull-left non-bold padding-left"> Until</label>';
                     echo '<div class = "pull-left col-md-4 time-input">';
@@ -223,7 +223,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class=form></span>
     <br class=form>
 
-    <div class="clickme row add-item1" onclick="xyz()">
+    <div class="padding-left-fifteen clickme row add-item1 assement-options-margin" onclick="xyz()">
         <div class="col-md-1 plus-icon" style="padding-right: 0">
             <img class="assessment-add-item-icon" id="img"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
@@ -231,10 +231,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <p><?php AppUtility::t('Core Options');?></p>
         </div>
     </div>
-        <div id="customoptions" class="col-md-12 padding-left-zero core-options">
+        <div id="customoptions" class="col-md-12 core-options assement-options-margin">
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
-                <div class='col-md-3 select-text-margin'><?php AppUtility::t('Require Password (blank for none)')?></div>
-                <div class=col-md-9>
+                <div class='col-md-2 select-text-margin'><?php AppUtility::t('Require Password')?></div>
+                <div class=col-md-10>
                     <input type="password" class="form-control width-fifty-per display-inline-block" name="assmpassword" id="assmpassword" value="<?php echo $assessmentData['password'];?>" autocomplete="off">
                     <a class="margin-left-twenty" href="#" onclick="apwshowhide(this);return false;"><?php AppUtility::t('Show')?></a>
                 </div>
@@ -242,8 +242,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-                <div class='col-md-3'><?php AppUtility::t('Time Limit (In minutes, 0 for no time limit)')?> </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'><?php AppUtility::t('Time Limit (In minutes, 0 for no time limit)')?> </div>
+                <div class='col-md-10'>
                     <input class="form-control width-ten-per display-inline-block" type=text size=4 name=timelimit value="<?php echo abs($timeLimit);?>">
                     <span class="margin-left-twenty">
                         <input type="checkbox" name="timelimitkickout" <?php if ($timeLimit<0) echo 'checked="checked"';?> />
@@ -254,9 +254,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Display method:')?></div>
-            <div class='col-md-9'>
-                <select name="displaymethod" class="form-control">
+            <div class='col-md-2 select-text-margin'><?php AppUtility::t('Display method')?></div>
+            <div class='col-md-10'>
+                <select name="displaymethod" class="width-fifty-per form-control">
                     <option value="AllAtOnce" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"AllAtOnce",AppConstant::NUMERIC_ZERO) ?>>Full test at once</option>
                     <option value="OneByOne" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"OneByOne",AppConstant::NUMERIC_ZERO) ?>>One question at a time</option>
                     <option value="Seq" <?php AssessmentUtility::writeHtmlSelected($assessmentData['displaymethod'],"Seq",AppConstant::NUMERIC_ZERO) ?>>Full test, submit one at time</option>
@@ -268,15 +268,15 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Default points per problem')?></div>
-            <div class='col-md-9'>
+            <div class='col-md-2'><?php AppUtility::t('Default points per problem')?></div>
+            <div class='col-md-10'>
                 <input class="form-control width-ten-per display-inline-block" type=text size=4 name=defpoints value="<?php echo $assessmentData['defpoints'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
             </div><BR class=form>
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3'><?php AppUtility::t('Default attempts per problem (0 for unlimited)')?></div>
-                    <div class='col-md-9'>
+            <div class='col-md-2'><?php AppUtility::t('Default attempts per problem (0 for unlimited)')?></div>
+                    <div class='col-md-10'>
                         <input class="floatleft form-control width-ten-per display-inline-block" type=text size=4 name=defattempts value="<?php echo $assessmentData['defattempts'];?>" >
                         <span id="showreattdiffver" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?> floatleft select-text-margin margin-left-twenty">
                             <input type=checkbox class="padding-left" name="reattemptsdiffver" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_EIGHT,AppConstant::NUMERIC_EIGHT); ?>/>
@@ -286,14 +286,14 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Default penalty')?></div>
-                    <div class='col-md-9'>
-                        <div class="col-md-12 padding-left-zero">
-                            <input class="form-control width-ten-per display-inline-block" type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
+            <div class='col-md-2 select-text-margin'><?php AppUtility::t('Default penalty')?></div>
+                    <div class='col-md-10'>
+                        <div class="col-md-2 floatleft padding-left-zero">
+                            <input class="form-control width-fifty-per display-inline-block" type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
                             <span class="margin-left-twenty"> %</span>
                         </div>
-                        <div class="col-md-12 margin-top-twenty padding-left-zero padding-right-zero">
-                            <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';} ?> class="form-control">
+                        <div class="col-md-10 floatleft padding-left-zero padding-right-zero">
+                            <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';} ?> class="form-control width-sixty-per">
                                 <option value="0" <?php if ($skipPenalty==AppConstant::NUMERIC_ZERO) {echo "selected=1";} ?>>per missed attempt</option>
                                 <option value="1" <?php if ($skipPenalty==AppConstant::NUMERIC_ONE) {echo "selected=1";} ?>>per missed attempt, after 1</option>
                                 <option value="2" <?php if ($skipPenalty==AppConstant::NUMERIC_TWO) {echo "selected=1";} ?>>per missed attempt, after 2</option>
@@ -308,9 +308,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Feedback method')?></div>
-                    <div class='col-md-9'>
-                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" class="form-control">
+            <div class='col-md-2 select-text-margin'><?php AppUtility::t('Feedback method')?></div>
+                    <div class='col-md-10'>
+                        <select id="deffeedback" name="deffeedback" onChange="chgfb()" class="form-control width-fifty-per">
                             <option value="NoScores" <?php if ($testType=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
                             <option value="EndScore" <?php if ($testType=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
                             <option value="EachAtEnd" <?php if ($testType=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
@@ -324,10 +324,10 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Show Answers')?></div>
-                    <div class='col-md-9'>
+            <div class='col-md-2 select-text-margin'><?php AppUtility::t('Show Answers')?></div>
+                    <div class='col-md-10'>
                         <span id="showanspracspan" class="<?php if ($testType=="Practice" || $testType=="Homework") {echo "show";} else {echo "hidden";} ?>">
-                        <select name="showansprac" class="form-control">
+                        <select name="showansprac" class="form-control width-fifty-per">
                             <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
                             <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
                             <option value="F" <?php if ($showAnswer=="F") {echo "SELECTED";} ?>>After last attempt (Skip Around only)</option>
@@ -341,7 +341,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </select>
                         </span>
                         <span id="showansspan" class="<?php if ($testType!="Practice" && $testType!="Homework") {echo "show";} else {echo "hidden";} ?>">
-                        <select name="showans" class="form-control">
+                        <select name="showans" class="form-control width-fifty-per">
                             <option value="V" <?php if ($showAnswer=="V") {echo "SELECTED";} ?>>Never, but allow students to review their own answers</option>
                             <option value="N" <?php if ($showAnswer=="N") {echo "SELECTED";} ?>>Never, and don't allow students to review their own answers</option>
                             <option value="I" <?php if ($showAnswer=="I") {echo "SELECTED";} ?>>Immediately (in gradebook) - don't use if allowing multiple attempts per problem</option>
@@ -353,9 +353,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class="col-md-3 select-text-margin"><?php AppUtility::t('Use equation helper?')?></div>
-                    <div class="col-md-9">
-                        <select name="eqnhelper" class="form-control">
+            <div class="col-md-2 select-text-margin"><?php AppUtility::t('Use equation helper?')?></div>
+                    <div class="col-md-10">
+                        <select name="eqnhelper" class="form-control width-fifty-per">
                             <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['eqnhelper'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                             <?php
                             if ($assessmentData['eqnhelper']==AppConstant::NUMERIC_ONE || $assessmentData['eqnhelper']==AppConstant::NUMERIC_TWO) {
@@ -372,37 +372,35 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
-            <div class=col-md-3><?php AppUtility::t('Show hints and video/text buttons when available?')?></div>
-                    <div class=col-md-9>
+            <div class=col-md-2><?php AppUtility::t('Show hints and video/text buttons when available?')?></div>
+                    <div class=col-md-10>
                         <label class=""><input type="checkbox" name="showhints" <?php AssessmentUtility::writeHtmlChecked($assessmentData['showhints'],AppConstant::NUMERIC_ONE); ?>></label>
                     </div><br class=form>
             </div>
 
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
-                <div class=col-md-3><?php AppUtility::t('Show "ask question" links?')?></div>
-                <div class=col-md-9>
-                    <div class="col-md-12 padding-left-zero">
-                    <span>
+                <div class=col-md-2><?php AppUtility::t('Show "ask question" links?')?></div>
+                <div class=col-md-10>
+                    <span class="col-md-12 padding-left-zero">
                         <input type="checkbox" name="msgtoinstr" <?php AssessmentUtility::writeHtmlChecked($assessmentData['msgtoinstr'],AppConstant::NUMERIC_ONE); ?>/>
                         <span class="margin-left-ten non-bold"><?php AppUtility::t('Show "Message instructor about this question" links')?></span>
                     </span>
 
-                    <span class="margin-left-twenty">
+                    <span class="col-md-12 padding-left-zero margin-top-fifteen">
                         <input type="checkbox" name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($assessmentData['posttoforum'],AppConstant::NUMERIC_ZERO,true); ?>/>
                         <span class="margin-left-ten non-bold">Show "Post this question to forum" links, to forum</span>
                     </span>
-                    </div>
 
-                    <div class="col-md-12 padding-left-zero padding-right-zero margin-top-twenty">
+                    <div class="col-md-12 padding-left-zero padding-right-zero margin-top-fifteen select-ask-ques-link">
                     <?php AssessmentUtility::writeHtmlSelect("posttoforum",$pageForumSelect['val'],$pageForumSelect['label'],$assessmentData['posttoforum']); ?></span>
                     </div>
                 </div><br class=form>
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Show answer entry tips?')?></div>
-                    <div class=col-md-9>
-                        <select name="showtips" class="form-control">
+            <div class='col-md-2'><?php AppUtility::t('Show answer entry tips?')?></div>
+                    <div class=col-md-10>
+                        <select name="showtips" class="form-control width-fifty-per">
                             <option value="0" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ZERO) ?>>No</option>
                             <option value="1" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_ONE) ?>>Yes, after question</option>
                             <option value="2" <?php AssessmentUtility::writeHtmlSelected($assessmentData['showtips'],AppConstant::NUMERIC_TWO) ?>>Yes, under answerbox</option>
@@ -411,35 +409,35 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-                <div class='col-md-3 select-text-margin'><?php AppUtility::t('Allow use of LatePasses?')?></div>
-                <div class=col-md-9>
-                    <?php
-                    AssessmentUtility::writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN);
-                    ?>
-                        <label class="margin-top-fifteen non-bold">
-                            <input type="checkbox" name="latepassafterdue" <?php AssessmentUtility::writeHtmlChecked($line['allowlate']>AppConstant::NUMERIC_TEN,true); ?>>
-                            <span class="margin-left-ten">Allow LatePasses after due date, within 1 LatePass period</span>
-                        </label>
+                <div class='col-md-2 '><?php AppUtility::t('Allow use of LatePasses?')?></div>
+                <div class='col-md-10 select-allow-useof-latepasses'>
+                    <div class="col-md-6 padding-left-zero padding-right-zero">
+                        <?php AssessmentUtility::writeHtmlSelect("allowlate",$pageAllowLateSelect['val'],$pageAllowLateSelect['label'],$assessmentData['allowlate']%AppConstant::NUMERIC_TEN); ?>
+                    </div>
+                    <label class="col-md-6 select-text-margin non-bold">
+                        <input type="checkbox" name="latepassafterdue" <?php AssessmentUtility::writeHtmlChecked($line['allowlate']>AppConstant::NUMERIC_TEN,true); ?>>
+                        <span class="margin-left-ten">Allow LatePasses after due date, within 1 LatePass period</span>
+                    </label>
                 </div><BR class=form>
             </div>
 
             <div class="col-md-12 margin-top-ten padding-left-zero">
-            <div class=col-md-3><?php AppUtility::t('Make hard to print?')?></div>
-                    <div class=col-md-9>
+            <div class=col-md-2><?php AppUtility::t('Make hard to print?')?></div>
+                    <div class=col-md-10>
                         <input type="radio" value="0" name="noprint" <?php AssessmentUtility::writeHtmlChecked($assessmentData['noprint'],AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left">No</span>
                         <label class="non-bold margin-left-thirty"><input type="radio" value="1" name="noprint" <?php AssessmentUtility::writeHtmlChecked($line['noprint'],AppConstant::NUMERIC_ONE); ?>/><span class="padding-left">Yes</span></label>
                     </div><br class=form>
             </div>
 
             <div class="col-md-12 margin-top-ten padding-left-zero">
-            <div class=col-md-3><?php AppUtility::t('Shuffle item order')?></div>
-                    <div class=col-md-9><input type="checkbox" name="shuffle" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE); ?>>
+            <div class=col-md-2><?php AppUtility::t('Shuffle item order')?></div>
+                    <div class=col-md-10><input type="checkbox" name="shuffle" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ONE); ?>>
                     </div><BR class=form>
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-            <div class='col-md-3 select-text-margin'><?php AppUtility::t('Gradebook Category')?></div>
-                    <div class=col-md-9>
+            <div class='col-md-2 select-text-margin'><?php AppUtility::t('Gradebook Category')?></div>
+                    <div class='col-md-10 select-gradebook-category'>
                     <?php
                     AssessmentUtility::writeHtmlSelect("gbcat",$pageGradebookCategorySelect['val'],$pageGradebookCategorySelect['label'],$gradebookCategory,"Default",AppConstant::NUMERIC_ZERO);
                     ?>
@@ -447,8 +445,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 margin-top-twenty padding-left-zero">
-               <div class=col-md-3><?php AppUtility::t('Count')?></div>
-               <div class="col-md-9">
+               <div class=col-md-2><?php AppUtility::t('Count')?></div>
+               <div class="col-md-10">
                    <span <?php if ($testType=="Practice") {echo "class=hidden";} else {echo "class=formright";} ?> id="stdcntingb">
                         <div class="col-md-12 padding-left-zero">
                             <input type=radio name="cntingb" value="1" <?php AssessmentUtility::writeHtmlChecked($countInGradebook,AppConstant::NUMERIC_ONE,AppConstant::NUMERIC_ZERO); ?> />
@@ -478,20 +476,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php if (!isset(   $CFG['GEN']['allowinstraddtutors']) || $CFG['GEN']['allowinstraddtutors']==true) { ?>
                 <div class="col-md-12 margin-top-ten padding-left-zero">
-                    <div class="col-md-3 select-text-margin">Tutor Access:</div>
-                    <div class="col-md-9">
+                    <div class="col-md-2 select-text-margin">Tutor Access</div>
+                    <div class="col-md-10 select-tutor-access">
                     <?php AssessmentUtility::writeHtmlSelect("tutoredit",$pageTutorSelect['val'],$pageTutorSelect['label'],$assessmentData['tutoredit']); ?>
                     </div><br class="form" />
                 </div>
             <?php } ?>
 
             <div class="col-md-12 margin-top-twenty margin-bottom-twenty padding-left-zero">
-                <div class="col-md-3 select-text-margin"><?php AppUtility::t('Calendar icon:')?></div>
-                <div class="col-md-9">
+                <div class="col-md-2 select-text-margin"><?php AppUtility::t('Calendar icon')?></div>
+                <div class="col-md-10">
                     <span>
                         <span>Active</span>
                         <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagact" type=text size=4 value="<?php echo $assessmentData['caltag'];?>"/>
-                    </span> &nbsp;,
+                    </span>
                     <span class="margin-left-twenty">
                         <span>Review</span>
                         <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagrev" type=text size=4 value="<?php echo $assessmentData['calrtag'];?>"/>
@@ -501,19 +499,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div>
 
-    <div class="clickmegreen row add-item1" style="margin-top: 10px" onclick="xyz1()">
+    <div class="padding-left-fifteen col-md-12 clickmegreen row add-item1 assement-options-margin" style="margin-top: 10px" onclick="xyz1()">
         <div class="col-md-1 plus-icon">
             <img class="assessment-add-item-icon" id="img1"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
-        <div class="col-md-2 add-item-text">
+        <div class="col-md-2 add-item-text padding-left-zero">
             <p><?php AppUtility::t('Advance Options');?></p>
         </div>
     </div>
-        <div id="customoptions" class="col-md-12 padding-left-zero advance-options" style="background-color: #fafafa">
+        <div id="customoptions" class="col-md-12 advance-options assement-options-margin" style="background-color: #fafafa">
 
             <div class="col-md-12 padding-left-zero">
-                <div class='col-md-3 select-text-margin'><?php AppUtility::t('Minimum score to receive credit')?></div>
-                <div class='col-md-9'>
+                <div class='col-md-2'><?php AppUtility::t('Minimum score to receive credit')?></div>
+                <div class='col-md-10'>
                     <input class="form-control display-inline-block width-ten-per" type=text size=4 name=minscore value="<?php echo $assessmentData['minscore'];?>">
                     <span class="margin-left-twenty">
                         <input type="radio" name="minscoretype" value="0" <?php AssessmentUtility::writeHtmlChecked($minScoreType,AppConstant::NUMERIC_ZERO);?>>
@@ -525,59 +523,61 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3 select-text-margin'><?php AppUtility::t('Show based on another assessment')?></div>
-                <div class='col-md-9'>
+                <div class='col-md-2'><?php AppUtility::t('Show based on another assessment')?></div>
+                <div class='col-md-10'>
                     <span class="col-md-12 padding-left-zero">
+                       <span class="col-md-6 padding-left-zero">
                         <span><?php AppUtility::t('Show only after a score of')?></span>
                         <input type=text class="margin-left-fifteen form-control width-ten-per display-inline-block" size=4 name=reqscore value="<?php echo $assessmentData['reqscore'];?>">
-                        <span class="margin-left-ten">
+                        <span class="margin-left-fifteen">
                             <?php AppUtility::t('points is obtained on')?>
                         </span>
-                   </span>
-                    <span class="col-md-12 padding-left-zero margin-top-fifteen">
-                        <?php AssessmentUtility::writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null); ?>
+                        </span>
+                        <span class="col-md-6 padding-left-zero margin-left-minus-thirty">
+                            <?php AssessmentUtility::writeHtmlSelect ("reqscoreaid",$pageCopyFromSelect['val'],$pageCopyFromSelect['label'],$assessmentData['reqscoreaid'],"Dont Use",AppConstant::NUMERIC_ZERO,null); ?>
+                        </span>
                     </span>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class="col-md-3 select-text-margin"><?php AppUtility::t('Default Feedback Text')?></div>
-                <div class="col-md-9">
+                <div class="col-md-2 select-text-margin"><?php AppUtility::t('Default Feedback Text')?></div>
+                <div class="col-md-10">
                    <span class="">
                        <span> Use?</span>
                        <input class="margin-left-ten" type="checkbox" name="usedeffb" <?php AssessmentUtility::writeHtmlChecked($useDefFeedback,true); ?>>
                    </span>
                    <span class="margin-left-twenty">
                        <span>Text</span>
-                       <input class="form-control width-eighty-two-pt-eight-per margin-left-ten display-inline-block width-fifty-per" type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$defFeedback);?>" />
+                       <input class="form-control width-fifty-per margin-left-ten display-inline-block width-fifty-per" type="text" size="60" name="deffb" value="<?php echo str_replace('"','&quot;',$defFeedback);?>" />
                    </span>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty margin-top-twenty">
-                <div class='col-md-3'>All items same random seed: </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'>All items same random seed</div>
+                <div class='col-md-10'>
                     <input type="checkbox" name="sameseed" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_TWO,AppConstant::NUMERIC_TWO); ?>>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3'>All students same version of questions: </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'>All students same version of questions</div>
+                <div class='col-md-10'>
                     <input type="checkbox" name="samever" <?php AssessmentUtility::writeHtmlChecked($assessmentData['shuffle']&AppConstant::NUMERIC_FOUR,AppConstant::NUMERIC_FOUR); ?>>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3'>Penalty for questions done while in exception/LatePass: </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'>Penalty for questions done while in exception/LatePass</div>
+                <div class='col-md-10'>
                     <input class="form-control width-ten-per display-inline-block" type=text size=4 name="exceptionpenalty" value="<?php echo $assessmentData['exceptionpenalty'];?>"><span class="margin-left-five">%</span>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3'>Group assessment: </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'>Group assessment</div>
+                <div class='col-md-10'>
                    <span class="col-md-12 padding-left-zero">
                        <input type="radio" name="isgroup" value="0" <?php AssessmentUtility::writeHtmlChecked($assessmentData['isgroup'],AppConstant::NUMERIC_ZERO); ?> />
                        <span class="padding-left">Not a group assessment</span>
@@ -599,14 +599,14 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3'>Max group members (if group assessment): </div>
-                <div class='col-md-9'>
+                <div class='col-md-2'>Max group members (if group assessment)</div>
+                <div class='col-md-10'>
                     <input class="form-control display-inline-block width-ten-per" type="text" name="groupmax" value="<?php echo $assessmentData['groupmax'];?>" />
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class="col-md-3 select-text-margin">Use group set:<?php
+                <div class="col-md-2 select-text-margin">Use group set:<?php
                     if ($assessmentSessionData) {
                         if ($assessmentData['isgroup']== AppConstant::NUMERIC_ZERO) {
                             echo '<br/>Only empty group sets can be used after the assessment has started';
@@ -615,14 +615,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     }?>
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-10 select-use-group-set">
                     <?php AssessmentUtility::writeHtmlSelect("groupsetid",$pageGroupSets['val'],$pageGroupSets['label'],$assessmentData['groupsetid'],"Not group forum",0); ?>
                 </div>
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class="col-md-3 select-text-margin">Default Outcome:</div>
-                <div class="col-md-9"><select name="defoutcome" class="form-control">
+                <div class="col-md-2 select-text-margin">Default Outcome</div>
+                <div class="col-md-10"><select name="defoutcome" class="form-control width-fifty-per">
                         <?php
                         $inGroup = false;
                         $isSelected = false;
@@ -644,8 +644,8 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div class="col-md-12 padding-left-zero margin-top-twenty">
-            <div class='col-md-3'>Show question categories:</div>
-            <div class='col-md-9'>
+            <div class='col-md-2'>Show question categories:</div>
+            <div class='col-md-10'>
                 <span class="col-md-12 padding-left-zero">
                     <input name="showqcat" type="radio" value="0" <?php AssessmentUtility::writeHtmlChecked($showQuestionCategory,"0"); ?>>
                     <span class="padding-left">No</span>
@@ -661,9 +661,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
             </div>
 
-            <div class="col-md-12 padding-left-zero margin-top-twenty">
-                <div class='col-md-3'>Display for tutorial-style questions: </div>
-                <div class='col-md-9'>
+            <div class="col-md-12 padding-left-zero margin-top-twenty margin-bottom-twenty-five">
+                <div class='col-md-2'>Display for tutorial-style questions</div>
+                <div class='col-md-10'>
                     <input type="checkbox" name="istutorial" <?php AssessmentUtility::writeHtmlChecked($assessmentData['istutorial'],AppConstant::NUMERIC_ONE); ?>>
                 </div>
             </div>
