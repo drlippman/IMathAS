@@ -150,7 +150,7 @@ function intcalculate(inputId,outputId,format) {
 		}
 		strarr.push(fullstr.substring(lastpos));
 	  } else {
-	  	  var strarr = fullstr.split(/U/);
+	  	  var strarr = fullstr.split(/U/i);
 	  }
 	  var isok = true; var fullerr="";
 	  for (i=0; i<strarr.length; i++) {
