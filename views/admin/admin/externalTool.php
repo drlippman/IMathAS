@@ -36,7 +36,6 @@ else{
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
-    <br>
 <?php
     if (!(isset($teacherId)) && $myRights < 75) {
         $err = "You need to log in as a teacher to access this page";
@@ -114,6 +113,8 @@ else{
             echo '</form>';
 
         } else {
+            echo '<div class="col-md-12 padding-twenty">
+            <div class="col-md-12 padding-top-twenty text-gray-background padding-left-thirty">';
             if ($isAdmin) {
                 echo '<p><b>System and Group Tools</b></p>';
             } else if ($isGrpAdmin) {
@@ -121,9 +122,10 @@ else{
             } else {
                 echo '<p><b>Course Tools</b></p>';
             }
-            echo '<ul class="nomark">';
+
+            echo '<ul class="nomark margin-left-zero">';
             if (count($resultFirst) == 0) {
-                echo '<li>No tools</li>';
+                echo '<span class="col-md-12 padding-left-zero">No tools</span>';
             } else {
                 foreach($resultFirst as $key => $row)
                 {
@@ -143,8 +145,8 @@ else{
                 }
             }
             echo '</ul>';
-            echo '<p><a href="'.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId. '&amp;id=new').'">Add a Tool</a></p>';
-
+            echo '<p class="col-md-12 padding-left-zero"><a href="'.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId. '&amp;id=new').'">Add a Tool</a></p>';
+            echo '</div></div>';
         } ?>
 
 </div>

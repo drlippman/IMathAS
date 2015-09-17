@@ -1014,3 +1014,38 @@ margin-top: -6% !important;
 .padding-left-twenty {
     padding-left: 20px;
 }
+.margin-top-minus-six-per {
+    margin-top: -6% !important;
+}
+.text-gray-background {
+min-height: 380px;
+height: 100%;
+background-color: #f8f8f8;
+}
+.padding-twenty {
+    padding: 20px;
+}
+.width-five-per {
+    width: 5% !important;
+}
+.padding-top-five{
+    padding-top: 5px !important;
+}
+.margin-left-zero {
+    margin-left:0px !important;
+}
+.background-color-gray {
+    background-color:#f8f8f8 !important;
+}
+.margin-left-two {
+    margin-left: 2px;
+}
+.margin-top-minus-five {
+    margin-top: -5px;
+}
+.margin-top-two {
+    margin-top: 2px !important;
+}
+.width-eighty-two-pt-eight-per {
+    width: 82.8%;
+}

@@ -20,7 +20,7 @@
     position: relative;
 }
 table.assesment-msg-table thead th {
-    border-bottom: 2px solid #00f;
+    /*border-bottom: 2px solid #00f;*/
     position: relative;
     text-align: center;
     z-index: 20;

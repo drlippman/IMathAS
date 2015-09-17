@@ -171,7 +171,7 @@ switch($action) {
                                 }
                                 echo '/><span class="margin-left-five"> Available to students</span>
                             </div>
-                            
+
                         <div class="col-md-12 margin-top-five">
                             <input type="checkbox" name="teachavail" value="2" ';
                             if (($avail&2)==0) {
@@ -501,37 +501,109 @@ switch($action) {
         echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
         break;
     case "importmacros":
-        echo "<h3>Install Macro File</h3>\n";
-        echo "<p><b>Warning:</b> Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></p>\n";
-        echo "<p><b>Warning:</b> Install will overwrite any existing macro file of the same name</p>\n"; ?>
+          ?>
          <form enctype="multipart/form-data" method=post action="actions?action=importmacros">
+             <div class = "title-container">
+                 <div class="row">
 
-        <?php echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
-        echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-        echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-        echo "</form>\n";
+                     <div class="">
+                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
+                     </div>
+                 </div>
+             </div>
+        <?php
+        echo "<div class='col-md-12 padding-twenty'>
+                <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+                    <h3>Install Macro File</h3>\n";
+        echo "<p>
+                    <b>Warning</b>
+                    <span class='margin-left-ten'>Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></span>
+               </p>\n";
+        echo "<p class='margin-bottom-ten'>
+                    <b>Warning</b>
+                    <span class='margin-left-ten'> Install will overwrite any existing macro file of the same name</span>
+                </p>\n";
+        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
+        echo "<div class='col-md-12 padding-left-zero'>
+              <span class='floatleft'>Import file </span>
+              <span class='floatleft margin-left-ten'>
+                   <input name=\"userfile\" type=\"file\" />
+              </span>
+              </div>";
+
+        echo "</div></div></form>\n";
         break;
 
     case "importqimages":
-        echo "<h3>Install Question Images</h3>\n";
-        echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.</p>\n";
-        echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n"; ?>
+        ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importqimages">
-        <?php echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"5000000\" />\n";
-        echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-        echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-        echo "</form>\n";
+
+            <div class = "title-container">
+                <div class="row">
+
+                    <div class="">
+                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
+                    </div>
+                </div>
+            </div>
+
+        <?php
+        echo "
+        <div class='col-md-12 padding-twenty'>
+                <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+        <h3>Install Question Images</h3>\n";
+        echo "<p>
+                    <b>Warning</b>
+                    <span class='margin-left-ten'> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.<span>
+              </p>\n";
+        echo "<p class='margin-bottom-ten'>
+                    <b>Warning</b>
+                    <span class='margin-left-ten'> Install will ignore files with the same filename as existing files.</span>
+              </p>\n";
+        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"5000000\" />\n";
+        echo "<span class='floatleft'>Import file </span>
+                <span class='floatleft margin-left-ten'>
+                    <input name=\"userfile\" type=\"file\" />
+                </span>";
+        echo "
+        </div></div></form>\n";
         break;
-    case "importcoursefiles":
-        echo "<h3>Install Course files</h3>\n";
-        echo "<p><b>Warning:</b> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</p>\n";
-        echo "<p><b>Warning:</b> Install will ignore files with the same filename as existing files.</p>\n"; ?>
+
+    case "importcoursefiles":?>
+
         <form enctype="multipart/form-data" method=post action="actions?action=importcoursefiles">
-        <?php echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
-        echo "<span class=form>Import file: </span><span class=formright><input name=\"userfile\" type=\"file\" /></span><br class=form>\n";
-        echo "<div class=submit><input type=submit value=\"Submit\"></div>\n";
-        echo "</form>\n";
+
+            <div class = "title-container">
+                <div class="row">
+
+                    <div class="">
+                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
+                    </div>
+                </div>
+            </div>
+
+        <?php
+        echo "
+          <div class='col-md-12 padding-twenty'>
+                <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
+        <h3>Install Course files</h3>\n";
+        echo "<p>
+                <b>Warning</b>
+               <span class='margin-left-ten'> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</span>
+            </p>\n";
+        echo "<p class='margin-bottom-ten'>
+                <b>Warning</b>
+                <span class='margin-left-ten'>Install will ignore files with the same filename as existing files.</span>
+               </p>\n";
+        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
+        echo "<span class='floatleft'>Import file </span>
+                <span class='floatleft margin-left-ten'>
+                    <input name=\"userfile\" type=\"file\" />
+                </span>";
+        echo "
+        </div></div></form>\n";
         break;
+
     case "transfer":
         echo '<div id="headerforms" class="pagetitle">';
         echo '<div>';
@@ -550,16 +622,52 @@ switch($action) {
         echo "</div>";
         echo "</form>\n";
         break;
+
     case "deloldusers":
-        echo "<h3>Delete Old Users</h3>\n"; ?>
+        ?>
          <form method=post action="actions?action=deloldusers">
-        <?php echo "<span class=form>Delete Users older than:</span>";
-        echo "<span class=formright><input type=text name=months size=4 value=\"6\"/> Months</span><br class=form>\n";
-        echo "<span class=form>Delete Who:</span>";
-        echo "<span class=formright><input type=radio name=who value=\"students\" CHECKED>Students<br/>\n";
-        echo "<input type=radio name=who value=\"all\">Everyone but Admins</span><br class=form>\n";
-        echo "<div class=submit><input type=submit value=\"Delete\"></div>\n";
-        echo "</form>\n";
+
+
+             <div class = "title-container">
+                 <div class="row">
+
+                     <div class="">
+                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Delete' ?></button>
+                     </div>
+                 </div>
+             </div>
+        <?php
+
+        echo "
+           <div class='col-md-12 padding-twenty'>
+            <div class='col-md-12 padding-top-five text-gray-background padding-left-thirty'>
+        <h3>Delete Old Users</h3>\n";
+        echo "
+        <div class='col-md-12 margin-top-ten padding-left-zero'>
+            <span>Delete Users older than</span>";
+            echo " <span>
+                        <input type=text class='margin-left-ten form-control display-inline-block width-five-per' name=months size=4 value=\"6\"/>
+                        <span class='margin-left-ten'>Months</span>
+                    </span>
+        </div>";
+        echo "
+        <div class='col-md-12 margin-top-fifteen padding-left-zero'>
+            <span>Delete Who</span>";
+        echo "<span>
+                <span class='margin-left-ten'><input type=radio name=who value=\"students\" CHECKED>
+                    <span class='margin-left-five'>Students</span>
+                </span>";
+                echo "
+                <span class='margin-left-ten'>
+                    <input type=radio name=who value=\"all\">
+                    <span class='margin-left-five'>Everyone but Admins</span>
+                </span>
+              </span>
+              </div>";
+//        echo "<div class=submit><input type=submit value=\"Delete\"></div>\n";
+        echo "
+        </div></div>
+        </form>\n";
         break;
     case "listltidomaincred":
 

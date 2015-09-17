@@ -639,7 +639,7 @@ class AdminController extends AppController
 
            }
        }
-       $this->includeCSS(['course/item.css']);
+       $this->includeCSS(['course/items.css']);
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
        'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'nameOfExtTool' => $nameOfExtTool);
        return $this->renderWithData('externalTool', $responseData);
