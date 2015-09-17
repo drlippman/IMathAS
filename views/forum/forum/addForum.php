@@ -5,8 +5,6 @@ use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
 $this->title = $pageTitle;
-$this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid='.$course->id]];
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php if ($modifyForumId){ ?>
     <form enctype="multipart/form-data" method=post action="add-forum?cid=<?php echo $course->id ?>&modifyFid=<?php echo $modifyForumId;?>&block=<?php echo $block ?>">

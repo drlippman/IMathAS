@@ -765,9 +765,3 @@ for ($i = 1; $i < count($gradebook); $i++) {
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>
 
-<script>
-    function a(r)
-    {
-        alert(r);
-    }
-</script>

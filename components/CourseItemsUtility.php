@@ -88,7 +88,7 @@ class CourseItemsUtility extends Component
                                href="javascript:copyItem('<?php echo $item['assessment']['id']; ?>','<?php echo AppConstant::ASSESSMENT ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
                         <li><a id="grades"
-                               href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid=2&asid=average&aid=31'); ?>"><?php AppUtility::t('Grades'); ?></a>
+                               href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid='.$course->id.'&asid=average&aid='.$assessment->id); ?>"><?php AppUtility::t('Grades'); ?></a>
                         </li>
                         <?php if (isset($hasstats['a' . $assessment->id])) { ?>
                             <li><a id="stats" href="#"><?php AppUtility::t('Stats'); ?></a></li>

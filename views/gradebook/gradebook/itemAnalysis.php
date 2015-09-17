@@ -31,7 +31,7 @@ $this->title = 'Item Analysis';?>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
     <?php
-if ($isTeacher) {
+if (!$isTeacher) {
    echo '<br><div class="text">';
     echo "This page not available to students";
         echo '</div>';

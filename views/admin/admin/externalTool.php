@@ -48,16 +48,15 @@ else{
         if (isset($params['delete']))
         { ?>
            <div id="name-external-tool">
-               <?php echo $extName = $nameOfExtTool['name'];?>
+               <?php $extName = $nameOfExtTool;?>
 
            </div>
             <input type="hidden" id="name-external-tool" value="<?php echo $extName;?> ">
 
          <?php
-            //echo '<p>Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</p>';
+            echo '<p>Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</p>';
             echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'&amp;delete=true">';
             echo '<input type=submit value="Yes, I\'m Sure">';
-            echo '<input type=button value="Nevermind" class="secondarybtn" onclick="window.location=\'externaltools.php?cid='.$cid.'\'">';
             echo '</form>';
 
         } else if (isset($params['id'])) {
@@ -150,32 +149,3 @@ else{
         } ?>
 
 </div>
-
-<script>
-    $('.confirmation-required').click(function(e){
-        var nm = $('#id').val();
-        var html = '<div>Are you SURE you want to delete the tool '+nm+'</div>';
-        var cancelUrl = $(this).attr('href');
-        e.preventDefault();
-        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-            width: 'auto', resizable: false,
-            closeText: "hide",
-            buttons: {
-                "Cancel": function () {
-                    $(this).dialog('destroy').remove();
-                    return false;
-                },
-                "Confirm": function () {
-                    window.location = cancelUrl;
-                    $(this).dialog("close");
-                    return true;
-                }
-            },
-            close: function (event, ui) {
-                $(this).remove();
-            }
-        });
-    });
-
-</script>

@@ -68,7 +68,6 @@ $this->title = 'Item Result'; ?>
             showresults($q, $qsdata[$qsids[$q]][0], $qdata, $qsids, $qsdata, $scorebarwidth);
             echo '</div>';
             echo '<div class="item-result-question">';
-            displayq2::displayq($k, $qsids[$q], 0, 0, 0, 0);
             echo '</div>';
             echo '<br class="clear"/>';
             echo '</div>';
@@ -133,28 +132,31 @@ $this->title = 'Item Result'; ?>
 
     function disp($qdata, $qsdata, $qsids, $scorebarwidth, $q, $qtype, $part = -1, $answer, $questions = array())
     {
+
         $res = array();
         $correct = array();
         $answer = explode(',', $answer);
-        foreach ($qdata[$q] as $varr) {
-            if ($part > -1) {
-                $v = $varr[0][$part];
-            } else {
-                $v = $varr[0];
-            }
-            $v = explode('|', $v); //sufficient for choices and multans
-            foreach ($v as $vp) {
+        if($qdata) {
+            foreach ($qdata[$q] as $varr) {
                 if ($part > -1) {
-                    if ($varr[1][$part] > 0) {
-                        $correct[] = $vp;
-                    }
+                    $v = $varr[0][$part];
                 } else {
-                    if ($varr[1] > 0) {
-                        $correct[] = $vp;
-                    }
+                    $v = $varr[0];
                 }
-                if ($vp !== '') {
-                    $res[] = $vp;
+                $v = explode('|', $v); //sufficient for choices and multans
+                foreach ($v as $vp) {
+                    if ($part > -1) {
+                        if ($varr[1][$part] > 0) {
+                            $correct[] = $vp;
+                        }
+                    } else {
+                        if ($varr[1] > 0) {
+                            $correct[] = $vp;
+                        }
+                    }
+                    if ($vp !== '') {
+                        $res[] = $vp;
+                    }
                 }
             }
         }
