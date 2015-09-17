@@ -93,7 +93,6 @@ $pagetitle =$line['name'];
         }
     </script>
 
-<!--    <span class=form>--><?php //printf(_('Select your %s'), $line['sel1name']); ?><!--</span><span class=formright>-->
     <div class=col-lg-2><?php printf(_('Select your %s'), $line['sel1name']); ?></div>
     <div class=col-lg-4>
     <select name="course" class="form-control" id="course" onchange="getteach()">

@@ -1,7 +1,7 @@
 <?php
 use app\components\AppUtility;
 
-$this->title = 'Library Management';
+$this->title = $pagetitle;
 $this->params['breadcrumbs'][] = $this->title;
 //if ($isadmin || $isgrpadmin) {
 //    $curBreadcrumb .= " &gt; <a href=\"../admin/admin.php\">Admin</a> ";
@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //}
 ?>
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index'], 'page_title' => $this->title]); ?>
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', 'Admin', 'Manage Library'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'admin/admin/index', AppUtility::getHomeURL() . 'admin/admin/manage-lib?cid='.$cid], 'page_title' => $this->title]); ?>
 </div>
 <div class="title-container">
     <div class="row">
@@ -22,6 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
     <BR class=form><br>
+<?php if ($overwriteBody == 1) {
+    echo $body;
+} else {
+    ?>
     <div class="col-lg-10">
         <?php
         if (isset($_POST['remove'])) {
@@ -110,11 +114,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         }
         } else if (isset($_GET['transfer'])) {
+//            print_r('inside'); die;
             ?>
         <form method=post action="manage-lib?cid=<?php echo $cid ?>">
             <input type=hidden name=transfer value="<?php echo $tlist ?>">
             Transfer library ownership to:
-            <?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerList['val'],$page_newOwnerList['label'],$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
+            <?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerListVal,$page_newOwnerListLabel,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
             <p>
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
@@ -194,6 +199,7 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
 <?php
 }?>
     </div>
+
 <script>
     var curlibs = '<?php echo 0 ?>';
     function libselect() {
@@ -207,3 +213,5 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
         document.getElementById("libnames").innerHTML = libn;
     }
 </script>
+
+<?php } ?>

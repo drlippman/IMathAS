@@ -538,7 +538,7 @@ class AdminController extends AppController
 
        if ($myRights == AppConstant::GROUP_ADMIN_RIGHT && $courseId=='admin') {
            $isGrpAdmin = true;
-       } else if ($myRights == 100 && $courseId == 'admin') {
+       } else if ($myRights == AppConstant::ADMIN_RIGHT && $courseId == 'admin') {
            $isAdmin = true;
        } else {
            $isTeacher = true;
@@ -563,7 +563,6 @@ class AdminController extends AppController
            $params['custom'] = preg_replace('/\s/','',$params['custom']);
 
            if (!empty($params['tname']) && !empty($params['key']) && !empty($params['secret'])) {
-               $query = '';
                if ($params['id'] == 'new') {
                    $external = new ExternalTools();
                    $external->saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGrpAdmin, $isAdmin, $privacy);
@@ -571,7 +570,6 @@ class AdminController extends AppController
                {
                     $params['groupId'] = $groupId;
                    if ($isTeacher) {
-
                        $attr = 'courseid';
                        $attrValue = $courseId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
@@ -583,7 +581,7 @@ class AdminController extends AppController
                    else{
                        if($isAdmin)
                        {
-                           if($params['scope'] == 0)
+                           if($params['scope'] == AppConstant::NUMERIC_ZERO)
                            {
                                ExternalTools::updateExternalTool($params,0,$privacy);
 
@@ -598,7 +596,7 @@ class AdminController extends AppController
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
        }  else if (isset($params['delete']) && $params['delete']=='true') {
            $id = intval($params['id']);
-           if ($id>0) {
+           if ($id > AppConstant::NUMERIC_ZERO) {
                 ExternalTools::deleteById($id, $isTeacher, $isGrpAdmin, $courseId, $groupId);
            }
            $ltfrom = str_replace('&amp;','&',$ltfrom);
@@ -609,10 +607,10 @@ class AdminController extends AppController
                $nameOfExtTool = $extTool['name'];
            } else if (isset($_GET['id'])) {
                if ($params['id'] == 'new') {
-                   $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = 3; $grp = 0;
+                   $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = AppConstant::NUMERIC_THREE; $grp = AppConstant::NUMERIC_ZERO;
                } else {
                    $result = ExternalTools::getByRights($id, $isTeacher, $courseId, $isGrpAdmin, $groupId);
-                   if (count($result)==0) { die("invalid id");}
+                   if (count($result) == AppConstant::NUMERIC_ZERO) { die("invalid id");}
                    $name = $result['name'];
                    $url = $result['url'];
                    $key = $result['ltikey'];
@@ -636,7 +634,6 @@ class AdminController extends AppController
                } else{
                    $resultFirst = ExternalTools::getByCourseAndOrderByName($courseId);
                }
-
            }
        }
        $this->includeCSS(['course/items.css']);
@@ -2407,6 +2404,7 @@ class AdminController extends AppController
         $isAdmin = false;
         $isGrpAdmin = false;
         $params = $this->getRequestParams();
+        $transfer = $this->getParamVal('transfer');
         if ($myRights < AppConstant::TEACHER_RIGHT)
         {
             $overwriteBody = AppConstant::NUMERIC_ONE;
@@ -2426,6 +2424,7 @@ class AdminController extends AppController
             $now = time();
 
             if (isset($params['remove'])) {
+
                 if (isset($params['confirmed'])) {
                     if ($params['remove']!='') {
                         $remlist = "'".implode("','",explode(',',$params['remove']))."'";
@@ -2548,7 +2547,42 @@ class AdminController extends AppController
                         }
                     }
                 }
-            } else if (isset($params['transfer'])) {
+            }
+            else if (isset($transfer))
+            {
+                if (isset($params['newowner'])) {
+
+                    print_r('hjhjhj'); die;
+                    //added for mysql 3.23 compatibility
+                    $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
+                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                    $newgpid = mysql_result($result,0,0);
+
+                    //$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
+                    //$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
+                    //$query .= "imas_libraries.id='{$_GET['transfer']}'";
+                    $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='{$_GET['transfer']}'";
+                    if (!$isadmin) {
+                        $query .= " AND groupid='$groupid'";
+                    }
+                    if (!$isadmin && !$isgrpadmin) {
+                        $query .= " AND ownerid='$userid'";
+                    }
+                    mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    return $this->redirect('manage-lib?cid='.$cid);
+                } else {
+                    $pagetitle = "Transfer Library";
+                    $result = User::getByIdOrdered();
+                    $i= AppConstant::NUMERIC_ZERO;
+                    $page_newOwnerList = array();
+                    foreach($result as $key => $row) {
+                        $page_newOwnerList['val'][$i] = $row['id'];
+                        $page_newOwnerList['label'][$i] = $row['LastName'] . ", " . $row['FirstName'];
+                        $i++;
+                    }
+                }
+            } else if(isset($params['transfer']))
+            {
                 if (isset($params['newowner'])) {
                     if ($params['transfer']!='') {
                         $translist = "'".implode("','",explode(',',$params['transfer']))."'";
@@ -2561,11 +2595,10 @@ class AdminController extends AppController
                 } else {
                     $pagetitle = "Confirm Transfer";
                     if (!isset($params['nchecked'])) {
-                        $overwriteBody = 1;
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
                         $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
                     } else {
                         $tlist = implode(",",$params['nchecked']);
-
                         $result = User::getByIdOrdered();
                         $i=0;
                        foreach($result as $key => $row) {
@@ -2658,40 +2691,6 @@ class AdminController extends AppController
                     $libcnt= mysql_result($result,0,0);
                     $pagetitle = ($libcnt>0) ? "Error" : "Remove Library";
                 }
-            } else if (isset($_GET['transfer'])) {
-                if (isset($_POST['newowner'])) {
-
-                    //added for mysql 3.23 compatibility
-                    $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    $newgpid = mysql_result($result,0,0);
-
-                    //$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
-                    //$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
-                    //$query .= "imas_libraries.id='{$_GET['transfer']}'";
-                    $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='{$_GET['transfer']}'";
-                    if (!$isadmin) {
-                        $query .= " AND groupid='$groupid'";
-                    }
-                    if (!$isadmin && !$isgrpadmin) {
-                        $query .= " AND ownerid='$userid'";
-                    }
-                    mysql_query($query) or die("Query failed : $query " . mysql_error());
-                    return $this->redirect('manage-lib?cid='.$cid);
-                } else {
-                    $pagetitle = "Transfer Library";
-                    $query = "SELECT id,FirstName,LastName FROM imas_users WHERE rights>19 ORDER BY LastName,FirstName";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    $i=0;
-                    $page_newOwnerList = array();
-                    while ($row = mysql_fetch_row($result)) {
-                        $page_newOwnerList['val'][$i] = $row[0];
-                        $page_newOwnerList['label'][$i] = $row[2] . ", " . $row[1];
-                        $i++;
-                    }
-
-                }
-
             } else if (isset($params['modify']))
             {
                 if (isset($params['name']) && trim($params['name'])!='')
@@ -2816,7 +2815,7 @@ class AdminController extends AppController
         $this->includeCSS(['libtree.css']);
         $this->includeJS(['libtree.js', 'general.js']);
 
-        $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label']);
+        $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body);
         return $this->renderWithData('manageLib', $responseData);
     }
 

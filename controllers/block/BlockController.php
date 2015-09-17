@@ -277,7 +277,8 @@ class BlockController extends AppController
      * @return string
      * Mass changes: Block
      */
-    public function actionChangeBlock(){
+    public function actionChangeBlock()
+    {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = "master";
@@ -290,11 +291,8 @@ class BlockController extends AppController
         $courseItemOrder = Course::getItemOrder($courseId);
         $itemOrder = $courseItemOrder->itemorder;
         $items = unserialize($itemOrder);
-        $overwriteBody = AppConstant::NUMERIC_ZERO;
-        $body = "";
         if(!(isset($teacherId))){
             $overwriteBody = AppConstant::NUMERIC_ONE;
-            $body = "You need to log in as a teacher to access this page";
         }elseif(isset($params['checked'])){
             $checked = array();
             foreach ($params['checked'] as $id) {

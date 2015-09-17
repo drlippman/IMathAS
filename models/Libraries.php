@@ -239,6 +239,5 @@ class Libraries extends BaseImasLibraries
         $query .= "FROM imas_libraries LEFT JOIN imas_library_items ON imas_library_items.libid=imas_libraries.id GROUP BY imas_libraries.id";
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
-
     }
 }
