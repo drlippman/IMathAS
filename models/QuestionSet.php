@@ -603,11 +603,16 @@ class QuestionSet extends BaseImasQuestionset
     public static function getUniqueIdToExportLib($includedGs)
     {
         $query = new Query();
-        $query ->select(['id','uniqueid'])
+        $query->select(['id', 'uniqueid'])
             ->from('imas_questionset')
-            ->where(['IN','id',$includedGs]);
+            ->where(['IN', 'id', $includedGs]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+
+    public static function getLicenseData($ids)
+    {
+        return QuestionSet::find()->select('id,uniqueid,author,ancestorauthors,license,otherattribution')->where(['IN','id',$ids])->all();
     }
 }

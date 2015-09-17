@@ -16,7 +16,7 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $myrights, $showtips, $urlmode, $CFG;
+	global $imasroot, $myrights, $showtips, $urlmode, $CFG;AppUtility::dump('kjsdjhsjhgshjd');
 	$imasroot = AppUtility::getHomeURL();
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;

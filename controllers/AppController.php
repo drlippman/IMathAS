@@ -357,7 +357,7 @@ class AppController extends Controller
                 $userId = $haveSession['id'];
                 $groupId = $haveSession['groupid'];
                 if ($haveSession['rights']==AppConstant::NUMERIC_ZERO) {
-                    echo 'You have not yet confirmed your registration.  You must respond to the email that was sent to you by IMathAS.';
+                    echo 'You have not yet confirmed your registration.  You must respond to the email that was sent to you by MyOpenMath.';
                     exit;
                 }
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];

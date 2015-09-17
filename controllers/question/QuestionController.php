@@ -4,16 +4,11 @@
 namespace app\controllers\question;
 
 use app\components\AppUtility;
-use app\components\AssessmentUtility;
 use app\components\filehandler;
 use app\controllers\AppController;
-use app\models\_base\BaseImasLibraryItems;
 use app\models\Assessments;
 use app\models\AssessmentSession;
 use app\models\Course;
-use app\models\Exceptions;
-use app\models\Forums;
-use app\models\GbCats;
 use app\models\Items;
 use app\models\Libraries;
 use app\models\LibraryItems;
@@ -23,10 +18,6 @@ use app\models\Questions;
 use app\models\Rubrics;
 use app\models\User;
 use app\models\QuestionSet;
-use app\models\SetPassword;
-use app\models\Student;
-use app\models\StuGroupSet;
-use app\models\Teacher;
 use Yii;
 use app\components\AppConstant;
 
@@ -160,9 +151,6 @@ class QuestionController extends AppController
             }
             if (isset($params['clearattempts'])) {
                 if ($params['clearattempts'] == "confirmed") {
-                    /*
-                     *                     require_once('../includes/filehandler.php');
-                     */
                     filehandler::deleteallaidfiles($assessmentId);
                     AssessmentSession::deleteByAssessmentId($assessmentId);
                     Questions::setWithdrawn($assessmentId, AppConstant::NUMERIC_ZERO);
@@ -544,7 +532,6 @@ class QuestionController extends AppController
                         $libSortOrder[$row['id']] = $row['sortorder'];
                     }
                     $lNames = implode(", ", $lNamesArray);
-
                     $pageLibRowHeader = ($searchAll == AppConstant::NUMERIC_ONE) ? "<th>Library</th>" : "";
 
                     if (isset($search)) {
@@ -1940,42 +1927,42 @@ class QuestionController extends AppController
         } else {    //PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
             $assessmentId = $this->getParamVal('aid');
             if (isset($params['vert'])) {
-                $ph = 11 - $params['vert'];
-                $pw = 8.5 - $params['horiz'];
-                if ($params['browser'] == 1) {
-                    $ph -= .5;
-                    $pw -= .5;
+                $ph = AppConstant::NUMERIC_ELEVEN - $params['vert'];
+                $pw = AppConstant::EIGHT_POINT_FIVE - $params['horiz'];
+                if ($params['browser'] == AppConstant::NUMERIC_ONE) {
+                    $ph -= AppConstant::POINT_FIVE;
+                    $pw -= AppConstant::POINT_FIVE;
                 }
             } else if (isset ($params['pw'])) {
                 $ph = $params['ph'];
                 $pw = $params['pw'];
             }
-            $isfinal = isset($params['final']);
+            $isFinal = isset($params['final']);
             $line = Assessments::getByAssessmentId($assessmentId);
-            $ioquestions = explode(",", $line['itemorder']);
+            $questionsOrder = explode(",", $line['itemorder']);
             $questions = array();
-            foreach ($ioquestions as $k => $q) {
+            foreach ($questionsOrder as $k => $q) {
                 if (strpos($q, '~') !== false) {
                     $sub = explode('~', $q);
                     if (strpos($sub[0], '|') === false) { //backwards compat
-                        $questions[] = $sub[array_rand($sub, 1)];
+                        $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
                     } else {
                         $grpqs = array();
                         $grpparts = explode('|', $sub[0]);
                         array_shift($sub);
-                        if ($grpparts[1] == 1) { // With replacement
-                            for ($i = 0; $i < $grpparts[0]; $i++) {
-                                $questions[] = $sub[array_rand($sub, 1)];
+                        if ($grpparts[1] == AppConstant::NUMERIC_ONE) { // With replacement
+                            for ($i = AppConstant::NUMERIC_ZERO; $i < $grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
                             }
-                        } else if ($grpparts[1] == 0) { //Without replacement
+                        } else if ($grpparts[1] == AppConstant::NUMERIC_ZERO) { //Without replacement
                             shuffle($sub);
-                            for ($i = 0; $i < min($grpparts[0], count($sub)); $i++) {
+                            for ($i = AppConstant::NUMERIC_ZERO; $i < min($grpparts[0], count($sub)); $i++) {
                                 $questions[] = $sub[$i];
                             }
                             //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
                             if ($grpparts[0] > count($sub)) { //fix stupid inputs
                                 for ($i = count($sub); $i < $grpparts[0]; $i++) {
-                                    $questions[] = $sub[array_rand($sub, 1)];
+                                    $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
                                 }
                             }
                         }
@@ -1988,20 +1975,17 @@ class QuestionController extends AppController
             $qn = array();
             $query = Questions::getByIdList($questions);
             foreach ($query as $row) {
-                if ($row['points'] == 9999) {
+                if ($row['points'] == AppConstant::QUARTER_NINE) {
                     $points[$row['id']] = $line['defpoints'];
                 } else {
                     $points[$row['id']] = $row['points'];
                 }
                 $qn[$row['id']] = $row['questionsetid'];
             }
-
-
             $numq = count($questions);
-            $phs = $ph - 0.6;
-            $pws = $pw - 0.5;
-            $pwss = $pw - 0.6;
-
+            $phs = $ph - AppConstant::POINT_SIX;
+            $pws = $pw - AppConstant::POINT_FIVE;
+            $pwss = $pw - AppConstant::POINT_SIX;
         }
         $this->includeCSS(['mathtest.css', 'print.css']);
         $this->includeJS(['AMhelpers.js']);
@@ -2012,50 +1996,123 @@ class QuestionController extends AppController
 
     public function actionPrintLayoutBare()
     {
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $assessmentId = $params['aid'];
+        $sessionId = $this->getSessionId();
+        $sessionData = $this->getSessionData($sessionId);
+        $course = Course::getById($courseId);
         $this->layout = 'master';
-        $overwriteBody = 0;
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
-        $pagetitle = "Print Layout";
-
-
-        //CHECK PERMISSIONS AND SET FLAGS
-        if (!(isset($teacherid))) {
-            $overwriteBody = 1;
-            $body = "You need to log in as a teacher to access this page";
-        } else {	//PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
-
+        if (!(isset($teacherId))) {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+        }
+        if (isset($params['versions'])) {
+            $this->includeCSS(['print.css']);
         }
 
-        if (isset($_POST['versions'])) {
-
-            $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
-        }
-
-        $nologo = true;
-        $cid = $_GET['cid'];
-        $aid = intval($_GET['aid']);
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='text') {
-            $sessiondata['mathdisp'] = 0;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='text') {
+            $sessionData['mathdisp'] = AppConstant::NUMERIC_ZERO;
         } else {
-            $sessiondata['mathdisp'] = 2;
+            $sessionData['mathdisp'] = AppConstant::NUMERIC_TWO;
         }
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='tex') {
-            $sessiondata['texdisp'] = true;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='tex') {
+            $sessionData['texdisp'] = true;
         }
-        if (isset($_POST['mathdisp']) && $_POST['mathdisp']=='textandimg') {
-            $printtwice = 2;
+        if (isset($params['mathdisp']) && $params['mathdisp']=='textandimg') {
+            $printTwice = AppConstant::NUMERIC_TWO;
         } else {
-            $printtwice = 1;
+            $printTwice = AppConstant::NUMERIC_ONE;
         }
 
-        $sessiondata['graphdisp'] = 2;
-        if (isset($_POST['versions'])) {
+        $sessionData['graphdisp'] = AppConstant::NUMERIC_TWO;
+        if (!isset($params['versions'])) {
 
+        }else{
+            $line = Assessments::getByAssessmentId($assessmentId);
+            $questionsOrder = explode(",",$line['itemorder']);
+            $assessmentName = $line['name'];
+            $questions = array();
+            foreach($questionsOrder as $k=>$q) {
+                if (strpos($q,'~')!==false) {
+                    $sub = explode('~',$q);
+                    if (strpos($sub[0],'|')===false) { //backwards compat
+                        $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                    } else {
+                        $grpqs = array();
+                        $grpParts = explode('|',$sub[0]);
+                        array_shift($sub);
+                        if ($grpParts[1] == AppConstant::NUMERIC_ONE) { // With replacement
+                            for ($i = AppConstant::NUMERIC_ZERO; $i<$grpParts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                            }
+                        } else if ($grpParts[1] == AppConstant::NUMERIC_ZERO) { //Without replacement
+                            shuffle($sub);
+                            for ($i = AppConstant::NUMERIC_ZERO; $i<min($grpParts[0],count($sub)); $i++) {
+                                $questions[] = $sub[$i];
+                            }
+                            //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
+                            if ($grpParts[0]>count($sub)) { //fix stupid inputs
+                                for ($i=count($sub); $i<$grpParts[0]; $i++) {
+                                    $questions[] = $sub[array_rand($sub,AppConstant::NUMERIC_ONE)];
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $questions[] = $q;
+                }
+            }
+
+            $points = array();
+            $qn = array();
+            $query = Questions::getPointsAndQsetId($questions);
+            foreach ($query as $row) {
+                if ($row['points'] == AppConstant::QUARTER_NINE) {
+                    $points[$row['id']] = $line['defpoints'];
+                } else {
+                    $points[$row['id']] = $row['points'];
+                }
+                $qn[$row['id']] = $row['questionsetid'];
+            }
+            if (is_numeric($params['versions'])) {
+                $copies = $params['versions'];
+            } else {
+                $copies = AppConstant::NUMERIC_ONE;
+            }
+
+            $seeds = array();
+            global $shuffle;
+            for ($j = AppConstant::NUMERIC_ZERO; $j<$copies; $j++) {
+                $seeds[$j] = array();
+                if ($line['shuffle']&2) {  //all questions same random seed
+                    if ($shuffle&4) { //all students same seed
+                        $seeds[$j] = array_fill(AppConstant::NUMERIC_ZERO,count($questions),$assessmentId+$j);
+                    } else {
+                        $seeds[$j] = array_fill(AppConstant::NUMERIC_ZERO,count($questions),rand(AppConstant::NUMERIC_ONE, AppConstant::QUARTER_NINE));
+                    }
+                } else {
+                    if ($shuffle&4) { //all students same seed
+                        for ($i = AppConstant::NUMERIC_ZERO; $i<count($questions);$i++) {
+                            $seeds[$j][] = $assessmentId + $i + $j;
+                        }
+                    } else {
+                        for ($i = AppConstant::NUMERIC_ZERO; $i<count($questions);$i++) {
+                            $seeds[$j][] = rand(AppConstant::NUMERIC_ONE, AppConstant::QUARTER_NINE);
+                        }
+                    }
+                }
+            }
+            $numq = count($questions);
         }
         $this->includeCSS(['default.css','handheld.css','print.css']);
-        $renderData = array('sessiondata' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $nologo, 'numq' => $numq,
-            'printtwice' => $printtwice, 'course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
-            'qn' => $qn, 'courseId' => $courseId);
+        $renderData = array('sessionData' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'numq' => $numq,
+            'printTwice' => $printTwice, 'course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
+            'qn' => $qn, 'courseId' => $courseId, 'questions' => $questions, 'points' => $points, 'seeds' => $seeds);
         return $this->renderWithData('printLayoutBare', $renderData);
     }
 

@@ -16,10 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class=" col-sm-6" style="right: 30px;">
                 <div class="vertical-align title-page">Print Test</div>
             </div>
-            <div class="col-sm-6"
-            ">
+            <div class="col-sm-6">
             <div class="col-sm-2 pull-right">
-                <!--                                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to course page" href="/openmath/web/instructor/instructor/index?cid=2" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>-->
             </div>
         </div>
     </div>
@@ -27,13 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="tab-content shadowBox print-test margin-top-fourty">
 <?php
-if (isset($params['versions'])) {
-//    $placeinhead = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$imasroot/assessment/print.css?v=100213\"/>\n";
-}
 
-$nologo = true;
-
-if ($overwriteBody == 1) {
+if ($overwriteBody == AppConstant::NUMERIC_ONE) {
     echo $body;
 }
 if (!isset($params['versions'])) {
@@ -41,10 +34,10 @@ if (!isset($params['versions'])) {
     echo '<div class="print-test-header"><div class="col-md-12 margin-left-fifteen"><a href="print-test?cid=' . $courseId . '&aid=' . $assessmentId . '">Generate for in-browser printing</a></div>';
     if (isset($CFG['GEN']['pandocserver'])) {
         echo ' |<div class="col-md-12"> <a href="print-layout-word?cid=' . $courseId . '&amp;aid=' . $assessmentId . '">Generate for Word</a></div>';
-    }
-    echo '</div>
+    } ?>
+    </div>
         <div class="col-md-12 padding-left-zero padding-bottom-five">
-            <form method=post action="print-layout-bare?cid=$courseId&aid=$assessmentId">
+            <form method=post action="print-layout-bare?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>">
                 <div class="col-md-12 margin-top-fifteen padding-left-zero padding-right-zero">
                     <input class="print-layout-bare-continue-btn" type=submit value="Continue">
                 </div>
@@ -122,12 +115,9 @@ if (!isset($params['versions'])) {
             </span>
             </div>
     </form>
-    </div>';
-
-} else {
-
-
-    ?>
+    </div>
+<?php
+} else { ?>
     <style type="text/css">
         body {
             padding: 0px;
@@ -159,22 +149,22 @@ if (!isset($params['versions'])) {
         }
     </style>
     <?php
-    for ($pt = 0; $pt < $printtwice; $pt++) {
-        if ($pt == 1) {
-            $sessionData['mathdisp'] = 0;
+    for ($pt = AppConstant::NUMERIC_ZERO; $pt < $printTwice; $pt++) {
+        if ($pt == AppConstant::NUMERIC_ONE) {
+            $sessionData['mathdisp'] = AppConstant::NUMERIC_ZERO;
             echo $params['vsep'] . '<br/>';;
         }
 
         if ($params['format'] == 'trad') {
-            for ($j = 0; $j < $copies; $j++) {
-                if ($j > 0) {
+            for ($j = AppConstant::NUMERIC_ZERO; $j < $copies; $j++) {
+                if ($j > AppConstant::NUMERIC_ZERO) {
                     echo $params['vsep'] . '<br/>';
                 }
 
                 $headerleft = '';
                 $headerleft .= $line['name'];
-                if ($copies > 1) {
-                    $headerleft .= ' - Form ' . ($j + 1);
+                if ($copies > AppConstant::NUMERIC_ONE) {
+                    $headerleft .= ' - Form ' . ($j + AppConstant::NUMERIC_ONE);
                 }
                 if ((isset($params['iname']) || isset($params['cname'])) && isset($params['aname'])) {
                     $headerleft .= "<br/>";
@@ -189,8 +179,8 @@ if (!isset($params['versions'])) {
                 echo "</div>\n";
 
 
-                for ($i = 0; $i < $numq; $i++) {
-                    if ($i > 0) {
+                for ($i = AppConstant::NUMERIC_ZERO; $i < $numq; $i++) {
+                    if ($i > AppConstant::NUMERIC_ZERO) {
                         echo $params['qsep'];
                     }
                     $sa[$j][$i] = AppUtility::printq($i, $qn[$questions[$i]], $seeds[$j][$i], $points[$questions[$i]], isset($params['showqn']));
@@ -198,12 +188,12 @@ if (!isset($params['versions'])) {
 
             }
 
-            if ($params['keys'] > 0) { //print answer keys
-                for ($j = 0; $j < $copies; $j++) {
+            if ($params['keys'] > AppConstant::NUMERIC_ZERO) { //print answer keys
+                for ($j = AppConstant::NUMERIC_ZERO; $j < $copies; $j++) {
                     echo $params['vsep'] . '<br/>';
-                    echo '<b>Key - Form ' . ($j + 1) . "</b>\n";
+                    echo '<b>Key - Form ' . ($j + AppConstant::NUMERIC_ONE) . "</b>\n";
                     echo "<ol>\n";
-                    for ($i = 0; $i < $numq; $i++) {
+                    for ($i = AppConstant::NUMERIC_ZERO; $i < $numq; $i++) {
                         echo '<li>';
                         if (is_array($sa[$j][$i])) {
                             echo printfilter(filter(implode(' ~ ', $sa[$j][$i])));
@@ -230,22 +220,22 @@ if (!isset($params['versions'])) {
             echo "<div id=intro>{$line['intro']}</div>\n";
             echo "</div>\n";
             echo "</div>\n";
-            for ($i = 0; $i < $numq; $i++) {
-                if ($i > 0) {
+            for ($i = AppConstant::NUMERIC_ZERO; $i < $numq; $i++) {
+                if ($i > AppConstant::NUMERIC_ZERO) {
                     echo $params['qsep'];
                 }
-                for ($j = 0; $j < $copies; $j++) {
-                    if ($j > 0) {
+                for ($j = AppConstant::NUMERIC_ZERO; $j < $copies; $j++) {
+                    if ($j > AppConstant::NUMERIC_ZERO) {
                         echo $params['qsep'];
                     }
                     $sa[] = AppUtility::printq($i, $qn[$questions[$i]], $seeds[$j][$i], $points[$questions[$i]], isset($params['showqn']));
                 }
             }
-            if ($params['keys'] > 0) { //print answer keys
+            if ($params['keys'] > AppConstant::NUMERIC_ZERO) { //print answer keys
                 echo $params['vsep'] . '<br/>';
                 echo "<b>Key</b>\n";
                 echo "<ol>\n";
-                for ($i = 0; $i < count($sa); $i++) {
+                for ($i = AppConstant::NUMERIC_ZERO; $i < count($sa); $i++) {
                     echo '<li>';
                     if (is_array($sa[$i])) {
                         echo printfilter(filter(implode(' ~ ', $sa[$i])));
@@ -258,7 +248,7 @@ if (!isset($params['versions'])) {
             }
         }
     }
-    $licurl = AppUtility::getURLFromHome('question', 'question/show-license?id=' . implode('-', $qn));
+    $licurl = AppUtility::getURLFromHome('assessment', 'assessment/show-license?id=' . implode('-', $qn));
     echo '<hr/><p style="font-size:70%">License info at: <a href="' . $licurl . '">' . $licurl . '</a></p>';
 
     echo "<div class=cbutn><a href=" . AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $courseId) . ">Return to course page</a></div>\n";

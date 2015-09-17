@@ -208,5 +208,9 @@ class AppConstant
     const DEFAULT_THEME = 'default.css';
     const CHANGE_ASSESSMENT_SUCCESSFULLY = 'Assessment data changes successfully.';
     const NO_QUESTION_SELECTED = 'No questions selected';
+    const POINT_FIVE = 0.5;
+    const POINT_SIX = 0.6;
+    const POINT_SEVEN = 0.5;
+    const EIGHT_POINT_FIVE = 8.5;
 
 }

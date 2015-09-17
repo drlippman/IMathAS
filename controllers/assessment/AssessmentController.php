@@ -5,6 +5,7 @@ namespace app\controllers\assessment;
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
 use app\components\CopyItemsUtility;
+use app\components\filehandler;
 use app\controllers\AppController;
 use app\models\Assessments;
 use app\models\AssessmentSession;
@@ -15,6 +16,7 @@ use app\models\GbCats;
 use app\models\Items;
 use app\models\Outcomes;
 use app\models\Questions;
+use app\models\QuestionSet;
 use app\models\SetPassword;
 use app\models\Student;
 use app\models\StuGroupSet;
@@ -131,7 +133,7 @@ class AssessmentController extends AppController
 
     public function actionAddAssessment()
     {
-        $user = $this->getAuthenticatedUser();
+        $this->getAuthenticatedUser();
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
@@ -146,6 +148,20 @@ class AssessmentController extends AppController
                 /*
                  * For Updating Question
                  */
+                if ($params['clearattempts']=="confirmed") {
+                    filehandler::deleteallaidfiles($params['id']);
+                    AssessmentSession::deleteByAssessmentId($params['id']);
+                    Questions::setWithdrawn($params['id'], AppConstant::NUMERIC_ZERO);
+                    return $this->redirect(AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$params['cid'].'&id='.$params['id']));
+                } else {
+                    $overwriteBody = AppConstant::NUMERIC_ONE;
+
+                    $assessmentName = $assessmentData['name'];
+                    $body = "<h3>$assessmentName</h3>";
+                    $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
+                    $body .= "<p><input type=button value=\"Yes, Clear\" onClick=\"window.location='".AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$params['cid'].'&id='.$params['id'].'&clearattempts=confirmed')."'\">\n";
+                    $body .= "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='".AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$params['cid'].'&id='.$params['id'])."'\"></p>\n";
+                }
             } elseif ($params['name'] != null) {//if the form has been submitted
                 if ($params['avail'] == AppConstant::NUMERIC_ONE) {
                     if ($params['sdatetype'] == AppConstant::NUMERIC_ZERO) {
@@ -332,12 +348,12 @@ class AssessmentController extends AppController
                 if ($params['summary'] == AppConstant::DEFAULT_ASSESSMENT_SUMMARY) {
                     $params['summary'] = '';
                 } else {
-                    $params['summary'] = htmLawed(stripslashes($_POST['summary']),$htmlawedconfig);
+                    $params['summary'] = addslashes(htmLawed(stripslashes($params['summary']),$htmlawedconfig));
                 }
                 if ($params['intro'] == AppConstant::DEFAULT_ASSESSMENT_INTRO) {
                     $params['intro'] = '';
                 } else {
-                    $params['intro'] = htmLawed(stripslashes($_POST['intro']),$htmlawedconfig);
+                    $params['intro'] = addslashes(htmLawed(stripslashes($params['intro']),$htmlawedconfig));
                 }
                 $assessmentArray['courseid'] = $params['cid'];
                 $assessmentArray['name'] = $params['name'];
@@ -639,7 +655,7 @@ class AssessmentController extends AppController
         }
         $this->includeCSS(['course/items.css', 'course/course.css']);
         $this->includeJS(["editor/tiny_mce.js","assessment/addAssessment.js", "general.js"]);
-        return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block);
+        return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body);
     }
 
     public function flatArray($outcomesData)
@@ -1065,6 +1081,25 @@ class AssessmentController extends AppController
         return $this->renderWithData('assessmentMessage',$responseData);
     }
 
+    public function actionShowLicense(){
+        $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $params = $this->getRequestParams();
+        if (empty($params['id'])) {
+            $this->setErrorFlash("No IDs specified");
+            return $this->redirect($this->previousPage());
+        }
+
+        $ids = explode('-',$params['id']);
+        foreach ($ids as $k=>$id) {
+            $ids[$k] = intval($id);
+        }
+
+        $licenseData = QuestionSet::getLicenseData($ids);
+        $renderData = array('licenseData' => $licenseData);
+        return $this->renderWithData('showLicense', $renderData);
+    }
+
     /**
      * @param $course
      * @param $assessmentData
@@ -1102,7 +1137,7 @@ class AssessmentController extends AppController
      * @param $block
      * @return string
      */
-    public function addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block)
+    public function addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body)
     {
         return $this->renderWithData('addAssessment', ['course' => $course, 'assessmentData' => $assessmentData,
             'saveTitle' => $saveTitle, 'pageCopyFromSelect' => $pageCopyFromSelect, 'timeLimit' => $timeLimit,
@@ -1112,7 +1147,7 @@ class AssessmentController extends AppController
             'gradebookCategory' => $gradebookCategory, 'countInGradebook' => $countInGb, 'pointCountInGradebook' => $pointCountInGb,
             'pageTutorSelect' => $pageTutorSelect, 'minScoreType' => $minScoreType, 'useDefFeedback' => $useDefFeedback,
             'defFeedback' => $defFeedback, 'pageGroupSets' => $pageGroupSets, 'pageOutcomesList' => $pageOutcomesList,
-            'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,
+            'pageOutcomes' => $pageOutcomes, 'showQuestionCategory' => $showQuestionCategory, 'sDate' => $sDate,'body'=>$body,
             'sTime' => $sTime, 'eDate' => $eDate, 'eTime' => $eTime, 'reviewDate' => $reviewDate, 'reviewTime' => $reviewTime,
             'startDate' => $startDate, 'endDate' => $endDate, 'title' => $title, 'pageTitle' => $pageTitle, 'block' => $block]);
     }

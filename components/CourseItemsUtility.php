@@ -77,7 +77,7 @@ class CourseItemsUtility extends Component
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
                                                        src="<?php echo AppUtility::getAssetURL() ?>img/courseSettingItem.png"/></a>
                     <ul class=" select1 dropdown-menu selected-options">
-                        <li><a class="question" href="#"><?php AppUtility::t('Questions'); ?></a></li>
+                        <li><a class="question" href="<?php echo AppUtility::getURLFromHome('question', 'question/add-questions?cid='.$course->id.'&aid='.$assessment->id); ?>"><?php AppUtility::t('Questions'); ?></a></li>
                         <li><a class="modify"
                                href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/add-assessment?id='.$assessment->id . '&cid=' . $course->id . '&block=0') ?>"><?php AppUtility::t('Setting'); ?></a>
                         </li>

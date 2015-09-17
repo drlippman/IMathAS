@@ -141,8 +141,6 @@ if ($overwriteBody==1) {
             echo ">&nbsp;</div>\n";
         }
     }
-    include("../components/displayq2.php");
-
 
     //echo "<div class=maintest>\n";
     echo "<form method=post action=\"print-test?cid=$courseId&aid=$assessmentId\" onSubmit=\"return packheights()\">\n";
@@ -348,10 +346,10 @@ function printq($qn,$qsetid,$seed,$pts) {
         }
         $laparts = explode("&",$la);
         foreach ($anstypes as $kidx=>$anstype) {
-            list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = \app\components\displayq2::makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
+            list($answerbox[$kidx],$tips[$kidx],$shans[$kidx]) = makeanswerbox($anstype,$kidx,$laparts[$kidx],$options,$qn+1);
         }
     } else {
-        list($answerbox,$tips[0],$shans[0]) = \app\components\displayq2::makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
+        list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
     }
 
     echo "<div class=q>";
