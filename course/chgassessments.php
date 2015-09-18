@@ -233,6 +233,14 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgavail'])) {
 			$sets[] = "avail='{$_POST['avail']}'";
 		}
+		if (isset($_POST['chgreqscoretype'])) {
+			if ($_POST['reqscoretype']==0) {
+				$sets[] = 'reqscore=ABS(reqscore)';
+			} else {
+				$sets[] = 'reqscore=-1*ABS(reqscore)';
+			}
+		}
+		
 		if (isset($_POST['chgintro'])) {
 			$query = "SELECT intro FROM imas_assessments WHERE id='{$_POST['intro']}'";
 			$result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -825,6 +833,16 @@ writeHtmlSelect("tutoredit",$page_tutorSelect['val'],$page_tutorSelect['label'],
 				<td><input type="checkbox" name="chgreqscore" class="chgbox"/></td>
 				<td class="r">Clear "show based on another assessment" settings.</td>
 				<td></td>
+			</tr>
+			<tr class="coptr">
+				<td><input type="checkbox" name="chgreqscoretype" class="chgbox"/></td>
+				<td class="r">"Show based on another assessment" display:</td>
+				<td>
+				<select name="reqscoretype">
+				<option value="0">Hide until requirement is met</option>
+				<option value="1">Show greyed until requirement is met</option>
+				</select>
+				</td>
 			</tr>
 			<tr class="coptr">
 				<td><input type="checkbox" name="chgsameseed" class="chgbox"/></td>

@@ -585,16 +585,19 @@ function enditem($canedit) {
 			   } else {
 				   $reviewdate = formatdate($line['reviewdate']);
 			   }
-			   $nothidden = true;
-			   if ($line['reqscore']>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
+			   $nothidden = true;  $showgreyedout = false;
+			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
 			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
+			   	   if ($line['reqscore']<0) {
+			   	   	   $showgreyedout = true;
+			   	   }
 				   $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
 				   $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				   if (mysql_num_rows($result)==0) {
 					   $nothidden = false;
 				   } else {
 					   $scores = explode(';',mysql_result($result,0,0));
-					   if (round(getpts($scores[0]),1)+.02<$line['reqscore']) {
+					   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
 					   	   $nothidden = false;
 					   }
 				   }
@@ -730,6 +733,30 @@ function enditem($canedit) {
 				   }
 				   echo filter("<br/><i>" . _('This assessment is in review mode - no scores will be saved') . "</i></div><div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
+			   } else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
+			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
+				   if (($hideicons&1)==0) {
+					   if ($graphicalicons) {
+						   echo "<img alt=\"assessment\" class=\"floatleft faded\" src=\"$imasroot/img/{$itemicons['assess']}\" />";
+					   } else {
+						   echo "<div class=icon style=\"background-color: #ccc;\">?</div>";
+					   }
+				   }
+				   if (substr($line['deffeedback'],0,8)=='Practice') {
+					   $endname = _('Available until');
+				   } else {
+					   $endname = _('Due');
+				   }
+				   
+				   echo "<div class=\"title grey\"><b><i>{$line['name']}</i></b>";
+				   echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
+
+				   if ($line['enddate']!=2000000000) {
+					   echo "<br/> $endname $enddate \n";
+				   }
+				   echo filter("</div><div class=\"itemsum grey\">{$line['summary']}</div>\n");
+				   enditem($canedit); //echo "</div>\n";
+			   	   
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
 					   $show = _('Hidden');

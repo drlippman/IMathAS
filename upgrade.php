@@ -1,7 +1,7 @@
 <?php  
 //change counter; increase by 1 each time a change is made
 //TODO:  change linked text tex to mediumtext
-$latest = 100;
+$latest = 101;
 
 
 @set_time_limit(0);
@@ -1580,6 +1580,13 @@ if (!empty($dbsetup)) {  //initial setup - just write upgradecounter.txt
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
 			 }
 			 $query = "ALTER TABLE `imas_forums` ADD `replyinstr` TEXT NOT NULL";
+			$res = mysql_query($query);
+			 if ($res===false) {
+			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";
+			 }
+		}
+		if ($last<101) {
+			$query = "ALTER TABLE  `imas_assessments` CHANGE  `reqscore`  `reqscore` SMALLINT(4) NOT NULL DEFAULT '0';";
 			$res = mysql_query($query);
 			 if ($res===false) {
 			 	 echo "<p>Query failed: ($query) : ".mysql_error()."</p>";

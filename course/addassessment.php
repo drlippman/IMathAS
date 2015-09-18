@@ -192,7 +192,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['ltisecret'] = '';
 		}
 		
-		
+		if ($_POST['reqscoretype']==1) {
+			$_POST['reqscore'] *= -1;
+		}
 		
 		//is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
 		//if so, cannot handle
@@ -943,8 +945,12 @@ if ($overwriteBody==1) {
 			</span><BR class=form>
 	
 			<span class=form>Show based on another assessment: </span>
-			<span class=formright>Show only after a score of 
-				<input type=text size=4 name=reqscore value="<?php echo $line['reqscore'];?>">
+			<span class=formright>
+<?php
+	writeHtmlSelect("reqscoretype", array(0,1), array(_('Show only after'), _('Show greyed until')), $line['reqscore']<0?1:0);
+?>
+			 a score of 
+				<input type=text size=4 name=reqscore value="<?php echo abs($line['reqscore']);?>">
 		   		points is obtained on 
 <?php 
 	writeHtmlSelect ("reqscoreaid",$page_copyFromSelect['val'],$page_copyFromSelect['label'],$line['reqscoreaid'],"Dont Use",0,null); 
