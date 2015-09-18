@@ -151,6 +151,9 @@ class QuestionController extends AppController
             }
             if (isset($params['clearattempts'])) {
                 if ($params['clearattempts'] == "confirmed") {
+                    /*
+                     *                     require_once('../includes/filehandler.php');
+                     */
                     filehandler::deleteallaidfiles($assessmentId);
                     AssessmentSession::deleteByAssessmentId($assessmentId);
                     Questions::setWithdrawn($assessmentId, AppConstant::NUMERIC_ZERO);
@@ -526,11 +529,12 @@ class QuestionController extends AppController
                         $libSortOrder[0] = AppConstant::NUMERIC_ZERO;
                     }
 
-                    $query = Libraries::getByIdList($lList);
+                    $query = Libraries::getByIdList(explode(',', $searchLibs));
                     foreach ($query as $row) {
                         $lNamesArray[$row['id']] = $row['name'];
                         $libSortOrder[$row['id']] = $row['sortorder'];
                     }
+
                     $lNames = implode(", ", $lNamesArray);
                     $pageLibRowHeader = ($searchAll == AppConstant::NUMERIC_ONE) ? "<th>Library</th>" : "";
 
@@ -947,7 +951,7 @@ class QuestionController extends AppController
         $this->includeCSS(['question/libtree.css']);
         $this->includeJS(['general.js', 'tablesorter.js', 'question/addquestions.js', 'question/addqsort.js', 'question/junkflag.js', 'question/libtree2.js']);
         $renderData = array('myRights' => $myRights, 'params' => $params, 'libraryData' => $libraryData);
-        return $this->renderWithData('questionLibraries', $renderData);
+        return $this->renderWithData('questionLibrary', $renderData);
     }
 
     public function actionModDataSet()
@@ -1594,7 +1598,7 @@ class QuestionController extends AppController
                         $question = new Questions();
                         $qid = $question->addQuestions($questionArray);
                         //add to itemorder
-                        if (isset($params['id'])) { //am adding copies of existing
+                        if (isset($params['id'])) { //am adding copies of existing  
                             $itemArray = explode(',', $itemOrder);
                             $key = array_search($params['id'], $itemArray);
                             array_splice($itemArray, $key + AppConstant::NUMERIC_ONE, AppConstant::NUMERIC_ZERO, $qid);
@@ -1927,42 +1931,42 @@ class QuestionController extends AppController
         } else {    //PERMISSIONS ARE OK, PERFORM DATA MANIPULATION
             $assessmentId = $this->getParamVal('aid');
             if (isset($params['vert'])) {
-                $ph = AppConstant::NUMERIC_ELEVEN - $params['vert'];
-                $pw = AppConstant::EIGHT_POINT_FIVE - $params['horiz'];
-                if ($params['browser'] == AppConstant::NUMERIC_ONE) {
-                    $ph -= AppConstant::POINT_FIVE;
-                    $pw -= AppConstant::POINT_FIVE;
+                $ph = 11 - $params['vert'];
+                $pw = 8.5 - $params['horiz'];
+                if ($params['browser'] == 1) {
+                    $ph -= .5;
+                    $pw -= .5;
                 }
             } else if (isset ($params['pw'])) {
                 $ph = $params['ph'];
                 $pw = $params['pw'];
             }
-            $isFinal = isset($params['final']);
+            $isfinal = isset($params['final']);
             $line = Assessments::getByAssessmentId($assessmentId);
-            $questionsOrder = explode(",", $line['itemorder']);
+            $ioquestions = explode(",", $line['itemorder']);
             $questions = array();
-            foreach ($questionsOrder as $k => $q) {
+            foreach ($ioquestions as $k => $q) {
                 if (strpos($q, '~') !== false) {
                     $sub = explode('~', $q);
                     if (strpos($sub[0], '|') === false) { //backwards compat
-                        $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                        $questions[] = $sub[array_rand($sub, 1)];
                     } else {
                         $grpqs = array();
                         $grpparts = explode('|', $sub[0]);
                         array_shift($sub);
-                        if ($grpparts[1] == AppConstant::NUMERIC_ONE) { // With replacement
-                            for ($i = AppConstant::NUMERIC_ZERO; $i < $grpparts[0]; $i++) {
-                                $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                        if ($grpparts[1] == 1) { // With replacement
+                            for ($i = 0; $i < $grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub, 1)];
                             }
-                        } else if ($grpparts[1] == AppConstant::NUMERIC_ZERO) { //Without replacement
+                        } else if ($grpparts[1] == 0) { //Without replacement
                             shuffle($sub);
-                            for ($i = AppConstant::NUMERIC_ZERO; $i < min($grpparts[0], count($sub)); $i++) {
+                            for ($i = 0; $i < min($grpparts[0], count($sub)); $i++) {
                                 $questions[] = $sub[$i];
                             }
                             //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
                             if ($grpparts[0] > count($sub)) { //fix stupid inputs
                                 for ($i = count($sub); $i < $grpparts[0]; $i++) {
-                                    $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                                    $questions[] = $sub[array_rand($sub, 1)];
                                 }
                             }
                         }
@@ -1975,17 +1979,20 @@ class QuestionController extends AppController
             $qn = array();
             $query = Questions::getByIdList($questions);
             foreach ($query as $row) {
-                if ($row['points'] == AppConstant::QUARTER_NINE) {
+                if ($row['points'] == 9999) {
                     $points[$row['id']] = $line['defpoints'];
                 } else {
                     $points[$row['id']] = $row['points'];
                 }
                 $qn[$row['id']] = $row['questionsetid'];
             }
+
+
             $numq = count($questions);
-            $phs = $ph - AppConstant::POINT_SIX;
-            $pws = $pw - AppConstant::POINT_FIVE;
-            $pwss = $pw - AppConstant::POINT_SIX;
+            $phs = $ph - 0.6;
+            $pws = $pw - 0.5;
+            $pwss = $pw - 0.6;
+
         }
         $this->includeCSS(['mathtest.css', 'print.css']);
         $this->includeJS(['AMhelpers.js']);
@@ -2015,6 +2022,7 @@ class QuestionController extends AppController
             $this->includeCSS(['print.css']);
         }
 
+        $nologo = true;
         if (isset($params['mathdisp']) && $params['mathdisp']=='text') {
             $sessionData['mathdisp'] = AppConstant::NUMERIC_ZERO;
         } else {
@@ -2024,9 +2032,9 @@ class QuestionController extends AppController
             $sessionData['texdisp'] = true;
         }
         if (isset($params['mathdisp']) && $params['mathdisp']=='textandimg') {
-            $printTwice = AppConstant::NUMERIC_TWO;
+            $printtwice = AppConstant::NUMERIC_TWO;
         } else {
-            $printTwice = AppConstant::NUMERIC_ONE;
+            $printtwice = AppConstant::NUMERIC_ONE;
         }
 
         $sessionData['graphdisp'] = AppConstant::NUMERIC_TWO;
@@ -2034,31 +2042,31 @@ class QuestionController extends AppController
 
         }else{
             $line = Assessments::getByAssessmentId($assessmentId);
-            $questionsOrder = explode(",",$line['itemorder']);
-            $assessmentName = $line['name'];
+            $ioquestions = explode(",",$line['itemorder']);
+            $aname = $line['name'];
             $questions = array();
-            foreach($questionsOrder as $k=>$q) {
+            foreach($ioquestions as $k=>$q) {
                 if (strpos($q,'~')!==false) {
                     $sub = explode('~',$q);
                     if (strpos($sub[0],'|')===false) { //backwards compat
-                        $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                        $questions[] = $sub[array_rand($sub,1)];
                     } else {
                         $grpqs = array();
-                        $grpParts = explode('|',$sub[0]);
+                        $grpparts = explode('|',$sub[0]);
                         array_shift($sub);
-                        if ($grpParts[1] == AppConstant::NUMERIC_ONE) { // With replacement
-                            for ($i = AppConstant::NUMERIC_ZERO; $i<$grpParts[0]; $i++) {
-                                $questions[] = $sub[array_rand($sub, AppConstant::NUMERIC_ONE)];
+                        if ($grpparts[1]==1) { // With replacement
+                            for ($i=0; $i<$grpparts[0]; $i++) {
+                                $questions[] = $sub[array_rand($sub,1)];
                             }
-                        } else if ($grpParts[1] == AppConstant::NUMERIC_ZERO) { //Without replacement
+                        } else if ($grpparts[1]==0) { //Without replacement
                             shuffle($sub);
-                            for ($i = AppConstant::NUMERIC_ZERO; $i<min($grpParts[0],count($sub)); $i++) {
+                            for ($i=0; $i<min($grpparts[0],count($sub)); $i++) {
                                 $questions[] = $sub[$i];
                             }
                             //$grpqs = array_slice($sub,0,min($grpparts[0],count($sub)));
-                            if ($grpParts[0]>count($sub)) { //fix stupid inputs
-                                for ($i=count($sub); $i<$grpParts[0]; $i++) {
-                                    $questions[] = $sub[array_rand($sub,AppConstant::NUMERIC_ONE)];
+                            if ($grpparts[0]>count($sub)) { //fix stupid inputs
+                                for ($i=count($sub); $i<$grpparts[0]; $i++) {
+                                    $questions[] = $sub[array_rand($sub,1)];
                                 }
                             }
                         }
@@ -2087,22 +2095,22 @@ class QuestionController extends AppController
 
             $seeds = array();
             global $shuffle;
-            for ($j = AppConstant::NUMERIC_ZERO; $j<$copies; $j++) {
+            for ($j=0; $j<$copies; $j++) {
                 $seeds[$j] = array();
                 if ($line['shuffle']&2) {  //all questions same random seed
                     if ($shuffle&4) { //all students same seed
-                        $seeds[$j] = array_fill(AppConstant::NUMERIC_ZERO,count($questions),$assessmentId+$j);
+                        $seeds[$j] = array_fill(0,count($questions),$assessmentId+$j);
                     } else {
-                        $seeds[$j] = array_fill(AppConstant::NUMERIC_ZERO,count($questions),rand(AppConstant::NUMERIC_ONE, AppConstant::QUARTER_NINE));
+                        $seeds[$j] = array_fill(0,count($questions),rand(1,9999));
                     }
                 } else {
                     if ($shuffle&4) { //all students same seed
-                        for ($i = AppConstant::NUMERIC_ZERO; $i<count($questions);$i++) {
+                        for ($i = 0; $i<count($questions);$i++) {
                             $seeds[$j][] = $assessmentId + $i + $j;
                         }
                     } else {
-                        for ($i = AppConstant::NUMERIC_ZERO; $i<count($questions);$i++) {
-                            $seeds[$j][] = rand(AppConstant::NUMERIC_ONE, AppConstant::QUARTER_NINE);
+                        for ($i = 0; $i<count($questions);$i++) {
+                            $seeds[$j][] = rand(1,9999);
                         }
                     }
                 }
@@ -2110,9 +2118,9 @@ class QuestionController extends AppController
             $numq = count($questions);
         }
         $this->includeCSS(['default.css','handheld.css','print.css']);
-        $renderData = array('sessionData' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'numq' => $numq,
-            'printTwice' => $printTwice, 'course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
-            'qn' => $qn, 'courseId' => $courseId, 'questions' => $questions, 'points' => $points, 'seeds' => $seeds);
+        $renderData = array('sessiondata' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $nologo, 'numq' => $numq,
+            'printtwice' => $printtwice, ' course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
+            'qn' => $qn, 'courseId' => $courseId);
         return $this->renderWithData('printLayoutBare', $renderData);
     }
 
