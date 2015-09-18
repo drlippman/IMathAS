@@ -64,27 +64,27 @@ else{
 
     echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'">';
 ?>
-            <div class="col-lg-2"><?php AppUtility::t('Tool Name')?></div>
+            <br/><div class="col-lg-2"><?php AppUtility::t('Tool Name')?></div>
             <div class="col-lg-10">
-                <input class="input-item-title" size="40" type="text" name="tname" value="<?php echo $name;?>" />
+                <input class="form-control-1" required="Please fill out this field"  size="40" type="text" name="tname" value="<?php echo $name;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Launch URL')?></div>
             <div class="col-lg-10">
-                <input type="text" size="40" name="url" value="<?php echo $url;?>" />
+                <input type="text" class="form-control-1" size="40" name="url" value="<?php echo $url;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Key')?></div>
             <div class="col-lg-10">
-                <input type="text" size="40" name="key" value="<?php echo $key;?>" />
+                <input type="text" class="form-control-1" size="40" name="key" value="<?php echo $key;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Secret')?></div>
             <div class="col-lg-10">
-                <input type="password" size="40" name="secret" value="<?php echo $secret;?>" />
+                <input type="password" class="form-control-1" size="40" name="secret" value="<?php echo $secret;?>" />
             </div>
             <br class="form" /><br/>
 
@@ -96,8 +96,8 @@ else{
 
             <div class="col-lg-2"><?php AppUtility::t('Privacy')?></div>
             <div class="col-lg-8">
-                <input type="checkbox" name="privname" value="1" <?php if (($privacy&1)==1) echo 'checked="checked"';?> /><?php AppUtility::t('Tool Name')?> Send name<br/>
-                <input type="checkbox" name="privemail" value="2" <?php if (($privacy&2)==2) echo 'checked="checked"';?> /><?php AppUtility::t('Tool Name')?>Send email
+                <input type="checkbox" name="privname" value="1" <?php if (($privacy&1)==1) echo 'checked="checked"';?> /><span class="padding-left-five">Send name</span><br/>
+                <input type="checkbox" name="privemail" value="2" <?php if (($privacy&2)==2) echo 'checked="checked"';?> /><span class="padding-left-five">Send email</span>
             </div>
             <br class="form" /><br/>
             <?php
@@ -109,7 +109,7 @@ else{
                 echo '</div>
             <br class="form" /><br/>';
             }
-            echo '<div class="submit"><input type="submit" value="Save"></div>';
+            echo '<div class="submit"><input type="submit" value="Save"></div><br/>';
             echo '</form>';
 
         } else {
