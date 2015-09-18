@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if(isset($addGrpSet)){?>
             <h4>Add new set of student groups</h4>
             <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&addgrpset=true')?>">
-            <p>New group set name: <input name="grpsetname" type="text" maxlength="60" size="40"/></p>
+            <p>New group set name: <input class="form-control-grp" name="grpsetname" type="text" maxlength="60" size="40"/></p>
             <div class="margin-left-groups">
             <p><input type="submit" value="Create" />
             <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p></div>
@@ -62,15 +62,15 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php }elseif(isset($renameGrpSet)){?>
              <h4>Rename student group set</h4>
              <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&renameGrpSet='.$renameGrpSet)?>">
-             <p>New group set name: <input name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"  maxlength="60"/></p>
-             <p><input type="submit" value="Rename" />
+             <p>New group set name: <input class="form-control-grp" name="grpsetname" type="text" value="<?php echo $grpSetName['name'];?>"  maxlength="60"/></p>
+             <p><input style="margin-left: 20.2%" type="submit" value="Rename" />
              <input type=button value="Nevermind" class="#" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id)?>'" /></p>
              </form>
         <?php }elseif(isset($deleteGrpSet)){?>
         <?php }elseif(isset($renameGrp)){?>
             <h4>Rename student group </h4>
                 <form method="post" action="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId.'&renameGrp='.$renameGrp)?>">
-                <p>New group name:<input name="grpname" type="text" value="<?php echo $currGrpName;?>"/></p>
+                <p>New group name:<input class="form-control-grp" name="grpname" type="text" value="<?php echo $currGrpName;?>"/></p>
                 <p><input type="submit" value="Rename" />
                     <input type=button value="Nevermind" class="" onClick="window.location='<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId'.$grpSetId)?>'" /></p>
             </form>
@@ -86,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
              {
                 echo "<input type='hidden' name='stutoadd' value=$stuList />";
              }?>
-                <p>New group name: <input name="grpname" type="text" size="40" /></p>
+                <p>New group name: <input class="form-control-grp" name="grpname" type="text" size="40" /></p>
                 <div class="margin-left-groups-set">
                 <p><input type="submit" value="Create" />
                 <input type=button value='Nevermind' class='' onClick='window.location="<?php echo AppUtility::getURLFromHome('groups','groups/manage-student-groups?cid='.$course->id.'&grpSetId='.$grpSetId)?>"' /></p>
@@ -110,8 +110,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 {
                     echo "<br><b>Group: $grpName</b>&nbsp;&nbsp;";
                     echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
-                    echo "<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>[Delete]</a>";
-                    echo "<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>[Remove all members]</a>";
+                    echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]";
+                    echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
                     echo '<ul>';
                     if (count($page_GrpMembers[$grpId])==0)
                     {

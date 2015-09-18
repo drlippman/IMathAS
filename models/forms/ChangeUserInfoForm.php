@@ -4,6 +4,7 @@ namespace app\models\forms;
 
 use app\components\AppConstant;
 use app\components\AppUtility;
+use app\models\User;
 use Yii;
 use yii\base\Model;
 class ChangeUserInfoForm extends Model
@@ -106,19 +107,26 @@ class ChangeUserInfoForm extends Model
     }
 
 
-    public function checkPassword()
+    public function checkPassword($userid,$params)
     {
-        if (!$this->validate())
+        $params = $params['ChangeUserInfoForm'];
+        $data = User::getById($userid);
+        $oldPassword = AppUtility::passwordHash($params['password']);
+        if($params['password'] == $params['rePassword'])
         {
-            $errors = $this->getErrors();
-            if(isset($errors['invalid'][0]))
+            if(strcmp($oldPassword,$data['password']))
             {
-                $error = $errors['invalid'][0];
-                Yii::$app->session->setFlash('danger', $error);
+                return AppConstant::NUMERIC_TWO;
             }
-            return false;
+            else
+            {
+                return AppConstant::NUMERIC_ZERO;
+            }
         }
-        return true;
-    }
+        else
+        {
+            return AppConstant::NUMERIC_ONE;
+        }
+   }
 
 }

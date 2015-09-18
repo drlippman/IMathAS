@@ -35,15 +35,15 @@ $now = $currentTime;
 <div class="tab-content shadowBox">
     <div class="row course-copy-export">
         <div class="col-md-2 course-top-menu">
-            <a href="#"><?php AppUtility::t('Export');?></a>
-        </div>
-        <div class="col-md-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
-            <a href="<?php echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?>"><?php AppUtility::t('Student view');?></a>
+            <a href="#"><?php AppUtility::t('Export');?></a>
         </div>
-        <ul class="nav nav-tabs  roster-menu-bar-nav sub-menu col-md-2 pull-right">
+<!--        <div class="col-md-2 course-top-menu">-->
+<!--            <a href="--><?php //echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?><!--">--><?php //AppUtility::t('Student view');?><!--</a>-->
+<!--        </div>-->
+        <ul class="nav roster-menu-bar-nav sub-menu col-md-2">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>
                     <span class="caret right-aligned"></span></a>

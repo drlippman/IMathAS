@@ -1611,7 +1611,7 @@ class AdminController extends AppController
                             }
                         }
                         $qIds = $this->parseQs($filename,$toUse,$qRights);
-                        if(count($qIds) > AppConstant::NUMERIC_ZERO)
+                         if(count($qIds) > AppConstant::NUMERIC_ZERO)
                         {
                             $qIdsToCheck = implode(',',$qIds);
                             $qIdsToUpdate = array();
@@ -1729,7 +1729,6 @@ class AdminController extends AppController
      ,'myRights' => $myRights,'parentsData' => $parents,'namesData' => $names);
         return $this->renderWithData('importLibrary',$responseData);
     }
-
     public function actionExportLib()
     {
         $this->guestUserHandler();
@@ -1791,13 +1790,14 @@ class AdminController extends AppController
                 {
                     array_unshift($rootLibs,$params['rootlib']);
                 }
+                $rootList = "'".implode("','",$rootLibs)."'";
                 global $libCnt,$libs,$nonPrivate;
                 $libCnt = AppConstant::NUMERIC_ONE;
                 $libs = Array();
                 $parents = Array();
                 $names = Array();
                 $nonPrivate = isset($_POST['nonpriv']);
-                $libraryData = Libraries::getLibraryData($rootLibs,$nonPrivate);
+                $libraryData = Libraries::getLibraryData($rootList,$nonPrivate);
                 if($libraryData)
                 {
                     foreach($libraryData as $row)
@@ -1847,7 +1847,7 @@ class AdminController extends AppController
                             $qAssoc[$row['qsetid']] = $qCnt;
                             $qCnt++;
                         }
-                        $libItems[$libs[$row['libid ']]][] = $qAssoc[$row['qsetid']];
+                        $libItems[$libs[$row['libid']]][] = $qAssoc[$row['qsetid']];
                     }
                 }
                 if($libs)
@@ -2085,7 +2085,6 @@ class AdminController extends AppController
 
     function parseQs($file,$toUse,$rights)
     {
-
         $toUse = explode(',',$toUse);
         $qNum = -1;
         $part = '';
@@ -2102,9 +2101,12 @@ class AdminController extends AppController
         $line = '';
         while ((!$nogz || !feof($handle)) && ($nogz || !gzeof($handle)))
         {
-            if ($nogz) {
+            if ($nogz)
+            {
                 $line = rtrim(fgets($handle, 4096));
-            } else {
+            }
+            else
+            {
                 $line = rtrim(gzgets($handle, 4096));
             }
             if ($line == "START QUESTION")
@@ -2223,7 +2225,8 @@ class AdminController extends AppController
         } else {
             gzclose($handle);
         }
-        foreach($qdata as $k=>$val) {
+        foreach($qdata as $k=>$val)
+        {
             $qdata[$k] = rtrim($val);
         }
         if (in_array($qdata['qid'],$toUse))
@@ -2234,18 +2237,19 @@ class AdminController extends AppController
                 $qIds[$qdata['qid']] = $qid;
             }
         }
-        return $qid;
+        return $qIds;
     }
     function writeQ($qd,$rights,$qn)
     {
         global $user,$isAdmin,$updateQ,$newQ,$isGrpAdmin,$params;
         $now = time();
+        $qd = array_map(array($this,'addslashes_deep'),$qd);
         $QuestionSetData = QuestionSet::getLastModDateAndId($qd['uqid']);
         if ($QuestionSetData)
         {
-            $qSetId = $QuestionSetData[0]['id'];
-            $addDate = $QuestionSetData[0]['adddate'];
-            $lastModDate = $QuestionSetData[0]['adddate'];
+            $qSetId = $QuestionSetData['id'];
+            $addDate = $QuestionSetData['adddate'];
+            $lastModDate = $QuestionSetData['adddate'];
             $exists = true;
         } else
         {
@@ -2307,7 +2311,8 @@ class AdminController extends AppController
         } else if ($exists && $params['merge']==-1)
         {
             return $qSetId;
-        } else
+        }
+        else
         {
             $importUIdStr = '';
             $importUIdVal = '';

@@ -652,26 +652,46 @@ class SiteController extends AppController
         $userid = $this->getUserId();
         $user = User::findByUserId($userid);
         $model = new ChangeUserInfoForm();
-        $r = $model->checkPassword();
-        AppUtility::dump($r);
-        if ($model->load($this->isPostMethod()) && $model->checkPassword())
+        $params = $this->getRequestParams();
+        if ($this->isPostMethod())
         {
-            $params = $this->getRequestParams();
-            $params = $params['ChangeUserInfoForm'];
-            $model->file = UploadedFile::getInstance($model, 'file');
-            if ($model->file ) {
-                $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
-                $model->remove= AppConstant::NUMERIC_ZERO;
-                if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
-                User::updateImgByUserId($userid);
+            if(!$params['ChangeUserInfoForm']['oldPassword'] && !$params['ChangeUserInfoForm']['password'] && !$params['ChangeUserInfoForm']['rePassword'])
+            {
+                $result = AppConstant::NUMERIC_TWO;
             }
-            if($model->remove == AppConstant::NUMERIC_ONE){
-                User::deleteImgByUserId($userid);
-                unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+            else
+            {
+                $result = $model->checkPassword($userid,$params);
             }
-            User::saveUserRecord($params,$user);
-            $this->setSuccessFlash('Changes updated successfully.');
-            return $this->redirect('dashboard');
+            if($result == AppConstant::NUMERIC_ONE)
+            {
+                $this->setErrorFlash('New password must match with confirm password');
+                return $this->redirect('change-user-info');
+            }
+            else if($result == AppConstant::NUMERIC_ZERO)
+            {
+                $this->setErrorFlash('Incorrect old Password');
+                return $this->redirect('Change-user-info');
+            }
+            else if($result == AppConstant::NUMERIC_TWO)
+            {
+                $params = $params['ChangeUserInfoForm'];
+                $model->file = UploadedFile::getInstance($model, 'file');
+                if ($model->file )
+                {
+                    $model->file->saveAs(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+                    $model->remove= AppConstant::NUMERIC_ZERO;
+                    if(AppConstant::UPLOAD_DIRECTORY.$user->id. '.jpg')
+                    User::updateImgByUserId($userid);
+                }
+                if($model->remove == AppConstant::NUMERIC_ONE){
+                    User::deleteImgByUserId($userid);
+                    unlink(AppConstant::UPLOAD_DIRECTORY . $user->id . '.jpg');
+                }
+                User::saveUserRecord($params,$user);
+                $this->setSuccessFlash('Changes updated successfully.');
+                return $this->redirect('dashboard');
+            }
         }
         $this->includeCSS(['dashboard.css']);
         $this->includeJS(['changeUserInfo.js']);

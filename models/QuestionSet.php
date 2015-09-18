@@ -329,7 +329,7 @@ class QuestionSet extends BaseImasQuestionset
             ->from(['imas_questionset'])
             ->where(['uniqueid' => $UId]);
         $command = $data->createCommand();
-        $data = $command->queryAll();
+        $data = $command->queryone();
         return $data;
 
     }

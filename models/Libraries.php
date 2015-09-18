@@ -205,17 +205,13 @@ class Libraries extends BaseImasLibraries
     public static function getLibraryData($rootLibs,$nonPrivate)
     {
 
-        $query = new Query();
-        $query ->select(['id','name','parent','uniqueid','lastmoddate'])
-                ->from('imas_libraries')
-                ->where(['IN','id',$rootLibs]);
-        if($nonPrivate)
+        $query = "SELECT id,name,parent,uniqueid,lastmoddate FROM imas_libraries WHERE id IN ($rootLibs)";
+        if ($nonPrivate)
         {
-            $query->andWhere(['>','userights','0']);
+            $query .= " AND userights>0";
         }
-        $query ->orderBy('uniqueid');
-        $command = $query->createCommand();
-        $data = $command->queryAll();
+        $query .= " ORDER BY uniqueid";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
     public static function getDataByParent($lib,$nonPrivate)
