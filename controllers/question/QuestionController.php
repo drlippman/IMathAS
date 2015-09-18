@@ -596,7 +596,7 @@ class QuestionController extends AppController
                                     $pageQuestionTable[$i]['qdata'] = array($avgTimePts[2], $avgTimePts[1], $avgTimePts[3]);
                                 }
                                 if ($searchAll == AppConstant::NUMERIC_ONE) {
-                                    $pageQuestionTable[$i]['lib'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/add-question?cid=' . $courseId . '&aid=' . $assessmentId . '&listlib=' . $line['libid']) . ">List lib</a>";
+                                    $pageQuestionTable[$i]['lib'] = "<a href=" . AppUtility::getURLFromHome('question', 'question/add-questions?cid=' . $courseId . '&aid=' . $assessmentId . '&listlib=' . $line['libid']) . ">List lib</a>";
                                 } else {
                                     $pageQuestionTable[$i]['junkflag'] = $line['junkflag'];
                                     $pageQuestionTable[$i]['libitemid'] = $line['libitemid'];

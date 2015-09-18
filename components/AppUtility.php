@@ -2802,11 +2802,11 @@ class AppUtility extends Component
             list($answerbox,$tips[0],$shans[0]) = makeanswerbox($qdata['qtype'],$qn,$la,$options,0);
         }
 
-        echo "<div class=q>";
+        echo "<div class='col-md-12 q'>";
         if ($isfinal) {
             echo "<div class=\"trq$qn\">\n";
         } else {
-            echo "<div class=m id=\"trq$qn\">\n";
+            echo "<div class='m col-md-12' id=\"trq$qn\">\n";
         }
         if ($showpts) {
             echo ($qn+1).'. ('.$pts.' pts) ';

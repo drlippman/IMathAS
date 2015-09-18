@@ -1095,6 +1095,7 @@ class AssessmentController extends AppController
             $ids[$k] = intval($id);
         }
 
+        $this->includeCSS(['assessment.css']);
         $licenseData = QuestionSet::getLicenseData($ids);
         $renderData = array('licenseData' => $licenseData);
         return $this->renderWithData('showLicense', $renderData);

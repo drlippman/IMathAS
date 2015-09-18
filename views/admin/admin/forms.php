@@ -671,15 +671,14 @@ switch($action) {
         break;
     case "listltidomaincred":
 
-//        if ($myrights<100) { echo "not allowed"; exit;}
-        echo '<div id="headerforms" class="pagetitle">';
+        echo '<div class="col-md-12 modify-lti-domain-credential"><div id="headerforms" class="pagetitle">';
         echo "<h3>Modify LTI Domain Credentials</h3>\n";
         echo '</div>';
-        echo "<table><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr>\n";
+        echo "<table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'><thead><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr></thead>\n";
 
         foreach ($users as $row) {
 
-            echo "<tr><td>{$row['email']}</td><td>{$row['SID']}</td>";
+            echo "<tbody><tr><td>{$row['email']}</td><td>{$row['SID']}</td>";
             if ($row['rights']==76) {
                 echo '<td>Yes</td>';
             } else {
@@ -693,26 +692,69 @@ switch($action) {
            <?php }
             echo "</tr>\n";
         }
-        echo "</table>\n";
+        echo "</tbody></table>\n";
             ?>
          <form method=post action="actions?action=modltidomaincred&id=new">
-        <?php echo "<p>Add new LTI key/secret: <br/>";
-        echo "Domain: <input type=text name=\"ltidomain\" size=20><br/>\n";
-        echo "Key: <input type=text name=\"ltikey\" size=20><br/>\n";
-        echo "Secret: <input type=text name=\"ltisecret\" size=20><br/>\n";
-        echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" selected=\"selected\">No</option>";
-        echo "<option value=\"76\">Yes, and creates $installname login</option>";
-        //echo "<option value=\"77\">Yes, with access via LMS only</option>
-        echo "</select><br/>\n";
-        echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
+        <?php echo "
+        <div class='col-md-12 padding-left-zero'>
+
+        <div class='col-md-12 padding-left-zero'> Add new LTI key/secret</div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <span class='col-md-2 padding-left-zero'>Domain</span>
+            <div class='col-md-4 padding-left-zero'>
+                <input class='form-control' type=text name=\"ltidomain\" size=20>
+            </div>
+        </div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <span class='col-md-2 padding-left-zero'>Key</span>
+            <div class='col-md-4 padding-left-zero'>
+                <input class='form-control' type=text name=\"ltikey\" size=20>
+            </div>
+        </div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <span class='col-md-2 padding-left-zero'>Secret</span>
+            <div class='col-md-4 padding-left-zero'>
+                <input class='form-control' type=text name=\"ltisecret\" size=20>
+            </div>
+        </div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <span class='col-md-2 padding-left-zero'>Can create instructors</span>
+            <div class='col-md-4 padding-left-zero'>
+                <select class='form-control' name=\"createinstr\">
+                    <option value=\"11\" selected=\"selected\">No</option>
+                    <option value=\"76\">Yes, and creates $installname login</option>
+                </select>
+            </div>
+        </div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <span class='col-md-2 padding-left-zero'>Associate with group</span>
+            <div class='col-md-4 padding-left-zero'>
+                <select class='form-control' name='groupid'>
+                    <option value='0'>Default</option>";
 
         foreach ($groupsName as $group ) {
             echo '<option value="'.$group['id'].'">'.$group['name'].'</option>';
         }
-        echo '</select><br/>';
-        echo "<input type=submit value=\"Add LTI Credentials\"></p>\n";
-        echo "</form>\n";
+
+        echo "</select>
+        </div>
+        </div>
+
+        <div class='margin-top-twenty col-md-12 padding-left-zero'>
+            <input type=submit value=\"Add LTI Credentials\">
+        </div>
+        </div>
+        </div></form>
+        ";
+
         break;
+
+
     case "modltidomaincred":
 //        if ($myrights<100) { echo "not allowed"; exit;}
         echo '<div id="headerforms" class="pagetitle">';
@@ -741,12 +783,12 @@ switch($action) {
         break;
 
     case "listgroups":
-        echo '<div id="headerforms" class="pagetitle">';
+        echo '<div class="col-md-12 modify-group-padding"><div id="headerforms" class="pagetitle">';
         echo "<h3>Modify Groups</h3>\n";
         echo '</div>';
-        echo "<table class='table table-bordered table-striped table-hover data-table'><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr>\n";
+        echo "<table class='margin-top-twenty table table-bordered table-striped table-hover data-table'><thead><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr></thead>\n";
         foreach($groupsName as $row) {
-            echo "<tr><td>{$row['name']}</td>"; ?>
+            echo "<tbody><tr><td>{$row['name']}</td>"; ?>
               <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>">Modify</a></td>
             <?php if ($row['id']==0) {
                 echo "<td></td>";
@@ -757,9 +799,12 @@ switch($action) {
         }
         echo "</table>\n"; ?>
          <form method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=addgroup');?>">
-        <?php  echo "Add new group: <input type=text name=gpname id=gpname size=50><br/>\n";
-        echo "<input type=submit value=\"Add Group\">\n";
-        echo "</form>\n";
+        <?php  echo "<div class='col-md-12 margin-top-twenty padding-left-zero'>
+                        <span class='floatleft select-text-margin'>Add new group</span>
+                       <input class='width-thirty-per floatleft margin-left-thirty form-control' type=text name=gpname id=gpname size=50>
+                      </div>";
+        echo "<div class='margin-top-twenty col-md-2 padding-left-zero'> <input type=submit value=\"Add Group\"><div>";
+        echo "</tbody></form></div>";
         break;
     case "modgroup":
         echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';

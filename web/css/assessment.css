@@ -61,3 +61,22 @@ table td {
 .assessment-body{
     margin-left: 35%;
 }
+.modify-lti-domain-credential {
+    margin-left: 15px;
+    margin-top: 5px;
+    margin-bottom: 30px;
+    padding-right: 45px !important;
+}
+.modify-group-padding {
+    padding: 5px 30px 30px 30px !important;
+}
+.show-license-question {
+    background-color: #F8F8F8;
+    margin-top: 20px;
+    padding-left: 20px !important;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+.show-license-shadowbox {
+    padding: 10px 30px 30px 30px !important;
+}

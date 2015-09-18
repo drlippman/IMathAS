@@ -170,10 +170,10 @@ if (!isset($params['versions'])) {
                     $headerleft .= "<br/>";
                 }
                 $headerright = '';
-                echo "<div class=q>\n";
-                echo "<div class=hdrm>\n";
+                echo "<div class='print-test-header q'>\n";
+                echo "<div class='col-md-12 hdrm'>\n";
 
-                echo "<div id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
+                echo "<div class='margin-left-twenty' id=headerleft>$headerleft</div><div id=headerright>$headerright</div>\n";
                 echo "<div id=intro>{$line['intro']}</div>\n";
                 echo "</div>\n";
                 echo "</div>\n";

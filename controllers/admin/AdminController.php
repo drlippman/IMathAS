@@ -772,7 +772,7 @@ class AdminController extends AppController
                 break;
         }
         $this->includeCSS(['imascore.css','assessment.css']);
-        $this->includeJS(["general.js"]);
+        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,

@@ -249,6 +249,13 @@ div.dialog-items{
 .add-assessment-margin {
     margin-left: 15px;
     margin-bottom: 30px;
-    margin-right: 30px;
+    margin-right: 15px;
     margin-top: 10px;
+}
+.assement-options-margin {
+    margin-left: -15px !important;
+    width: 102.6% !important;
+}
+.select-ask-ques-link select, .select-use-group-set select, .select-gradebook-category select, .select-tutor-access select{
+    width:50%;
 }

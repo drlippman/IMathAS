@@ -23,13 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox col-md-12" style="padding-bottom: 15px">
+<div class="tab-content shadowBox col-md-12 show-license-shadowbox">
 <?php
 
 
 
 foreach ($licenseData as $row) {
-    echo "<div class='col-md-12' style='background-color: #F8F8F8; margin-top: 15px'><p>Question ID ".$row['id'].' (Universal ID '.$row['uniqueid'].')</p>';
+    echo "<div class='col-md-12 show-license-question'><p>Question ID ".$row['id'].' (Universal ID '.$row['uniqueid'].')</p>';
     echo \app\components\AssessmentUtility::getquestionlicense($row);
     echo '</div>';
 }
