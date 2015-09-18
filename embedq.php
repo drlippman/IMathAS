@@ -17,7 +17,9 @@ require("./assessment/displayq2.php");
 
 $sessiondata = array();
 $sessiondata['graphdisp'] = 1;
-$sessiondata['mathdisp'] = 2;
+$sessiondata['mathdisp'] = 1;
+$showtips = 2;
+$useeqnhelper = 4;
 $sessiondata['drill']['cid'] = 0;
 $sessiondata['drill']['sa'] = 0;
 if (empty($_GET['id'])) {
@@ -80,7 +82,22 @@ if (isset($_POST['seed'])) {
 }
 
 $flexwidth = true; //tells header to use non _fw stylesheet
-$placeinhead = '<style type="text/css">div.question {width: auto;} div.review {width: auto; margin-top: 5px;} body {height:auto;}</style>';
+$placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/assessment/mathquill.css?v=102113\" type=\"text/css\" />";
+if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE')!==false) {
+	$placeinhead .= '<!--[if lte IE 7]><style style="text/css">
+		.mathquill-editable.empty { width: 0.5em; }
+		.mathquill-rendered-math .numerator.empty, .mathquill-rendered-math .empty { padding: 0 0.25em;}
+		.mathquill-rendered-math sup { line-height: .8em; }
+		.mathquill-rendered-math .numerator {float: left; padding: 0;}
+		.mathquill-rendered-math .denominator { clear: both;width: auto;float: left;}
+		</style><![endif]-->';
+}
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquill_min.js?v=102113\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/mathquilled.js?v=070214\"></script>";
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/AMtoMQ.js?v=102113\"></script>";
+$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/eqntips.js?v=032810\"></script>";
+
 $useeditor = 1;
 require("./assessment/header.php");
 
