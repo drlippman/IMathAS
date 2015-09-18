@@ -44,6 +44,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-2"><a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'</a></div>
             <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('question','question/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
             <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div></div>';
+        if ($displaymethod=='VideoCue') {
+            echo '<p><input type=button value="Define Video Cues" onClick="window.location='.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'"/></p>';
+        }
          ?>
     </div>
     <div class="assessment-ques-shadowbox">
@@ -89,8 +92,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo " <li>Click the <b>Add</b> button above the question list to add the questions to your assessment</li> ";
                     echo "  </ul>";
             echo '</div>';
-            echo '</div>';
-        } else { ?>
+            echo '</div>'; ?>
+
+                <script>
+                    var itemarray = <?php echo 0; ?>;
+                </script>
+      <?php  } else { ?>
                 <form id="curqform" method="post" action="add-questions?modqs=true&aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
                 <?php
                 if (!$beentaken) {?>
@@ -120,10 +127,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     var itemarray = <?php echo $jsarr ?>;
                     var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
                 </script>
-        <?php }
-        if ($displaymethod=='VideoCue') {
-            echo '<p><input type=button value="Define Video Cues" onClick="window.location='.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'"/></p>';
-        } ?>
+        <?php } ?>
     </div>
 </div>
 <div class="tab-content shadowBox margin-top-fifteen">

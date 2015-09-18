@@ -951,7 +951,7 @@ class QuestionController extends AppController
         $this->includeCSS(['question/libtree.css']);
         $this->includeJS(['general.js', 'tablesorter.js', 'question/addquestions.js', 'question/addqsort.js', 'question/junkflag.js', 'question/libtree2.js']);
         $renderData = array('myRights' => $myRights, 'params' => $params, 'libraryData' => $libraryData);
-        return $this->renderWithData('questionLibrary', $renderData);
+        return $this->renderWithData('questionLibraries', $renderData);
     }
 
     public function actionModDataSet()

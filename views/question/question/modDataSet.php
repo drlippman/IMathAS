@@ -11,7 +11,11 @@ if($courseId == 'admin') {
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
+    <?php if($params['cid'] == "admin"){ ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'ManageQuestionSet'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/manage-question-set?cid=admin'] ,'page_title' => $this->title]); ?>
+    <?php } else{ ?>
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$params['aid']] ,'page_title' => $this->title]); ?>
+    <?php }?>
 </div>
 <div class = "title-container">
     <div class="row">

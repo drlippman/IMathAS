@@ -12,7 +12,9 @@ var imasroot = $('.home-path').val();
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 function generate(){
+    if(itemarray != 0) {
     document.getElementById("curqtbl").innerHTML = generateTable();
+    }
 }
 
 function refreshTable() {

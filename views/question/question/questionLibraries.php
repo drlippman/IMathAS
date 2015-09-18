@@ -296,3 +296,6 @@ END;
     echo $colorcode;
 }
 ?>
+<script>
+    var itemarray = <?php echo 0; ?>;
+</script>
