@@ -58,17 +58,7 @@ body {
     height: 50px;
     width: 150px
 }
-/*.index-header .right-side .right-item{*/
 
-/*}*/
-/*.index-header .right-side .item-icon{*/
-/*float: left;*/
-/*margin-top: 10px;*/
-/*margin-left: 5px;*/
-/*height: 34px;*/
-/*width: 34px;*/
-/*background: url("../img/two_gears.png");*/
-/*}*/
 .index-header .right-side .item-icon{
     float: left;
     margin-top: 10px;
@@ -137,11 +127,7 @@ body {
     padding-right: 12%;
     padding-left: 0%;
 }
-/*.right-side-button{*/
-/*background-color: #104E88;*/
-/*height: 50px;*/
-/*width: 150px*/
-/*}*/
+
 .btn{
     padding: 6px 6px;
 }
@@ -163,7 +149,6 @@ body {
     font-size: 15px;
     margin-left: 10px;
     margin-top: 0;
-    /*padding: 20%;*/
 }
 
 .add-help{
@@ -377,7 +362,7 @@ i.fa-home{
     overflow-y: scroll;
     height: auto;
     min-width: 100%;
-    max-width: 300px;
+    max-width: 500px;
     max-height: 300px;
 
 

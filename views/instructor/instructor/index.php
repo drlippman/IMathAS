@@ -34,17 +34,11 @@ $now = $currentTime;
 
 <div class="tab-content shadowBox">
     <div class="row course-copy-export">
-        <div class="col-md-1 course-top-menu">
-            <a href="#"><?php AppUtility::t('Copy All');?></a>
+        <div class="col-md-2 course-top-menu">
+            <a href="#"><?php AppUtility::t('Export');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
-            <a href="#"><?php AppUtility::t('Export Course');?></a>
-        </div>
-        <div class="col-md-2 course-top-menu">
-            <a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('outcomes');?></a>
-        </div>
-        <div class="col-md-2 course-top-menu">
-            <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('CopyCourse');?></a>
+            <a href="<?php echo AppUtility::getURLFromHome('instructor','instructor/copy-course-items?cid='.$course->id);?>"><?php AppUtility::t('Copy Items');?></a>
         </div>
         <div class="col-md-2 course-top-menu">
             <a href="<?php echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?>"><?php AppUtility::t('Student view');?></a>

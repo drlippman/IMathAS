@@ -1094,10 +1094,10 @@ div.review {
     border-left:1px solid #a9a9a9;
     border-bottom: 1px solid #ffffff;
 }
-.nav-tabs .dropdown-menu {
-    max-width: 100%;
-    overflow-x: scroll;
-}
+/*.nav-tabs .dropdown-menu {*/
+    /*max-width: 100%;*/
+    /*overflow-x: scroll;*/
+/*}*/
 .nav-tabs .roster-enroll-options a{
     padding: 3px 5px !important;
 }

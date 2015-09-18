@@ -8,17 +8,18 @@ use app\components\AppUtility;
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Manage');?><span class="caret"></span></a>
             <ul class="dropdown-menu settings-menu">
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>"><?php AppUtility::t('Assign Sections and/or Codes');?></a></li>
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>"><?php AppUtility::t('Manage LatePass');?></a></li>
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid='.$course->id); ?>"><?php AppUtility::t('Manage Tutors');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'assign-sections-and-codes?cid='.$course->id); ?>"><?php AppUtility::t('Sections and codes');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-late-passes?cid='.$course->id); ?>"><?php AppUtility::t('LatePass');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'manage-tutors?cid='.$course->id); ?>"><?php AppUtility::t('Tutors');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('outcomes','outcomes/add-outcomes?cid='.$course->id);?>"><?php AppUtility::t('Outcomes');?></a></li>
             </ul>
         </li>
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><?php AppUtility::t('Enroll Students');?><span class="caret"></span></a>
             <ul class="dropdown-menu enroll-options roster-enroll-options">
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>"><?php AppUtility::t('Enroll Student with known username');?></a></li>
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>"><?php AppUtility::t('Enroll Student from another Course');?></a></li>
-                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>"><?php AppUtility::t('Create and Enroll new student');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'student-enrollment?cid='.$course->id.'&enroll=student'); ?>"><?php AppUtility::t('With known username');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'enroll-from-other-course?cid='.$course->id); ?>"><?php AppUtility::t('From another Course');?></a></li>
+                <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'create-and-enroll-new-student?cid='.$course->id); ?>"><?php AppUtility::t('Create new student');?></a></li>
             </ul>
         </li>
         <li><a href="<?php echo AppUtility::getURLFromHome('roster/roster', 'import-student?cid='.$course->id); ?>"><?php AppUtility::t('Import Students');?></a></li>
