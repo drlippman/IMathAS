@@ -16,8 +16,9 @@ require("interpret5.php");
 require("macros.php");
 function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt=false,$clearla=false,$seqinactive=false,$qcolors=array()) {
 	//$starttime = microtime(true);
-	global $imasroot, $myrights, $showtips, $urlmode, $CFG;AppUtility::dump('kjsdjhsjhgshjd');
+	global $imasroot, $myrights, $showtips, $urlmode, $CFG;
 	$imasroot = AppUtility::getHomeURL();
+    $path = AppUtility::getHomeURL()."Uploads";
 	if (!isset($_SESSION['choicemap'])) { $_SESSION['choicemap'] = array(); }
 	$GLOBALS['inquestiondisplay'] = true;
 
@@ -28,7 +29,6 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	} else {
 		$nosabutton = false;
 	}
-
     $qdata = QuestionSet::getByQuesSetId($qidx);
 
 	if ($qdata['hasimg']>0) {
@@ -37,7 +37,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 			if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
 				${$row['var']} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
 			} else {
-				${$row['var']} = "<img src=\"$imasroot\Uploads/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+				${$row['var']} = "<img src=\"$path/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
 			}
 		}
 	}

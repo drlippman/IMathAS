@@ -8,7 +8,7 @@
 $(document).ready(function () {
     generate();
 });
-var imasroot = '/openmath/web';
+var imasroot = $('.home-path').val();
 //output submitted via AHAH is new assessment itemorder in form:
 // item,item,n|w/wo~item~item,item
 function generate(){
@@ -292,9 +292,9 @@ function generateTable() {
 						html += "<input type=checkbox id=\"qc"+ln+"\" name=\"checked[]\" value=\""+(curisgroup?i+'-'+j:i)+":"+curitems[j][0]+"\"/></td><td>";
 					} else {
 						if (itemarray[i][3]==1) {
-							html += "<img src=\""+imasroot+"/img/collapse.gif\" onclick=\"collapseqgrp("+i+")\"/>";	
+							html += "<img src=\""+imasroot+"img/collapse.gif\" onclick=\"collapseqgrp("+i+")\"/>";
 						} else {
-							html += "<img src=\""+imasroot+"/img/expand.gif\" onclick=\"expandqgrp("+i+")\"/>";
+							html += "<img src=\""+imasroot+"img/expand.gif\" onclick=\"expandqgrp("+i+")\"/>";
 						}
 						html += '</td><td>';
 					}
@@ -347,13 +347,13 @@ function generateTable() {
 				var showicons = "_no";
 			}
 			if ((curitems[j][7]&4) == 4) {
-				html += '<img src="'+imasroot+'/img/video_tiny'+showicons+'.png"/>';
+				html += '<img src="'+imasroot+'img/video_tiny'+showicons+'.png"/>';
 			}
 			if ((curitems[j][7]&2) == 2) {
-				html += '<img src="'+imasroot+'/img/html_tiny'+showicons+'.png"/>';
+				html += '<img src="'+imasroot+'img/html_tiny'+showicons+'.png"/>';
 			}
 			if ((curitems[j][7]&8) == 8) {
-				html += '<img src="'+imasroot+'/img/assess_tiny'+showicons+'.png"/>';
+				html += '<img src="'+imasroot+'img/assess_tiny'+showicons+'.png"/>';
 			}  
 			html += "</div></td>";
 			html += "<td>"+curitems[j][1]+"</td>";

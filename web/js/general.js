@@ -1,12 +1,12 @@
 //dropdown menu
-var imasroot = '/openmath/web';
+var imasroot = $('.home-path').val();
 var closetimer	= 0;
 var ddmenuitem	= 0;
 var homemenuloaded = 0;
 // open hidden layer
 function mopen(id,cid) {	
 	if (id=='homemenu' && homemenuloaded==0) {
-		basicahah(imasroot+'/gethomemenu.php?cid='+cid,'homemenu');
+		basicahah(imasroot+'gethomemenu.php?cid='+cid,'homemenu');
 		homemenuloaded = 1;
 	}
 	mcancelclosetime();
@@ -406,7 +406,7 @@ function recclick(type,typeid,info,txt) {
 		}
 		jQuery.ajax({
 			type: "POST",
-			url: imasroot+'/course/rectrack.php?cid='+cid,
+			url: imasroot+'course/rectrack.php?cid='+cid,
 			data: "type="+encodeURIComponent(type)+"&typeid="+encodeURIComponent(typeid)+"&info="+encodeURIComponent(info+'::'+txt)+extradata
 		});
 	}			
@@ -525,7 +525,7 @@ function hidefromcourselist(el,cid) {
 	if (confirm("Are you SURE you want to hide this course from your course list?")) {
 		jQuery.ajax({
 				type: "GET",
-				url: imasroot+'/admin/hidefromcourselist.php?cid='+cid
+				url: imasroot+'admin/hidefromcourselist.php?cid='+cid
 		}).done(function(msg) {
 			if (msg=='OK') {
 				jQuery(el).parent().slideUp();
@@ -542,7 +542,7 @@ jQuery(document).ready(function($) {
 	$('body').fitVids();
 	$('a[target="_blank"]').each(function() {
 		if (!this.href.match(/youtu/) && !this.href.match(/vimeo/)) {
-		   $(this).append(' <img src="'+imasroot+'/img/extlink.png"/>')
+		   $(this).append(' <img src="'+imasroot+'img/extlink.png"/>')
 		}
 	});
 });

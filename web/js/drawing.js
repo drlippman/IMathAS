@@ -25,7 +25,7 @@ var curTarget = null;
 var nocanvaswarning = false;
 var hasTouch = false;
 var didMultiTouch = false;
-var imasroot = "/openmath/web";
+var imasroot = $('.home-path').val();
 /* 
    Canvas-based function drawing script
    (c) David Lippman, part of www.imathas.com
@@ -805,7 +805,7 @@ function drawMouseDown(ev) {
 			
 			var foundpt = findnearpoint(curTarget,mouseOff);
 			if (foundpt==null) { //not a current point
-				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pendown.cur), default';
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pendown.cur), default';
 				if (targets[curTarget].mode==1) {//if in dot mode
 					dots[curTarget].push([mouseOff.x,mouseOff.y]);
 					dragObj = {mode: 1, num: dots[curTarget].length-1};
@@ -887,7 +887,7 @@ function drawMouseDown(ev) {
 							curLine = null;
 						} else {
 							//if (foundpt[1]!=curLine) { //so long as point is not on current line, add it
-								targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pendown.cur), default';
+								targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pendown.cur), default';
 								lines[curTarget][curLine].push([mouseOff.x,mouseOff.y]);
 							//}
 						}
@@ -919,19 +919,19 @@ function drawMouseDown(ev) {
 				if (lines[curTarget][curLine].length<2) {
 					lines[curTarget].splice(curLine,1);
 				}
-				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 			}
 			if (curTPcurve != null) {
 				if (tplines[curTarget][curTPcurve].length<2) {
 					tplines[curTarget].splice(curTPcurve,1);
 				}
-				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 			}
 			if (curIneqcurve != null) {
 				if (ineqlines[curTarget][curIneqcurve].length<3) {
 					ineqlines[curTarget].splice(curIneqcurve,1);
 				}
-				targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+				targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 			}
 			curLine = null;
 			curTPcurve = null;
@@ -1084,7 +1084,7 @@ function drawMouseUp(ev) {
 		if (curLine==null && curTPcurve == null) {
 			targets[curTarget].el.style.cursor = 'move';
 		} else {
-			targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+			targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 		}
 		if (typeof ev != 'undefined') {
 			ev.preventDefault();
@@ -1170,7 +1170,7 @@ function drawMouseMove(ev) {
 				if (curLine==null) {
 					var foundpt = findnearpoint(tempTarget,mouseOff);
 					if (foundpt==null) {
-						targets[tempTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+						targets[tempTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 					} else {
 						targets[tempTarget].el.style.cursor = 'move';
 					}
@@ -1241,7 +1241,7 @@ function drawMouseMove(ev) {
 				} else { //see if we're near a point
 					var foundpt = findnearpoint(curTarget,mouseOff);
 					if (foundpt==null) {
-						targets[curTarget].el.style.cursor = 'url('+imasroot+'/img/pen.cur), default';
+						targets[curTarget].el.style.cursor = 'url('+imasroot+'img/pen.cur), default';
 					} else {
 						targets[curTarget].el.style.cursor = 'move';
 					}

@@ -35,7 +35,7 @@ function selectCheckBox() {
     });
 }
 function selectCheckBox1() {
-    $('.question-table input[name = "header-checked1"]').live("click",function(){
+    $('.question-table input[name = "header-checked1"]').click(function(){
         if($(this).prop("checked") == true){
             $('#question-information-table input:checkbox').each(function () {
                 $(this).prop('checked', true);

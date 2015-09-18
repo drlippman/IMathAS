@@ -31,7 +31,8 @@ AppAsset::register($this);
 <body>
 <?php $this->beginBody() ?>
 <div class="header-content">
-    <?php  echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount,'user' => $user]); ?>
+    <?php
+    echo $this->render('_header',['courseId' =>$courseId,'messageCount' => $messageCount,'totalCount' => $totalCount,'postCount' => $postCount,'user' => $user]); ?>
 </div>
 <div class="clear-both"></div>
 <div class="master-wrap">
@@ -61,7 +62,7 @@ AppAsset::register($this);
         </div>
     </div>
 </div>
-
+<input type="hidden" class="home-path" value="<?php echo AppUtility::getHomeURL();?>">
 <?php $this->endBody() ?>
 <div class="clear-both"></div>
 </body>

@@ -2738,6 +2738,7 @@ class AppUtility extends Component
 
     public static function printq($qn,$qsetid,$seed,$pts,$showpts) {
         global $isfinal,$imasroot,$urlmode,$displayformat,$anstypes,$evaledqtext;
+        $homePath = AppUtility::getHomeURL()."Uploads";
         srand($seed);
         $qdata = QuestionSet::getSelectedDataByQuesSetId($qsetid);
         if ($qdata['hasimg'] > AppConstant::NUMERIC_ZERO) {
@@ -2746,7 +2747,7 @@ class AppUtility extends Component
                 if(isset($GLOBALS['CFG']['GEN']['AWSforcoursefiles']) && $GLOBALS['CFG']['GEN']['AWSforcoursefiles'] == true) {
                     ${$row['var']} = "<img src=\"{$urlmode}s3.amazonaws.com/{$GLOBALS['AWSbucket']}/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
                 } else {
-                    ${$row['var']} = "<img src=\"$imasroot/Uploads/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
+                    ${$row['var']} = "<img src=\"$homePath/qimages/{$row['filename']}\" alt=\"".htmlentities($row['alttext'],ENT_QUOTES)."\" />";
                 }
             }
         }

@@ -16,12 +16,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-sm-12">
             <div class=" col-sm-6" style="right: 30px;">
-                <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('/openmath/web/docs/help.php?section=addingquestionstoanassessment','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
+                <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=addingquestionstoanassessment' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
             </div>
             <div class="col-sm-6" style="left: 35px;">
-                <div class="col-sm-5 col-sm-offset-5"> <a style="margin-left: 20px;" title="Preview this assessment" onclick="window.open('/openmath/web/assessment/assessment/show-assessment?cid=2&amp;id=10','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="/openmath/web/img/prvAssess.png">&nbsp;&nbsp;Preview Assessment</a></div>
+                <div class="col-sm-5 col-sm-offset-5"> <a style="margin-left: 20px;" title="Preview this assessment" onclick="window.open('<?php echo AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&amp;id='.$assessmentId) ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="<?php echo AppUtility::getHomeURL().'img/prvAssess.png' ?>">&nbsp;&nbsp;Preview Assessment</a></div>
                 <div class="col-sm-2 pull-right">
-                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="/openmath/web/instructor/instructor/index?cid=<?php echo $course->id?>" class="btn btn-primary  page-settings"><img class="small-icon" src="/openmath/web/img/done.png">&nbsp;Done</a>
+                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id) ?>" class="btn btn-primary  page-settings"><img class="small-icon" src="<?php echo AppUtility::getHomeURL().'img/done.png' ?>">&nbsp;Done</a>
                 </div>
             </div>
         </div>

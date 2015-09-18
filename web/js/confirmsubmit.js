@@ -2,7 +2,7 @@
 //taken from http://www.faqts.com/knowledge_base/view.phtml/aid/1756/fid/129
 function checkComplete (form) {
 	if (typeof tinyMCE != "undefined") {
-		try{tinyMCE.triggerSave();}catch(err1){};
+		try{tinyMCE.triggerSave();}catch(err1){}
 	}
 	if (!form.elements) { return true;} //temp fix for editor preventing this from working right
   for (var e = 0; e < form.elements.length; e++) {

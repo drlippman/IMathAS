@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-sm-12">
             <div class=" col-sm-10" style="right: 30px;">
-                <div class="vertical-align title-page"><?php echo AppUtility::t($pagetitle) ?><a href="#" onclick="window.open('/openmath/web/docs/help.php?section=managequestionset','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
+                <div class="vertical-align title-page"><?php echo AppUtility::t($pagetitle) ?><a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=managequestionset' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
             </div>
         </div>
     </div>
