@@ -1491,6 +1491,7 @@ class AdminController extends AppController
         $courseId = $this->getParamVal('cid');
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
+        $teacherId = AppConstant::TEACHER_RIGHT;
         $myRights  = $user->rights;
         if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
         {
@@ -1742,6 +1743,7 @@ class AdminController extends AppController
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
         $myRights  = $user->rights;
+        $teacherId = AppConstant::TEACHER_RIGHT;
         if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
         {
             $overwriteBody = AppConstant::NUMERIC_ONE;
@@ -2281,7 +2283,7 @@ class AdminController extends AppController
                 }
                 else
                 {
-                    $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin);
+                    $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin,0);
                 }
                 if ($affectedRow > 0)
                 {
@@ -2822,6 +2824,447 @@ class AdminController extends AppController
 
         $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body);
         return $this->renderWithData('manageLib', $responseData);
+    }
+
+    public function actionImportQuestionSet()
+    {
+        $this->guestUserHandler();
+        @set_time_limit(0);
+        ini_set("max_input_time", "600");
+        ini_set("max_execution_time", "600");
+        ini_set("memory_limit", "104857600");
+        ini_set("upload_max_filesize", "10485760");
+        ini_set("post_max_size", "10485760");
+        $installName = "MyOpenMath";
+        $overwriteBody = 0;
+        $body = "";
+        $pageTitle = $installName . "Import Questions";
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        $teacherId = AppConstant::TEACHER_RIGHT;
+        $courseId = $this->getParamVal('cid');
+        $user = $this->getAuthenticatedUser();
+        $params = $this->getRequestParams();
+        $myRights  = $user->rights;
+        if (!(isset($teacherId)) && $myRights< AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::NO_TEACHER_RIGHTS;
+
+        } elseif (isset($courseId) && $courseId == "admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::REQUIRED_ADMIN_ACCESS;
+        }
+        elseif (!(isset($courseId)) && $myRights < AppConstant::GROUP_ADMIN_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+            $body = AppConstant::ACCESS_THROUGH_MENU;
+        } else
+        {
+            $courseId = (isset($courseId)) ? $courseId : "admin" ;
+
+            if ($myRights < AppConstant::ADMIN_RIGHT)
+            {
+                $isGrpAdmin = true;
+            } else if ($myRights == AppConstant::ADMIN_RIGHT)
+            {
+                $isAdmin = true;
+            }
+            if (isset($params['process']))
+            {
+                $filename = AppConstant::UPLOAD_DIRECTORY.'importLibrary/' . $params['filename'];
+                $qData = $this->parseFile($filename);
+                $newLibs = explode(",",$params['libs']);
+                if (in_array('0',$newLibs) && count($newLibs) > AppConstant::NUMERIC_ONE)
+                {
+                    array_shift($newLibs);
+                }
+                $checked = $params['checked'];
+                $rights = $params['userights'];
+                foreach ($checked as $qn)
+                {
+                    if (is_numeric($qData[$qn]['uqid']))
+                    {
+                        $lookup[] = $qData[$qn]['uqid'];
+                    }
+                }
+                $questionSetData = QuestionSet::getDataForImportQSet($lookup);
+                if($questionSetData)
+                {
+                    foreach($questionSetData as $row)
+                    {
+                        $exists[$row['uniqueid']] = $row['id'];
+                        $addDate[$row['id']] = $row['adddate'];
+                        $lastMod[$row['id']] = $row['lastmoddate'];
+                    }
+                }
+                if (count($exists) > AppConstant::NUMERIC_ZERO)
+                {
+                    $LibraryItemData = LibraryItems::getDataForImportQSet($exists);
+                    if($LibraryItemData)
+                    {
+                        foreach($LibraryItemData as $row)
+                        {
+                            $doNotAddLi[$row['libid']] = $row['qsetid'];
+                        }
+                    }
+                }
+                $mt = microtime();
+                $newQ = 0;
+                $updateQ = 0;
+                $newLi = 0;
+                $now = time();
+                $allQIds = array();
+                $connection = $this->getDatabase();
+                $transaction = $connection->beginTransaction();
+                try
+                {
+                    foreach ($checked as $qn)
+                    {
+                        if (!empty($qData[$qn]['qimgs']))
+                        {
+                            $hasImg = 1;
+                        } else
+                        {
+                            $hasImg = 0;
+                        }
+                        if (isset($exists[$qData[$qn]['uqid']]) && $params['merge'] == AppConstant::NUMERIC_ONE)
+                        {
+                            $qSetId = $exists[$qData[$qn]['uqid']];
+                            if ($qData[$qn]['lastmod']>$addDate[$qSetId])
+                            {
+                                if ($isGrpAdmin)
+                                {
+                                    $query = QuestionSet::getQSetAndUserData($qSetId,$user->groupid);
+                                    if($query)
+                                    {
+                                        $affectedRow = QuestionSet::updateDataForImportQSet($qData[$qn],$now,$qSetId,$hasImg);
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qData[$qn],$hasImg,$now,$qSetId,$user,$isAdmin,1);
+                                }
+                                if($affectedRow > AppConstant::NUMERIC_ZERO)
+                                {
+                                    $updateQ++;
+                                    if (!empty($qd['qimgs']))
+                                    {
+                                        QImages::deleteByQsetId($qSetId);
+                                        $qImages = explode("\n",trim($qd['qimgs']));
+                                        if($qImages)
+                                        {
+                                            foreach($qImages as $qimg)
+                                            {
+                                                $p = explode(',',$qimg);
+                                                $QImages = new QImages();
+                                                $QImages->insertFilename($qSetId,$p);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                        elseif(isset($exists[$qData[$qn]['uqid']]) && $params['merge']==-AppConstant::NUMERIC_ONE)
+                        {
+                            $qSetId = $exists[$qData[$qn]['uqid']];
+                        }
+                        else
+                        {
+                            $importUIdVal = '';
+                            if ($qData[$qn]['uqid']=='0' || (isset($exists[$qData[$qn]['uqid']]) && $params['merge'] == AppConstant::NUMERIC_ZERO))
+                            {
+                                $importUIdVal = $qData[$qn]['uqid'];
+                                $qData[$qn]['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
+                            }
+                            $insert = new QuestionSet();
+                            $insertId = $insert->InsertData($now,$user,$qData[$qn],$importUIdVal,$hasImg,$rights);
+                            $qSetId = $insertId;
+                            if (!empty($qData[$qn]['qimgs']))
+                            {
+                                $qImages = explode("\n",$qData[$qn]['qimgs']);
+                                if($qImages)
+                                {
+                                    foreach($qImages as $qImg)
+                                    {
+                                        $p = explode(',',$qImg);
+                                        $QImages = new QImages();
+                                        $QImages->insertFilename($qSetId,$p);
+                                    }
+                                }
+                            }
+                            $newQ++;
+                        }
+                        foreach ($newLibs as $lib)
+                        {
+                            if (!(isset($doNotAddLi[$lib]) && $doNotAddLi[$lib] == $qSetId))
+                            {
+
+                                $insert = new LibraryItems();
+                                $insert->insertData($lib,$qSetId,$user);
+                                $newLi++;
+                            }
+                        }
+                        $allQIds[] = $qSetId;
+                    }
+                    unlink($filename);
+                    $qIdsToUpdate = array();
+                    $qIdsToCheck = implode(',',$allQIds);
+                    $questionSetData = QuestionSet::findDataToImportLib($qIdsToCheck);
+                    $includedQs = array();
+                    if($questionSetData)
+                    {
+                        foreach($questionSetData as $row)
+                        {
+                            $qIdsToUpdate[] = $row['id'];
+                            if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row['control'],$matches,PREG_PATTERN_ORDER) >0)
+                            {
+                                $includedQs = array_merge($includedQs,$matches[1]);
+                            }
+                            if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row['qtext'],$matches,PREG_PATTERN_ORDER) >0)
+                            {
+                                $includedQs = array_merge($includedQs,$matches[1]);
+                            }
+                        }
+                    }
+                    if(count($qIdsToUpdate) > AppConstant::NUMERIC_ZERO)
+                    {
+                        $includedBackRef = array();
+                        if(count($includedQs) > AppConstant::NUMERIC_ZERO)
+                        {
+                            $includedList = implode(',',$includedQs);
+                            $idAndUniqueId = QuestionSet::getUniqueId($includedList);
+                            if($idAndUniqueId)
+                            {
+                                foreach($idAndUniqueId as $row)
+                                {
+                                    $includedBackRef[$row['uniqueid']] = $row['id'];
+                                }
+                            }
+                        }
+                        $updateList = implode(',',$qIdsToUpdate);
+                        $data = QuestionSet::getDataToImportLib($updateList);
+                        if($data)
+                        {
+                            foreach($data as $row)
+                            {
+                                $control = addslashes(preg_replace('/includecodefrom\(UID(\d+)\)/e','"includecodefrom(".$includedbackref["\\1"].")"',$row['control']));
+                                $qText = addslashes(preg_replace('/includeqtextfrom\(UID(\d+)\)/e','"includeqtextfrom(".$includedbackref["\\1"].")"',$row['qtext']));
+                                QuestionSet::updateQuestionSetToImportLib($control,$qText,$row['id']);
+                            }
+                        }
+                    }
+                    $transaction->commit();
+                }
+                catch (Exception $e)
+                {
+                    $transaction->rollBack();
+                    return false;
+                }
+            }
+            elseif($_FILES['userfile']['name']!='')
+            {
+                $page_fileErrorMsg = "";
+                $page_fileNoticeMsg = "";
+                $uploadDir = AppConstant::UPLOAD_DIRECTORY.'importLibrary/';
+                $uploadFile = $uploadDir . basename($_FILES['userfile']['name']);
+
+                if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile))
+                {
+                    $page_fileHiddenInput = "<input type=hidden name=\"filename\" value=\"".basename($uploadFile)."\" />\n";
+                } else
+                {
+                    $page_fileErrorMsg .= "<p>Error uploading file!</p>\n";
+                }
+                $qData = $this->parseFile($uploadFile);
+                if (!isset($qData['pack']) && !isset($qData['libdesc']))
+                {
+                    $page_fileErrorMsg .= "This does not appear to be a valid IMathAS file. <a href='".AppUtility::getURLFromHome('admin','admin/import-question-set?cid='.$courseId)."'>Try Again</a>";
+                }
+                if($qData)
+                {
+                    foreach ($qData as $qnd)
+                    {
+                        if(is_array($qnd))
+                        {
+                            if (is_numeric($qnd['uqid']))
+                            {
+                                $lookup[] = $qnd['uqid'];
+                            }
+                        }
+                    }
+                }
+                if($lookup)
+                {
+                    $questionSetData = QuestionSet::getDataForImportQSet($lookup);
+                }
+                if($questionSetData)
+                {
+                    $existing = true;
+                    $page_existingMsg = "<p>This file contains questions with uniqueids that already exist on this system.  With these questions, do you want to:<br/>\n";
+                    $page_existingMsg .= "<input type=radio name=merge value='1' CHECKED>Update existing questions<br><input type=radio name=merge value='0'>Add as new question<br><input type=radio name=merge value='-1'>Keep existing question</p>\n";
+                }
+                else
+                {
+                    $existing = false;
+                    $page_existingMsg = "";
+                }
+                if (isset($qData['pack']))
+                {
+                    $importLibLink = AppUtility::getURLFromHome('admin','admin/import-lib?cid='.$courseId);
+                    $page_fileNoticeMsg .=  "<p>This file contains a library structure as well as questions.  Continue to use this form ";
+                    $page_fileNoticeMsg .=  "if you with to import individual questions.<br />  Use the <a href='.$importLibLink'>Import Libraries</a> ";
+                    $page_fileNoticeMsg .=  "page to import the libraries with structure</p>\n";
+                }
+            }
+            else
+            {
+                //STEP 1 DATA MANIPULATION
+            }
+        }
+        $this->layout = 'master';
+        $responseData = array('overwriteBody' => $overwriteBody,'body' =>$body,'params' => $params,'courseId' => $courseId,'newQ' => $newQ,'updateQ' => $updateQ,'newLi' => $newLi,
+            'page_fileNoticeMsg' => $page_fileNoticeMsg,'page_fileErrorMsg' => $page_fileErrorMsg,'page_fileHiddenInput' => $page_fileHiddenInput,'qData' => $qData,'page_existingMsg' => $page_existingMsg,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin);
+        return $this->renderWithData('importQuestionSet',$responseData);
+    }
+
+    function parseFile($file)
+    {
+        $handle = fopen($file,"r");
+        $qNum = -AppConstant::NUMERIC_ONE;
+        $part = '';
+        while (!feof($handle))
+        {
+            $line = rtrim(fgets($handle, 4096));
+            if ($line == "LIBRARY DESCRIPTION")
+            {
+                $part = "libdesc";
+                continue;
+            } else if ($line=="PACKAGE DESCRIPTION")
+            {
+                $qData['pack'] = 'set';
+                continue;
+            }
+            else if ($line == "START QUESTION")
+            {
+                $part = '';
+                if ($qNum>-1)
+                {
+                    foreach($qData[$qNum] as $k=>$val)
+                    {
+                        $qData[$qNum][$k] = rtrim($val);
+                    }
+                }
+                $qNum++;
+                continue;
+            }
+            else if ($line == "UQID")
+            {
+                $part = 'uqid';
+                continue;
+            }
+            else if ($line == "LASTMOD")
+            {
+                $part = 'lastmod';
+                continue;
+            }
+            else if ($line == "DESCRIPTION")
+            {
+                $part = 'description';
+                continue;
+            }
+            else if ($line == "AUTHOR")
+            {
+                $part = 'author';
+                continue;
+            }else if ($line == "CONTROL")
+            {
+                $part = 'control';
+                continue;
+            }else if ($line == "QCONTROL")
+            {
+                $part = 'qcontrol';
+                continue;
+            }else if ($line == "QTEXT")
+            {
+                $part = 'qtext';
+                continue;
+            }else if ($line == "QTYPE")
+            {
+                $part = 'qtype';
+                continue;
+            }else if ($line == "ANSWER")
+            {
+                $part = 'answer';
+                continue;
+            }else if ($line == "SOLUTION")
+            {
+                $part = 'solution';
+                continue;
+            }else if ($line == "SOLUTIONOPTS")
+            {
+                $part = 'solutionopts';
+                continue;
+            }else if ($line == "EXTREF")
+            {
+                $part = 'extref';
+                continue;
+            }else if ($line == "LICENSE")
+            {
+                $part = 'license';
+                continue;
+            }else if ($line == "ANCESTORAUTHORS")
+            {
+                $part = 'ancestorauthors';
+                continue;
+            }else if ($line == "OTHERATTRIBUTION")
+            {
+                $part = 'otherattribution';
+                continue;
+            }else if ($line == "QIMGS")
+            {
+                $part = 'qimgs';
+                continue;
+            }else
+            {
+                if ($part=="libdesc")
+                {
+                    $qData['libdesc'] .= $line . "\n";
+                }
+                else if ($part=="qtype")
+                {
+                    if ($qNum>-1)
+                    {
+                        $qData[$qNum]['qtype'] .= $line;
+                    }
+                }
+                else
+                {
+                    if ($qNum>-1 && $part!='')
+                    {
+                        $qData[$qNum][$part] .= $line . "\n";
+                    }
+                }
+            }
+        }
+        fclose($handle);
+        if ($qNum > -1)
+        {
+            foreach($qData[$qNum] as $k=>$val)
+            {
+                $qData[$qNum][$k] = rtrim($val);
+            }
+        }
+        return $qData;
     }
 
 }

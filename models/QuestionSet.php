@@ -358,15 +358,25 @@ class QuestionSet extends BaseImasQuestionset
         return $data;
     }
 
-    public static function UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin)
+    public static function UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin,$num)
     {
         $query = "UPDATE imas_questionset SET description='{$qd['description']}',author='{$qd['author']}',";
         $query.= "qtype='{$qd['qtype']}',control='{$qd['control']}',qcontrol='{$qd['qcontrol']}',qtext='{$qd['qtext']}',";
         $query.= "answer='{$qd['answer']}',extref='{$qd['extref']}',license='{$qd['license']}',ancestorauthors='{$qd['ancestorauthors']}',otherattribution='{$qd['otherattribution']}',";
         $query.= "solution='{$qd['solution']}',solutionopts='{$qd['solutionopts']}',adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
-        if (!$isAdmin)
+        if($num == 0)
         {
-            $query.= " AND ownerid=$user->id";
+            if (!$isAdmin)
+            {
+                $query.= " AND ownerid=$user->id";
+            }
+        }
+        else if($num == 1)
+        {
+            if (!$isAdmin)
+            {
+                $query .= " AND (ownerid='$user->id' OR userights>3)";
+            }
         }
         $data = \Yii::$app->db->createCommand($query)->execute();
         return $data;
@@ -610,9 +620,30 @@ class QuestionSet extends BaseImasQuestionset
         $data = $command->queryAll();
         return $data;
     }
-
     public static function getLicenseData($ids)
     {
         return QuestionSet::find()->select('id,uniqueid,author,ancestorauthors,license,otherattribution')->where(['IN','id',$ids])->all();
     }
+    public static function getDataForImportQSet($uniqueId)
+    {
+        $query = new Query();
+        $query->select(['id','uniqueid','adddate','lastmoddate'])
+            ->from('imas_questionset')
+            ->where(['IN', 'uniqueid', $uniqueId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function updateDataForImportQSet($qdata,$now,$qSetId,$hasImg)
+    {
+        $query = "UPDATE imas_questionset SET description='{$qdata['description']}',author='{$qdata['author']}',";
+        $query .= "qtype='{$qdata['qtype']}',control='{$qdata['control']}',qcontrol='{$qdata['qcontrol']}',qtext='{$qdata['qtext']}',";
+        $query .= "answer='{$qdata['answer']}',extref='{$qdata['extref']}',license='{$qdata['license']}',ancestorauthors='{$qdata['ancestorauthors']}',otherattribution='{$qdata['otherattribution']}',";
+        $query .= "solution='{$qdata['solution']}',solutionopts='{$qdata['solutionopts']}',";
+        $query .= "adddate=$now,lastmoddate=$now,hasimg=$hasImg WHERE id='$qSetId'";
+        $data = \Yii::$app->db->createCommand($query)->execute();
+        return $data;
+    }
+
 }

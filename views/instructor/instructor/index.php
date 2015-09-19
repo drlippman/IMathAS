@@ -47,7 +47,7 @@ $now = $currentTime;
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>
                     <span class="caret right-aligned"></span></a>
-                <ul class="dropdown-menu selected-options">
+                <ul class="dropdown-menu selected-options mass-changes">
                     <li>
                         <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/change-assessment?cid=' . $course->id)?>"><?php AppUtility::t('Assessments'); ?></a>
                     </li>

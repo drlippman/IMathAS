@@ -731,4 +731,9 @@ function generaterandstring() {
         }
         return $isTutor ;
     }
+
+    public static  function customizeDate($data)
+    {
+        return date('F d, o g:i a', $data);
+    }
 }

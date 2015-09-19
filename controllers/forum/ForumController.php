@@ -85,7 +85,7 @@ class ForumController extends AppController
                     'subject' => $data['subject'],
                     'views' => $data['views'],
                     'replyBy' => $repliesCount[0]['count'],
-                    'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                    'postdate' => AppController::customizeDate($postdate->lastposttime),
                     'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
                 );
                 array_push($searchThread, $tempArray);
@@ -139,7 +139,7 @@ class ForumController extends AppController
                                 'startDate' => $forum['startdate'],
                                 'countId' => $count['forumid'],
                                 'count' =>$count['COUNT(imas_forum_threads.id)'],
-                                'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                                'lastPostDate' => ($lastObject != '') ? AppController::customizeDate($lastObject->postdate): '',
                             );
                             $flag = AppConstant::NUMERIC_ONE;
                             array_push($forumArray, $tempArray);
@@ -158,7 +158,7 @@ class ForumController extends AppController
                             'avail' => $forum['avail'],
                             'startDate' => $forum['startdate'],
                             'countId' => AppConstant::NUMERIC_ZERO,
-                            'lastPostDate' => ($lastObject != '') ? date('F d, o g:i a', $lastObject->postdate) : '',
+                            'lastPostDate' => ($lastObject != '') ? AppController::customizeDate($lastObject->postdate): '',
                         );
                          array_push($forumArray, $tempArray);
                     }
@@ -199,7 +199,7 @@ class ForumController extends AppController
                             'forumiddata' => $thread['forumid'],
                             'forumName' => $forumName['name'],
                             'subject' => $thread['subject'],
-                            'postdate' => date('F d, o g:i a', $thread['postdate']),
+                            'postdate' => AppController::customizeDate( $thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                             'userright' => $user['rights'],
                             'postUserId' => $username->id,
@@ -274,7 +274,7 @@ class ForumController extends AppController
                             'subject' => $thread['subject'],
                             'views' => $views,
                             'replyby' => $thread['replyby'],
-                            'postdate' => date('F d, o g:i a', $thread['postdate']),
+                            'postdate' => AppController::customizeDate($thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                             'tagged' => $tagged[0]['tagged'],
                             'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
@@ -315,10 +315,10 @@ class ForumController extends AppController
                             'subject' => $thread['subject'],
                             'views' => $views,
                             'replyby' => $thread['replyby'],
-                            'postdate' => date('F d, o g:i a', $thread['postdate']),
+                            'postdate' => AppController::customizeDate($thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                             'tagged' => $tagged[0]['tagged'],
-                            'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
+                            'lastview' => AppController::customizeDate($lastView[0]['lastview']),
                             'userright' => $currentUser['rights'],
                             'postUserId' => $username->id,
                             'currentUserId' => $currentUser['id'],
@@ -344,7 +344,7 @@ class ForumController extends AppController
                     $uniquesData = ForumView::getByThreadId($thread['threadid']);
                     $lastView = ForumView::getLastView($currentUser, $thread['threadid']);
                      if($lastView){
-                         $lastView1 = date('F d, o g:i a', $lastView[0]['lastview']);
+                         $lastView1 = AppController::customizeDate($lastView[0]['lastview']);
                      }else{
                          $lastView1 = AppConstant::NUMERIC_ZERO;
                      }
@@ -365,7 +365,7 @@ class ForumController extends AppController
                         'subject' => $thread['subject'],
                         'views' => $views,
                         'replyby' => $thread['replyby'],
-                        'postdate' => date('F d, o g:i a', $thread['postdate']),
+                        'postdate' => AppController::customizeDate($thread['postdate']),
                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                         'tagged' => $tagged[0]['tagged'],
                         'userright' => $currentUser['rights'],
@@ -388,7 +388,7 @@ class ForumController extends AppController
                     $username = User::getById($un['userid']);
                     $temparrayForUnique = array(
                         'threadId' => $un['threadid'],
-                        'lastView' => date('F d, o g:i a', $un['lastview']),
+                        'lastView' => AppController::customizeDate($un['lastview']),
                         'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                     );
                     array_push($FinalUniquesData, $temparrayForUnique);
@@ -679,7 +679,7 @@ class ForumController extends AppController
             $tempArray['forumIdData'] = $postData['forumid'];
             $tempArray['subject'] = $titleLevel['title'];
             $tempArray['forumName'] = ucfirst($forumName->name);
-            $tempArray['postdate'] = date('F d, o g:i a', $postData->postdate);
+            $tempArray['postdate'] = AppController::customizeDate($postData->postdate);
             $tempArray['postType'] = $postData['posttype'];
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
             $tempArray['userRights'] = $username->rights;
@@ -821,7 +821,7 @@ class ForumController extends AppController
                 'message' => $data['message'],
                 'forumType' => $forumData['forumtype'],
                 'files' => $data['files'],
-                'postDate' => date('F d, o g:i a', $data['postdate']),
+                'postDate' => AppController::customizeDate($data['postdate']),
             );
             array_push($threadArray, $tempArray);
         }
@@ -1013,7 +1013,7 @@ class ForumController extends AppController
                                     'subject' => $data['subject'],
                                     'views' => $data['views'],
                                     'forumName' => ucfirst($forumName->name),
-                                    'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                                    'postdate' => AppController::customizeDate($postdate->lastposttime),
                                     'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
                                     'message' => $data['message'],
                                 );
@@ -1030,7 +1030,7 @@ class ForumController extends AppController
                                 'subject' => $data['subject'],
                                 'views' => $data['views'],
                                 'forumName' => ucfirst($forumName->name),
-                                'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                                'postdate' => AppController::customizeDate($postdate->lastposttime),
                                 'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
                                 'message' => $data['message'],
                             );
@@ -1070,7 +1070,7 @@ class ForumController extends AppController
                         'subject' => $data['subject'],
                         'views' => $data['views'],
                         'forumName' => ucfirst($forumName->name),
-                        'postdate' => date('F d, o g:i a', $postdate->lastposttime),
+                        'postdate' => AppController::customizeDate($postdate->lastposttime),
                         'name' => ucfirst($username->FirstName) . ' ' . ucfirst($username->LastName),
                         'message' => $data['message'],
                     );
@@ -1121,7 +1121,7 @@ class ForumController extends AppController
                     'hasImg' => $username->hasuserimg,
                     'lastView' => $isNew[0]['lastview'],
                     'subject' => $data['subject'],
-                    'postdate' => date('F d, o g:i a', $data['postdate']),
+                    'postdate' => AppController::customizeDate($data['postdate']),
                     'message' => $data['message'],
                     'postType' => $data['posttype'],
                     'settings' => $forumName['settings'],
