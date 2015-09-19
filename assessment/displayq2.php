@@ -3910,13 +3910,12 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if (!isset($reltolerance) && !isset($abstolerance)) { $reltolerance = $defaultreltol;}
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		$ansformats = explode(',',$answerformat);
-		$givenans = str_replace('∞', 'oo', $givenans);
-		$givenans = str_replace(array('（','）'), array('(',')'), $givenans);
-		
-		
+		$givenans = normalizemathunicode($givenans);
+		$_POST["tc$qn"] = normalizemathunicode($_POST["tc$qn"]);
+
 		if ($anstype == 'interval') {
 			$GLOBALS['partlastanswer'] = $givenans;
-			$givenans = str_replace(array('u','∪'), 'U', $givenans);
+			$givenans = str_replace('u', 'U', $givenans);
 		} else if ($anstype == 'calcinterval') {
 			$GLOBALS['partlastanswer'] = $_POST["tc$qn"];
 			//test for correct format, if specified
@@ -3948,8 +3947,8 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					}
 				}
 			} else {
-				$givenans = str_replace(array('u','∪'), 'U', $givenans);
-				$_POST["tc$qn"] = str_replace(array('u','∪'), 'U', $_POST["tc$qn"]);
+				$givenans = str_replace('u', 'U', $givenans);
+				$_POST["tc$qn"] = str_replace('u', 'U', $_POST["tc$qn"]);
 				if (in_array('list',$ansformats)) {
 					$orarr = preg_split('/(?<=[\)\]]),(?=[\(\[])/',$_POST["tc$qn"]);
 				} else {
@@ -5796,6 +5795,11 @@ function rawscoretocolor($sc,$aw) {
 	} else {
 		return 'ansyel';
 	}	
+}
+
+function normalizemathunicode($str) {
+	$str = str_replace(array('（','）','∞','∪','⁄ ','≤','≥','÷'), array('(',')','oo','U','/','<=','>=','/'), $str);
+	return $str;	
 }
 
 if (!function_exists('stripslashes_deep')) {
