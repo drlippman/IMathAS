@@ -5,7 +5,7 @@ use app\components\AppConstant;
 use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 
-$this->title = 'Mass Change Forums';
+$this->title = AppUtility::t('Mass Change Forums',false);
 $this->params['breadcrumbs'][] = ['label' => $course->name, 'url' => ['/instructor/instructor/index?cid=' . $course->id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php if (count($forumItems) != 0) { ?>
                 <div class="pull-left header-btn">
                     <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i
-                            class="fa fa-share header-right-btn"></i><?php echo 'Apply Changes' ?></button>
+                            class="fa fa-share header-right-btn"></i><?php AppUtility::t('Apply Changes') ?></button>
                 </div>
             <?php } ?>
         </div>
@@ -30,15 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="tab-content shadowBox non-nav-tab-item">
         <div class="change-assessment">
             <?php
-
-            if (count($forumItems) == 0) {
-                echo "<br><div style='  margin-left: 35%;'> <h4><p>No forums to change.</p></h4><br></div>";
-            }else{
-            ?>
-
-            Check: <a href="#" onclick="return chkAllNone('mainform','checked[]',true)">All</a> <a href="#"
-                                                                                                   onclick="return chkAllNone('mainform','checked[]',false)">None</a>
-
+            if (count($forumItems) == 0)
+            { ?>
+                 <br><div style='  margin-left: 35%;'> <h4><p><?php AppUtility::t('No forums to change.');?></p></h4><br></div>
+            <?php }else{
+            AppUtility::t('Check:'); ?>
+             <a href="#" onclick="return chkAllNone('mainform','checked[]',true)"><?php AppUtility::t('All');?></a>
+             <a href="#" onclick="return chkAllNone('mainform','checked[]',false)"><?php AppUtility::t('None')?></a>
             <ul class=nomark>
                 <?php
                 foreach ($forumItems as $id => $name) {
@@ -46,23 +44,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
             </ul>
-
         </div>
         <div class="change-assessment">
-            <p>With selected, make changes below
-                <legend>Forum Options</legend>
+            <p><?php AppUtility::t('With selected, make changes below');?>
+                <legend><?php AppUtility::t('Forum Options')?></legend>
             <table class="table table-bordered table-striped table-hover data-table">
                 <thead>
                 <tr>
-                    <th>Change?</th>
-                    <th>Option</th>
-                    <th>Setting</th>
+                    <th><?php AppUtility::t('Change?');?></th>
+                    <th><?php AppUtility::t('Option');?></th>
+                    <th><?php AppUtility::t('Setting')?></th>
                 </tr>
                 </thead>
                 <tbody>
 
                 <tr class="coptr">
-                    <td><input type="checkbox" name="chgavail" class="chgbox"/></td>
+                    <td><input type="checkbox" name="chg-avail" class="chgbox"/></td>
                     <td class="col-lg-2"><?php AppUtility::t('Visibility')?></td>
                     <td class="col-lg-10">
                         <input type=radio name="avail" value="1" checked="checked"/><span
@@ -75,7 +72,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 class='padding-left'><?php AppUtility::t('Show Always')?></span>
                     </td>
                 </tr>
-
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-post-by" class="chgbox"/></td>
                     <td class=col-lg-2><?php AppUtility::t('Students can create new threads')?></td>
@@ -103,7 +99,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '<div class=" col-lg-6">';
                         echo TimePicker::widget([
                             'name' => 'postTime',
-//                    'value' =>  $defaultValue['postByTime'],
                             'pluginOptions' => [
                                 'showSeconds' => false,
                                 'class' => 'time'
@@ -111,8 +106,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]);
                         echo '</td>'; ?>
                 </tr>
-
-
                 <tr class="coptr item-alignment">
                     <td><input type="checkbox" name="chg-reply-by" class="chgbox"/></td>
                     <td class=col-lg-2><?php AppUtility::t('Students can reply to posts')?></td>
@@ -122,9 +115,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <input type=radio name="reply" value="Never"><span
                             class="padding-left"><?php AppUtility::t('Never')?></span><br>
                         <input type=radio name="reply" class="pull-left " value="Date">
-                        <?php
-                        echo '<label class="end pull-left non-bold padding-left">Before</label>';
-                        echo '<div class = "col-lg-4 time-input">';
+                         <label class="end pull-left non-bold padding-left"><?php AppUtility::t('Before')?></label>
+                        <?php echo '<div class = "col-lg-4 time-input">';
                         echo DatePicker::widget([
                             'name' => 'replyByDate',
                             'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -140,7 +132,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo '<div class=" col-lg-6">';
                         echo TimePicker::widget([
                             'name' => 'replyByTime',
-//                    'value' => $defaultValue['replyByTime'],
                             'pluginOptions' => [
                                 'showSeconds' => false,
                                 'class' => 'time'
@@ -155,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <td class=col-lg-2><?php AppUtility::t('Calendar icon')?></td>
                     <td class=col-lg-10>
                         <?php AppUtility::t('New Threads')?><span class="padding-left"><input type="text"
-                                                                                              name="caltagpost"
+                                                                                              name="cal-tag-post"
                                                                                               value="FP"
                                                                                               size="2"></span> ,
                         <label class="padding-left non-bold"><?php AppUtility::t('Replies')?><span class="padding-left"><input
@@ -219,9 +210,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     <td class=col-lg-2><?php AppUtility::t('Default display')?></td>
                     <td class=col-lg-4>
                         <select name="default-display" class="form-control">
-                            <option value="0">Expanded</option>
-                            <option value="1">Collapsed</option>
-                            <option value="2">Condensed</option>
+                            <option value="0"><?php AppUtility::t('Expanded');?></option>
+                            <option value="1"><?php AppUtility::t('Collapsed');?></option>
+                            <option value="2"><?php AppUtility::t('Condensed');?></option>
                         </select>
                     </td>
                 </tr>
@@ -249,7 +240,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             class='padding-left'><?php AppUtility::t('Yes, but hide from students for now')?></span><br>
                         <input type=radio name="count-in-gradebook" value="2"/><span
                             class='padding-left'><?php AppUtility::t('Yes, as extra credit')?></span><br>
-                        If yes, for: <input type=text size=4 name="points" value=""/> points (leave blank to not change)
+                        <?php AppUtility::t('If yes, for:')?> <input type=text size=4 name="points" value=""/> <?php AppUtility::t('points (leave blank to not change)')?>
                     </td>
                 </tr>
 
@@ -257,10 +248,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <td><input type="checkbox" name="chg-gb-cat" class="chgbox"/></td>
                     <td class=col-lg-2><?php AppUtility::t('Gradebook Category')?></td>
                     <td class=col-lg-4>
-                        <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbcatsId, $gbcatsLabel, null, "Default", 0, " id=gbcat"); ?>
+                        <?php AssessmentUtility::writeHtmlSelect("gradebook-category", $gbCatsId, $gbCatsLabel, null, "Default", 0, " id=gbcat"); ?>
                     </td>
-                    <?php $page_tutorSelect['label'] = array("No access to scores", "View Scores", "View and Edit Scores");
-                    $page_tutorSelect['val'] = array(2, 0, 1); ?>
                 </tr>
 
                 <tr class="coptr item-alignment">

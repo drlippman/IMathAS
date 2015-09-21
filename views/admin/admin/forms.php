@@ -2,7 +2,7 @@
 use app\components\AppUtility;
 use kartik\time\TimePicker;
 use app\components\AppConstant;
-//$this->title = AppUtility::t('Course Settings',false);
+$this->title = AppUtility::t('Form',false);
 if (isset($params['cid'])) {
 ?>
 <div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
@@ -446,7 +446,6 @@ switch($action) {
         <input type="hidden" name="deflatepass" value="0">
         <input type="hidden" name="avail" value="0">
         <input type="hidden" name="blockcnt" value="0">
-
         <?php echo "</div>";
         break;
     case "chgteachers":
@@ -508,108 +507,92 @@ switch($action) {
         echo "</table></form>\n";
         echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
         break;
-    case "importmacros":
-          ?>
+    case "importmacros": ?>
+
          <form enctype="multipart/form-data" method=post action="actions?action=importmacros">
              <div class = "title-container">
                  <div class="row">
-
                      <div class="">
-                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
+                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
                      </div>
                  </div>
              </div>
-        <?php
-        echo "<div class='col-md-12 padding-twenty'>
+         <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
-                    <h3>Install Macro File</h3>\n";
-        echo "<p>
-                    <b>Warning</b>
-                    <span class='margin-left-ten'>Macro Files have a large security risk.  <b>Only install macro files from a trusted source</b></span>
-               </p>\n";
-        echo "<p class='margin-bottom-ten'>
-                    <b>Warning</b>
-                    <span class='margin-left-ten'> Install will overwrite any existing macro file of the same name</span>
-                </p>\n";
-        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />\n";
-        echo "<div class='col-md-12 padding-left-zero'>
-              <span class='floatleft'>Import file </span>
+                    <h3><?php AppUtility::t('Install Macro File')?></h3>
+                    <p>
+                    <b><?php AppUtility::t('Warning')?></b>
+                    <span class='margin-left-ten'><?php AppUtility::t('Macro Files have a large security risk')?>.  <b><?php AppUtility::t('Only install macro files from a trusted source')?></b></span>
+                    </p>
+                    <p class='margin-bottom-ten'>
+                    <b><?php AppUtility::t('Warning')?></b>
+                    <span class='margin-left-ten'> <?php AppUtility::t('Install will overwrite any existing macro file of the same name')?></span>
+                    </p>
+                <input type="hidden" name="MAX_FILE_SIZE" value="300000" />
+             <div class='col-md-12 padding-left-zero'>
+              <span class='floatleft'><?php AppUtility::t('Import file')?> </span>
               <span class='floatleft margin-left-ten'>
-                   <input name=\"userfile\" type=\"file\" />
+                   <input name="userfile" type="file" />
               </span>
-              </div>";
+              </div>
 
-        echo "</div></div></form>\n";
+             </div></div></form><?php
         break;
 
-    case "importqimages":
-        ?>
+    case "importqimages": ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importqimages">
-
             <div class = "title-container">
                 <div class="row">
-
                     <div class="">
                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
                     </div>
                 </div>
             </div>
 
-        <?php
-        echo "
         <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
-        <h3>Install Question Images</h3>\n";
-        echo "<p>
-                    <b>Warning</b>
-                    <span class='margin-left-ten'> This has a large security risk.  <b>Only install question images from a trusted source</b>, and where you've verified the archive only contains images.<span>
-              </p>\n";
-        echo "<p class='margin-bottom-ten'>
-                    <b>Warning</b>
-                    <span class='margin-left-ten'> Install will ignore files with the same filename as existing files.</span>
-              </p>\n";
-        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"5000000\" />\n";
-        echo "<span class='floatleft'>Import file </span>
+        <h3><?php AppUtility::t('Install Question Images')?></h3>
+              <p>
+                    <b><?php AppUtility::t('Warning')?></b>
+                    <span class='margin-left-ten'> <?php AppUtility::t('This has a large security risk')?>.  <b><?php AppUtility::t('Only install question images from a trusted source')?></b>, <?php AppUtility::t("and where you've verified the archive only contains images")?>.<span>
+              </p>
+         <p class='margin-bottom-ten'>
+                    <b></b>
+                    <span class='margin-left-ten'><?php AppUtility::t('Install will ignore files with the same filename as existing files')?> .</span>
+              </p>
+         <input type="hidden" name="MAX_FILE_SIZE\" value="5000000" />
+         <span class='floatleft'><?php AppUtility::t('Import file')?> </span>
                 <span class='floatleft margin-left-ten'>
-                    <input name=\"userfile\" type=\"file\" />
-                </span>";
-        echo "
-        </div></div></form>\n";
-        break;
-
+                    <input name="userfile" type="file" />
+                </span>
+        </div></div></form>
+         <?php break;
     case "importcoursefiles":?>
-
         <form enctype="multipart/form-data" method=post action="actions?action=importcoursefiles">
-
             <div class = "title-container">
                 <div class="row">
-
                     <div class="">
-                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Submit' ?></button>
+                        <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Submit') ?></button>
                     </div>
                 </div>
             </div>
-
-        <?php
-        echo "
           <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
-        <h3>Install Course files</h3>\n";
-        echo "<p>
-                <b>Warning</b>
-               <span class='margin-left-ten'> This has a large security risk.  <b>Only install course files from a trusted source</b>, and where you've verified the archive only contains regular files (no PHP files).</span>
-            </p>\n";
-        echo "<p class='margin-bottom-ten'>
-                <b>Warning</b>
-                <span class='margin-left-ten'>Install will ignore files with the same filename as existing files.</span>
-               </p>\n";
-        echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\" />\n";
-        echo "<span class='floatleft'>Import file </span>
+        <h3><?php AppUtility::t('Install Course files')?></h3>
+            <p>
+                <b><?php AppUtility::t('Warning')?></b>
+               <span class='margin-left-ten'> <?php AppUtility::t('This has a large security risk')?>.  <b><?php AppUtility::t('Only install course files from a trusted source')?></b>, <?php AppUtility::t("and where you've verified the archive only contains regular files (no PHP files)")?>.</span>
+            </p>
+         <p class='margin-bottom-ten'>
+                <b><?php AppUtility::t('Warning')?></b>
+                <span class='margin-left-ten'><?php AppUtility::t('Install will ignore files with the same filename as existing files')?>.</span>
+               </p>
+         <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
+         <span class='floatleft'>Import file </span>
                 <span class='floatleft margin-left-ten'>
-                    <input name=\"userfile\" type=\"file\" />
-                </span>";
-        echo "
-        </div></div></form>\n";
+                    <input name="userfile" type="file" />
+                </span>
+        </div></div></form>  <?php
         break;
 
     case "transfer":
@@ -635,197 +618,180 @@ switch($action) {
         echo "</form>\n";
         break;
 
-    case "deloldusers":
-        ?>
-         <form method=post action="actions?action=deloldusers">
-
-
-             <div class = "title-container">
-                 <div class="row">
-
-                     <div class="">
-                         <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo 'Delete' ?></button>
+    case "deloldusers": ?>
+             <form method=post action="actions?action=deloldusers">
+                 <div class = "title-container">
+                     <div class="row">
+                         <div class="">
+                             <button class="floatright margin-top-minus-six-per btn btn-primary page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php AppUtility::t('Delete') ?></button>
+                         </div>
                      </div>
                  </div>
-             </div>
-        <?php
-
-        echo "
-           <div class='col-md-12 padding-twenty'>
-            <div class='col-md-12 padding-top-five text-gray-background padding-left-thirty'>
-        <h3>Delete Old Users</h3>\n";
-        echo "
-        <div class='col-md-12 margin-top-ten padding-left-zero'>
-            <span>Delete Users older than</span>";
-            echo " <span>
-                        <input type=text class='margin-left-ten form-control display-inline-block width-five-per' name=months size=4 value=\"6\"/>
-                        <span class='margin-left-ten'>Months</span>
+               <div class='col-md-12 padding-twenty'>
+                <div class='col-md-12 padding-top-five text-gray-background padding-left-thirty'>
+            <h3><?php AppUtility::t('Delete Old Users')?></h3>
+            <div class='col-md-12 margin-top-ten padding-left-zero'>
+                <span><?php AppUtility::t('Delete Users older than')?></span>
+                         <span>
+                            <input type=text class='margin-left-ten form-control display-inline-block width-five-per' name=months size=4 value="6"/>
+                            <span class='margin-left-ten'><?php AppUtility::t('Months')?></span>
+                        </span>
+            </div>
+            <div class='col-md-12 margin-top-fifteen padding-left-zero'>
+                <span><?php AppUtility::t('Delete Who')?></span>
+             <span>
+                    <span class='margin-left-ten'><input type=radio name=who value="students" CHECKED>
+                        <span class='margin-left-five'><?php AppUtility::t('Students')?></span>
                     </span>
-        </div>";
-        echo "
-        <div class='col-md-12 margin-top-fifteen padding-left-zero'>
-            <span>Delete Who</span>";
-        echo "<span>
-                <span class='margin-left-ten'><input type=radio name=who value=\"students\" CHECKED>
-                    <span class='margin-left-five'>Students</span>
-                </span>";
-                echo "
-                <span class='margin-left-ten'>
-                    <input type=radio name=who value=\"all\">
-                    <span class='margin-left-five'>Everyone but Admins</span>
-                </span>
-              </span>
-              </div>";
-//        echo "<div class=submit><input type=submit value=\"Delete\"></div>\n";
-        echo "
-        </div></div>
-        </form>\n";
-        break;
-    case "listltidomaincred":
-
-        echo '<div class="col-md-12 modify-lti-domain-credential"><div id="headerforms" class="pagetitle">';
-        echo "<h3>Modify LTI Domain Credentials</h3>\n";
-        echo '</div>';
-        echo "<table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'><thead><tr><th>Domain</th><th>Key</th><th>Can create Instructors?</th><th>Modify</th><th>Delete</th></tr></thead>\n";
-
+                    <span class='margin-left-ten'>
+                        <input type=radio name=who value="all">
+                        <span class='margin-left-five'><?php AppUtility::t('Everyone but Admins')?></span>
+                    </span>
+                  </span>
+                  </div>
+            </div></div>
+            </form> <?php
+            break;
+    case "listltidomaincred":  ?>
+         <div class="col-md-12 modify-lti-domain-credential"><div id="headerforms" class="pagetitle">
+         <h3><?php AppUtility::t('Modify LTI Domain Credentials')?></h3>
+         </div>
+         <table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'><thead><tr><th><?php AppUtility::t('Domain')?></th><th><?php AppUtility::t('Key')?></th><th><?php AppUtility::t('Can create Instructors')?>?</th><th><?php AppUtility::t('Modify')?></th><th><?php AppUtility::t('Delete')?></th></tr></thead>
+        <?php
         foreach ($users as $row) {
-
             echo "<tbody><tr><td>{$row['email']}</td><td>{$row['SID']}</td>";
-            if ($row['rights']==76) {
-                echo '<td>Yes</td>';
-            } else {
-                echo '<td>No</td>';
-            } ?>
-             <td><a href="forms?action=modltidomaincred&id=<?php echo $row['id']?>">Modify</a></td>
+            if ($row['rights']==76) { ?>
+                 <td><?php AppUtility::t('Yes')?></td>
+            <?php } else { ?>
+                  <td><?php AppUtility::t('No')?></td>
+            <?php } ?>
+             <td><a href="forms?action=modltidomaincred&id=<?php echo $row['id']?>"><?php AppUtility::t('Modify')?></a></td>
             <?php if ($row['id']==0) {
                 echo "<td></td>";
             } else { ?>
-             <td><a href="actions?action=delltidomaincred&id=<?php echo $row['id']?>" onclick="return confirm('Are you sure?');">Delete</a></td>
-           <?php }
-            echo "</tr>\n";
-        }
-        echo "</tbody></table>\n";
-            ?>
+             <td>
+                 <a href="#" onclick="deleteLtiUser(<?php echo $row['id']?>)"><?php AppUtility::t('Delete')?></a>
+             </td>
+           <?php } ?>
+             </tr>
+            <?php } ?>
+            </tbody></table>
          <form method=post action="actions?action=modltidomaincred&id=new">
-        <?php echo "
         <div class='col-md-12 padding-left-zero'>
-
-        <div class='col-md-12 padding-left-zero'> Add new LTI key/secret</div>
-
+        <div class='col-md-12 padding-left-zero'><?php AppUtility::t('Add new LTI key/secret')?></div>
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'>Domain</span>
+            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Domain')?></span>
             <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name=\"ltidomain\" size=20>
+                <input class='form-control' type=text name="ltidomain" size=20>
             </div>
         </div>
-
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'>Key</span>
+            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Key')?></span>
             <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name=\"ltikey\" size=20>
+                <input class='form-control' type=text name="ltikey" size=20>
             </div>
         </div>
-
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'>Secret</span>
+            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Secret')?></span>
             <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name=\"ltisecret\" size=20>
+                <input class='form-control' type=text name="ltisecret" size=20>
             </div>
         </div>
-
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'>Can create instructors</span>
+            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Can create instructors')?></span>
             <div class='col-md-4 padding-left-zero'>
-                <select class='form-control' name=\"createinstr\">
-                    <option value=\"11\" selected=\"selected\">No</option>
-                    <option value=\"76\">Yes, and creates $installname login</option>
+                <select class='form-control' name="createinstr">
+                    <option value="11" selected="selected"><?php AppUtility::t('No')?></option>
+                    <option value="76"><?php AppUtility::t('Yes, and creates'); echo ' '.$installname.' '; AppUtility::t('login');?></option>
                 </select>
             </div>
         </div>
-
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'>Associate with group</span>
+            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Associate with group')?></span>
             <div class='col-md-4 padding-left-zero'>
                 <select class='form-control' name='groupid'>
-                    <option value='0'>Default</option>";
-
-        foreach ($groupsName as $group ) {
+                    <option value='0'><?php AppUtility::t('Default')?></option>
+        <?php
+        foreach ($groupsName as $group )
+        {
             echo '<option value="'.$group['id'].'">'.$group['name'].'</option>';
         }
-
-        echo "</select>
+        echo "</select>"; ?>
         </div>
         </div>
-
         <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <input type=submit value=\"Add LTI Credentials\">
+            <input type=submit value="<?php AppUtility::t('Add LTI Credentials')?>">
         </div>
         </div>
         </div></form>
-        ";
-
+        <?php
         break;
-
-
     case "modltidomaincred":
-//        if ($myrights<100) { echo "not allowed"; exit;}
-        echo '<div id="headerforms" class="pagetitle">';
-        echo "<h3>Modify LTI Domain Credentials</h3>\n";
-        echo '</div>'; ?>
+//        if ($myrights<100) { echo "not allowed"; exit;} ?>
+         <div id="headerforms" class="pagetitle">
+         <h3><?php AppUtility::t('Modify LTI Domain Credentials')?></h3>
+         </div>
         <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id']?>">
-        <?php echo "Modify LTI key/secret: <br/>";
-        echo "Domain: <input type=text name=\"ltidomain\" value=\"{$user['email']}\" size=20><br/>\n";
-        echo "Key: <input type=text name=\"ltikey\" value=\"{$user['SID']}\" size=20><br/>\n";
-        echo "Secret: <input type=text name=\"ltisecret\"  value=\"{$user['password']}\" size=20><br/>\n";
-        echo "Can create instructors: <select name=\"createinstr\"><option value=\"11\" ";
-        if ($user['rights']==11) {echo 'selected="selected"';}
-        echo ">No</option><option value=\"76\" ";
-        if ($user['rights']==76) {echo 'selected="selected"';}
-        echo ">Yes</option></select><br/>\n";
-        echo 'Associate with group <select name="groupid"><option value="0">Default</option>';
-
+        <?php AppUtility::t('Modify LTI key/secret')?> <br/>
+        <?php AppUtility::t('Domain')?> <input type=text name="ltidomain" value="<?php echo $user['email'];?>" size=20><br/>
+        <?php AppUtility::t('Key')?><input type=text name="ltikey" value="<?php echo $user['SID'] ?>" size=20><br/>
+        <?php AppUtility::t('Secret')?><input type=text name="ltisecret"  value="<?php echo $user['password']?>"size=20><br/>
+        <?php AppUtility::t('Can create instructors')?>
+         <select name="createinstr"><option value="11"
+        <?php if ($user['rights']==11)
+        {
+            echo 'selected="selected"';
+        }
+         ?> > <?php AppUtility::t('No')?></option>
+              <option value="76" <?php
+        if ($user['rights']==76) {echo 'selected="selected"';} ?>
+          ><?php AppUtility::t('Yes')?></option></select><br/>
+        <?php AppUtility::t('Associate with group')?> <select name="groupid"><option value="0"><?php AppUtility::t('Default')?></option>
+                <?php
         foreach ($groupsName as $group ) {
             echo '<option value="'.$group['id'].'"';
             if ($group['id']==$user['groupid']) { echo ' selected="selected"';}
             echo '>'.$group['name'].'</option>';
         }
-        echo '</select><br/>';
-        echo "<input type=submit value=\"Update LTI Credentials\">\n";
-        echo "</form>\n";
+        echo '</select><br/>'; ?>
+         <input type=submit value="<?php AppUtility::t('Update LTI Credentials')?>">
+         </form> <?php
         break;
-
-    case "listgroups":
-        echo '<div class="col-md-12 modify-group-padding"><div id="headerforms" class="pagetitle">';
-        echo "<h3>Modify Groups</h3>\n";
-        echo '</div>';
-        echo "<table class='margin-top-twenty table table-bordered table-striped table-hover data-table'><thead><tr><th>Group Name</th><th>Modify</th><th>Delete</th></tr></thead>\n";
-        foreach($groupsName as $row) {
+    case "listgroups":?>
+         <div class="col-md-12 modify-group-padding">
+          <div id="headerforms" class="pagetitle">
+         <h3><?php AppUtility::t('Modify Groups')?></h3>
+         </div>
+         <table class='margin-top-twenty table table-bordered table-striped table-hover data-table'><thead><tr><th><?php AppUtility::t('Group Name')?></th><th><?php AppUtility::t('Modify')?></th><th><?php AppUtility::t('Delete')?></th></tr></thead>
+         <?php foreach($groupsName as $row)
+         {
             echo "<tbody><tr><td>{$row['name']}</td>"; ?>
-              <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>">Modify</a></td>
-            <?php if ($row['id']==0) {
-                echo "<td></td>";
+            <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>"><?php AppUtility::t('Modify')?></a></td>
+            <?php if ($row['id'] == AppConstant::NUMERIC_ZERO)
+            {
+               echo "<td></td>";
             } else { ?>
-                  <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=delgroup&id='.$row['id'])?>" onclick="return confirm('Are you SURE you want to delete this group?');">Delete</a></td>
-           <?php }
-            echo "</tr>\n";
+                  <td> <a href="#" onclick="deleteGroup(<?php echo $row['id'] ?>)"><?php AppUtility::t('Delete')?></a> </td>
+            <?php }
+            echo "</tr>";
         }
-        echo "</table>\n"; ?>
-         <form method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=addgroup');?>">
+        echo "</table>"; ?>
+        <form method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=addgroup');?>">
         <?php  echo "<div class='col-md-12 margin-top-twenty padding-left-zero'>
                         <span class='floatleft select-text-margin'>Add new group</span>
-                       <input class='width-thirty-per floatleft margin-left-thirty form-control' type=text name=gpname id=gpname size=50>
-                      </div>";
-        echo "<div class='margin-top-twenty col-md-2 padding-left-zero'> <input type=submit value=\"Add Group\"><div>";
-        echo "</tbody></form></div>";
+                        <input class='width-thirty-per floatleft margin-left-thirty form-control' type=text name=gpname id=gpname size=50>
+                        </div>"; ?>
+        <div class='margin-top-twenty col-md-2 padding-left-zero'> <input type=submit value="<?php AppUtility::t('Add Group')?>"></div>
+        </tbody></form></div><?php
         break;
-    case "modgroup":
-        echo '<div id="headerforms" class="pagetitle"><h2>Rename Instructor Group</h2></div>';
-        $gpname = $groupsName['name']; ?>
+    case "modgroup": ?>
+         <div id="headerforms" class="pagetitle"><h2><?php AppUtility::t('Rename Instructor Group')?></h2></div>
+         <?php $gpname = $groupsName['name']; ?>
          <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id']?>>
-        <?php echo "Group name: <input type=text size=50 name=gpname id=gpname value=\"$gpname\"><br/>\n";
-        echo "<input type=submit value=\"Update Group\">\n";
-        echo "</form>\n";
-        break;
+         <?php AppUtility::t('Group name:',false)?> <input type=text size=50 name=gpname id=gpname value="<?php echo $gpname ?>"><br/>
+         <input type=submit value="<?php AppUtility::t('Update Group')?>">
+         </form> <?php
+         break;
     case "removediag":
         if ($myRights < 60)
         {

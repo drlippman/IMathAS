@@ -414,7 +414,6 @@ function initsuggest() {
     for (var i=1;i<trs.length;i++) {
         names.push(trs[i].getElementsByTagName("td")[0].innerHTML);
     }
-    console.log(names);
     new AutoSuggest(document.getElementById("qaname"),names);
 }
 addLoadEvent(initsuggest);
@@ -498,8 +497,7 @@ function onarrow(e,field) {
     }
 }
 $(document).ready(function () {
-    togglefeedback(btn)
-
+    togglefeedback(1);
 });
 function togglefeedback(btn) {
     var form = document.getElementById("mainform");
@@ -519,21 +517,6 @@ function togglefeedback(btn) {
         btn.value = "Expand Feedback Boxes";
     }
 }
-
-function doonblur(value) {
-    value = value.replace(/[^\d\.\+\-\*\/]/g,'');
-    if (value!='0') {
-        value = value.replace(/^0+/,'');
-    }
-    if (value=='') {return ('');}
-    try {
-        return (eval(value));
-    } catch (e) {
-        return '';
-    }
-}
-
-
 var quickaddshowing = false;
 function togglequickadd(el) {
     if (!quickaddshowing) {
@@ -561,13 +544,79 @@ function sendtoall(w,type) {
         CommonPopUp(message);
         return;
     }
-    if (type==2 && w==0 && document.getElementById("toallgrade").value == "" && !confirm("Clear all Score?")) {
-         return;
-    }
-    if (type==2 && w==1 && document.getElementById("toallfeedback").value == "" && !confirm("Clear all feedback?")) {
-            return;
-        }
+    if (type==2 && w==0 && document.getElementById("toallgrade").value == "" ) {
+        var html ='<div><p> "Text" field should not be empty.</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
 
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "confirm": function () {
+
+                    $(this).dialog("close");
+                    for (var e = 0; e<form.elements.length; e++) {
+                        var el = form.elements[e];
+                        if (w==0) {
+                            if (document.getElementById("toallgrade").value.match(/\d/)) {
+                                if (el.type=="text" && el.id.match(/score/)) {
+                                    if (type==2) { el.value = document.getElementById("toallgrade").value;}
+                                }
+                            } else if (document.getElementById("toallgrade").value == "") {
+                                if (el.type=="text" && el.id.match(/score/) && type==2) {
+                                    el.value = '';
+                                }
+                            }
+                        }
+                    }
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+        return;
+    }
+    if (type==2 && w==1 && document.getElementById("toallfeedback").value == "" )
+    {
+        var html ='<div><p> "Text" field should not be empty.</p></div>';
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "confirm": function () {
+
+                    $(this).dialog("close");
+                    for (var e = 0; e<form.elements.length; e++) {
+                        var el = form.elements[e];
+                        if (w==1) {
+                            if (el.type=="textarea" && el.id!="toallfeedback") {
+                                el.value = document.getElementById("toallfeedback").value;
+                            }
+                        }
+                    }
+                    document.getElementById("toallfeedback").value = '';
+                    document.getElementById("toallgrade").value = '';
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            }
+        });
+        return;
+    }
     for (var e = 0; e<form.elements.length; e++) {
         var el = form.elements[e];
         if (w==1) {
@@ -580,7 +629,7 @@ function sendtoall(w,type) {
             if (document.getElementById("toallgrade").value.match(/\d/)) {
                 if (el.type=="text" && el.id.match(/score/)) {
                     if (type==0) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
-                    else if (type==1) { el.value = doonblur(el.value+'*'+document.getElementById("toallgrade").value);}
+                    else if (type==1) { el.value =  el.value * document.getElementById("toallgrade").value}
                     else if (type==2) { el.value = document.getElementById("toallgrade").value;}
                 }
             } else if (document.getElementById("toallgrade").value == "") {

@@ -1,6 +1,7 @@
 $(document).ready(function () {
     var courseId = $(".course-info").val();
     var userId = $(".user-info").val();
+    var showpics = $("#showpics").val();
     selectCheckBox();
     studentLock();
         var table = $('.gradebook-table').DataTable( {
@@ -11,9 +12,13 @@ $(document).ready(function () {
             "ordering":false,
             paging: false
         });
-    new $.fn.dataTable.FixedColumns( table );
+    new $fn.dataTable.FixedColumns( table );
     var data = {courseId: courseId, userId: userId};
     jQuerySubmit('fetch-gradebook-data-ajax', data, 'fetchDataSuccess');
+    var x = document.cookie;
+    var s = x.split(/:/);
+    conditionalColor('gradebook-table',0,low,high);
+
 });
 var data;
 var showPics = 0;
@@ -22,11 +27,6 @@ function fetchDataSuccess(response){
     var result = JSON.parse(response);
     GradebookData = result.data.gradebook;
 }
-//function chgtoggle(){
-//    showPics = $('#toggle4').val();
-//    $('.gradebook-table').remove();
-//    displayGradebook();
-//}
 function selectCheckBox() {
     $('.check-all').click(function () {
         $('.gradebook-table-body input:checkbox').each(function () {
@@ -178,9 +178,12 @@ function teacherMakeException() {
     }
 }
 function chgfilter() {
-    var ffilter = document.getElementById("ffilter").value;
-    window.location = tagfilterurl+'&ffilter='+ffilter;
+    var cat = document.getElementById("filtersel").value;
+    //var studentId = $("#student-id").val();
+    var courseId = $("#course-id").val();
+    //window.location = "gradebook?cid="+courseId+"&stu=0&catfilter=" + cat;
 }
+
 function createStudentList(){
     var markArray = [];
     $('.gradebook-table input[name = "checked"]:checked').each(function () {
@@ -200,3 +203,103 @@ function createStudentList(){
   	//window.location = toopen;
      window.location = "gradebook-export?cid="+courseId+"&stu="+studentId+toopen;
  }
+
+function updateColors(el) {
+    console.log(el);
+    //alert('a');
+    var courseId = $("#course-id").val();
+    if (el.value==0) {
+        var tds=document.getElementById("gradebook-table").getElementsByTagName("td");
+        for (var i=0;i<tds.length;i++) {
+            tds[i].style.backgroundColor = "";
+        }
+    } else {
+        var s = el.value.split(/:/);
+        conditionalColor("gradebook-table",0,s[0],s[1]);
+    }
+    document.cookie = 'colorize-'+ courseId +'='+el.value;
+}
+
+function conditionalColor(table,type,low,high) {
+
+var tbl = document.getElementById(table);
+if (type==0) {  //instr gb view
+    var poss = [];
+    var startat = 2;
+    var ths = tbl.getElementsByTagName("thead")[0].getElementsByTagName("th");
+    for (var i=0;i<ths.length;i++) {
+        if (k = ths[i].innerHTML.match(/(\d+)(&nbsp;|\u00a0)pts/)) {
+            poss[i] = k[1]*1;
+            if (poss[i]==0) {poss[i]=.0000001;}
+        } else {
+            poss[i] = 100;
+            if(ths[i].className.match(/nocolorize/)) {
+                startat++;
+            }
+        }
+    }
+    var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (var j=0;j<trs.length;j++) {
+        var tds = trs[j].getElementsByTagName("td");
+        for (var i=startat;i<tds.length;i++) {
+            if (low==-1) {
+                if (tds[i].className.match("isact")) {
+                    tds[i].style.backgroundColor = "#99ff99";
+                } else {
+                    tds[i].style.backgroundColor = "#ffffff";
+                }
+            } else {
+                if (tds[i].innerText) {
+                    var v = tds[i].innerText;
+                } else {
+                    var v = tds[i].textContent;
+                }
+                if (k = v.match(/\(([\d\.]+)%\)/)) {
+                    var perc = k[1]/100;
+                } else if (k = v.match(/([\d\.]+)\/(\d+)/)) {
+                    if (k[2]==0) { var perc = 0;} else { var perc= k[1]/k[2];}
+                } else {
+                    v = v.replace(/[^\d\.]/g,"");
+                    var perc = v/poss[i];
+                }
+
+                if (perc<low/100) {
+                    tds[i].style.backgroundColor = "#ff9999";
+
+                } else if (perc>high/100) {
+                    tds[i].style.backgroundColor = "#99ff99";
+                } else {
+                    tds[i].style.backgroundColor = "#ffffff";
+                }
+            }
+        }
+    }
+} else {
+    var trs = tbl.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (var j=0;j<trs.length;j++) {
+        var tds = trs[j].getElementsByTagName("td");
+        if (tds[1].innerText) {
+            var poss = tds[1].innerText.replace(/[^\d\.]/g,"");
+            var v = tds[2].innerText.replace(/[^\d\.]/g,"");
+        } else {
+            var poss = tds[1].textContent.replace(/[^\d\.]/g,"");
+            var v = tds[2].textContent.replace(/[^\d\.]/g,"");
+        }
+        if (v/poss<low/100) {
+            tds[2].style.backgroundColor = "#ff6666";
+
+        } else if (v/poss>high/100) {
+            tds[2].style.backgroundColor = "#66ff66";
+        } else {
+            tds[2].style.backgroundColor = "#ffffff";
+
+        }
+
+    }
+}
+
+}
+
+function hi(a){
+    alert(a);
+}

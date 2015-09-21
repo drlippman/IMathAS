@@ -212,5 +212,8 @@ class AppConstant
     const POINT_SIX = 0.6;
     const POINT_SEVEN = 0.5;
     const EIGHT_POINT_FIVE = 8.5;
+    const USE_GROUP_SET = 'Use group set';
+    const NO_FORUM_SELECTED = 'No forums are selected to be changed';
+    const FORUM_UPDATED = 'Forums data changes successfully';
 
 }

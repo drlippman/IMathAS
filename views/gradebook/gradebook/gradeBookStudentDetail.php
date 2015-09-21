@@ -755,7 +755,6 @@ echo "<p class='text-area-padding'>",AppUtility::t('Meanings: IP-In Progress (so
 //         $('#updatingicon').show();
          var courseId = $("#course-id").val();
          window.location = "grade-book-student-detail?cid="+courseId+"&studentId="+el.value;
-
      }
     function makeofflineeditable(el) {
         var anchors = document.getElementsByTagName("a");

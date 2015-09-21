@@ -7,11 +7,14 @@ if (($course['newflag']&1)==1) {
     $this->title = AppUtility::t('Gradebook', false);
 }
 $this->params['breadcrumbs'][] = $this->title;
- ?>
+?>
+<input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
 <input type="hidden" class="user-info" name="user-info" value="<?php echo $user->id; ?>"/>
 <input type="hidden" id="student-id"  value="<?php echo $data['defaultValuesArray']['studentId']; ?>"/>
 <input type="hidden" id="gradebook-id" name="gradebook-data" value=""/>
+<input type="hidden" id="showpics" name="user-info" value="<?php echo $data['defaultValuesArray']['showpics']; ?>"/>
+
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
@@ -54,34 +57,30 @@ $this->params['breadcrumbs'][] = $this->title;
     <span class="inner-page-options col-lg-8 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
-                <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
-                   href="#"><?php AppUtility::t('Color'); ?><span class="caret right-aligned"></span></a>
-                <ul class="dropdown-menu with-selected dropdown-scroll">
-                    <li><a><?php AppUtility::t('None') ?></a></li>
-                    <?php
-echo '';
-for ($j=50; $j<90; $j+=($j<70 ? 10:5)) {
-    for ($k = $j+($j<70 ? 10:5); $k<100; $k += ($k<70 ? 10:5)) {
-        echo "<li";
-        if ("$j:$k" == $data['colorized']) {
-            echo 'class = "active" ';
-        }
-        echo "><a>$j/$k</a></li>";
-    }
-}
-echo '<li';
-if ($data['colorized'] == "-1:-1") { echo 'class = "active" ';}
-echo '><a>'.AppUtility::t('Active', false).'</a></li>';
-?>
-                </ul>
+                 <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';
+                echo '<option value="0">', _('Color'), '</option>';
+                echo '<option value="0">', _('None'), '</option>';
+                for ($j=50;$j<90;$j+=($j<70?10:5)) {
+                    for ($k=$j+($j<70?10:5);$k<100;$k+=($k<70?10:5)) {
+                        echo "<option value=\"$j:$k\" ";
+                        if ("$j:$k"==$colorize) {
+                            echo 'selected="selected" ';
+                        }
+                        echo ">$j/$k</option>";
+                    }
+                }
+                echo '<option value="-1:-1" ';
+                if ($colorize == "-1:-1") { echo 'selected="selected" ';}
+                echo '>', _('Active'), '</option>';
+                echo '</select>';?>
             </li>
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('Category'); ?><span class="caret right-aligned"></span></a>
-                <ul class="dropdown-menu with-selected ">
+                <ul id="filtersel"  onchange='chgfilter()' class="dropdown-menu with-selected ">
                     <?php
-echo "<li><a>".AppUtility::t('All', false)."</a></li>";
-echo "<li><a>".AppUtility::t('Default', false)."</a></li>";
+echo "<li  value='1'><a>".AppUtility::t('All', false)."</a></li>";
+echo "<li  value='0'><a>".AppUtility::t('Default', false)."</a></li>";
 foreach($data['gbCatsData'] as $category){
     echo "<li><a>".$category['name']."</a></li>";
 }
@@ -744,8 +743,6 @@ for ($i = 1; $i < count($gradebook); $i++) {
         }
     }
     echo '</tr>';
-
-
 }
 ?>
         </tbody>
@@ -760,7 +757,6 @@ for ($i = 1; $i < count($gradebook); $i++) {
 </div>
  <!-- jQuery -->
 <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js"></script>
-
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>

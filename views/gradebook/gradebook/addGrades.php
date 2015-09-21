@@ -313,7 +313,6 @@ if ($params['gbitem'] == 'new') {
                                      </div>';
                             echo '</div>';
                         }
-//                        echo '<div class="clear"></div>';
             echo '<div class="col-md-12 margin-top-fifteen">';
                         echo "<table style='width: 97.5%;margin-left: 15px' class='' id=myTable>
                                     <thead>
@@ -378,7 +377,7 @@ if ($params['gbitem'] == 'new') {
                         </table>
             </div>";
             if ($hassection) {
-                echo "<script> initSortTable('myTable',Array('S','S',false,false),false);</script>";
+                echo "<script type='javascript'> initSortTable('myTable',Array('S','S',false,false),false);</script>";
             }
             ?>
          </div>

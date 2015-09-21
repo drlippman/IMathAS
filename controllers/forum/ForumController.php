@@ -604,41 +604,43 @@ class ForumController extends AppController
         $forumId = $this->getParamVal('forumid');
         $forumData = Forums::getById($forumId);
         $allThreadIds = Thread::getAllThread($forumId);
-        $prevNextValueArray =Thread::checkPreOrNextThreadByForunId($forumId);
+        $prevNextValueArray = Thread::checkPreOrNextThreadByForunId($forumId);
         $isNew = ForumView::getById($threadId, $currentUser);
         $tagValue = $isNew[0]['tagged'];
-        $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
-        $isTutor = $this->isTutor($currentUser['id'],$courseId);
+        $isTeacher = $this->isTeacher($currentUser['id'], $courseId);
+        $isTutor = $this->isTutor($currentUser['id'], $courseId);
         $canViewAll = false;
-        if($isTeacher || $isTutor){
+        if ($isTeacher || $isTutor) {
             $canViewAll = true;
         }
-        $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId,$currentUser['id']);
+        $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId, $currentUser['id']);
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
-             foreach($FullThread as $singleThreadArray){
-                 if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $singleThreadArray['parent'] == AppConstant::NUMERIC_ZERO && $singleThreadArray['posttype'] == AppConstant::NUMERIC_THREE){
-                     $data = array();
-                     array_push($data, $singleThreadArray);
-                     $forumPostData = ForumPosts::getByThreadIdAndUserID($threadId, $currentUser['id']);
-                     if ($forumPostData) {
-                         foreach ($forumPostData as $single) {
-                             $Replies = ForumPosts::isThreadHaveReply($single['id']);
-                             foreach($Replies as $singleReply){
-                                 array_push($data, $singleReply);
-                             }
-                             if($single['parent'] == $threadId){
-                                 array_push($data, $single);
-                             }
-                         }
-                    }
-                break;
-             }else{
-                     array_push($data, $singleThreadArray);
-                  }
-             }
+//             foreach($FullThread as $singleThreadArray){
+//                 if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $singleThreadArray['parent'] == AppConstant::NUMERIC_ZERO && $singleThreadArray['posttype'] == AppConstant::NUMERIC_THREE){
+////                     $data = array();
+////AppUtility::dump('kl');
+//                     array_push($data, $singleThreadArray);
+//                     $forumPostData = ForumPosts::getByThreadIdAndUserID($threadId, $currentUser['id']);
+//                     if ($forumPostData) {
+//                         foreach ($forumPostData as $single) {
+//                             $Replies = ForumPosts::isThreadHaveReply($single['id']);
+//                             foreach($Replies as $singleReply){
+//                                 array_push($data, $singleReply);
+//                             }
+//                             if($single['parent'] == $threadId){
+//                                 array_push($data, $single);
+//                             }
+//                         }
+//                    }
+//                break;
+//             }else{
+//                     array_push($data, $singleThreadArray);
+//                  }
+//             }
+//        AppUtility::dump($data);
         $titleCountArray = array();
-        foreach ($data as $postData) {
+        foreach ($FullThread as $postData) {
             $this->children[$postData['parent']][] = $postData['id'];
             $username = User::getById($postData['userid']);
             $forumName = Forums::getById($postData['forumid']);
@@ -650,12 +652,10 @@ class ForumController extends AppController
             $teacherCount = AppConstant::NUMERIC_ZERO;
             $isReplies = AppConstant::NUMERIC_ZERO;
             $threadReplies = ForumPosts::isThreadHaveReply($postData['id']);
-            if($threadReplies)
-            {
+            if ($threadReplies) {
                 $isReplies = AppConstant::NUMERIC_ONE;
             }
-            foreach ($likeCnt as $like)
-            {
+            foreach ($likeCnt as $like) {
                 $Rights = User::getById($like['userid']);
                 if ($Rights->rights == AppConstant::STUDENT_RIGHT) {
                     $studentCount = $studentCount + AppConstant::NUMERIC_ONE;
@@ -668,8 +668,7 @@ class ForumController extends AppController
                     'teacherCount' => $teacherCount,
                 );
             }
-            if($postData['parent'] == AppConstant::NUMERIC_ZERO)
-            {
+            if ($postData['parent'] == AppConstant::NUMERIC_ZERO) {
                 $replyBy = $postData['replyby'];
             }
             array_push($titleCountArray, $tempArray);
@@ -682,6 +681,7 @@ class ForumController extends AppController
             $tempArray['postdate'] = AppController::customizeDate($postData->postdate);
             $tempArray['postType'] = $postData['posttype'];
             $tempArray['name'] = AppUtility::getFullName($username->FirstName, $username->LastName);
+            $tempArray['userId'] = $username->id;
             $tempArray['userRights'] = $username->rights;
             $tempArray['userId'] = $username->id;
             $tempArray['settings'] = $forumName->settings;
@@ -697,8 +697,8 @@ class ForumController extends AppController
             $tempArray['files'] = $postData['files'];
             $tempArray['fileType'] = $forumData['forumtype'];
             $tempArray['isReplies'] = $isReplies;
-            if($postData['parent'] != AppConstant::NUMERIC_ZERO){
-                if(substr($postData['subject'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_FOUR) !== 'Re: '){
+            if ($postData['parent'] != AppConstant::NUMERIC_ZERO) {
+                if (substr($postData['subject'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR) !== 'Re: ') {
                     $this->threadLevel = AppConstant::NUMERIC_ONE;
                     $this->calculatePostLevel($postData);
                     $tempArray['level'] = $this->threadLevel;
@@ -714,32 +714,67 @@ class ForumController extends AppController
         $likeCount = $Count->findCOunt($threadId);
         $myLikes = $Count->UserLikes($threadId, $currentUser);
         $this->setReferrer();
-        foreach($this->totalPosts as $key=>$threadArray)
-        {
-            if($threadArray){
-                foreach($this->totalPosts as $singleThread) {
-                    if($threadArray['parent'] == $singleThread['id'])
-                    {
-                        if(substr($threadArray['subject'],AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_TWO) !== 'Re') {
+        foreach ($this->totalPosts as $key => $threadArray) {
+            if ($threadArray) {
+                foreach ($this->totalPosts as $singleThread) {
+                    if ($threadArray['parent'] == $singleThread['id']) {
+                        if (substr($threadArray['subject'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_TWO) !== 'Re') {
                             $moveThreadSubject = $threadArray['id'];
                             $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
                         }
-                        if( $threadArray['parent']  == $moveThreadSubject){
+                        if ($threadArray['parent'] == $moveThreadSubject) {
                             $threadArray['level'] = $threadArray['level'] + $singleThread['level'];
                         }
                     }
                 }
             }
             $FinalPostArray[$key] = $threadArray;
+            if($threadArray['parent'] == AppConstant::NUMERIC_ZERO){
+                $postType = $threadArray['postType'];
+            }
+            if($threadArray['userId'] == $currentUser['id']){
+                $studentPosts[] = $threadArray['id'];
+            }
         }
-        if($forumData['replyby'] == AppConstant::ALWAYS_TIME || $forumData['replyby'] > time()){
+        if ($forumData['replyby'] == AppConstant::ALWAYS_TIME || $forumData['replyby'] > time()) {
             $allowReply = AppConstant::NUMERIC_ONE;
-        }else{
+        } else {
             $allowReply = AppConstant::NUMERIC_ZERO;
         }
+        if($postType == AppConstant::NUMERIC_THREE && $currentUser['rights'] == AppConstant::NUMERIC_TEN) {
+            $threadOnce = AppConstant::NUMERIC_ZERO;
+            foreach ($FinalPostArray as $array) {
+                    global $parentArray;
+                    $this->parentList($array['id']);
+                    $isShow = false;
+                    if ($parentArray) {
+
+                        foreach ($studentPosts as $studentPost) {
+                            if (in_array($studentPost, $parentArray)) {
+                                $isShow = true;
+                                break;
+                            }
+                        }
+                        $parentArray = null;
+                    }
+
+                 if($array['parent'] == AppConstant::NUMERIC_ZERO && $threadOnce == AppConstant::NUMERIC_ZERO){
+                     $threadOnce = AppConstant::NUMERIC_ONE;
+                     array_push($data,$array);
+                 }else if($array['userId'] == $currentUser['id'] || in_array($array['parent'],$studentPosts)){
+                     array_push($data,$array);
+                 }else if($isShow == true)
+                 {
+                     array_push($data,$array);
+                 }
+            }
+        }else{
+            $data = $FinalPostArray;
+        }
+
         $this->includeCSS(['forums.css']);
         $this->includeJS(["general.js", "forum/post.js?ver=<?php echo time() ?>"]);
-        $responseData = array('atLeastOneThread' => $atLeastOneThread,'postdata' => $FinalPostArray,'allowReply' => $allowReply,'canViewAll' => $canViewAll,'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
+        $responseData = array('atLeastOneThread' => $atLeastOneThread,'postdata' => $data,'allowReply' => $allowReply,'canViewAll' => $canViewAll,'forumData' => $forumData, 'course' => $course, 'currentUser' => $currentUser, 'forumId' => $forumId, 'threadId' => $threadId, 'tagValue' => $tagValue, 'prevNextValueArray' => $prevNextValueArray, 'likeCount' => $likeCount, 'mylikes' => $myLikes, 'titleCountArray' => $titleCountArray,'allThreadIds' => $allThreadIds,'replyBy' => $replyBy);
         return $this->render('post', $responseData);
     }
 
@@ -1578,10 +1613,10 @@ class ForumController extends AppController
           $key++;
       }
       $key = AppConstant::NUMERIC_ZERO;
-      $gbcatsData = GbCats::getByCourseId($courseId);
-      foreach ($gbcatsData as $singleGbcatsData) {
-          $gbcatsId[$key] = $singleGbcatsData['id'];
-          $gbcatsLabel[$key] = $singleGbcatsData['name'];
+      $gbCatsData = GbCats::getByCourseId($courseId);
+      foreach ($gbCatsData as $singleGbCatsData) {
+          $gbCatsId[$key] = $singleGbCatsData['id'];
+          $gbCatsLabel[$key] = $singleGbCatsData['name'];
           $key++;
       }
       if($this->isPostMethod()) {
@@ -1594,7 +1629,7 @@ class ForumController extends AppController
                   }
               }
                if($count == AppConstant::NUMERIC_ZERO){
-                   $this->setWarningFlash('No settings have been selected to be changed. Use the checkboxes along the left to indicate that you want to change that setting.');
+                   $this->setWarningFlash(AppConstant::NO_SETTING);
                    return $this->redirect('change-forum?cid='.$courseId);
                }
               $checked = $params['checked'];
@@ -1613,7 +1648,8 @@ class ForumController extends AppController
                   }
                   $sets[] = "replyby='$replyBy'";
               }
-              if (isset($params['chg-reply-by'])) {
+
+              if (isset($params['chg-post-by'])) {
                   if ($params['post'] == "Always") {
                       $postBy = AppConstant::ALWAYS_TIME;
                   } else if ($params['post'] == "Never") {
@@ -1624,7 +1660,7 @@ class ForumController extends AppController
                   $sets[] = "postby='$postBy'";
               }
               if (isset($params['chg-cal-tag'])) {
-                  $sets[] = "caltag='" . $params['caltagpost'] . '--' . $params['caltagreply'] . "'";
+                  $sets[] = "caltag='" . $params['cal-tag-post'] . '--' . $params['caltagreply'] . "'";
               }
               $sops = array();
               if (isset($params['chg-allow-anon'])) {
@@ -1720,19 +1756,19 @@ class ForumController extends AppController
               if (isset($params['chg-subscribe'])) {
                   if (isset($params['Get-email-notify-of-new-posts'])) {
                       //add any subscriptions we don't already have
-                          $subScriptionId = ForumSubscriptions::getByManyForumIdsANdUserId($checkedList,$currentUser['id']);
+                          $subscriptionId = ForumSubscriptions::getByManyForumIdsANdUserId($checkedList,$currentUser['id']);
                       $hasSubscribe = array();
-                      if ($subScriptionId > AppConstant::NUMERIC_ZERO) {
-                          foreach($subScriptionId as $subScription){
-                              $hasSubscribe[] = $subScription['forumid'];
+                      if ($subscriptionId > AppConstant::NUMERIC_ZERO) {
+                          foreach($subscriptionId as $subscription){
+                              $hasSubscribe[] = $subscription['forumid'];
                           }
                       }
                       $toadd = array_diff($params['checked'], $hasSubscribe);
                       foreach ($toadd as $fid) {
                           $fid = intval($fid);
                           if ($fid > AppConstant::NUMERIC_ZERO) {
-                              $subScription = new ForumSubscriptions();
-                              $subScription->AddNewEntry($fid,$currentUser->id);
+                              $subscription = new ForumSubscriptions();
+                              $subscription->AddNewEntry($fid,$currentUser->id);
                           }
                       }
                   } else {
@@ -1742,16 +1778,31 @@ class ForumController extends AppController
                       }
                   }
               }
-               $this->setWarningFlash('Forums data changes successfully.');
+               $this->setWarningFlash(AppConstant::FORUM_UPDATED);
                return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$courseId));
           }else{
-              $this->setWarningFlash('No forums are selected to be changed.');
+              $this->setWarningFlash(AppConstant::NO_FORUM_SELECTED);
               return $this->redirect('change-forum?cid='.$courseId);
           }
       }
+
       $this->includeCSS(['assessment.css','dataTables.bootstrap.css']);
       $this->includeJS(['general.js?ver=012115','DataTables-1.10.6/media/js/jquery.dataTables.js']);
-      $responseData = array('course' => $course,'gbcatsId' => $gbcatsId,'gbcatsLabel' => $gbcatsLabel,'groupNameId' => $groupNameId,'gbcatsLabel' => $gbcatsLabel,'isTeacher' => $isTeacher,'forumItems' => $forumItems);
+      $responseData = array('course' => $course,'gbCatsId' => $gbCatsId,'gbCatsLabel' => $gbCatsLabel,'groupNameId' => $groupNameId,'isTeacher' => $isTeacher,'forumItems' => $forumItems);
       return $this->renderWithData('changeForum',$responseData);
   }
+
+    public function parentList($id)
+    {
+        global $parentArray;
+        $parentData = ForumPosts::getPostById($id);
+        if($parentData['parent'] == AppConstant::NUMERIC_ZERO)
+        {
+            return $parentArray;
+        }else
+        {
+            $parentArray[] = $parentData['parent'];
+            $this->parentList($parentData['parent']);
+        }
+    }
 }

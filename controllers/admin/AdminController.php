@@ -597,7 +597,7 @@ class AdminController extends AppController
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
        } else {
            if (isset($params['delete'])) {
-               $extTool= $nameOfExtTool = ExternalTools::getById($id);
+               $extTool = ExternalTools::getById($id);
                $nameOfExtTool = $extTool['name'];
            } else if (isset($_GET['id'])) {
                if ($params['id'] == 'new') {
@@ -765,8 +765,8 @@ class AdminController extends AppController
             case "removediag":
                 break;
         }
-        $this->includeCSS(['imascore.css','assessment.css']);
-        $this->includeJS(['general.js?ver=012115', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+        $this->includeCSS(['assessment.css']);
+        $this->includeJS(['general.js?ver=012115','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
         $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
@@ -1099,7 +1099,7 @@ class AdminController extends AppController
                             if ($GLOBALS['filehandertypecfiles'] == 's3') {
                                 $n = $tar->extractToS3("qimages","public");
                             } else {
-                               $n = $tar->extractToDir("../assessment/qimages/");
+                               $n = $tar->extractToDir(AppConstant::UPLOAD_DIRECTORY.'macro/');
                             }
 
                             echo "<p>Extracted $n files.  <a href='".AppUtility::getURLFromHome('admin','admin/index')."'>Continue</a></p>\n";
@@ -1239,6 +1239,7 @@ class AdminController extends AppController
                 }
                 break;
             case "delgroup":
+
                 if ($myRights <100) {
                     $this->setWarningFlash("You don't have the authority for this action");
 //                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
