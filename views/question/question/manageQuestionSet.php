@@ -5,7 +5,7 @@ use app\components\AppConstant;
 $this->title = AppUtility::t($pagetitle, false);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php $imasroot = AppUtility::getHomeURL();?>
+<?php $imasroot = AppUtility::getHomeURL().'img';?>
 <!--Get current time-->
 <div class="item-detail-header">
     <?php if(!empty($curBreadcrumb)){?>
@@ -348,9 +348,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
                 } else if ($searchall==0) {
                     if ($page_questionTable[$qid]['junkflag']==1) {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/flagfilled.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     } else {
-                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
+                        echo "<td class=c><img class=\"pointer wlf\" id=\"tag{$page_questionTable[$qid]['libitemid']}\" src=\"$imasroot/flagempty.gif\" onClick=\"toggleJunkFlag({$page_questionTable[$qid]['libitemid']});return false;\" /></td>";
                     }
                 }
                 $ln++;

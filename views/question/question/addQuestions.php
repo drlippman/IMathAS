@@ -7,7 +7,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <!--Get current time-->
 <input type="hidden" class="" value="<?php echo $courseId = $course->id?>">
-<?php $imasroot = AppUtility::getHomeURL();?>
+<?php $imasroot = AppUtility::getHomeURL().'img';?>
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $courseId]]); ?>
 </div>
@@ -129,6 +129,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </script>
         <?php } ?>
     </div>
+</div>
 </div>
 <div class="tab-content shadowBox margin-top-fifteen">
     <?php
@@ -304,9 +305,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <td><?php echo $pageQuestionTable[$qid]['mine'] ?></td>
                                     <?php if ($searchall==0) {
                                         if ($pageQuestionTable[$qid]['junkflag']==1) {
-                                            echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagfilled.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
+                                            echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/flagfilled.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
                                         } else {
-                                            echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/img/flagempty.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
+                                            echo "<td class=c><img class=\"pointer\" id=\"tag{$pageQuestionTable[$qid]['libitemid']}\" src=\"$imasroot/flagempty.gif\" onClick=\"toggleJunkFlag({$pageQuestionTable[$qid]['libitemid']});return false;\" /></td>";
                                         }
                                     } ?>
                                     <td class=""><div> <a style="width: 80%" class='btn btn-primary disable-btn background-color-blue'>
@@ -481,4 +482,3 @@ $this->params['breadcrumbs'][] = $this->title;
             </script>
         <?php } ?>
     </div>
-</div>

@@ -24,12 +24,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
-        <div class="pull-left header-btn">
+
+        <div>
+        <?php if (isset($assessmentData['id'])) {
+        echo '<div class="floatleft"><a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$params['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''._('This will discard any changes you have made on this page').'\');">'._('Add/Remove Questions').'</a></div>';
+        } ?>
+        <div class="pull-left header-btn width-twenty-five-per">
             <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
+        </div>
         </div>
     </div>
 </div>
-
 <div class="tab-content shadowBox non-nav-tab-item">
     <div style="background: #f8f8f8; height: 75px;">
         <?php
@@ -47,8 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
         <div id="copyfromoptions" class="hidden" style="background-color:#f8f8f8;margin-top: 15px;">
-            <div class=col-md-2><?php AppUtility::t('Also copy')?></div>
-            <div class='col-md-10 padding-left-zero'>
+            <div class='col-md-2 padding-left-thirty'><?php AppUtility::t('Also copy')?></div>
+            <div class='col-md-10 padding-left-zero padding-left-ten'>
                 <div class="col-md-8">
                     <input type=checkbox name="copysummary"/>
                     <span class="padding-left"><?php AppUtility::t('Summary')?></span>
@@ -67,9 +72,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
 
-            <div class="col-md-12 padding-left-zero margin-top-fifteen">
-            <div class='col-md-2'>Remove any existing per-question settings?</div>
-            <div class='col-md-10'>
+            <div class="col-md-12 padding-left-zero margin-top-fifteen margin-bottom-twenty-five">
+            <div class='col-md-2 padding-left-thirty'>Remove any existing per-question settings?</div>
+            <div class='col-md-10 padding-left-twenty-five'>
                 <div class="checkbox override-hidden">
                     <label class="margin-left-two margin-top-five inline-checkbox label-visible">
                         <input type=checkbox name="removeperq" />
@@ -121,7 +126,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <label class="pull-left non-bold"><input type=radio name="sdatetype" class="margin-left-two pull-left margin-top-two" value="0" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ZERO); ?>/><span class="padding-left"><?php AppUtility::t('Always until end date')?></span></label>
                     <label class="pull-left non-bold" style="padding-left: 40px"><input type=radio name="sdatetype"  value="1" <?php AssessmentUtility::writeHtmlChecked($startDate,"0",AppConstant::NUMERIC_ONE); ?>/></label>
                     <?php
-                    echo '<div class = "margin-top-minus-five time-input pull-left col-md-4">';
+                    echo '<div class = "margin-top-minus-five time-input pull-left col-md-4 width-twenty-one-per">';
                     echo DatePicker::widget([
                         'name' => 'sdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -134,7 +139,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                     <?php
                     echo '<label class="end pull-left non-bold margin-top-two"> at </label>';
-                     echo '<div class="margin-top-minus-five pull-left col-md-4">';
+                     echo '<div class="margin-top-minus-five pull-left col-md-4 width-twenty-seven-per">';
                         echo TimePicker::widget([
                         'name' => 'stime',
                         'value' => $sTime,
@@ -154,7 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <label class='pull-left non-bold'><input type=radio name="edatetype" class="margin-left-two pull-left margin-top-two" value="2000000000" <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",0); ?>/><span class="padding-left"></span><?php AppUtility::t('Always after start date')?></span></label>
                     <label class='pull-left non-bold' style="padding-left: 33px"><input type=radio name="edatetype"  value="1"  <?php AssessmentUtility::writeHtmlChecked($endDate,"2000000000",1); ?>/></label>
                     <?php
-                    echo '<div class = "margin-top-minus-five pull-left col-md-4 time-input">';
+                    echo '<div class = "margin-top-minus-five pull-left col-md-4 time-input width-twenty-one-per">';
                     echo DatePicker::widget([
                         'name' => 'edate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -167,7 +172,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                     <?php
                     echo '<label class="end pull-left non-bold margin-top-two"> at </label>';
-                    echo '<div class="margin-top-minus-five pull-left col-md-4">';
+                    echo '<div class="margin-top-minus-five pull-left col-md-4 width-twenty-seven-per">';
 
                     echo TimePicker::widget([
                         'name' => 'etime',
@@ -192,7 +197,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <label class='pull-left select-text-margin'><input type=radio name="doreview" class="margin-left-two pull-left " value="1" <?php if ($assessmentData['reviewdate']>AppConstant::NUMERIC_ZERO && $assessmentData['reviewdate']<2000000000) { echo "checked=1";} ?>></label>
                     <?php
                     echo '<label class="select-text-margin end pull-left non-bold padding-left"> Until</label>';
-                    echo '<div class = "pull-left col-md-4 time-input">';
+                    echo '<div class = "pull-left col-md-4 time-input width-twenty-one-per">';
                     echo DatePicker::widget([
                         'name' => 'rdate',
                         'type' => DatePicker::TYPE_COMPONENT_APPEND,
@@ -205,7 +210,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '</div>';?>
                     <?php
                     echo '<label class="end pull-left non-bold select-text-margin"> at </label>';
-                    echo '<div class=" col-md-6">';
+                    echo '<div class=" col-md-6 width-twenty-seven-per">';
                     echo TimePicker::widget([
                         'name' => 'rtime',
                         'value' => $reviewTime,
@@ -228,7 +233,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <img class="assessment-add-item-icon" id="img"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
         <div class="col-md-2 add-item-text" style="padding-left: 0">
-            <p><?php AppUtility::t('Core Options');?></p>
+            <p class="margin-left-minus-twenty"><?php AppUtility::t('Core Options');?></p>
         </div>
     </div>
         <div id="customoptions" class="col-md-12 core-options assement-options-margin">
@@ -289,10 +294,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class='col-md-2 select-text-margin'><?php AppUtility::t('Default penalty')?></div>
                     <div class='col-md-10'>
                         <div class="col-md-2 floatleft padding-left-zero">
-                            <input class="form-control width-fifty-per display-inline-block" type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
-                            <span class="margin-left-twenty"> %</span>
+                            <input class="form-control width-sixty-six-per display-inline-block" type=text size=4 name=defpenalty value="<?php echo $assessmentData['defpenalty'];?>" <?php if ($assessmentSessionData) {echo 'disabled=disabled';}?>>
+                            <span class="margin-left-five"> %</span>
                         </div>
-                        <div class="col-md-10 floatleft padding-left-zero padding-right-zero">
+                        <div class="col-md-10 floatleft padding-left-zero padding-right-zero margin-left-minus-twenty-five">
                             <select name="skippenalty" <?php if ($assessmentSessionData) {echo 'disabled=disabled';} ?> class="form-control width-sixty-per">
                                 <option value="0" <?php if ($skipPenalty==AppConstant::NUMERIC_ZERO) {echo "selected=1";} ?>>per missed attempt</option>
                                 <option value="1" <?php if ($skipPenalty==AppConstant::NUMERIC_ONE) {echo "selected=1";} ?>>per missed attempt, after 1</option>
@@ -504,10 +509,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <img class="assessment-add-item-icon" id="img1"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
         <div class="col-md-2 add-item-text padding-left-zero">
-            <p><?php AppUtility::t('Advance Options');?></p>
+            <p class="margin-left-minus-twenty"><?php AppUtility::t('Advance Options');?></p>
         </div>
     </div>
-        <div id="customoptions" class="col-md-12 advance-options assement-options-margin" style="background-color: #fafafa">
+        <div id="customoptions1" class="advance-options col-md-12  assement-options-margin" style="background-color: #fafafa">
 
             <div class="col-md-12 padding-left-zero">
                 <div class='col-md-2'><?php AppUtility::t('Minimum score to receive credit')?></div>
@@ -671,51 +676,3 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
 </div></form>
-
-<script>
-    $(document).ready(function(){
-        $('.core-options').hide();
-        $('.advance-options').hide();
-        var img = document.getElementById('img');
-        var img1 = document.getElementById('img1');
-    });
-        var cnt=0;
-        var cnt1 = 0;
-    function xyz()
-    {
-        var img = document.getElementById('img');
-        $('.core-options').toggle();
-        if(cnt == 0)
-        {
-            $('.clickme').css('background-color','#fafafa');
-            $('.core-options').css('background-color','#fafafa');
-            img.src= '../../img/assessMinusIcon.png';
-            cnt++;
-        }else if(cnt > 0)
-        {
-            $('.clickme').css('background-color','#f0f0f0');
-            img.src= '../../img/assessAddIcon.png';
-            cnt = 0;
-        }
-
-    }
-
-    function xyz1()
-    {
-        var img1 = document.getElementById('img1');
-        $('.advance-options').toggle();
-        if(cnt1 == 0)
-        {
-            $('.clickmegreen').css('background-color','#fafafa');
-            $('.advance-options').css('background-color','#fafafa');
-            img1.src= '../../img/assessMinusIcon.png';
-            cnt1++;
-        }else if(cnt1 > 0)
-        {
-            $('.clickmegreen').css('background-color','#f0f0f0');
-            img1.src= '../../img/assessAddIcon.png';
-            cnt1 = 0;
-        }
-    }
-
-</script>
