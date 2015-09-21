@@ -260,7 +260,7 @@ class Libraries extends BaseImasLibraries
         $query ->select(['id'])
             ->from('imas_libraries')
             ->where(['IN','id',$remlist]);
-          $query->andWhere(['groupid',$groupid]);
+          $query->andWhere(['groupid' => $groupid]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;

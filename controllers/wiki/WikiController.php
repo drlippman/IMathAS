@@ -224,7 +224,7 @@ class WikiController extends AppController
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' .$course->id));
             }
         }
-        $this->includeJS(["editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
+        $this->includeJS(["course/inlineText.js","editor/tiny_mce.js" , 'editor/tiny_mce_src.js', 'general.js', 'editor.js']);
         $this->includeCSS(["roster/roster.css", 'course/items.css']);
         $returnData = array('course' => $course, 'saveTitle' => $saveTitle, 'wiki' => $wiki, 'groupNames' => $groupNames, 'defaultValue' => $defaultValues);
         return $this->render('addWiki', $returnData);

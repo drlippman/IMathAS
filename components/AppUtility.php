@@ -2860,7 +2860,6 @@ class AppUtility extends Component
             //if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
             if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
                 if (!$isadmin) {
-                    AppUtility::dump('jjjjj');
                     if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
                         $rights[$child]=4;  //adjust coloring
                     }

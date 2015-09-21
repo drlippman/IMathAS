@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasDiags;
 use Yii;
 use yii\db\Query;
@@ -21,7 +22,7 @@ class Diags extends BaseImasDiags
         if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
             $query->andWhere(['imas_diags.ownerid' => $userId]);
         } else if ($myRights < AppConstant::NUMERIC_HUNDREAD) {
-            $query->andWhere(['imas_users.groupid=' => $groupId]);
+            $query->andWhere(['imas_users.groupid' => $groupId]);
         }
         $query->orderBy('imas_diags.name');
         $command = $query->createCommand();

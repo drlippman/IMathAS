@@ -140,15 +140,19 @@ class AdminController extends AppController
             }
 
         }
-        if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT) {
+        if ($myRights >= AppConstant::DIAGNOSTIC_CREATOR_RIGHT)
+        {
             $result = Diags::getDiagnostic($myRights, $userId, $groupId);
             $i = AppConstant::NUMERIC_ZERO;
-            foreach($result as $key => $row){
-                $page_diagnosticsId[$i] = $row['id'];
-                $page_diagnosticsName[$i] = $row['name'];
-                $page_diagnosticsAvailable[$i] = ($row['public']&1) ? "Yes" : "No";
-                $page_diagnosticsPublic[$i] = ($row['public']&2) ? "Yes" : "No";
-                $i++;
+            if($result)
+            {
+                foreach($result as $key => $row){
+                    $page_diagnosticsId[$i] = $row['id'];
+                    $page_diagnosticsName[$i] = $row['name'];
+                    $page_diagnosticsAvailable[$i] = ($row['public']&1) ? "Yes" : "No";
+                    $page_diagnosticsPublic[$i] = ($row['public']&2) ? "Yes" : "No";
+                    $i++;
+                }
             }
         }
         /**
@@ -2381,24 +2385,18 @@ class AdminController extends AppController
                             $deleteAdmin = new LibraryItems();
                             $deleteAdmin->deleteLibraryAdmin($remlist);
                         } else if ($isGrpAdmin) {
-                            /*
-                             * Work in progress: Group Admin
-                             */
-                            /*$result = Libraries::getByIdGroupAdmin($remlist, $groupId);
+                            $result = Libraries::getByIdGroupAdmin($remlist, $groupId);
                             foreach($result as $key => $row)
                             {
                                 $deleteLibItem = new LibraryItems();
                                 $deleteLibItem->deleteLibraryGrpAdmin($row['id']);
-                            }*/
+                            }
                         } else {
                             $result = Libraries::getByIdAdmin($remlist, $userId);
                             foreach($result as $key => $row)
                             {
-                                /*
-                                * Work in progress: Group Admin
-                                */
-                                /*$deleteLibItem = new LibraryItems();
-                                $deleteLibItem->deleteLibraryGrpAdmin($row['id']);*/
+                                $deleteLibItem = new LibraryItems();
+                                $deleteLibItem->deleteLibraryGrpAdmin($row['id']);
                             }
                         }
 

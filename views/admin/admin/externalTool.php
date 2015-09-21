@@ -9,8 +9,10 @@ else{
     $this->title = 'External Tools';
     $this->params['breadcrumbs'] = $this->title;
 }
+if (isset($params['id'])) {
+echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'">';
+}
 ?>
-
 <div class="item-detail-header">
     <?php
     if($isTeacher){
@@ -33,6 +35,13 @@ else{
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $this->title ?></div>
         </div>
+        <?php if (isset($params['id'])) { ?>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings" type="submit" value="submit">
+                <i class="fa fa-share header-right-btn"></i><?php echo 'Save'; ?></button>
+    </div>
+          <?php  } ?>
+
     </div>
 </div>
 <div class="tab-content shadowBox non-nav-tab-item">
@@ -58,35 +67,34 @@ else{
             echo '<div class="col-lg-2"><input type=submit value="Yes, I\'m Sure"></div>';
             echo '</form>';
         } else if (isset($params['id'])) {
-    echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'">';
 ?>
             <br/><div class="col-lg-2"><?php AppUtility::t('Tool Name')?></div>
             <div class="col-lg-10">
-                <input class="form-control-1" required="Please fill out this field"  size="40" type="text" name="tname" value="<?php echo $name;?>" />
+                <input class="form-control-1" required="Please fill out this field" maxlength="40" size="40" type="text" name="tname" value="<?php echo $name;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Launch URL')?></div>
             <div class="col-lg-10">
-                <input type="text" class="form-control-1" size="40" name="url" value="<?php echo $url;?>" />
+                <input type="url" class="form-control-1" size="40" name="url" pattern="https?://.+" value="<?php echo $url;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Key')?></div>
             <div class="col-lg-10">
-                <input type="text" class="form-control-1" size="40" name="key" value="<?php echo $key;?>" />
+                <input type="text" class="form-control-1" size="40" maxlength="40" name="key" value="<?php echo $key;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Secret')?></div>
             <div class="col-lg-10">
-                <input type="password" class="form-control-1" size="40" name="secret" value="<?php echo $secret;?>" />
+                <input type="password" class="form-control-1" size="40" maxlength="40" name="secret" value="<?php echo $secret;?>" />
             </div>
             <br class="form" /><br/>
 
             <div class="col-lg-2"><?php AppUtility::t('Custom Parameters')?></div>
-            <div class="col-lg-8">
-                <textarea rows="2" cols="30" name="custom"><?php echo $custom;?></textarea>
+            <div class="col-lg-3">
+                <textarea rows="2" cols="60" class="form-control" name="custom"><?php echo $custom;?></textarea>
             </div>
             <br class="form" /><br/>
 
@@ -105,7 +113,6 @@ else{
                 echo '</div>
             <br class="form" /><br/>';
             }
-            echo '<div class="submit"><input type="submit" value="Save"></div><br/>';
             echo '</form>';
 
         } else {

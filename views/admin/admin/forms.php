@@ -137,13 +137,12 @@ switch($action) {
         break;
     case "modify":
     case "addcourse":
-    if ($myRights < 40) {
-        echo "You don't have the authority for this action";
-        break;
-    }
+//    if ($myRights < 40) {
+//        echo "You don't have the authority for this action";
+//        break;
+//    }
         if (isset($params['cid'])) {
             $cid = $params['cid'];
-//            echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
         }
         echo "<form method=post action=\"actions?action={$params['action']}";
         if (isset($params['cid'])) {
