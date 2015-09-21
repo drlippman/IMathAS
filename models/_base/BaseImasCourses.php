@@ -81,7 +81,7 @@ class BaseImasCourses extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 254],
             [['enrollkey'], 'string', 'max' => 100],
             [['topbar', 'theme'], 'string', 'max' => 32],
-            //[['ltisecret'], 'string', 'max' => 10]
+            [['ltisecret'], 'string', 'max' => 10]
         ];
     }
 

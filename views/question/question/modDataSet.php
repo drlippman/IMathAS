@@ -22,9 +22,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="pull-left page-heading">
             <div class="vertical-align title-page"><?php echo $addMode ?><?php echo AppUtility::t(' QuestionSet Question',false);?></div>
         </div>
-        <div class="pull-left header-btn hide-hover">
-<!--            <a href="#"id="mess" class="btn btn-primary1 pull-right  btn-color"><img class = "small-icon" src="--><?php //echo AppUtility::getAssetURL()?><!--img/newzmessg.png">&nbsp;Send Message</a>-->
-        </div>
     </div>
 </div>
 <div class="item-detail-content">

@@ -62,95 +62,36 @@ $this->params['breadcrumbs'][] = $this->title;
         function libselect() {
             window.open('library-tree?cid=<?php echo $cid ?>&libtree=popup&libs='+curlibs,'libtree','width=400,height='+(.7*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(screen.width-420));
         }
-        function setlib(libs) {
-            document.getElementById("libs").value = libs;
-            curlibs = libs;
-        }
-        function setlibnames(libn) {
-            document.getElementById("libnames").innerHTML = libn;
-        }
-        function getnextprev(formn,loc) {
-            var form = document.getElementById(formn);
-            var prevq = 0; var nextq = 0; var found=false;
-            var prevl = 0; var nextl = 0;
-            for (var e = 0; e < form.elements.length; e++) {
-                var el = form.elements[e];
-                if (typeof el.type == "undefined") {
-                    continue;
-                }
-                if (el.type == 'checkbox' && el.name=='nchecked[]') {
-                    if (found) {
-                        nextq = el.value;
-                        nextl = el.id;
-                        break;
-                    } else if (el.id==loc) {
-                        found = true;
-                    } else {
-                        prevq = el.value;
-                        prevl = el.id;
-                    }
-                }
-            }
-            return ([[prevl,prevq],[nextl,nextq]]);
-        }
+
     </script>
 
-<!--    <div class="breadcrumb">--><?php //echo $curBreadcrumb ?><!--</div>-->
-<!--    <div id="headermanageqset" class="pagetitle"><h2>--><?php //echo $pagetitle; echo $helpicon; ?><!--</h2></div>-->
-
     <?php
-    if (isset($params['remove'])) {
+    if (isset($remove)) {
         ?>
-        <div>Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
-        to all users.  If any are currently being used in an assessment, it will mess up that assessment.</div>
-        <form method=post action="manage-question-set?cid=<?php echo $cid ?>&confirmed=true">
-            <input type=hidden name=remove value="<?php echo $rlist ?>">
-            <div class="margin-top-fifteen">
-                <input type=submit value="Really Delete">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-            </div>
-        </form>
+        Are you SURE you want to delete this question from the Question Set.  This will make it unavailable
+        to all users.  If it is currently being used in an assessment, it will mess up that assessment.
+        <p>
+            <input type=button onclick="window.location='manage-question-set?cid=<?php echo $cid ?>&remove=<?php echo $remove ?>&confirmed=true'" value="Really Delete">
+            <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+        </p>
     <?php
-    } else if (isset($params['transfer'])) {
+    } else if (isset($transfer)) {
     ?>
-        <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
-            <input type=hidden name=transfer value="<?php echo $tlist ?>">
-           <div class="margin-top-five"> <span>Transfer question ownership to</span>
+        <form method=post action="manage-question-set?cid=<?php echo $cid ?>&transfer=<?php echo $transfer ?>">
+            Transfer to:
 
-            <span class="display-inline-block width-twenty-per margin-left-fifteen"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
-            </div>
-            <div class="margin-top-fifteen">
+            <?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
+
+            <p>
                 <input type=submit value="Transfer">
-                <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-            </div>
+                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+            </p>
         </form>
+
     <?php
     } else if (isset($params['chglib'])) {
     ?>
-        <script type="text/javascript">
-            var chgliblaststate = 0;
-            function chglibtoggle(rad) {
-                var val = rad.value;
-                var help = document.getElementById("chglibhelp");
-                if (val==0) {
-                    help.innerHTML = "Select libraries to add these questions to. ";
-                    if (chgliblaststate==2) {
-                        initlibtree(false);
-                    }
-                } else if (val==1) {
-                    help.innerHTML = "Select libraries to add these questions to.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
-                    if (chgliblaststate==2) {
-                        initlibtree(false);
-                    }
-                } else if (val==2) {
-                    help.innerHTML = "Unselect the libraries you want to remove questions from.  The questions will not be deleted; they will be moved to Unassigned if no other library assignments exist.  Questions will only be removed from existing libraries if you have the rights to make those changes.";
-                    if (chgliblaststate==0 || chgliblaststate==1) {
-                        initlibtree(true);
-                    }
-                }
-                chgliblaststate = val;
-            }
-        </script>
+
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
             <input type=hidden name=chglib value="true">
             <input type=hidden name=qtochg value="<?php echo $clist ?>">
@@ -275,8 +216,6 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <input type="hidden" name="qtochg" value="<?php echo $clist ?>">
-
-
             <div class="margin-top-fifteen">
                 <input type=submit value="Change Rights">
                 <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
@@ -285,24 +224,28 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     } else if (isset($params['remove'])) {
         ?>
-        Are you SURE you want to delete this question from the Question Set.  This will make it unavailable
-        to all users.  If it is currently being used in an assessment, it will mess up that assessment.
-        <p>
-            <input type=button onclick="window.location='manage-question-set?cid=<?php echo $cid ?>&remove=<?php echo $params['remove'] ?>&confirmed=true'" value="Really Delete">
-            <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-        </p>
+        <div>Are you SURE you want to delete these questions from the Question Set.  This will make them unavailable
+        to all users.  If any are currently being used in an assessment, it will mess up that assessment.</div>
+        <form method=post action="manage-question-set?cid=<?php echo $cid ?>&confirmed=true">
+            <input type=hidden name=remove value="<?php echo $rlist ?>">
+            <div class="margin-top-fifteen">
+                <input type=submit value="Really Delete">
+                <input type=button value="Nevermind" class="secondarybtn margin-left-fifteen" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+            </div>
+        </form>
     <?php
     } else if (isset($params['transfer'])) {
         ?>
-        <form method=post action="manage-question-set?cid=<?php echo $cid ?>&transfer=<?php echo $params['transfer'] ?>">
-            Transfer to:
+        <form method=post action="manage-question-set?cid=<?php echo $cid ?>">
+            <input type=hidden name=transfer value="<?php echo $tlist ?>">
+            <div class="margin-top-five"> <span>Transfer question ownership to</span>
 
-            <?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
-
-            <p>
+                <span class="display-inline-block width-twenty-per margin-left-fifteen"><?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?></span>
+            </div>
+            <div class="margin-top-fifteen">
                 <input type=submit value="Transfer">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-            </p>
+                <input type=button value="Nevermind" class="secondarybtn margin-left-ten" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
+            </div>
         </form>
     <?php
     } else { //DEFAULT DISPLAY

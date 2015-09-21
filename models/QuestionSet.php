@@ -114,27 +114,8 @@ class QuestionSet extends BaseImasQuestionset
     }
 
     public function createQuestionSet($params){
-        $this->uniqueid = isset($params['uniqueid']) ? $params['uniqueid'] : null;
-        $this->adddate = isset($params['adddate']) ? $params['adddate'] : null;
-        $this->lastmoddate = isset($params['lastmoddate']) ? $params['lastmoddate'] : null;
-        $this->description = isset($params['description']) ? $params['description'] : null;
-        $this->ownerid = isset($params['ownerid']) ? $params['ownerid'] : null;
-        $this->author = isset($params['author']) ? $params['author'] : null;
-        $this->userights = isset($params['userights']) ? $params['userights'] : null;
-        $this->license = isset($params['license']) ? $params['license'] : null;
-        $this->otherattribution = isset($params['otherattribution']) ? $params['otherattribution'] : null;
-        $this->qtype = isset($params['qtype']) ? $params['qtype'] : null;
-        $this->control = isset($params['control']) ? $params['control'] : null;
-        $this->qcontrol = isset($params['qcontrol']) ? $params['qcontrol'] : null;
-        $this->qtext = isset($params['qtext']) ? $params['qtext'] : null;
-        $this->answer = isset($params['answer']) ? $params['answer'] : null;
-        $this->hasimg = isset($params['hasimg']) ? $params['hasimg'] : null;
-        $this->ancestors = isset($params['ancestors']) ? $params['ancestors'] : null;
-        $this->ancestorauthors = isset($params['ancestorauthors']) ? $params['ancestorauthors'] : null;
-        $this->extref = isset($params['extref']) ? $params['extref'] : null;
-        $this->replaceby = isset($params['replaceby']) ? $params['replaceby'] : null;
-        $this->solution = isset($params['solution']) ? $params['solution'] : null;
-        $this->solutionopts = isset($params['solutionopts']) ? $params['solutionopts'] : null;
+        $data = AppUtility::removeEmptyAttributes($params);
+        $this->attributes = $data;
         $this->save();
         return $this->id;
     }

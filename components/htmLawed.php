@@ -10,7 +10,7 @@ See htmLawed_README.txt/.htm
 
 Stripslashes() GET/POST if magic_quotes is on
 */
-
+use yii\helpers\Inflector;
 //require_once("filehandler.php");
 
 function convertdatauris($in) {
@@ -35,7 +35,7 @@ function convertdatauris($in) {
 	return $in;
 }
 
-function htmLawed($in, $cf = 1, $spec = array()){
+function htmLawed($in, $cf = 1, $spec = array()){;
 $in = convertdatauris($in);
 $cf = is_array($cf) ? $cf : array();
 // config: valid_xhtml

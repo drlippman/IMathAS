@@ -825,11 +825,6 @@ class QuestionController extends AppController
         return $pageAssessmentList;
     }
 
-    public function actionSaveQuestions()
-    {
-        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress'));
-    }
-
     public function actionAddVideoTimes()
     {
         return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress'));
@@ -1181,7 +1176,7 @@ class QuestionController extends AppController
                 $questionSetArray['qtext'] = $params['qtext'];
                 $questionSetArray['answer'] = $params['answer'];
                 $questionSetArray['hasimg'] = $params['hasimg'];
-                $questionSetArray['ancestors'] = $ancestors;
+                $questionSetArray['ancestors'] = $ancestors.'';
                 $questionSetArray['ancestorauthors'] = $ancestorauthors;
                 $questionSetArray['extref'] = $extRef;
                 $questionSetArray['replaceby'] = $replaceby;
@@ -1269,12 +1264,11 @@ class QuestionController extends AppController
             }
             if (count($toadd) > AppConstant::NUMERIC_ZERO) {
                 foreach ($toadd as $libId) {
-                    $libArray = array();
-                    $libArray['libid'] = $libId;
-                    $libArray['qsetid'] = $questionSetId;
-                    $libArray['ownerid'] = $userId;
+                    $tempLibArray['libid'] = $libId;
+                    $tempLibArray['qsetid'] = $questionSetId;
+                    $tempLibArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
-                    $lib->createLibraryItems($libArray);
+                    $lib->createLibraryItems($tempLibArray);
                 }
             } else if (count($toRemove) > AppConstant::NUMERIC_ZERO) {
                 foreach ($toRemove as $libId) {
@@ -1284,12 +1278,13 @@ class QuestionController extends AppController
             if (count($newlibs) == AppConstant::NUMERIC_ZERO) {
                 $query = LibraryItems::getByQid($questionSetId);
                 if (count($query) == AppConstant::NUMERIC_ZERO) {
-                    $libArray = array();
-                    $libArray['libid'] = AppConstant::NUMERIC_ZERO;
-                    $libArray['qsetid'] = $questionSetId;
-                    $libArray['ownerid'] = $userId;
+
+
+                    $tempLibArray['libid'] = AppConstant::NUMERIC_ZERO;
+                    $tempLibArray['qsetid'] = $questionSetId;
+                    $tempLibArray['ownerid'] = $userId;
                     $lib = new LibraryItems();
-                    $lib->createLibraryItems($libArray);
+                    $lib->createLibraryItems($tempLibArray);
                 }
             }
             if (!isset($params['aid'])) {
@@ -2128,6 +2123,8 @@ class QuestionController extends AppController
     public function actionManageQuestionSet()
     {
         $user = $this->getAuthenticatedUser();
+        $remove = $this->getParamVal('remove');
+        $transfer = $this->getParamVal('transfer');
         $params = $this->getRequestParams();
         $cid = $params['cid'];
         $userId = $user['id'];
@@ -2164,101 +2161,50 @@ class QuestionController extends AppController
                     $isAdmin = true;
                 }
             }
-            if(is_numeric($params['transfer'])){
-                $params['nchecked'] = $params['transfer'];
-            }
-            if(is_numeric($params['remove'])){
-                $params['nchecked'] = $params['remove'];
-            }
-            if(is_numeric($params['chglib'])){
-                $params['nchecked'] = $params['chglib'];
-            }
-            if(is_numeric($params['chgrights'])){
-                $params['nchecked'] = $params['chgrights'];
-            }
-            if(is_numeric($params['license'])){
-                $params['nchecked'] = $params['license'];
-            }
-            if(is_numeric($params['template'])){
-                $params['nchecked'] = $params['template'];
-            }
-            if (isset($params['remove'])) {
+
+            if (isset($remove)) {//get remove
                 if (isset($params['confirmed'])) {
-                    if ($params['remove'] != '') {
-                        $removeList = explode(',', $params['remove']);
-                        if ($isAdmin) {
-                            LibraryItems::DeleteByIds($removeList);
-                        } else if ($isGrpAdmin) {
-                            $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
-                            foreach ($query as $row) {
-                                LibraryItems::deleteByQsetId($row['id']);
-                            }
+                    if ($isGrpAdmin) {
+                        $query = QuestionSet::getQidByQSetIdAndGroupId($remove, $groupId);
+                        if (count($query) > AppConstant::NUMERIC_ZERO) {
+                            QuestionSet::setDeletedById($remove);
                         } else {
-                            $query = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
-                            foreach ($query as $row) {
-                                LibraryItems::deleteByQsetId($row['id']);
-                            }
+                            return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                         }
-                        if ($isGrpAdmin) {
-                            $query = $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
-                            foreach ($query as $row) {
-                                QuestionSet::setDeletedById($row['id']);
-                            }
+                    } else {
+                        if (!$isAdmin) {
+                            QuestionSet::setDeletedByIdAndOwnerId($remove, $userId);
                         } else {
-                            if (!$isAdmin) {
-                                QuestionSet::setDeletedByIdsAndOwnerId($removeList, $userId);
-                            } else {
-                                QuestionSet::setDeletedByIds($removeList);
-                            }
+                            QuestionSet::setDeletedById($remove);
                         }
+                    }
+                    if (count($link) > AppConstant::NUMERIC_ZERO) {
+                        LibraryItems::deleteByQsetId($remove);
                     }
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
-                    if (!isset($params['nchecked'])) {
-                        $this->setErrorFlash('No Questions Selected');
-                        return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
-                    }
                     $pagetitle = "Confirm Delete";
                     $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    if(is_array($params['nchecked'])){
-                        $rlist = implode(",", $params['nchecked']);
-                    }else{
-                        $rlist = $params['nchecked'];
-                    }
-
                 }
-            } else if (isset($params['transfer'])) {
+            } else if (isset($transfer)) {//get remove
                 if (isset($params['newowner'])) {
-                    if ($params['transfer'] != '') {
-                        $translist = explode(',', $params['transfer']);
 
-                        if ($isGrpAdmin) {
-                            $query = QuestionSet::getByQSetIdAndGroupId($translist, $groupId);
-                            foreach ($query as $row) {
-                                QuestionSet::setOwnerIdById($row['id'], $params['newowner']);
-                            }
+                    if ($isGrpAdmin) {
+                        $query = QuestionSet::getQidByQSetIdAndGroupId($transfer, $groupId);
+                        if (count($query) > AppConstant::NUMERIC_ZERO) {
+                            QuestionSet::setOwnerIdById($transfer, $params['newowner']);
+                        }
+                    } else {
+                        if (!$isAdmin) {
+                            QuestionSet::setOwnerIdByIdAndOwnerId($transfer, $userId, $params['newowner']);
                         } else {
-                            if (!$isAdmin) {
-                                QuestionSet::setOwnerIdByIdsAndOwnerId($translist, $userId, $params['newowner']);
-                            } else {
-                                QuestionSet::setOwnerIdByIds($translist, $params['newowner']);
-                            }
+                            QuestionSet::setOwnerIdById($transfer, $params['newowner']);
                         }
                     }
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Transfer Ownership";
                     $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
-                    if(is_array($params['nchecked'])){
-                        $tlist = implode(",", $params['nchecked']);
-                    }else{
-                        $tlist = $params['nchecked'];
-                    }
-
-                    if (!isset($params['nchecked'])) {
-                        $this->setErrorFlash('No Questions Selected');
-                        return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
-                    }
                     $query = User::getUserGreaterThenTeacherRights();
                     $i = AppConstant::NUMERIC_ZERO;
                     $page_transferUserList = array();
@@ -2523,11 +2469,10 @@ class QuestionController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                     }
                 }
-
             } else if (isset($params['chgrights'])) {
                 if (isset($params['qtochg'])) {
                     if ($isGrpAdmin) {
-                        $query = QuestionSet::getByQSetIdAndGroupId($libarray, $groupId);
+                        $query = QuestionSet::getByQSetIdAndGroupId(explode(',', $params['qtochg']), $groupId);
                         $tochg = array();
                         foreach ($query as $row) {
                             $tochg[] = $row['id'];
@@ -2560,49 +2505,74 @@ class QuestionController extends AppController
                         return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                     }
                 }
-            } else if (isset($params['remove'])) {
+            } else if (isset($params['remove'])) {//post remove
                 if (isset($params['confirmed'])) {
-                    if ($isGrpAdmin) {
-                        $query = QuestionSet::getQidByQSetIdAndGroupId($params['remove'], $groupId);
-                        if (count($query) > AppConstant::NUMERIC_ZERO) {
-                            QuestionSet::setDeletedById($params['remove']);
+                    if ($params['remove'] != '') {
+                        $removeList = explode(',', $params['remove']);
+                        if ($isAdmin) {
+                            LibraryItems::DeleteByIds($removeList);
+                        } else if ($isGrpAdmin) {
+                            $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
+                            foreach ($query as $row) {
+                                LibraryItems::deleteByQsetId($row['id']);
+                            }
                         } else {
-                            return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
+                            $query = QuestionSet::getIdByIDAndOwnerId($removeList, $userId);
+                            foreach ($query as $row) {
+                                LibraryItems::deleteByQsetId($row['id']);
+                            }
                         }
-                    } else {
-                        if (!$isAdmin) {
-                            QuestionSet::setDeletedByIdAndOwnerId($params['remove'], $userId);
+                        if ($isGrpAdmin) {
+                            $query = $query = QuestionSet::getByQSetIdAndGroupId($removeList, $groupId);
+                            foreach ($query as $row) {
+                                QuestionSet::setDeletedById($row['id']);
+                            }
                         } else {
-                            QuestionSet::setDeletedById($params['remove']);
+                            if (!$isAdmin) {
+                                QuestionSet::setDeletedByIdsAndOwnerId($removeList, $userId);
+                            } else {
+                                QuestionSet::setDeletedByIds($removeList);
+                            }
                         }
-                    }
-                    if (count($link) > AppConstant::NUMERIC_ZERO) {
-                        LibraryItems::deleteByQsetId($params['remove']);
                     }
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
+                    if (!isset($params['nchecked'])) {
+                        $this->setErrorFlash('No Questions Selected');
+                        return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
+                    }
                     $pagetitle = "Confirm Delete";
                     $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
+                        $rlist = implode(",", $params['nchecked']);
                 }
             } else if (isset($params['transfer'])) {
                 if (isset($params['newowner'])) {
+                    if ($params['transfer'] != '') {
+                        $translist = explode(',', $params['transfer']);
 
-                    if ($isGrpAdmin) {
-                        $query = QuestionSet::getQidByQSetIdAndGroupId($params['transfer'], $groupId);
-                        if (count($query) > AppConstant::NUMERIC_ZERO) {
-                            QuestionSet::setOwnerIdById($params['transfer'], $params['newowner']);
-                        }
-                    } else {
-                        if (!$isAdmin) {
-                            QuestionSet::setOwnerIdByIdAndOwnerId($params['transfer'], $userId, $params['newowner']);
+                        if ($isGrpAdmin) {
+                            $query = QuestionSet::getByQSetIdAndGroupId($translist, $groupId);
+                            foreach ($query as $row) {
+                                QuestionSet::setOwnerIdById($row['id'], $params['newowner']);
+                            }
                         } else {
-                            QuestionSet::setOwnerIdById($params['transfer'], $params['newowner']);
+                            if (!$isAdmin) {
+                                QuestionSet::setOwnerIdByIdsAndOwnerId($translist, $userId, $params['newowner']);
+                            } else {
+                                QuestionSet::setOwnerIdByIds($translist, $params['newowner']);
+                            }
                         }
                     }
                     return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
                 } else {
                     $pagetitle = "Transfer Ownership";
                     $curBreadcrumb .= "<a href=" . AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid) . ">Manage Question Set </a>";
+
+                    if (!isset($params['nchecked'])) {
+                        $this->setErrorFlash('No Questions Selected');
+                        return $this->redirect(AppUtility::getURLFromHome('question', 'question/manage-question-set?cid=' . $cid));
+                    }
+                    $tlist = implode(",", $params['nchecked']);
                     $query = User::getUserGreaterThenTeacherRights();
                     $i = AppConstant::NUMERIC_ZERO;
                     $page_transferUserList = array();
@@ -2861,7 +2831,7 @@ class QuestionController extends AppController
             'pagetitle' => $pagetitle, 'helpicon' => $helpicon, 'cid' => $cid, 'rlist' => $rlist, 'tlist' => $tlist, 'page_transferUserList' => $page_transferUserList,
             'clist' => $clist, 'page_adminMsg' => $page_adminMsg, 'lnames' => $lnames, 'search' => $search, 'searchall' => $searchall, 'searchmine' => $searchmine,
             'isadmin' => $isAdmin, 'hidepriv' => $hidepriv, 'isgrpadmin' => $isGrpAdmin, 'page_libstouse' => $page_libstouse, 'lnamesarr' => $lnamesarr,
-            'page_libqids' => $page_libqids, 'page_questionTable' => $page_questionTable);
+            'page_libqids' => $page_libqids, 'page_questionTable' => $page_questionTable, 'remove' => $remove, 'transfer' => $transfer);
         return $this->renderWithData('manageQuestionSet', $renderData);
     }
 }

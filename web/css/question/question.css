@@ -57,10 +57,6 @@ input.empty {
 .dropdown-menu li a {
     padding: 3px 10px !important;
 }
-.dropdown-menu, .qmenu
-{
-overflow-x: scroll !important;
-}
 .setting-btn {
 min-width: 90px !important;
 }
