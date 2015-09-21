@@ -3269,9 +3269,9 @@ class AdminController extends AppController
 
                 $resultQSet = new QuestionSet();
                 $resultQSet = $resultQSet->getByIdLike($clist);
-
                 $includedqs = array();
-                if($resultQSet){
+                if($resultQSet)
+                {
                     foreach($resultQSet as $key => $line)
                     {
                         if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) > 0)
@@ -3297,12 +3297,12 @@ class AdminController extends AppController
                     }
                 }
                 $resultClist = new QuestionSet();
-                $resultClist = $resultClist->getByIdUsingInClause($clist);
+                $resultClist = $resultClist->getByIdUsingInClause($checked);
                 $qcnt = AppConstant::NUMERIC_ZERO;
                 foreach($resultClist as $key => $line)
                 {
-                    $line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
-                    $line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+                    $line['control']  = preg_replace_callback('/^( +)/', function($matches){return str_repeat("&nbsp;", strlen($matches["$1"]));},$line['control']);
+                    $line['qtext']  = preg_replace_callback('/^( +)/', function($matches){return str_repeat("&nbsp;", strlen($matches["$1"]));},$line['qtext']);
                     echo "\nSTART QUESTION\n";
                     echo "QID\n";
                     echo "$qcnt\n";

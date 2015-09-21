@@ -643,6 +643,6 @@ class QuestionSet extends BaseImasQuestionset
     {
         $query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
         $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
-        return \Yii::$app->db->createCommand($query)->execute();
+        return \Yii::$app->db->createCommand($query)->queryAll();
     }
 }

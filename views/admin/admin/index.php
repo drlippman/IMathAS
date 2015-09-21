@@ -74,17 +74,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td style="text-align: center">
                     <div class='btn-group settings'> <a class='btn btn-primary setting-btn' href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$page_courseList[$i]['id']);?>">
                         <i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
-                    <ul class='dropdown-menu'>
-                        <li>
-                            <a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-pencil"></i>&nbsp;Add/Remove</a>
-                        </li>
-                        <li>
-                            <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=transfer&cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-exchange"></i>&nbsp;Transfer</a>
-                        </li>
-                        <li>
-                            <a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?>'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>
-                        </li>
-                    </ul></div>
+                        <ul class='dropdown-menu'>
+                            <li>
+                                <a href="<?php echo AppUtility::getURLFromHome('course', 'course/add-remove-course?cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-pencil"></i>&nbsp;Add/Remove</a>
+                            </li>
+                            <li>
+                                <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=transfer&cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-exchange"></i>&nbsp;Transfer</a>
+                            </li>
+                            <li>
+                                <a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?>'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>
+                            </li>
+                        </ul>
+                    </div>
                 </td>
             <?php
             }
@@ -226,9 +227,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Email</th>
                 <th>Rights</th>
                 <th>Last Login</th>
-                <th>Rights</th>
-                <th>Password</th>
-                <th>Delete</th>
+                <th>Settings</th>
+<!--                <th>Password</th>-->
+<!--                <th>Delete</th>-->
             </tr>
             </thead>
             <tbody class="">
@@ -242,9 +243,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 <td><?php echo $page_userDataEmail[$i] ?></td>
                 <td><?php echo $page_userDataType[$i] ?></td>
                 <td><?php echo $page_userDataLastAccess[$i] ?></td>
-                <td class=c><a href=<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id='.$page_userDataId[$i])?>>Change</a></td>
-                <td class=c><a href="<?php echo AppUtility::getURLFromHome('site', 'change-password?id='.$page_userDataId[$i]) ?>">Reset</a></td>
-                <td class=c><a href="#">Delete</a></td>
+
+                <td class=c>
+                    <ul class="nav roster-menu-bar-nav sub-menu col-md-12">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Settings'); ?>
+                                <span class="caret right-aligned"></span></a>
+                            <ul class="dropdown-menu selected-options user-settings">
+                                <li>
+                                    <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/change-rights?id='.$page_userDataId[$i])?>">Change</a>
+                                </li>
+                                <li>
+                                    <a href="<?php echo AppUtility::getURLFromHome('site', 'change-password?id='.$page_userDataId[$i]) ?>">Reset</a>
+                                </li>
+                                <li>
+                                    <a href="#">Delete</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
                 </tr>
             <?php
             }
@@ -320,7 +338,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             });
         });
-
     }
 
      function showcourses() {
