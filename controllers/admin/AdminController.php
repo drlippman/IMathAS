@@ -528,6 +528,7 @@ class AdminController extends AppController
        $isGrpAdmin = false;
        $isTeacher = false;
        $id = $this->getParamVal('id');
+       $delete = $this->getParamVal('delete');
        $params = $this->getRequestParams();
        $courseId = (isset($params['cid'])) ? $params['cid'] : "admin";
        $course = Course::getById($courseId);
@@ -547,7 +548,8 @@ class AdminController extends AppController
            $ltfrom = '';
        }
 
-       if (isset($params['tname'])) {
+       if (isset($params['tname']))
+       {
            $privacy = AppConstant::NUMERIC_ZERO;
            if (isset($params['privname']))
            {
@@ -592,21 +594,29 @@ class AdminController extends AppController
            }
            $ltfrom = str_replace('&amp;','&',$ltfrom);
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
-       }  else if (isset($params['delete']) && $params['delete']=='true') {
+       }  else if (isset($delete) && $delete =='true')
+       {
            $id = intval($params['id']);
-           if ($id > AppConstant::NUMERIC_ZERO) {
+           if ($id > AppConstant::NUMERIC_ZERO)
+           {
                 ExternalTools::deleteById($id, $isTeacher, $isGrpAdmin, $courseId, $groupId);
            }
            $ltfrom = str_replace('&amp;','&',$ltfrom);
            return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom));
-       } else {
-           if (isset($params['delete'])) {
-               $extTool = ExternalTools::getById($id);
-               $nameOfExtTool = $extTool['name'];
-           } else if (isset($_GET['id'])) {
-               if ($params['id'] == 'new') {
+       } else
+       {
+           if (isset($params['delete']))
+           {
+//               $extTool = ExternalTools::getById($id);
+//               $nameOfExtTool = $extTool['name'];
+           } else if (isset($_GET['id']))
+           {
+               if ($params['id'] == 'new')
+               {
                    $name = ''; $url = ''; $key = ''; $secret = ''; $custom = ''; $privacy = AppConstant::NUMERIC_THREE; $grp = AppConstant::NUMERIC_ZERO;
-               } else {
+               }
+               else
+               {
                    $result = ExternalTools::getByRights($id, $isTeacher, $courseId, $isGrpAdmin, $groupId);
                    if (count($result) == AppConstant::NUMERIC_ZERO) { die("invalid id");}
                    $name = $result['name'];
@@ -638,6 +648,17 @@ class AdminController extends AppController
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
        'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'nameOfExtTool' => $nameOfExtTool);
        return $this->renderWithData('externalTool', $responseData);
+   }
+
+   public function actionDeleteExternalToolAjax()
+   {
+       $params = $this->getRequestParams();
+       $cid = $params['cid'];
+       $id = $params['ExternalToolId'];
+       $extTool = ExternalTools::getExternalToolName($id);
+       $nameOfExtTool = $extTool['name'];
+       $responseData = array('nameOfExtTool' => $nameOfExtTool,'cid' => $cid,'id' => $id);
+       return $this->successResponse($responseData);
    }
 
     public function actionForms()

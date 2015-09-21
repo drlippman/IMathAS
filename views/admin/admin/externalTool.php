@@ -143,8 +143,12 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
                     <input type="hidden" id="id" value="<?php echo $row['nm']?>">
                  <?php
                     echo ' <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id']).'>Edit</a> ';
-                    echo '| <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id'].'&amp;delete=ask').'>Delete</a>';
-                   echo '</li>';
+//                    echo '| <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id'].'&amp;delete=ask').'>Delete</a>';
+                    $ExternalToolId = $row['id'];
+                    $cid = $courseId.$ltfrom;?>
+                    <input type="hidden" id="admin" value="<?php echo $cid?>">
+                    <a onclick=deleteExternalTool(<?php echo $ExternalToolId?>) href='#'>Delete</a>
+                  <?php echo '</li>';
                 }
             }
             echo '</ul>';
@@ -153,3 +157,53 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
         } ?>
 
 </div>
+
+<script>
+    function deleteExternalTool(ExternalToolId)
+    {
+        var courseId = $('#admin').val();
+        jQuerySubmit('delete-external-tool-ajax', {cid: courseId,ExternalToolId:ExternalToolId},'removeResponseSuccess');
+    }
+
+    function removeResponseSuccess(response)
+    {
+        response = JSON.parse(response);
+        console.log(response);
+        var name = response.data.nameOfExtTool;
+        var cid = response.data.cid;
+        var id = response.data.id;
+
+        if(response.status == 0)
+        {
+            var message ='';
+            message+='Are you SURE you want to delete the tool <b>'+name+'</b>? Doing so will break ALL placements of this tool';
+            var html = '<div><p>'+message+'</p></div>';
+            $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                modal: true, title: 'Delete student group set', zIndex: 10000, autoOpen: true,
+                width: 'auto', resizable: false,
+                closeText: "hide",
+                buttons:
+                {
+                    "Nevermind": function ()
+                    {
+                        $(this).dialog('destroy').remove();
+                        return false;
+                    },
+                    "Yes,Delete": function ()
+                    {
+                        window.location ="external-tool?cid="+cid+"&id="+id+"&delete=true";
+                    }
+                },
+                close: function (event, ui) {
+                    $(this).remove();
+                },
+                open: function(){
+                    jQuery('.ui-widget-overlay').bind('click',function(){
+                        jQuery('#dialog').dialog('close');
+                    })
+                }
+            });
+        }
+    }
+
+</script>

@@ -200,4 +200,15 @@ class ExternalTools extends BaseImasExternalTools
             $courseData->delete();
         }
     }
+
+    public static function getExternalToolName($id)
+    {
+        $query = new Query();
+        $query->select(['name'])
+            ->from('imas_external_tools')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }
