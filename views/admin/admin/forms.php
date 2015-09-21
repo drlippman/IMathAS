@@ -40,6 +40,11 @@ switch($action) {
         echo '<div class=col-lg-10><a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a></div>';
     break;
     case "delete":
+        if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
+        {
+            echo "You don't have the authority for this action";
+            break;
+        }
         echo '<div id="headerforms" class="pagetitle col-lg-10"><h2>Delete Course</h2></div>';
         echo '<div>';
         echo "<div class='col-lg-10'>Are you sure you want to delete the course <b>$name</b>?</div><br>\n";
@@ -132,7 +137,10 @@ switch($action) {
         break;
     case "modify":
     case "addcourse":
-
+    if ($myRights < 40) {
+        echo "You don't have the authority for this action";
+        break;
+    }
         if (isset($params['cid'])) {
             $cid = $params['cid'];
 //            echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">$coursename</a> &gt; Course Settings</div>";
@@ -605,6 +613,10 @@ switch($action) {
         break;
 
     case "transfer":
+        if ($myRights < 40)
+        {
+            echo "You don't have the authority for this action"; break;
+        }
         echo '<div id="headerforms" class="pagetitle">';
         echo '<div>';
         echo "<div class='col-lg-10'><h3>Transfer Course Ownership</h3></div>\n";
@@ -815,6 +827,11 @@ switch($action) {
         echo "</form>\n";
         break;
     case "removediag":
+        if ($myRights < 60)
+        {
+            echo "You don't have the authority for this action";
+            break;
+        }
         echo '<div class=""><br>';
         echo "<div class='col-lg-10'>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</div><br>\n";
         echo "<br> <div class='col-lg-6 padding-left-zero'><div class='col-lg-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";

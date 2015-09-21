@@ -297,18 +297,15 @@ class AdminController extends AppController
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $userId = $user->id;
-        $userName = $user->SID;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $diagnoId = $this->getParamVal('id');
         $params = $this->getRequestParams();
-
         if($myRights < AppConstant::DIAGNOSTIC_CREATOR_RIGHT)
         {
             $overwriteBody = AppConstant::NUMERIC_ONE;
         } elseif (isset($params['step']) && $params['step'] == AppConstant::NUMERIC_TWO) {  // STEP 2 DATA PROCESSING
-
             $sel1 = array();
             $ips = array();
             $pws = array();
@@ -316,11 +313,11 @@ class AdminController extends AppController
             foreach ($_POST as $k=>$v) {
                 if (strpos($k,'selout')!==FALSE) {
                     $sel1[] = $v;
-                } else if (strpos($k,'ipout')!==FALSE) {
+                } else if (strpos($k,'ipout') !== FALSE) {
                     $ips[] = $v;
-                } else if (strpos($k,'pwout')!==FALSE) {
+                } else if (strpos($k,'pwout') !== FALSE) {
                     $pws[] = $v;
-                } else if (strpos($k,'pwsout')!==FALSE) {
+                } else if (strpos($k,'pwsout') !== FALSE) {
                     $spws[] = $v;
                 }
             }
@@ -328,7 +325,6 @@ class AdminController extends AppController
                 natsort($sel1);
                 $sel1 = array_values($sel1);
             }
-
             $sel1list = implode(',',$sel1);
             $iplist = implode(',',$ips);
             $pwlist = implode(',',$pws) . ';'. implode(',',$spws);
@@ -339,7 +335,6 @@ class AdminController extends AppController
             } else if ($_POST['termtype']=='day') {
                 $params['term'] = '*day*';
             }
-
             if (isset($params['entrynotunique'])) {
                 $params['entrytype'] = chr(ord($params['entrytype'])-2);
             }
@@ -351,7 +346,7 @@ class AdminController extends AppController
                 $row = Diags::getById($diagnosticId);
                 $s1l = explode(',',$row['sel1list']);
                 $s2l = explode(';',$row['sel2list']);
-                for ($i=0; $i<count($s1l); $i++) {
+                for ($i = 0; $i < count($s1l); $i++) {
                     $sel2[$s1l[$i]] = explode('~',$s2l[$i]);
                 }
                 $sel2name = $row['sel2name'];
@@ -361,14 +356,14 @@ class AdminController extends AppController
             } else {
                 $sel2name = "instructor";
                 $aids = array();
-                $page_updateId = 0;
-                $forceregen = 0;
+                $page_updateId = AppConstant::NUMERIC_ZERO;
+                $forceregen = AppConstant::NUMERIC_ZERO;
             }
             foreach($sel1 as $k=>$s1) {
                 $page_selectValList[$k] = array();
-                $page_selectLabelList[$k] = array();
+                 $page_selectLabelList[$k] = array();
                 $page_selectName[$k] = "aid" . $k;
-                $i=0;
+                $i= AppConstant::NUMERIC_ZERO;
                 $courseId = $params['cid'];
                 $result = Assessments::getByCId($courseId);
 
@@ -386,22 +381,22 @@ class AdminController extends AppController
         } elseif (isset($_GET['step']) && $_GET['step']== AppConstant::NUMERIC_THREE) {  //STEP 3 DATA PROCESSING
             $sel1 = explode(',',$params['sel1list']);
             $aids = array();
-            $forceregen = 0;
-            for ($i=0;$i<count($sel1);$i++) {
-                $aids[$i] = $_POST['aid'.$i];
-                if (isset($_POST['reg'.$i]) && $_POST['reg'.$i]==1) {
+            $forceregen = AppConstant::NUMERIC_ZERO;
+            for ($i = 0;$i < count($sel1);$i++) {
+                $aids[$i] = $params['aid'.$i];
+                if (isset($params['reg'.$i]) && $params['reg'.$i] == 1) {
                     $forceregen = $forceregen ^ (1<<$i);
                 }
             }
             $aidlist = implode(',',$aids);
             $sel2 = array();
-            foreach ($_POST as $k=>$v) {
+            foreach ($params as $k=>$v) {
                 if (strpos($k,'out')!==FALSE) {
                     $n = substr($k,3,strpos($k,'-')-3);
                     $sel2[$n][] = ucfirst($v);
                 }
             }
-            if (isset($_POST['useoneforall'])) { //use first sel2 for all
+            if (isset($params['useoneforall'])) { //use first sel2 for all
                 if (isset($_POST['alpha'])) {
                     sort($sel2[0]);
                 }
@@ -410,8 +405,8 @@ class AdminController extends AppController
                     $sel2[$i] = $sel2[0];
                 }
             } else {
-                for ($i=0;$i<count($sel2);$i++) {
-                    if (isset($_POST['alpha'])) {
+                for ($i = 0;$i < count($sel2);$i++) {
+                    if (isset($params['alpha'])) {
                         sort($sel2[$i]);
                     }
                     $sel2[$i] = implode('~',$sel2[$i]);
@@ -446,7 +441,7 @@ class AdminController extends AppController
                 $entryformat = $line['entryformat'];
                 $forceregen = $line['forceregen'];
                 $reentrytime = $line['reentrytime'];
-                if ($myRights >= 75) {
+                if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                     $owner = $line['ownerid'];
                 } else if ($line['ownerid'] != $userId) {
                     echo "Not yours!";
@@ -457,8 +452,8 @@ class AdminController extends AppController
             } else {
                  //STEP 1, ADD MODE
                 $diagname = '';
-                $cid = 0;
-                $public = 7;
+                $cid = AppConstant::NUMERIC_ZERO;
+                $public = AppConstant::NUMERIC_SEVEN;
                 $idprompt = "Enter your student ID number";
                 $ips = '';
                 $pws = '';
@@ -466,8 +461,8 @@ class AdminController extends AppController
                 $sel1list = '';
                 $term = '';
                 $entryformat = 'C0';
-                $forceregen = 0;
-                $reentrytime = 0;
+                $forceregen = AppConstant::NUMERIC_ZERO;
+                $reentrytime = AppConstant::NUMERIC_ZERO;
                 $owner = $userId;
             }
             $entrytype = substr($entryformat,0,1); //$entryformat{0};
@@ -478,7 +473,7 @@ class AdminController extends AppController
                 $entrynotunique = true;
             }
             $course = Course::getByUserId($userId);
-            $i=0;
+            $i = AppConstant::NUMERIC_ZERO;
             $page_courseSelectList = array();
             foreach($course as $key => $row){
                 $page_courseSelectList['val'][$i] = $row['id'];
@@ -488,11 +483,10 @@ class AdminController extends AppController
                 }
                 $i++;
             }
-
             $page_entryNums = array();
-            for ($j=0;$j<15;$j++) {
+            for ($j = 0;$j < 15;$j++) {
                 $page_entryNums['val'][$j] = $j;
-                if ($j==0) {
+                if ($j == 0) {
                     $page_entryNums['label'][$j] = "Any number";
                 } else {
                     $page_entryNums['label'][$j] = $j;
@@ -791,8 +785,8 @@ class AdminController extends AppController
         $action = $params['action'];
         $myRights = $currentUser['rights'];
         $enablebasiclti = true;
-        $userid = 0;
-        $groupid = 0;
+        $userid = AppConstant::NUMERIC_ZERO;
+        $groupid = AppConstant::NUMERIC_ZERO;
         switch($action) {
             case "emulateuser":
                 if ($myRights < AppConstant::ADMIN_RIGHT )
@@ -837,94 +831,22 @@ class AdminController extends AppController
                 break;
             case "modify":
             case "addcourse":
-
-            if ($myRights < 40) {
-                echo "You don't have the authority for this action";
-                break;
-            }
-
-            if (isset($CFG['CPS']['msgset']) && $CFG['CPS']['msgset'][1]==0) {
-                $msgset = $CFG['CPS']['msgset'][0];
-            } else {
-                $msgset = $_POST['msgset'];
-                if (isset($_POST['msgmonitor'])) {
-                    $msgset += 5;
-                }
-                if (isset($_POST['msgqtoinstr'])) {
-                    $msgset += 5*2;
-                }
-            }
-
-            if (isset($CFG['CPS']['chatset']) && $CFG['CPS']['chatset'][1]==0) {
-                $chatset = intval($CFG['CPS']['chatset'][0]);
-            } else {
-                if (isset($_POST['chatset'])) {
-                    $chatset = 1;
-                } else {
-                    $chatset = 0;
-                }
-            }
-
-            if (isset($CFG['CPS']['deftime']) && $CFG['CPS']['deftime'][1]==0) {
-                $deftime = $CFG['CPS']['deftime'][0];
-            } else {
-                preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['deftime'],$tmatches);
-                if (count($tmatches)==0) {
-                    preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['deftime'],$tmatches);
-                    $tmatches[3] = $tmatches[2];
-                    $tmatches[2] = 0;
-                }
-                $tmatches[1] = $tmatches[1]%12;
-                if($tmatches[3]=="pm") {$tmatches[1]+=12; }
-                $deftime = $tmatches[1]*60 + $tmatches[2];
-
-                preg_match('/(\d+)\s*:(\d+)\s*(\w+)/',$_POST['defstime'],$tmatches);
-                if (count($tmatches)==0) {
-                    preg_match('/(\d+)\s*([a-zA-Z]+)/',$_POST['defstime'],$tmatches);
-                    $tmatches[3] = $tmatches[2];
-                    $tmatches[2] = 0;
-                }
-                $tmatches[1] = $tmatches[1]%12;
-                if($tmatches[3]=="pm") {$tmatches[1]+=12; }
-                $deftime += 10000*($tmatches[1]*60 + $tmatches[2]);
-            }
-            if (isset($CFG['CPS']['copyrights']) && $CFG['CPS']['copyrights'][1]==0) {
-                $copyrights = $CFG['CPS']['copyrights'][0];
-            } else {
-                $copyrights = $params['copyrights'];
-            }
-            if (isset($CFG['CPS']['deflatepass']) && $CFG['CPS']['deflatepass'][1]==0) {
-                $deflatepass = $CFG['CPS']['deflatepass'][0];
-            } else {
-                $deflatepass = intval($_POST['deflatepass']);
-            }
-
-            if (isset($params['showlatepass']) && $params['showlatepass'][1]==0) {
-                $showlatepass = intval($params['showlatepass'][0]);
-            } else {
-                if (isset($params['showlatepass'])) {
-                    $showlatepass = 1;
-                } else {
-                    $showlatepass = 0;
-                }
-            }
-
-            $avail = 3 - $params['stuavail'] - $params['teachavail'];
-            $istemplate = 0;
-            if ($myRights == 100) {
+            $avail = AppConstant::NUMERIC_THREE - $params['stuavail'] - $params['teachavail'];
+            $istemplate = AppConstant::NUMERIC_ZERO;
+            if ($myRights == AppConstant::ADMIN_RIGHT) {
                 if (isset($params['istemplate'])) {
-                    $istemplate += 1;
+                    $istemplate += AppConstant::NUMERIC_ONE;
                 }
                 if (isset($params['isselfenroll'])) {
-                    $istemplate += 4;
+                    $istemplate += AppConstant::NUMERIC_FOUR;
                 }
                 if (isset($params['isguest'])) {
-                    $istemplate += 8;
+                    $istemplate += AppConstant::NUMERIC_EIGHT;
                 }
             }
-            if ($myRights >= 75) {
+            if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
                 if (isset($params['isgrptemplate'])) {
-                    $istemplate += 2;
+                    $istemplate += AppConstant::NUMERIC_TWO;
                 }
             }
             $params['ltisecret'] = trim($params['ltisecret']);
@@ -933,7 +855,7 @@ class AdminController extends AppController
                 $available = $this->getSanitizedValue($params['avail'], AppConstant::AVAILABLE_NOT_CHECKED_VALUE);
                 $toolSet = $this->getSanitizedValue($params['toolSet'], AppConstant::NAVIGATION_NOT_CHECKED_VALUE);
                 $defTime = AppUtility::calculateTimeDefference($params['defstime'], $params['deftime']);
-                if ($myRights < 75)
+                if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
@@ -964,25 +886,19 @@ class AdminController extends AppController
                 $connection = $this->getDatabase();
                 $transaction = $connection->beginTransaction();
                 try{
-                if ($myRights < 40)
-                {
-                    echo "You don't have the authority for this action";
-                    break;
-                }
                 if (isset($CFG['GEN']['doSafeCourseDelete']) && $CFG['GEN']['doSafeCourseDelete']==true) {
                     $oktodel = false;
-                    if ($myRights < 75) {
+                    if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
                         $result = Course::getByIdandOwnerIdByAll($params['id'], $userId);
-                        if (count($result) > 0) {
+                        if (count($result) > AppConstant::NUMERIC_ZERO) {
                             $oktodel = true;
                         }
-                    } else if ($myRights == 75) {
+                    } else if ($myRights == AppConstant::GROUP_ADMIN_RIGHT) {
                         $result = Course::getCidAndUid($params, $groupid);
-                        if (count($result) > 0) {
+                        if (count($result) > AppConstant::NUMERIC_ZERO) {
                             $oktodel = true;
                         }
-                    } else if ($myRights == 100) {
-
+                    } else if ($myRights == AppConstant::ADMIN_RIGHT) {
                         $oktodel = true;
                     }
                     if ($oktodel) {
@@ -990,7 +906,7 @@ class AdminController extends AppController
                     }
                 } else {
                     $affectedRowsData = Course::deleteByCourseId($params, $myRights, $userId);
-                    if ($myRights == 75)
+                    if ($myRights == AppConstant::GROUP_ADMIN_RIGHT)
                     {
                         $result = Course::getCidAndUid($params, $groupid);
                         if (count($result) > AppConstant::NUMERIC_ZERO) {
@@ -999,8 +915,7 @@ class AdminController extends AppController
                             break;
                         }
                     }
-                    if ($affectedRowsData == 0) { break;}
-
+                    if ($affectedRowsData == AppConstant::NUMERIC_ZERO) { break;}
                     $result = Assessments::getByAssId($params['id']);
                     if($result){
                     foreach($result as $key => $line){
@@ -1039,7 +954,6 @@ class AdminController extends AppController
                     }
                      Wiki::deleteCourseId($params['id']);
                     }
-
                     /**
                      * delete inline text files
                      */
@@ -1076,23 +990,19 @@ class AdminController extends AppController
                             Grades::deleteById($row['id']);
                         }
                     }
-
                    LinkedText::deleteByCourseId($params['id']);
                    Items::deleteByCourseId($params['id']);
                    Teacher::deleteByCourseId($params['id']);
                    Student::deleteByCourseId($params['id']);
                    Tutor::deleteByCourseId($params['id']);
-
                     $result = GbItems::getByCourseIdAll($params['id']);
                     foreach($result as $key => $row){
                         Grades::deleteByGradeId($row['id']);
                     }
-
                     GbItems::deleteByCId($params['id']);
                     GbScheme::deleteByCourseId($params['id']);
                     GbCats::deleteByCourseId($params['id']);
                     CalItem::deleteByCourseIdOne($params['id']);
-
                     $result = StuGroupSet::getByCid($params['id']);
                      foreach($result as $key => $row)
                      {
@@ -1243,41 +1153,33 @@ class AdminController extends AppController
                     exit;
                 }
             case "transfer":
-                if ($myRights < 40)
-                {
-                    echo "You don't have the authority for this action"; break;
-                }
                 $exec = false;
-                if ($myRights < 75)
+                if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
 
                     $updateResult->setOwnerId($params, $columnName, $columnValue);
-                }else
+                } else
                 {
                     $columnName = 'id'; $columnValue = $params['id'];
                     $updateResult = new Course();
                     $updateResult->setOwnerId($params, $columnName, $columnValue);
                 }
-                if ($myRights == 75)
+                if ($myRights == AppConstant::GROUP_ADMIN_RIGHT)
                 {
                     $resultOfQuery = Course::getCidAndUid($params, $groupid);
-                    if (count($resultOfQuery) > 0) {
-
+                    if (count($resultOfQuery) > AppConstant::NUMERIC_ZERO) {
                         $updateResult = new Course();
                         $affectedRow = $updateResult->setOwnerIdByExecute($params);
                         $exec = true;
                     }
-                    //$query = "UPDATE imas_courses,imas_users SET imas_courses.ownerid='{$_POST['newowner']}' WHERE ";
-                    //$query .= "imas_courses.id='{$_GET['id']}' AND imas_courses.ownerid=imas_users.id AND imas_users.groupid='$groupid'";
                 } else {
-//                    mysql_query($query) or die("Query failed : " . mysql_error());
                     $exec = true;
                 }
                 if ($exec && $affectedRow > 0) {
                     $result = Teacher::getByCourseId($params);
-                    if (count($result) == 0) {
+                    if (count($result) == AppConstant::NUMERIC_ZERO) {
                         $teacherData = new Teacher();
                         $teacherData->insertUidAndCid($params);
                     }
@@ -1366,11 +1268,7 @@ class AdminController extends AppController
                 User::deleteUserById($params['id']);
                 break;
             case "removediag";
-                if ($myRights < 60)
-                {
-                    echo "You don't have the authority for this action";
-                    break;
-                }
+
                 $row = User::getByUserIdASDiagnoId($params);
                 if (($myRights < 75 && $row['id'] == $userId) || ($myRights == 75 && $row['groupid'] == $groupid) || $myRights == 100) {
                      Diags::deleteDiagno($params);
@@ -1380,6 +1278,9 @@ class AdminController extends AppController
         }
         session_write_close();
         if (isset($params['cid'])) {
+            /*
+             * Work-in-progress
+             */
 //            echo '<a href="'.AppUtility::getURLFromHome('admin','admin/index').'"></a>';
 //            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
         } else {
@@ -1393,7 +1294,6 @@ class AdminController extends AppController
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $userId = $user->id;
-        $userName = $user->SID;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
         $diag = $this->getParamVal('id');
@@ -1410,30 +1310,27 @@ class AdminController extends AppController
                 $now = time();
                 $n = intval($_POST['n']);
                 $goodfor = intval($_POST['multi']);
-                for ($i=0; $i<$n; $i++) {
-
+                for ($i = 0; $i < $n; $i++) {
                     $code = '';
-                    for ($j=0;$j<3;$j++) {
+                    for ($j = 0; $j < 3; $j++) {
                         $code .= substr($lets,rand(0,23),1);
                     }
-                    for ($j=0;$j<3;$j++) {
+                    for ($j = 0; $j < 3; $j++) {
                         $code .= rand(1,9);
                     }
-
                     $query = new DiagOneTime();
                     $query->generateDiagOneTime($diag, $now, $code, $goodfor);
-//                    if ($i>0) { $query .= ','; }
-//                    $query .= "('$diag',$now,'$code',$goodfor)";
+                    /*if ($i>0) { $query .= ','; }
+                    $query .= "('$diag',$now,'$code',$goodfor)"; */
                     $code_list[] = $code;
                 }
                 $code_list = array();
                 $result = DiagOneTime::getByTime($now);
-
                 foreach($result as $key => $row) {
-                    if ($row['goodfor']==0) {
+                    if ($row['goodfor'] == AppConstant::NUMERIC_ZERO) {
                         $row['goodfor'] = "One-time";
-                    } else if ($row['goodfor']>1000000000) {
-                        if ($row['goodfor']<time()) {
+                    } else if ($row['goodfor'] > 1000000000) {
+                        if ($row['goodfor'] < time()) {
                             $row['goodfor'] = "Used - Expired";
                         } else {
                             $row['goodfor'] = "Used - set to expire";
@@ -1445,29 +1342,28 @@ class AdminController extends AppController
                 }
             }
         } else if (isset($_GET['delete'])) {
-            if ($_GET['delete']=='true') {
+            if ($_GET['delete'] == 'true') {
                  DiagOneTime::deleteDiagOneTime($diag);
                 return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
             }
         } else {
-            $old = time() - 365*24*60*60; //one year ago
+            /*$old = time() - 365*24*60*60; //one year ago
             $now = time();
-//            $queryDelete = DiagOneTime::deleteByTime($old, $now);
+            $queryDelete = DiagOneTime::deleteByTime($old, $now); */
             $code_list = array();
             $diagByTime = DiagOneTime::getByDiag($diag);
             foreach($diagByTime as $key => $row)
              {
                 $row['time'] = AppUtility::tzdate("F j, Y",$row['time']);
-                if ($row['goodfor']==0) {
+                if ($row['goodfor'] == AppConstant::NUMERIC_ZERO) {
                     $row['goodfor'] = "One-time";
-                } else if ($row['goodfor']>1000000000) {
+                } else if ($row['goodfor'] > 1000000000) {
                     $row['goodfor'] = "Used - set to expire";
                 } else {
                     $row['goodfor'] = intval($row['goodfor']) . " minutes";
                 }
                 $code_list[] = $row;
             }
-
         }
         if ($overwriteBody == AppConstant::NUMERIC_ONE) { //NO AUTHORITY
             echo $body;
@@ -2403,15 +2299,14 @@ class AdminController extends AppController
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $userId = $user->id;
-        $userName = $user->SID;
         $allownongrouplibs = false;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
-        $helpIcon = "";
         $isAdmin = false;
         $isGrpAdmin = false;
         $params = $this->getRequestParams();
         $transfer = $this->getParamVal('transfer');
+        $remove = $this->getParamVal('remove');
         if ($myRights < AppConstant::TEACHER_RIGHT)
         {
             $overwriteBody = AppConstant::NUMERIC_ONE;
@@ -2422,135 +2317,171 @@ class AdminController extends AppController
         } else {
             $cid = $params['cid'];
             if ($cid == 'admin') {
-                if ($myRights >74 && $myRights < AppConstant::ADMIN_RIGHT) {
+                if ($myRights > 74 && $myRights < AppConstant::ADMIN_RIGHT) {
                     $isGrpAdmin = true;
                 } else if ($myRights == AppConstant::ADMIN_RIGHT) {
                     $isAdmin = true;
                 }
             }
             $now = time();
-
-            if (isset($params['remove'])) {
-
+            if (isset($remove)) {
                 if (isset($params['confirmed'])) {
+                    $result = LibraryItems::getDistinctQSet($params['remove']);
+                    foreach($result as $key => $row) {
+                        $qidstocheck[] = $row[0];
+                    }
+                    $remove = $params['remove'];
+                    $deleteSingleLib = new Libraries();
+                    $affectedRow = $deleteSingleLib->deleteLibrarySingle($remove,$isAdmin,$groupId,$isGrpAdmin,$userId);
+                    if ($affectedRow > AppConstant::NUMERIC_ZERO && count($qidstocheck) > AppConstant::NUMERIC_ZERO)
+                    {
+                        $libid = $params['remove'];
+                        LibraryItems::deleteLibraryGrpAdmin($libid);
+                        $qids = implode(",",$qidstocheck);
+                        $result = LibraryItems::getByDistinctQid($qids);
+                        $okqids = array();
+                        foreach($result as $key => $row) {
+                            $okqids[] = $row['qsetid'];
+                        }
+                        $qidstofix = array_diff($qidstocheck,$okqids);
+                        if ($params['delq'] == 'yes' && count($qidstofix) > AppConstant::NUMERIC_ZERO)
+                        {
+                            $qlist = implode(',',$qidstofix);
+                            $updateQdata = new QuestionSet();
+                            $updateQdata->updateIdIn($qlist);
+                        } else {
+                            foreach($qidstofix as $qid) {
+                                $insertDataLibItem = new LibraryItems();
+                                $insertDataLibItem->insertDataLib(0,$qid);
+                            }
+                        }
+                    }
+                    return $this->redirect('manage-lib?cid='.$cid);
+                } else {
+                    $parentLib = $params['remove'];
+                    $libcnt = Libraries::getCountOfId($parentLib);
+                    $libcnt = count($libcnt);
+                    $pagetitle = ($libcnt > AppConstant::NUMERIC_ZERO) ? "Error" : "Remove Library";
+                }
+            } elseif(isset($params['remove']))
+            {
+                if (isset($params['confirmed']))
+                {
                     if ($params['remove']!='') {
-                        $remlist = "'".implode("','",explode(',',$params['remove']))."'";
 
-                        $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid IN ($remlist)";
-                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                        while ($row = mysql_fetch_row($result)) {
-                            $qidstocheck[] = $row[0];
+                        $remlist = "'".implode("','",explode(',',$params['remove']))."'";
+                        $result = LibraryItems::getDistictqlibData($remlist);
+                       foreach($result as $key => $row) {
+                            $qidstocheck[] = $row['qsetid'];
                         }
 
-                        if ($isadmin) {
-                            $query = "DELETE FROM imas_library_items WHERE libid IN ($remlist)";
-                            mysql_query($query) or die("Query failed : " . mysql_error());
-                        } else if ($isgrpadmin) {
-                            $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND groupid='$groupid'";
-                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                            while ($row = mysql_fetch_row($result)) {
-                                $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
-                                mysql_query($query) or die("Query failed : " . mysql_error());
-                            }
+                        if ($isAdmin)
+                        {
+                            $deleteAdmin = new LibraryItems();
+                            $deleteAdmin->deleteLibraryAdmin($remlist);
+                        } else if ($isGrpAdmin) {
+                            /*
+                             * Work in progress: Group Admin
+                             */
+                            /*$result = Libraries::getByIdGroupAdmin($remlist, $groupId);
+                            foreach($result as $key => $row)
+                            {
+                                $deleteLibItem = new LibraryItems();
+                                $deleteLibItem->deleteLibraryGrpAdmin($row['id']);
+                            }*/
                         } else {
-                            $query = "SELECT id FROM imas_libraries WHERE id IN ($remlist) AND ownerid='$userid'";
-                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                            while ($row = mysql_fetch_row($result)) {
-                                $query = "DELETE FROM imas_library_items WHERE libid='$row[0]'";
-                                mysql_query($query) or die("Query failed : " . mysql_error());
+                            $result = Libraries::getByIdAdmin($remlist, $userId);
+                            foreach($result as $key => $row)
+                            {
+                                /*
+                                * Work in progress: Group Admin
+                                */
+                                /*$deleteLibItem = new LibraryItems();
+                                $deleteLibItem->deleteLibraryGrpAdmin($row['id']);*/
                             }
                         }
 
                         if (isset($qidstocheck)) {
                             $qids = implode(",",$qidstocheck);
-                            $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
-                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                            $result = LibraryItems::getByDistinctQid($qids);
                             $okqids = array();
-                            while ($row = mysql_fetch_row($result)) {
-                                $okqids[] = $row[0];
+                            foreach($result as $key => $row){
+                                $okqids[] = $row['qsetid'];
                             }
                             $qidstofix = array_diff($qidstocheck,$okqids);
-                            if ($_POST['delq']=='yes' && count($qidstofix)>0) {
+                            if ($params['delq'] == 'yes' && count($qidstofix) > 0)
+                            {
                                 $qlist = implode(',',$qidstofix);
-                                //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
-                                $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
-                                mysql_query($query) or die("Query failed : " . mysql_error());
-                                /*foreach ($qidstofix as $qid) {
-                                    delqimgs($qid);
-                                }*/
+                                QuestionSet::updateIdIn($qlist);
                             } else {
                                 foreach($qidstofix as $qid) {
-                                    $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
-                                    mysql_query($query) or die("Query failed : " . mysql_error());
+                                    $query = new LibraryItems();
+                                    $query->insertDataLib($qid,0);
                                 }
                             }
                         }
-                        $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
-                        if (!$isadmin) {
-                            $query .= " AND groupid='$groupid'";
-                        }
-                        if (!$isadmin && !$isgrpadmin) {
-                            $query .= " AND ownerid='$userid'";
-                        }
-                        mysql_query($query) or die("Query failed : " . mysql_error());
+                        $deleteLib = new Libraries();
+                        $deleteLib->deleteLibraryAdmin($remlist,$isAdmin,$groupId,$isGrpAdmin,$userId);
                     }
                     return $this->redirect('manage-lib?cid='.$cid);
                 } else {
                     $pagetitle = "Confirm Removal";
-                    if (!isset($_POST['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
                     } else {
                         $oktorem = array();
-                        for ($i=0; $i<count($_POST['nchecked']); $i++) {
-                            $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_POST['nchecked'][$i]}'";
-                            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                            $libcnt= mysql_result($result,0,0);
-                            if ($libcnt == 0) {
-                                $oktorem[] = $_POST['nchecked'][$i];
+                        for ($i=0; $i<count($params['nchecked']); $i++)
+                        {
+                            $parentLib = $params['nchecked'][$i];
+                            $libcnt = Libraries::getCountOfId($parentLib);
+                            $libcnt = count($libcnt);
+                            if ($libcnt == AppConstant::NUMERIC_ZERO) {
+                                $oktorem[] = $params['nchecked'][$i];
                             }
                         }
                         $rlist = implode(",",$oktorem);
-                        $hasChildWarning = (count($_POST['nchecked'])>count($oktorem)) ? "<p>Warning:  Some libraries selected have children, and cannot be deleted.</p>\n": "";
+                        $hasChildWarning = (count($params['nchecked']) > count($oktorem)) ? "<p>Warning:  Some libraries selected have children, and cannot be deleted.</p>\n": "";
                     }
                 }
-            } else if (isset($_POST['chgrights'])) {
-                if (isset($_POST['newrights'])) {
-                    if ($_POST['newrights']!='') {
-                        $llist = "'".implode("','",explode(',',$_POST['chgrights']))."'";
-                        $query = "UPDATE imas_libraries SET userights='{$_POST['newrights']}',lastmoddate=$now WHERE id IN ($llist)";
-                        if (!$isadmin) {
-                            $query .= " AND groupid='$groupid'";
-                        }
-                        if (!$isadmin && !$isgrpadmin) {
-                            $query .= " AND ownerid='$userid'";
-                        }
-                        mysql_query($query) or die("Query failed : $query " . mysql_error());
+            }
+            else if (isset($params['chgrights']))
+            {
+                if (isset($params['newrights']))
+                {
+                    if ($params['newrights'] != '')
+                    {
+                        $llist = "'".implode("','",explode(',',$params['chgrights']))."'";
+                        $rights = $params['newrights'];
+                        $query = new Libraries();
+                        $query->updateUserRightLastModeDate($rights,$now, $llist,$isAdmin,$groupId,$isGrpAdmin,$userId);
                     }
                     return $this->redirect('manage-lib?cid='.$cid);
                 } else {
                     $pagetitle = "Change Library Rights";
-                    if (!isset($_POST['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    if (!isset($params['nchecked']))
+                    {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
                     } else {
-                        $tlist = implode(",",$_POST['nchecked']);
+                        $tlist = implode(",",$params['nchecked']);
+
                         $page_libRights = array();
-                        $page_libRights['val'][0] = 0;
-                        $page_libRights['val'][1] = 1;
-                        $page_libRights['val'][2] = 2;
+                        $page_libRights['val'][0] = AppConstant::NUMERIC_ZERO;
+                        $page_libRights['val'][1] = AppConstant::NUMERIC_ONE;
+                        $page_libRights['val'][2] = AppConstant::NUMERIC_TWO;
 
                         $page_libRights['label'][0] = "Private";
                         $page_libRights['label'][1] = "Closed to group, private to others";
                         $page_libRights['label'][2] = "Open to group, private to others";
 
-                        if ($isadmin || $isgrpadmin || $allownongrouplibs) {
+                        if ($isAdmin || $isGrpAdmin || $allownongrouplibs) {
                             $page_libRights['label'][3] = "Closed to all";
                             $page_libRights['label'][4] = "Open to group, closed to others";
                             $page_libRights['label'][5] = "Open to all";
-                            $page_libRights['val'][3] = 4;
-                            $page_libRights['val'][4] = 5;
-                            $page_libRights['val'][5] = 8;
+                            $page_libRights['val'][3] = AppConstant::NUMERIC_FOUR;
+                            $page_libRights['val'][4] = AppConstant::NUMERIC_FIVE;
+                            $page_libRights['val'][5] = AppConstant::NUMERIC_EIGHT;
                         }
                     }
                 }
@@ -2558,24 +2489,11 @@ class AdminController extends AppController
             else if (isset($transfer))
             {
                 if (isset($params['newowner'])) {
-
-                    print_r('hjhjhj'); die;
-                    //added for mysql 3.23 compatibility
-                    $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    $newgpid = mysql_result($result,0,0);
-
-                    //$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
-                    //$query .= ",imas_libraries.groupid=imas_users.groupid WHERE imas_libraries.ownerid=imas_users.id AND ";
-                    //$query .= "imas_libraries.id='{$_GET['transfer']}'";
-                    $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='{$_GET['transfer']}'";
-                    if (!$isadmin) {
-                        $query .= " AND groupid='$groupid'";
-                    }
-                    if (!$isadmin && !$isgrpadmin) {
-                        $query .= " AND ownerid='$userid'";
-                    }
-                    mysql_query($query) or die("Query failed : $query " . mysql_error());
+                    $newgroup = User::getByGroupId($params['newowner']);
+                    $newgpid = $newgroup[0]['groupid'];
+                    $idTransfer = $params['transfer'];
+                    $queryLibrary = new Libraries();
+                    $queryLibrary->updateByGrpUserIdSingle($params, $newgpid, $idTransfer, $isAdmin, $groupId, $isGrpAdmin, $userId);
                     return $this->redirect('manage-lib?cid='.$cid);
                 } else {
                     $pagetitle = "Transfer Library";
@@ -2615,88 +2533,36 @@ class AdminController extends AppController
                         }
                     }
                 }
-            } else if (isset($_POST['setparent'])) {
-                if (isset($_POST['libs'])) {
-                    if ($_POST['libs']!='') {
+            } else if (isset($params['setparent']))
+            {
+                if (isset($params['libs'])) {
+                    if ($params['libs']!='') {
                         $toset = array();
-                        $_POST['setparent'] = explode(',',$_POST['setparent']);
-                        foreach ($_POST['setparent'] as $alib) {
-                            if ($alib != $_POST['libs']) {
+                        $params['setparent'] = explode(',',$params['setparent']);
+                        foreach ($params['setparent'] as $alib) {
+                            if ($alib != $params['libs']) {
                                 $toset[] = $alib;
                             }
                         }
-                        if (count($toset)>0) {
+                        if (count($toset) > 0)
+                        {
                             $parlist = "'".implode("','",$toset)."'";
-                            $query = "UPDATE imas_libraries SET parent='{$_POST['libs']}',lastmoddate=$now WHERE id IN ($parlist)";
-                            if (!$isadmin) {
-                                $query .= " AND groupid='$groupid'";
-                            }
-                            if (!$isadmin && !$isgrpadmin) {
-                                $query .= " AND ownerid='$userid'";
-                            }
-                            mysql_query($query) or die("Query failed : $query " . mysql_error());
+                            $lib = $params['libs'];
+                            $query = new Libraries();
+                            $query->updateParent($lib,$now,$parlist,$isAdmin,$groupId,$isGrpAdmin,$userId);
                         }
                     }
                     return $this->redirect('manage-lib?cid='.$cid);
-
                 } else {
                     $pagetitle = "Set Parent";
                     $parent1 = "";
 
-                    if (!isset($_POST['nchecked'])) {
-                        $overwriteBody = 1;
-                        $body = "No libraries selected.  <a href=\"managelibs.php?cid=$cid\">Go back</a>\n";
+                    if (!isset($params['nchecked'])) {
+                        $overwriteBody = AppConstant::NUMERIC_ONE;
+                        $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
                     } else {
-                        $tlist = implode(",",$_POST['nchecked']);
+                        $tlist = implode(",",$params['nchecked']);
                     }
-                }
-            } else if (isset($_GET['remove'])) {
-                if (isset($_GET['confirmed'])) {
-                    $query = "SELECT DISTINCT qsetid FROM imas_library_items WHERE libid='{$_GET['remove']}'";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    while ($row = mysql_fetch_row($result)) {
-                        $qidstocheck[] = $row[0];
-                    }
-                    $query = "DELETE FROM imas_libraries WHERE id='{$_GET['remove']}'";
-                    if (!$isadmin) {
-                        $query .= " AND groupid='$groupid'";
-                    }
-                    if (!$isadmin && !$isgrpadmin) {
-                        $query .= " AND ownerid='$userid'";
-                    }
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    if (mysql_affected_rows()>0 && count($qidstocheck)>0) {
-                        $query = "DELETE FROM imas_library_items WHERE libid='{$_GET['remove']}'";
-                        mysql_query($query) or die("Query failed : " . mysql_error());
-                        $qids = implode(",",$qidstocheck);
-                        $query = "SELECT DISTINCT qsetid FROM `imas_library_items` WHERE qsetid IN ($qids)";
-                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                        $okqids = array();
-                        while ($row = mysql_fetch_row($result)) {
-                            $okqids[] = $row[0];
-                        }
-                        $qidstofix = array_diff($qidstocheck,$okqids);
-                        if ($_POST['delq']=='yes' && count($qidstofix)>0) {
-                            $qlist = implode(',',$qidstofix);
-                            //$query = "DELETE FROM imas_questionset WHERE id IN ($qlist)";
-                            $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
-                            mysql_query($query) or die("Query failed : " . mysql_error());
-                            /*foreach ($qidstofix as $qid) {
-                                delqimgs($qid);
-                            }*/
-                        } else {
-                            foreach($qidstofix as $qid) {
-                                $query = "INSERT INTO imas_library_items (qsetid,libid) VALUES ('$qid',0)";
-                                mysql_query($query) or die("Query failed : " . mysql_error());
-                            }
-                        }
-                    }
-                    return $this->redirect('manage-lib?cid='.$cid);
-                } else {
-                    $query = "SELECT count(id) FROM imas_libraries WHERE parent='{$_GET['remove']}'";
-                    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    $libcnt= mysql_result($result,0,0);
-                    $pagetitle = ($libcnt>0) ? "Error" : "Remove Library";
                 }
             } else if (isset($params['modify']))
             {
@@ -2745,28 +2611,25 @@ class AdminController extends AppController
                     if (!isset($name)) { $name = '';}
                     if (!isset($rights)) {
                         if ($isadmin || $allownongrouplibs) {
-                            $rights = 8;
+                            $rights = AppConstant::NUMERIC_EIGHT;
                         } else {
-                            $rights = 2;
+                            $rights = AppConstant::NUMERIC_TWO;
                         }
                     }
-                    if (!isset($parent)) {$parent = 0;}
-                    if (!isset($sortorder)) {$sortorder = 0;}
+                    if (!isset($parent)) {$parent = AppConstant::NUMERIC_ZERO;}
+                    if (!isset($sortorder)) {$sortorder = AppConstant::NUMERIC_ZERO;}
                     $parent1 = $parent;
-
-                    if ($parent==0) {
+                    if ($parent == AppConstant::NUMERIC_ZERO) {
                         $lnames = "Root";
                     } else {
-                        $query = "SELECT name FROM imas_libraries WHERE id='$parent'";
-                        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                        $lnames = mysql_result($result,0,0);
+                        $result = Libraries::getByName($parent);
+                        $lnames = $result[0]['name'];
                     }
                 }
-
                 $page_libRights = array();
-                $page_libRights['val'][0] = 0;
-                $page_libRights['val'][1] = 1;
-                $page_libRights['val'][2] = 2;
+                $page_libRights['val'][0] = AppConstant::NUMERIC_ZERO;
+                $page_libRights['val'][1] = AppConstant::NUMERIC_ONE;
+                $page_libRights['val'][2] = AppConstant::NUMERIC_TWO;
 
                 $page_libRights['label'][0] = "Private";
                 $page_libRights['label'][1] = "Closed to group, private to others";
@@ -2775,11 +2638,10 @@ class AdminController extends AppController
                     $page_libRights['label'][3] = "Closed to all";
                     $page_libRights['label'][4] = "Open to group, closed to others";
                     $page_libRights['label'][5] = "Open to all";
-                    $page_libRights['val'][3] = 4;
-                    $page_libRights['val'][4] = 5;
-                    $page_libRights['val'][5] = 8;
+                    $page_libRights['val'][3] = AppConstant::NUMERIC_FOUR;
+                    $page_libRights['val'][4] = AppConstant::NUMERIC_FIVE;
+                    $page_libRights['val'][5] = AppConstant::NUMERIC_EIGHT;
                 }
-
             } else { //DEFAULT PROCESSING HERE
                 $pagetitle = "Library Management";
                 if ($isAdmin) {
@@ -2813,16 +2675,15 @@ class AdminController extends AppController
             }
                 $qcount[0] = $this->addupchildqs(0);
 
-                $count = 0;
+                $count = AppConstant::NUMERIC_ZERO;
             }
-//            $setParentRights = $this->setparentrights($id);
-//            $qcount[0] = $this->addupchildqs(0);
             $page_appliesToMsg = (!$isAdmin) ? "(Only applies to your libraries)" : "";
             }
         $this->includeCSS(['libtree.css']);
         $this->includeJS(['libtree.js', 'general.js']);
 
-        $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body);
+        $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body, 'rlist' => $rlist, 'hasChildWarning' => $hasChildWarning,
+        'parent1' => $parent1, 'lnames' => $lnames);
         return $this->renderWithData('manageLib', $responseData);
     }
 
@@ -3267,4 +3128,230 @@ class AdminController extends AppController
         return $qData;
     }
 
+    public function actionExportQuestionSet()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $userId = $user->id;
+        $myRights = $user['rights'];
+        $groupId= $user['groupid'];
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        $overWriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $page_hasSearchResults = AppConstant::NUMERIC_ZERO;
+        $cId = (isset($params['cid'])) ? $params['cid'] : "admin" ;
+        $params = $this->getRequestParams();
+        $isTeacher = $this->isTeacher($userId, $cId);
+
+        if (!(isset($isTeacher)) && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+        } elseif (isset($params['cid']) && $params['cid']=="admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+        } elseif (!(isset($params['cid'])) && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
+            $overWriteBody = AppConstant::NUMERIC_ONE;
+        } else
+        {
+            if ($myRights < AppConstant::ADMIN_RIGHT) {
+                $isGrpAdmin = true;
+            } else if ($myRights == AppConstant::ADMIN_RIGHT) {
+                $isAdmin = true;
+            }
+            $sessionId = $this->getSessionId();
+            $sessiondata = $this->getSessionData($sessionId);
+
+            if (isset($params['search']))
+            {
+                $safesearch = $params['search'];
+                $search = stripslashes($safesearch);
+                $search = str_replace('"','&quot;',$search);
+                $sessiondata['lastsearch'] = str_replace(" ","+",$safesearch);
+                Sessions::setSessionId($sessionId,$sessiondata);
+            }
+            else if (isset($sessiondata['lastsearch']))
+            {
+                $safesearch = str_replace("+"," ",$sessiondata['lastsearch']);
+                $search = stripslashes($safesearch);
+                $search = str_replace('"','&quot;',$search);
+            }
+            else
+            {
+                $search = '';
+            }
+
+            if (isset($params['libs'])) {
+                if ($params['libs'] == '') {
+                    $params['libs'] = '0';
+                }
+                $searchlibs = $params['libs'];
+                $sessiondata['lastsearchlibs'] = $searchlibs;
+                Sessions::setSessionId($sessionId,$sessiondata);
+            } else if (isset($sessiondata['lastsearchlibs'])) {
+                $searchlibs = $sessiondata['lastsearchlibs'];
+            } else {
+                $searchlibs = '0';
+            }
+            /*
+             * get list of items already checked for export
+             * USED FOR STEP 2
+             */
+            $checked = array_merge((array)$params['pchecked'],(array)$params['nchecked']);
+            $clist = "'".implode("','",$checked)."'";
+            $now = time();
+            $result = QuestionSet::getById($checked);
+            $i = AppConstant::NUMERIC_ZERO;
+            $page_pChecked = array();
+            foreach($result as $key => $line) {
+                $page_pChecked[$i]['id'] = $line['id'];
+                $page_pChecked[$i]['description'] = $line['description'];
+                $page_pChecked[$i]['qtype'] = $line['qtype'];
+                $i++;
+            }
+            /*
+             * GRAB LIST OF LIBS/QUESTIONS, USED IN STEP 1 AND 2;
+             */
+            $llist = "'".implode("','",explode(',',$searchlibs))."'";
+
+            if (substr($searchlibs, 0, 1) == "0")
+                $lnames[] = "Unassigned";
+
+            $resultLib = Libraries::getByNameList($llist);
+            foreach($resultLib as $key => $row) {
+                    $lnames[] = $row['name'];
+            }
+            $lnames = implode(", ",$lnames);
+
+            if (isset($search)) {
+                if ($isAdmin) {
+                    $query = new LibraryItems();
+                    $query = $query->getDataByAdmin($safesearch, $llist, $checked, $clist);
+                } else if ($isGrpAdmin) {
+                    $query = new LibraryItems();
+                    $query = $query->getDataByGrpAdmin($groupId, $llist, $safesearch, $checked, $clist);
+                } else {
+                   $query = new LibraryItems();
+                   $query = $query->getDataByUserId($userId,$safesearch,$llist, $checked, $clist);
+                }
+
+                if ($query != 0) {
+                    $page_hasSearchResults = AppConstant::NUMERIC_ONE;
+                    $i = AppConstant::NUMERIC_ZERO;
+                    $page_nChecked = array();
+
+                    foreach($query as $key => $line)
+                    {
+                        $page_nChecked[$i]['id'] = $line['id'];
+                        $page_nChecked[$i]['description'] = $line['description'];
+                        $page_nChecked[$i]['qtype'] = $line['qtype'];
+                        $i++;
+                    }
+                }
+            }
+
+            /*
+             * output export file here
+             */
+            if (isset($params['export']))
+            {
+                header('Content-type: text/imas');
+                header("Content-Disposition: attachment; filename=\"imasexport.imas\"");
+                echo "PACKAGE DESCRIPTION\n";
+                echo $params['libdescription'];
+                echo "\n";
+                echo "\nSTART LIBRARY\nID\n1\nUID\n0\nLASTMODDATE\n$now\nNAME\n{$params['libname']}\nPARENT\n0\n";
+                $qsetlist = implode(',',range(0,count($checked)-1));
+                echo "\nSTART LIBRARY ITEMS\nLIBID\n1\nQSETIDS\n$qsetlist\n";
+                /*
+                 * first, lets pull any questions that have include__from so we can lookup backrefs
+                 */
+
+                $resultQSet = new QuestionSet();
+                $resultQSet = $resultQSet->getByIdLike($clist);
+
+                $includedqs = array();
+                if($resultQSet){
+                    foreach($resultQSet as $key => $line)
+                    {
+                        if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) > 0)
+                        {
+                            $includedqs = array_merge($includedqs,$matches[1]);
+                        }
+                        if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) > 0)
+                        {
+                            $includedqs = array_merge($includedqs,$matches[1]);
+                        }
+                    }
+                }
+
+                $includedbackref = array();
+                if (count($includedqs) > 0)
+                {
+                    $includedlist = implode(',',$includedqs);
+                    $resultId = new QuestionSet();
+                    $resultId = $resultId->getUniqueIdToExportLib($includedlist);
+                    foreach($resultId as $key => $row)
+                    {
+                        $includedbackref[$row['id']] = $row['uniqueid'];
+                    }
+                }
+                $resultClist = new QuestionSet();
+                $resultClist = $resultClist->getByIdUsingInClause($clist);
+                $qcnt = AppConstant::NUMERIC_ZERO;
+                foreach($resultClist as $key => $line)
+                {
+                    $line['control'] = preg_replace('/includecodefrom\((\d+)\)/e','"includecodefrom(UID".$includedbackref["\\1"].")"',$line['control']);
+                    $line['qtext'] = preg_replace('/includeqtextfrom\((\d+)\)/e','"includeqtextfrom(UID".$includedbackref["\\1"].")"',$line['qtext']);
+                    echo "\nSTART QUESTION\n";
+                    echo "QID\n";
+                    echo "$qcnt\n";
+                    $qcnt++;
+                    echo "\nUQID\n";
+                    echo rtrim($line['uniqueid']) . "\n";
+                    echo "\nLASTMOD\n";
+                    echo rtrim($line['lastmoddate']) . "\n";
+                    echo "\nDESCRIPTION\n";
+                    echo rtrim($line['description']) . "\n";
+                    echo "\nAUTHOR\n";
+                    echo rtrim($line['author']) . "\n";
+                    echo "\nCONTROL\n";
+                    echo rtrim($line['control']) . "\n";
+                    echo "\nQCONTROL\n";
+                    echo rtrim($line['qcontrol']) . "\n";
+                    echo "\nQTYPE\n";
+                    echo rtrim($line['qtype']) . "\n";
+                    echo "\nQTEXT\n";
+                    echo rtrim($line['qtext']) . "\n";
+                    echo "\nANSWER\n";
+                    echo rtrim($line['answer']) . "\n";
+                    echo "\nSOLUTION\n";
+                    echo rtrim($line['solution']) . "\n";
+                    echo "\nSOLUTIONOPTS\n";
+                    echo rtrim($line['solutionopts']) . "\n";
+                    echo "\nEXTREF\n";
+                    echo rtrim($line['extref']) . "\n";
+                    echo "\nLICENSE\n";
+                    echo rtrim($line['license']) . "\n";
+                    echo "\nANCESTORAUTHORS\n";
+                    echo rtrim($line['ancestorauthors']) . "\n";
+                    echo "\nOTHERATTRIBUTION\n";
+                    echo rtrim($line['otherattribution']) . "\n";
+
+                    if ($line['hasimg'] == AppConstant::NUMERIC_ONE) {
+                        echo "\nQIMGS\n";
+                        $r2 = new QImages();
+                        $r2 = $r2->dataForExportLib($line['id']);
+                        foreach($r2 as $key => $row){
+                            echo $row['var'].','.$row['filename']. "\n";
+                        }
+                    }
+                }
+                exit;
+            }
+        }
+        $this->includeJS(['tablesorter.js', 'general.js']);
+        $responseData = array('myRights' => $myRights, 'isTeacher' => $isTeacher, 'overWriteBody' => $overWriteBody, 'body' => $body, 'params' => $params, 'cid' => $cId, 'search' => $search, 'searchlibs' => $searchlibs, 'page_pChecked' => $page_pChecked, 'lnames' => $lnames,
+        'page_hasSearchResults' => $page_hasSearchResults, 'checked' => $checked, 'page_nChecked' => $page_nChecked);
+        return $this->renderWithData('exportQuestionSet', $responseData);
+    }
 }

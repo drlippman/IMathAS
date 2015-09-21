@@ -197,4 +197,78 @@ class LibraryItems extends BaseImasLibraryItems
         $data = $command->queryAll();
         return $data;
     }
+    public static function getDistictqlibData($remlist)
+    {
+        return LibraryItems::find()->select('qsetid')->distinct()->where(['IN', 'libid', $remlist])->all();
+    }
+
+    public static function deleteLibraryAdmin($remlist)
+    {
+        $query = "DELETE FROM imas_library_items WHERE libid IN ($remlist)";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function deleteLibraryGrpAdmin($libid)
+    {
+        $id = LibraryItems::find()->where(['libid' => $libid])->one();
+        if($id)
+        {
+            $id->delete();
+        }
+    }
+    public static function getByDistinctQid($qids)
+    {
+        return LibraryItems::find()->select('qsetid')->distinct()->where(['IN', 'qsetid', $qids])->all();
+    }
+    public static function getDistinctQSet($remlist)
+    {
+        return LibraryItems::find()->select('qsetid')->distinct()->where(['libid' => $remlist])->all();
+    }
+
+    public function insertDataLib($libId,$qId)
+    {
+        $this->libid = $libId;
+        $this->qsetid = $qId;
+        $this->save();
+    }
+    public static function getDataByAdmin($safesearch, $llist, $checked, $clist)
+    {
+        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
+        $query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE '%$safesearch%' ";
+        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        if (count($checked) > 0)
+        {
+            $query .= "AND imas_questionset.id NOT IN ($clist);";
+        }
+
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getDataByGrpAdmin($groupid, $llist, $safesearch, $checked, $clist)
+    {
+        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
+        $query .= "FROM imas_questionset,imas_library_items,imas_users WHERE imas_questionset.description LIKE '%$safesearch%' ";
+        $query .= "AND imas_questionset.ownerid=imas_users.id ";
+        $query .= "AND (imas_users.groupid='$groupid' OR imas_questionset.userights>0) ";
+        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        if (count($checked) > 0)
+        {
+            $query .= "AND imas_questionset.id NOT IN ($clist);";
+        }
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getDataByUserId($userid,$safesearch,$llist, $checked, $clist)
+    {
+        $query = "SELECT DISTINCT imas_questionset.id,imas_questionset.description,imas_questionset.qtype ";
+        $query .= "FROM imas_questionset,imas_library_items WHERE imas_questionset.description LIKE '%$safesearch%' ";
+        $query .= "AND (imas_questionset.ownerid='$userid' OR imas_questionset.userights>0) ";
+        $query .= "AND imas_library_items.qsetid=imas_questionset.id AND imas_library_items.libid IN ($llist)";
+        if (count($checked) > 0)
+        {
+            $query .= "AND imas_questionset.id NOT IN ($clist);";
+        }
+        AppUtility::dump($query);
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }

@@ -63,10 +63,10 @@ class QImages extends BaseImasQimages {
         $this->filename = $p[1];
         $this->save();
     }
-    public static function  dataForExportLib($qSetId)
+    public static function dataForExportLib($qSetId)
     {
-       $query = new Query();
-    $query ->select(['var','filename'])
+        $query = new Query();
+        $query ->select(['var','filename'])
             ->from('imas_qimages')
             ->where(['qsetid' => $qSetId]);
         $command = $query->createCommand();

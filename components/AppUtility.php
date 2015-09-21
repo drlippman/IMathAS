@@ -2537,7 +2537,7 @@ class AppUtility extends Component
         *$labelList is an array of strings that are displayed as the select list
         *$selectVal is optional, if passed the item in $valList that matches will be output as selected
         */
-        echo "<select class=form-control name=\"$name\" ";
+        echo "<select class=form-control apply-scroll name=\"$name\" ";
         echo (isset($actions)) ? $actions : "";
         echo ">\n";
         if (isset($defaultLabel) && isset($defaultVal)) {
@@ -2842,7 +2842,7 @@ class AppUtility extends Component
         }
     }
 
-    public static function printlist($parent,$names = null,$ltlibs = null,$count = null, $qcount = null, $cid = null, $rights = null, $sortorder = null, $ownerids = null, $userid = null, $isadmin = null, $groupids = null, $groupid = null, $isgrpadmin = null)
+    public function printlist($parent,$names = null,$ltlibs = null,$count = null, $qcount = null, $cid = null, $rights = null, $sortorder = null, $ownerids = null, $userid = null, $isadmin = null, $groupids = null, $groupid = null, $isgrpadmin = null)
     {
         $arr = $ltlibs[$parent];
         if ($sortorder[$parent]==1) {
@@ -2854,21 +2854,22 @@ class AppUtility extends Component
             $arr = array_keys($orderarr);
         }
 
+
         foreach ($arr as $child) {
+
             //if ($rights[$child]>0 || $ownerids[$child]==$userid || $isadmin) {
             if ($rights[$child]>2 || ($rights[$child]>0 && $groupids[$child]==$groupid) || $ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) ||$isadmin) {
                 if (!$isadmin) {
+                    AppUtility::dump('jjjjj');
                     if ($rights[$child]==5 && $groupids[$child]!=$groupid) {
                         $rights[$child]=4;  //adjust coloring
                     }
                 }
+
                 if (isset($ltlibs[$child])) { //library has children
-                    //echo "<li><input type=button id=\"b$count\" value=\"-\" onClick=\"toggle($count)\"> {$names[$child]}";
                     echo "<li class=lihdr><span class=dd>-</span><span class=hdr onClick=\"toggle($child)\"><span class=btn id=\"b$child\">+</span> ";
                     echo "</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=hdr onClick=\"toggle($child)\"><span class=\"r{$rights[$child]}\">{$names[$child]}</span> </span>\n";
-                    //if ($isadmin) {
                     echo " ({$qcount[$child]}) ";
-                    //}
                     echo "<span class=op>";
 
                     if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {
@@ -2880,15 +2881,13 @@ class AppUtility extends Component
                     echo "<ul class=hide id=$child>\n";
                     echo "</span>";
                     $count++;
-                    printlist($child,$names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin);
+                    $this->printlist($child,$names,$ltlibs,$count,$qcount,$cid,$rights,$sortorder,$ownerids,$userid,$isadmin,$groupids,$groupid,$isgrpadmin);
                     echo "</ul></li>\n";
 
                 } else {  //no children
 
                     echo "<li><span class=dd>-</span><input type=checkbox name=\"nchecked[]\" value=$child> <span class=\"r{$rights[$child]}\">{$names[$child]}</span> ";
-                    //if ($isadmin) {
                     echo " ({$qcount[$child]}) ";
-                    //}
                     echo "<span class=op>";
 
                     if ($ownerids[$child]==$userid || ($isgrpadmin && $groupids[$child]==$groupid) || $isadmin) {

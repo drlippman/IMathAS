@@ -160,7 +160,6 @@ echo '<form>';
         Allow access without password from computer with these IP addresses.  Use * for wildcard, e.g. 134.39.*</div><br/>
         <div class="col-lg-2 padding-top-five">Enter IP address</div> <div class="col-lg-8"> <input type=text id="ipin" class="form-control-1" onkeypress="return onenter(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additem('ipin','ipout')"/>
-
 	<table>
         <tbody id="ipout">
         <?php

@@ -1,13 +1,15 @@
 <?php
 use app\components\AppConstant;
 use app\models\Libraries;
-
+global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
 $libtreeshowchecks = false;
+
 if (isset($params['libtree']) && $params['libtree']=="popup") {
     $isAdmin = false;
     $isGrpAdmin = false;
-    if (isset($params['cid']) && $params['cid']=="admin") {
-        if ($myRights <AppConstant::GROUP_ADMIN_RIGHT) {
+    if (isset($params['cid']) && $params['cid'] == "admin") {
+
+        if ($myRights < AppConstant::GROUP_ADMIN_RIGHT) {
             echo AppConstant::REQUIRED_ADMIN_ACCESS;
             exit;
         } else if ($myRights < AppConstant::ADMIN_RIGHT) {
@@ -30,11 +32,11 @@ END;
 <form id="libselectform">
 END;
 }
-
 ?>
 <input type="hidden" id="lib-data" value="<?php echo $libraryData;?>">
 <?php
 echo "<script type=\"text/javascript\">";
+
 if (isset($params['select'])) {
     $select = $params['select'];
 } else if (!isset($select)) {
@@ -42,8 +44,8 @@ if (isset($params['select'])) {
 }
 
 echo "var select = '$select';\n";
-if (isset($params['type'])) {
-    echo "var treebox = '{$params['type']}';\n";
+if (isset($_GET['type'])) {
+    echo "var treebox = '{$_GET['type']}';\n";
 } else {
     echo "var treebox = 'checkbox';\n";
 }
@@ -59,6 +61,7 @@ $libraryData = Libraries::getAllLibrariesByJoin();
 
 $rights = array();
 $sortorder = array();
+
 foreach ($libraryData as $line)  {
     $id = $line['id'];
     $name = addslashes($line['name']);
@@ -77,7 +80,7 @@ foreach ($libraryData as $line)  {
 //if parent has lower userights, up them to match child library
 function setparentrights($alibid) {
     global $rights,$parents;
-    if ($parents[$alibid]>0) {
+    if ($parents[$alibid] > 0) {
         if ($rights[$parents[$alibid]] < $rights[$alibid]) {
             $rights[$parents[$alibid]] = $rights[$alibid];
         }
@@ -121,8 +124,9 @@ if (isset($ltlibs[0])) {
     }
 }
 
-function printlist($parent) {
-    global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
+function printlist($parent)
+{
+   global $names,$ltlibs,$checked,$toopen, $select,$isempty,$rights,$sortorder,$ownerids,$isadmin,$selectrights,$allsrights,$published,$userid,$locked,$groupids,$groupid,$isgrpadmin,$donefirst;
     $newchildren = array();
     $allownongrouplibs = false;
     $arr = array();

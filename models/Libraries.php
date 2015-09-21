@@ -236,4 +236,102 @@ class Libraries extends BaseImasLibraries
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function updateByGrpUserIdSingle($params, $newgpid, $idTransfer, $isadmin, $groupid, $isgrpadmin, $userid)
+    {
+        $query = "UPDATE imas_libraries SET ownerid='{$params['newowner']}',groupid='$newgpid' WHERE imas_libraries.id='$idTransfer'";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getCountOfId($parent)
+    {
+        return Libraries::find()->where(['parent' => $parent])->all();
+    }
+
+    public static function getByIdGroupAdmin($remlist, $groupid)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+            ->from('imas_libraries')
+            ->where(['IN','id',$remlist]);
+          $query->andWhere(['groupid',$groupid]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public static function getByIdAdmin($remlist, $userid)
+    {
+        $query = new Query();
+        $query ->select(['id'])
+            ->from('imas_libraries')
+            ->where(['IN','id',$remlist]);
+        $query->andWhere(['ownerid',$userid]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+    public static function deleteLibraryAdmin($remlist,$isadmin,$groupid,$isgrpadmin,$userid)
+    {
+        $query = "DELETE FROM imas_libraries WHERE id IN ($remlist)";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function deleteLibrarySingle($remove,$isadmin,$groupid,$isgrpadmin,$userid)
+    {
+        $query = "DELETE FROM imas_libraries WHERE id='$remove'";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+      return  \Yii::$app->db->createCommand($query)->execute();
+    }
+    public static function updateUserRightLastModeDate($rights,$now, $llist,$isadmin,$groupid,$isgrpadmin,$userid)
+    {
+        $query = "UPDATE imas_libraries SET userights='$rights',lastmoddate=$now WHERE id IN ($llist)";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function updateParent($lib,$now,$parlist,$isadmin,$groupid,$isgrpadmin,$userid)
+    {
+        $query = "UPDATE imas_libraries SET parent='$lib',lastmoddate=$now WHERE id IN ($parlist)";
+        if (!$isadmin) {
+            $query .= " AND groupid='$groupid'";
+        }
+        if (!$isadmin && !$isgrpadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getByName($id)
+    {
+        return Libraries::find()->select('name')->where(['id'=> $id])->all();
+    }
+    public static function getByNameList($ids)
+    {
+        return Libraries::find()->select('name')->where(['IN', 'id', $ids])->all();
+    }
+
+
 }

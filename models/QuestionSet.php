@@ -646,4 +646,22 @@ class QuestionSet extends BaseImasQuestionset
         return $data;
     }
 
+    public static function updateIdIn($qlist)
+    {
+        $query = "UPDATE imas_questionset SET deleted=1 WHERE id IN ($qlist)";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getById($clist)
+    {
+        $result = QuestionSet::find()->select(['id','description','qtype'])->where(['IN','id',$clist])->all();
+        return $result;
+    }
+
+    public static function getByIdLike($clist)
+    {
+        $query = "SELECT * FROM imas_questionset WHERE id IN ($clist)";
+        $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
 }
