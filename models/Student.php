@@ -12,6 +12,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
+use app\controllers\AppController;
 use yii\db\Query;
 
 class Student extends BaseImasStudents {
@@ -68,7 +69,7 @@ class Student extends BaseImasStudents {
         if($params != null)
         {
            if($params['locked'] == 1) {
-               $student->locked = strtotime(date('F d, o g:i a'));
+               $student->locked = AppController::dateToString();
            }
             else{
                 $student->locked = 0;
@@ -94,7 +95,7 @@ class Student extends BaseImasStudents {
     public static function updateLocked($userid,$courseid)
     {
         $student = Student::findOne(['userid' => $userid,'courseid' => $courseid]);
-        $student->locked = strtotime(date('F d, o g:i a'));
+        $student->locked = AppController::dateToString();
         $student->save();
     }
     public static function deleteStudent($userid,$courseid)
@@ -120,7 +121,7 @@ class Student extends BaseImasStudents {
          }
         if($params['lockOrUnlock'] == 0)
         {
-            $student->locked = strtotime(date('F d, o g:i a'));
+            $student->locked = AppController::dateToString();
             $student->save();
         }
     }

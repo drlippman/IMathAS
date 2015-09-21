@@ -40,11 +40,6 @@ switch($action) {
         echo '<div class=col-lg-10><a href='.AppUtility::getURLFromHome('instructor', 'instructor/index?cid='.$cid).'>Enter the Course</a></div>';
     break;
     case "delete":
-        if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
-        {
-            echo "You don't have the authority for this action";
-            break;
-        }
         echo '<div id="headerforms" class="pagetitle col-lg-10"><h2>Delete Course</h2></div>';
         echo '<div>';
         echo "<div class='col-lg-10'>Are you sure you want to delete the course <b>$name</b>?</div><br>\n";

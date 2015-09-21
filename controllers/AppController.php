@@ -736,4 +736,10 @@ function generaterandstring() {
     {
         return date('F d, o g:i a', $data);
     }
+
+    public static function  dateToString()
+    {
+        return strtotime(date('F d, o g:i a'));
+
+    }
 }

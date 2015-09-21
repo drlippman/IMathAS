@@ -291,5 +291,11 @@ class Questions extends BaseImasQuestions
         return $query;
 
     }
-
+    public static function getDataByJoin($aid)
+    {
+        $query = "SELECT iq.id,iqs.description FROM imas_questions AS iq,imas_questionset as iqs";
+        $query .= " WHERE iq.questionsetid=iqs.id AND iq.assessmentid='$aid'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

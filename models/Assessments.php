@@ -447,4 +447,16 @@ class Assessments extends BaseImasAssessments
     public static function getSelectedData($id){
         return Assessments::find()->select('itemorder,shuffle,defpoints,name,intro')->where(['id' => $id])->all();
     }
+
+    public static  function updateVideoCued($data,$aid)
+    {
+        $assessmentData = Assessments::find()->where(['id' => $aid])->one();
+        if($assessmentData)
+        {
+            $assessmentData->viddata = $data;
+            $assessmentData->save();
+        }
+
+    }
+
 }

@@ -6,6 +6,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\models\_base\BaseImasForumPosts;
 use Yii;
+use app\controllers\AppController;
 use yii\db\Query;
 
 
@@ -106,7 +107,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->userid = isset($user->id) ? $user->id : null;
         $this->parent = $params['parentId'];
         $this->message = isset($params['post-reply']) ? $params['post-reply'] : null;
-        $postdate = strtotime(date('F d, o g:i a'));
+        $postdate = AppController::dateToString();
         $this->postdate = $postdate;
         $this->files = $fileName;
         $this->save();
@@ -126,7 +127,7 @@ class ForumPosts extends BaseImasForumPosts
         $this->subject = trim($params['subject']);
         $this->userid = isset($userId) ? $userId : null;
         $this->message = isset($params['message']) ? $params['message'] : null;
-            $postdate = strtotime(date('F d, o g:i a'));
+            $postdate = AppController::dateToString();
             $this->postdate = $postdate;
             $this->posttype = $postType;
             if ($alwaysReplies == AppConstant::NUMERIC_ONE)

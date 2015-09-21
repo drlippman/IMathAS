@@ -24,7 +24,7 @@ class Message extends BaseImasMsgs
         $this->msgto = $params['receiver'];
         $this->title = $params['subject'];
         $this->message = $params['body'];
-        $sendDate = strtotime(date('F d, o g:i a'));
+        $sendDate = AppController::dateToString();
         $this->senddate = $sendDate;
         if($params['isread'] == 4)
         {
@@ -179,7 +179,7 @@ class Message extends BaseImasMsgs
             $baseId = isset($params['parentId']) ? $params['parentId'] : null;
             $this->baseid = $baseId;
         }
-        $sendDate = strtotime(date('F d, o g:i a'));
+        $sendDate = AppController::dateToString();
         $this->senddate = $sendDate;
         $this->save();
         return $this->id;

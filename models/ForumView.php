@@ -4,6 +4,8 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
+use app\controllers\AppController;
 use Yii;
 
 use app\models\_base\BaseImasForumViews;
@@ -51,7 +53,7 @@ class ForumView extends BaseImasForumViews
     public function createThread($userId, $threadId)
     {
         $this->threadid = $threadId;
-        $postdate = strtotime(date('F d, o g:i a'));
+        $postdate = AppController::dateToString();
         $this->lastview = $postdate;
         $this->userid = $userId;
         $this->tagged = AppConstant::NUMERIC_ZERO;
@@ -74,14 +76,14 @@ class ForumView extends BaseImasForumViews
         $users = ForumView::find(['lastview', 'tagged'])->where(['threadid' => $threadId, 'userid' => $CurrentUser['id']])->all();
         if ($users) {
             foreach ($users as $user) {
-                $lastView = strtotime(date('F d, o g:i a'));
+                $lastView = AppController::dateToString();
                 $user->lastview = $lastView;
                 $user->save();
             }
         } else {
             $this->userid = $CurrentUser->id;
             $this->threadid = $threadId;
-            $lastView = strtotime(date('F d, o g:i a'));
+            $lastView = AppController::dateToString();
             $this->lastview = $lastView;
             $this->tagged = AppConstant::NUMERIC_ZERO;
             $this->save();
@@ -106,7 +108,7 @@ class ForumView extends BaseImasForumViews
             if (!$users) {
                 $this->userid = $thread['currentUserId'];
                 $this->threadid = $thread['threadId'];
-                $lastView = strtotime(date('F d, o g:i a'));
+                $lastView = AppController::dateToString();
                 $this->lastview = $lastView;
                 $this->tagged = AppConstant::NUMERIC_ZERO;
                 $this->save();

@@ -5,6 +5,7 @@ namespace app\models;
 use app\components\AppConstant;
 use app\models\_base\BaseImasForumThreads;
 use yii\db\Query;
+use app\controllers\AppController;
 
 class ForumThread extends BaseImasForumThreads
 {
@@ -13,7 +14,7 @@ class ForumThread extends BaseImasForumThreads
     {
         $this->forumid = isset($params['forumid']) ? $params['forumid'] : null;
         $this->id = $threadId;
-        $postdate = strtotime(date('F d, o g:i a'));
+        $postdate = AppController::dateToString();
         $this->lastposttime = $postdate;
         $this->lastpostuser = $userId;
         $this->views = AppConstant::NUMERIC_ZERO;

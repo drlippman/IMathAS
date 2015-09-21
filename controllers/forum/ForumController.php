@@ -277,7 +277,7 @@ class ForumController extends AppController
                             'postdate' => AppController::customizeDate($thread['postdate']),
                             'name' => AppUtility::getFullName($username->FirstName, $username->LastName),
                             'tagged' => $tagged[0]['tagged'],
-                            'lastview' => date('F d, o g:i a', $lastView[0]['lastview']),
+                            'lastview' => AppController::customizeDate($lastView[0]['lastview']),
                             'userright' => $currentUser['rights'],
                             'postUserId' => $username->id,
                             'currentUserId' => $currentUser['id'],
