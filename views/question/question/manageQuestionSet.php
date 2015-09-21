@@ -49,12 +49,42 @@ $this->params['breadcrumbs'][] = $this->title;
                 addr = addrmod+id;
             } else if (todo=="temp") {
                 addr = addrtemp+id;
-            } else if (todo=="del") {
-                addr = addrmq+'&remove='+id;
             } else if (todo=="tr") {
                 addr = addrmq+'&transfer='+id;
             }
-            window.location = addr;
+
+            if (todo == 'del'){
+                event.preventDefault();
+                var html ='<div><p>Are you SURE you want to delete this question from the Question Set? This will make it unavailable</p></div>';
+                html +='<div><p class="pull-left">to all users. If it is currently being used in an assessment, it will mess up that assessment.</p></div>';
+                $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                    modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+                    width: 'auto', resizable: false,
+                    closeText: "hide",
+                    buttons: {
+                        "Cancel": function () {
+                            $(this).dialog('destroy').remove();
+                            return false;
+                        },
+                        "confirm": function () {
+                            $(this).dialog("close");
+                            addr = addrmq+'&remove='+id+'&confirmed=true';
+                            window.location= addr;
+                            return true;
+                        }
+                    },
+                    close: function (event, ui) {
+                        $(this).remove();
+                    },
+                    open: function(){
+                        jQuery('.ui-widget-overlay').bind('click',function(){
+                            jQuery('#dialog').dialog('close');
+                        })
+                    }
+                });
+            }else{
+                window.location = addr;
+            }
         }
 
         var curlibs = '<?php echo $searchlibs ?>';
@@ -66,22 +96,12 @@ $this->params['breadcrumbs'][] = $this->title;
     </script>
 
     <?php
-    if (isset($remove)) {
-        ?>
-        Are you SURE you want to delete this question from the Question Set.  This will make it unavailable
-        to all users.  If it is currently being used in an assessment, it will mess up that assessment.
-        <p>
-            <input type=button onclick="window.location='manage-question-set?cid=<?php echo $cid ?>&remove=<?php echo $remove ?>&confirmed=true'" value="Really Delete">
-            <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">
-        </p>
-    <?php
-    } else if (isset($transfer)) {
+    if (isset($transfer)) {
     ?>
         <form method=post action="manage-question-set?cid=<?php echo $cid ?>&transfer=<?php echo $transfer ?>">
             Transfer to:
 
             <?php AppUtility::writeHtmlSelect("newowner",$page_transferUserList['val'],$page_transferUserList['label']); ?>
-
             <p>
                 <input type=submit value="Transfer">
                 <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-question-set?cid=<?php echo $cid ?>'">

@@ -74,9 +74,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12 text-label">
             <div class="col-md-3">Show Answers</div><div class="col-md-4">
                 <select name="showans" class="form-control">
-                    <option value="0" <?php if ($line['showans']=='0') { echo 'selected="1"';}?>>Use Default</option>
-                    <option value="N" <?php if ($line['showans']=='N') { echo 'selected="1"';}?>>Never during assessment</option>
-                    <option value="F" <?php if ($line['showans']=='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
+                    <option value="0" <?php if ($line['showans']==='0') { echo 'selected="1"';}?>>Use Default</option>
+                    <option value="N" <?php if ($line['showans']==='N') { echo 'selected="1"';}?>>Never during assessment</option>
+                    <option value="F" <?php if ($line['showans']==='F') { echo 'selected="1"';}?>>Show answer after last attempt</option>
                 </select>
             </div>
         </div>

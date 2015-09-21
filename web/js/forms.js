@@ -44,6 +44,11 @@ function deleteLtiUser(ltiUserId)
         },
         close: function (event, ui) {
             $(this).remove();
+        },
+        open: function(){
+            jQuery('.ui-widget-overlay').bind('click',function(){
+                jQuery('#dialog').dialog('close');
+            })
         }
     });
 }
