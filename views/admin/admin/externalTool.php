@@ -147,7 +147,7 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
                     $ExternalToolId = $row['id'];
                     $cid = $courseId.$ltfrom;?>
                     <input type="hidden" id="admin" value="<?php echo $cid?>">
-                    <a onclick=deleteExternalTool(<?php echo $ExternalToolId?>) href='#'>Delete</a>
+                   | <a onclick=deleteExternalTool(<?php echo $ExternalToolId?>) href='#'>Delete</a>
                   <?php echo '</li>';
                 }
             }
