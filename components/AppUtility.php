@@ -771,7 +771,7 @@ class AppUtility extends Component
             $responseString .= '<div id="headershowtest" class="pagetitle">';
             $responseString .= "<div class=right id=timelimitholder><span id='timercontent'></span><span id='timerhide' class='clickable' title='Hide' style='color:#aaa;' onclick='toggletimer()'>[x]</span> <span style='color: #000000;' class='time' id='expired'><b>Time Expired</b></span> </div>\n";
             if ($testsettings['testtype'] == "Practice" && !$isreview) {
-                echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href=\"showtest.php?regenall=fromscratch\">", _('Create new version.'), "</a></div>";
+                echo "<div class=right><span style=\"color:#f00\">Practice Test.</span>  <a href='".AppUtility::getURLFromHome('assessment','assessment/showAssessment?regenall=fromscratch')."'>", _('Create new version.'), "</a></div>";
             }
             if (!$isreview && !$superdone) {
                 if ($exceptionduedate > AppConstant::NUMERIC_ZERO) {
@@ -867,9 +867,9 @@ class AppUtility extends Component
                     if ($allowregen && $qi[$questions[$qn]]['allowregen'] == AppConstant::NUMERIC_ONE) {
                         $responseString .= '<p>';
                         if ($reattemptsremain && !$immediatereattempt) {
-                            $responseString .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>, ";
+                            $responseString .= "<a href='".AppUtility::getURLFromHome('assessment','assessment/show-assessment?action=skip&to='.$qn.'reattempt='.$qn)."'>Reattempt last question</a>, ";
                         }
-                        $responseString .= "<a href=\"showtest.php?action=skip&amp;to=$qn&amp;regen=$qn\">Try another similar question</a>";
+                        $responseString .= "<a href='".AppUtility::getURLFromHome('assessment','assessment/show-assessment?action=skip&to='.$qn.'&regen='.$qn)."'>Try another similar question</a>";
                         if ($immediatereattempt) {
                             $responseString .= _(", reattempt last question below, or select another question.");
                         } else {
@@ -877,7 +877,7 @@ class AppUtility extends Component
                         }
                         $responseString .= "</p>\n";
                     } else if ($reattemptsremain && !$immediatereattempt) {
-                        $responseString .= "<p><a href=\"showtest.php?action=skip&amp;to=$qn&amp;reattempt=$qn\">Reattempt last question</a>";
+                        $responseString .= "<p><a href='".AppUtility::getURLFromHome('assessment','assessment/show-assessment?action=skip&to='.$qn.'reattempt='.$qn)."'>Reattempt last question</a>";
                         if ($lefttodo > AppConstant::NUMERIC_ZERO) {
                             $responseString .= _(", or select another question");
                         }
@@ -1015,9 +1015,9 @@ class AppUtility extends Component
                         }
                         $qshowans = ((($showansafterlast && $qi[$questions[$next]]['showans'] == AppConstant::ZERO_VALUE) || $qi[$questions[$next]]['showans'] == 'F' || $qi[$questions[$next]]['showans'] == 'J') || ($showansduring && $qi[$questions[$next]]['showans'] == AppConstant::ZERO_VALUE && $attempts[$next] >= $testsettings['showans']));
                         if ($qshowans) {
-                            displayq2::displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], AppConstant::NUMERIC_TWO, false, $attempts[$next], false, false, false, $colors);
+                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], AppConstant::NUMERIC_TWO, false, $attempts[$next], false, false, false, $colors);
                         } else {
-                            displayq2::displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], false, false, $attempts[$next], false, false, false, $colors);
+                            displayq($next, $qi[$questions[$next]]['questionsetid'], $seeds[$next], false, false, $attempts[$next], false, false, false, $colors);
                         }
                         $contactlinks = showquestioncontactlinks($next);
                         if ($contactlinks != '') {

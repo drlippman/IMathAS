@@ -54,7 +54,7 @@ class RosterController extends AppController
         $this->setSessionData('postCount',$countPost);
         $isShowPic = $this->getParamVal('showpic');
         $course = Course::getById($courseId);
-        if($isShowPic == 0){
+        if($isShowPic == AppConstant::NUMERIC_ZERO){
             $isImageColumnPresent = AppConstant::NUMERIC_ZERO;
         }else{
             $isImageColumnPresent = AppConstant::NUMERIC_ONE;

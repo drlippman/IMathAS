@@ -628,9 +628,9 @@ function deletefilesifnotused($delfrom,$ifnothere) {
 	}
 	require_once("../components/filehandler.php");
 	if ($testsettings['isgroup']>0 && $sessiondata['groupid']>0 && !$isreview) {
-		deleteasidfilesfromstring2($outstr,'agroupid',$sessiondata['groupid'],$testsettings['id']);
+		\app\components\filehandler::deleteasidfilesfromstring2($outstr,'agroupid',$sessiondata['groupid'],$testsettings['id']);
 	} else {
-		deleteasidfilesfromstring2($outstr,'id',$testid,$testsettings['id']);
+		\app\components\filehandler::deleteasidfilesfromstring2($outstr,'id',$testid,$testsettings['id']);
 	}
 	//deleteasidfilesfromstring($outstr);
 }
