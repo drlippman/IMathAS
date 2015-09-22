@@ -1,26 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 5/8/15
- * Time: 8:34 PM
- */
 
 namespace app\models;
 
 use Yii;
-use yii\db\Exception;
-use app\components\AppUtility;
 use app\models\_base\BaseImasStugroupmembers;
 use yii\db\Query;
 
-class StuGroupMembers extends BaseImasStugroupmembers{
+class StuGroupMembers extends BaseImasStugroupmembers
+{
 
     public static function deleteMemberFromCourse($toUnEnroll, $stuGroups)
     {
         $query = StuGroupMembers::find()->where(['IN', 'stugroupid', $stuGroups])->andWhere(['IN', 'userid', $toUnEnroll])->all();
-        if($query){
-            foreach($query as $object){
+        if ($query) {
+            foreach ($query as $object) {
                 $object->delete();
             }
         }
@@ -29,15 +22,15 @@ class StuGroupMembers extends BaseImasStugroupmembers{
     public static function findByStuGroupId($groupId)
     {
         $query = new Query();
-        $query ->select('userid')
-                ->from('imas_stugroupmembers')
-                ->where('stugroupid= :stugroupid',[':stugroupid' => $groupId]);
+        $query->select('userid')
+            ->from('imas_stugroupmembers')
+            ->where('stugroupid= :stugroupid', [':stugroupid' => $groupId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
     }
 
-    public function insertStuGrpMemberData($userId,$newStuGrpId)
+    public function insertStuGrpMemberData($userId, $newStuGrpId)
     {
         $this->userid = $userId;
         $this->stugroupid = $newStuGrpId;
@@ -47,10 +40,8 @@ class StuGroupMembers extends BaseImasStugroupmembers{
     public static function deleteStuGroupMembers($grpId)
     {
         $query = StuGroupMembers::find()->where(['stugroupid' => $grpId])->all();
-        if($query)
-        {
-            foreach($query as $data)
-            {
+        if ($query) {
+            foreach ($query as $data) {
                 $data->delete();
             }
         }
@@ -64,21 +55,19 @@ class StuGroupMembers extends BaseImasStugroupmembers{
 
     }
 
-    public static function alreadyStuAdded($grpSetId,$stuList)
+    public static function alreadyStuAdded($grpSetId, $stuList)
     {
         $data = Yii::$app->db->createCommand("SELECT i_sgm.userid FROM imas_stugroupmembers as i_sgm JOIN imas_stugroups as i_sg ON i_sgm.stugroupid=i_sg.id WHERE i_sg.groupsetid= :uid AND i_sgm.userid IN ($stuList) ");
-        $data->bindValue('uid',$grpSetId);
+        $data->bindValue('uid', $grpSetId);
         $query = $data->queryAll();
         return $query;
     }
 
-    public static function removeGrpMember($uid,$grpId)
+    public static function removeGrpMember($uid, $grpId)
     {
         $query = StuGroupMembers::find()->where(['stugroupid' => $grpId])->andWhere(['userid' => $uid])->all();
-        if($query)
-        {
-            foreach($query as $data)
-            {
+        if ($query) {
+            foreach ($query as $data) {
                 $data->delete();
             }
         }
@@ -86,8 +75,8 @@ class StuGroupMembers extends BaseImasStugroupmembers{
 
     public static function deleteByStudGrpId($stugroupid)
     {
-        $courseData = StuGroupMembers::findOne(['stugroupid',$stugroupid]);
-        if($courseData){
+        $courseData = StuGroupMembers::findOne(['stugroupid', $stugroupid]);
+        if ($courseData) {
             $courseData->delete();
         }
     }

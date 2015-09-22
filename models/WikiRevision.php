@@ -1,7 +1,7 @@
 <?php
 namespace app\models;
 
-use app\components\AppUtility;
+use app\components\AppConstant;
 use app\models\_base\BaseImasWikiRevisions;
 
 class WikiRevision extends BaseImasWikiRevisions
@@ -10,24 +10,25 @@ class WikiRevision extends BaseImasWikiRevisions
     {
         return WikiRevision::findAll(['wikiid' => $wikiId]);
     }
+
     public function saveRevision($params)
     {
         $this->wikiid = isset($params['wikiId']) ? $params['wikiId'] : null;
-        $this->userid = 3;
+        $this->userid = AppConstant::NUMERIC_THREE;
         $this->revision = isset($params['wikicontent']) ? $params['wikicontent'] : null;
-        $this->stugroupid = 0;
+        $this->stugroupid = AppConstant::NUMERIC_ZERO;
         $this->time = isset($params['time']) ? $params['time'] : null;
         $this->save();
     }
 
-    public static function getEditedWiki($sortBy, $order,$wikiId)
+    public static function getEditedWiki($sortBy, $order, $wikiId)
     {
-        return WikiRevision::find()->where(['id'=> $wikiId])->all();
+        return WikiRevision::find()->where(['id' => $wikiId])->all();
     }
 
     public static function getFirstWikiData($sortBy, $order)
     {
-            return WikiRevision::find()->all();
+        return WikiRevision::find()->all();
     }
 
     public static function getRevisionId($id)
@@ -37,7 +38,7 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function getByWikiId($wikiId)
     {
-        return WikiRevision::findAll(['wikiid' =>$wikiId]);
+        return WikiRevision::findAll(['wikiid' => $wikiId]);
     }
 
     public static function getRevisionTotalData($wikiId, $stugroupid)
@@ -46,19 +47,21 @@ class WikiRevision extends BaseImasWikiRevisions
         return $query;
     }
 
-    public static function deleteByWikiId($wikiId){
+    public static function deleteByWikiId($wikiId)
+    {
         $wikiRevisionData = WikiRevision::findAll(['wikiid' => $wikiId]);
-        if($wikiRevisionData){
-            foreach($wikiRevisionData as $singleData){
+        if ($wikiRevisionData) {
+            foreach ($wikiRevisionData as $singleData) {
                 $singleData->delete();
             }
         }
     }
+
     public static function deleteWikiRivision($wikilist)
     {
         $query = WikiRevision::find()->where(['IN', 'wikiid', $wikilist])->all();
-        if($query){
-            foreach($query as $object){
+        if ($query) {
+            foreach ($query as $object) {
                 $object->delete();
             }
         }
@@ -66,11 +69,9 @@ class WikiRevision extends BaseImasWikiRevisions
 
     public static function deleteGrp($grpId)
     {
-        $query = WikiRevision::find()->where(['stugroupid'=> $grpId])->all();
-        if($query)
-        {
-            foreach($query as $object)
-            {
+        $query = WikiRevision::find()->where(['stugroupid' => $grpId])->all();
+        if ($query) {
+            foreach ($query as $object) {
                 $object->delete();
             }
         }
@@ -79,7 +80,7 @@ class WikiRevision extends BaseImasWikiRevisions
     public static function deleteByWikiRevisionId($itemId)
     {
         $instrFileData = WikiRevision::findOne(['wikiid' => $itemId]);
-        if($instrFileData){
+        if ($instrFileData) {
             $instrFileData->delete();
         }
     }

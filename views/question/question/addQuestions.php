@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox">
+<div class="tab-content shadowBox margin-top-fourty">
     <?php if ($overwriteBody == AppConstant::NUMERIC_ONE) {
            echo $body;
           } else { ?>
@@ -142,14 +142,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12 patential-ques-header search-patential-ques-header">
                     <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
                     <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
-                    <div class="col-md-2"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
+                    <div class="col-md-3"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
                     <input type=hidden name="libs" id="libs"  value="<?php echo $searchlibs ?>">
 
                </div>
 
             <div class="col-md-12 question-search">
-                <div class="col-md-2"><input class="form-control" placeholder="Search&#xF002;" type=text size=15 name=search value="<?php echo $search ?>"></div>
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <input type="search" rel="search" id="search" class="form-control" placeholder="Search" type=text size=15 name=search value="<?php echo $search ?>">
+                </div>
+                <div class="col-md-4 select-text-margin">
                         <span onmouseover="tipshow(this,'Search all libraries, not just selected ones')" onmouseout="tipout()">
                         <input type=checkbox name="searchall" value="1" <?php AppUtility::writeHtmlChecked($searchall,1,0) ?> />
                         Search all libs</span>

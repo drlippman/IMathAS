@@ -647,145 +647,248 @@ switch($action) {
             </form> <?php
             break;
     case "listltidomaincred":  ?>
-         <div class="col-md-12 modify-lti-domain-credential"><div id="headerforms" class="pagetitle">
-         <h3><?php AppUtility::t('Modify LTI Domain Credentials')?></h3>
-         </div>
-         <table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'><thead><tr><th><?php AppUtility::t('Domain')?></th><th><?php AppUtility::t('Key')?></th><th><?php AppUtility::t('Can create Instructors')?>?</th><th><?php AppUtility::t('Modify')?></th><th><?php AppUtility::t('Delete')?></th></tr></thead>
-        <?php
-        foreach ($users as $row) {
-            echo "<tbody><tr><td>{$row['email']}</td><td>{$row['SID']}</td>";
-            if ($row['rights']==76) { ?>
-                 <td><?php AppUtility::t('Yes')?></td>
-            <?php } else { ?>
-                  <td><?php AppUtility::t('No')?></td>
-            <?php } ?>
-             <td><a href="forms?action=modltidomaincred&id=<?php echo $row['id']?>"><?php AppUtility::t('Modify')?></a></td>
-            <?php if ($row['id']==0) {
-                echo "<td></td>";
-            } else { ?>
-             <td>
-                 <a href="javascript: deleteLtiUser(<?php echo $row['id']?>)">  <?php AppUtility::t('Delete')?></a>
-             </td>
-           <?php } ?>
-             </tr>
-            <?php } ?>
-            </tbody></table>
-         <form method=post action="actions?action=modltidomaincred&id=new">
+         <div class="col-md-12 modify-lti-domain-credential">
+        <form method=post action="actions?action=modltidomaincred&id=new">
+            <input class="add-lti-credentials-btn" type=submit value="<?php AppUtility::t('Add LTI Credentials')?>">
+            <div id="headerforms" class="pagetitle">
+                <h3>
+                    <?php AppUtility::t('Modify LTI Domain Credentials')?>
+                </h3>
+            </div>
+            <table class='margin-top-fifteen table table-bordered table-striped table-hover data-table'>
+                <thead>
+                <tr>
+                    <th><?php AppUtility::t('Domain')?></th>
+                    <th><?php AppUtility::t('Key')?></th>
+                    <th><?php AppUtility::t('Can create Instructors')?>?</th>
+                    <th><?php AppUtility::t('Modify')?></th>
+                    <th><?php AppUtility::t('Delete')?></th>
+                </tr>
+                </thead>
+                <?php
+                foreach ($users as $row) {
+                    echo "<tbody>
+                    <tr>
+                        <td>{$row['email']}</td>
+                        <td>{$row['SID']}</td>";
+                    if ($row['rights']==76) { ?>
+                        <td><?php AppUtility::t('Yes')?></td>
+                    <?php } else { ?>
+                        <td><?php AppUtility::t('No')?></td>
+                    <?php } ?>
+                    <td><a href="forms?action=modltidomaincred&id=<?php echo $row['id']?>"><?php AppUtility::t('Modify')?></a></td>
+                    <?php if ($row['id']==0) {
+                        echo "<td></td>";
+                    } else { ?>
+                        <td>
+                            <a href="javascript: deleteLtiUser(<?php echo $row['id']?>)">  <?php AppUtility::t('Delete')?></a>
+                        </td>
+                    <?php } ?>
+                    </tr>
+                <?php } ?>
+                </tbody>
+            </table>
         <div class='col-md-12 padding-left-zero'>
-        <div class='col-md-12 padding-left-zero'><?php AppUtility::t('Add new LTI key/secret')?></div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Domain')?></span>
-            <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name="ltidomain" size=20>
+            <div class='col-md-12 padding-left-zero'>
+                <?php AppUtility::t('Add new LTI key/secret')?>
+            </div>
+            <div class='margin-top-twenty col-md-12 padding-left-zero'>
+                <span class='col-md-2 padding-left-zero'>
+                    <?php AppUtility::t('Domain')?>
+                </span>
+                <div class='col-md-4 padding-left-zero'>
+                    <input class='form-control' type=text name="ltidomain" size=20>
+                </div>
+            </div>
+            <div class='margin-top-twenty col-md-12 padding-left-zero'>
+                <span class='col-md-2 padding-left-zero'>
+                    <?php AppUtility::t('Key')?>
+                </span>
+                <div class='col-md-4 padding-left-zero'>
+                    <input class='form-control' type=text name="ltikey" size=20>
+                </div>
+            </div>
+            <div class='margin-top-twenty col-md-12 padding-left-zero'>
+                <span class='col-md-2 padding-left-zero'>
+                    <?php AppUtility::t('Secret')?>
+                </span>
+                <div class='col-md-4 padding-left-zero'>
+                    <input class='form-control' type=text name="ltisecret" size=20>
+                </div>
+            </div>
+            <div class='margin-top-twenty col-md-12 padding-left-zero'>
+                <span class='col-md-2 padding-left-zero'>
+                    <?php AppUtility::t('Can create instructors')?>
+                </span>
+                <div class='col-md-4 padding-left-zero'>
+                    <select class='form-control' name="createinstr">
+                        <option value="11" selected="selected"><?php AppUtility::t('No')?></option>
+                        <option value="76"><?php AppUtility::t('Yes, and creates'); echo ' '.$installname.' '; AppUtility::t('login');?></option>
+                    </select>
+                </div>
+            </div>
+            <div class='margin-top-twenty col-md-12 padding-left-zero'>
+                <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Associate with group')?></span>
+                <div class='col-md-4 padding-left-zero'>
+                    <select class='form-control' name='groupid'>
+                        <option value='0'><?php AppUtility::t('Default')?></option>
+            <?php
+            foreach ($groupsName as $group )
+            {
+                echo '<option value="'.$group['id'].'">'.$group['name'].'</option>';
+            }
+            echo "</select>"; ?>
+            </div>
             </div>
         </div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Key')?></span>
-            <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name="ltikey" size=20>
-            </div>
         </div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Secret')?></span>
-            <div class='col-md-4 padding-left-zero'>
-                <input class='form-control' type=text name="ltisecret" size=20>
-            </div>
-        </div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Can create instructors')?></span>
-            <div class='col-md-4 padding-left-zero'>
-                <select class='form-control' name="createinstr">
-                    <option value="11" selected="selected"><?php AppUtility::t('No')?></option>
-                    <option value="76"><?php AppUtility::t('Yes, and creates'); echo ' '.$installname.' '; AppUtility::t('login');?></option>
-                </select>
-            </div>
-        </div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <span class='col-md-2 padding-left-zero'><?php AppUtility::t('Associate with group')?></span>
-            <div class='col-md-4 padding-left-zero'>
-                <select class='form-control' name='groupid'>
-                    <option value='0'><?php AppUtility::t('Default')?></option>
-        <?php
-        foreach ($groupsName as $group )
-        {
-            echo '<option value="'.$group['id'].'">'.$group['name'].'</option>';
-        }
-        echo "</select>"; ?>
-        </div>
-        </div>
-        <div class='margin-top-twenty col-md-12 padding-left-zero'>
-            <input type=submit value="<?php AppUtility::t('Add LTI Credentials')?>">
-        </div>
-        </div>
-        </div></form>
+        </form>
         <?php
         break;
     case "modltidomaincred":
 //        if ($myrights<100) { echo "not allowed"; exit;} ?>
-         <div id="headerforms" class="pagetitle">
-         <h3><?php AppUtility::t('Modify LTI Domain Credentials')?></h3>
-         </div>
-        <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id']?>">
-        <?php AppUtility::t('Modify LTI key/secret')?> <br/>
-        <?php AppUtility::t('Domain')?> <input type=text name="ltidomain" value="<?php echo $user['email'];?>" size=20><br/>
-        <?php AppUtility::t('Key')?><input type=text name="ltikey" value="<?php echo $user['SID'] ?>" size=20><br/>
-        <?php AppUtility::t('Secret')?><input type=text name="ltisecret"  value="<?php echo $user['password']?>"size=20><br/>
-        <?php AppUtility::t('Can create instructors')?>
-         <select name="createinstr"><option value="11"
-        <?php if ($user['rights']==11)
-        {
-            echo 'selected="selected"';
-        }
-         ?> > <?php AppUtility::t('No')?></option>
-              <option value="76" <?php
-        if ($user['rights']==76) {echo 'selected="selected"';} ?>
-          ><?php AppUtility::t('Yes')?></option></select><br/>
-        <?php AppUtility::t('Associate with group')?> <select name="groupid"><option value="0"><?php AppUtility::t('Default')?></option>
-                <?php
-        foreach ($groupsName as $group ) {
-            echo '<option value="'.$group['id'].'"';
-            if ($group['id']==$user['groupid']) { echo ' selected="selected"';}
-            echo '>'.$group['name'].'</option>';
-        }
-        echo '</select><br/>'; ?>
-         <input type=submit value="<?php AppUtility::t('Update LTI Credentials')?>">
-         </form> <?php
-        break;
+        <div class="col-md-12 modify-lti-domain-group-padding">
+
+            <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id']?>">
+<!--                <div class="col-md-12 padding-left-zero margin-top-twenty">-->
+                    <input type=submit class="update-group-btn" value="<?php AppUtility::t('Update LTI Credentials')?>">
+<!--                </div>-->
+                <div id="headerforms" class="pagetitle">
+                    <h3>
+                        <?php AppUtility::t('Modify LTI Domain Credentials')?>
+                    </h3>
+                </div>
+                <span class="col-md-3 padding-left-zero margin-top-ten">
+                    <?php AppUtility::t('Modify LTI key/secret')?>
+                </span>
+                <div class="col-md-12 padding-left-zero margin-top-fifteen">
+                    <span class="col-md-2 padding-left-zero select-text-margin">
+                        <?php AppUtility::t('Domain')?>
+                    </span>
+                    <span class="col-md-4 padding-left-zero">
+                        <input class="form-control" type=text name="ltidomain" value="<?php echo $user['email'];?>" size=20>
+                    </span>
+                </div>
+                <div class="col-md-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 padding-left-zero select-text-margin">
+                        <?php AppUtility::t('Key')?>
+                    </span>
+                    <span class="col-md-4 padding-left-zero">
+                        <input class="form-control" type=text name="ltikey" value="<?php echo $user['SID'] ?>" size=20>
+                    </span>
+                </div>
+                <div class="col-md-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 padding-left-zero select-text-margin">
+                        <?php AppUtility::t('Secret')?>
+                    </span>
+                    <span class="col-md-4 padding-left-zero">
+                        <input class="form-control" type=text name="ltisecret"  value="<?php echo $user['password']?>"size=20>
+                    </span>
+                </div>
+                <div class="col-md-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 padding-left-zero select-text-margin">
+                        <?php AppUtility::t('Can create instructors')?>
+                    </span>
+                    <span class="col-md-4 padding-left-zero">
+                        <select class="form-control" name="createinstr">
+                            <option value="11"
+                                <?php if ($user['rights']==11) {
+                                    echo 'selected="selected"';
+                                } ?> >
+                                <?php AppUtility::t('No')?>
+                            </option>
+                            <option value="76" <?php
+                                if ($user['rights']==76) {
+                                    echo 'selected="selected"';
+                                } ?> >
+                                <?php AppUtility::t('Yes')?>
+                            </option>
+                        </select>
+                    </span>
+                </div>
+                <div class="col-md-12 padding-left-zero margin-top-twenty">
+                    <span class="col-md-2 padding-left-zero select-text-margin">
+                        <?php AppUtility::t('Associate with group')?>
+                    </span>
+                    <span class="col-md-4 padding-left-zero">
+                        <select class="form-control" name="groupid">
+                            <option value="0">
+                                <?php AppUtility::t('Default')?>
+                            </option>
+                            <?php
+                            foreach ($groupsName as $group ) {
+                                echo '<option value="'.$group['id'].'"';
+                                if ($group['id']==$user['groupid']) { echo ' selected="selected"';}
+                                echo '>'.$group['name'].'</option>';
+                            }
+                            echo '
+                         </select>'; ?>
+                     </span>
+                </div>
+            </form>
+        </div>
+            <?php break;
     case "listgroups":?>
          <div class="col-md-12 modify-group-padding">
-          <div id="headerforms" class="pagetitle">
-         <h3><?php AppUtility::t('Modify Groups')?></h3>
-         </div>
-         <table class='margin-top-twenty table table-bordered table-striped table-hover data-table'><thead><tr><th><?php AppUtility::t('Group Name')?></th><th><?php AppUtility::t('Modify')?></th><th><?php AppUtility::t('Delete')?></th></tr></thead>
-         <?php foreach($groupsName as $row)
-         {
-            echo "<tbody><tr><td>{$row['name']}</td>"; ?>
-            <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>"><?php AppUtility::t('Modify')?></a></td>
-            <?php if ($row['id'] == AppConstant::NUMERIC_ZERO)
-            {
-               echo "<td></td>";
-            } else { ?>
-                  <td> <a href="#" onclick="deleteGroup(<?php echo $row['id'] ?>)"><?php AppUtility::t('Delete')?></a> </td>
-            <?php }
-            echo "</tr>";
-        }
-        echo "</table>"; ?>
         <form method=post action="<?php echo AppUtility::getURLFromHome('admin','admin/actions?action=addgroup');?>">
-        <?php  echo "<div class='col-md-12 margin-top-twenty padding-left-zero'>
+            <button class="add-group-btn" type=submit value="<?php AppUtility::t('Add Group')?>">
+                <i class="fa fa-share header-right-btn"></i>
+                <?php AppUtility::t('Add Group')?>
+            </button>
+            <div id="headerforms" class="pagetitle">
+                <h3>
+                    <?php AppUtility::t('Modify Groups')?>
+                </h3>
+            </div>
+            <table class='margin-top-twenty table table-bordered table-striped table-hover data-table'>
+                <thead>
+                <tr>
+                    <th><?php AppUtility::t('Group Name')?></th>
+                    <th><?php AppUtility::t('Modify')?></th>
+                    <th><?php AppUtility::t('Delete')?></th>
+                </tr>
+                </thead>
+                <?php foreach($groupsName as $row)
+                {
+                    echo "<tbody>
+                    <tr>
+                        <td>{$row['name']}</td>"; ?>
+                    <td><a href="<?php echo AppUtility::getURLFromHome('admin','admin/forms?action=modgroup&id='.$row['id']);?>"><?php AppUtility::t('Modify')?></a></td>
+                    <?php if ($row['id'] == AppConstant::NUMERIC_ZERO)
+                {
+                    echo "<td></td>";
+                } else { ?>
+                    <td> <a href="#" onclick="deleteGroup(<?php echo $row['id'] ?>)"><?php AppUtility::t('Delete')?></a> </td>
+                <?php }
+                    echo "</tr>";
+                }?>
+            </table>
+            <?php  echo "<div class='col-md-12 margin-top-twenty padding-left-zero'>
                         <span class='floatleft select-text-margin'>Add new group</span>
                         <input class='width-thirty-per floatleft margin-left-thirty form-control' type=text name=gpname id=gpname size=50>
-                        </div>"; ?>
-        <div class='margin-top-twenty col-md-2 padding-left-zero'> <input type=submit value="<?php AppUtility::t('Add Group')?>"></div>
-        </tbody></form></div><?php
-        break;
+                        </div>";
+            ?>
+        </tbody>
+        </form>
+        </div>
+        <?php break;
     case "modgroup": ?>
-         <div id="headerforms" class="pagetitle"><h2><?php AppUtility::t('Rename Instructor Group')?></h2></div>
-         <?php $gpname = $groupsName['name']; ?>
-         <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id']?>>
-         <?php AppUtility::t('Group name:',false)?> <input type=text size=50 name=gpname id=gpname value="<?php echo $gpname ?>"><br/>
-         <input type=submit value="<?php AppUtility::t('Update Group')?>">
-         </form> <?php
-         break;
+        <div class="col-md-12 rename-group-padding">
+
+             <?php $gpname = $groupsName['name']; ?>
+             <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id']?>>
+                 <button class="update-group-btn" type=submit value="<?php AppUtility::t('Update Group')?>">
+                     <i class="fa fa-share header-right-btn"></i>
+                     <?php AppUtility::t('Update Group')?>
+                 </button>
+                 <div id="headerforms" class="pagetitle">
+                     <h2>
+                         <?php AppUtility::t('Rename Instructor Group')?></h2>
+                 </div>
+                 <?php AppUtility::t('Group name:',false)?> <input class="form-control width-thirty-three-per margin-top-thirty" type=text size=50 name=gpname id=gpname value="<?php echo $gpname ?>">
+             </form>
+        </div>
+        <?php break;
     case "removediag":
         if ($myRights < 60)
         {

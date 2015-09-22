@@ -33,19 +33,21 @@ function chgcopyfrom() {
     if (document.getElementById('copyfrom').value == 0) {
        NoneClick = 1;
             if(cnt == 1 || (hidden == 1 && cnt==1)) {
-                $('#customoptions').removeClass("hidden");
-                document.getElementById('customoptions').className="show";
+                $('#core-options').removeClass("hidden");
+                $('#core-options').addClass('show');
             }
             if(cnt1 == 1) {
-                $('#customoptions1').removeClass("hidden");
-                document.getElementById('customoptions1').className="show";
+                $('#advance-options').removeClass("hidden");
+                $('#advance-options').addClass("show");
         }
+    $('#copyfromoptions').addClass("hidden");
     document.getElementById('copyfromoptions').className="hidden";
     } else {
         NoneClick = 0;
-    document.getElementById('customoptions').className="hidden";
-    document.getElementById('customoptions1').className="hidden";
-    document.getElementById('copyfromoptions').className="show";
+        $('#core-options').addClass('hidden');
+        $('#advance-options').addClass('hidden');
+        $('#copyfromoptions').removeClass('hidden');
+        $('#copyfromoptions').addClass('show');
         var hidden = 1;
     }
 }
@@ -60,51 +62,55 @@ function apwshowhide(s) {
     }
 }
 
-function xyz()
+function coreOptionToggle()
 {
     var img = document.getElementById('img');
-    $('#customoptions').toggle();
+    $('#core-options').toggle();
     if(NoneClick == 1) {
-        $('#customoptions').removeClass("hidden");
+        $('#core-options').removeClass("hidden");
     }
     if(cnt == 0)
     {
 
         $('.clickme').css('background-color','#fafafa');
+        $('#core-options').css('background-color','#fafafa');
         $('.core-options').css('background-color','#fafafa');
         img.src= '../../img/assessMinusIcon.png';
         cnt++;
     }else if(cnt > 0)
     {
         if(NoneClick == 1) {
-            $('#customoptions').addClass("hidden");
+            $('#core-options').addClass("hidden");
         }
         $('.clickme').css('background-color','#f0f0f0');
+        $('#core-options').css('background-color','#f0f0f0');
         img.src= '../../img/assessAddIcon.png';
         cnt = 0;
     }
 
 }
 
-function xyz1()
+function advanceOptionToggle()
 {
     var img1 = document.getElementById('img1');
-    $('#customoptions1').toggle();
+    $('#advance-options').toggle();
     if(NoneClick == 1) {
-        $('#customoptions1').removeClass("hidden");
+        $('#advance-options').removeClass("hidden");
     }
     if(cnt1 == 0)
     {
         $('.clickmegreen').css('background-color','#fafafa');
+        $('#advance-options').css('background-color','#fafafa');
         $('.advance-options').css('background-color','#fafafa');
         img1.src= '../../img/assessMinusIcon.png';
         cnt1++;
     }else if(cnt1 > 0)
     {
         if(NoneClick == 1) {
-            $('#customoptions1').addClass("hidden");
+            $('#advance-options').addClass("hidden");
         }
         $('.clickmegreen').css('background-color','#f0f0f0');
+        $('#advance-options').css('background-color','#f0f0f0');
         img1.src= '../../img/assessAddIcon.png';
         cnt1 = 0;
     }

@@ -21,17 +21,21 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class = "title-container">
     <div class="row">
-        <div class="pull-left page-heading">
+        <div class="pull-left page-heading col-md-8 padding-left-zero">
             <div class="vertical-align title-page"><?php echo $this->title ?><img class="help-img" src="<?php echo AppUtility::getAssetURL()?>img/helpIcon.png" alt="Help" onClick="window.open('<?php echo AppUtility::getHomeURL() ?>docs/help.php?section=assessments','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"/></div>
         </div>
 
-        <div>
-        <?php if (isset($assessmentData['id'])) {
-        echo '<div class="floatleft"><a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$params['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''._('This will discard any changes you have made on this page').'\');">'._('Add/Remove Questions').'</a></div>';
-        } ?>
-        <div class="pull-left header-btn width-twenty-five-per">
-            <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
-        </div>
+        <div class="col-md-4 floatright padding-right-zero">
+            <?php if (isset($assessmentData['id'])) {
+            echo '<div class="floatleft">
+            <a class="btn btn-primary" href="'.AppUtility::getURLFromHome('question','question/add-questions?aid='.$params['id'].'&amp;cid='.$course->id).'" onclick="return confirm(\''.AppUtility::t('This will discard any changes you have made on this page',false).'\');">
+                <i class="fa fa-share header-right-btn"></i>'
+                .AppUtility::t('Add/Remove Questions',false).
+            '</a></div>';
+            } ?>
+            <div class="pull-right header-btn width-twenty-five-per">
+                <button class="btn btn-primary pull-right page-settings" type="submit" value="Submit"><i class="fa fa-share header-right-btn"></i><?php echo $saveTitle ?></button>
+            </div>
         </div>
     </div>
 </div>
@@ -228,7 +232,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <span class=form></span>
     <br class=form>
 
-    <div class="padding-left-fifteen clickme row add-item1 assement-options-margin" onclick="xyz()">
+    <div class="padding-left-fifteen clickme row add-item1 assement-options-margin" onclick="coreOptionToggle()">
         <div class="col-md-1 plus-icon" style="padding-right: 0">
             <img class="assessment-add-item-icon" id="img"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
@@ -236,7 +240,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <p class="margin-left-minus-twenty"><?php AppUtility::t('Core Options');?></p>
         </div>
     </div>
-        <div id="customoptions" class="col-md-12 core-options assement-options-margin">
+        <div id="core-options" class="col-md-12 core-options assement-options-margin">
             <div class="col-md-12 margin-top-fifteen padding-left-zero">
                 <div class='col-md-2 select-text-margin'><?php AppUtility::t('Require Password')?></div>
                 <div class=col-md-10>
@@ -504,7 +508,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         </div>
 
-    <div class="padding-left-fifteen col-md-12 clickmegreen row add-item1 assement-options-margin" style="margin-top: 10px" onclick="xyz1()">
+    <div class="padding-left-fifteen col-md-12 clickmegreen row add-item1 assement-options-margin" style="margin-top: 10px" onclick="advanceOptionToggle()">
         <div class="col-md-1 plus-icon">
             <img class="assessment-add-item-icon" id="img1"  src="<?php echo AppUtility::getAssetURL()?>img/assessAddIcon.png">
         </div>
@@ -512,7 +516,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <p class="margin-left-minus-twenty"><?php AppUtility::t('Advance Options');?></p>
         </div>
     </div>
-        <div id="customoptions1" class="advance-options col-md-12  assement-options-margin" style="background-color: #fafafa">
+        <div id="advance-options" class="advance-options col-md-12  assement-options-margin" style="background-color: #fafafa">
 
             <div class="col-md-12 padding-left-zero">
                 <div class='col-md-2'><?php AppUtility::t('Minimum score to receive credit')?></div>

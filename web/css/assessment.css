@@ -80,3 +80,17 @@ table td {
 .show-license-shadowbox {
     padding: 10px 30px 30px 30px !important;
 }
+.rename-group-padding {
+    padding: 15px 30px 30px 30px !important;
+}
+.margin-top-thirty {
+    margin-top: 30px;
+}
+.modify-lti-domain-group-padding {
+    padding: 5px 30px 30px 30px !important;
+}
+.update-group-btn, .add-lti-credentials-btn, .add-group-btn {
+    float: right !IMPORTANT;
+    margin-top: -8.6% !IMPORTANT;
+    margin-right: -30px !IMPORTANT;
+}

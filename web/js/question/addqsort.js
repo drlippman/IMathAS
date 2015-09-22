@@ -118,7 +118,7 @@ function removeSelected() {
 		var chgcnt = 0;
 		for (var e = form.elements.length-1; e >-1 ; e--) {
 			var el = form.elements[e];
-			if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+			if (el.type == 'checkbox' && el.checked && el.value != 'ignore') {
 				val = el.value.split(":");
 				doremoveitem(val[0]); 
 				chgcnt++;
@@ -135,7 +135,8 @@ function groupSelected() {
 	var form = document.getElementById("curqform");
 	for (var e = form.elements.length-1; e >-1 ; e--) {
 		var el = form.elements[e];
-		if (el.type == 'checkbox' && el.checked && el.value!='ignore') {
+		if (el.type == 'checkbox' && el.checked && el.value!='ignore')
+        {
 			val = el.value.split(":")[0];
 			if (val.indexOf("-")>-1) { //is group
 				val = val.split("-")[0];
@@ -156,24 +157,24 @@ function groupSelected() {
 	if (grplist.length<2) {
 		return;
 	}
+
 	var to = grplist[grplist.length-1];
-	if (itemarray[to].length<5) {  //moving to existing group
-		
-	} else {
-		var existing = itemarray[to];
-		itemarray[to] = [1,0,[existing],1];
-	}
-	for (i=0; i<grplist.length-1; i++) { //going from last in current to first in current
-		tomove = itemarray.splice(grplist[i],1);
-		if (tomove[0].length<5) { //if grouping a group
-			for (var j=0; j<tomove[0][2].length; j++) {
-				itemarray[to][2].push(tomove[0][2][j]);
-			}
-		} else {
-			itemarray[to][2].push(tomove[0]);
-		}	
-	}
-	submitChanges();
+            if (itemarray[to].length<5) {  //moving to existing group
+        } else {
+            var existing = itemarray[to];
+            itemarray[to] = [1,0,[existing],1];
+        }
+        for (i=0; i<grplist.length-1; i++) { //going from last in current to first in current
+            tomove = itemarray.splice(grplist[i],1);
+            if (tomove[0].length<5) { //if grouping a group
+                for (var j=0; j<tomove[0][2].length; j++) {
+                    itemarray[to][2].push(tomove[0][2][j]);
+                }
+            } else {
+                itemarray[to][2].push(tomove[0]);
+            }
+        }
+        submitChanges();
 }
 
 function updateGrpN(num) {
@@ -246,7 +247,7 @@ function generateTable() {
 	var html = '';
 	html += "<table cellpadding=5 class='floatleft question-table'><thead><tr>";
 	if (!beentaken) {
-		html += "<th><div class='checkbox override-hidden'><label><input type='checkbox' name='header-checked1' value=''>" +
+		html += "<th><div class='checkbox override-hidden'><label><input type='checkbox' id='header-checked1' name='header-checked1' value='ignore'>" +
         "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th>";
 	}
 	html += "<th>Order</th>";
@@ -369,10 +370,11 @@ function generateTable() {
 				curpt = curitems[j][4];
 			}
             //Action
-            html += "<td><div class='btn-group settings'> <a style='width: 72% !important;' class='btn btn-primary disable-btn background-color-blue'>" +
-            "<i class='fa fa-cog fa-fw'></i> Settings</a><a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
-            "<ul class='dropdown-menu' style='min-width: 92%;max-width: 92%;'>" +
-            "<li class=c><a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Change</a></li>" ;//settings
+            html += "<td><div class='btn-group settings'> " +
+                "<a href=\"mod-question?id="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\" style='width: 72% !important;' class='btn btn-primary background-color-blue'>" +
+            "<i class='fa fa-cog fa-fw'></i> Settings</a>" +
+                "<a class='btn btn-primary dropdown-toggle' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>" +
+            "<ul class='dropdown-menu' style='min-width: 92%;max-width: 92%;'>";
             if (curitems[j][5]) {
                 html += "<li class=c><a href=\"mod-data-set?id="+curitems[j][1]+"&qid="+curitems[j][0]+"&aid="+curaid+"&cid="+curcid+"\"><i class='fa fa-fw'></i></i> Edit</a></li>";//edit
             } else {
@@ -395,9 +397,15 @@ function generateTable() {
             html += "</ul></div></td>";
 
             if (beentaken) {
-                html += "<td><input style='width: 95% !important;margin-left: -10px;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\"/></td>"; //Preview
+                html += "<td>" +
+                    "<div style='width: 95% !important;margin-left: -10px;' class='btn btn-primary' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">" +
+                     "<img class ='margin-right-ten small-preview-icon' src='../../img/prvAssess.png'>&nbsp;Preview" +
+                    "</div>" +
+                    "</td>"; //Preview
             } else {
-                html += "<td><input style='width: 95% !important;margin-left: -10px;' type=button value='Preview' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"/></td>"; //Preview
+                html += "<td>" +
+                    "<div style='width: 95% !important;margin-left: -10px;' class='btn btn-primary' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"><img class ='margin-right-ten small-preview-icon' src='../../img/prvAssess.png'>&nbsp;Preview</div>" +
+                    "</td>"; //Preview
             }
 			html += "</tr>";
 			ln++;

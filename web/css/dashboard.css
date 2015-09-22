@@ -99,3 +99,8 @@ table.gb thead th{
 width: 10.5%;
 height: 34px;
 }
+.all-user-select {
+display: inline-block;
+padding-top: 2px;
+margin-left: 20px;
+}

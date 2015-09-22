@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 29/4/15
- * Time: 4:46 PM
- */
 
 namespace app\models;
-
 
 use app\components\AppConstant;
 use app\components\AppUtility;
@@ -27,7 +20,7 @@ class Wiki extends BaseImasWikis
 
     public static function getAllData($wikiId)
     {
-        $query = Wiki::find(['name','startdate','enddate','editbydate','avail'])->where(['id' => $wikiId])->all();
+        $query = Wiki::find(['name', 'startdate', 'enddate', 'editbydate', 'avail'])->where(['id' => $wikiId])->all();
         return $query;
     }
 
@@ -46,43 +39,44 @@ class Wiki extends BaseImasWikis
     public function updateChange($params)
     {
         $updateWiki = Wiki::findOne(['id' => $params['id']]);
-        $endDate = AppUtility::parsedatetime($params['edate'],$params['etime']);
-        $startDate = AppUtility::parsedatetime($params['sdate'],$params['stime']);
+        $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
+        $startDate = AppUtility::parsedatetime($params['sdate'], $params['stime']);
         $updateWiki->courseid = $params['cid'];
         $updateWiki->name = $params['name'];
         $updateWiki->description = $params['description'];
         $updateWiki->avail = $params['avail'];
-        if($params['avail'] == AppConstant::NUMERIC_ONE)
-        {
-            if($params['available-after'] == 0){
-                $startDate = 0;
+        if ($params['avail'] == AppConstant::NUMERIC_ONE) {
+            if ($params['available-after'] == AppConstant::NUMERIC_ZERO) {
+                $startDate = AppConstant::NUMERIC_ZERO;
             }
-            if($params['available-until'] == AppConstant::ALWAYS_TIME){
+            if ($params['available-until'] == AppConstant::ALWAYS_TIME) {
                 $endDate = AppConstant::ALWAYS_TIME;
             }
             $updateWiki->startdate = $startDate;
             $updateWiki->enddate = $endDate;
-        }else
-        {
+        } else {
             $updateWiki->startdate = AppConstant::NUMERIC_ZERO;
             $updateWiki->enddate = AppConstant::ALWAYS_TIME;
         }
         $updateWiki->save();
     }
 
-    public static function deleteById($itemId){
+    public static function deleteById($itemId)
+    {
         $wikiData = Wiki::findOne($itemId);
-        if($wikiData){
+        if ($wikiData) {
             $wikiData->delete();
         }
     }
+
     public static function getAllDataWiki($wikiId)
     {
-        $query =\Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryOne();
+        $query = \Yii::$app->db->createCommand("SELECT name,startdate,enddate,editbydate,avail FROM imas_wikis WHERE id='$wikiId'")->queryOne();
         return $query;
     }
 
-    public function addWiki($wiki){
+    public function addWiki($wiki)
+    {
         $this->courseid = isset($wiki['courseid']) ? $wiki['courseid'] : null;
         $this->name = isset($wiki['name']) ? $wiki['name'] : null;
         $this->description = isset($wiki['description']) ? $wiki['description'] : null;
@@ -96,12 +90,11 @@ class Wiki extends BaseImasWikis
         return $this->id;
     }
 
-    public  static function setEditByDate($shift,$typeId)
+    public static function setEditByDate($shift, $typeId)
     {
-        $date = Wiki::find()->where(['id'=>$typeId])->andWhere(['>','editbydate','0'])->andWhere(['<','editbydate','2000000000'])->one();
-        if($date)
-        {
-            $date->editbydate = $date['editbydate']+$shift;
+        $date = Wiki::find()->where(['id' => $typeId])->andWhere(['>', 'editbydate', '0'])->andWhere(['<', 'editbydate', '2000000000'])->one();
+        if ($date) {
+            $date->editbydate = $date['editbydate'] + $shift;
             $date->save();
         }
     }
@@ -114,10 +107,8 @@ class Wiki extends BaseImasWikis
     public static function updateWikiForGroups($deleteGrpSet)
     {
         $query = Wiki::find()->where(['groupsetid' => $deleteGrpSet])->all();
-        if($query)
-        {
-            foreach($query as $singleData)
-            {
+        if ($query) {
+            foreach ($query as $singleData) {
                 $singleData->groupsetid = AppConstant::NUMERIC_ZERO;
                 $singleData->save();
             }
@@ -127,7 +118,7 @@ class Wiki extends BaseImasWikis
     public static function updateWikiById($startdate, $enddate, $avail, $id)
     {
         $wiki = Wiki::findOne(['id' => $id]);
-        if($wiki){
+        if ($wiki) {
             $wiki->startdate = $startdate;
             $wiki->enddate = $enddate;
             $wiki->avail = $avail;
@@ -150,7 +141,7 @@ class Wiki extends BaseImasWikis
     public static function deleteCourseId($courseId)
     {
         $wikiData = Wiki::find()->where(['courseid' => $courseId])->one();
-        if($wikiData){
+        if ($wikiData) {
             $wikiData->delete();
         }
     }

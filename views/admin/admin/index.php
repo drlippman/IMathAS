@@ -279,7 +279,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
         <?php
         function writeHtmlSelect ($name,$valList,$labelList,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) {
-        echo "<select class='user-select' name=\"$name\" id=\"$name\" ";
+        echo "<select class='form-control all-user-select user-select' name=\"$name\" id=\"$name\" ";
         echo (isset($actions)) ? $actions : "" ;
         echo ">\n";
         if (isset($defaultLabel) && isset($defaultVal)) {

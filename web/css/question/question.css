@@ -170,3 +170,27 @@ text-align: left;
     padding-top: 15px;
     padding-bottom: 5px;
 }
+#search {
+    background-image: url(../../img/icon-search.png);
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    border: 1px solid #ccc;
+
+    -webkit-border-radius: 4px !important;
+    -moz-border-radius: 4px !important;
+    -ms-border-radius: 4px !IMPORTANT;
+    -o-border-radius: 4px !important;
+    border-radius: 4px !important;
+
+    padding: 10px 5px;
+    text-indent: 20px;
+
+    -webkit-transition: all 0.2s !important;
+    -moz-transition: all 2s !important;
+    transition: all 0.2s;
+}
+#search:focus {
+    /* Picked a random icon from Google */
+    background-position: -20px center;
+    text-indent: 0;
+}

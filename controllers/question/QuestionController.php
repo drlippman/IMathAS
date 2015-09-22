@@ -574,7 +574,7 @@ class QuestionController extends AppController
                                 } else {
                                     $pageQuestionTable[$i]['desc'] = filter($line['description']);
                                 }
-                                $pageQuestionTable[$i]['preview'] = "<button style='width: 100%;' class='question-preview-btn'><img class = 'small-preview-icon' src='" . AppUtility::getAssetURL() . 'img/prvAssess.png' . "' onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\">&nbsp;Preview</button>";
+                                $pageQuestionTable[$i]['preview'] = "<div onClick=\"previewq('selq','qo$ln',{$line['id']},true,false)\" style='width: 100%;' class='btn btn-primary'><img class = 'margin-right-ten small-preview-icon' src='" . AppUtility::getAssetURL() . 'img/prvAssess.png' . "'>&nbsp;Preview</div>";
                                 $pageQuestionTable[$i]['type'] = $line['qtype'];
                                 $avgTimePts = explode(',', $line['avgtime']);
                                 if ($avgTimePts[0] > AppConstant::NUMERIC_ZERO) {

@@ -1,25 +1,23 @@
 <?php
 
-
 namespace app\models;
 
 use Yii;
-use yii\db\Exception;
-use app\components\AppUtility;
 use app\models\_base\BaseImasStugroups;
 use yii\db\Query;
 
 class Stugroups extends BaseImasStugroups
 {
-    public static function findByCourseId($courseId){
+    public static function findByCourseId($courseId)
+    {
         $query = new Query();
-        $query	->select(['imas_stugroups.id'])
+        $query->select(['imas_stugroups.id'])
             ->from('imas_stugroups')
-            ->join(	'INNER JOIN',
+            ->join('INNER JOIN',
                 'imas_stugroupset',
                 'imas_stugroups.groupsetid=imas_stugroupset.id'
             )
-            ->where('imas_stugroupset.courseid= :groupsetid',[ ':groupsetid' => $courseId]);
+            ->where('imas_stugroupset.courseid= :groupsetid', [':groupsetid' => $courseId]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -29,7 +27,8 @@ class Stugroups extends BaseImasStugroups
     {
         return Stugroups::find()->where(['groupsetid' => $copyGrpSet])->one();
     }
-    public function insertStuGrpData($stuGroupName,$NewGrpSetId)
+
+    public function insertStuGrpData($stuGroupName, $NewGrpSetId)
     {
         $this->name = $stuGroupName;
         $this->groupsetid = $NewGrpSetId;
@@ -38,12 +37,12 @@ class Stugroups extends BaseImasStugroups
 
     }
 
-    public static  function findByGrpSetIdToDlt($deleteGrpSet)
+    public static function findByGrpSetIdToDlt($deleteGrpSet)
     {
         $query = new Query();
-        $query	->select(['id'])
+        $query->select(['id'])
             ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid',[ ':groupsetid' => $deleteGrpSet]);
+            ->where('groupsetid= :groupsetid', [':groupsetid' => $deleteGrpSet]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -52,22 +51,20 @@ class Stugroups extends BaseImasStugroups
     public static function deleteGrp($grpId)
     {
         $query = Stugroups::find()->where(['id' => $grpId])->all();
-        if($query)
-        {
-            foreach($query as $data)
-            {
+        if ($query) {
+            foreach ($query as $data) {
                 $data->delete();
             }
         }
 
     }
 
-    public static  function findByGrpSetIdForCopy($copyGrpSet)
+    public static function findByGrpSetIdForCopy($copyGrpSet)
     {
         $query = new Query();
-        $query	->select(['id','name'])
+        $query->select(['id', 'name'])
             ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid',[ ':groupsetid' => $copyGrpSet]);
+            ->where('groupsetid= :groupsetid', [':groupsetid' => $copyGrpSet]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -76,42 +73,44 @@ class Stugroups extends BaseImasStugroups
     public static function findByGrpSetIdToManageSet($grpSetId)
     {
         $query = new Query();
-        $query	->select(['id','name'])
+        $query->select(['id', 'name'])
             ->from('imas_stugroups')
-            ->where('groupsetid= :groupsetid',[ ':groupsetid'=> $grpSetId]);
+            ->where('groupsetid= :groupsetid', [':groupsetid' => $grpSetId]);
         $query->orderBy('id');
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
 
     }
+
     public static function getById($renameGrp)
     {
         return Stugroups::find()->where(['id' => $renameGrp])->one();
 
     }
 
-    public static function renameGrpName($renameGrp,$grpName)
+    public static function renameGrpName($renameGrp, $grpName)
     {
         $query = Stugroups::find()->where(['id' => $renameGrp])->one();
-        if($query)
-        {
-                $query ->name = $grpName;
-                $query ->save();
+        if ($query) {
+            $query->name = $grpName;
+            $query->save();
         }
     }
-    public function insertStuGrpName($grpSetId,$newGrpName)
+
+    public function insertStuGrpName($grpSetId, $newGrpName)
     {
         $this->groupsetid = $grpSetId;
         $this->name = $newGrpName;
         $this->save();
         return $this->id;
     }
+
     public static function getAllIdName()
     {
 
         $query = new Query();
-        $query	->select(['id','name'])
+        $query->select(['id', 'name'])
             ->from('imas_stugroups');
         $command = $query->createCommand();
         $data = $command->queryAll();
@@ -125,8 +124,8 @@ class Stugroups extends BaseImasStugroups
 
     public static function deleteByStudGrpId($groupsetId)
     {
-        $courseData = Stugroups::findOne(['groupsetid',$groupsetId]);
-        if($courseData){
+        $courseData = Stugroups::findOne(['groupsetid', $groupsetId]);
+        if ($courseData) {
             $courseData->delete();
         }
     }
