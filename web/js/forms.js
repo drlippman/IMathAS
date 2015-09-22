@@ -1,6 +1,5 @@
 function deleteGroup(groupId)
 {
-    event.preventDefault();
     var html ='<div><p>Are you SURE you want to remove this group?</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
@@ -25,7 +24,6 @@ function deleteGroup(groupId)
 
 function deleteLtiUser(ltiUserId)
 {
-    event.preventDefault();
     var html ='<div><p>Are you SURE you want to remove this Lti User?</p></div>';
     $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
         modal: true, title: 'Message', zIndex: 10000, autoOpen: true,

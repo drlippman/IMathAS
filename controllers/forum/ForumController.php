@@ -616,29 +616,6 @@ class ForumController extends AppController
         $atLeastOneThread = ForumPosts::checkLeastOneThread($forumId, $currentUser['id']);
         $FullThread = ForumPosts::getbyid($threadId);
         $data = array();
-//             foreach($FullThread as $singleThreadArray){
-//                 if($currentUser['rights'] == AppConstant::NUMERIC_TEN && $singleThreadArray['parent'] == AppConstant::NUMERIC_ZERO && $singleThreadArray['posttype'] == AppConstant::NUMERIC_THREE){
-////                     $data = array();
-////AppUtility::dump('kl');
-//                     array_push($data, $singleThreadArray);
-//                     $forumPostData = ForumPosts::getByThreadIdAndUserID($threadId, $currentUser['id']);
-//                     if ($forumPostData) {
-//                         foreach ($forumPostData as $single) {
-//                             $Replies = ForumPosts::isThreadHaveReply($single['id']);
-//                             foreach($Replies as $singleReply){
-//                                 array_push($data, $singleReply);
-//                             }
-//                             if($single['parent'] == $threadId){
-//                                 array_push($data, $single);
-//                             }
-//                         }
-//                    }
-//                break;
-//             }else{
-//                     array_push($data, $singleThreadArray);
-//                  }
-//             }
-//        AppUtility::dump($data);
         $titleCountArray = array();
         foreach ($FullThread as $postData) {
             $this->children[$postData['parent']][] = $postData['id'];

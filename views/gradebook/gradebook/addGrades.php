@@ -288,7 +288,7 @@ if ($params['gbitem'] == 'new') {
                                         echo "<div class='col-md-2'>Add/Replace to all grades</div>
                                         <div class='col-md-10'>
                                             <div class='floatleft'>
-                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblhhhur(this.value);\"/>
+                                                <input class='width-seventy-seven form-control' type=text size=3 id=\"toallgrade\" onblur=\"this.value = doonblur(this.value);\"/>
                                             </div>";
                                             echo '<div class="floatleft margin-left-fifteen">';
                                                         echo ' <input class="width-seventy-seven" type=button value="Add" onClick="sendtoall(0,0);"/>

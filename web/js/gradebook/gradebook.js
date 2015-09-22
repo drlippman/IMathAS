@@ -12,33 +12,36 @@ $(document).ready(function () {
             "ordering":false,
             paging: false
         });
-    new $fn.dataTable.FixedColumns( table );
+    new $.fn.dataTable.FixedColumns(table);
     var data = {courseId: courseId, userId: userId};
     jQuerySubmit('fetch-gradebook-data-ajax', data, 'fetchDataSuccess');
-    var x = document.cookie;
-    var s = x.split(/:/);
-    conditionalColor('gradebook-table',0,low,high);
-
+    var color = document.cookie;
+    var bothColor = color.split(/=/);
+    var colorArray = bothColor[1].split(/:/);
+    conditionalColor('gradebook-table',0,colorArray[0],colorArray[1]);
 });
+
+function selectCheckBox() {
+    $('.gradebook-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('.gradebook-table-body input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.gradebook-table-body input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
+}
+
 var data;
 var showPics = 0;
 var GradebookData;
 function fetchDataSuccess(response){
     var result = JSON.parse(response);
     GradebookData = result.data.gradebook;
-}
-function selectCheckBox() {
-    $('.check-all').click(function () {
-        $('.gradebook-table-body input:checkbox').each(function () {
-            $(this).prop('checked', true);
-        })
-    });
-
-    $('.uncheck-all').click(function () {
-        $('.gradebook-table-body input:checkbox').each(function () {
-            $(this).prop('checked', false);
-        })
-    });
 }
 
 function highlightrow(el) {
@@ -63,7 +66,8 @@ function studentLock() {
                 }
             }
         });
-
+        dataArray.sort();
+        dataArray = dataArray.unique();
         if (markArray.length != 0) {
             var html = '<div><p>Are you SURE you want to lock the selected students out of the course?</p></div><p>';
             $.each(dataArray, function (index, studentData) {
@@ -135,6 +139,7 @@ function createStudentList(appendId, e){
 }
 
 function studentMessage() {
+
     var markArray = createStudentList();
     if (markArray.length != 0) {
         document.getElementById("message-id").value = markArray;
@@ -148,7 +153,7 @@ function studentMessage() {
 function studentEmail() {
     var markArray = createStudentList();
     if (markArray.length != 0) {
-        document.getElementById("student-id").value = markArray;
+        document.getElementById("email").value = markArray;
         document.forms["gradebook-email-form"].submit();
     } else {
         var msg = "Select at least one student to send Email.";
@@ -177,11 +182,9 @@ function teacherMakeException() {
         CommonPopUp(msg);
     }
 }
-function chgfilter() {
-    var cat = document.getElementById("filtersel").value;
-    //var studentId = $("#student-id").val();
+function chgfilter(cat) {ata
     var courseId = $("#course-id").val();
-    //window.location = "gradebook?cid="+courseId+"&stu=0&catfilter=" + cat;
+    window.location = "gradebook?cid="+courseId+"&stu=0&catfilter=" + cat;
 }
 
 function createStudentList(){
@@ -192,21 +195,18 @@ function createStudentList(){
     return markArray;
 }
 
- function chgexport() {
+ function chgexport(type) {
      var courseId = $("#course-id").val();
      var studentId = $("#student-id").val();
- var type = document.getElementById("exportsel").value;
  if (type==1) { toopen = '&export=true';}
  if (type==2) { toopen =  '&emailgb=me';}
  	if (type==3) { toopen = '&emailgb=ask';}
  	if (type==0) { return false;}
-  	//window.location = toopen;
      window.location = "gradebook-export?cid="+courseId+"&stu="+studentId+toopen;
  }
 
-function updateColors(el) {
-    console.log(el);
-    //alert('a');
+function updateColors(el)
+{
     var courseId = $("#course-id").val();
     if (el.value==0) {
         var tds=document.getElementById("gradebook-table").getElementsByTagName("td");
@@ -221,7 +221,6 @@ function updateColors(el) {
 }
 
 function conditionalColor(table,type,low,high) {
-
 var tbl = document.getElementById(table);
 if (type==0) {  //instr gb view
     var poss = [];
@@ -298,8 +297,4 @@ if (type==0) {  //instr gb view
     }
 }
 
-}
-
-function hi(a){
-    alert(a);
 }

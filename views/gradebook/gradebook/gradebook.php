@@ -31,9 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     <a class="btn btn-primary dropdown-toggle green-carret" data-toggle="dropdown" href="#">
                         <span class="fa fa-caret-down"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#"> File</a></li>
-                        <li><a href="#"> My Email</a></li>
-                        <li><a href="#"> Other Email</a></li>
+                        <li><a href="javascript: chgexport(1)"> File</a></li>
+                        <li><a href="javascript: chgexport(2)"> My Email</a></li>
+                        <li><a href="javascript: chgexport(3)"> Other Email</a></li>
                     </ul>
                 </div>
             </div>
@@ -43,18 +43,16 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="item-detail-content">
     <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
 </div>
-<?php echo $this->render("_toolbarGradebook", ['course' => $course]); ?>
+<?php echo $this->render("_toolbarGradebook", ['course' => $course,'data' => $data]); ?>
 <div class="tab-content shadowBox"">
 <div class="inner-content-gradebook">
 <div class="button-container col-lg-12 padding-zero">
 
-    <span class="col-lg-4 padding-zero pull-left">Check: <a class="check-all" href="#">All</a>/<a class="uncheck-all" href="#">None</a>
-   <?php
-    if ($data['isDiagnostic']) { ?>
-     &nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-testing?cid='.$course->id);?>"> View diagnostic gradebook </a>
-   <?php } ?>
+    <span class="col-lg-7 padding-zero pull-left">
+ Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit
+    <sup>*</sup>Has feedback,<sub> d</sub>Dropped score,<sup> e</sup>Has exception,<sup> LP</sup>Used latepass
         </span>
-    <span class="inner-page-options col-lg-8 padding-zero pull-left">
+    <span class="inner-page-options col-lg-5 padding-zero pull-left">
         <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
             <li class="dropdown">
                  <?php echo '<select  class="form-control export-to-height" id="colorsel" onchange="updateColors(this)">';
@@ -77,15 +75,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown"
                    href="#"><?php AppUtility::t('Category'); ?><span class="caret right-aligned"></span></a>
-                <ul id="filtersel"  onchange='chgfilter()' class="dropdown-menu with-selected ">
-                    <?php
-echo "<li  value='1'><a>".AppUtility::t('All', false)."</a></li>";
-echo "<li  value='0'><a>".AppUtility::t('Default', false)."</a></li>";
-foreach($data['gbCatsData'] as $category){
-    echo "<li><a>".$category['name']."</a></li>";
-}
-echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
-?>
+                <ul id="filtersel" class="dropdown-menu with-selected ">
+ <li  value='1'><a  href="javascript: chgfilter(-1)" ><?php AppUtility::t('All') ?></a></li>
+ <li  value='0'><a href="javascript: chgfilter(0)"  ><?php AppUtility::t('Default') ?> </a></li>
+                    <?php foreach($data['gbCatsData'] as $category){ ?>
+     <li><a href="javascript: chgfilter(<?php echo $category['id']?>)"><?php echo $category['name']?></a></li>
+<?php } ?>
+ <li><a href="javascript: chgfilter(-2)"><?php AppUtility::t('Category Totals')?></a></li>
+
                 </ul>
             </li>
             <li class="dropdown">
@@ -98,7 +95,7 @@ echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
                     </li>
                     <li>
                         <form action="<?php echo AppUtility::getURLFromHome('roster', 'roster/roster-email?cid=' . $course->id . '&gradebook=1') ?>" method="post" id="gradebook-email-form">
-                            <input type="hidden" id="student-id" name="student-data" value=""/>
+                            <input type="hidden" id="email" name="student-data" value=""/>
                             <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
                             <a href="javascript: studentEmail()"><i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
                         </form>
@@ -145,18 +142,6 @@ echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
 
                 </ul>
             </li>
-
-
-
-
-
-            <li class="dropdown">
-                         <?php echo '<select  class="form-control export-to-height" id="exportsel" onchange="chgexport()">';
-                            echo '<option value="0">', _('Export to...'), '</option>';
-                            echo '<option value="1">', _('... file'), '</option>';
-                            echo '<option value="2">', _('... my email'), '</option>';
-                            echo '<option value="3">', _('... other email'), '</option></select>  '; ?>
-             </li>
         </ul>
     </span>
 </div><br/>
@@ -166,7 +151,6 @@ echo "<li><a>".AppUtility::t('Category Totals', false)."</a></li>";
     <table id="gradebook-table" class="gradebook-table table table-bordered table-striped table-hover data-table">
         <thead>
         <?php
-
 if ($data['availShow'] == 4) {
     $data['availShow'] = 1;
     $hidepast = true;
@@ -175,7 +159,6 @@ if ($avgontop) {
     $avgrow = array_pop($gradebook);
     array_splice($gradebook, 1, 0, array($avgrow));
 }
-
 $sortarr = array();
 for ($i = 0; $i < count($gradebook[0][0]); $i++) { //biographical headers
     if ($i == 1) {
@@ -202,8 +185,14 @@ for ($i = 0; $i < count($gradebook[0][0]); $i++) { //biographical headers
         }
         echo "</select>";
 
-    } else if ($gradebook[0][0][$i] == 'Name') {
-        echo '<br/><span class="small">N=' . (count($gradebook) - 2) . '</span><br/>';
+    } else if ($gradebook[0][0][$i] == 'Name') {?>
+        <div class="checkbox pull-left override-hidden">
+            <label>
+                <input type="checkbox" name="header-checked" value="">
+                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+            </label>
+        </div>
+        <?php echo '<br/><span class="small">N=' . (count($gradebook) - 2) . '</span><br/>';
     }
     echo '</div></th>';
     if ($gradebook[0][0][$i] == 'Last Login') {
@@ -392,10 +381,15 @@ for ($i = 1; $i < count($gradebook); $i++) {
         echo "<tr class=odd onMouseOver=\"highlightrow(this)\" onMouseOut=\"unhighlightrow(this)\">";
     }
     echo '<td class="locked" scope="row"><div class="trld">';
-    if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) {
-        echo "<input type=\"checkbox\" name='checked' value='{$gradebook[$i][4][0]}' />&nbsp;";
-    }
-    ?>
+    if ($gradebook[$i][0][0] != "Averages" && $data['isTeacher']) { ?>
+        <div class="checkbox override-hidden">
+            <label>
+                <input type="checkbox" name='checked' value='<?php echo $gradebook[$i][4][0] ?>'/>
+                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+            </label>
+        </div>
+    <?php
+    } ?>
     <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/grade-book-student-detail?cid='.$course->id.'&studentId='.$gradebook[$i][4][0])?>" >
 
     <?php
@@ -748,15 +742,10 @@ for ($i = 1; $i < count($gradebook); $i++) {
         </tbody>
     </table>
 </div>
-
-<p>Meanings: IP-In Progress (some unattempted questions), OT-overtime, PT-practice test, EC-extra credit, NC-no credit
-    <br>
-    <sup>*</sup>Has feedback,<sub> d</sub>Dropped score,<sup> e</sup>Has exception,<sup> LP</sup>Used latepass
-</p>
 </div>
 </div>
- <!-- jQuery -->
-<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js"></script>
+ <!-- jQuery --><!--
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js"></script-->>
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>

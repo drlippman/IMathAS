@@ -772,12 +772,11 @@ class RosterController extends AppController
             $emailSender = $this->getAuthenticatedUser();
             $isActionForEmail = isset($selectedStudents['isEmail']) ? $selectedStudents['isEmail'] : AppConstant::NUMERIC_ZERO;
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
-
             if (!$isActionForEmail) {
                 $course = Course::getById($courseId);
                 $assessments = Assessments::getByCourseId($courseId);
                 if ($selectedStudents['student-data'] != '') {
-                    $selectedStudents = explode(',', $selectedStudents['student-data']);
+                    $selectedStudents = array_unique(explode(',', $selectedStudents['student-data']));
                     $studentArray = array();
                     foreach ($selectedStudents as $studentId) {
                         $student = User::getById($studentId);
@@ -875,7 +874,7 @@ class RosterController extends AppController
         $this->layout = "master";
         $params = $this->getRequestParams();
         if(isset($params['lockinstead'])){
-            $toLock = explode(',', $params['studentData']);
+            $toLock = array_unique(explode(',', $params['studentData']));
             foreach ($toLock as $student) {
                 Student::updateLocked($student, $params['cid']);
             }
@@ -902,7 +901,7 @@ class RosterController extends AppController
         }
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $studentData = explode(',',$params['student-data']);
+        $studentData = array_unique(explode(',',$params['student-data']));
         $students = array();
         $delForumMsg = 0;
         $delWikiMsg = 0;
@@ -937,6 +936,7 @@ class RosterController extends AppController
     }
     public function actionRosterMessage()
     {
+
         if ($this->isPost()) {
             $this->guestUserHandler();
             $this->layout = "master";
@@ -948,7 +948,7 @@ class RosterController extends AppController
                 $course = Course::getById($courseId);
                 $assessments = Assessments::getByCourseId($courseId);
                 if ($selectedStudents['student-data'] != '') {
-                    $selectedStudents = explode(',', $selectedStudents['student-data']);
+                    $selectedStudents = array_unique(explode(',', $selectedStudents['student-data']));
                     $studentArray = array();
                     foreach ($selectedStudents as $studentId) {
                         $student = User::getById($studentId);
@@ -1057,7 +1057,7 @@ class RosterController extends AppController
             $courseId = $this->getParamVal('cid');
             $course = Course::getById($courseId);
             $assessments = Assessments::getByCourseId($courseId);
-            $studentList = explode(',', $data['student-data']);
+            $studentList = array_unique(explode(',', $data['student-data']));
             $studentArray = array();
             if ($this->isPost() || $data['student-data'] != "") {
                 $params = $this->getRequestParams();
@@ -1265,7 +1265,7 @@ class RosterController extends AppController
             $this->layout = "master";
             $selectedStudents = $this->getRequestParams();
             $isGradebook = $selectedStudents['gradebook'];
-            $selectedStudentId = explode(',', $selectedStudents['student-data']);
+            $selectedStudentId = array_unique(explode(',', $selectedStudents['student-data']));
             $courseId = isset($selectedStudents['course-id']) ? $selectedStudents['course-id'] : '';
             $course = Course::getById($courseId);
             $studentArray = array();

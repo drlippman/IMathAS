@@ -147,4 +147,18 @@ tr#quickadd td {
 .export-to-height
 {
     height: 42px !important;
+    /*width: 60% !important;*/
+}
+
+.drop-down-entity-width
+{
+    top: auto;
+    left: auto;
+    /*min-width: 80% !important;*/
+}
+.drop-down-entity-width-With-selected
+{
+    top: auto;
+    left: auto;
+    /*min-width: 72% !important;*/
 }

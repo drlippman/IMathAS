@@ -664,7 +664,7 @@ switch($action) {
                 echo "<td></td>";
             } else { ?>
              <td>
-                 <a href="#" onclick="deleteLtiUser(<?php echo $row['id']?>)"><?php AppUtility::t('Delete')?></a>
+                 <a href="javascript: deleteLtiUser(<?php echo $row['id']?>)">  <?php AppUtility::t('Delete')?></a>
              </td>
            <?php } ?>
              </tr>

@@ -584,7 +584,7 @@ function sendtoall(w,type) {
     }
     if (type==2 && w==1 && document.getElementById("toallfeedback").value == "" )
     {
-        var html ='<div><p> "Text" field should not be empty.</p></div>';
+        var html ='<div><p> Are you sure, You want to remove all feedback?</p></div>';
         $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
             modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
             width: 'auto', resizable: false,
@@ -629,8 +629,8 @@ function sendtoall(w,type) {
             if (document.getElementById("toallgrade").value.match(/\d/)) {
                 if (el.type=="text" && el.id.match(/score/)) {
                     if (type==0) { el.value = doonblur(el.value+'+'+document.getElementById("toallgrade").value);}
-                    else if (type==1) { el.value =  el.value * document.getElementById("toallgrade").value}
-                    else if (type==2) { el.value = document.getElementById("toallgrade").value;}
+                    else if (type==1) { el.value =  el.value * doonblur(document.getElementById("toallgrade").value)}
+                    else if (type==2) { el.value = doonblur(document.getElementById("toallgrade").value)}
                 }
             } else if (document.getElementById("toallgrade").value == "") {
                 if (el.type=="text" && el.id.match(/score/) && type==2) {
