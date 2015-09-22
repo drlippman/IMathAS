@@ -67,7 +67,7 @@ class CourseItemsUtility extends Component
 
             <div class="title">
                 <b>
-                    <a href="<?php echo AppUtility::getURLFromHome('question', 'question/show-test?id=' . $assessment->id . '&cid=' . $course->id) ?>"
+                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id . '&cid=' . $course->id) ?>"
                        class="confirmation-require assessment-link"
                        id="<?php echo $assessment->id ?>"><?php echo ucfirst($assessment->name) ?></a>
                 </b><br>

@@ -215,5 +215,6 @@ class AppConstant
     const USE_GROUP_SET = 'Use group set';
     const NO_FORUM_SELECTED = 'No forums are selected to be changed';
     const FORUM_UPDATED = 'Forums data changes successfully';
-
+    const UNASSIGNED = 'Unassigned';
+    const TABLE_HEADER_LIB = "<th>Library</th>";
 }

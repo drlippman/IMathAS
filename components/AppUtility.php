@@ -13,6 +13,7 @@ use app\models\Sessions;
 use app\models\User;
 use Yii;
 use yii\base\Component;
+use app\models\Links;
 
 require_once("../filter/filter.php");
 
@@ -612,7 +613,7 @@ class AppUtility extends Component
         $mathfuncs = array("sin", "cos", "tan", "sinh", "cosh", "tanh", "arcsin", "arccos", "arctan", "arcsinh", "arccosh", "sqrt", "ceil", "floor", "round", "log", "ln", "abs", "max", "min", "count");
         $allowedmacros = $mathfuncs;
         $introdividers = array();
-        include("displayq2.php");
+        include("displayQuestion.php");
         include("testutil.php");
         include("asidutil.php");
         $isTeacher = false;
@@ -1182,7 +1183,7 @@ class AppUtility extends Component
             $scoredtype = 'last';
             $scoredview = false;
         }
-        include("displayq2.php");
+        include("displayQuestion.php");
         include("testutil.php");
         $flexwidth = true; //tells header to use non _fw stylesheet
         if ($scoredview) {

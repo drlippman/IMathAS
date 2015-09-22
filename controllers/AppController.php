@@ -267,6 +267,7 @@ class AppController extends Controller
                 if ((time()-$haveSession['time'])>AppConstant::MAX_SESSION_TIME && (!isset($params) || count($params)==AppConstant::NUMERIC_ZERO)) {
                     Sessions::deleteSession($userId);
                     unset($userId);
+                    $this->setErrorFlash('You need to login again');
                 }
             } else {
                 $sessionData['useragent'] = $_SERVER['HTTP_USER_AGENT'];
