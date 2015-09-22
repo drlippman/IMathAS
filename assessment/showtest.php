@@ -154,7 +154,7 @@
 			if ($pwfail) {
 				require("../header.php");
 				if (!$isdiag && strpos($_SERVER['HTTP_REFERER'],'treereader')===false && !(isset($sessiondata['ltiitemtype']) && $sessiondata['ltiitemtype']==0)) {
-					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">{$sessiondata['coursename']}</a> ";
+					echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid={$_GET['cid']}\">$coursename</a> ";
 					echo '&gt; ', _('Assessment'), '</div>';
 				}
 				echo $out;
