@@ -70,7 +70,7 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
 ?>
             <br/><div class="col-lg-2"><?php AppUtility::t('Tool Name')?></div>
             <div class="col-lg-10">
-                <input class="form-control-1" required="Please fill out this field" maxlength="40" size="40" type="text" name="tname" value="<?php echo $name;?>" />
+                <input class="form-control-1" required="Please fill out this field" maxlength="30" size="40" type="text" name="tname" value="<?php echo $name;?>" />
             </div>
             <br class="form" /><br/>
 
@@ -143,7 +143,6 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
                     <input type="hidden" id="id" value="<?php echo $row['nm']?>">
                  <?php
                     echo ' <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id']).'>Edit</a> ';
-//                    echo '| <a href='.AppUtility::getURLFromHome('admin', 'admin/external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$row['id'].'&amp;delete=ask').'>Delete</a>';
                     $ExternalToolId = $row['id'];
                     $cid = $courseId.$ltfrom;?>
                     <input type="hidden" id="admin" value="<?php echo $cid?>">
@@ -176,10 +175,11 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
         if(response.status == 0)
         {
             var message ='';
-            message+='Are you SURE you want to delete the tool <b>'+name+'</b>? Doing so will break ALL placements of this tool';
+            message+='Are you SURE you want to delete the tool <b>'+name+'</b>? <BR/>';
+            message+='Doing so will break ALL placements of this tool';
             var html = '<div><p>'+message+'</p></div>';
             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-                modal: true, title: 'Delete student group set', zIndex: 10000, autoOpen: true,
+                modal: true, title: 'Delete External Tool', zIndex: 10000, autoOpen: true,
                 width: 'auto', resizable: false,
                 closeText: "hide",
                 buttons:
