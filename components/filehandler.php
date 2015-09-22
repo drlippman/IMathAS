@@ -547,12 +547,16 @@ public static function deletecoursefile($file) {
 			return false;
 		}
 	} else {
-		$base = AppConstant::UPLOAD_DIRECTORY;
-		if (unlink($base."$file")) {
-			return true;
-		} else {
-			return false;
-		}
+
+        $base = AppConstant::UPLOAD_DIRECTORY;
+        if(file_exists($base)){
+            if (unlink($base."$file")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
 	}
 }
 public static function deleteqimage($file) {

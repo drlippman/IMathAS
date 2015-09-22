@@ -63,6 +63,7 @@ class LibraryItems extends BaseImasLibraryItems
                 $singleItem->delete();
             }
         }
+        return $data;
     }
 
     public static function getByQid($qSetId){
@@ -119,7 +120,9 @@ class LibraryItems extends BaseImasLibraryItems
     public static function getQueSetId($id)
     {
         $query = new Query();
-        $query ->select(['qsetid'])->from('imas_library_items')->where(['id' => $id]);
+        $query ->select(['qsetid'])
+            ->from('imas_library_items')
+            ->where(['id' => $id]);
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
@@ -268,7 +271,46 @@ class LibraryItems extends BaseImasLibraryItems
         {
             $query .= "AND imas_questionset.id NOT IN ($clist);";
         }
-        AppUtility::dump($query);
         return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getQSetId($lib)
+    {
+        return LibraryItems::find()->select('qsetid')->where(['libid' => $lib])->all();
+    }
+
+    public static function getByLibIdWithLimit($lib, $offset)
+    {
+        $query = "SELECT qsetid FROM imas_library_items WHERE libid='$lib' LIMIT $offset,1";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getByLibItem($groupid, $qsetid, $lib)
+    {
+        $query = "SELECT imas_library_items FROM imas_library_items,imas_users WHERE ";
+        $query .= "imas_library_items.ownerid=imas_users.id AND imas_users.groupid='$groupid' AND ";
+        $query .= "imas_library_items.qsetid='$qsetid' AND imas_library_items.libid='$lib'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+    public static function deleteLib($qsetid,$lib,$isadmin,$userid)
+    {
+        $query = "DELETE FROM imas_library_items WHERE qsetid='$qsetid' AND libid='$lib'";
+        if (!$isadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+      return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getByQSetANDLibAndUId($lib,$qsetid)
+    {
+        $query = new Query();
+        $query ->select(['imas_library_items.ownerid', 'imas_users.groupid'])
+            ->from('imas_library_items, imas_users')
+            ->where('imas_library_items.ownerid=imas_users.id');
+        $query->andWhere(['imas_library_items.libid'=> $lib]);
+        $query->andWhere(['imas_library_items.qsetid' => $qsetid]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
     }
 }

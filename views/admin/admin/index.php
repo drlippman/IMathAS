@@ -82,7 +82,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=transfer&cid='.$page_courseList[$i]['id']);?>"><i class="fa fa-exchange"></i>&nbsp;Transfer</a>
                             </li>
                             <li>
-                                <a href='<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?>'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>
+                                <?php $CourseID = $page_courseList[$i]['id'];?>
+                                <a href='javascript:deleteCourse(<?php echo $CourseID?>)'><i class='fa fa-trash-o'></i>&nbsp;Delete</a>
+<!--                                <a href='--><?php //echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?><!--'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>-->
                             </li>
                         </ul>
                     </div>
@@ -199,7 +201,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             <i class="fa fa-pencil"></i> Modify</a><a class='btn btn-primary dropdown-toggle' id='drop-down-id' data-toggle='dropdown' href='#'><span class='fa fa-caret-down'></span></a>
                         <ul class='dropdown-menu'>
                             <li>
-                                <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=removediag&id='.$page_diagnosticsId[$i]);?>"><i class='fa fa-trash-o'></i>&nbsp;Remove</a>
+                               <?php $diagnoId = $page_diagnosticsId[$i];?>
+                                <a href='javascript:deleteDiagnostics(<?php echo $diagnoId?>)'><i class='fa fa-trash-o'></i>&nbsp;Remove</a>
                             </li>
                             <li>
                                 <a  href="<?php echo AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id='.$page_diagnosticsId[$i])?>"><i class="fa fa-key"></i>&nbsp;One-time Passwords</a>
@@ -228,8 +231,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <th>Rights</th>
                 <th>Last Login</th>
                 <th>Settings</th>
-<!--                <th>Password</th>-->
-<!--                <th>Delete</th>-->
             </tr>
             </thead>
             <tbody class="">
@@ -257,6 +258,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <a href="<?php echo AppUtility::getURLFromHome('site', 'change-password?id='.$page_userDataId[$i]) ?>">Reset</a>
                                 </li>
                                 <li>
+
                                     <a href="#">Delete</a>
                                 </li>
                             </ul>
@@ -348,4 +350,95 @@ $this->params['breadcrumbs'][] = $this->title;
                window.location='index?showcourses='+uid;
            }
      }
+
+    function deleteDiagnostics(diagnoId)
+    {
+        jQuerySubmit('delete-diagnostics-ajax', {diagnoId:diagnoId},'removeResponseSuccess');
+    }
+
+     function removeResponseSuccess(response)
+     {
+         response = JSON.parse(response);
+         var id = response.data.id;
+
+         if(response.status == 0)
+         {
+             var message ='';
+             message+='Are you sure you want to delete this diagnostic?'+'<br>';
+             message+='This does not delete the connected course and does not remove students or their scores.';
+             var html = '<div><p>'+message+'</p></div>';
+             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                 modal: true, title: 'Remove Diagnostics', zIndex: 10000, autoOpen: true,
+                 width: 'auto', resizable: false,
+                 closeText: "hide",
+                 buttons:
+                 {
+                     "Nevermind": function ()
+                     {
+                         $(this).dialog('destroy').remove();
+                         return false;
+                     },
+                     "Yes,Delete": function ()
+                     {
+                         window.location ="actions?action=removediag&id="+id;
+                     }
+                 },
+                 close: function (event, ui) {
+                     $(this).remove();
+                 },
+                 open: function(){
+                     jQuery('.ui-widget-overlay').bind('click',function(){
+                         jQuery('#dialog').dialog('close');
+                     })
+                 }
+             });
+         }
+     }
+
+    function deleteCourse(courseID)
+    {
+        jQuerySubmit('delete-course-ajax',{id:courseID}, 'removeSuccess')
+    }
+
+     function removeSuccess(response)
+     {
+         console.log(response);
+         response = JSON.parse(response);
+         var id = response.data.id;
+         var name = response.data.name;
+
+         if(response.status == 0)
+         {
+             var message ='';
+             message+='Are you sure you want to delete the course<b>'+name+'</b>'+'<br>';
+             var html = '<div><p>'+message+'</p></div>';
+             $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+                 modal: true, title: 'Remove Course', zIndex: 10000, autoOpen: true,
+                 width: 'auto', resizable: false,
+                 closeText: "hide",
+                 buttons:
+                 {
+                     "Nevermind": function ()
+                     {
+                         $(this).dialog('destroy').remove();
+                         return false;
+                     },
+                     "Yes,Delete": function ()
+                     {
+                         window.location ="actions?action=delete&id="+id;
+                     }
+                 },
+                 close: function (event, ui) {
+                     $(this).remove();
+                 },
+                 open: function(){
+                     jQuery('.ui-widget-overlay').bind('click',function(){
+                         jQuery('#dialog').dialog('close');
+                     })
+                 }
+             });
+         }
+
+     }
+
 </script>

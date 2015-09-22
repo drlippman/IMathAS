@@ -573,7 +573,6 @@ margin-top: 7px;
     min-width: 90%;
 }
 
-
 div.insblock {
     background: #ccf;
     margin-top: 5px;
@@ -596,5 +595,21 @@ div.vidsegblock
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.tile_div a {
+    display: block;
+    float: left;
+    height: 35px;
+    width: 130px;
+    margin-right: 10px;
+    background-color: #104e87;
+    color: #fff;
+    text-align: center;
+    line-height: 35px;
+    text-decoration: none;
+}
+.title_div a.last {
+    margin-right: 0;
 }
 

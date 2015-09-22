@@ -514,7 +514,13 @@ class AdminController extends AppController
         'page_selectLabelList' => $page_selectLabelList, 'page_selectedOption' => $page_selectedOption, 'sel2list' => $sel2list, 'aidlist' => $aidlist);
         return $this->renderWithData('diagnostics', $responseData);
     }
-
+    public function actionDeleteDiagnosticsAjax()
+    {
+        $params = $this->getRequestParams();
+        $id = $params['diagnoId'];
+        $responseData = array('id' => $id);
+        return $this->successResponse($responseData);
+    }
    public function actionExternalTool()
    {
        $this->guestUserHandler();
@@ -607,8 +613,7 @@ class AdminController extends AppController
        {
            if (isset($params['delete']))
            {
-//               $extTool = ExternalTools::getById($id);
-//               $nameOfExtTool = $extTool['name'];
+
            } else if (isset($_GET['id']))
            {
                if ($params['id'] == 'new')
@@ -799,7 +804,15 @@ class AdminController extends AppController
             'ltisecret' => $ltisecret, 'defstimedisp' => $defstimedisp, 'deftimedisp' => $deftimedisp,'assessment' => $assessment, 'enablebasiclti' => $enablebasiclti, 'installname' => $installname, 'queryUser' => $queryUser);
         return $this->renderWithData('forms',$responseData);
     }
-
+    public function actionDeleteCourseAjax()
+    {
+        $params = $this->getRequestParams();
+        $id = $params['id'];
+        $course = Course::getById($params['id']);
+        $name = $course['name'];
+        $responseData = array('name' => $name,'id' => $id);
+        return $this->successResponse($responseData);
+    }
     public function actionActions()
     {
         $params = $this->getRequestParams();
@@ -991,8 +1004,10 @@ class AdminController extends AppController
                             foreach($result as $key1 => $row) {
                                 $safefn = $row['filename'];
                                 $r2 = InstrFiles::getIdName($safefn);
-                                if (count($r2) == 1) {
-                                    filehandler::deletecoursefile($row['filename']);
+                                if($r2) {
+                                    if (count($r2) == 1) {
+                                        filehandler::deletecoursefile($row['filename']);
+                                    }
                                 }
                             }
                             InstrFiles::deleteByItemId($ilid['id']);
@@ -1066,7 +1081,7 @@ class AdminController extends AppController
                         if ($handle) {
                             while (!feof($handle)) {
                                 $buffer = fgets($handle, 4096);
-                                if (strpos($buffer,"//")===0) {
+                                if (strpos($buffer,"//") === 0) {
                                     $trimmed = trim(substr($buffer,2));
                                     if ($trimmed{0}!='<' && substr($trimmed,-1)!='>')
                                     {
@@ -3373,5 +3388,283 @@ class AdminController extends AppController
         $responseData = array('myRights' => $myRights, 'isTeacher' => $isTeacher, 'overWriteBody' => $overWriteBody, 'body' => $body, 'params' => $params, 'cid' => $cId, 'search' => $search, 'searchlibs' => $searchlibs, 'page_pChecked' => $page_pChecked, 'lnames' => $lnames,
         'page_hasSearchResults' => $page_hasSearchResults, 'checked' => $checked, 'page_nChecked' => $page_nChecked);
         return $this->renderWithData('exportQuestionSet', $responseData);
+    }
+
+    public function actionReviewLibrary()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+//        $this->layout = 'master';
+        $userId = $user->id;
+        $myRights = $user['rights'];
+        $groupId= $user['groupid'];
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        $params = $this->getRequestParams();
+        $courseId = $params['cid'];
+        $isTeacher = $this->isTeacher($userId, $courseId);
+        $overwriteBody = AppConstant::NUMERIC_ZERO;
+        $body = "";
+        $pageTitle = "Review Library";
+        $page_updatedMsg = "";
+
+        if($myRights < AppConstant::TEACHER_RIGHT)
+        {
+            $overwriteBody = AppConstant::NUMERIC_ONE;
+        } else
+        {
+            if (isset($params['source']))
+            {
+                $source = $params['source'];
+            } else
+            {
+                $source = AppConstant::NUMERIC_ZERO;
+            }
+
+            if ($params['cid'] === "admin")
+            {
+                if ($myRights == AppConstant::ADMIN_RIGHT) {
+                    $isAdmin = true;
+                } else if ($myRights == AppConstant::GROUP_ADMIN_RIGHT) {
+                    $isGrpAdmin = true;
+                }
+            } else if ($params['cid'] == AppConstant::NUMERIC_ZERO)
+            {
+                /*
+                 * handling breadcrumb
+                 */
+            } else
+            {
+                /*
+                 * handling breadcrumb
+                 */
+            }
+            $sessionId = $this->getSessionId();
+            $sessionData = $this->getSessionData($sessionId);
+            Sessions::setSessionId($sessionId,$sessionData);
+
+            if (!isset($_REQUEST['lib']))
+            {
+                if (isset($sessiondata['lastsearchlibs']))
+                {
+                    $inlibs = $sessiondata['lastsearchlibs'];
+                } else
+                {
+                    $inlibs = '0';
+                }
+                if (substr($inlibs,0,1) == '0')
+                {
+                    $lnames[] = "Unassigned";
+                }
+                $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
+                $result = Libraries::getByNameList($inlibs);
+                foreach($result as $key => $row)
+                {
+                    $lnames[] = $row['name'];
+                }
+                $lnames = implode(", ",$lnames);
+            }  else {
+
+                $lib = $_REQUEST['lib'];
+                if (isset($params['offset'])) {
+                    $offset = $params['offset'];
+                } else {
+                    $offset = AppConstant::NUMERIC_ZERO;
+                }
+                $result = LibraryItems::getQSetId($lib);
+                $cnt = count($result);
+                if ($cnt == AppConstant::NUMERIC_ZERO) {
+                    $overwriteBody = AppConstant::NUMERIC_ONE;
+                    $body = "Library empty";
+                }
+
+                $resultLibLimit = LibraryItems::getByLibIdWithLimit($lib, $offset);
+                $qSetId = $resultLibLimit[0]['qsetid'];
+
+                /*
+                 * delete selected question
+                 */
+                if (isset($params['remove']) || isset($params['delete']))
+                {
+                    if (!isset($params['confirm']))
+                    {
+                        if (isset($params['remove']))
+                        {
+                            $page_ConfirmMsg = "<p>Are you SURE you want to remove this question from this library?</p><input type=hidden name=remove value=1>";
+                        }
+                        if (isset($_POST['delete'])) {
+                            $page_ConfirmMsg = "<p>Are you SURE you want to delete this question?  Question will be removed from ALL libraries.</p><input type=hidden name=delete value=1>";
+                        }
+                    } else
+                    {
+                        if (isset($params['delete']))
+                        {
+                            if ($isGrpAdmin)
+                            {
+                                $result = QuestionSet::getQSetAndUserData($qSetId,$groupId);
+                                if (count($result) > AppConstant::NUMERIC_ZERO)
+                                {
+                                    $result = new QuestionSet();
+                                    $deleteQSetId = $result->updateId($qSetId);
+                                    if ($deleteQSetId > AppConstant::NUMERIC_ZERO)
+                                    {
+                                        LibraryItems::deleteByQsetId($qSetId);
+                                        $cnt--;
+                                    }
+                                }
+                            } else {
+
+                                $result = QuestionSet::updateInAdmin($qSetId,$isAdmin, $userId);
+                                if ($result > AppConstant::NUMERIC_ZERO)
+                                {
+                                    LibraryItems::deleteByQsetId($qSetId);
+                                    $cnt--;
+                                }
+                            }
+                        }
+                        if (isset($params['remove'])) {
+                            $madeChange = false;
+                            if ($isGrpAdmin)
+                            {
+                                $result = LibraryItems::getByLibItem($groupId, $qSetId, $lib);
+                                if (count($result) > AppConstant::NUMERIC_ZERO) {
+                                    $result = LibraryItems::deleteLibraryItems($lib,$qSetId);
+                                    if ($result > AppConstant::NUMERIC_ZERO) {
+                                        $madeChange = true;
+                                    }
+                                }
+
+                            }
+                            else {
+                                $result = LibraryItems::deleteLib($qSetId,$lib,$isAdmin,$userId);
+                                if ($result > AppConstant::NUMERIC_ZERO) {
+                                    $madeChange = true;
+                                }
+                            }
+                            if ($madeChange)
+                            {
+                                $result = LibraryItems::getIdByQid($qSetId);
+                                if (count($result) == AppConstant::NUMERIC_ZERO)
+                                {
+                                    $tempLibArray['libid'] = AppConstant::NUMERIC_ZERO;
+                                    $tempLibArray['qsetid'] = $qSetId;
+                                    $tempLibArray['userid'] = $userId;
+                                    $library = new LibraryItems();
+                                    $library->createLibraryItems($tempLibArray);
+                                }
+                                $cnt--;
+                            }
+                        }
+
+                        if ($offset == $cnt)
+                        { /*
+                            Just deleted last problem in library
+                           */
+                            if ($offset == AppConstant::NUMERIC_ZERO)
+                            { /*
+                                if already on first question
+                              */
+                                $overwriteBody = AppConstant::NUMERIC_ONE;
+                                $body = "Library empty";
+                            } else {
+                            /*
+                             * go back to last question
+                             */
+                                $offset--;
+                            }
+                        }
+                        $resultLibLimit = LibraryItems::getByLibIdWithLimit($lib, $offset);
+                        $qSetId = $resultLibLimit[0]['qsetid'];
+                    }
+                }
+                elseif (isset($params['update'])) {
+                    $params['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
+                    $params['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
+                    $params['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
+                    $params['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
+                    $now = time();
+
+                    if ($isGrpAdmin)
+                    {
+                        $result = QuestionSet::getByOrUserId($qSetId,$groupId);
+                        if (count($result) > AppConstant::NUMERIC_ZERO)
+                        {
+                            $result = QuestionSet::updateQSetId($params,$now,$qSetId);
+                        }
+                    } else {
+
+                        $result = QuestionSet::updateQSetAdmin($params,$now,$qSetId,$isAdmin,$userId);
+                    }
+                    $page_updatedMsg = "Question Updated. ";
+                }
+
+                /*
+                 * Default Display
+                 */
+                if ($offset > AppConstant::NUMERIC_ZERO)
+                {
+                    $last = $offset -1;
+                    $page_lastLink =  "<a href=\"review-library?cid=$courseId&source=$source&offset=$last&lib=$lib\">Last</a> ";
+                } else {
+                    $page_lastLink = "Last ";
+                }
+
+                if ($offset < $cnt-1)
+                {
+                    $next = $offset +1;
+                    $page_nextLink = "<a href=\"review-library?cid=$courseId&source=$source&offset=$next&lib=$lib\">Next</a>";
+                } else {
+                    $page_nextLink = "Next";
+                }
+
+                $row = LibraryItems::getByQSetANDLibAndUId($lib,$qSetId);
+                $myLib = (intval($row['ownerid']) == $userId);
+                if ($isAdmin || ($isGrpAdmin && intval($row['groupid']) == $groupId)) {
+                    $myLib = true;
+                }
+                $lineQSet = QuestionSet::getByUIdQSetId($qSetId);
+                $myQ = (intval($lineQSet['ownerid']) == $userId);
+
+                if ($isAdmin || ($isGrpAdmin && intval($lineQSet['groupid']) == $groupId) || $lineQSet['userights'] == AppConstant::NUMERIC_FOUR)
+                {
+                    $myQ = true;
+                }
+                $page_deleteForm = "";
+                if ($myQ || $myLib)
+                {
+                    $page_deleteForm .= "<form method=post action=\"review-library?cid=$courseId&source=$source&offset=$offset&lib=$lib\">\n";
+                    if ($myQ) {$page_deleteForm .=  "<input type=submit name=delete value=\"Delete\">\n";}
+                    if ($myLib) {$page_deleteForm .=  "<input type=submit name=remove value=\"Remove from Library\">\n";}
+                    $page_deleteForm .=  "</form>\n";
+                }
+                $seed = rand(0,10000);
+                require("../components/displayQuestion.php");
+                if (isset($params['seed']))
+                {
+
+                    list($score,$rawscores) = scoreq(0,$qSetId,$params['seed'],$params['qn0']);
+                    $page_lastScore = "<p>Score on last answer: $score/1</p>\n";
+                }
+                $twobx = ($lineQSet['qcontrol']=='' && $lineQSet['answer']=='');
+
+                if (!$myQ) {
+                    $page_canModifyMsg = "<p>This question is not set to allow you to modify the code.  You can only view the code and make additional library assignments</p>";
+                }
+                if (isset($CFG['AMS']['showtips'])) {
+                    $showtips = $CFG['AMS']['showtips'];
+                } else {
+                    $showtips = AppConstant::NUMERIC_ONE;
+                }
+            }
+
+        }
+        if ($showtips == AppConstant::NUMERIC_TWO)
+        {
+            $this->includeJS(['eqntips.js']);
+        }
+        $this->includeJS(['AMhelpers_min.js']);
+        $responseData = array('params' => $params,'inlibs' => $inlibs, 'source' => $source, 'cid' => $courseId, 'lnames' => $lnames, 'lib' => $lib, 'page_ConfirmMsg' => $page_ConfirmMsg, 'offset' => $offset, 'page_updatedMsg' => $page_updatedMsg, 'page_lastLink' => $page_lastLink, 'page_nextLink' => $page_nextLink,
+        'qsetid' => $qSetId, 'lineQSet' => $lineQSet, 'page_deleteForm' => $page_deleteForm, 'page_lastScore' => $page_lastScore, 'seed' => $seed, 'page_canModifyMsg' => $page_canModifyMsg, 'myq' => $myQ, 'twobx' => $twobx, 'overwriteBody' => $overwriteBody);
+        return $this->renderWithData('reviewLibrary', $responseData);
     }
 }

@@ -24,7 +24,15 @@ $now = $currentTime;
         </div>
         <div class="pull-left header-btn">
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
-               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting</a>
+               class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
+            </a>
+            <div class="tile_div">
+                <a href="#">Instructor</a>
+                <a href="#">Student</a>
+                <a href="#" class="last">Quick Rearrange</a>
+                <div class="clear"></div>
+            </div>
+<!--           <a class="btn btn-primary pull-right page-settings padding-right-ten" href="--><?php //echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?><!--">--><?php //AppUtility::t('Student view');?><!--</a>-->
         </div>
     </div>
 </div>
@@ -40,9 +48,7 @@ $now = $currentTime;
         <div class="col-md-2 course-top-menu">
             <a href="#"><?php AppUtility::t('Export');?></a>
         </div>
-<!--        <div class="col-md-2 course-top-menu">-->
-<!--            <a href="--><?php //echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?><!--">--><?php //AppUtility::t('Student view');?><!--</a>-->
-<!--        </div>-->
+
         <ul class="nav roster-menu-bar-nav sub-menu col-md-2">
             <li class="dropdown">
                 <a class="dropdown-toggle grey-color-link" data-toggle="dropdown" href="#"><?php AppUtility::t('Mass Change'); ?>

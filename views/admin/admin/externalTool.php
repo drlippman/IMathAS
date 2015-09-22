@@ -189,7 +189,7 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
                         $(this).dialog('destroy').remove();
                         return false;
                     },
-                    "Yes,Delete": function ()
+                    "Delete": function ()
                     {
                         window.location ="external-tool?cid="+cid+"&id="+id+"&delete=true";
                     }

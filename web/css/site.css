@@ -643,11 +643,11 @@ img.small-icon{
     vertical-align: middle;
 }
 .page-heading{
-    width: 60%;
+    width: 50%;
 }
 
 .header-btn{
-    width: 40%;
+    width: 50%;
 }
 .btn.btn-primary.page-settings{
     color: #FFF;
@@ -1162,3 +1162,7 @@ div.review {
 .padding-right{
     padding-right: 15px;
 }
+
+/*view > a:active{*/
+    /*background-color: #104e87;*/
+/*}*/

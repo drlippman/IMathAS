@@ -645,4 +645,58 @@ class QuestionSet extends BaseImasQuestionset
         $query .= " AND (control LIKE '%includecodefrom%' OR qtext LIKE '%includeqtextfrom%')";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
+    public static function updateId($qlist)
+    {
+       $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qlist'";
+       return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function updateInAdmin($qsetid,$isadmin, $userid)
+    {
+        $query = "UPDATE imas_questionset SET deleted=1 WHERE id='$qsetid'";
+        if (!$isadmin) {
+            $query .= " AND ownerid='$userid'";
+        }
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getByOrUserId($qsetid,$groupid)
+    {
+        $query = "SELECT iq.id FROM imas_questionset AS iq,imas_users ";
+        $query .= "WHERE iq.id='$qsetid' AND iq.ownerid=imas_users.id AND (imas_users.groupid='$groupid' OR iq.userights>3)";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function updateQSetId($params,$now,$qSetId){
+        $query = "UPDATE imas_questionset SET description='{$params['description']}',";
+        $query .= "qtype='{$params['qtype']}',control='{$params['control']}',qcontrol='{$params['qcontrol']}',";
+        $query .= "qtext='{$params['qtext']}',answer='{$params['answer']}',lastmoddate=$now ";
+        $query .= "WHERE id='$qSetId'";
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function updateQSetAdmin($params,$now,$qSetId,$isadmin,$userid)
+    {
+        $query = "UPDATE imas_questionset SET description='{$params['description']}',";
+        $query .= "qtype='{$params['qtype']}',control='{$params['control']}',qcontrol='{$params['qcontrol']}',";
+        $query .= "qtext='{$params['qtext']}',answer='{$params['answer']}',lastmoddate=$now ";
+        $query .= "WHERE id='$qSetId'";
+        if (!$isadmin)
+        {
+            $query .= " AND (ownerid='$userid' OR userights>3);";
+        }
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getByUIdQSetId($qsetid)
+    {
+        $query = new Query();
+        $query ->select(['imas_questionset.*', 'imas_users.groupid'])
+            ->from('imas_questionset, imas_users')
+            ->where('imas_questionset.ownerid=imas_users.id');
+        $query->andWhere(['imas_questionset.id' => $qsetid]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }

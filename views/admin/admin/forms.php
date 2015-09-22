@@ -890,11 +890,6 @@ switch($action) {
         </div>
         <?php break;
     case "removediag":
-        if ($myRights < 60)
-        {
-            echo "You don't have the authority for this action";
-            break;
-        }
         echo '<div class=""><br>';
         echo "<div class='col-lg-10'>Are you sure you want to delete this diagnostic?  This does not delete the connected course and does not remove students or their scores.</div><br>\n";
         echo "<br> <div class='col-lg-6 padding-left-zero'><div class='col-lg-2'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=removediag&id={$params['id']}'\"></div>\n";
@@ -904,3 +899,5 @@ switch($action) {
 }
 ?>
      </div>
+
+

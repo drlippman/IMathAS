@@ -200,7 +200,6 @@ class ExternalTools extends BaseImasExternalTools
             $courseData->delete();
         }
     }
-
     public static function getExternalToolName($id)
     {
         $query = new Query();
