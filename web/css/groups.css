@@ -77,3 +77,8 @@ input[type="submit"]:focus, button:focus, input[type="button"]:hover, a.abutton:
 {
     margin-left: 122px;
 }
+.stu-list
+{
+    margin-left: -2px!important;
+}
+

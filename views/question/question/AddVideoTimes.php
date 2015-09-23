@@ -13,9 +13,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="item-detail-header">
     <?php if($params['cid'] == "admin"){ ?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'ManageQuestionSet'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/manage-question-set?cid=admin'] ,'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'ManageQuestionSet'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseId.'&aid='.$params['aid'] ,AppUtility::getHomeURL().'question/question/manage-question-set?cid=admin'] ,'page_title' => $this->title]);?>
     <?php } else{ ?>
-        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseIdadmin,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$aid] ,'page_title' => $this->title]); ?>
+        <?php echo $this->render("../../itemHeader/_indexWithLeftContent",['link_title'=>['Home',$cname,'Add/Remove Question'], 'link_url' => [AppUtility::getHomeURL().'site/index',AppUtility::getHomeURL().'instructor/instructor/index?cid='.$courseIdadmin,AppUtility::getHomeURL().'question/question/add-questions?cid='.$courseId.'&aid='.$aid] ,'page_title' => $this->title]);?>
     <?php }?>
 </div>
 <div class = "title-container">
@@ -47,8 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             for ($i=0;$i<$n;$i++)
             {
                 echo '<div class="insblock" id="insat'.$i.'">';
-                echo '<a href="#" onclick="addsegat('.$i.'); return false;">Add video segment break</a></div>';
-
+                echo '<a href="javascript:void(0)" onclick="addsegat('.$i.'); return false;">Add video segment break</a></div>';
                 if (isset($qn[$i]))
                 {
                     echo '<div class="vidsegblock">';
@@ -59,9 +58,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<input type="hidden" name="qn'.$i.'" value="'.$qn[$i].'"/>';
                     echo '<br/>';
                     echo 'Has followup? <input type="checkbox" name="hasfollowup'.$i.'" value="1" ';
-                    if ($hasFollowUp[$i]) {
+                    if ($hasFollowUp[$i])
+                    {
                         echo 'checked="checked" onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'">';
-                    } else {
+                    }
+                    else
+                    {
                         echo ' onclick="updatefollowup('.$i.',this);" /> <span id="followupspan'.$i.'" style="display:none;">';
                     }
                     echo 'Followup title: <input class="seg-title" type="text" size="20" name="followuptitle'.$i.'" value="'.$followUpTitle[$i].'"/> ';
@@ -80,12 +82,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo '<div class="vidsegblock">';
                     echo 'Segment title: <input class="seg-title" type="text" size="20" name="segtitle'.$i.'" value="'.$title[$i].'"/> ';
                     echo 'Ends at: <input class="seg-title" type="text" size="4" name="segend'.$i.'" id="segend'.$i.'" value="'.$endTime[$i].'"/> ';
-                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
+                    echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a></div>';
                 }
             }
             echo '<div class="insblock" id="insat'.$n.'">';
-            echo '<a href="#" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
-
+            echo '<a href="javascript:void(0)" onclick="addsegat('.$n.'); return false;">Add video segment break</a></div>';
             echo '<div class="vidsegblock">';
             echo 'Remainder of video segment title (if any): <input class="seg-title" type="text" size="20" name="finalseg" value="'.$finalSegTitle.'"/></div>';
             echo '<p><input type="submit" value="Submit"/></p>';
@@ -93,7 +94,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
     </div>
 </div>
-
 <?php
 echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 ?>
@@ -102,30 +102,35 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
     tag.src = "//www.youtube.com/player_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
     var player;
     var vidid = "<?php echo $vidid;?>";
-
-    function validatevidform(el) {
+    function validatevidform(el)
+    {
         var els = el.getElementsByTagName("input");
         var lastsegtime = 0;
         var hasfollowup = false;
         for (var i=0; i<els.length; i++) {
             if (els[i].name.match(/segtitle/)) {
-                if (els[i].value=="") {
-                    alert("Please give all segments titles");
+                if (els[i].value=="")
+                {
+                    var msg="Please give all segments titles";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
             } else if (els[i].name.match(/vidid/)) {
-                if (els[i].value=="") {
-                    alert("Please provide a video ID");
+                if (els[i].value=="")
+                {
+                    var msg="Please provide a video ID";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
             } else if (els[i].name.match(/segend/)) {
-                if (els[i].value=="") {
-                    alert("Please supply end times for all segments");
+                if (els[i].value=="")
+                {
+                    var msg="Please supply end times for all segments";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
@@ -135,8 +140,10 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
                 } else {
                     var v = els[i].value*1;
                 }
-                if (v<lastsegtime) {
-                    alert("Make sure each segment's end time is later than previous segments");
+                if (v<lastsegtime)
+                {
+                    var msg="Make sure each segment's end time is later than previous segments";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
@@ -144,14 +151,18 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
             } else if (els[i].name.match(/hasfollowup/)) {
                 hasfollowup = els[i].checked;
             } else if (els[i].name.match(/followuptitle/) && hasfollowup) {
-                if (els[i].value=="") {
-                    alert("Please give all segments titles");
+                if (els[i].value=="")
+                {
+                    var msg="Please give all segments titles";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
             } else if (els[i].name.match(/followupend/) && hasfollowup) {
-                if (els[i].value=="") {
-                    alert("Please supply end times for all segments");
+                if (els[i].value=="")
+                {
+                    var msg="Please supply end times for all segments";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
@@ -162,7 +173,8 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
                     var v = els[i].value*1;
                 }
                 if (v<lastsegtime) {
-                    alert("Make sure each segment's end time is later than previous segments");
+                    var msg="Make sure each segment's end time is later than previous segments";
+                    CommonPopUp(msg);
                     els[i].focus();
                     return false;
                 }
@@ -172,14 +184,15 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
         }
         return true;
     }
-
-    function onYouTubePlayerAPIReady() {
+    function onYouTubePlayerAPIReady()
+    {
         if (vidid!="") {
             loadPlayer();
         }
     }
 
-    function loadPlayer() {
+    function loadPlayer()
+    {
         player = new YT.Player('player', {
             height: 270,
             width: 443,
@@ -187,8 +200,8 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
             playerVars: {'autoplay': 0, 'wmode': 'transparent', 'fs': 0, 'controls':1, 'rel':0, 'modestbranding':1, 'showinfo':0}
         });
     }
-
-    function loadnewvideo() {
+    function loadnewvideo()
+    {
         if (vidid=="") {
             vidid = document.getElementById("vidid").value;
             loadPlayer();
@@ -197,7 +210,8 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
             player.cueVideoById(vidid);
         }
     }
-    function grabcurvidtime(n,type) {
+    function grabcurvidtime(n,type)
+    {
         //do youtube video logic here
         if (!player || player.getPlayerState() != 1) { return;}
         var t =  Math.floor(player.getCurrentTime());
@@ -213,46 +227,44 @@ echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
             document.getElementById("followupend"+n).value=o;
         }
     }
-    function updatefollowup(n,el) {
+    function updatefollowup(n,el)
+    {
         if (el.checked) {
             document.getElementById("followupspan"+n).style.display = "inline";
         } else {
             document.getElementById("followupspan"+n).style.display = "none";
         }
     }
-    function addsegat(n) {
+    function addsegat(n)
+    {
         var insat = document.getElementById("insat"+n);
 
         var newins = document.createElement("div");
         newins.className = "insblock";
         newins.id = "insat"+(curnumseg+1);
-        newins.innerHTML = '<a href="#" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
+        newins.innerHTML = '<a href="javascript:void(0)" onclick="addsegat('+(curnumseg+1)+'); return false;">Add video segment break</a>';
         insat.parentNode.insertBefore(newins, insat);
 
         var html = 'Segment title: <input type="text" size="20" name="segtitle'+curnumseg+'" value=""/> ';
         html += 'Ends at: <input type="text" size="4" name="segend'+curnumseg+'" id="segend'+curnumseg+'"  value=""/> ';
         html += '<input type="button" value="grab" onclick="grabcurvidtime('+curnumseg+',0);"/>';
-        html += ' <a href="#" onclick="return deleteseg(this);">[Delete]</a>';
-
+        html += ' <a href="javascript:void(0)" onclick="return deleteseg(this);">[Delete]</a>';
         var newseg = document.createElement("div");
         newseg.className = "vidsegblock";
         newseg.innerHTML = html;
         insat.parentNode.insertBefore(newseg, insat);
-
         curnumseg++;
     }
-
-    function get_previoussibling(n) {
+    function get_previoussibling(n)
+    {
         x=n.previousSibling;
         while (x.nodeType!=1) {
             x=x.previousSibling;
         }
         return x;
     }
-
     function deleteseg(el)
     {
-
         var message ='';
         message+='Are you sure you want to remove this video segment?';
         var html = '<div><p>'+message+'</p></div>';

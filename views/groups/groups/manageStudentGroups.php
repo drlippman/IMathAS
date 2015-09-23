@@ -111,9 +111,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     echo "<br><b>Group: $grpName</b>&nbsp;&nbsp;";
                     echo "[<a href='manage-student-groups?cid=$course->id&grpSetId={$grpSetId}&renameGrp={$grpId}'>Rename</a>] ";
                     echo "[<a href='javascript:deleteGrp($course->id,$grpId,$grpSetId)'>Delete</a>]";
-                    echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
+                    if (count($page_GrpMembers[$grpId]) > 0)
+                    {
+                        echo "[<a href='javascript:removeAllMember($course->id,$grpId,$grpSetId)'>Remove all members</a>]";
+                    }
                     echo '<ul>';
-                    if (count($page_GrpMembers[$grpId])==0)
+                    if (count($page_GrpMembers[$grpId]) == 0)
                     {
                         echo '<br><li>No group members</li>';
                     }else
@@ -151,7 +154,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         echo "<option value=$grpId>$grpName</option>";
                     }
                     echo '</select>';
-                    echo '<ul class="nomark">';
+                    echo '<ul class="nomark stu-list">';
                     foreach ($page_unGrpStu as $grpId=>$grpName)
                     {
                         echo "<li><input type='checkbox' style='text-align: center' name='stutoadd[]' value=$grpId />";
