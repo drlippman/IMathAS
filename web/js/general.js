@@ -638,7 +638,6 @@ function _(txt) {
 
 //code for alt selectors
 function setAltSelectors(group,val) {
-	console.log("looking for "+group);
 	$(".alts."+group).parents(".altWrap").find(".altContentOn").removeClass("altContentOn").addClass("altContentOff");
 	$(".alts."+group).parents(".altWrap").find("."+val).addClass("altContentOn").removeClass("altContentOff");	
 	$("select.alts."+group).val(group+":"+val);

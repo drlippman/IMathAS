@@ -1119,7 +1119,6 @@ class CourseController extends AppController
         $block = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $model = new ThreadForm();
-        $rubricsData = Rubrics::getByUserId($user['id']);
         $query = Outcomes::getByCourse($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();
@@ -1142,31 +1141,31 @@ class CourseController extends AppController
             }
         }
         $key = AppConstant::NUMERIC_ZERO;
-        $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach ($gbcatsData as $group) {
-            $gbcatsId[$key] = $group['id'];
-            $gbcatsLabel[$key] = $group['name'];
+        $gbCatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbCatsData as $group) {
+            $gbCatsId[$key] = $group['id'];
+            $gbCatsLabel[$key] = $group['name'];
             $key++;
         }
         $toolsData = ExternalTools::externalToolsDataForLink($courseId,$user['groupid']);
-        $toolvals = array();
-        $toolvals[0] = AppConstant::NUMERIC_ZERO;
+        $toolVals = array();
+        $toolVals[0] = AppConstant::NUMERIC_ZERO;
         $key = AppConstant::NUMERIC_ONE;
         foreach ($toolsData as $tool) {
-            $toolvals[$key++] = $tool['id'];
+            $toolVals[$key++] = $tool['id'];
         }
-        $toollabels[0] = 'Select a tool...';
+        $toolLabels[0] = AppConstant::SELECT_TOOL;
         $key = AppConstant::NUMERIC_ONE;
         foreach ($toolsData as $tool)
         {
-            $toollabels[$key++] = $tool['name'];
+            $toolLabels[$key++] = $tool['name'];
         }
         if ($params['id']) {
             $linkData = LinkedText::getById($params['id']);
             if ($linkData['avail'] == AppConstant::NUMERIC_TWO && $linkData['startdate'] > AppConstant::NUMERIC_ZERO) {
-                $altoncal = AppConstant::NUMERIC_ONE;
+                $altOnCal = AppConstant::NUMERIC_ONE;
             } else {
-                $altoncal = AppConstant::NUMERIC_ZERO;
+                $altOnCal = AppConstant::NUMERIC_ZERO;
             }
             if (substr($linkData['text'], AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_FOUR) == 'http') {
                 $type = 'web';
@@ -1181,25 +1180,25 @@ class CourseController extends AppController
                 $points = $linkData['points'];
                 $toolParts = explode('~~', substr($linkData['text'], AppConstant::NUMERIC_EIGHT));
                 $selectedTool = $toolParts[0];
-                $toolcustom = $toolParts[1];
+                $toolCustom = $toolParts[1];
                 if (isset($toolParts[2])) {
-                    $toolcustomurl = $toolParts[2];
+                    $toolCustomUrl = $toolParts[2];
                 } else {
-                    $toolcustomurl = '';
+                    $toolCustomUrl = '';
                 }
                 if (isset($toolParts[3])) {
-                    $gbcat = $toolParts[3];
-                    $cntingb = $toolParts[4];
-                    $tutoredit = $toolParts[5];
-                    $gradesecret = $toolParts[6];
+                    $gbCat = $toolParts[3];
+                    $cntInGb = $toolParts[4];
+                    $tutorEdit = $toolParts[5];
+                    $gradeSecret = $toolParts[6];
                 }
             } else {
                 $type = 'text';
             }
             if ($linkData['outcomes'] != '') {
-                $gradeoutcomes = explode(',', $linkData['outcomes']);
+                $gradeOutcomes = explode(',', $linkData['outcomes']);
             } else {
-                $gradeoutcomes = array();
+                $gradeOutcomes = array();
             }
             if ($linkData['summary'] == '') {
                 $line['summary'] = "<p>Enter summary here (displays on course page)</p>";
@@ -1224,13 +1223,13 @@ class CourseController extends AppController
             }
             $saveTitle = "Modify Link";
             $saveButtonTitle = "Save Changes";
-            $gradesecret = uniqid();
+            $gradeSecret = uniqid();
             $defaultValues = array(
                 'title' => $linkData['title'],
                 'summary' => $linkData['summary'],
                 'text' => $linkData['text'],
                 'startDate' => $startDate,
-                'gradeoutcomes' => $gradeoutcomes,
+                'gradeoutcomes' => $gradeOutcomes,
                 'endDate' => $endDate,
                 'sDate' => $sDate,
                 'sTime' =>$sTime,
@@ -1238,33 +1237,30 @@ class CourseController extends AppController
                 'eTime' => $eTime,
                 'webaddr' => $webaddr,
                 'filename' => $filename,
-                'altoncal' => $altoncal,
+                'altoncal' => $altOnCal,
                 'type' => $type,
-                'gradeoutcomes' => $gradeoutcomes,
                 'toolparts' => $toolParts,
-                'cntingb' => $cntingb,
-                'gbcat' => $gbcat,
-                'tutoredit' => $tutoredit,
-                'gradesecret' => $gradesecret,
+                'cntingb' => $cntInGb,
+                'gbcat' => $gbCat,
+                'tutoredit' => $tutorEdit,
+                'gradesecret' => $gradeSecret,
                 'saveButtonTitle' => $saveButtonTitle,
                 'saveTitle' => $saveTitle,
                 'points' => $points,
                 'selectedtool' => $selectedTool,
-                'toolcustom' => $toolcustom,
-                'toolcustomurl' => $toolcustomurl,
-                'gradesecret' => $gradesecret,
+                'toolcustom' => $toolCustom,
+                'toolcustomurl' => $toolCustomUrl,
                 'calendar' => $linkData['oncal'],
                 'avail' => $linkData['avail'],
                 'open-page-in' => $linkData['target'],
-                'altoncal' => $altoncal,
                 'caltag' => $linkData['caltag'],
             );
         } else {
             $defaultValues = array(
-                'saveButtonTitle' => "Create Link",
-                'saveTitle' => "Create Link",
-                'title' => "Enter title here",
-                'summary' => "Enter summary here (displays on course page)",
+                'saveButtonTitle' => AppConstant::CREATE_LINK,
+                'saveTitle' => AppConstant::CREATE_LINK,
+                'title' => AppConstant::ENTER_TITLE,
+                'summary' => AppConstant::ENTER_SUMMARY,
                 'text' => "Enter text here",
                 'gradeoutcomes' => array(),
                 'type' => 'text',
@@ -1279,7 +1275,7 @@ class CourseController extends AppController
                 'cntingb' => AppConstant::NUMERIC_ONE,
                 'tutoredit' => AppConstant::NUMERIC_ZERO,
                 'filename' => ' ',
-                'selectedtool' => 0,
+                'selectedtool' => AppConstant::NUMERIC_ZERO,
                 'endDate' => AppConstant::NUMERIC_ONE,
                 'startDate' => AppConstant::NUMERIC_ONE,
                 'gradesecret' => uniqid(),
@@ -1337,7 +1333,7 @@ class CourseController extends AppController
                 $externalToolsData = new ExternalTools();
                 $externalToolsData->updateExternalToolsData($params);
             }
-            $caltag = $params['tag'];
+            $calTag = $params['tag'];
             if ($params['avail']== AppConstant::NUMERIC_ONE) {
                 if ($params['available-after']== AppConstant::NUMERIC_ZERO) {
                     $startDate = AppConstant::NUMERIC_ZERO;
@@ -1351,25 +1347,25 @@ class CourseController extends AppController
                 } else {
                     $endDate = AppUtility::parsedatetime($params['edate'], $params['etime']);
                 }
-                $oncal = $params['oncal'];
+                $onCal = $params['oncal'];
             } else if ($params['avail']== AppConstant::NUMERIC_TWO) {
                 if ($params['altoncal']== AppConstant::NUMERIC_ZERO) {
                     $startDate = AppConstant::NUMERIC_ZERO;
-                    $oncal = AppConstant::NUMERIC_ZERO;
+                    $onCal = AppConstant::NUMERIC_ZERO;
                 } else {
                     $startDate = AppUtility::parsedatetime($params['cdate'],"12:00 pm");
-                    $oncal = AppConstant::NUMERIC_ONE;
-                    $caltag = $params['tag-always'];
+                    $onCal = AppConstant::NUMERIC_ONE;
+                    $calTag = $params['tag-always'];
                 }
                 $endDate =  AppConstant::ALWAYS_TIME;
             } else {
                 $startDate = AppConstant::NUMERIC_ONE;
-                $endDate =  AppConstant::ALWAYS_TIME;
-                $oncal = AppConstant::NUMERIC_ZERO;
+                $endDate = AppConstant::ALWAYS_TIME;
+                $onCal = AppConstant::NUMERIC_ZERO;
             }
             $finalArray['courseid'] = $params['cid'];
             $finalArray['title'] = $params['name'];
-            $str = '<p>Enter summary here (displays on course page)</p>';
+            $str = AppConstant::ENTER_SUMMARY;
             if ($params['summary']== $str) {
                 $finalArray['summary'] = ' ';
             } else {
@@ -1380,8 +1376,8 @@ class CourseController extends AppController
             }
             $finalArray['text'] = $params['text'];
             $finalArray['avail'] = $params['avail'];
-            $finalArray['oncal'] = $oncal;
-            $finalArray['caltag'] = $caltag ;
+            $finalArray['oncal'] = $onCal;
+            $finalArray['caltag'] = $calTag;
             $finalArray['target'] = $params['target'];
             $finalArray['points'] = $params['points'];
             $finalArray['target'] = $params['open-page-in'];
@@ -1390,11 +1386,9 @@ class CourseController extends AppController
             $finalArray['outcomes'] = $outcomes;
             if ($modifyLinkId) {
                 $finalArray['id'] = $params['id'];
-
                 $link = new LinkedText();
                 $link->updateLinkData($finalArray);
             } else {
-
                 $linkText = new LinkedText();
                 $linkTextId = $linkText->AddLinkedText($finalArray);
                 $itemType = AppConstant::LINK;
@@ -1403,23 +1397,23 @@ class CourseController extends AppController
                 $courseItemOrder = Course::getItemOrder($courseId);
                 $itemOrder = $courseItemOrder->itemorder;
                 $items = unserialize($itemOrder);
-                $blocktree = explode('-',$block);
+                $blockTree = explode('-',$block);
                 $sub =& $items;
-                for ($i = AppConstant::NUMERIC_ONE; $i < count($blocktree); $i++) {
-                    $sub =& $sub[$blocktree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
+                for ($i = AppConstant::NUMERIC_ONE; $i < count($blockTree); $i++) {
+                    $sub =& $sub[$blockTree[$i] - AppConstant::NUMERIC_ONE]['items']; //-1 to adjust for 1-indexing
                 }
                 array_unshift($sub, intval($lastItemId));
-                $itemorder = (serialize($items));
+                $itemOrder = (serialize($items));
                 $saveItemOrderIntoCourse = new Course();
-                $saveItemOrderIntoCourse->setItemOrder($itemorder, $courseId);
+                $saveItemOrderIntoCourse->setItemOrder($itemOrder, $courseId);
             }
             $this->includeJS(["editor/tiny_mce.js", "general.js"]);
             return $this->redirect(AppUtility::getURLFromHome('instructor', 'instructor/index?cid=' . $course->id));
         }
         $this->includeCSS(["course/items.css"]);
         $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
-        $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames, 'rubricsData' => $rubricsData, 'pageOutcomesList' => $pageOutcomesList, 'linkData' => $linkData,
-            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolvals, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId, 'toollabels' => $toollabels, 'defaultValues' => $defaultValues,'block' => $block);
+        $responseData = array('model' => $model, 'course' => $course, 'groupNames' => $groupNames,'pageOutcomesList' => $pageOutcomesList, 'linkData' => $linkData,
+            'pageOutcomes' => $pageOutcomes, 'toolvals' => $toolVals, 'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId, 'toollabels' => $toolLabels, 'defaultValues' => $defaultValues,'block' => $block);
         return $this->renderWithData('addLink', $responseData);
     }
 

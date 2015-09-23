@@ -691,7 +691,7 @@ class AdminController extends AppController
             case "addnewcourse":
                 break;
             case "modify":
-
+                break;
             case "addcourse":
             if ($params['action'] == 'modify')
             {
@@ -797,7 +797,7 @@ class AdminController extends AppController
         }
         $this->includeCSS(['assessment.css']);
         $this->includeJS(['general.js?ver=012115','forms.js','jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
-        $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
+        $responseData = array('users' => $users,'params'=> $params,'groupsName' => $groupsName,'user' =>$user,'myRights' => $myRights,'course' => $course,'action' => $action, 'courseid' => $courseid, 'name' => $name,
             'ekey' => $ekey, 'hideicons' => $hideicons, 'picicons' => $picicons, 'allowunenroll'=> $allowunenroll, 'copyrights' => $copyrights, 'msgset' => $msgset, 'toolset' => $toolset, 'msgmonitor' => $msgmonitor, 'msgQtoInstr' => $msgQtoInstr,'cploc' => $cploc, 'topbar' => $topbar, 'theme' => $theme,
             'chatset' => $chatset, 'showlatepass' => $showlatepass, 'istemplate' => $istemplate,
             'avail' => $avail, 'lockaid' => $lockaid, 'deftime' => $deftime, 'deflatepass' => $deflatepass,
@@ -836,9 +836,9 @@ class AdminController extends AppController
             case "chgrights":
                 break;
             case "resetpwd":
-                if ($myRights < 75)
+                if ($myRights < AppConstant::GROUP_ADMIN_RIGHT)
                 {
-                    echo "You don't have the authority for this action"; break;
+                     break;
                 }
                 $id = $this->getParamVal('id');
                 if (isset($params['newpw']))
@@ -1068,7 +1068,10 @@ class AdminController extends AppController
             case "addteacher":
                 exit;
             case "importmacros":
-                if ($myRights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
+                if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=importmacros');
+                }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'macro/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
                 if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile))
@@ -1123,11 +1126,14 @@ class AdminController extends AppController
                     }
                     break;
                 } else {
-                    $this->setWarningFlash('Error uploading file!');
+                    $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
                     return $this->redirect('forms?action=importmacros');
                 }
             case "importqimages":
-                if ($myRights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
+                if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=importqimages');
+                }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'qimages/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
                 if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
@@ -1141,34 +1147,34 @@ class AdminController extends AppController
                             } else {
                                $n = $tar->extractToDir(AppConstant::UPLOAD_DIRECTORY.'macro/');
                             }
-
                             echo "<p>Extracted $n files.  <a href='".AppUtility::getURLFromHome('admin','admin/index')."'>Continue</a></p>\n";
                             exit;
                         } else {
-                            echo "<p>File appears to contain nothing</p>\n";
-
-                            exit;
+                            $this->setWarningFlash(AppConstant::EMPTY_FILE);
+                            return $this->redirect('forms?action=importqimages');
                         }
                     }
                     unlink($uploadfile);
                     break;
                 } else {
-                    $this->setWarningFlash('Error uploading file!');
+                    $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
                     return $this->redirect('forms?action=importqimages');
                 }
             case "importcoursefiles":
-
-                if ($myRights < 100 || !$allowmacroinstall) { echo "You don't have the authority for this action"; break;}
+                if ($myRights < AppConstant::ADMIN_RIGHT || !$allowmacroinstall) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=importcoursefiles');
+                }
                 $uploaddir = AppConstant::UPLOAD_DIRECTORY.'coursefile/';
                 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
                 if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) {
                     if (strpos($uploadfile,'.zip')!==FALSE && class_exists('ZipArchive')) {
                         $zip = new \ZipArchive();
                         $res = $zip->open($uploadfile);
-                        $ne = 0;  $ns = 0;
+                        $ne = AppConstant::NUMERIC_ZERO;  $ns = AppConstant::NUMERIC_ZERO;
                         if ($res===true) {
                             for($i = 0; $i < $zip->numFiles; $i++) {
-                                //if (file_exists("../course/files/".$zip->getNameIndex($i))) {
+
                                 if (filehandler::doesfileexist('cfile',$zip->getNameIndex($i))) {
                                     $ns++;
                                 } else {
@@ -1180,17 +1186,15 @@ class AdminController extends AppController
                             echo "<p>Extracted $ne files.  <a href='".AppUtility::getURLFromHome('admin','admin/index')."'>Continue</a></p>\n";
                             exit;
                         } else {
-
-                            echo "<p>File appears to contain nothing</p>\n";
+                            $this->setWarningFlash(AppConstant::EMPTY_FILE);
+                            return $this->redirect('forms?action=importcoursefiles');
                         }
                     }
                     unlink($uploadfile);
                     break;
                 } else {
-
-                    echo "<p>Error uploading file!</p>\n";
-
-                    exit;
+                     $this->setWarningFlash(AppConstant::ERROR_UPLOADING_FILE);
+                     return $this->redirect('forms?action=importcoursefiles');
                 }
             case "transfer":
                 $exec = false;
@@ -1198,7 +1202,6 @@ class AdminController extends AppController
                 {
                     $columnName = 'ownerid'; $columnValue = $userId;
                     $updateResult = new Course();
-
                     $updateResult->setOwnerId($params, $columnName, $columnValue);
                 } else
                 {
@@ -1217,7 +1220,7 @@ class AdminController extends AppController
                 } else {
                     $exec = true;
                 }
-                if ($exec && $affectedRow > 0) {
+                if ($exec && $affectedRow > AppConstant::NUMERIC_ZERO) {
                     $result = Teacher::getByCourseId($params);
                     if (count($result) == AppConstant::NUMERIC_ZERO) {
                         $teacherData = new Teacher();
@@ -1227,12 +1230,12 @@ class AdminController extends AppController
                 }
                 break;
             case "deloldusers":
-                if ($myRights <100)
+                if ($myRights < AppConstant::ADMIN_RIGHT)
                 {
-                    $this->setWarningFlash("You don't have the authority for this action");
-                    break;
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=deloldusers');
                 }
-                $old = time() - 60*60*24*30*$params['months'];
+                $old = time() - AppConstant::SECONDS * AppConstant::SECONDS * AppConstant::HOURS * AppConstant::NUMERIC_THIRTY * $params['months'];
                 $who = $params['who'];
                 if ($who=="students") {
                     $users = User::getByLastAccessAndRights($old);
@@ -1252,12 +1255,12 @@ class AdminController extends AppController
                 }
                 break;
             case "addgroup":
-                if ($myRights <100) {
-                    $this->setWarningFlash("You don't have the authority for this action");
-//                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
+                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=listgroups');
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
-                if (strlen($existingGroupData['name'])>0) {
+                if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
                     $this->setWarningFlash('Group name already exists.');
                     return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
                 }else{
@@ -1266,12 +1269,12 @@ class AdminController extends AppController
                 }
                 break;
             case "modgroup":
-                if ($myRights <100) {
-                    $this->setWarningFlash("You don't have the authority for this action");
-//                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
+                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=listgroups');
                 }
                 $existingGroupData = Groups::getByName($params['gpname']);
-                if (strlen($existingGroupData['name'])>0) {
+                if (strlen($existingGroupData['name']) > AppConstant::NUMERIC_ZERO) {
                     $this->setWarningFlash('Group name already exists.');
                     return $this->redirect('forms?action=modgroup&id='.$existingGroupData['id']);
                 }else{
@@ -1280,18 +1283,18 @@ class AdminController extends AppController
                 break;
             case "delgroup":
 
-                if ($myRights <100) {
-                    $this->setWarningFlash("You don't have the authority for this action");
-//                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
+                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action=listgroups');
                 }
                 Groups::deleteById($params['id']);
                 User::updateGroupId($params['id']);
                 Libraries::updateGroupId($params['id']);
                 break;
             case "modltidomaincred":
-                if ($myRights <100) {
-                    $this->setWarningFlash("You don't have the authority for this action");
-//                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
+                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action = listltidomaincred');
                 }
                 if ($params['id']=='new') {
                     $user = new User();
@@ -1302,9 +1305,9 @@ class AdminController extends AppController
 
                 break;
             case "delltidomaincred":
-                if ($myRights <100) {
-                    $this->setWarningFlash("You don't have the authority for this action");
-//                    return $this->redirect('forms?action=listgroups&id='.$existingGroupData['id']);
+                if ($myRights < AppConstant::ADMIN_RIGHT) {
+                    $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+                    return $this->redirect('forms?action = listltidomaincred');
                 }
                 User::deleteUserById($params['id']);
                 break;
@@ -1319,11 +1322,7 @@ class AdminController extends AppController
         }
         session_write_close();
         if (isset($params['cid'])) {
-            /*
-             * Work-in-progress
-             */
-//            echo '<a href="'.AppUtility::getURLFromHome('admin','admin/index').'"></a>';
-//            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . $imasroot . "/course/course.php?cid={$_GET['cid']}");
+            return $this->redirect(AppUtility::getURLFromHome('instructor','instructor/index?cid='.$params['cid']));
         } else {
             return $this->redirect('index');
         }

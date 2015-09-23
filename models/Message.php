@@ -13,6 +13,7 @@ use Yii;
 use yii\db\Exception;
 use app\components\AppUtility;
 use app\models\_base\BaseImasMsgs;
+use app\controllers\AppController;
 use yii\db\Query;
 
 class Message extends BaseImasMsgs

@@ -112,7 +112,7 @@ if($totalData['isTutor']){
     echo '</select>
     </div></div>';
    echo '<div class=" "><span class="pull-left select-text-margin">';
-    echo _('Not Counted:'), " </span><div class='col-sm-2 drop-down-width'><select id=\"toggle2\" class='form-control  ' onchange=\"chgtoggle()\">";
+    echo _('Not Counted:'), " </span><div class='col-sm-2 drop-down-width'><select id=\"toggle2\" class='form-control  ' onchange=\"totonleft()\">";
     echo "<option value=0 "; AssessmentUtility::writeHtmlSelected($hidenc,0); echo ">",AppUtility::t('Show all'), "</option>";
     echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($hidenc,1); echo ">",AppUtility::t('Show stu view'), "</option>";
     echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($hidenc,2); echo ">",AppUtility::t('Hide all'), "</option>";

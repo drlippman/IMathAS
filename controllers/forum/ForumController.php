@@ -1233,16 +1233,17 @@ class ForumController extends AppController
         $key = AppConstant::NUMERIC_ZERO;
         foreach ($groupNames as $group) {
             $groupNameId[$key] = $group['id'];
-            $groupNameLabel[$key] = 'Use group set:' . $group['name'];
+            $groupNameLabel[$key] = AppConstant::USE_GROUP_SET . $group['name'];
             $key++;
         }
         $key = AppConstant::NUMERIC_ZERO;
-        $gbcatsData = GbCats::getByCourseId($courseId);
-        foreach ($gbcatsData as $singleGbcatsData) {
-            $gbcatsId[$key] = $singleGbcatsData['id'];
-            $gbcatsLabel[$key] = $singleGbcatsData['name'];
+        $gbCatsData = GbCats::getByCourseId($courseId);
+        foreach ($gbCatsData as $singleGbCatsData) {
+            $gbCatsId[$key] = $singleGbCatsData['id'];
+            $gbCatsLabel[$key] = $singleGbCatsData['name'];
             $key++;
         }
+        $key = AppConstant::NUMERIC_ZERO;
         $rubricsId = array(0);
         $rubricsLabel = array('None');
         $rubrics = Rubrics::getIdAndName($user['id'],$user['groupid']);
@@ -1450,7 +1451,7 @@ class ForumController extends AppController
                 $replyByDate = AppUtility::parsedatetime($params['replyByDate'],$params['replyByTime']);
                 $settingValue = $params['allow-anonymous-posts']+$params['allow-students-to-modify-posts']+$params['allow-students-to-delete-own-posts']+$params['like-post'] + $params['viewing-before-posting'];
                 $finalArray['name'] = trim($params['name']);
-                 if ($params['description']=='<p>Enter forum description here</p>') {
+                 if ($params['description']== AppConstant::FORUM_DESCRIPTION) {
                      $finalArray['description'] = '';
                  } else {
                      /*
@@ -1549,7 +1550,7 @@ class ForumController extends AppController
         $this->includeCSS(['course/items.css']);
         $responseData = array('course' => $course,'groupNameId' => $groupNameId, 'groupNameLabel' => $groupNameLabel,'saveTitle' => $saveTitle, 'pageTitle' => $pageTitle, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
         'pageOutcomes' => $pageOutcomes, 'defaultValue' => $defaultValue,'forumData' => $forumData, 'modifyForumId' => $modifyForumId,
-        'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId,'block' => $block);
+        'gbcatsLabel' => $gbCatsLabel, 'gbcatsId' => $gbCatsId,'block' => $block);
         return $this->renderWithData('addForum', $responseData);
     }
 

@@ -15,10 +15,10 @@ $(document).ready(function () {
     new $.fn.dataTable.FixedColumns(table);
     var data = {courseId: courseId, userId: userId};
     jQuerySubmit('fetch-gradebook-data-ajax', data, 'fetchDataSuccess');
-    var color = document.cookie;
-    var bothColor = color.split(/=/);
-    var colorArray = bothColor[1].split(/:/);
-    conditionalColor('gradebook-table',0,colorArray[0],colorArray[1]);
+    //var color = document.cookie;
+    //var bothColor = color.split(/=/);
+    //var colorArray = bothColor[1].split(/:/);
+    //conditionalColor('gradebook-table',0,colorArray[0],colorArray[1]);
 });
 
 function selectCheckBox() {
@@ -296,5 +296,84 @@ if (type==0) {  //instr gb view
 
     }
 }
+}
+function chgtoggle(key)
+{
+    var totonleft = $("#totonleft").val();
+    var avgontop = $("#avgontop").val();
+    var courseId = $("#course-id").val();
+    var includelastchange = $("#includelastchange").val();
+    var lastlogin = $("#lastlogin").val();
+    var includeduedate = $("#includeduedate").val();
 
+    var toggle5 = $("#toggle5").val();
+    if(key >= 0 && key < 5)
+    {
+        toggle3 = key;
+    }else
+    {
+        var toggle3 = $("#toggle3").val();
+    }
+
+    if(key >= 5 && key < 8)
+    {
+        if(key == 5)
+        {
+            toggle2 = 1;
+        }else if(key == 6)
+        {
+            toggle2 = 0;
+        }else if(key == 7)
+        {
+            toggle2 =  2;
+        }
+    }else
+    {
+        var toggle2 = $("#toggle2").val();
+    }
+
+    if(key >= 8 && key <= 9)
+    {
+        if(key == 8)
+        {
+            toggle1 =  0;
+        }else if(key == 9)
+        {
+            toggle1 =  1;
+        }
+    }else
+    {
+        var toggle1 = $("#toggle1").val();
+    }
+    if(key == 10)
+    {
+        var toggle5 = 0;
+    }else if(key == 11)
+    {
+        var toggle5 = 2;
+    }else
+    {
+        var toggle5 = $("#toggle5").val();
+    }
+    if(key == 12)
+    {
+        var toggle4 = 1;
+    }else if(key == 13)
+    {
+        var toggle4 = 0;
+    }else
+    {
+        var toggle4 = $("#toggle4").val();
+    }
+     var altgbmode = 10000 *  toggle4  + 1000 * parseInt(totonleft) + parseInt(avgontop) + 100 * ( toggle1  * 1 +  toggle5  * 1) + 10 *  toggle2  + 1 *  toggle3 ;
+    if (includelastchange) {
+        altgbmode += 40;
+    }
+    if (lastlogin) {
+        altgbmode += 4000;
+    }
+    if (includeduedate) {
+        altgbmode += 400;
+    }
+    window.location = "gradebook?cid="+courseId+"&gbmode="+altgbmode;
 }

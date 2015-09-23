@@ -106,13 +106,13 @@ switch($action) {
         echo "<input type=radio name=\"newrights\" value=\"75\" ";
         if ($oldrights == 75) {echo "CHECKED";}
         echo "> Group Admin <BR>\n";
-        if ($myrights==100) {
+        if ($myRights==100) {
             echo "<input type=radio name=\"newrights\" value=\"100\" ";
             if ($oldrights == 100) {echo "CHECKED";}
             echo "> Full Admin </span><BR class=form>\n";
         }
 
-        if ($myrights == 100) {
+        if ($myRights == 100) {
             echo "<span class=form>Assign to group: </span>";
             echo "<span class=formright><select name=\"group\" id=\"group\">";
             echo "<option value=0>Default</option>\n";
@@ -361,12 +361,12 @@ switch($action) {
             </div>
             </div>';
         }
-        if ($myrights>=75) {
+        if ($myRights>=75) {
             echo '<div class=col-md-3>Mark course as template?</div>';
             echo '<div class=col-md-10><input type=checkbox name="isgrptemplate" value="2" ';
             if (($istemplate&2)==2) {echo 'checked="checked"';};
             echo ' /> Mark as group template course';
-            if ($myrights==100) {
+            if ($myRights==100) {
                 echo '<br/><input type=checkbox name="istemplate" value="1" ';
                 if (($istemplate&1)==1) {echo 'checked="checked"';};
                 echo ' /> Mark as global template course<br/>';
@@ -479,9 +479,9 @@ switch($action) {
         echo "</table></form>\n";
 
         echo "<h4>Potential Teachers:</h4>\n";
-        if ($myrights<100) {
+        if ($myRights<100) {
             $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
-        } else if ($myrights==100) {
+        } else if ($myRights==100) {
             $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
         }
         $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -502,7 +502,6 @@ switch($action) {
         echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
         break;
     case "importmacros": ?>
-
          <form enctype="multipart/form-data" method=post action="actions?action=importmacros">
              <div class = "title-container">
                  <div class="row">
@@ -529,10 +528,8 @@ switch($action) {
                    <input name="userfile" type="file" />
               </span>
               </div>
-
              </div></div></form><?php
         break;
-
     case "importqimages": ?>
         <form enctype="multipart/form-data" method=post action="actions?action=importqimages">
             <div class = "title-container">
@@ -542,7 +539,6 @@ switch($action) {
                     </div>
                 </div>
             </div>
-
         <div class='col-md-12 padding-twenty'>
                 <div class='col-md-12 text-gray-background padding-left-thirty padding-top-five'>
         <h3><?php AppUtility::t('Install Question Images')?></h3>
@@ -582,13 +578,12 @@ switch($action) {
                 <span class='margin-left-ten'><?php AppUtility::t('Install will ignore files with the same filename as existing files')?>.</span>
                </p>
          <input type="hidden" name="MAX_FILE_SIZE" value="10000000" />
-         <span class='floatleft'>Import file </span>
+         <span class='floatleft'><?php AppUtility::t('Import file')?> </span>
                 <span class='floatleft margin-left-ten'>
                     <input name="userfile" type="file" />
                 </span>
         </div></div></form>  <?php
         break;
-
     case "transfer":
         if ($myRights < 40)
         {
@@ -671,13 +666,13 @@ switch($action) {
                     <tr>
                         <td>{$row['email']}</td>
                         <td>{$row['SID']}</td>";
-                    if ($row['rights']==76) { ?>
+                    if ($row['rights'] == AppConstant::SEVENTY_SIX) { ?>
                         <td><?php AppUtility::t('Yes')?></td>
                     <?php } else { ?>
                         <td><?php AppUtility::t('No')?></td>
                     <?php } ?>
                     <td><a href="forms?action=modltidomaincred&id=<?php echo $row['id']?>"><?php AppUtility::t('Modify')?></a></td>
-                    <?php if ($row['id']==0) {
+                    <?php if ($row['id'] == AppConstant::NUMERIC_ZERO) {
                         echo "<td></td>";
                     } else { ?>
                         <td>
@@ -746,13 +741,13 @@ switch($action) {
         <?php
         break;
     case "modltidomaincred":
-//        if ($myrights<100) { echo "not allowed"; exit;} ?>
+        if ($myRights < AppConstant::ADMIN_RIGHT) {
+        $this->setWarningFlash(AppConstant::NO_ACCESS_RIGHTS);
+        return $this->redirect('forms?action = listltidomaincred');
+        } ?>
         <div class="col-md-12 modify-lti-domain-group-padding">
-
             <form method=post action="actions?action=modltidomaincred&id=<?php echo $user['id']?>">
-<!--                <div class="col-md-12 padding-left-zero margin-top-twenty">-->
                     <input type=submit class="update-group-btn" value="<?php AppUtility::t('Update LTI Credentials')?>">
-<!--                </div>-->
                 <div id="headerforms" class="pagetitle">
                     <h3>
                         <?php AppUtility::t('Modify LTI Domain Credentials')?>
@@ -792,13 +787,13 @@ switch($action) {
                     <span class="col-md-4 padding-left-zero">
                         <select class="form-control" name="createinstr">
                             <option value="11"
-                                <?php if ($user['rights']==11) {
+                                <?php if ($user['rights'] == AppConstant::NUMERIC_ELEVEN) {
                                     echo 'selected="selected"';
                                 } ?> >
                                 <?php AppUtility::t('No')?>
                             </option>
                             <option value="76" <?php
-                                if ($user['rights']==76) {
+                                if ($user['rights'] == AppConstant::SEVENTY_SIX) {
                                     echo 'selected="selected"';
                                 } ?> >
                                 <?php AppUtility::t('Yes')?>
@@ -874,7 +869,6 @@ switch($action) {
         <?php break;
     case "modgroup": ?>
         <div class="col-md-12 rename-group-padding">
-
              <?php $gpname = $groupsName['name']; ?>
              <form method=post action=actions?action=modgroup&id=<?php echo $groupsName['id']?>>
                  <button class="update-group-btn" type=submit value="<?php AppUtility::t('Update Group')?>">

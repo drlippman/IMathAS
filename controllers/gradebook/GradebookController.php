@@ -123,9 +123,13 @@ class GradebookController extends AppController
                 $defgbmode = GbScheme::findOne(['courseid' => $courseId]);
                 $gbmode = $defgbmode->defgbmode;
             }
-
-            $defgbmode = GbScheme::findOne(['courseid' => $courseId]);
-            $colorized = $defgbmode->colorize;
+            if (isset($_COOKIE["colorize-$courseId"]) && !isset($params['refreshdef'])) {
+                $colorize = $_COOKIE["colorize-$courseId"];
+            } else {
+                $defgbmode = GbScheme::getByCourseId($courseId);
+                $colorize = $defgbmode->colorize;
+                setcookie("colorize-$courseId",$colorize);
+            }
 
             if (isset($params['catfilter'])) {
                 $catfilter = $params['catfilter'];
@@ -133,8 +137,8 @@ class GradebookController extends AppController
                 $sessionData[$courseId.'catfilter'] = $catfilter;
                 $enc = base64_encode(serialize($sessionData));
                 Sessions::setSessionId($sessionId,$enc);
-            } else if (isset($sessiondata[$courseId.'catfilter'])) {
-                $catfilter = $sessiondata[$courseId.'catfilter'];
+            } else if (isset($sessionData[$courseId.'catfilter'])) {
+                $catfilter = $sessionData[$courseId.'catfilter'];
             } else {
                 $catfilter = -1;
             }
@@ -142,11 +146,11 @@ class GradebookController extends AppController
 
             if (isset($params['catfilter'])) {
                 $catfilter = $params['catfilter'];
-                $sessiondata[$courseId.'catfilter'] = $catfilter;
-                AppUtility::writesessiondata($sessiondata,$sessionId);
-            } else if (isset($sessiondata[$courseId.'catfilter'])) {
+                $sessionData[$courseId.'catfilter'] = $catfilter;
+                AppUtility::writesessiondata($sessionData,$sessionId);
+            } else if (isset($sessionData[$courseId.'catfilter'])) {
 
-                $catfilter = $sessiondata[$courseId.'catfilter'];
+                $catfilter = $sessionData[$courseId.'catfilter'];
             } else {
 
                 $catfilter = -1;
@@ -157,10 +161,10 @@ class GradebookController extends AppController
             } else {
                 if (isset($params['secfilter'])) {
                     $secfilter = $params['secfilter'];
-                    $sessiondata[$courseId.'secfilter'] = $secfilter;
-                    AppUtility::writesessiondata($sessiondata,$sessionId);
-                } else if (isset($sessiondata[$courseId.'secfilter'])) {
-                    $secfilter = $sessiondata[$courseId.'secfilter'];
+                    $sessionData[$courseId.'secfilter'] = $secfilter;
+                    AppUtility::writesessiondata($sessionData,$sessionId);
+                } else if (isset($sessionData[$courseId.'secfilter'])) {
+                    $secfilter = $sessionData[$courseId.'secfilter'];
                 } else {
                     $secfilter = -1;
                 }
@@ -1942,7 +1946,7 @@ class GradebookController extends AppController
             'totonleft' => $totonleft,
             'avgontop' => $avgontop,
             'hidelocked' => $hidelocked,
-            'latlogin' => $lastlogin,
+            'lastlogin' => $lastlogin,
             'includeduedate' => $includeduedate,
             'includelastchange' => $includelastchange,
             'studentId' => $stu,
@@ -1950,7 +1954,7 @@ class GradebookController extends AppController
         $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
         $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
-            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray, 'colorized' => $colorized, 'gbCatsData' => $gbCatsData);
+            'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray, 'colorize' => $colorize, 'gbCatsData' => $gbCatsData);
         return $responseData;
     }
 
@@ -4054,12 +4058,13 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $isTeacher = $this->isTeacher($currentUser['id'],$courseId);
         $this->layout = 'master';
-        if (isset($sessiondata[$courseId.'gbmode'])) {
-            $gbmode =  $sessiondata[$courseId.'gbmode'];
+        if (isset($sessionData[$courseId.'gbmode'])) {
+            $gbmode =  $sessionData[$courseId.'gbmode'];
         } else {
             $gbScheme = GbScheme::getByCourseId($courseId);
             $gbmode = $gbScheme['defgbmode'];
         }
+
         if (isset($params['stu']) && $params['stu']!='') {
             $stu = $params['stu'];
         } else {

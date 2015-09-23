@@ -46,7 +46,6 @@ class AppConstant
     const AVAILABLE_NOT_CHECKED_VALUE = 3;
     const NAVIGATION_NOT_CHECKED_VALUE = 7;
     const ITEM_ORDER = 'a:0:{}';
-
     const NUMERIC_ZERO = 0;
     const NUMERIC_ONE = 1;
     const NUMERIC_TWO = 2;
@@ -244,4 +243,12 @@ class AppConstant
     const MANAGE_QUE_SET_TITLE7 = "Template Questions";
     const PAGE_ADMIN_MSG1 = "You are in Admin mode, which means actions will apply to all questions, regardless of owner";
     const PAGE_ADMIN_MSG2 = "You are in Group Admin mode, which means actions will apply to all group's questions, regardless of owner";
+    const ERROR_UPLOADING_FILE = "Error uploading file!";
+    const EMPTY_FILE = 'File appears to contain nothing';
+    const SEVENTY_SIX = 76;
+    const SELECT_TOOL = 'Select a tool...';
+    const CREATE_LINK = 'Create Link';
+    const ENTER_TITLE = 'Enter title here';
+    const ENTER_SUMMARY = '<p>Enter summary here (displays on course page)</p>';
+    const FORUM_DESCRIPTION = '<p>Enter forum description here</p>';
 }

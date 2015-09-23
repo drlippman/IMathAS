@@ -22,28 +22,28 @@ use app\components\AppUtility;
                 <li class="divider"></li>
                 <li><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/new-flag?cid='.$course->id)?>"><?php AppUtility::t('New Flag');?></a>
                 <li class="divider"></li>
-                <li class="dropdown-header"><?php AppUtility::t('Availability');?></li>
-                <li><a href="#"><?php AppUtility::t('All');?></a>
-                <li><a href="#"><?php AppUtility::t('Past due');?></a></li>
-                <li><a href="#"><?php AppUtility::t('Past and Attempted');?></a></li>
-                <li><a href="#"><?php AppUtility::t('Available only');?></a></li>
-                <li><a href="#"><?php AppUtility::t('Past and Available');?></a></li>
+                <li class="dropdown-header"><?php AppUtility::t('Show');?></li>
+                <li><a href="javascript:chgtoggle(2)"><?php AppUtility::t('All');?></a>
+                <li><a href="javascript:chgtoggle(0)"><?php AppUtility::t('Past due');?></a></li>
+                <li><a href="javascript:chgtoggle(3)"><?php AppUtility::t('Past and Attempted');?></a></li>
+                <li><a href="javascript:chgtoggle(4)"><?php AppUtility::t('Available only');?></a></li>
+                <li><a href="javascript:chgtoggle(1)"><?php AppUtility::t('Past and Available');?></a></li>
                 <li class="divider"></li>
                 <li class="dropdown-header"><?php AppUtility::t('Not Counted Items');?></li>
-                <li><a href="#"><?php AppUtility::t('Show Student View');?></a>
-                <li><a href="#"><?php AppUtility::t('Show All');?></a></li>
-                <li><a href="#"><?php AppUtility::t('Hide');?></a></li>
+                <li ><a href="javascript:chgtoggle(5)"><?php AppUtility::t('Show Student View');?></a>
+                <li ><a href="javascript:chgtoggle(6)"><?php AppUtility::t('Show All');?></a></li>
+                <li ><a href="javascript:chgtoggle(7)"><?php AppUtility::t('Hide');?></a></li>
                 <li class="divider"></li>
                 <li class="dropdown-header"><?php AppUtility::t('Links');?></li>
-                <li><a href="#"><?php AppUtility::t('View/Edit');?></a>
-                <li><a href="#"><?php AppUtility::t('Scores');?></a></li>
+                <li><a href="javascript:chgtoggle(8)"><?php AppUtility::t('View/Edit');?></a>
+                <li><a href="javascript:chgtoggle(9)"><?php AppUtility::t('Scores');?></a></li>
                 <li class="divider"></li>
                 <li class="dropdown-header"><?php AppUtility::t('Locked Students');?></li>
-                <li><a href="#"><?php AppUtility::t('Show');?></a>
-                <li><a href="#"><?php AppUtility::t('Hide');?></a></li>
+                <li><a href="javascript:chgtoggle(10)"><?php AppUtility::t('Show');?></a>
+                <li><a href="javascript:chgtoggle(11)"><?php AppUtility::t('Hide');?></a></li>
                 <li class="dropdown-header"><?php AppUtility::t('Picture');?></li>
-                <li><a href="#"><?php AppUtility::t('Show');?></a>
-                <li><a href="#"><?php AppUtility::t('Hide');?></a></li>
+                <li><a href="javascript:chgtoggle(12)"><?php AppUtility::t('Show');?></a>
+                <li><a href="javascript:chgtoggle(13)"><?php AppUtility::t('Hide');?></a></li>
             </ul>
         </li>
 

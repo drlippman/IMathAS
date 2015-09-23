@@ -641,7 +641,6 @@ function tzdate($string,$time) {
 }
 
 function writesessiondata($sessionData,$sessionId) {
-//    global $sessionData,$sessionId;
     $sessionContent = base64_encode(serialize($sessionData));
     Sessions::setSessionId($sessionId,$sessionContent);
 }

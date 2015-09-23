@@ -7,6 +7,9 @@ if (($course['newflag']&1)==1) {
     $this->title = AppUtility::t('Gradebook', false);
 }
 $this->params['breadcrumbs'][] = $this->title;
+$includeduedate = $defaultValuesArray['includeduedate'];
+$includelastchange = $defaultValuesArray['includelastchange'];
+$lastlogin = $defaultValuesArray['lastlogin'];
 ?>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
@@ -14,7 +17,16 @@ $this->params['breadcrumbs'][] = $this->title;
 <input type="hidden" id="student-id"  value="<?php echo $data['defaultValuesArray']['studentId']; ?>"/>
 <input type="hidden" id="gradebook-id" name="gradebook-data" value=""/>
 <input type="hidden" id="showpics" name="user-info" value="<?php echo $data['defaultValuesArray']['showpics']; ?>"/>
-
+<input type="hidden" id="totonleft" value="<?php echo $data['totOnLeft'] ?>">
+<input type="hidden" id="avgontop" value="<?php echo $data['defaultValuesArray']['avgontop']?>">
+<input type="hidden" id="includelastchange" value="<?php echo $includelastchange?>">
+<input type="hidden" id="lastlogin" value="<?php echo $lastlogin?>">
+<input type="hidden" id="includeduedate" value="<?php echo $includeduedate?>">
+<input type="hidden" id="toggle1" value="<?php echo $data['defaultValuesArray']['links']?>">
+<input type="hidden" id="toggle2" value="<?php echo $data['defaultValuesArray']['hidenc']?>">
+<input type="hidden" id="toggle3" value="<?php echo $data['availShow']?>">
+<input type="hidden" id="toggle4" value="<?php echo $data['defaultValuesArray']['showpics'] ?>" >
+<input type="hidden" id="toggle5" value="<?php echo $data['defaultValuesArray']['hidelocked'] ?>" >
 <div class="item-detail-header">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
 </div>
@@ -155,7 +167,7 @@ if ($data['availShow'] == 4) {
     $data['availShow'] = 1;
     $hidepast = true;
 }
-if ($avgontop) {
+if ($data['defaultValuesArray']['avgontop']) {
     $avgrow = array_pop($gradebook);
     array_splice($gradebook, 1, 0, array($avgrow));
 }
@@ -403,15 +415,19 @@ for ($i = 1; $i < count($gradebook); $i++) {
         echo '<sup>*</sup>';
     }
     echo '</div></td>';
-    if ($data['showPics'] == 1 && $gradebook[$i][4][2] == 1) {
-        echo "<td>{$insdiv}<div class=\"trld\"><img src=\"#\"/></div></td>";
-    } else if ($data['showPics'] == 2 && $gradebook[$i][4][2] == 1) {
-        echo "<td>{$insdiv}<div class=\"trld\"><img src=\"#\"/></div></td>";
-    } else {
+    if ($data['defaultValuesArray']['showpics'] == 1 && $gradebook[$i][0][0] !== 'Averages') { ?>
+        <?php $fileName = AppUtility::getHomeURL().'Uploads/'.$gradebook[$i][4][0].'.jpg';
+         if($gradebook[$i][4][2] == 1){ ?>
+             <td><?php echo $insdiv ?><div class="trld"><img src="<?php echo AppUtility::getHomeURL()?>Uploads/<?php echo $gradebook[$i][4][0] ?>.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+        <?php  }else{ ?>
+             <td><?php echo $insdiv ?><div class="trld"><img src="<?php echo AppUtility::getHomeURL()?>Uploads/dummy_profile.jpg?ver=<?php echo time()?>" width="50" height="50" /></div></td>
+        <?php }
+
+    }else {
         echo '<td>' . $insdiv . '<div class="trld">&nbsp;</div></td>';
     }
     for ($j = ($gradebook[0][0][1] == 'ID' ? 1 : 2); $j < count($gradebook[0][0]); $j++) {
-        echo '<td class="c">' . $insdiv . $gradebook[$i][0][$j] . $enddiv . '</td>';
+        echo '<td class="">' . $insdiv . $gradebook[$i][0][$j] . $enddiv . '</td>';
     }
     if ($data['totOnLeft'] && !$hidepast) {
         //total totals
@@ -744,8 +760,9 @@ for ($i = 1; $i < count($gradebook); $i++) {
 </div>
 </div>
 </div>
+ <?php
+?>
  <!-- jQuery --><!--
-<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.0.min.js"></script-->>
 <!-- DataTables -->
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>

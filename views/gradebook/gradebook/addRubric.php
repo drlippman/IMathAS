@@ -123,7 +123,7 @@ if ($overwriteBody==1) {
                 var val = document.getElementById("rubtype").value;
 
                 els = document.getElementsByTagName("input");
-                console.log(els);
+
                 for (i in els) {
                     if (els[i].className=='rubricpoints') {
                         if (val==2) {

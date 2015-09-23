@@ -167,7 +167,6 @@ echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id
     function removeResponseSuccess(response)
     {
         response = JSON.parse(response);
-        console.log(response);
         var name = response.data.nameOfExtTool;
         var cid = response.data.cid;
         var id = response.data.id;
