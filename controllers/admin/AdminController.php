@@ -68,10 +68,12 @@ class AdminController extends AppController
        $userName = $user->SID;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
+        $showUser = $this->getParamVal('showusers');
         if ($myRights == AppConstant::NUMERIC_HUNDREAD) {
-            if (isset($_GET['showusers'])) {
-                setcookie('showusers',$_GET['showusers']);
-                $showusers = $_GET['showusers'];
+            if (isset($showUser))
+            {
+                setcookie('showusers',$showUser);
+                $showusers = $showUser;
             } else if (isset($_COOKIE['showusers'])) {
                 $showusers = $_COOKIE['showusers'];
             } else {
@@ -85,7 +87,7 @@ class AdminController extends AppController
             if (isset($params['showcourses']))
             {
                 setcookie('showcourses',$params['showcourses']);
-                $showcourses = $_GET['showcourses'];
+                $showcourses = $showCid;
             } else if (isset($_COOKIE['showcourses']))
             {
                 $showcourses = $_COOKIE['showcourses'];
@@ -210,7 +212,7 @@ class AdminController extends AppController
             $i++;
         }
         $this->includeCSS(['dataTables.bootstrap.css','forums.css','dashboard.css', 'course/items.css']);
-        $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js']);
+        $this->includeJS(['general.js', 'jquery.dataTables.min.js', 'dataTables.bootstrap.js','adminIndex.js']);
         return $this->renderWithData('index', ['showCid' => $showCid ,'users' => $users, 'page_userDataId' =>$page_userDataId,'page_userDataLastName' => $page_userDataLastName, 'page_userDataFirstName' => $page_userDataFirstName, 'page_userDataSid' => $page_userDataSid,'page_userDataEmail' => $page_userDataEmail,'page_userDataType' => $page_userDataType,'page_userDataLastAccess' => $page_userDataLastAccess, 'page_userSelectVal' => $page_userSelectVal,'page_userSelectLabel' => $page_userSelectLabel,'showusers' => $showusers,'myRights' => $myRights, 'page_courseList' => $page_courseList, 'resultTeacher' => $resultTeacher, 'page_diagnosticsId' => $page_diagnosticsId, 'page_diagnosticsName' => $page_diagnosticsName, 'page_diagnosticsAvailable' => $page_diagnosticsAvailable, 'page_diagnosticsPublic' => $page_diagnosticsPublic, 'page_userBlockTitle' => $page_userBlockTitle, 'showcourses' => $showcourses, 'page_teacherSelectVal' => $page_teacherSelectVal, 'page_teacherSelectLabel' => $page_teacherSelectLabel, 'userId' => $userId, 'userName' => $userName]);
     }
 /*
@@ -304,7 +306,7 @@ class AdminController extends AppController
                     $spws[] = $v;
                 }
             }
-            if (isset($_POST['alpha'])) {
+            if (isset($params['alpha'])) {
                 natsort($sel1);
                 $sel1 = array_values($sel1);
             }
@@ -315,7 +317,7 @@ class AdminController extends AppController
 
             if ($params['termtype']=='mo') {
                 $params['term'] = '*mo*';
-            } else if ($_POST['termtype']=='day') {
+            } else if ($params['termtype']=='day') {
                 $params['term'] = '*day*';
             }
             if (isset($params['entrynotunique'])) {
@@ -380,7 +382,7 @@ class AdminController extends AppController
                 }
             }
             if (isset($params['useoneforall'])) { //use first sel2 for all
-                if (isset($_POST['alpha'])) {
+                if (isset($params['alpha'])) {
                     sort($sel2[0]);
                 }
                 $sel2[0] = implode('~',$sel2[0]);
@@ -407,7 +409,7 @@ class AdminController extends AppController
                 $page_successMsg = "<BR class=form><div class='col-lg-2'>Diagnostic Added</div><BR class=form><br>\n";
             }
             $page_diagLink = "<div class=col-lg-10>Direct link to diagnostic  <b>".AppUtility::getURLFromHome('site', 'diagnostics?id='.$id)."</b></div><BR class=form><br>";
-            $page_publicLink = ($_POST['public']&2) ? "<div class=col-lg-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
+            $page_publicLink = ($params['public']&2) ? "<div class=col-lg-10>Diagnostic is listed on the public listing at <b>".AppUtility::getURLFromHome('site', 'diagnostics')."</b></div><BR class=form><br>\n" : ""  ;
 
         } else {  //STEP 1 DATA PROCESSING, MODIFY MODE
             if (isset($params['id'])) {
@@ -1322,8 +1324,8 @@ class AdminController extends AppController
                 $lets = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
                 $code_list = array();
                 $now = time();
-                $n = intval($_POST['n']);
-                $goodfor = intval($_POST['multi']);
+                $n = intval($params['n']);
+                $goodfor = intval($params['multi']);
                 for ($i = 0; $i < $n; $i++) {
                     $code = '';
                     for ($j = 0; $j < 3; $j++) {
@@ -1637,6 +1639,7 @@ class AdminController extends AppController
 
         }
      $this->includeCSS(['libtree.css']);
+     $this->includeJS(['importLibrary.js']);
      $responseData = array('overwriteBody' => $overwriteBody,'body' => $body,'page_uploadSuccessMsg' => $page_uploadSuccessMsg,'params' => $params,'page_fileErrorMsg' => $page_fileErrorMsg,
      'page_fileHiddenInput' => $page_fileHiddenInput,'courseId' => $courseId,'packName' => $packName,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin
      ,'myRights' => $myRights,'parentsData' => $parents,'namesData' => $names);
@@ -1706,7 +1709,7 @@ class AdminController extends AppController
                 $libCnt = AppConstant::NUMERIC_ONE;
                 $libs = Array();
                 $parents = Array();
-                $nonPrivate = isset($_POST['nonpriv']);
+                $nonPrivate = isset($params['nonpriv']);
                 $libraryData = Libraries::getLibraryData($rootList,$nonPrivate);
                 if($libraryData)
                 {
@@ -2981,6 +2984,7 @@ class AdminController extends AppController
             }
         }
         $this->layout = 'master';
+        $this->includeJS(['importQuestionSet.js']);
         $responseData = array('overwriteBody' => $overwriteBody,'body' =>$body,'params' => $params,'courseId' => $courseId,'newQ' => $newQ,'updateQ' => $updateQ,'newLi' => $newLi,
             'page_fileNoticeMsg' => $page_fileNoticeMsg,'page_fileErrorMsg' => $page_fileErrorMsg,'page_fileHiddenInput' => $page_fileHiddenInput,'qData' => $qData,'page_existingMsg' => $page_existingMsg,'isAdmin' => $isAdmin,'isGrpAdmin' => $isGrpAdmin);
         return $this->renderWithData('importQuestionSet',$responseData);
@@ -3430,7 +3434,7 @@ class AdminController extends AppController
                         {
                             $page_ConfirmMsg = "<p>Are you SURE you want to remove this question from this library?</p><input type=hidden name=remove value=1>";
                         }
-                        if (isset($_POST['delete'])) {
+                        if (isset($params['delete'])) {
                             $page_ConfirmMsg = "<p>Are you SURE you want to delete this question?  Question will be removed from ALL libraries.</p><input type=hidden name=delete value=1>";
                         }
                     } else
@@ -3516,10 +3520,10 @@ class AdminController extends AppController
                     }
                 }
                 elseif (isset($params['update'])) {
-                    $params['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$_POST['qtext']);
-                    $params['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['qtext']);
-                    $params['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$_POST['qtext']);
-                    $params['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$_POST['description']);
+                    $params['qtext'] = preg_replace('/<([^<>]+?)>/',"&&&L$1&&&G",$params['qtext']);
+                    $params['qtext'] = str_replace(array("<",">"),array("&lt;","&gt;"),$params['qtext']);
+                    $params['qtext'] = str_replace(array("&&&L","&&&G"),array("<",">"),$params['qtext']);
+                    $params['description'] = str_replace(array("<",">"),array("&lt;","&gt;"),$params['description']);
                     $now = time();
 
                     if ($isGrpAdmin)

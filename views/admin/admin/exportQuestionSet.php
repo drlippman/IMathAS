@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="tab-content shadowBox non-nav-tab-item">
     <?php
     if (!(isset($isTeacher)) && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
-        $body = "You need to log in as a teacher to access this page";
+        $body = AppConstant::NO_TEACHER_RIGHTS;
     } elseif (isset($params['cid']) && $params['cid'] == "admin" && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
-        $body = "You need to log in as an admin to access this page";
+        $body = AppConstant::REQUIRED_ADMIN_ACCESS;
     } elseif (!(isset($params['cid'])) && $myRights < AppConstant::GROUP_ADMIN_RIGHT) {
-        $body = "Please access this page from the menu links only.";
+        $body = AppConstant::ACCESS_THROUGH_MENU;
     } else {
     }
 

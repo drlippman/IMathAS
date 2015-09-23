@@ -99,7 +99,7 @@ if (isset($params['id'])) {
         <div class="col-lg-2"><?php AppUtility::t('Privacy') ?></div>
         <div class="col-lg-8">
             <input type="checkbox" name="privname"
-                   value="1" <?php if (($privacy && AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) echo 'checked="checked"'; ?> /><span
+                   value="1" <?php if (($privacy & AppConstant::NUMERIC_ONE) == AppConstant::NUMERIC_ONE) echo 'checked="checked"'; ?> /><span
                 class="padding-left-five">Send name</span><br/>
             <input type="checkbox" name="privemail"
                    value="2" <?php if (($privacy & AppConstant::NUMERIC_TWO) == AppConstant::NUMERIC_TWO) echo 'checked="checked"'; ?> /><span

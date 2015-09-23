@@ -96,11 +96,11 @@ table.gb thead th{
 
 }
 .user-select {
-width: 10.5%;
-height: 34px;
+width: 10.5% !important;
+height: 34px !important;
 }
 .all-user-select {
-display: inline-block;
-padding-top: 2px;
-margin-left: 20px;
+display: inline-block !important;
+padding-top: 2px !important;
+margin-left: 20px !important;
 }
