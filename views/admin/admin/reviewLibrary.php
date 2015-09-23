@@ -7,8 +7,6 @@ if ($overwriteBody == 1) {
 } else { //DISPLAY BLOCK HERE
     ?>
 
-<!--    <div class="breadcrumb">--><?php //echo $curBreadcrumb; ?><!--</div>-->
-<!--    <div id="headerreviewlibrary" class="pagetitle"><h2>Review Library</h2></div>-->
     <?php
     if (!isset($_REQUEST['lib'])) {
         ?>

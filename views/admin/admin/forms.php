@@ -132,10 +132,6 @@ switch($action) {
         break;
     case "modify":
     case "addcourse":
-//    if ($myRights < 40) {
-//        echo "You don't have the authority for this action";
-//        break;
-//    }
         if (isset($params['cid'])) {
             $cid = $params['cid'];
         }

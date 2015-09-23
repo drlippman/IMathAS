@@ -212,39 +212,3 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
 </script>
 
 <?php } ?>
-
-<script>
-    $(document).ready(function(){
-    $('.transfer-post').click(function(e) {
-        alert('hiii');
-
-//        var linkId = $(this).attr('id');
-//        var timelimit = Math.abs($('#time-limit'+linkId).val());
-//        var hour = (Math.floor(timelimit/3600) < 10) ? '0'+Math.floor(timelimit/3600) : Math.floor(timelimit/3600);
-//        var min = Math.floor((timelimit%3600)/60);
-//        var html = '<div>This assessment has a time limit of '+hour+' hour, '+min+' minutes.  Click confirm to start or continue working on the assessment.</div>';
-//        var cancelUrl = $(this).attr('href');
-//        e.preventDefault();
-//        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
-//            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
-//            width: 'auto', resizable: false,
-//            closeText: "hide",
-//            buttons: {
-//                "Cancel": function () {
-//                    $(this).dialog('destroy').remove();
-//                    return false;
-//                },
-//                "Confirm": function () {
-//                    window.location = cancelUrl;
-//                    $(this).dialog("close");
-//                    return true;
-//                }
-//            },
-//            close: function (event, ui) {
-//                $(this).remove();
-//            }
-//        });
-//
-    });
-    });
-</script>

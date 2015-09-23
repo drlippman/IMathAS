@@ -31,7 +31,7 @@ $placeinhead = "<link rel=\"stylesheet\" href=\"$imasroot/infopages.css\" type=\
 <li><a href="http://www.imathas.com/imathas/docs/wamaplayouts.html">Examples of Course Layouts</a>.  Some ideas for how to lay out a course page</li>
 <li><a href="http://www.imathas.com/imathas/docs/wamaptemplate2.html">Using Course Templates</a>.  How to copy pre-created course templates to use
   course assignments created by your colleagues.</li>
-<li><a href="http://www.imathas.com/imathas/docs/docs.html">Video versions of several other guides</a> are also available.</p>
+<p><a href="http://www.imathas.com/imathas/docs/docs.html">Video versions of several other guides</a> are also available.</p>
 </ul>
 <h4>Question Writing Guides</h4>
 <ul>

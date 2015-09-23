@@ -284,7 +284,6 @@ class BlockController extends AppController
         $this->layout = "master";
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
-        $courseID = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
         $userId = $user['id'];
         $teacherId = $this->isTeacher($userId,$courseId);
@@ -337,7 +336,7 @@ class BlockController extends AppController
         }
         $this->includeCSS(['course/items.css']);
         $this->includeJS(['general.js']);
-        $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids, 'page_sectionlistval' => $page_sectionlistval, 'page_sectionlistlabel' => $page_sectionlistlabel);
+        $responseData = array('course' => $course, 'items' => $items, 'existblocks' => $this->existblocks, 'existblockids' => $this->existblockids, 'page_sectionlistval' => $page_sectionlistval, 'page_sectionlistlabel' => $page_sectionlistlabel, 'overwriteBody' => $overwriteBody);
         return $this->renderWithData('changeBlock', $responseData);
     }
 
@@ -385,12 +384,10 @@ class BlockController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
-        $courseName = $course->name;
         $userId = $user['id'];
         $teacherId = $this->isTeacher($userId,$courseId);
         $tutorId = $this->isTutor($userId, $courseId);
         $previewshift = -1;
-        $curBreadcrumb = '';
         $folder = 'TR'.$params['folder'];
         $astatus = array();
         $foundfirstitem = '';
@@ -424,14 +421,15 @@ class BlockController extends AppController
         if($student != NULL){
             $studentinfo['section'] = $student['section'];
         }
-        if ($params['folder'] != '0') {
+        if ($params['folder'] != '0')
+        {
             $now = time() + $previewshift;
             $blocktree = explode('-',$params['folder']);
             $backtrack = array();
-            for ($i=1;$i<count($blocktree);$i++) {
+            for ($i = AppConstant::NUMERIC_ONE;$i<count($blocktree);$i++) {
                 $backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));
                 if (!isset($teacherid) && !isset($tutorid) && $items[$blocktree[$i]-1]['avail']<2 && $items[$blocktree[$i]-1]['SH'][0]!='S' &&($now<$items[$blocktree[$i]-1]['startdate'] || $now>$items[$blocktree[$i]-1]['enddate'] || $items[$blocktree[$i]-1]['avail']=='0')) {
-                    $_GET['folder'] = 0;
+                    $_GET['folder'] = AppConstant::NUMERIC_ZERO;
                     $items = unserialize($courseData['itemorder']);
                     unset($backtrack);
                     unset($blocktree);
@@ -460,7 +458,7 @@ class BlockController extends AppController
                             continue 2;
                         }
                     }
-                    $astatus[$row['id']] = 0; //unstarted
+                    $astatus[$row['id']] = AppConstant::NUMERIC_ZERO; //unstarted
                 }
             }
             $exceptions = array();
@@ -471,11 +469,11 @@ class BlockController extends AppController
                 }
             }
             //update block start/end dates to show blocks containing items with exceptions
-            if (count($exceptions)>0) {
+            if (count($exceptions) > AppConstant::NUMERIC_ZERO) {
                 $this->upsendexceptions($items);
             }
         }
-        if (isset($backtrack) && count($backtrack)>0) {
+        if (isset($backtrack) && count($backtrack) > AppConstant::NUMERIC_ZERO) {
             $blockName = $backtrack[count($backtrack)-1][0];
 
             if (count($backtrack) == AppConstant::NUMERIC_ONE) {
@@ -496,11 +494,10 @@ class BlockController extends AppController
     }
 
     function printlist($items) {
-        global $courseId,$imasroot,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
+        global $courseId,$foundfirstitem, $foundopenitem, $openitem, $astatus, $studentinfo, $now, $viewall, $exceptions;
         $out = '';
         $isopen = false;
         foreach ($items as $item) {
-
             if (is_array($item)) { //is block
                 $path = AppUtility::getHomeURL();
                 //TODO check that it's available
@@ -562,12 +559,12 @@ class BlockController extends AppController
 
                         if ($line['timelimit']> AppConstant::NUMERIC_ONE) {
 
-                            if ($line['timelimit']>3600) {
+                            if ($line['timelimit'] > AppConstant::MINUTES) {
 
-                                $tlhrs = floor($line['timelimit']/3600);
-                                $tlrem = $line['timelimit'] % 3600;
-                                $tlmin = floor($tlrem/60);
-                                $tlsec = $tlrem % 60;
+                                $tlhrs = floor($line['timelimit'] / AppConstant::MINUTES);
+                                $tlrem = $line['timelimit'] % AppConstant::MINUTES;
+                                $tlmin = floor($tlrem/AppConstant::SIXTY);
+                                $tlsec = $tlrem % AppConstant::SIXTY;
                                 $tlwrds = "$tlhrs " . _('hour');
 
                                 if ($tlhrs > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
@@ -575,13 +572,13 @@ class BlockController extends AppController
                                 if ($tlmin > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
                                 if ($tlsec > AppConstant::NUMERIC_ZERO) { $tlwrds .= ", $tlsec " . _('second');}
                                 if ($tlsec > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
-                            } else if ($line['timelimit']>60) {
-                                $tlmin = floor($line['timelimit']/60);
-                                $tlsec = $line['timelimit'] % 60;
+                            } else if ($line['timelimit'] > AppConstant::SIXTY) {
+                                $tlmin = floor($line['timelimit']/ AppConstant::SIXTY);
+                                $tlsec = $line['timelimit'] % AppConstant::SIXTY;
                                 $tlwrds = "$tlmin " . _('minute');
-                                if ($tlmin > 1) { $tlwrds .= "s";}
-                                if ($tlsec > 0) { $tlwrds .= ", $tlsec " . _('second');}
-                                if ($tlsec > 1) { $tlwrds .= "s";}
+                                if ($tlmin > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
+                                if ($tlsec > AppConstant::NUMERIC_ZERO) { $tlwrds .= ", $tlsec " . _('second');}
+                                if ($tlsec > AppConstant::NUMERIC_ONE) { $tlwrds .= "s";}
                             } else {
                                 $tlwrds = $line['timelimit'] . _(' second(s)');
                             }
@@ -643,9 +640,9 @@ class BlockController extends AppController
         return array($out,$isopen);
     }
 
-    function upsendexceptions(&$items) {
+   public function upsendexceptions(&$items) {
         global $exceptions;
-        $minsdate = 9999999999;
+        $minsdate = AppConstant::MIN_START_DATE;
         $maxedate = AppConstant::NUMERIC_ZERO;
         foreach ($items as $k=>$item) {
             if (is_array($item)) {
@@ -657,19 +654,17 @@ class BlockController extends AppController
                     if ($hasexc[1]>$items[$k]['enddate']) {
                         $items[$k]['enddate'] = $hasexc[1];
                     }
-                    //return ($hasexc);
                     if ($hasexc[0]<$minsdate) { $minsdate = $hasexc[0];}
                     if ($hasexc[1]>$maxedate) { $maxedate = $hasexc[1];}
                 }
             } else {
                 if (isset($exceptions[$item])) {
-                    // return ($exceptions[$item]);
                     if ($exceptions[$item][0]<$minsdate) { $minsdate = $exceptions[$item][0];}
                     if ($exceptions[$item][1]>$maxedate) { $maxedate = $exceptions[$item][1];}
                 }
             }
         }
-        if ($minsdate<9999999999 || $maxedate>0) {
+        if ($minsdate < AppConstant::MIN_START_DATE || $maxedate > AppConstant::NUMERIC_ZERO) {
             return (array($minsdate,$maxedate));
         } else {
             return false;

@@ -37,30 +37,31 @@ $this->params['breadcrumbs'][] = $this->title;
 <input type=hidden name="reentrytime" value="<?php echo $params['reentrytime'] ?>"/>
 <input type=hidden name="id" value="<?php echo $page_updateId ?>">
 
-<div class="col-lg-2">Second-level selector name</div>
+<div class="col-lg-2"><?php AppUtility::t('Second-level selector name')?></div>
 <div class="col-lg-8"><input type=text class="form-control-1" name=sel2name value="<?php echo $sel2name ?>"/>
-    'Select your ______'
+   <?php AppUtility::t('Select your ______')?>
 </div>
 <BR class=form><br>
 
-<div class="col-lg-10">For each of the first-level selectors, select which assessment should be delivered,
-    and provide options for the second-level selector
+<div class="col-lg-10">
+<?php AppUtility::t('For each of the first-level selectors, select which assessment should be delivered,
+    and provide options for the second-level selector')?>
 </div>
 <BR class=form><br>
 
-<div class="col-lg-2">Alphabetize selectors on submit?</div>
+<div class="col-lg-2"><?php AppUtility::t('Alphabetize selectors on submit?')?></div>
 <div class="col-lg-6"><input type="checkbox" name="alpha" value="1"/></div>
 <BR class=form><br>
 <?php
 foreach ($sel1 as $k => $s1) {
     ?>
     <div>
-        <p><b><?php echo $s1 ?></b>. Deliver assessment:
+        <p><b><?php echo $s1 ?></b>. <?php AppUtility::t('Deliver assessment')?>
             <?php
             AppUtility::writeHtmlSelect($page_selectName[$k], $page_selectValList[$k], $page_selectLabelList[$k], $page_selectedOption[$k]);
             ?>
             <br/>
-            Force regen on reentry (if allowed)? <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php
+            <?php AppUtility::t('Force regen on reentry (if allowed)?')?> <input type=checkbox name="reg<?php echo $k; ?>" value="1" <?php
             if (($forceregen & (AppConstant::NUMERIC_ONE << $k)) > AppConstant::NUMERIC_ZERO) {
                 echo 'checked="checked"';
             }?> />
@@ -72,7 +73,7 @@ foreach ($sel1 as $k => $s1) {
             ?>
         </p>
 
-        <div class="sel2">Add selector value:
+        <div class="sel2"><?php AppUtility::t('Add selector value')?>
             <input type=text id="in<?php echo $k ?>"
                    onkeypress="return onenter(event,'in<?php echo $k ?>','out<?php echo $k ?>')"/>
             <input type="button" value="Add" onclick="additem('in<?php echo $k ?>','out<?php echo $k ?>')"/><br/>
@@ -127,12 +128,12 @@ echo '<form>';
     <form method=post action=diagnostics?step=2><BR class=form>
     <?php echo (isset($params['id'])) ? "	<input type=hidden name=id value=\"{$params['id']}\"/>" : ""; ?>
 
-    <div class="col-lg-2 padding-top-five">Diagnostic Name</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('Diagnostic Name')?></div>
     <div class="col-lg-6"><input type=text size=60 name="diagname" class="form-control" maxlength="60"
                                  required="Please fill out this field" value="<?php echo $diagname; ?>"/></div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Term designator (e.g. F06)</div>
+    <div class="col-lg-2"><?php AppUtility::t('Term designator (e.g. F06)')?></div>
     <div class="col-lg-8">
         <input type=radio name="termtype" value="mo" <?php if ($term == "*mo*") {
             echo 'checked="checked"';
@@ -152,34 +153,34 @@ echo '<form>';
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2 padding-top-five">Linked with course</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('Linked with course')?></div>
     <div class="col-lg-4">
         <?php
         AppUtility::writeHtmlSelect("cid", $page_courseSelectList['val'], $page_courseSelectList['label'], $page_courseSelected); ?>
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Available? (Can be taken)?</div>
+    <div class="col-lg-2"><?php AppUtility::t('Available? (Can be taken)?')?></div>
     <div class="col-lg-6"><input type=radio name="avail"
                                  value="1" <?php AppUtility::writeHtmlChecked(AppConstant::NUMERIC_ONE, ($public & 1), AppConstant::NUMERIC_ZERO); ?> /><span
-            class="padding-left-three padding-right"> Yes</span>
+            class="padding-left-three padding-right"><?php AppUtility::t('')?> Yes</span>
         <input type=radio name="avail"
                value="0" <?php AppUtility::writeHtmlChecked(AppConstant::NUMERIC_ONE, ($public & 1), AppConstant::NUMERIC_ONE); ?> /> <span
-            class="padding-left-three padding-right">No</span>
+            class="padding-left-three padding-right"><?php AppUtility::t('')?>No</span>
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Include in public listing?</div>
+    <div class="col-lg-2"><?php AppUtility::t('Include in public listing?')?></div>
     <div class="col-lg-6"><input type=radio name="public"
                                  value="1" <?php AppUtility::writeHtmlChecked(AppConstant::NUMERIC_TWO, ($public & AppConstant::NUMERIC_TWO), AppConstant::NUMERIC_ZERO); ?> /> <span
-            class="padding-left-three padding-right">Yes</span>
+            class="padding-left-three padding-right"><?php AppUtility::t('')?>Yes</span>
         <input type=radio name="public"
                value="0" <?php AppUtility::writeHtmlChecked(AppConstant::NUMERIC_TWO, ($public & AppConstant::NUMERIC_TWO), AppConstant::NUMERIC_ONE); ?> /><span
-            class="padding-left-five padding-right">No</span>
+            class="padding-left-five padding-right"><?php AppUtility::t('')?>No</span>
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Allow reentry (continuation of test at later date)?</div>
+    <div class="col-lg-2"><?php AppUtility::t('Allow reentry (continuation of test at later date)?')?></div>
     <div class="col-lg-8"><input type=radio name="reentry"
                                  value="0" <?php AppUtility::writeHtmlChecked(AppConstant::NUMERIC_FOUR, ($public & 4), AppConstant::NUMERIC_ONE); ?> /><span
             class="padding-left-five padding-right">No</span>
@@ -190,24 +191,24 @@ echo '<form>';
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2 padding-top-five">Unique ID prompt</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('Unique ID prompt')?></div>
     <div class="col-lg-6">
         <input type=text size=60 name="idprompt" class="form-control" value="<?php echo $idprompt; ?>"/></div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Attach first level selector to ID</div>
+    <div class="col-lg-2"><?php AppUtility::t('Attach first level selector to ID')?></div>
     <div class="col-lg-6"><input type="checkbox" name="entrynotunique"
                                  value="1" <?php AppUtility::writeHtmlChecked($entrynotunique, true); ?> /></div>
     <BR class=form><br>
 
-    <div class="col-lg-2 padding-top-five">ID entry format</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('ID entry format')?></div>
     <div class="col-lg-4">   <?php
         AppUtility::writeHtmlSelect("entrytype", $page_entryType['val'], $page_entryType['label'], $page_entryTypeSelected);
         ?>
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2">ID entry number of characters?</div>
+    <div class="col-lg-2"><?php AppUtility::t('ID entry number of characters?')?></div>
     <div class="col-lg-4">    <?php
         AppUtility::writeHtmlSelect("entrydig", $page_entryNums['val'], $page_entryNums['label'], $page_entryNumsSelected);
         ?>
@@ -215,11 +216,11 @@ echo '<form>';
     <BR class=form><br>
 
     <div class="col-lg-10">
-        Allow access without password from computer with these IP addresses. Use * for wildcard, e.g. 134.39.*
+        <?php AppUtility::t('Allow access without password from computer with these IP addresses. Use * for wildcard, e.g. 134.39.*')?>
     </div>
     <br/>
 
-    <div class="col-lg-2 padding-top-five">Enter IP address</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('')?>Enter IP address</div>
     <div class="col-lg-8"><input type=text id="ipin" class="form-control-1"
                                  onkeypress="return onenter(event,'ipin','ipout')">
         <input type=button value="Add" onclick="additem('ipin','ipout')"/>
@@ -257,11 +258,10 @@ echo '<form>';
         ?>
     </div>
     <BR class=form><br>
-
-    <div class="col-lg-10">From other computers, a password will be required to access the diagnostic.</div>
+    <div class="col-lg-10"><?php AppUtility::t('From other computers, a password will be required to access the diagnostic.')?></div>
     <br/>
 
-    <div class="col-lg-2 padding-top-five">Enter Password</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
     <div class="col-lg-8"><input type=text id="pwin" class="form-control-1"
                                  onkeypress="return onenter(event,'pwin','pwout')">
         <input type=button value="Add" onclick="additem('pwin','pwout')"/>
@@ -302,11 +302,10 @@ echo '<form>';
         ?>
     </div>
     <BR class=form><br>
-
-    <div class="col-lg-10">Super passwords will override testing window limits.</div>
+    <div class="col-lg-10"><?php AppUtility::t('Super passwords will override testing window limits.')?></div>
     <br/>
 
-    <div class="col-lg-2 padding-top-five">Enter Password</div>
+    <div class="col-lg-2 padding-top-five"><?php AppUtility::t('')?>Enter Password</div>
     <div class="col-lg-8"><input type=text id="pwsin" class="form-control-1"
                                  onkeypress="return onenter(event,'pwsin','pwsout')">
         <input type=button value="Add" onclick="additem('pwsin','pwsout')"/>
@@ -347,21 +346,20 @@ echo '<form>';
         ?>
     </div>
     <BR class=form><br>
-
-    <div class="col-lg-10"><h4>First-level selector - selects assessment to be delivered</h4></div>
+    <div class="col-lg-10"><h4><?php AppUtility::t('First-level selector - selects assessment to be delivered')?></h4></div>
     <BR class=form>
 
-    <div class="col-lg-2">Selector name</div>
+    <div class="col-lg-2"><?php AppUtility::t('Selector name')?></div>
     <div class="col-lg-8"><input name="sel" class="form-control-1" type=text value="<?php echo $sel; ?>"/> "Please
         select your _______"
     </div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Alphabetize selectors on submit?</div>
+    <div class="col-lg-2"><?php AppUtility::t('Alphabetize selectors on submit?')?></div>
     <div class="col-lg-6"><input type="checkbox" name="alpha" value="1"/></div>
     <BR class=form><br>
 
-    <div class="col-lg-2">Enter new selector option</div>
+    <div class="col-lg-2"><?php AppUtility::t('Enter new selector option')?></div>
     <div class="col-lg-8"><input type=text id="sellist" class="form-control-1"
                                  onkeypress="return onenter(event,'sellist','selout')">
         <input type=button value="Add" onclick="additem('sellist','selout')"/>

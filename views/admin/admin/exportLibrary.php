@@ -27,7 +27,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         } else {
             ?>
-
             <form method=post
                   action="<?php echo AppUtility::getURLFromHome('admin', 'admin/export-lib?cid=' . $courseId) ?>">
 

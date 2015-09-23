@@ -251,4 +251,7 @@ class AppConstant
     const ENTER_TITLE = 'Enter title here';
     const ENTER_SUMMARY = '<p>Enter summary here (displays on course page)</p>';
     const FORUM_DESCRIPTION = '<p>Enter forum description here</p>';
+    const FOUR_ZERO_NINE_SIX = 4096;
+    const SIXTY = 60;
+    const MIN_START_DATE = 9999999999;
 }

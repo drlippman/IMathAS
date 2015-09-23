@@ -237,26 +237,6 @@ class AdminController extends AppController
         return $this->renderWithData('addNewUser',$responseData);
     }
 
-    public function actionAdminDiagnostic()
-    {
-        $this->guestUserHandler();
-        $model = new AdminDiagnosticForm();
-        if ($model->load($this->isPostMethod()))
-        {
-            $params = $this->getRequestParams();
-            $user = $this->getAuthenticatedUser();
-            $params = $params['AdminDiagnosticForm'];
-            $params['ownerid'] = $user->SID;
-            $params['name'] = $params['DiagnosticName'];
-            $params['term'] = $params['TermDesignator'];
-            $diag = new BaseImasDiags();
-            $diag->attributes = $params;
-            $diag->save();
-        }
-        $responseData = array('model' => $model);
-        return $this->renderWithData('adminDiagnostic',$responseData);
-    }
-
     public function actionGetAllCourseUserAjax()
     {
         $sortBy = AppConstant::FIRST_NAME;
@@ -302,7 +282,6 @@ class AdminController extends AppController
         $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];
-        $groupId= $user['groupid'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $diagnoId = $this->getParamVal('id');
         $params = $this->getRequestParams();
@@ -511,7 +490,7 @@ class AdminController extends AppController
         $this->includeJS(['diag.js']);
         $responseData = array('params' => $params, 'page_courseSelectList' => $page_courseSelectList, 'page_courseSelected' => $page_courseSelected, 'cid'=> $cid, 'idprompt' => $idprompt, 'reentrytime' => $reentrytime, 'page_entryType' => $page_entryType, 'page_entryTypeSelected' => $page_entryTypeSelected, 'page_entryNums' => $page_entryNums, 'page_entryNumsSelected' => $page_entryNumsSelected, 'sel' => $sel, 'sel2name' => $sel2name,
         'sel1list' => $sel1list, 'entryformat' => $entryformat, 'public' => $public, 'owner' => $owner, 'page_updateId' => $page_updateId, 'pwlist' => $pwlist, 'forceregen' => $forceregen, 'page_successMsg' => $page_successMsg, 'page_diagLink' => $page_diagLink, 'page_publicLink' => $page_publicLink, 'diagname' =>$diagname, 'ips' => $ips, 'pws' => $pws, 'term' => $term, 'iplist' => $iplist, 'sel1' => $sel1, 'page_selectName' => $page_selectName, 'page_selectValList' => $page_selectValList,
-        'page_selectLabelList' => $page_selectLabelList, 'page_selectedOption' => $page_selectedOption, 'sel2list' => $sel2list, 'aidlist' => $aidlist);
+        'page_selectLabelList' => $page_selectLabelList, 'page_selectedOption' => $page_selectedOption, 'sel2list' => $sel2list, 'aidlist' => $aidlist, 'overwriteBody' => $overwriteBody, 'page_cntScript' => $page_cntScript);
         return $this->renderWithData('diagnostics', $responseData);
     }
     public function actionDeleteDiagnosticsAjax()
@@ -527,7 +506,6 @@ class AdminController extends AppController
        $user = $this->getAuthenticatedUser();
        $this->layout = 'master';
        $userId = $user->id;
-       $userName = $user->SID;
        $myRights = $user['rights'];
        $groupId= $user['groupid'];
        $isAdmin = false;
@@ -822,8 +800,6 @@ class AdminController extends AppController
         $userId = $currentUser['id'];
         $action = $params['action'];
         $myRights = $currentUser['rights'];
-        $enablebasiclti = true;
-        $userid = AppConstant::NUMERIC_ZERO;
         $groupid = AppConstant::NUMERIC_ZERO;
         switch($action) {
             case "emulateuser":
@@ -1333,9 +1309,7 @@ class AdminController extends AppController
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
-        $userId = $user->id;
         $myRights = $user['rights'];
-        $groupId= $user['groupid'];
         $diag = $this->getParamVal('id');
         $params = $this->getRequestParams();
         $overwriteBody = AppConstant::NUMERIC_ZERO;
@@ -1360,7 +1334,8 @@ class AdminController extends AppController
                     }
                     $query = new DiagOneTime();
                     $query->generateDiagOneTime($diag, $now, $code, $goodfor);
-                    /*if ($i>0) { $query .= ','; }
+                    /* Work-in progress Group Admin
+                     * if ($i>0) { $query .= ','; }
                     $query .= "('$diag',$now,'$code',$goodfor)"; */
                     $code_list[] = $code;
                 }
@@ -1387,7 +1362,8 @@ class AdminController extends AppController
                 return $this->redirect(AppUtility::getURLFromHome('admin', 'admin/index'));
             }
         } else {
-            /*$old = time() - 365*24*60*60; //one year ago
+            /*Work-in progress group admin
+             * $old = time() - 365*24*60*60; //one year ago
             $now = time();
             $queryDelete = DiagOneTime::deleteByTime($old, $now); */
             $code_list = array();
@@ -1672,9 +1648,6 @@ class AdminController extends AppController
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
         $this->layout = "master";
-        $isAdmin = false;
-        $allowNonGroupLibs = false;
-        $isGrpAdmin = false;
         $courseId = $this->getParamVal('cid');
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
@@ -1713,7 +1686,7 @@ class AdminController extends AppController
 
             if(isset($params['submit']) && $params['submit'] == 'Export')
             {
-                if (count($params['libs'])== 0)
+                if (count($params['libs'])== AppConstant::NUMERIC_ZERO)
                 {
                     $this->setErrorFlash('No libraries selected');
                   return $this->redirect('export-lib?cid='.$courseId);
@@ -1733,7 +1706,6 @@ class AdminController extends AppController
                 $libCnt = AppConstant::NUMERIC_ONE;
                 $libs = Array();
                 $parents = Array();
-                $names = Array();
                 $nonPrivate = isset($_POST['nonpriv']);
                 $libraryData = Libraries::getLibraryData($rootList,$nonPrivate);
                 if($libraryData)
@@ -1810,18 +1782,18 @@ class AdminController extends AppController
                 {
                     foreach($questionSetData as $line)
                     {
-                        if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) >0)
+                        if (preg_match_all('/includecodefrom\((\d+)\)/',$line['control'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
                         {
                             $includedGs = array_merge($includedGs,$matches[1]);
                         }
-                        if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) >0)
+                        if (preg_match_all('/includeqtextfrom\((\d+)\)/',$line['qtext'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
                         {
                             $includedGs = array_merge($includedGs,$matches[1]);
                         }
                     }
                 }
                 $includedBackRef = array();
-                if(count($includedGs) > 0)
+                if(count($includedGs) > AppConstant::NUMERIC_ZERO)
                 {
                     $data = QuestionSet::getUniqueIdToExportLib($includedGs);
                     if($data)
@@ -1884,7 +1856,11 @@ class AdminController extends AppController
                                     echo $row['var'].','.$row['filename']. "\n";
                                     if ($GLOBALS['filehandertypecfiles'] == 's3')
                                     {
-                                        copyqimage($row['filename'],realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row['filename']);
+                                        /*
+                                         * Work-in-progress
+                                         * copyqimage($row['filename'],realpath("../assessment/qimages").DIRECTORY_SEPARATOR.$row['filename']);
+                                         */
+
                                     }
                                     $imgFiles[] =AppConstant::UPLOAD_DIRECTORY.'exportLibrary/'.DIRECTORY_SEPARATOR.$row['filename'];
                                 }
@@ -1955,15 +1931,15 @@ class AdminController extends AppController
         while (((!$noGz || !feof($handle)) && ($noGz || !gzeof($handle))) && $line!="START QUESTION") {
             if ($noGz)
             {
-                $line = rtrim(fgets($handle, 4096));
+                $line = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else {
-                $line = rtrim(gzgets($handle, 4096));
+                $line = rtrim(gzgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             if ($line=="PACKAGE DESCRIPTION")
             {
                 $doPacked = true;
-                $packName = rtrim(fgets($handle, 4096));
+                $packName = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else if ($line=="START LIBRARY")
             {
@@ -1972,26 +1948,26 @@ class AdminController extends AppController
             }
             else if ($line=="ID")
             {
-                $libId = rtrim(fgets($handle, 4096));
+                $libId = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else if ($line=="UID")
             {
-                $unique[$libId] = rtrim(fgets($handle, 4096));
+                $unique[$libId] = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else if ($line=="LASTMODDATE")
             {
-                $lastModDate[$libId] = rtrim(fgets($handle, 4096));
+                $lastModDate[$libId] = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else if ($line=="NAME")
             {
                 if ($libId != -1)
                 {
-                    $names[$libId] = rtrim(fgets($handle, 4096));
+                    $names[$libId] = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
                 }
             } else if ($line=="PARENT") {
                 if ($libId != -1)
                 {
-                    $parents[$libId]= rtrim(fgets($handle, 4096));
+                    $parents[$libId]= rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
                 }
             }else if ($line=="START LIBRARY ITEMS")
             {
@@ -1999,13 +1975,13 @@ class AdminController extends AppController
             }
             else if ($line=="LIBID")
             {
-                $libItemId = rtrim(fgets($handle, 4096));
+                $libItemId = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else if ($line=="QSETIDS")
             {
-                if ($libItemId!=-1)
+                if ($libItemId != -1)
                 {
-                    $libItems[$libItemId] = rtrim(fgets($handle, 4096));
+                    $libItems[$libItemId] = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
                 }
             } else if ($doPacked ==true) {
                 $packName .= rtrim($line);
@@ -2041,11 +2017,11 @@ class AdminController extends AppController
         {
             if ($nogz)
             {
-                $line = rtrim(fgets($handle, 4096));
+                $line = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             else
             {
-                $line = rtrim(gzgets($handle, 4096));
+                $line = rtrim(gzgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             }
             if ($line == "START QUESTION")
             {
@@ -2187,22 +2163,21 @@ class AdminController extends AppController
         {
             $qSetId = $QuestionSetData['id'];
             $addDate = $QuestionSetData['adddate'];
-            $lastModDate = $QuestionSetData['adddate'];
             $exists = true;
         } else
         {
             $exists = false;
         }
-        if ($exists && ($params['merge']==1 || $params['merge']==2))
+        if ($exists && ($params['merge']==1 || $params['merge'] == AppConstant::NUMERIC_TWO))
         {
-            if ($qd['lastmod']>$addDate || $params['merge']==2)
+            if ($qd['lastmod']>$addDate || $params['merge'] == AppConstant::NUMERIC_TWO)
             {
                 if (!empty($qd['qimgs']))
                 {
-                    $hasImg = 1;
+                    $hasImg = AppConstant::NUMERIC_ONE;
                 } else
                 {
-                    $hasImg = 0;
+                    $hasImg = AppConstant::NUMERIC_ZERO;
                 }
                 if ($isGrpAdmin)
                 {
@@ -2221,7 +2196,7 @@ class AdminController extends AppController
                 {
                     $affectedRow = QuestionSet::UpdateQuestionsetDataIfNotAdmin($qd,$hasImg,$now,$qSetId,$user,$isAdmin,0);
                 }
-                if ($affectedRow > 0)
+                if ($affectedRow > AppConstant::NUMERIC_ZERO)
                 {
                     $updateQ++;
                     if (!empty($qd['qimgs']))
@@ -2233,7 +2208,7 @@ class AdminController extends AppController
                             foreach($qImages as $qimg)
                             {
                                 $p = explode(',',$qimg);
-                                if (count($p) < 2)
+                                if (count($p) < AppConstant::NUMERIC_TWO)
                                 {
                                     continue;
                                 }
@@ -2246,28 +2221,26 @@ class AdminController extends AppController
                 }
             }
             return $qSetId;
-        } else if ($exists && $params['merge']==-1)
+        } else if ($exists && $params['merge'] == -1)
         {
             return $qSetId;
         }
         else
         {
-            $importUIdStr = '';
             $importUIdVal = '';
-            if ($qd['uqid']=='0' || ($exists && $params['merge']==0))
+            if ($qd['uqid']=='0' || ($exists && $params['merge'] == AppConstant::NUMERIC_ZERO))
             {
-                $importUIdStr  = 'importuid';
                 $importUIdVal = $qd['uqid'];
                 $mt = microtime();
                 $qd['uqid'] = substr($mt,11).substr($mt,2,2).$qn;
             }
             if (!empty($qd['qimgs']))
             {
-                $hasImg = 1;
+                $hasImg = AppConstant::NUMERIC_ONE;
             }
             else
             {
-                $hasImg = 0;
+                $hasImg = AppConstant::NUMERIC_ZERO;
             }
             $insert = new QuestionSet();
             $insertId = $insert->InsertData($now,$user,$qd,$importUIdVal,$hasImg,$rights);
@@ -2290,20 +2263,6 @@ class AdminController extends AppController
             return $qSetId;
         }
     }
-
-    function delqimgs($qsid) {
-        $query = "SELECT id,filename,var FROM imas_qimages WHERE qsetid='$qsid'";
-        $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-        while ($row = mysql_fetch_row($result)) {
-            $query = "SELECT id FROM imas_qimages WHERE filename='{$row[1]}'";
-            $r2 = mysql_query($query) or die("Query failed :$query " . mysql_error());
-            if (mysql_num_rows($r2)==1) { //don't delete if file is used in other questions
-                unlink(rtrim(dirname(__FILE__), '/\\') .'/../assessment/qimages/'.$row[1]);
-            }
-            $query = "DELETE FROM imas_qimages WHERE id='{$row[0]}'";
-            mysql_query($query) or die("Query failed :$query " . mysql_error());
-        }
-    }
     function addslashes_deep($value=null)
     {
         return (is_array($value) ? array_map('addslashes_deep', $value) : addslashes($value));
@@ -2311,9 +2270,8 @@ class AdminController extends AppController
     function setparentrights($alibid)
     {
         global $rights,$parents;
-        if ($parents[$alibid]>0) {
+        if ($parents[$alibid] > AppConstant::NUMERIC_ZERO) {
             if ($rights[$parents[$alibid]] < $rights[$alibid]) {
-                //if (($rights[$parents[$alibid]]>2 && $rights[$alibid]<3) || ($rights[$alibid]==0 && $rights[$parents[$alibid]]>0)) {
                 $rights[$parents[$alibid]] = $rights[$alibid];
             }
             $this->setparentrights($parents[$alibid]);
@@ -2414,7 +2372,6 @@ class AdminController extends AppController
                        foreach($result as $key => $row) {
                             $qidstocheck[] = $row['qsetid'];
                         }
-
                         if ($isAdmin)
                         {
                             $deleteAdmin = new LibraryItems();
@@ -2434,7 +2391,6 @@ class AdminController extends AppController
                                 $deleteLibItem->deleteLibraryGrpAdmin($row['id']);
                             }
                         }
-
                         if (isset($qidstocheck)) {
                             $qids = implode(",",$qidstocheck);
                             $result = LibraryItems::getByDistinctQid($qids);
@@ -2443,14 +2399,14 @@ class AdminController extends AppController
                                 $okqids[] = $row['qsetid'];
                             }
                             $qidstofix = array_diff($qidstocheck,$okqids);
-                            if ($params['delq'] == 'yes' && count($qidstofix) > 0)
+                            if ($params['delq'] == 'yes' && count($qidstofix) > AppConstant::NUMERIC_ZERO)
                             {
                                 $qlist = implode(',',$qidstofix);
                                 QuestionSet::updateIdIn($qlist);
                             } else {
                                 foreach($qidstofix as $qid) {
                                     $query = new LibraryItems();
-                                    $query->insertDataLib($qid,0);
+                                    $query->insertDataLib($qid, AppConstant::NUMERIC_ZERO);
                                 }
                             }
                         }
@@ -2465,7 +2421,7 @@ class AdminController extends AppController
                         $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
                     } else {
                         $oktorem = array();
-                        for ($i=0; $i<count($params['nchecked']); $i++)
+                        for ($i = AppConstant::NUMERIC_ZERO; $i < count($params['nchecked']); $i++)
                         {
                             $parentLib = $params['nchecked'][$i];
                             $libcnt = Libraries::getCountOfId($parentLib);
@@ -2685,11 +2641,9 @@ class AdminController extends AppController
                 } else {
                     $page_AdminModeMsg = "";
                 }
-
                 $resultLib = Libraries::getById();
                 $rights = array();
                 $sortorder = array();
-
                 foreach($resultLib as $key => $line)
                 {
                     $id = $line['id'];
@@ -2717,7 +2671,7 @@ class AdminController extends AppController
         $this->includeJS(['libtree.js', 'general.js']);
 
         $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body, 'rlist' => $rlist, 'hasChildWarning' => $hasChildWarning,
-        'parent1' => $parent1, 'lnames' => $lnames);
+        'parent1' => $parent1);
         return $this->renderWithData('manageLib', $responseData);
     }
 
@@ -2806,9 +2760,9 @@ class AdminController extends AppController
                     }
                 }
                 $mt = microtime();
-                $newQ = 0;
-                $updateQ = 0;
-                $newLi = 0;
+                $newQ = AppConstant::NUMERIC_ZERO;
+                $updateQ = AppConstant::NUMERIC_ZERO;
+                $newLi = AppConstant::NUMERIC_ZERO;
                 $now = time();
                 $allQIds = array();
                 $connection = $this->getDatabase();
@@ -2819,10 +2773,10 @@ class AdminController extends AppController
                     {
                         if (!empty($qData[$qn]['qimgs']))
                         {
-                            $hasImg = 1;
+                            $hasImg = AppConstant::NUMERIC_ONE;
                         } else
                         {
-                            $hasImg = 0;
+                            $hasImg = AppConstant::NUMERIC_ZERO;
                         }
                         if (isset($exists[$qData[$qn]['uqid']]) && $params['merge'] == AppConstant::NUMERIC_ONE)
                         {
@@ -2921,11 +2875,11 @@ class AdminController extends AppController
                         foreach($questionSetData as $row)
                         {
                             $qIdsToUpdate[] = $row['id'];
-                            if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row['control'],$matches,PREG_PATTERN_ORDER) >0)
+                            if (preg_match_all('/includecodefrom\(UID(\d+)\)/',$row['control'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
                             {
                                 $includedQs = array_merge($includedQs,$matches[1]);
                             }
-                            if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row['qtext'],$matches,PREG_PATTERN_ORDER) >0)
+                            if (preg_match_all('/includeqtextfrom\(UID(\d+)\)/',$row['qtext'],$matches,PREG_PATTERN_ORDER) > AppConstant::NUMERIC_ZERO)
                             {
                                 $includedQs = array_merge($includedQs,$matches[1]);
                             }
@@ -3039,7 +2993,7 @@ class AdminController extends AppController
         $part = '';
         while (!feof($handle))
         {
-            $line = rtrim(fgets($handle, 4096));
+            $line = rtrim(fgets($handle, AppConstant::FOUR_ZERO_NINE_SIX));
             if ($line == "LIBRARY DESCRIPTION")
             {
                 $part = "libdesc";
@@ -3247,7 +3201,7 @@ class AdminController extends AppController
              */
             $llist = "'".implode("','",explode(',',$searchlibs))."'";
 
-            if (substr($searchlibs, 0, 1) == "0")
+            if (substr($searchlibs, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_ONE) == "0")
                 $lnames[] = "Unassigned";
 
             $resultLib = Libraries::getByNameList($llist);
@@ -3268,7 +3222,7 @@ class AdminController extends AppController
                    $query = $query->getDataByUserId($userId,$safesearch,$llist, $checked, $clist);
                 }
 
-                if ($query != 0) {
+                if ($query != AppConstant::NUMERIC_ZERO) {
                     $page_hasSearchResults = AppConstant::NUMERIC_ONE;
                     $i = AppConstant::NUMERIC_ZERO;
                     $page_nChecked = array();
@@ -3296,6 +3250,7 @@ class AdminController extends AppController
                 echo "\nSTART LIBRARY\nID\n1\nUID\n0\nLASTMODDATE\n$now\nNAME\n{$params['libname']}\nPARENT\n0\n";
                 $qsetlist = implode(',',range(0,count($checked)-1));
                 echo "\nSTART LIBRARY ITEMS\nLIBID\n1\nQSETIDS\n$qsetlist\n";
+
                 /*
                  * first, lets pull any questions that have include__from so we can lookup backrefs
                  */
@@ -3317,9 +3272,8 @@ class AdminController extends AppController
                         }
                     }
                 }
-
                 $includedbackref = array();
-                if (count($includedqs) > 0)
+                if (count($includedqs) > AppConstant::NUMERIC_ZERO)
                 {
                     $includedlist = implode(',',$includedqs);
                     $resultId = new QuestionSet();
@@ -3393,7 +3347,6 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
-//        $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
@@ -3402,8 +3355,6 @@ class AdminController extends AppController
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $overwriteBody = AppConstant::NUMERIC_ZERO;
-        $body = "";
-        $pageTitle = "Review Library";
         $page_updatedMsg = "";
 
         if($myRights < AppConstant::TEACHER_RIGHT)
@@ -3426,16 +3377,6 @@ class AdminController extends AppController
                 } else if ($myRights == AppConstant::GROUP_ADMIN_RIGHT) {
                     $isGrpAdmin = true;
                 }
-            } else if ($params['cid'] == AppConstant::NUMERIC_ZERO)
-            {
-                /*
-                 * handling breadcrumb
-                 */
-            } else
-            {
-                /*
-                 * handling breadcrumb
-                 */
             }
             $sessionId = $this->getSessionId();
             $sessionData = $this->getSessionData($sessionId);
@@ -3454,7 +3395,6 @@ class AdminController extends AppController
                 {
                     $lnames[] = "Unassigned";
                 }
-                $inlibssafe = "'".implode("','",explode(',',$inlibs))."'";
                 $result = Libraries::getByNameList($inlibs);
                 foreach($result as $key => $row)
                 {
@@ -3640,7 +3580,7 @@ class AdminController extends AppController
                 if (isset($params['seed']))
                 {
 
-                    list($score,$rawscores) = scoreq(0,$qSetId,$params['seed'],$params['qn0']);
+                    list($score,$rawscores) = scoreq(AppConstant::NUMERIC_ZERO,$qSetId,$params['seed'],$params['qn0']);
                     $page_lastScore = "<p>Score on last answer: $score/1</p>\n";
                 }
                 $twobx = ($lineQSet['qcontrol']=='' && $lineQSet['answer']=='');
@@ -3654,7 +3594,6 @@ class AdminController extends AppController
                     $showtips = AppConstant::NUMERIC_ONE;
                 }
             }
-
         }
         if ($showtips == AppConstant::NUMERIC_TWO)
         {

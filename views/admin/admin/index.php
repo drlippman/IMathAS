@@ -84,7 +84,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             <li>
                                 <?php $CourseID = $page_courseList[$i]['id'];?>
                                 <a href='javascript:deleteCourse(<?php echo $CourseID?>)'><i class='fa fa-trash-o'></i>&nbsp;Delete</a>
-<!--                                <a href='--><?php //echo AppUtility::getURLFromHome('admin', 'admin/forms?action=delete&id='.$page_courseList[$i]['id']) ?><!--'><i class='fa fa-trash-o'></i></i>&nbsp;Delete</a>-->
                             </li>
                         </ul>
                     </div>
@@ -98,23 +97,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <a class="btn btn-primary margin-left-twenty" href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=addcourse') ?>">Add
             New Course</a>
         </div>
-
-<!--        <div class="lg-col-2 pull-left select-text-margin">-->
-<!--            &nbsp;&nbsp;Show courses of:&nbsp;&nbsp;-->
-<!--        </div>-->
-<!---->
-<!--        <div class="lg-col-3 pull-left">-->
-<!--            <select name="seluid" class="dropdown form-control" id="seluid" onchange="showcourses()">-->
-<!--                <option value="0" selected>Select a user..</option>-->
-<!--                --><?php // $i=0;
-//                foreach($resultTeacher as $key => $row)
-//                {  $page_teacherSelectVal[$i] = $row['id'];?>
-<!--                    <option-->
-<!--                        value="--><?php //echo $page_teacherSelectLabel[$i] ?><!--">--><?php //echo $row['LastName'] . ", " . $row['FirstName']. ' ('.$row['SID'].')'; $i++;?><!--</option>-->
-<!--                --><?php //} ?>
-<!--            </select>-->
-<!--        </div>-->
-
         <?php
         if ($myRights >= 75) {
             if ($showcourses > 0) {
