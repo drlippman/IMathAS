@@ -53,27 +53,22 @@ if (isset($params['id'])) {
         $err = AppConstant::ACCESS_THROUGH_MENU;
     }
 
-    if (isset($params['delete'])) {
-        ?>
-        <div id="name-external-tool">
-            <?php $extName = $nameOfExtTool; ?>
-        </div>
-        <input type="hidden" id="name-external-tool" value="<?php echo $extName; ?> ">
-        <?php
-        echo '<br/>';
-        echo '<div class="col-lg-12">'. AppUtility::t('Are you SURE you want to delete the tool',false).'<b>' . $extName . '</b>'.AppUtility::t('?  Doing so will break ALL placements of this tool.',false).'</div><br/><br/>';
-        echo '<form method="post" action="external-tool?cid=' . $courseId . $ltfrom . '&amp;id=' . $params['id'] . '&amp;delete=true">';
-        echo '<div class="col-lg-2"><input type=submit value="Yes, I\'m Sure"></div>';
-        echo '</form>';
-    } else if (isset($params['id'])) {
-        ?>
-        <br/>
-        <div class="col-lg-2"><?php AppUtility::t('Tool Name') ?></div>
-        <div class="col-lg-10">
-            <input class="form-control-1" required="Please fill out this field" maxlength="30" size="40" type="text"
-                   name="tname" value="<?php echo $name; ?>"/>
-        </div>
-        <br class="form"/><br/>
+        if (isset($params['delete']))
+        { ?>
+            <input type="hidden" id="name-external-tool" value="<?php echo $extName;?> ">
+         <?php
+            echo '<br/>';
+            echo '<div class="col-lg-12">Are you SURE you want to delete the tool <b>'.$extName.'</b>?  Doing so will break ALL placements of this tool.</div><br/><br/>';
+            echo '<form method="post" action="external-tool?cid='.$courseId.$ltfrom.'&amp;id='.$params['id'].'&amp;delete=true">';
+            echo '<div class="col-lg-2"><input type=submit value="Yes, I\'m Sure"></div>';
+            echo '</form>';
+        } else if (isset($params['id'])) {
+?>
+            <br/><div class="col-lg-2"><?php AppUtility::t('Tool Name')?></div>
+            <div class="col-lg-10">
+                <input class="form-control-1" required="Please fill out this field" maxlength="30" size="40" type="text" name="tname" value="<?php echo $name;?>" />
+            </div>
+            <br class="form" /><br/>
 
         <div class="col-lg-2"><?php AppUtility::t('Launch URL') ?></div>
         <div class="col-lg-10">

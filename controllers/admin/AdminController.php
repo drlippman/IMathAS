@@ -651,7 +651,7 @@ class AdminController extends AppController
        }
        $this->includeCSS(['course/items.css']);
        $responseData = array('myRights' => $myRights, 'teacherId' => $teacherId, 'params' => $params, 'err' => $err, 'isAdmin' => $isAdmin, 'isGrpAdmin' => $isGrpAdmin, 'resultFirst' => $resultFirst, 'courseId' => $courseId, 'ltfrom' => $ltfrom,
-       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course, 'nameOfExtTool' => $nameOfExtTool);
+       'name' => $name, 'grp' => $grp, 'privacy' => $privacy, 'url' => $url, 'key' => $key, 'secret' => $secret, 'custom' => $custom, 'course' => $course);
        return $this->renderWithData('externalTool', $responseData);
    }
 
@@ -3401,7 +3401,6 @@ class AdminController extends AppController
         $isGrpAdmin = false;
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
-        $isTeacher = $this->isTeacher($userId, $courseId);
         $overwriteBody = AppConstant::NUMERIC_ZERO;
         $body = "";
         $pageTitle = "Review Library";
