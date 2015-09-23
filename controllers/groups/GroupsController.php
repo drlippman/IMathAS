@@ -185,7 +185,7 @@ class GroupsController extends AppController
                             }
                         }
                     }
-                    if(count($alreadyGroupedStu) > 0)
+                    if(count($alreadyGroupedStu) > AppConstant::NUMERIC_ZERO)
                     {
                         echo '<p>Some students joined a group already and were skipped:</p><p>';
                         $stuList = "'".implode("','",$alreadyGroupedStu)."'";
@@ -314,7 +314,7 @@ class GroupsController extends AppController
             if(isset($grpSetId))
             {
                 $query = StuGroupSet::getByGrpSetId($grpSetId);
-                $showImg = 1;
+                $showImg = AppConstant::NUMERIC_ONE;
                 $grpSetName = $query['name'];
                 $page_Grp = array();
                 $page_GrpMembers = array();
@@ -387,7 +387,7 @@ class GroupsController extends AppController
             }
         }
         $this->includeCSS(['groups.css']);
-        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'currGrpNameToDlt' => $currGrpNameToDlt,'currGrpSetNameToDlt' => $currGrpSetNameToDlt,'deleteGrp' => $deleteGrp,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'stuNameToBeRemoved' => $stuNameToBeRemoved,'Stu_GrpName' => $Stu_GrpName,'Stu_GrpSetName' => $Stu_GrpSetName,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message]);
+        return $this->renderWithData('manageStudentGroups',['course' => $course,'page_groupSets' => $page_groupSets,'addGrpSet' => $addGrpSet,'renameGrpSet' => $renameGrpSet,'grpSetName' => $grpSetName,'deleteGrpSet' => $deleteGrpSet,'used' => $used,'deleteGrpName' => $deleteGrpName,'grpSetId' => $grpSetId,'hasUserImg' => $hasUserImg,'page_Grp' => $page_Grp,'page_GrpMembers' => $page_GrpMembers,'page_unGrpStu' => $page_unGrpStu,'grpSetName' => $grpSetName,'renameGrp' => $renameGrp,'currGrpName' => $currGrpName,'newGrpSetName' => $newGrpSetName,'addGrp' => $addGrp,'stuList' => $stuList,'remove' => $remove,'grpId' => $grpId,'removeAll' => $removeAll,'showImg' => $showImg,'message' => $message]);
     }
 
     /*Ajax Call to delete group set*/

@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tudip
- * Date: 1/9/15
- * Time: 1:59 PM
- */
-
 namespace app\controllers\utilities;
 
 use app\components\AppConstant;
@@ -45,13 +38,12 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You are not authorized to view this page';
+            $message = AppConstant::UNAUTHORIZED;
         }
         if (isset($removeLti))
         {
             $id = intval($this->getParamVal('removelti'));
-            $query = "DELETE FROM imas_ltiusers WHERE id=$id";
-            mysql_query($query) or die("Query failed : " . mysql_error());
+            LtiUserForm::deleteLtiUsr($id);
         }
         if (isset($form))
         {
@@ -76,7 +68,7 @@ class UtilitiesController extends AppController
                     }
                     if(!$queryForUser)
                     {
-                        $message = 'No results found';
+                        $message = AppConstant::NORESULT;
                     }
                     else
                     {
@@ -110,9 +102,6 @@ class UtilitiesController extends AppController
            $query = Course::getItemOrderAndBlockCnt($courseId);
             $items = unserialize($query['itemorder']);
             $blockCnt = $query['blockcnt'];
-        }else
-        {
-                exit;
         }
         global $itemsFnd;
         $itemsFnd = array();
@@ -162,7 +151,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = "You do not have access to this page";
+            $message = AppConstant::NO_AUTHORITY;
         }
         $now = time();
         $date = mktime(AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_ZERO,AppConstant::NUMERIC_SEVEN,AppConstant::NUMERIC_TEN,AppConstant::YEAR_TWENTY_ELEVEN);
@@ -218,7 +207,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         $now = time();
         $start = $now - AppConstant::SECONDS_CONVERSION *AppConstant::NUMERIC_THIRTY;
@@ -226,7 +215,7 @@ class UtilitiesController extends AppController
         if(isset($start))
         {
             $parts = explode('-',$start);
-            if (count($parts)==3)
+            if (count($parts)== AppConstant::NUMERIC_THREE)
             {
                 $start = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
             }
@@ -238,7 +227,7 @@ class UtilitiesController extends AppController
         if(isset($end))
         {
             $parts = explode('-',$end);
-            if (count($parts)==3)
+            if (count($parts)== AppConstant::NUMERIC_THREE)
             {
                 $end = mktime(0,0,0,$parts[0],$parts[1],$parts[2]);
             }
@@ -257,13 +246,13 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if(!empty($params['from']) && ($params['to']))
         {
             $from = trim($params['from']);
             $to = trim($params['to']);
-            if (strlen($from)!=11 || strlen($to)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to))
+            if (strlen($from) != AppConstant::NUMERIC_ELEVEN || strlen($to) != AppConstant::NUMERIC_ELEVEN || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to))
             {
             }else
             {
@@ -293,13 +282,13 @@ class UtilitiesController extends AppController
         $this->layout = "master";
         $user = $this->getAuthenticatedUser();
         $params = $this->getRequestParams();
-        $installName = "MyOpenMath";
         $skipN = $this->getParamVal('skipn');
         $go = $this->getParamVal('go');
+        $installName = AppConstant::INSTALL_NAME;
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if(isset($skipN))
         {
@@ -344,7 +333,7 @@ class UtilitiesController extends AppController
                 $userData = User::getUserDataForUtilities($params['id']);
                 $headers = 'Account Approval';
                 $message = '<style type="text/css">p {margin:0 0 1em 0} </style><p>Hi '.$userData['FirstName'].'</p>';
-                if ($installName == "MyOpenMath")
+                if ($installName == AppConstant::INSTALL_NAME)
                 {
                     $message .= '<p>Welcome to MyOpenMath.  Your account has been activated, and you\'re all set to log in at <a href="https://www.myopenmath.com">MyOpenMath.com</a> as an instructor using the username <b>'.$userData['SID'].'</b> and the password you provided.</p>';
                     $message .= '<p>I\'ve signed you up as a "student" in the Support Course, which has forums in which you can ask questions, report problems, or find out about new system improvements.</p>';
@@ -360,7 +349,8 @@ class UtilitiesController extends AppController
                 }
                 if (isset($CFG['GEN']['useSESmail']))
                 {
-                    SESmail($userData['email'], 'MyOpenMath', $installName . ' Account Approval', $message);
+                    /*Remaining
+                     * SESmail($userData['email'], 'MyOpenMath', $installName . ' Account Approval', $message);*/
                 } else
                 {
                     AppUtility::sendMail($headers, $message, $userData['email']);
@@ -395,7 +385,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         $this->includeCSS(['utilities.css']);
         $data = QuestionSet::getWrongLibFlag();
@@ -410,20 +400,20 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if(isset($params['data']))
         {
             $info = array();
             $lines = explode("\n",$params['data']);
             $valArray = array();
-            $tot = 0;
+            $tot = AppConstant::NUMERIC_ZERO;
             foreach ($lines as $line)
             {
                 $line = str_replace(array("\r","\t"," "),'',$line);
                 list($uqId,$uLibId) = explode('@',$line);
                 $valArray[] = "('$uqId','$uLibId')";
-                if (count($valArray)==500)
+                if (count($valArray) == 500)
                 {
                     $tot += $this->doQuery($valArray);
                     $valArray = array();
@@ -447,7 +437,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if(isset($params['data']))
         {
@@ -500,7 +490,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if(isset($params['search']))
         {
@@ -530,9 +520,9 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
-        ini_set('display_errors',1);
+        ini_set('display_errors',AppConstant::NUMERIC_ONE);
         error_reporting(E_ALL);
         @set_time_limit(AppConstant::NUMERIC_ZERO);
         ini_set("max_input_time", "3600");
@@ -540,10 +530,10 @@ class UtilitiesController extends AppController
         ini_set("memory_limit", "712857600");
         $start = microtime(true);
         $data = DbSchema::getData();
-        if(count($data) == 0)
+        if(count($data) == AppConstant::NUMERIC_ZERO)
         {
-            $lastUpdate = 0;
-            $lastFirstUpdate = 0;
+            $lastUpdate = AppConstant::NUMERIC_ZERO;
+            $lastFirstUpdate = AppConstant::NUMERIC_ZERO;
         }
         else
         {
@@ -551,7 +541,7 @@ class UtilitiesController extends AppController
             {
                 foreach($data as  $result)
                 {
-                    if ($result['id']== 3)
+                    if ($result['id']== AppConstant::NUMERIC_THREE)
                     {
                         $lastUpdate = $result['ver'];
                     } else {
@@ -629,17 +619,17 @@ class UtilitiesController extends AppController
         $n = array();
         $thisTimes = array();
         $thisScores = array();
-        $lastQ = -1;
+        $lastQ = -AppConstant::NUMERIC_ONE;
         $fScore = FirstScores::getDataForQuestionUsage($lastFirstUpdate);
         if($fScore)
         {
             foreach($fScore as $row)
             {
-                if ($row['qsetid'] != $lastQ && $lastQ>0) {
+                if ($row['qsetid'] != $lastQ && $lastQ> AppConstant::NUMERIC_ZERO) {
                     $n[$lastQ] = count($thisScores);
                     sort($thisTimes, SORT_NUMERIC);
                     $trimN = floor($trim*count($thisTimes));
-                    $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-2*$trimN);
+                    $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-AppConstant::NUMERIC_TWO*$trimN);
                     $avgFirstTime[$lastQ] = round(array_sum($thisTimes)/count($thisTimes));
                     $avgFirstScore[$lastQ] = round(array_sum($thisScores)/count($thisScores));
                     $thisTimes = array();
@@ -652,12 +642,12 @@ class UtilitiesController extends AppController
                 }
             }
         }
-        if (count($thisTimes)>0)
+        if (count($thisTimes) > AppConstant::NUMERIC_ZERO)
         {
             $n[$lastQ] = count($thisScores);
             sort($thisTimes, SORT_NUMERIC);
             $trimN = floor($trim*count($thisTimes));
-            $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-2*$trimN);
+            $thisTimes = array_slice($thisTimes,$trimN,count($thisTimes)-AppConstant::NUMERIC_TWO*$trimN);
             $avgFirstTime[$lastQ] = round(array_sum($thisTimes)/count($thisTimes));
             $avgFirstScore[$lastQ] = round(array_sum($thisScores)/count($thisScores));
         }
@@ -689,7 +679,7 @@ class UtilitiesController extends AppController
                 foreach($questionSetData as $row)
                 {
                     $qsId = $row['id'];
-                    if (!isset($avgFirstTime[$qsId]) || $n[$qsId]==0) {continue;}
+                    if (!isset($avgFirstTime[$qsId]) || $n[$qsId]== AppConstant::NUMERIC_ZERO) {continue;}
 
                     if (strpos($row['avgtime'],',')!==false)
                     {
@@ -715,7 +705,7 @@ class UtilitiesController extends AppController
             }
         }
         $maxId = FirstScores::getMaxId();
-        if ($lastFirstUpdate == 0)
+        if ($lastFirstUpdate == AppConstant::NUMERIC_ZERO)
         {
             $lastFirstUpdate = $maxId;
             if ($dosLowMethod)
@@ -727,11 +717,11 @@ class UtilitiesController extends AppController
         else
         {
             $lastFirstUpdate = $maxId;
-            DbSchema::updateData($lastFirstUpdate,4);
+            DbSchema::updateData($lastFirstUpdate,AppConstant::NUMERIC_FOUR);
             if($dosLowMethod)
             {
                 $lastUpdate = time();
-                DbSchema::updateData($lastUpdate,3);
+                DbSchema::updateData($lastUpdate,AppConstant::NUMERIC_THREE);
             }
         }
         $this->includeCSS(['utilities.css']);
@@ -748,7 +738,7 @@ class UtilitiesController extends AppController
         if($user->rights < AppConstant::ADMIN_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = 'You do not have access to this page';
+            $message = AppConstant::NO_AUTHORITY;
         }
         if ((isset($params['submit']) && $params['submit']=="Message") || isset($massEnd))
         {
@@ -781,7 +771,7 @@ class UtilitiesController extends AppController
         if($user->rights != AppConstant::TEACHER_RIGHT)
         {
             $body = AppConstant::NUMERIC_ONE;
-            $message = "You need to log in as a teacher to access this page";
+            $message = AppConstant::NO_TEACHER_RIGHTS;
         }
 
         if(isset($params['message']))
@@ -857,7 +847,8 @@ class UtilitiesController extends AppController
                     }
                 }
                 $sentTo = implode('<br/>',$fullNames);
-                $message = $params['message'] . addslashes("<p>Instructor note: Message sent to these students from course $course->name: <br/> $sentTo </p>\n");
+                $srt = AppConstant::INSTRUCTORNOTE;
+                $message = $params['message'] . addslashes("$srt $course->name: <br/> $sentTo </p>\n");
                 foreach($toList as $data)
                 {
                     $insert = new Message();
@@ -913,7 +904,8 @@ class UtilitiesController extends AppController
                             $teacherAddy[] = "{$row['FirstName']} {$row['LastName']} <{$row['email']}>";
                         }
                     }
-                    $message .= "<p>A copy was also emailed to all instructors for this course</p>\n";
+                    $string = AppUtility::t('A copy was also emailed to all instructors for this course');
+                    $message .= "<p>$string</p>\n";
                 }
                 foreach ($teacherAddy as $addy)
                 {
@@ -955,7 +947,7 @@ class UtilitiesController extends AppController
                     return array($parent.'-'.($k+1), $it['name']);
                 } else {
                     $val = $this->getStr($it['items'], $str, $parent.'-'.($k+1));
-                    if (count($val)>0)
+                    if (count($val)> AppConstant::NUMERIC_ZERO)
                     {
                         return $val;
                     }
@@ -965,7 +957,6 @@ class UtilitiesController extends AppController
         return array();
 
     }
-
     public function fixSub($items)
     {
         global $itemsFnd;
@@ -975,7 +966,8 @@ class UtilitiesController extends AppController
             } else if (is_array($item)) {
                 if (!isset($item['items']) || !is_array($item['items'])) {
                     unset($items[$k]);
-                } else if (count($item['items'])>0) {
+                } else if (count($item['items'])> AppConstant::NUMERIC_ZERO)
+                {
                     $this->fixSub($items[$k]['items']);
                 }
             } else {
@@ -994,5 +986,4 @@ class UtilitiesController extends AppController
         $affectedRow = LibraryItems::updateWrongLibFlag($val);
         return $affectedRow;
     }
-
 }

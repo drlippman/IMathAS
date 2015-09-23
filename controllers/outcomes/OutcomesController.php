@@ -52,8 +52,6 @@ class OutcomesController extends AppController
                 $unusedList = implode(',',$unused);
                 Outcomes::deleteUnusedOutcomes($unusedList);
                 Assessments::updateOutcomes($this->courseId,$unusedList);
-//                $query = "UPDATE imas_questions SET category='' WHERE category IN ($unusedlist)";
-//                mysql_query($query) or die("Query failed : " . mysql_error());
             }
         }
         //load existing outcomes
@@ -80,7 +78,7 @@ class OutcomesController extends AppController
     {
         $outArr = array();
         $list = substr($list,1,-1);
-        $i = 0; $nd = 0; $last = 0;
+        $i = AppConstant::NUMERIC_ZERO; $nd = AppConstant::NUMERIC_ZERO; $last = AppConstant::NUMERIC_ZERO;
         $listArr = array();
         while ($i<strlen($list))
         {
@@ -88,7 +86,7 @@ class OutcomesController extends AppController
                 $nd++;
             } else if($list[$i]==']') {
                 $nd--;
-            } else if ($list[$i]==',' && $nd==0) {
+            } else if ($list[$i]==',' && $nd==AppConstant::NUMERIC_ZERO) {
                 $listArr[] = substr($list,$last,$i-$last);
                 $last = $i+1;
             }
@@ -106,12 +104,12 @@ class OutcomesController extends AppController
                     $pts[0] = $it;
                 } else
                 {
-                    $pts[0] = substr($it,0,$pos);
+                    $pts[0] = substr($it,AppConstant::NUMERIC_ZERO,$pos);
                     $pts[1] = substr($it,$pos+1);
                     $subarr = $this->addItems($pts[1]);
                     $block = array("outcomes"=>$subarr);
                 }
-                if (substr($pts[0],0,3)=='new')
+                if (substr($pts[0],AppConstant::NUMERIC_ZERO,3)=='new')
                 {
                     $name = stripslashes($this->params['newg'.substr($pts[0],6)]);
                 } else
@@ -123,7 +121,7 @@ class OutcomesController extends AppController
 
             }else
             { //is an outcome
-                if (substr($it,0,3)=='new')
+                if (substr($it,AppConstant::NUMERIC_ZERO,3)=='new')
                 {
                     $oCnt = substr($it,3);
                     $query  = new Outcomes();
@@ -567,7 +565,7 @@ class OutcomesController extends AppController
              $kcnt++;
          }
          $cats = array();
-         $catcolcnt = 0;
+         $catcolcnt = AppConstant::NUMERIC_ZERO;
          if (in_array(AppConstant::NUMERIC_ZERO,$category)) {  //define default category, if used
              $cats[0] = explode(',',$defaultcat);
              array_unshift($cats[0],"Default");

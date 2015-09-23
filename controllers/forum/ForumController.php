@@ -975,9 +975,6 @@ class ForumController extends AppController
         $responseData = array('forumData' => $forumData, 'course' => $course, 'userId' => $userId, 'rights' => $rights);
         return $this->renderWithData('addNewThread', $responseData);
     }
-    /*
-     * Controller Action To Save The Newly Added Thread In Database
-     */
     /*Controller Action To Toggle The Flag Image On Click*/
     public function actionChangeImageAjax()
     {
@@ -1741,8 +1738,8 @@ class ForumController extends AppController
                               $hasSubscribe[] = $subscription['forumid'];
                           }
                       }
-                      $toadd = array_diff($params['checked'], $hasSubscribe);
-                      foreach ($toadd as $fid) {
+                      $toAdd = array_diff($params['checked'], $hasSubscribe);
+                      foreach ($toAdd as $fid) {
                           $fid = intval($fid);
                           if ($fid > AppConstant::NUMERIC_ZERO) {
                               $subscription = new ForumSubscriptions();

@@ -27,5 +27,13 @@ class LtiUserForm extends BaseImasLtiusers
         return $data;
 
     }
+    public static function deleteLtiUsr($id)
+    {
+        $data = LtiUserForm::find()->where(['id' => $id])->one();
+        if($data)
+        {
+            $data->delete();
+        }
+    }
 
 } 
