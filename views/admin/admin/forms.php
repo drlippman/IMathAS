@@ -44,94 +44,22 @@ switch($action) {
         echo '<div>';
         echo "<div class='col-lg-10'>Are you sure you want to delete the course <b>$name</b>?</div><br>\n";
         echo "<div class='col-lg-10'><input type=button value=\"Delete\" onclick=\"window.location='actions?action=delete&id={$params['id']}'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></div>\n";
         echo "</div>";
         break;
     case "deladmin":
-        echo "<p>Are you sure you want to delete this user?</p>\n";
-        echo "<p><input type=button value=\"Delete\" onclick=\"window.location='actions.php?action=deladmin&id={$_GET['id']}'\">\n";
-        echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='admin.php'\"></p>\n";
         break;
     case "chgpwd":
-        echo '<div id="headerforms" class="pagetitle"><h2>Change Your Password</h2></div>';
-        echo "<form method=post action=\"actions.php?action=chgpwd\">\n";
-        echo "<span class=form>Enter old password:</span>  <input class=form type=password name=oldpw size=40> <BR class=form>\n";
-        echo "<span class=form>Enter new password:</span> <input class=form type=password name=newpw1 size=40> <BR class=form>\n";
-        echo "<span class=form>Verify new password:</span>  <input class=form type=password name=newpw2 size=40> <BR class=form>\n";
-        echo '<div class=submit><input type="submit" value="'._('Save').'"></div></form>';
         break;
 
-    case "chgrights":
+    case "chgrights": break;
     case "newadmin":
-        echo "<form method=post action=\"actions.php?action={$_GET['action']}";
-        if ($_GET['action']=="chgrights") { echo "&id={$_GET['id']}"; }
-        echo "\">\n";
-        if ($_GET['action'] == "newadmin") {
-            echo "<span class=form>New User username:</span>  <input class=form type=text size=40 name=adminname><BR class=form>\n";
-            echo "<span class=form>First Name:</span> <input class=form type=text size=40 name=firstname><BR class=form>\n";
-            echo "<span class=form>Last Name:</span> <input class=form type=text size=40 name=lastname><BR class=form>\n";
-            echo "<span class=form>Email:</span> <input class=form type=text size=40 name=email><BR class=form>\n";
-            echo '<span class="form">Password:</span> <input class="form" type="text" size="40" name="password"/><br class="form"/>';
-            $oldgroup = 0;
-            $oldrights = 10;
-        } else {
-            $query = "SELECT FirstName,LastName,rights,groupid FROM imas_users WHERE id='{$_GET['id']}'";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            $line = mysql_fetch_array($result, MYSQL_ASSOC);
-            echo "<h2>{$line['FirstName']} {$line['LastName']}</h2>\n";
-            $oldgroup = $line['groupid'];
-            $oldrights = $line['rights'];
-
-        }
-        echo "<BR><span class=form><img src=\"".AppUtility::getHomeURL()."img/help.gif\" alt=\"Help\" onClick=\"window.open('$imasroot/help.php?section=rights','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))\"/> Set User rights to: </span> \n";
-        echo "<span class=formright><input type=radio name=\"newrights\" value=\"5\" ";
-        if ($oldrights == 5) {echo "CHECKED";}
-        echo "> Guest User <BR>\n";
-        echo "<input type=radio name=\"newrights\" value=\"10\" ";
-        if ($oldrights == 10) {echo "CHECKED";}
-        echo "> Student <BR>\n";
-        //obscelete
-        //echo "<input type=radio name=\"newrights\" value=\"15\" ";
-        //if ($oldrights == 15) {echo "CHECKED";}
-        //echo "> TA/Tutor/Proctor <BR>\n";
-        echo "<input type=radio name=\"newrights\" value=\"20\" ";
-        if ($oldrights == 20) {echo "CHECKED";}
-        echo "> Teacher <BR>\n";
-        echo "<input type=radio name=\"newrights\" value=\"40\" ";
-        if ($oldrights == 40) {echo "CHECKED";}
-        echo "> Limited Course Creator <BR>\n";
-        echo "<input type=radio name=\"newrights\" value=\"60\" ";
-        if ($oldrights == 60) {echo "CHECKED";}
-        echo "> Diagnostic Creator <BR>\n";
-        echo "<input type=radio name=\"newrights\" value=\"75\" ";
-        if ($oldrights == 75) {echo "CHECKED";}
-        echo "> Group Admin <BR>\n";
-        if ($myRights==100) {
-            echo "<input type=radio name=\"newrights\" value=\"100\" ";
-            if ($oldrights == 100) {echo "CHECKED";}
-            echo "> Full Admin </span><BR class=form>\n";
-        }
-
-        if ($myRights == 100) {
-            echo "<span class=form>Assign to group: </span>";
-            echo "<span class=formright><select name=\"group\" id=\"group\">";
-            echo "<option value=0>Default</option>\n";
-            $query = "SELECT id,name FROM imas_groups ORDER BY name";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            while ($row = mysql_fetch_row($result)) {
-                echo "<option value=\"{$row[0]}\" ";
-                if ($oldgroup==$row[0]) {
-                    echo "selected=1";
-                }
-                echo ">{$row[1]}</option>\n";
-            }
-            echo "</select><br class=form />\n";
-        }
-
-        echo "<div class=submit><input type=submit value=Save></div></form>\n";
         break;
     case "modify":
     case "addcourse":
+    if ($myRights < AppConstant::LIMITED_COURSE_CREATOR_RIGHT) {
+        echo "You don't have the authority for this action";
+        break;
+    }
         if (isset($params['cid'])) {
             $cid = $params['cid'];
         }
@@ -233,7 +161,6 @@ switch($action) {
                     </div>
             </div>';
         }
-
         if (!isset($CFG['CPS']['copyrights']) || $CFG['CPS']['copyrights'][1]==1) {
             echo "<div class='col-md-12 margin-top-fifteen'>
                     <div class=col-md-3>Allow other instructors to copy course items
@@ -377,51 +304,7 @@ switch($action) {
             }
             echo '</div><br class="form" /><br class="form" />';
         }
-        if (isset($CFG['CPS']['templateoncreate']) && $params['action']=='addcourse' ) {
-            echo '<div class=col-md-3>Use content from a template course:</div>';
-            echo '<div class=col-md-10><select name="usetemplate" onchange="templatepreviewupdate(this)">';
-            echo '<option value="0" selected="selected">Start with blank course</option>';
-            //$query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic,imas_teachers WHERE imas_teachers.courseid=ic.id AND imas_teachers.userid='$templateuser' ORDER BY ic.name";
-            $globalcourse = array();
-            $groupcourse = array();
-            $query = "SELECT id,name,copyrights,istemplate FROM imas_courses WHERE (istemplate&1)=1 AND available<4 AND copyrights=2 ORDER BY name";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            while ($row = mysql_fetch_row($result)) {
-                $globalcourse[$row[0]] = $row[1];
-            }
-            $query = "SELECT ic.id,ic.name,ic.copyrights FROM imas_courses AS ic JOIN imas_users AS iu ON ic.ownerid=iu.id WHERE ";
-            $query .= "iu.groupid='$groupid' AND (ic.istemplate&2)=2 AND ic.copyrights>0 AND ic.available<4 ORDER BY ic.name";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            while ($row = mysql_fetch_row($result)) {
-                $groupcourse[$row[0]] = $row[1];
-            }
-            if (count($groupcourse)>0) {
-                echo '<optgroup label="Group Templates">';
-                foreach ($groupcourse as $id=>$name) {
-                    echo '<option value="'.$id.'">'.$name.'</option>';
-                }
-                echo '</optgroup>';
-            }
-            if (count($globalcourse)>0) {
-                if (count($groupcourse)>0) {
-                    echo '<optgroup label="System-wide Templates">';
-                }
-                foreach ($globalcourse as $id=>$name) {
-                    echo '<option value="'.$id.'">'.$name.'</option>';
-                }
-                if (count($groupcourse)>0) {
-                    echo '</optgroup>';
-                }
-            }
-
-            echo '</select><span id="templatepreview"></span></div><br class="form" /><br class="form" />';
-            echo '<script type="text/javascript"> function templatepreviewupdate(el) {';
-            echo '  var outel = document.getElementById("templatepreview");';
-            echo '  if (el.value>0) {';
-            echo '  outel.innerHTML = "<a href=\"'.AppUtility::getHomeURL().'course/course.php?cid="+el.value+"\" target=\"preview\">Preview</a>";';
-            echo '  } else {outel.innerHTML = "";}';
-            echo '}</script>';
-        } ?>
+         ?>
         <input type="hidden" name="picicons" value="<?php echo AppConstant::PIC_ICONS_VALUE;?>">
         <input type="hidden" name="topbar" value="<?php echo AppConstant::TOPBAR_VALUE;?>">
         <input type="hidden" name="chatset" value="<?php echo AppConstant::CHATSET_VALUE;?>">
@@ -439,63 +322,6 @@ switch($action) {
         <?php echo "</div>";
         break;
     case "chgteachers":
-        $query = "SELECT name FROM imas_courses WHERE id='{$_GET['id']}'";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        $line = mysql_fetch_array($result, MYSQL_ASSOC);
-        echo '<div id="headerforms" class="pagetitle">';
-        echo "<h2>{$line['name']}</h2>\n";
-        echo '</div>';
-
-        echo "<h4>Current Teachers:</h4>\n";
-        $query = "SELECT imas_users.FirstName,imas_users.LastName,imas_teachers.id,imas_teachers.userid ";
-        $query .= "FROM imas_users,imas_teachers WHERE imas_teachers.courseid='{$_GET['id']}' AND " ;
-        $query .= "imas_teachers.userid=imas_users.id ORDER BY imas_users.LastName;";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        $num = mysql_num_rows($result);
-        echo '<form method="post" action="actions.php?action=remteacher&cid='.$_GET['id'].'&tot='.$num.'">';
-        echo 'With Selected: <input type="submit" value="Remove as Teacher"/>';
-        echo "<table cellpadding=5>\n";
-        $onlyone = ($num==1);
-        while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-
-            if ($onlyone) {
-                echo '<tr><td></td>';
-            } else {
-                echo '<tr><td><input type="checkbox" name="tid[]" value="'.$line['id'].'"/></td>';
-            }
-
-            echo "<td>{$line['LastName']}, {$line['FirstName']}</td>";
-            if ($onlyone) {
-                echo "<td></td></tr>";
-            } else {
-                echo "<td><A href=\"actions.php?action=remteacher&cid={$_GET['id']}&tid={$line['id']}\">Remove as Teacher</a></td></tr>\n";
-            }
-            $used[$line['userid']] = true;
-        }
-        echo "</table></form>\n";
-
-        echo "<h4>Potential Teachers:</h4>\n";
-        if ($myRights<100) {
-            $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) AND groupid='$groupid' ORDER BY LastName;";
-        } else if ($myRights==100) {
-            $query = "SELECT id,FirstName,LastName,rights FROM imas_users WHERE rights>19 AND (rights<76 or rights>78) ORDER BY LastName;";
-        }
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        echo '<form method="post" action="actions.php?action=addteacher&cid='.$_GET['id'].'">';
-        echo 'With Selected: <input type="submit" value="Add as Teacher"/>';
-        echo "<table cellpadding=5>\n";
-        while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-            if (trim($line['LastName'])=='' && trim($line['FirstName'])=='') {continue;}
-            if ($used[$line['id']]!=true) {
-
-
-                echo '<tr><td><input type="checkbox" name="atid[]" value="'.$line['id'].'"/></td>';
-                echo "<td>{$line['LastName']}, {$line['FirstName']} </td> ";
-                echo "<td><a href=\"actions.php?action=addteacher&cid={$_GET['id']}&tid={$line['id']}\">Add as Teacher</a></td></tr>\n";
-            }
-        }
-        echo "</table></form>\n";
-        echo "<p><input type=button value=\"Done\" onclick=\"window.location='admin.php'\" /></p>\n";
         break;
     case "importmacros": ?>
          <form enctype="multipart/form-data" method=post action="actions?action=importmacros">

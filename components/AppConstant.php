@@ -254,4 +254,5 @@ class AppConstant
     const FOUR_ZERO_NINE_SIX = 4096;
     const SIXTY = 60;
     const MIN_START_DATE = 9999999999;
+    const NO_ASSESSEMENT_SELECTED = 'No assessments selected';
 }
