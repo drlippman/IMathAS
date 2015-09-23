@@ -1076,3 +1076,9 @@ background-color: #f8f8f8;
 .width-twenty-five-per {
     width: 25% !important;
 }
+.margin-left-minus-five {
+    margin-left: -5px;
+}
+.padding-thirty {
+    padding: 30px;
+}

@@ -162,3 +162,18 @@ tr#quickadd td {
     left: auto;
     /*min-width: 72% !important;*/
 }
+.offline-grade-header {
+    background-color: #E0E0E0;
+    height: 60px;
+    padding-top: 21px;
+}
+.offline-grade-padding {
+    padding: 25px 30px 25px 30px !important;
+}
+.offline-grade-save-btn, .upload-multiple-grade-submit-btn {
+    width: 70px;
+    margin-right: 10px;
+}
+.upload-mutiple-grade-padding {
+    padding: 20px 25px 20px 30px !important;
+}

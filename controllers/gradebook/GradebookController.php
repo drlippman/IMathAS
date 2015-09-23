@@ -2545,6 +2545,7 @@ class GradebookController extends AppController
     public function actionManageOfflineGrades()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $model = new AddGradesForm();
         $params = $this->getRequestParams();
         $currentUser = $this->getAuthenticatedUser();
@@ -2603,7 +2604,7 @@ class GradebookController extends AppController
                 $this->setErrorFlash('Select atleast one grade to manage.');
             }
         }
-        $this->includeCSS(['dataTables.bootstrap.css']);
+        $this->includeCSS(['dataTables.bootstrap.css','gradebook.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/manageofflinegrades.js']);
         $responseData = array('model' => $model, 'gradeNames' => $gradeNames, 'course' => $course, 'gbcatsLabel' => $gbcatsLabel, 'gbcatsId' => $gbcatsId);
         return $this->renderWithData('manageOfflineGrades', $responseData);
@@ -2839,6 +2840,7 @@ class GradebookController extends AppController
     public function actionUploadMultipleGrades()
     {
         $params = $this->getRequestParams();
+        $this->layout = 'master';
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
         $model = new UploadCommentsForm();
@@ -2852,6 +2854,7 @@ class GradebookController extends AppController
                 $model->file->saveAs($filename);
             }
         }
+        $this->includeCSS(['gradebook.css']);
         $responseData = array('course' => $course, 'model' => $model);
         return $this->renderWithData('uploadMultipleGrades', $responseData);
     }

@@ -4,16 +4,10 @@ use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use yii\helpers\ArrayHelper;
 
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\changeUserInfoForm */
-
 $this->title = 'Change Rights';
-
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-
     <fieldset>
         <legend>Change Rights</legend>
         <?php $form = ActiveForm::begin([
@@ -33,14 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
             AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
             AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
             AppConstant::ADMIN_RIGHT => 'Full Admin',]) ?>
-
-            <?= $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
-
+        <?= $form->field($model, 'groupid')->dropDownList(ArrayHelper::map(\app\models\_base\BaseImasGroups::find()->all(), 'id', 'name'), ['prompt' => 'Default']) ?>
         <div class="form-group">
-
             <div class="col-lg-offset-2">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
-
             </div>
         </div>
     </fieldset>

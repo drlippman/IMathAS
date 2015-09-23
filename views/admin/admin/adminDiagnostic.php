@@ -7,7 +7,7 @@ use app\components\AppUtility;
 $this->title = 'Diagnostic Setup';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php AppUtility::includeCSS('adminDiagnostic.css');?>
+<?php AppUtility::includeCSS('adminDiagnostic.css'); ?>
 
 <div class="site-login">
     <?php $form = ActiveForm::begin([

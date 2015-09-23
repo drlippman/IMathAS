@@ -183,7 +183,7 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 }
 
 .select-text-margin{
-    margin-top: 7px;
+    margin-top: 7px !important;
 }
 .clear-both{
     clear: both;

@@ -3,11 +3,6 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use app\components\AppConstant;
 use app\components\AppUtility;
-use kartik\time\TimePicker;
-use yii\helpers\ArrayHelper;
-
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
 
 $this->title = 'Add new user';
 $this->params['breadcrumbs'][] = ['label' => 'Admin', 'url' => ['/admin/admin/index']];
@@ -36,23 +31,22 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'email')->textInput() ?>
 
         <?= $form->field($model, 'password')->passwordInput() ?>
-        
-        <!--        <div class="form-group">-->
-    <div class="col-lg-0 pull-left select-text-margin"><a href="#" onclick="window.open('help-of-rights','helpOfRights','top=0,width=400,height=500,scrollbars=1,left=150')"><img src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
+        <div class="col-lg-0 pull-left select-text-margin"><a href="#"
+                                                              onclick="window.open('help-of-rights','helpOfRights','top=0,width=400,height=500,scrollbars=1,left=150')"><img
+                    src="<?php echo AppUtility::getHomeURL() ?>img/help.gif"></a></div>
         <div class="rights_alignment">
 
-            <?=$form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User' ,
-            AppConstant::STUDENT_RIGHT => 'Student',
-            AppConstant::TEACHER_RIGHT => 'Teacher',
-            AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
-            AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
-            AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
-            AppConstant::ADMIN_RIGHT => 'Full Admin']) ?>
+            <?=
+            $form->field($model, 'rights')->inline()->radioList([AppConstant::GUEST_RIGHT => 'Guest User',
+                AppConstant::STUDENT_RIGHT => 'Student',
+                AppConstant::TEACHER_RIGHT => 'Teacher',
+                AppConstant::LIMITED_COURSE_CREATOR_RIGHT => 'Limited Course Creator',
+                AppConstant::DIAGNOSTIC_CREATOR_RIGHT => 'Diagnostic Creator ',
+                AppConstant::GROUP_ADMIN_RIGHT => 'Group Admin ',
+                AppConstant::ADMIN_RIGHT => 'Full Admin']) ?>
         </div>
-<!--        </div>-->
         <div class="clear-both"></div>
         <?= $form->field($model, 'AssignToGroup')->dropDownList(array(''), ['prompt' => 'Default']) ?>
-
         <div class="form-group">
             <div class="col-lg-offset-2 col-lg-5">
                 <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'Submit']) ?>
