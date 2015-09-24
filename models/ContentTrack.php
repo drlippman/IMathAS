@@ -94,7 +94,7 @@ class ContentTrack extends BaseImasContentTrack
     public static function getByTypeId($courseId, $userId)
     {
         $query = new Query();
-        $query	->select(['typeid'])
+        $query->select(['typeid'])
             ->from(['imas_content_track'])
             ->where(['courseid' => $courseId]);
         $query->andWhere(['userid' => $userId]);
@@ -102,5 +102,16 @@ class ContentTrack extends BaseImasContentTrack
         $command = $query->createCommand();
         $data = $command->queryAll();
         return $data;
+    }
+    public function createTrack($params){
+        $data = AppUtility::removeEmptyAttributes($params);
+        if($data){
+            $this->attributes = $data;
+            $this->save();
+        }
+    }
+
+    public static function getTypeId($courseId, $userId,$type){
+        return ContentTrack::find()->select('typeid')->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['type' => $type])->all();
     }
 }

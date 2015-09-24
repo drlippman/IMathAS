@@ -25,4 +25,10 @@ class Log extends BaseImasLog
         $data = $command->queryOne();
         return $data;
     }
+
+    public function createLog($time, $log){
+        $this->log = $log;
+        $this->time = $time;
+        $this->save();
+    }
 } 

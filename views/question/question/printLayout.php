@@ -11,7 +11,6 @@ $loadgraphfilter = true;
 if ($overwriteBody==1) {
     echo $body;
 } else {
-
     ?>
     <div class="tab-content shadowBox">
     <style type="text/css">
@@ -204,7 +203,7 @@ if ($overwriteBody==1) {
 
 
         for ($i=0; $i<$numq; $i++) {
-            $sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]]);
+            $sa[$j][$i] = printq($i,$qn[$questions[$i]],$seeds[$i],$points[$questions[$i]],$isfinal);
         }
         if ($isfinal) {
             echo "<p class=pageb>&nbsp;</p>\n";
@@ -288,7 +287,7 @@ if ($overwriteBody==1) {
 
 }
 
-function printq($qn,$qsetid,$seed,$pts) {
+function printq($qn,$qsetid,$seed,$pts,$isfinal) {
     global $isfinal,$imasroot;
     srand($seed);
 
@@ -300,13 +299,13 @@ function printq($qn,$qsetid,$seed,$pts) {
             ${$row['var']} = "<img src=\"$imasroot/assessment/qimages/{$row['filename']}\" alt=\"{$row['alttext']}\" />";
         }
     }
-    eval(interpretUtility::interpret('control',$qdata['qtype'],$qdata['control']));
-    eval(interpretUtility::interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
-    $toevalqtxt = interpretUtility::interpret('qtext',$qdata['qtype'],$qdata['qtext']);
+    eval(interpret('control',$qdata['qtype'],$qdata['control']));
+    eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+    $toevalqtxt = interpret('qtext',$qdata['qtype'],$qdata['qtext']);
     $toevalqtxt = str_replace('\\','\\\\',$toevalqtxt);
     $toevalqtxt = str_replace(array('\\\\n','\\\\"','\\\\$','\\\\{'),array('\\n','\\"','\\$','\\{'),$toevalqtxt);
     srand($seed+1);
-    eval(interpretUtility::interpret('answer',$qdata['qtype'],$qdata['answer']));
+    eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
     srand($seed+2);
     $la = '';
 

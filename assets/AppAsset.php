@@ -7,6 +7,7 @@
 
 namespace app\assets;
 
+use app\components\AppConstant;
 use yii\web\AssetBundle;
 
 /**
@@ -23,21 +24,21 @@ class AppAsset extends AssetBundle
         'yii\web\YiiAsset',
     ];
     public $css = [
-        'css/imascore.css',
-        'css/default.css',
-        'css/jquery-ui.min.css',
-        'css/jquery-ui.structure.min.css',
-        'css/site.css',
-        'css/font-awesome.min.css'
+        'css/imascore.css?ver=12',
+        'css/default.css?ver=12',
+        'css/jquery-ui.min.css?ver=12',
+        'css/jquery-ui.structure.min.css?ver=12',
+        'css/site.css?ver=12',
+        'css/font-awesome.min.css?ver=12'
     ];
     public $jsOptions = array(
         'position' => \yii\web\View::POS_HEAD
     );
     public $js = [
         'js/mathjax/MathJax.js?config=AM_HTMLorMML',
-        'js/ASCIIsvg_min.js',
-        'js/mathgraphcheck.js',
-        'js/jquery-ui.min.js',
-        'js/common.js',
+        'js/ASCIIsvg_min.js?ver=12',
+        'js/mathgraphcheck.js?ver=12',
+        'js/jquery-ui.min.js?ver=12',
+        'js/common.js?ver=12',
     ];
 }

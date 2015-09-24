@@ -530,6 +530,7 @@ class Course extends BaseImasCourses {
         }
     }
 
+
     public static function getByLatePasshrs($courseId)
     {
         $query = new Query();
@@ -540,4 +541,9 @@ class Course extends BaseImasCourses {
         $data = $command->queryAll();
         return $data;
     }
+
+    public static function getLatePassHrs($courseId){
+        return Course::find()->select('latepasshrs')->where(['id' => $courseId])->one();
+    }
+
 }

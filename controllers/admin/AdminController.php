@@ -550,16 +550,23 @@ class AdminController extends AppController
 
            if (!empty($params['tname']) && !empty($params['key']) && !empty($params['secret'])) {
                if ($params['id'] == 'new') {
+                   /**
+                    * Create tool
+                    */
                    $external = new ExternalTools();
                    $external->saveExternalTool($courseId,$groupId,$params, $isTeacher, $isGrpAdmin, $isAdmin, $privacy);
                } else
                {
+                   /**
+                    * Update external tool
+                    */
                     $params['groupId'] = $groupId;
                    if ($isTeacher) {
                        $attr = 'courseid';
                        $attrValue = $courseId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
-                   } else if ($isGrpAdmin) {
+                   } else if ($isGrpAdmin)
+                   {
                        $attr = 'groupid';
                        $attrValue = $groupId;
                        ExternalTools::updateExternalToolByAdmin($params, $isAdmin,$attrValue,$attr, $privacy);
@@ -594,7 +601,7 @@ class AdminController extends AppController
            if (isset($params['delete']))
            {
 
-           } else if (isset($_GET['id']))
+           } else if ($id)
            {
                if ($params['id'] == 'new')
                {

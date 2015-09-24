@@ -473,4 +473,12 @@ class Assessments extends BaseImasAssessments
         return $data;
     }
 
+    public static function getAssessmentData($id){
+        return Assessments::find()->select('deffeedback,startdate,enddate,reviewdate,shuffle,itemorder,password,avail,isgroup,groupsetid,deffeedbacktext,timelimit,courseid,istutorial,name,allowlate')->where(['id' => $id])->all();
+    }
+
+    public static function getAssessmentIntro($id){
+        return Assessments::find()->select('intro')->where(['id' => $id])->all();
+    }
+
 }

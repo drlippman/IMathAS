@@ -99,6 +99,7 @@ class Exceptions extends BaseImasExceptions
         }
     }
 
+
     public static function getByUIdAndAssId($userId,$aid)
     {
         $query = new Query();
@@ -153,4 +154,10 @@ class Exceptions extends BaseImasExceptions
         $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
         return \Yii::$app->db->createCommand($query)->queryAll();
     }
+
+    public static function getStartDateEndDate($userId, $assessmentId)
+    {
+        return Exceptions::find()->select('startdate,enddate')->where(['assessmentid' => $assessmentId, 'userid' => $userId]);
+    }
+
 }

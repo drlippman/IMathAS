@@ -2206,7 +2206,8 @@ class QuestionController extends AppController
         $this->includeCSS(['mathtest.css', 'print.css']);
         $this->includeJS(['AMhelpers.js']);
         $renderData = array('course' => $course, 'overwriteBody' => $overwriteBody, 'body' => $body, 'courseId' => $courseId,
-            'assessmentId' => $assessmentId, 'line' => $line, 'user' => $user, 'pwss' => $pwss, 'pws' => $pws, 'phs' => $phs, 'numq' => $numQuestion);
+            'params' => $params,'isfinal' => $isFinal,'points' => $points,'qn' => $qn,'ph' => $ph,
+            'assessmentId' => $assessmentId, 'line' => $line, 'user' => $user, 'pwss' => $pwss, 'pws' => $pws, 'phs' => $phs, 'numq' => $numQuestion, 'questions' => $questions);
         return $this->renderWithData('printLayout', $renderData);
     }
 
@@ -2323,7 +2324,7 @@ class QuestionController extends AppController
             $numQuestion = count($questions);
         }
         $this->includeCSS(['default.css', 'handheld.css', 'print.css']);
-        $renderData = array('sessiondata' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $noLogo, 'numq' => $numQuestion,
+        $renderData = array('sessionData' => $sessionData, 'overwriteBody' => $overwriteBody, 'body' => $body, 'nologo' => $noLogo, 'numq' => $numQuestion,
             'printTwice' => $printTwice, ' course' => $course, 'assessmentId' => $assessmentId, 'params' => $params, 'copies' => $copies, 'line' => $line,
             'qn' => $qn, 'courseId' => $courseId, 'questions' => $questions, 'points' => $points, 'seeds' => $seeds);
         return $this->renderWithData('printLayoutBare', $renderData);

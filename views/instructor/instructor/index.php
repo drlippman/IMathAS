@@ -26,13 +26,12 @@ $now = $currentTime;
             <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=modify&cid='.$course->id); ?>"
                class="btn btn-primary pull-right page-settings"><img class = "small-icon" src="<?php echo AppUtility::getAssetURL()?>img/courseSetting.png">&nbsp;Course Setting
             </a>
-            <div class="tile_div">
-                <a href="#">Instructor</a>
-                <a href="#">Student</a>
-                <a href="#" class="last">Quick Rearrange</a>
-                <div class="clear"></div>
-            </div>
-<!--           <a class="btn btn-primary pull-right page-settings padding-right-ten" href="--><?php //echo AppUtility::getURLFromHome('course','course/index?cid='.$course->id. '&stuview=0');?><!--">--><?php //AppUtility::t('Student view');?><!--</a>-->
+<!--            <div class="tile_div">-->
+<!--                <a href="#">Instructor</a>-->
+<!--                <a href="#">Student</a>-->
+<!--                <a href="#" class="last">Quick Rearrange</a>-->
+<!--                <div class="clear"></div>-->
+<!--            </div>-->
         </div>
     </div>
 </div>

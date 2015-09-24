@@ -129,4 +129,19 @@ class Stugroups extends BaseImasStugroups
             $courseData->delete();
         }
     }
+
+    public static function getStuGrpId($userId, $groupSetId){
+        $query = 'SELECT i_sg.id FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid ';
+        $query .= "WHERE i_sgm.userid='$userId' AND i_sg.groupsetid= $groupSetId";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
+
+    public static function getUserIdStuGrpAndMembers($grpSetId)
+    {
+        $data = Yii::$app->db->createCommand("SELECT i_sgm.userid FROM imas_stugroups as i_sg JOIN imas_stugroupmembers as i_sgm ON i_sg.id=i_sgm.stugroupid  WHERE i_sg.groupsetid= :grpSetId ");
+        $data->bindValue('grpSetId', $grpSetId);
+        $query = $data->queryAll();
+        return $query;
+    }
 }

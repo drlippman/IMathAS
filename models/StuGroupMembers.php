@@ -80,4 +80,15 @@ class StuGroupMembers extends BaseImasStugroupmembers
             $courseData->delete();
         }
     }
+
+    public static function getUserId($stugroupId, $userId){
+        return StuGroupMembers::find()->select('userid')->where(['stugroupid' => $stugroupId])->andWhere(['<>','userid',$userId])->all();
+    }
+
+    public static function getByStuGrpAndUser($grpId){
+        $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_stugroupmembers WHERE ";
+        $query .= "imas_users.id=imas_stugroupmembers.userid AND imas_stugroupmembers.stugroupid= $grpId ORDER BY imas_users.LastName,imas_users.FirstName";
+        $data = Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

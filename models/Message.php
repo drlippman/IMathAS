@@ -320,5 +320,9 @@ class Message extends BaseImasMsgs
         $this->courseid = $courseId;
         $this->save();
     }
+
+    public static function getMsgIds($userid, $courseId){
+        return Message::find()->select('id')->where(['msgto' => $userid, 'courseid' => $courseId])->andWhere(['OR','isread = 0' , 'isread = 4'])->all();
+    }
 }
 

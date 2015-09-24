@@ -114,7 +114,7 @@ $this->params['breadcrumbs'][] = $this->title;
                href="<?php echo AppUtility::getURLFromHome('admin', 'admin/forms?action=addcourse') ?>"><?php AppUtility::t('Add New Course'); ?> </a>
         </div>
         <?php
-        if ($myRights >= GROUP_ADMIN_RIGHT) {
+        if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
         if ($showcourses > AppConstant::NUMERIC_ZERO) {
             echo "<input type=button value=\"Show My Courses\" onclick=\"window.location='index?showcourses=0'\" />";
         }
@@ -127,14 +127,14 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
 </div>
 <?php
-if ($myRights < GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteacherexport'])) {
+if ($myRights < AppConstant::GROUP_ADMIN_RIGHT && isset($CFG['GEN']['allowteacherexport'])) {
     ?>
     <div class=cp>
         <a href="#"><?php AppUtility::t('Export Question Set'); ?></a><BR>
         <a href="#"><?php AppUtility::t('Export Libraries'); ?></a>
     </div>
 <?php
-} else if ($myRights >= GROUP_ADMIN_RIGHT) {
+} else if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
     ?>
     <div class='cp item margin-left-twenty padding-bottom'>
         <span class=column>

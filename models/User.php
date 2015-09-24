@@ -724,5 +724,18 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = $command->queryOne();
         return $data;
     }
+
+    public static function getPwdUNameById($id)
+    {
+        return User::find()->select('password,LastName,FirstName')->where(['id' => $id])->all();
+    }
+
+    public static function getStudentData($curids,$id){
+        $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_students ";
+        $query .= "WHERE imas_users.id=imas_students.userid AND imas_students.courseid='$id' ";
+        $query .= "AND imas_users.id NOT IN ($curids) ORDER BY imas_users.LastName,imas_users.FirstName";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }
 

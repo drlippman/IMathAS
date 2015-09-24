@@ -3,6 +3,7 @@ namespace app\components;
 
 use \yii\base\Component;
 use Yii;
+use app\models\Questions;
 class CategoryScoresUtility extends Component
 {
 
@@ -10,26 +11,24 @@ class CategoryScoresUtility extends Component
     {
         $qlist = "'" . implode("','", $quests) . "'";
 
-        $connection = Yii::$app->getDb();
-        $query = "SELECT id,category,points FROM imas_questions WHERE id IN ($qlist)";
-        $result = $connection->createCommand($query)->queryAll();
+        $result = Questions::getIdCatPoints($quests);
         $cat = array();
         $pospts = array();
         $tolookup = array($defoutcome);
         foreach ($result as $row) {
-            if (is_numeric($row[1]) && $row[1] == AppConstant::NUMERIC_ZERO && $defoutcome != AppConstant::NUMERIC_ZERO) {
-                $cat[$row[0]] = $defoutcome;
+            if (is_numeric($row['category']) && $row['category'] == AppConstant::NUMERIC_ZERO && $defoutcome != AppConstant::NUMERIC_ZERO) {
+                $cat[$row['id']] = $defoutcome;
             } else {
-                $cat[$row[0]] = $row[1];
+                $cat[$row['id']] = $row['category'];
             }
 
-            if (is_numeric($row[1]) && $row[1] > AppConstant::NUMERIC_ZERO) {
-                $tolookup[] = $row[1];
+            if (is_numeric($row['category']) && $row['category'] > AppConstant::NUMERIC_ZERO) {
+                $tolookup[] = $row['category'];
             }
-            if ($row[2] == AppConstant::QUARTER_NINE) {
-                $pospts[$row[0]] = $defptsposs;
+            if ($row['points'] == AppConstant::QUARTER_NINE) {
+                $pospts[$row['id']] = $defptsposs;
             } else {
-                $pospts[$row[0]] = $row[2];
+                $pospts[$row['id']] = $row['points'];
             }
         }
 

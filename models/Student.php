@@ -529,5 +529,10 @@ class Student extends BaseImasStudents
     {
         return Student::find()->select('latepass')->where(['userid' => $userId, 'courseid' => $courseId])->all();
     }
+
+    public static function getLatePass($userId, $courseId)
+    {
+        return Student::find()->select('latepass')->where(['courseid' => $courseId, 'userid' => $userId])->one();
+    }
 }
 

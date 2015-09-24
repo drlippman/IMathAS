@@ -182,4 +182,9 @@ class LinkedText extends BaseImasLinkedtext
             $courseData->delete();
         }
     }
+
+    public static function getText($id)
+    {
+        return LinkedText::find()->select('text')->where(['id' => $id])->one();
+    }
 }

@@ -71,7 +71,7 @@ function buildbranch(parentid) {
                         hdr = document.createElement("span"); 
                         hdr.className = 'hdr'; 
                         //hdr.onclick = 'toggle('+tree[parentid][i][0]+')';
-			
+
                         btn = document.createElement("span"); 
                         btn.className = 'btn'; 
                         btn.id = 'b'+tree[parentid][i][0]; 

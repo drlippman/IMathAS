@@ -13,12 +13,14 @@ class AssessmentSession extends BaseImasAssessmentSessions
         return AssessmentSession::findAll(['assessmentid' => $id]);
     }
 
-    public static function createSessionForAssessment($params)
+    public function createSessionForAssessment($params)
     {
-        $params['starttime'] = AppConstant::ZERO_VALUE;
-        $assessmentSession = new AssessmentSession();
-        $assessmentSession->attributes = $params;
-        $assessmentSession->save();
+        $data = AppUtility::removeEmptyAttributes($params);
+        if($data){
+            $this->attributes = $data;
+            $this->save();
+            return $this->id;
+        }
     }
 
     public static function getById($id)
@@ -400,10 +402,56 @@ class AssessmentSession extends BaseImasAssessmentSessions
         return $items;
     }
 
-    public static function deleteData($userid,$paid)
+    public static function deleteData($userid,$aid)
     {
-        $query = "DELETE FROM imas_assessment_sessions WHERE userid='$userid' AND assessmentid='$paid' LIMIT 1";
-        \Yii::$app->db->createCommand($query)->execute();
+        $data = AssessmentSession::find()->where(['userid' => $userid, 'assessmentid' => $aid])->limit(1)->one();
+        if($data){
+            $data->delete();
+        }
+    }
+
+    public static function getIdByUserIdAndAid($userid, $aid){
+        return AssessmentSession::find()->select('id')->where(['userid' => $userid, 'assessmentid' => $aid])->orderBy('id')->limit(1)->one();
+    }
+
+    public static function getAssessmentSessionData($userid, $aid){
+        return AssessmentSession::find()->select('id,agroupid,lastanswers,bestlastanswers,starttime')->where(['userid' => $userid, 'assessmentid' => $aid])->orderBy(['id' => AppConstant::DESCENDING])->limit(1)->one();
+    }
+
+    public static function setGroupIdById($stdGrpId, $id)
+    {
+        $assessment = AssessmentSession::findOne(['id' => $id]);
+        $assessment->agroupid = $stdGrpId;
+        $assessment->save();
+    }
+
+    public static function setLtiSourceId($sourceId, $id)
+    {
+        $assessment = AssessmentSession::findOne(['id' => $id]);
+        $assessment->lti_sourcedid = $sourceId;
+        $assessment->save();
+    }
+
+    public static function setStartTime($time, $id)
+    {
+        $assessment = AssessmentSession::findOne(['id' => $id]);
+        $assessment->starttime = $time;
+        $assessment->save();
+    }
+
+    public static function getAssessmentSessionDataToCopy($fieldstocopy,$testid){
+        return AssessmentSession::find()->select($fieldstocopy)->where(['id' => $testid])->all();
+    }
+
+    public static function getIdAndAGroupId($userid, $aid){
+        return AssessmentSession::find()->select('id, agroupid')->where(['userid' => $userid, 'assessmentid' => $aid])->orderBy('id')->limit(1)->one();
+    }
+
+    public static function getFromUser($groupId){
+        $query = "SELECT imas_users.id,imas_users.FirstName,imas_users.LastName FROM imas_users,imas_assessment_sessions WHERE ";
+        $query .= "imas_users.id=imas_assessment_sessions.userid AND imas_assessment_sessions.agroupid=$groupId ORDER BY imas_users.LastName,imas_users.FirstName";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
     }
 }
 
