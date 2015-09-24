@@ -20,6 +20,8 @@
 	} else {
 		$shownav = true;
 	}
+	$isteacher = isset($teacherid);
+	$istutor = isset($tutorid);
 	$query = "SELECT text,title,target FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	$result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$text = mysql_result($result, 0,0);
@@ -164,7 +166,11 @@
 		$navbuttons .= '<div class="clear"></div>';
 	}
 	if ($navbuttons != '') {
-		$text = preg_replace('/(<hr[^>]*>\s*<div[^>]*smallattr[^>]*>)/sm', $navbuttons.'$1', $text);
+		if (strpos($text, 'smallattr')!==false) {
+			$text = preg_replace('/(<hr[^>]*>\s*<div[^>]*smallattr[^>]*>)/sm', $navbuttons.'$1', $text);
+		} else {
+			$text .= '<hr/>'.$navbuttons;
+		}
 	}
 	echo filter($text);
 	echo '</div>';

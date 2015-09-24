@@ -655,6 +655,10 @@ div.question img {
 	height: auto;
 }
 
+div.txtimgwrap > img {
+	max-width: none;
+}
+
 div.question td img, div.question th img {
 	max-width: 100%;
 }

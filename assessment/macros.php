@@ -2012,7 +2012,7 @@ function textonimage() {
 	$args = func_get_args();
 	$img = array_shift($args);
 	$img = preg_replace('/^.*src="(.*?)".*$/',"$1",$img);
-	$out = '<div style="position: relative;">';
+	$out = '<div style="position: relative;" class="txtimgwrap">';
 	$out .= '<img src="'.$img.'" style="position: relative; top: 0px; left: 0px;" />';
 	while (count($args)>2) {
 		$text = array_shift($args);
