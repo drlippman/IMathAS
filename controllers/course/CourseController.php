@@ -76,6 +76,9 @@ class CourseController extends AppController
         $responseData = array();
         $now = time();
         $calendarCount = array();
+        $exceptionDataCount = array();
+        $exceptions = array();
+        $latePassHrs = array();
         $useviewbuttons = false;
         $previewshift = $this->getParamVal('stuview');
         $course = Course::getById($courseId);
@@ -104,18 +107,29 @@ class CourseController extends AppController
                         $tempItem = array();
                         $item = Items::getById($blockItem);
                         switch ($item->itemtype) {
-
                             case 'Assessment':
+
                                 $assessment = Assessments::getByAssessmentId($item->typeid);
+                                $exceptionData = Exceptions::getExceptionDataLatePass($userId);
+                                $result = Course::getByLatePasshrs($courseId);
+                                $hours = $result[0]['latepasshrs'];
+                                foreach($exceptionData as $key1 => $line) {
+                                    $exceptions[$line['id']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                                }
+
                                 if($previewshift > AppConstant::NUMERIC_ZERO){
                                     if($assessment['enddate'] > ($now + $previewshift))
                                     {
                                     $tempItem[$item->itemtype] = $assessment;
                                     array_push($calendarCount, $assessment);
+                                    array_push($exceptionDataCount, $exceptions);
+                                    array_push($latePassHrs, $hours);
                                     }
-                                } else{
+                                } else {
                                     $tempItem[$item->itemtype] = $assessment;
                                     array_push($calendarCount, $assessment);
+                                    array_push($exceptionDataCount, $exceptions);
+                                    array_push($latePassHrs, $hours);
                                 }
                                 break;
                             case 'Calendar':
@@ -176,7 +190,16 @@ class CourseController extends AppController
                     switch ($item->itemtype) {
                         case 'Assessment':
                             $assessment = Assessments::getByAssessmentId($item->typeid);
-                            if($previewshift > AppConstant::NUMERIC_ZERO){
+                            $exceptionData = Exceptions::getExceptionDataLatePass($userId);
+                            $result = Course::getByLatePasshrs($courseId);
+                            $hours = $result[0]['latepasshrs'];
+                            foreach($exceptionData as $key1 => $line) {
+
+                                $exceptions[$line['typeid']] = array($line['startdate'],$line['enddate'],$line['islatepass'],$line['waivereqscore']);
+                            }
+
+                            if($previewshift > AppConstant::NUMERIC_ZERO)
+                            {
                                if($assessment['enddate'] > ($now + $previewshift))
                                {
                                    $exception = Exceptions::getByAssessmentIdAndUserId($user->id, $assessment->id);
@@ -187,6 +210,8 @@ class CourseController extends AppController
                                    $tempAray[$item->itemtype] = $assessment;
                                    array_push($responseData, $tempAray);
                                    array_push($calendarCount, $assessment);
+                                   array_push($exceptionDataCount, $exceptions);
+                                   $latePassHrs[$assessment['id']] = $hours;
                                }
                             }else
                             {
@@ -198,6 +223,8 @@ class CourseController extends AppController
                                 $tempAray[$item->itemtype] = $assessment;
                                 array_push($responseData, $tempAray);
                                 array_push($calendarCount, $assessment);
+                                array_push($exceptionDataCount, $exceptions);
+                                $latePassHrs[$assessment['id']] = $hours;
                             }
                             break;
                         case 'Calendar':
@@ -273,7 +300,7 @@ class CourseController extends AppController
 
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css', 'course/course.css']);
         $this->includeJS(['moment.min.js', 'fullcalendar.min.js', 'student.js', 'latePass.js']);
-        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception, 'topbar1' => $topbar[0], 'topbar2' => $topbar[2], 'previewshift' => $previewshift, 'useviewbuttons' => $useviewbuttons);
+        $returnData = array('calendarData' => $calendarCount, 'courseDetail' => $responseData, 'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession, 'messageList' => $msgList, 'exception' => $exception, 'topbar1' => $topbar[0], 'topbar2' => $topbar[2], 'previewshift' => $previewshift, 'useviewbuttons' => $useviewbuttons, 'exceptionDataCount' => $exceptionDataCount, 'latePassHrs' => $latePassHrs);
         return $this->render('index', $returnData);
     }
     /**

@@ -456,7 +456,21 @@ class Assessments extends BaseImasAssessments
             $assessmentData->viddata = $data;
             $assessmentData->save();
         }
+    }
+    public static function getEndDateById($aid)
+    {
+        return Assessments::find()->select('enddate')->where(['id' => $aid])->all();
+    }
 
+    public static function getDateAndAllowById($aid)
+    {
+        $query = new Query();
+        $query	->select(['allowlate','enddate','startdate'])
+            ->from(['imas_assessments'])
+            ->where(['id' => $aid]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
+        return $data;
     }
 
 }

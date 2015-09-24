@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasContentTrack;
 use yii\db\Query;
 
@@ -88,5 +89,18 @@ class ContentTrack extends BaseImasContentTrack
             $this->info = $forumId.';'.$threadIdOfPost;
         }
         $this->save();
+    }
+
+    public static function getByTypeId($courseId, $userId)
+    {
+        $query = new Query();
+        $query	->select(['typeid'])
+            ->from(['imas_content_track'])
+            ->where(['courseid' => $courseId]);
+        $query->andWhere(['userid' => $userId]);
+        $query->andWhere(['type' => 'gbviewasid']);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
     }
 }

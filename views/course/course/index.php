@@ -29,7 +29,6 @@ $jsAddress1 = AppUtility::getURLFromHome('course', 'course/index?cid='.$course->
 <div class="col-lg-12">
 <?php
 if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbuttons)) {
-
     if($previewshift > -1 && !$useviewbuttons) { ?>
         <div class="col-lg-3">
        <?php  echo _('Showing student view. Show view:') ?></div>
@@ -65,13 +64,24 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
 <div class="tab-content shadowBox student-no-second-level-nav">
     <?php if(count($courseDetail)){
         foreach($courseDetail as $key => $item){
-
             switch(key($item)):
                 case 'Assessment': ?>
-
                     <?php $assessment = $item[key($item)];
+                    $canundolatepass = false;
+                    $latepasscnt = 0;
 
-                    if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
+                    $latepasshrs = $latePassHrs[$assessment['id']];
+                    foreach($exceptionDataCount as $key => $exceptions) {
+                        if ($exceptions[$assessment['id']]) {
+                            if ($exceptions[$assessment['id']][2] > 0 && ($now < $line['enddate'] || $exceptions[$assessment['id']][1] > $now + $latepasshrs*60*60)) {
+                                $canundolatepass = true;
+                            }
+                            $latepasscnt = round(($exceptions[$assessment['id']][1] - $line['enddate'])/($latepasshrs*3600));
+                            $line['startdate'] = $exceptions[$assessment['id']][0];
+                            $line['enddate'] = $exceptions[$assessment['id']][1];
+                        }
+                    }
+                     if ($assessment->enddate > $currentTime && $assessment->startdate < $currentTime) {
                         ?>
                         <div class="item student-course-alignment">
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
@@ -82,13 +92,17 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                             <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a>
                                         </b>
                                         <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                                        <?php if ($assessment->enddate != 2000000000) { ?>
+                                        <?php if ($assessment->enddate != 2000000000) {
+                                            ?>
                                             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
                                             <!-- Use Late Pass here-->
                                             <?php if($students->latepass != 0) {
                                                 if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                     ?>
-                                                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <?php if ($canundolatepass) { ?>
+                                                     | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                          <?php } ?>
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                 <?php } ?>
@@ -100,13 +114,17 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                     <?php } else {?>
                                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"class="confirmation-require assessment-link" id="<?php echo $assessment->id?>"><?php echo $assessment->name ?></a></b>
                                         <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                                        <?php if ($assessment->enddate != 2000000000) { ?>
+                                        <?php if ($assessment->enddate != 2000000000) {
+                                            ?>
                                             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
                                             <!-- Use Late Pass here-->
                                             <?php if($students->latepass != 0) {
                                                 if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                     ?>
-                                                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <?php if ($canundolatepass) { ?>
+                                                        | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                    <?php } ?>
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                 <?php } ?>
@@ -118,12 +136,18 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                 <?php } else { ?>
                                     <?php if($assessment->password == '') {?>
                                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/show-assessment?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
-                                        <?php if ($assessment->enddate != 2000000000) { ?>
+                                        <?php if ($assessment->enddate != 2000000000) {
+                                            ?>
                                             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
                                             <!-- Use Late Pass here-->
-                                            <?php if($students->latepass != 0) {?>
+                                            <?php if($students->latepass != 0) {
+                                               ?>
                                                 <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
-                                                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <?php if ($canundolatepass) {   ?>
+                                                        | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                    <?php }
+                                                    ?>
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                 <?php } ?>
@@ -134,13 +158,17 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                     <?php } else {?>
                                         <b><a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/password?id=' . $assessment->id.'&cid=' .$course->id) ?>"><?php echo $assessment->name ?></a></b>
                                         <input type="hidden" class="confirmation-require" id="time-limit<?php echo $assessment->id?>" name="urlTimeLimit" value="<?php echo $assessment->timelimit;?>">
-                                        <?php if ($assessment->enddate != 2000000000) { ?>
+                                        <?php if ($assessment->enddate != 2000000000) {
+                                            ?>
                                             <BR><?php echo 'Due ' . AppUtility::formatDate($assessment->enddate); ?>
                                             <!-- Use Late Pass here-->
                                             <?php if($students->latepass != 0) {
                                                 if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                     ?>
-                                                    <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                    <?php if ($canundolatepass) { ?>
+                                                        | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                    <?php } ?>
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                     <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                 <?php } ?>
@@ -155,7 +183,8 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                 <p><?php echo $assessment->summary ?></p>
                             </div>
                         </div>
-                    <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {?>
+                    <?php } elseif ($assessment->enddate < $currentTime && ($assessment->reviewdate != 0) && ($assessment->reviewdate > $currentTime)) {
+                       ?>
                         <div class="item student-course-alignment">
                             <img alt="assess" class="floatleft item-icon-alignment" src="<?php echo AppUtility::getAssetURL() ?>img/iconAssessment.png"/>
                             <div class="title">
@@ -537,7 +566,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -555,7 +587,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -572,7 +607,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <!-- Use Late Pass here-->
                                                                 <?php if($students->latepass != 0) {?>
                                                                     <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -589,7 +627,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -987,7 +1028,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -1005,7 +1049,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -1022,7 +1069,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <!-- Use Late Pass here-->
                                                                 <?php if($students->latepass != 0) {?>
                                                                     <?php if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>
@@ -1039,7 +1089,10 @@ if ((count($topbar1) > 0 && $topbar2 == 0) || ($previewshift > -1 && !$useviewbu
                                                                 <?php if($students->latepass != 0) {
                                                                     if($students->latepass != 0 && (($currentTime - $assessment->enddate) < $course->latepasshrs*3600) ){
                                                                         ?>
-                                                                        <a href="<?php echo AppUtility::getURLFromHome('assessment', 'assessment/late-pass?id=' . $assessment->id.'&cid=' .$course->id) ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&confirm=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>"> Use Late Pass</a>
+                                                                        <?php if ($canundolatepass) { ?>
+                                                                            | <a href="<?php echo AppUtility::getURLFromHome('admin', 'admin/late-pass?id=' . $assessment->id.'&cid=' .$course->id. '&undo=true') ?>" class="confirmation-late-pass" id="<?php echo $assessment->id?>">", _('Un-use LatePass'), "</a>";
+                                                                        <?php } ?>
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass<?php echo $assessment->id?>" name="urlLatePass" value="<?php echo $students->latepass;?>">
                                                                         <input type="hidden" class="confirmation-late-pass" id="late-pass-hrs<?php echo $assessment->id?>" name="urlLatePassHrs" value="<?php echo $course->latepasshrs;?>">
                                                                     <?php } ?>

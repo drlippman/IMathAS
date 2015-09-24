@@ -50,33 +50,6 @@ class AssessmentController extends AppController
         $responseData = array('response' => $response, 'isQuestions' => $isQuestions, 'courseId' => $courseId, 'now' => time(), 'assessment' => $assessment, 'assessmentSession' => $assessmentSession, 'isShowExpiredTime' => $to, 'user' => $user, 'course' => $course);
         return $this->render('ShowAssessment', $responseData);
     }
-
-    public function actionLatePass()
-    {
-        $this->guestUserHandler();
-        $assessmentId = $this->getParamVal('id');
-        $courseId = $this->getParamVal('cid');
-        $studentId = $this->getAuthenticatedUser();
-        $exceptionAssessment = Exceptions::getByAssessmentId($assessmentId);
-        $assessment = Assessments::getByAssessmentId($assessmentId);
-        $student = Student::getByCourseId($courseId, $studentId);
-        $startDate = $assessment->startdate;
-        $endDate = $assessment->enddate;
-        $wave = AppConstant::NUMERIC_ZERO;
-        $param['assessmentid'] = $assessmentId;
-        $param['userid'] = $studentId;
-        $param['startdate'] = $startDate;
-        $param['enddate'] = $endDate;
-        $param['waivereqscore'] = $wave;
-        $latepass = $student->latepass;
-        $student->latepass = $latepass - AppConstant::NUMERIC_ONE;
-        $exception = new Exceptions();
-        $exception->attributes = $param;
-        $exception->save();
-        $student->save();
-        $this->redirect(AppUtility::getURLFromHome('course', 'course/index?id=' . $assessmentId . '&cid=' . $courseId));
-    }
-
     /**
      * Display password, when assessment need password.
      */

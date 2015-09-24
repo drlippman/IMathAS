@@ -530,4 +530,14 @@ class Course extends BaseImasCourses {
         }
     }
 
+    public static function getByLatePasshrs($courseId)
+    {
+        $query = new Query();
+        $query	->select(['latepasshrs'])
+            ->from(['imas_courses'])
+            ->where(['id' => $courseId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }

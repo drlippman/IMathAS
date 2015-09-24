@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasStudents;
 use app\controllers\AppController;
 use yii\db\Query;
@@ -511,6 +512,22 @@ class Student extends BaseImasStudents
         $this->courseid = $pcid;
         $this->section = $teacher;
         $this->save();
+    }
+
+    public static function updateLatePass($n, $userid, $cid)
+    {
+        $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+    public static function updateLatePassById($userId,$courseId)
+    {
+        $query = "UPDATE imas_students SET latepass=latepass-1 WHERE userid='$userId' AND courseid='$courseId' AND latepass>0";
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getLatePassById($userId, $courseId)
+    {
+        return Student::find()->select('latepass')->where(['userid' => $userId, 'courseid' => $courseId])->all();
     }
 }
 

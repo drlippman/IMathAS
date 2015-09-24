@@ -1,6 +1,8 @@
 <?php
 namespace app\models;
 
+use app\components\AppConstant;
+use app\components\AppUtility;
 use app\models\_base\BaseImasExceptions;
 use yii\db\Query;
 
@@ -97,4 +99,58 @@ class Exceptions extends BaseImasExceptions
         }
     }
 
+    public static function getByUIdAndAssId($userId,$aid)
+    {
+        $query = new Query();
+        $query	->select(['enddate', 'islatepass'])
+        ->from(['imas_exceptions'])
+        ->where(['userid' => $userId]);
+        $query->andWhere(['assessmentid' => $aid]);
+        $command = $query->createCommand();
+        $data = $command->queryone();
+        return $data;
+    }
+
+    public static function deleteByUserIdAndAssId($userId, $aid)
+    {
+        $exceptions = Exceptions::find()->where(['userid' => $userId, 'assessmentid' => $aid])->one();
+        if($exceptions) {
+            $exceptions->delete();
+        }
+    }
+
+    public static function updateData($n, $newend, $userid, $aid)
+    {
+        $query = "UPDATE imas_exceptions SET islatepass=islatepass-$n,enddate=$newend WHERE userid='$userid' AND assessmentid='$aid'";
+        \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public static function getEndDateById($userId, $aid)
+    {
+        return Exceptions::find()->select('enddate')->where(['userid' => $userId, 'assessmentid' => $aid])->one();
+    }
+
+    public static function updateIsLatePass($addtime,$userid, $aid)
+    {
+        $query = "UPDATE imas_exceptions SET enddate=enddate+$addtime,islatepass=islatepass+1 WHERE userid='$userid' AND assessmentid='$aid'";
+        return \Yii::$app->db->createCommand($query)->execute();
+    }
+
+    public function insertByUserData($userId, $assessmentId, $startdate, $enddate)
+    {
+        $this->userid = $userId;
+        $this->assessmentid = $assessmentId;
+        $this->startdate = $startdate;
+        $this->enddate = $enddate;
+        $this->islatepass = 1;
+        $this->save();
+    }
+
+    public static function getExceptionDataLatePass($userId)
+    {
+        $query = "SELECT items.id,ex.startdate,ex.enddate,ex.islatepass,ex.waivereqscore, items.typeid FROM ";
+        $query .= "imas_exceptions AS ex,imas_items as items,imas_assessments as i_a WHERE ex.userid='$userId' AND ";
+        $query .= "ex.assessmentid=i_a.id AND (items.typeid=i_a.id AND items.itemtype='Assessment') ";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
