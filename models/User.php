@@ -714,5 +714,15 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return User::find()->select('groupid')->where(['id' => $id])->all();
     }
+    public static function userDataForTutorial($id)
+    {
+        $query = new Query();
+        $query->select(['FirstName', 'LastName'])
+            ->from('imas_users')
+            ->where(['id' => $id]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }
 

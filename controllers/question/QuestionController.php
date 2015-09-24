@@ -1691,11 +1691,6 @@ class QuestionController extends AppController
         return $videoId;
     }
 
-    public function actionModTutorialQuestion()
-    {
-        return $this->redirect(AppUtility::getURLFromHome('site', 'work-in-progress'));
-    }
-
     public function actionModQuestion()
     {
         $user = $this->getAuthenticatedUser();
@@ -3053,5 +3048,555 @@ class QuestionController extends AppController
             'isadmin' => $isAdmin, 'hidepriv' => $hidePrivate, 'isgrpadmin' => $isGrpAdmin, 'page_libstouse' => $pageLibsToUse, 'lnamesarr' => $lNamesArray,
             'page_libqids' => $pageLibQids, 'page_questionTable' => $pageQuestionTable, 'remove' => $remove, 'transfer' => $transfer);
         return $this->renderWithData('manageQuestionSet', $renderData);
+    }
+
+    public function actionModTutorialQuestion()
+    {
+        $user = $this->getAuthenticatedUser();
+        $isAdmin = false;
+        $isGrpAdmin = false;
+        global $qSetId;
+        $makeLocal = $this->getParamVal('makelocal');
+        $templateId = $this->getParamVal('templateid');
+        $aid = $this->getParamVal('aid');
+        $cid = $this->getParamVal('cid');
+        $getId = $this->getParamVal('id');
+        $params = $this->getRequestParams();
+        $now = time();
+        $editMsg = '';
+        if (!isset($aid))
+        {
+            if ($cid == "admin")
+            {
+                if ($user['rights'] == AppConstant::ADMIN_RIGHT)
+                {
+                    $isAdmin = true;
+                    $cid = 'admin';
+                }
+                else if ($user['rights'] == AppConstant::GROUP_ADMIN_RIGHT)
+                {
+                    $isGrpAdmin = true;
+                }
+            }
+        }
+        if(isset($params['text']))
+        {
+            if (!isset($id))
+            {
+                $id = 'new';
+            }
+            else
+            {
+                $id = $getId;
+            }
+            $params = stripslashes_deep($params);
+            $qText = $this->stripSmartQuotesForTutorial($params['text']);
+            $nParts = intval($params['nparts']);
+            $qTypes = array();
+            $qParts = array();
+            $questions = array();
+            $feedback = array();
+            $feedBackTxtDef = array();
+            $feedBackTxtEssay = array();
+            $answerBoxSize = array();
+            $scoreMethod = array();
+            $useEditor = array();
+            $answer = array();
+            $partial = array();
+            $qToL = array();
+            for ($n=AppConstant::NUMERIC_ZERO;$n<$nParts;$n++)
+            {
+                $qTypes[$n] = $params['qtype'.$n];
+                $feedback[$n] = array();
+                if ($qTypes[$n] == 'choices')
+                {
+                    $questions[$n] = array();
+                    $answer[$n] = $params['ans'.$n];
+                }
+                else if ($qTypes[$n] == 'number')
+                {
+                    $partialAns[$n] = array();
+                    $qToL[$n] = (($params['qtol'.$n]=='abs')?'|':'') . $params['tol'.$n];
+                    $feedBackTxtDef[$n] = $params['fb'.$n.'-def'];
+                    $answer[$n] = $params['txt'.$n.'-'.$params['ans'.$n]];
+                    $params['pc'.$n.'-'.$params['ans'.$n]] = AppConstant::NUMERIC_ONE;
+                    $answerBoxSize[$n] = intval($params['numboxsize'.$n]);
+                }
+                else if ($qTypes[$n] == 'essay')
+                {
+                    $answer[$n] = '"'.str_replace('"','\\"',$params['essay'.$n.'-fb']).'"';
+                    if (isset($params['useeditor'.$n]))
+                    {
+                        $useEditor[$n] = true;
+                    }
+                    if (isset($params['takeanything'.$n]))
+                    {
+                        $scoreMethod[$n] = 'takeanything';
+                    }
+                    $answerBoxSize[$n] = intval($params['essayrows'.$n]);
+                }
+                if ($qTypes[$n] == 'choices' || $qTypes[$n] == 'number')
+                {
+                    $qParts[$n] = intval($params['qparts'.$n]);
+                    $questions[$n] = array();
+                    $partialAns[$n] = array();
+                    $feedBackTxt[$n] = array();
+                    $partial[$n] = array();
+                    for($i=0;$i<$qParts[$n];$i++)
+                    {
+                        if (trim($params['txt'.$n.'-'.$i]) == '') {continue;}
+                        if ($qTypes[$n] == 'choices')
+                        {
+                            $questions[$n][] = $params['txt'.$n.'-'.$i];
+                        }
+                        else if ($qTypes[$n] == 'number')
+                        {
+                            $partialAns[$n][] = $params['txt'.$n.'-'.$i];
+                        }
+                        $feedBackTxt[$n][] = $params['fb'.$n.'-'.$i];
+                        $partial[$n][] = floatval($params['pc'.$n.'-'.$i]);
+                    }
+                    $qParts[$n] = count($feedBackTxt[$n]);
+                }
+                else if($qTypes[$n] == 'essay')
+                {
+                    $qParts[$n] = AppConstant::NUMERIC_ZERO;
+                    $feedBackTxtEssay[$n] = $params['essay'.$n.'-fb'];
+                }
+            }
+            $nHints = intval($params['nhints']);
+            $hintText = array();
+            for ($n=0;$n<$nHints;$n++)
+            {
+                if (!empty($params['hint'.$n]))
+                {
+                    $hintText[] = $params['hint'.$n];
+                }
+            }
+            $nHints = count($hintText);
+            $code = '';
+            if ($nParts == AppConstant::NUMERIC_ONE)
+            {
+                $qType = $qTypes[0];
+                $partialOut = array();
+                for ($i=0;$i<$qParts[0];$i++)
+                {
+                    if ($qTypes[0]=='choices')
+                    {
+                        $code .= '$questions['.$i.'] = "'.str_replace('"','\\"',$questions[0][$i]).'"'."\n";
+                    }
+                    $code .= '$feedBackTxt['.$i.'] = "'.str_replace('"','\\"',$feedBackTxt[0][$i]).'"'."\n";
+                    if ($partial[0][$i]!=0 || $qTypes[0]=='number')
+                    {
+                        if ($qTypes[0]=='choices')
+                        {
+                            $partialOut[] = $i;
+                        }
+                        else if ($qTypes[0]=='number')
+                        {
+                            $partialOut[] = $partialAns[0][$i];
+                        }
+                        $partialOut[] = $partial[0][$i];
+                    }
+                }
+                if (count($partialOut) > AppConstant::NUMERIC_ZERO)
+                {
+                    $code .= '$partialCredit = array('.implode(',',$partialOut).')'."\n";
+                }
+                if ($qTypes[0]=='choices')
+                {
+                    $code .= '$displayFormat = "'.$params['qdisp0'].'"'."\n";
+                    $code .= '$noShuffle = "'.$params['qshuffle0'].'"'."\n";
+                }
+                else if ($qTypes[0]=='number')
+                {
+                    $code .= '$feedBackTxtDef = "'.str_replace('"','\\"',$feedBackTxtDef[0]).'"'."\n";
+                    $code .= '$answerBoxSize = '.$answerBoxSize[0]."\n";
+                    $code .= (($params['qtol0']=='abs')?'$absTolerance':'$relTolerance').' = '.$params['tol0']."\n";
+                }
+                else if ($qTypes[0]=='essay')
+                {
+                    $code .= '$feedBackTxtEssay = "'.str_replace('"','\\"',$feedBackTxtEssay[0]).'"'."\n";
+                    $code .= '$answerBoxSize = '.$answerBoxSize[0]."\n";
+                    if (isset($useEditor[0]))
+                    {
+                        $code .= '$displayFormat = "editor"'."\n";
+                    }
+                    if (isset($scoreMethod[0]))
+                    {
+                        $code .= '$scoreMethod = "'.$scoreMethod[0].'"'."\n";
+                    }
+                }
+                $code .= '$answer = '.$answer[0]."\n\n";
+            }
+            else
+            {
+                $qType = 'multiPart';
+                $code .= '$ansTypes = "'.implode(',',$qTypes).'"'."\n\n";
+                for ($n=0;$n<$nParts;$n++)
+                {
+                    $partialOut = array();
+                    for ($i=0;$i<$qParts[$n];$i++)
+                    {
+                        if ($qTypes[$n]=='choices')
+                        {
+                            $code .= '$questions['.$n.']['.$i.'] = "'.str_replace('"','\\"',$questions[$n][$i]).'"'."\n";
+                        }
+                        $code .= '$feedBackTxt['.$n.']['.$i.'] = "'.str_replace('"','\\"',$feedBackTxt[$n][$i]).'"'."\n";
+                        if ($partial[$n][$i]!= AppConstant::NUMERIC_ZERO || $qTypes[$n]=='number')
+                        {
+                            if ($qTypes[$n]=='choices')
+                            {
+                                $partialOut[] = $i;
+                            }
+                            else if ($qTypes[$n]=='number')
+                            {
+                                $partialOut[] = $partialAns[$n][$i];
+                            }
+                            $partialOut[] = $partial[$n][$i];
+                        }
+                    }
+                    if (count($partialOut) > AppConstant::NUMERIC_ZERO)
+                    {
+                        $code .= '$partialCredit['.$n.'] = array('.implode(',',$partialOut).')'."\n";
+                    }
+                    if ($qTypes[$n]=='choices')
+                    {
+                        $code .= '$displayFormat['.$n.'] = "'.$params['qdisp'.$n].'"'."\n";
+                        $code .= '$noShuffle['.$n.'] = "'.$params['qshuffle'.$n].'"'."\n";
+                    }
+                    else if ($qTypes[$n]=='number')
+                    {
+                        $code .= '$feedBackTxtDef['.$n.'] = "'.str_replace('"','\\"',$feedBackTxtDef[$n]).'"'."\n";
+                        $code .= '$answerBoxSize['.$n.'] = '.$answerBoxSize[$n]."\n";
+                        $code .= (($params['qtol'.$n]=='abs')?'$absTolerance[':'$relTolerance[').$n.'] = '.$params['tol'.$n]."\n";
+                    }
+                    else if ($qTypes[$n]=='essay')
+                    {
+                        $code .= '$feedBackTxtEssay['.$n.'] = "'.str_replace('"','\\"',$feedBackTxtEssay[$n]).'"'."\n";
+                        $code .= '$answerBoxSize['.$n.'] = '.$answerBoxSize[$n]."\n";
+                        if (isset($useEditor[$n]))
+                        {
+                            $code .= '$displayFormat['.$n.'] = "editor"'."\n";
+                        }
+                        if (isset($scoreMethod[$n]))
+                        {
+                            $code .= '$scoreMethod['.$n.'] = "'.$scoreMethod[$n].'"'."\n";
+                        }
+                    }
+                    $code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
+                }
+            }
+            for ($i=0;$i<$nHints;$i++)
+            {
+                $code .= '$hintText['.$i.'] = "'.str_replace('"','\\"',$hintText[$i]).'"'."\n";
+            }
+            $code .= "\n//end stored values - Tutorial Style question\n\n";
+            $qTexPre = '';
+            if ($nHints > AppConstant::NUMERIC_ZERO)
+            {
+                $qTexPre .= '<p style="text-align: right">';
+                for ($i=0;$i < $nHints;$i++)
+                {
+                    $code .= '$hintLink['.$i.'] = formHoverOver("Hint '.($i+1).'",$hintText['.$i.'])'."\n";
+                    $qTexPre .= '$hintLink['.$i.'] ';
+                }
+                $qTexPre .= '</p>';
+            }
+            $code .= "\n";
+            if ($nParts == AppConstant::NUMERIC_ONE)
+            {
+                if ($qTypes[0]=='choices')
+                {
+                    $code .= '$feedback = getFeedBackTxt($stuAnswers[$thisQ], $feedBackTxt, $answer)'."\n";
+                }
+                else if ($qTypes[0]=='number')
+                {
+                    $code .= '$feedback = getFeedBackTxtNumber($stuAnswers[$thisQ], $partialCredit, $feedBackTxt, $feedBackTxtDef, "'.$qToL[0].'")'."\n";
+                }
+                else if ($qTypes[0]=='essay')
+                {
+                    $code .= '$feedback = getFeedBackTxtEssay($stuAnswers[$thisQ], $feedBackTxtEssay)'."\n";
+                }
+            }
+            else
+            {
+                for ($n=0;$n<$nParts;$n++)
+                {
+                    if ($qTypes[$n]=='choices')
+                    {
+                        $code .= '$feedback['.$n.'] = getFeedBackTxt($stuAnswers[$thisQ]['.$n.'], $feedBackTxt['.$n.'], $answer['.$n.'])'."\n";
+                    }
+                    else if ($qTypes[$n]=='number')
+                    {
+                        $code .= '$feedback['.$n.'] = getFeedBackTxtNumber($stuAnswers[$thisQ]['.$n.'], $partialCredit['.$n.'], $feedBackTxt['.$n.'], $feedbacktxtdef['.$n.'], "'.$qToL[$n].'")'."\n";
+                    }
+                    else if ($qTypes[$n]=='essay')
+                    {
+                        $code .= '$feedback['.$n.'] = getFeedBackTxEssay($stuAnswers[$thisQ]['.$n.'], $feedBackTxtEssay['.$n.'])'."\n";
+                    }
+                }
+            }
+            $qText = $qTexPre . $qText;
+            $code = addslashes($code);
+            $qText = addslashes($qText);
+            if ($id == 'new')
+            {
+                $mt = microtime();
+                $uQid = substr($mt,11).substr($mt,2,6);
+                $ancestors = '';
+                if(isset($templateId))
+                {
+                    $ancestors = QuestionSet::getAncestor($templateId);
+                    if($ancestors == '')
+                    {
+                        $ancestors = $templateId . ','. $ancestors['ancestors'];
+                    }
+                    else
+                    {
+                        $ancestors = $templateId;
+                    }
+                }
+                $query =new QuestionSet();
+                $insertId = $query->insertDataForModTutorial($uQid,$now,$params,$user,$qType,$code,$qText,$ancestors);
+                $id = $insertId;
+                if(isset($makeLocal))
+                {
+                    QuestionSet::updateQSetForTutorial($qSetId,$makeLocal);
+                    $editMsg .= " Local copy of Question Created ";
+                    $fromPot = AppConstant::NUMERIC_ZERO;
+                }
+                else
+                {
+                    $editMsg .= " Question Added to QuestionSet. ";
+                    $fromPot = AppConstant::NUMERIC_ONE;
+                }
+            }
+            else
+            {
+                $isOk = true;
+                if($isGrpAdmin)
+                {
+                    $query = QuestionSet::getByGroupId($id,$user['groupid']);
+                    if(!$query)
+                    {
+                        $isOk = false;
+                    }
+                }
+                if(!$isAdmin && !$isGrpAdmin)
+                {
+                    $query = QuestionSet::getByUserIdGroupId($id,$user['id'],$user['groupid']);
+                    if(!$query)
+                    {
+                        $isOk = false;
+                    }
+                }
+                if($isOk)
+                {
+                    QuestionSet::updateQueSet($params,$now,$qType,$code,$id,$qText);
+                }
+            }
+            if (!isset($aid))
+            {
+                $editMsg .=  "<a href='".AppUtility::getURLFromHome('question','question/manage-question-set?cid='.$cid)."'>Return to Question Set Management</a>\n";
+            }
+            else
+            {
+                if ($fromPot == AppConstant::NUMERIC_ONE)
+                {
+                    $editMsg .=  "<a href='".AppUtility::getURLFromHome('question','question/mod-question?cid='.$cid.'&qsetid='.$id.'&aid='.$aid.'&process=true&usedef=true')."'>Add Question to Assessment using Defaults</a>\n";
+                    $editMsg .=  "<a href='".AppUtility::getURLFromHome('question','question/mod-question?cid='.$cid.'&qsetid='.$id.'&aid='.$aid)."'>Add Question to Assessment</a>\n";
+                }
+                $editMsg .=  "<a href='".AppUtility::getURLFromHome('question','question/add-questions?cid='.$cid.'&aid='.$aid)."'>Return to Assessment</a>\n";
+            }
+            $newLibs = explode(",",$params['libs']);
+            if (in_array('0',$newLibs) && count($newLibs) > AppConstant::NUMERIC_ONE)
+            {
+                array_shift($newLibs);
+            }
+            $qSetId = $id;
+            if ($params['libs']=='')
+            {
+                $newLibs = array();
+            }
+            $libraryData = LibraryItems::getByGroupId($user['groupid'],$qSetId,$user['id'],$isGrpAdmin,$isAdmin);
+            $existing = array();
+            foreach ($libraryData as $row)
+            {
+                $existing[] = $row['libid'];
+            }
+            $toAdd = array_values(array_diff($newLibs,$existing));
+            $toRemove = array_values(array_diff($existing,$newLibs));
+            while(count($toRemove) > AppConstant::NUMERIC_ZERO && count($toAdd) > AppConstant::NUMERIC_ZERO)
+            {
+                $toChange = array_shift($toRemove);
+                $toRep = array_shift($toAdd);
+                LibraryItems::setLibId($toRep,$qSetId,$toChange);
+            }
+            if(count($toAdd) > AppConstant::NUMERIC_ZERO)
+            {
+                foreach($toAdd as $libId)
+                {
+                    $query = new LibraryItems();
+                    $query->insertData($libId,$qSetId,$user);
+                }
+            }
+            else if(count($toRemove) > AppConstant::NUMERIC_ZERO)
+            {
+                foreach($toRemove as $libId)
+                {
+                    LibraryItems::deleteByQsetIdAndLibId($libId,$qSetId);
+                }
+            }
+            if(count($newLibs) == 0)
+            {
+                $query = LibraryItems::getIdByQid($qSetId);
+                if(!$query)
+                {
+                    $query = new LibraryItems();
+                    $query->insertData(0,$qSetId,$user);
+                }
+            }
+        }
+        $query = User::userDataForTutorial($user['id']);
+        $myName = $query['LastName'].','.$query['FirstName'];
+        if(isset($id) && $id == 'new')
+        {
+            $id = intval($id);
+            $query = QuestionSet::getByUIdQSetId($id);
+            $myQ = ($query['ownerid'] == $user['id']);
+            if ($isAdmin || ($isGrpAdmin && $query['groupid'] == $user['groupid']) || ($query['userights']== AppConstant::NUMERIC_THREE && $query['groupid'] == $user['groupid']) || $query['userights'] > AppConstant::NUMERIC_THREE)
+            {
+                $myQ = true;
+            }
+            $nameList = explode(", mb ",$query['author']);
+            if ($myQ && !in_array($myName,$nameList))
+            {
+                $nameList[] = $myName;
+            }
+            if (isset($_GET['template']))
+            {
+                $author = $myName;
+                $myQ = true;
+            }
+            else
+            {
+                $author = implode(", mb ",$nameList);
+            }
+            foreach ($query as $k=>$v)
+            {
+                $query[$k] = str_replace('&','&amp;',$v);
+            }
+            $inLibs = array();
+            if(isset($templateId))
+            {
+                $query = User::findIdentity($user['id']);
+                $userFullName = "";
+                $defLib = $query['deflib'];
+                $useDefLib = $query['usedeflib'];
+                if (isset($makeLocal))
+                {
+                    $inLibs[] = $defLib;
+                    $query['description'] .= " (local for $userFullName)";
+                }
+                else
+                {
+                    $query['description'] .= " (copy by $userFullName)";
+                    if ($useDefLib == AppConstant::NUMERIC_ONE)
+                    {
+                        $inLibs[] = $defLib;
+                    }
+                    else
+                    {
+                        $libData = Libraries::getByQSetId($id);
+                        foreach($libData as $row)
+                        {
+                            if($row['userights'] == 8 || ($row['groupid'] == $user['groupid'] && ($row['userights']%3 ==2)) || $row['ownerid'] == $user['id'])
+                            {
+                                $inLibs[] = $row['id'];
+                            }
+                        }
+                    }
+                }
+                $lockLibs = array();
+                $addMod = "Add";
+                $userData = User::getById($user['id']);
+                $query['userights'] = $userData['qrightsdef'];
+            }
+            else
+            {
+                if($isGrpAdmin)
+                {
+                    $dataForLib = LibraryItems::getDataForModTutorial($user['groupid'],$id);
+                }
+                else
+                {
+                    $dataForLib = LibraryItems::getByQidIfNotAdmin($id,$isAdmin,$user['id']);
+                }
+                if($dataForLib)
+                {
+                    foreach($dataForLib as $row)
+                    {
+                        $inLibs[] = $row['libid'];
+                    }
+                }
+                $lockLibs = array();
+                if (!$isAdmin)
+                {
+                    if ($isGrpAdmin)
+                    {
+                        $libData = LibraryItems::getDataForModTutorial($user['groupid'],$id);
+                    }
+                    else if (!$isAdmin)
+                    {
+                        $libData = LibraryItems::getDataForModTutorialIfNoAdmin($user['id'],$id);
+                    }
+                    if($libData)
+                    {
+                        foreach($libData as $row)
+                        {
+                            $lockLibs[] = $row['libid'];
+                        }
+                    }
+                }
+                $addMod = "Modify";
+                $query = Questions::getDataForModTutorial($user['id'],$id);
+                if($query)
+                {
+                    $inUseCnt = $query[0]['count(imas_questions.id)'];
+                }
+
+            }
+            if (count($inLibs)==0 && count($lockLibs)==0)
+            {
+
+                $inLibs = array(0);
+            }
+            $inLibs = implode(",",$inLibs);
+            $lockLibs = implode(",",$lockLibs);
+
+            $code = $query['control'];
+            $type = $query['qtype'];
+            $qText = $query['qtext'];
+            if (strpos($code,'//end stored') === false)
+            {
+                echo 'This question is not formatted in a way that allows it to be editted with this tool.';
+                exit;
+            }
+        }
+
+    }
+
+    function stripSmartQuotesForTutorial($text)
+    {
+        $text = str_replace
+        (array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
+            array("'", "'", '"', '"', '-', '--', '...'),
+            $text);
+        $text = str_replace(
+            array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
+            array("'", "'", '"', '"', '-', '--', '...'),
+            $text);
+        return $text;
     }
 }

@@ -27,6 +27,8 @@ class AppConstant
     const DIAGNOSTIC_CREATOR_RIGHT = 60;
     const GROUP_ADMIN_RIGHT = 75;
     const INSTALL_NAME = 'OpenMath';
+    const UNAUTHORIZED = 'You are not authorized to view this page';
+    const NORESULT = 'No results found';
     const INSTRUCTOR_REQUEST_SUCCESS = 'Your new account request has been sent.';
     const ADD_NEW_USER = 'Added new user.';
     const INSTRUCTOR_REQUEST_MAIL_SUBJECT = 'New Instructor Account Request';
@@ -180,6 +182,7 @@ class AppConstant
     const AVAILABLE_UNTIL = 'Available %1$s until %2$s';
     const NUMERIC_HUNDREAD = 100;
     const NUMERIC_THOUSAND = 1000;
+    const INSTRUCTORNOTE = '<p>Instructor note: Message sent to these students from course';
     const NUMERIC_TWO_THOUSAND = 2000;
     const NUMERIC_TRIPLE_NINE =999;
     const QUARTER_NINE = 9999;

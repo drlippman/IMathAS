@@ -19,7 +19,8 @@ class LibraryItems extends BaseImasLibraryItems
         return $query;
     }
 
-    public static function getByGroupId($groupId, $qSetId,$userId,$isGrpAdmin,$isAdmin){
+    public static function getByGroupId($groupId, $qSetId,$userId,$isGrpAdmin,$isAdmin)
+    {
         if ($isGrpAdmin) {
             $query = "SELECT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
             $query .= "AND (imas_users.groupid='$groupId' OR ili.libid=0) AND ili.qsetid='$qSetId'";
@@ -35,7 +36,8 @@ class LibraryItems extends BaseImasLibraryItems
         return $data;
     }
 
-    public static function setLibId($toRep,$qSetId,$toChange){
+    public static function setLibId($toRep,$qSetId,$toChange)
+    {
         $data = LibraryItems::getByQueSetId($qSetId, $toChange);
         if($data){
             foreach($data as $singleItem){
@@ -49,7 +51,8 @@ class LibraryItems extends BaseImasLibraryItems
         return LibraryItems::findAll(['qsetid' => $qSetId,'libid' => $toChange]);
     }
 
-    public function createLibraryItems($libArray){
+    public function createLibraryItems($libArray)
+    {
         $this->libid = $libArray['libid'];
         $this->qsetid = $libArray['qsetid'];
         $this->ownerid = $libArray['ownerid'];
@@ -313,4 +316,37 @@ class LibraryItems extends BaseImasLibraryItems
         $data = $command->queryOne();
         return $data;
     }
+    public static function deleteByQsetIdAndLibId($libId,$qSetId)
+    {
+        $data = LibraryItems::find()->where(['libid' => $libId])->andWhere(['qsetid' => $qSetId])->all();
+        if($data)
+        {
+            foreach($data as $row)
+            {
+                $row->delete();
+            }
+        }
+    }
+    public static function  getDataForModTutorial($groupId,$id)
+    {
+        $query = "SELECT DISTINCT ili.libid FROM imas_library_items AS ili,imas_users WHERE ili.ownerid=imas_users.id ";
+        $query .= "AND imas_users.groupid='$groupId' AND ili.qsetid='{$id}'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getByQidIfNotAdmin($id,$isAdmin,$userId)
+    {
+        $query = "SELECT DISTINCT libid FROM imas_library_items WHERE qsetid='{$id}'";
+        if (!$isAdmin)
+        {
+            $query .= " AND ownerid='$userId'";
+        }
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+    public static function getDataForModTutorialIfNoAdmin($userId,$id)
+    {
+        $query = "SELECT libid FROM imas_library_items WHERE qsetid='{$id}' AND imas_library_items.ownerid!='$userId'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
 }

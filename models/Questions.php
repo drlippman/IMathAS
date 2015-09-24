@@ -298,4 +298,11 @@ class Questions extends BaseImasQuestions
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+    public static function getDataForModTutorial($userId,$id)
+    {
+        $query = "SELECT count(imas_questions.id) FROM imas_questions,imas_assessments,imas_courses WHERE imas_assessments.id=imas_questions.assessmentid ";
+        $query .= "AND imas_assessments.courseid=imas_courses.id AND imas_questions.questionsetid='{$id}' AND imas_courses.ownerid<>'$userId'";
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
+        return $data;
+    }
 }

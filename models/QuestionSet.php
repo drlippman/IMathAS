@@ -77,7 +77,8 @@ class QuestionSet extends BaseImasQuestionset
 
     public static function updateQuestionSet($params,$now,$extref,$replaceby,$solutionopts){
         $questionSet = QuestionSet::findOne(['id' => $params['id']]);
-        if($questionSet){
+        if($questionSet)
+        {
             $questionSet->description = isset($params['description']) ? $params['description'] : null;
             $questionSet->author = isset($params['author']) ? $params['author'] : null;
             $questionSet->userights = isset($params['userights']) ? $params['userights'] : null;
@@ -698,5 +699,59 @@ class QuestionSet extends BaseImasQuestionset
         $command = $query->createCommand();
         $data = $command->queryOne();
         return $data;
+    }
+
+    public static function getAncestor($templateId)
+    {
+        $query = new Query();
+        $query ->select(['ancestors'])
+            ->from('imas_questionset')
+            ->where(['id' => $templateId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
+
+    public function insertDataForModTutorial($uQid,$now,$params,$user,$qType,$code,$qText,$ancestors)
+    {
+        $this->uniqueid = $uQid;
+        $this->adddate = $now;
+        $this->lastmoddate = $now;
+        $this->description = $params['description'];
+        $this->ownerid = $user['id'];
+        $this->author = $params['author'];
+        $this->userights = $params['userights'];
+        $this->qtype = $qType;
+        $this->control = $code;
+        $this->qtext = $qText;
+        $this->ancestors = $ancestors;
+        $this->save();
+        return $this->id;
+    }
+
+    public static function updateQSetForTutorial($qSetId,$makeLocal)
+    {
+        $data = QuestionSet::find()->where(['id' => $makeLocal])->one();
+        if($data)
+        {
+            $data->questionsetid = $qSetId;
+            $data->save();
+        }
+    }
+    public static function updateQueSet($params,$now,$qType,$code,$id,$qText)
+    {
+        $data = QuestionSet::find()->where(['id' => $id])->one();
+        if($data)
+        {
+            $data->lastmoddate = $now;
+            $data->description = $params['description'];
+            $data->author = $params['author'];
+            $data->userights = $params['userights'];
+            $data->qtype = $qType;
+            $data->control = $code;
+            $data->qtext = $qText;
+            $data->save();
+        }
+
     }
 }
