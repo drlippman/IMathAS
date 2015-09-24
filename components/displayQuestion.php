@@ -319,7 +319,7 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt===2) {
 		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
-		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div class="question col-lg-12">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
 		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;

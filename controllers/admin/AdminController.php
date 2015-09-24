@@ -65,7 +65,7 @@ class AdminController extends AppController
         $params = $this->getRequestParams();
         $userId = $user->id;
         $showCid = $this->getParamVal('showcourses');
-       $userName = $user->SID;
+        $userName = $user->SID;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
         $showUser = $this->getParamVal('showusers');
@@ -671,9 +671,8 @@ class AdminController extends AppController
             case "addnewcourse":
                 break;
             case "modify":
-                break;
             case "addcourse":
-            if ($params['action'] == 'modify')
+            if ($params['action']=='modify')
             {
                 $line = Course::getById($params['cid']);
                 $courseid = $line['id'];
@@ -2371,6 +2370,7 @@ class AdminController extends AppController
                     if ($params['remove']!='') {
 
                         $remlist = "'".implode("','",explode(',',$params['remove']))."'";
+
                         $result = LibraryItems::getDistictqlibData($remlist);
                        foreach($result as $key => $row) {
                             $qidstocheck[] = $row['qsetid'];
@@ -2422,7 +2422,8 @@ class AdminController extends AppController
                     if (!isset($params['nchecked'])) {
                         $overwriteBody = AppConstant::NUMERIC_ONE;
                         $body = "No libraries selected.  <a href=\"manage-lib?cid=$cid\">Go back</a>\n";
-                    } else {
+                    } else
+                    {
                         $oktorem = array();
                         for ($i = AppConstant::NUMERIC_ZERO; $i < count($params['nchecked']); $i++)
                         {
@@ -2674,7 +2675,7 @@ class AdminController extends AppController
         $this->includeJS(['libtree.js', 'general.js']);
 
         $responseData = array('page_appliesToMsg' => $page_appliesToMsg, 'page_AdminModeMsg' => $page_AdminModeMsg, 'rights' => $rights, 'cid' => $cid, 'page_libRightsLabel' => $page_libRights['label'], 'page_libRightsVal' => $page_libRights['val'], 'lnames' => $lnames, 'parent' => $parent, 'names' => $names, 'ltlibs' => $ltlibs, 'count' => $count,'qcount' => $qcount, 'sortorder' => $sortorder,'ownerids' => $ownerids, 'userid' => $userId, 'isadmin' => $isAdmin, 'groupids' => $groupids, 'groupid' => $groupId,'isgrpadmin' => $isGrpAdmin, 'name' => $name, 'tlist' => $tlist, 'page_newOwnerListVal' => $page_newOwnerList['val'], 'page_newOwnerListLabel' => $page_newOwnerList['label'], 'pagetitle' => $pagetitle, 'overwriteBody' => $overwriteBody, 'body' => $body, 'rlist' => $rlist, 'hasChildWarning' => $hasChildWarning,
-        'parent1' => $parent1);
+        'parent1' => $parent1, 'params' => $params);
         return $this->renderWithData('manageLib', $responseData);
     }
 
@@ -3351,6 +3352,7 @@ class AdminController extends AppController
     {
         $this->guestUserHandler();
         $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
         $userId = $user->id;
         $myRights = $user['rights'];
         $groupId= $user['groupid'];
@@ -3426,19 +3428,11 @@ class AdminController extends AppController
                 /*
                  * delete selected question
                  */
+
                 if (isset($params['remove']) || isset($params['delete']))
                 {
-                    if (!isset($params['confirm']))
-                    {
-                        if (isset($params['remove']))
-                        {
-                            $page_ConfirmMsg = "<p>Are you SURE you want to remove this question from this library?</p><input type=hidden name=remove value=1>";
-                        }
-                        if (isset($params['delete'])) {
-                            $page_ConfirmMsg = "<p>Are you SURE you want to delete this question?  Question will be removed from ALL libraries.</p><input type=hidden name=delete value=1>";
-                        }
-                    } else
-                    {
+                     if (isset($params['confirm']))
+                     {
                         if (isset($params['delete']))
                         {
                             if ($isGrpAdmin)
@@ -3455,7 +3449,6 @@ class AdminController extends AppController
                                     }
                                 }
                             } else {
-
                                 $result = QuestionSet::updateInAdmin($qSetId,$isAdmin, $userId);
                                 if ($result > AppConstant::NUMERIC_ZERO)
                                 {
@@ -3543,22 +3536,6 @@ class AdminController extends AppController
                 /*
                  * Default Display
                  */
-                if ($offset > AppConstant::NUMERIC_ZERO)
-                {
-                    $last = $offset -1;
-                    $page_lastLink =  "<a href=\"review-library?cid=$courseId&source=$source&offset=$last&lib=$lib\">Last</a> ";
-                } else {
-                    $page_lastLink = "Last ";
-                }
-
-                if ($offset < $cnt-1)
-                {
-                    $next = $offset +1;
-                    $page_nextLink = "<a href=\"review-library?cid=$courseId&source=$source&offset=$next&lib=$lib\">Next</a>";
-                } else {
-                    $page_nextLink = "Next";
-                }
-
                 $row = LibraryItems::getByQSetANDLibAndUId($lib,$qSetId);
                 $myLib = (intval($row['ownerid']) == $userId);
                 if ($isAdmin || ($isGrpAdmin && intval($row['groupid']) == $groupId)) {
@@ -3570,14 +3547,6 @@ class AdminController extends AppController
                 if ($isAdmin || ($isGrpAdmin && intval($lineQSet['groupid']) == $groupId) || $lineQSet['userights'] == AppConstant::NUMERIC_FOUR)
                 {
                     $myQ = true;
-                }
-                $page_deleteForm = "";
-                if ($myQ || $myLib)
-                {
-                    $page_deleteForm .= "<form method=post action=\"review-library?cid=$courseId&source=$source&offset=$offset&lib=$lib\">\n";
-                    if ($myQ) {$page_deleteForm .=  "<input type=submit name=delete value=\"Delete\">\n";}
-                    if ($myLib) {$page_deleteForm .=  "<input type=submit name=remove value=\"Remove from Library\">\n";}
-                    $page_deleteForm .=  "</form>\n";
                 }
                 $seed = rand(0,10000);
                 require("../components/displayQuestion.php");
@@ -3603,9 +3572,9 @@ class AdminController extends AppController
         {
             $this->includeJS(['eqntips.js']);
         }
-        $this->includeJS(['AMhelpers_min.js']);
-        $responseData = array('params' => $params,'inlibs' => $inlibs, 'source' => $source, 'cid' => $courseId, 'lnames' => $lnames, 'lib' => $lib, 'page_ConfirmMsg' => $page_ConfirmMsg, 'offset' => $offset, 'page_updatedMsg' => $page_updatedMsg, 'page_lastLink' => $page_lastLink, 'page_nextLink' => $page_nextLink,
-        'qsetid' => $qSetId, 'lineQSet' => $lineQSet, 'page_deleteForm' => $page_deleteForm, 'page_lastScore' => $page_lastScore, 'seed' => $seed, 'page_canModifyMsg' => $page_canModifyMsg, 'myq' => $myQ, 'twobx' => $twobx, 'overwriteBody' => $overwriteBody);
+        $this->includeJS(['AMhelpers_min.js', 'reviewlibrary.js']);
+        $responseData = array('params' => $params,'inlibs' => $inlibs, 'source' => $source, 'cid' => $courseId, 'lnames' => $lnames, 'lib' => $lib, 'offset' => $offset, 'page_updatedMsg' => $page_updatedMsg, 'cnt' => $cnt,
+        'qsetid' => $qSetId, 'lineQSet' => $lineQSet, 'page_lastScore' => $page_lastScore, 'seed' => $seed, 'page_canModifyMsg' => $page_canModifyMsg, 'myq' => $myQ, 'twobx' => $twobx, 'overwriteBody' => $overwriteBody, 'myLib' => $myLib);
         return $this->renderWithData('reviewLibrary', $responseData);
     }
 }

@@ -34,7 +34,7 @@ function deleteLtiUser(ltiUserId)
                 $(this).dialog('destroy').remove();
                 return false;
             },
-            "confirm": function () {
+            "Confirm": function () {
                 $(this).dialog("close");
                 window.location = "actions?action=delltidomaincred&id="+ltiUserId;
                 return true;

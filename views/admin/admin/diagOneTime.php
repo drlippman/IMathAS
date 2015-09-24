@@ -44,12 +44,10 @@ $this->params['breadcrumbs'] = $this->title;
             echo '</form>';
         }
     } else if (isset($_GET['delete'])) {
-        echo "<div class='col-lg-10'>" . AppUtility::t('Are you sure you want to delete all one-time passwords for this diagnostic?', false) . "</div>\n<br>";
-        echo "<br><div class='col-lg-10'><div class='col-lg-1 padding-left-zero'><input type=button value=\"Delete\" onclick=\"window.location='diag-one-time?id=$diag&delete=true'\"></div>\n";
-        echo "<div class='col-lg-2 padding-left-zero'><input type=button value=\"Nevermind\" class=\"secondarybtn\" onclick=\"window.location='index'\"></div></div>\n";
     } else {
         echo "<div class=col-lg-3><b>" . AppUtility::t('All one-time passwords', false) . "</b></div> <div class=col-lg-1><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&generate=true') . " ?>Generate</a></div>
-             <div class=col-lg-1><a href=" . AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&delete=check') . ">Delete All</a></div><br/><br/>";
+             <div class=col-lg-1><a href='#' onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
+//             <div class=col-lg-1><a href=" .AppUtility::getURLFromHome('admin', 'admin/diag-one-time?id=' . $diag . '&delete=check') ." onclick=deleteAll($diag)>Delete All</a></div><br/><br/>";
         echo '<div class="col-lg-12"><table class="table table-bordered table-striped table-hover data-table">
                     <thead>
                         <tr>
@@ -70,3 +68,33 @@ $this->params['breadcrumbs'] = $this->title;
     }
     ?>
 </div>
+<script>
+    function deleteAll(diag)
+    {
+        var html ='<div><p>Are you sure you want to delete all one-time passwords for this diagnostic?' ;
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    $(this).dialog("close");
+                    window.location = "diag-one-time?id="+diag+"&delete=true";
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });
+    }
+</script>

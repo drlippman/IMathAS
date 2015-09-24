@@ -1,5 +1,6 @@
 <?php
 use app\components\AppUtility;
+use \app\components\AppConstant;
 
 $this->title = $pagetitle;
 $this->params['breadcrumbs'][] = $this->title;
@@ -25,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         if (isset($_POST['remove'])) {
             ?>
             <?php echo $hasChildWarning; ?>
-            Are you SURE you want to delete these libraries?
+           <?php AppUtility::t('Are you SURE you want to delete these libraries?')?>
             <form method=post action="manage-lib?cid=<?php echo $cid ?>&confirmed=true">
                 <p>
                     <input type=radio name="delq" value="no" CHECKED>
@@ -36,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <input type=hidden name=remove value="<?php echo $rlist ?>">
                 <p>
                     <input type=submit value="Really Delete">
-                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
                 </p>
             </form>
         <?php
@@ -80,12 +81,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <p>
                     <input type=submit value="Set Parent">
-                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+                    <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
                 </p>
             </form>
         <?php
         }
-        else if (isset($_GET['remove'])) {
+        else if (isset($remove)) {
         if ($libcnt>0) {
         ?>
         <?php AppUtility::t('The library selected has children libraries.  A parent library cannot be removed until all
@@ -94,8 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
             } else {
             ?>
-
-        <form method=post action="manage-lib?cid=<?php echo $cid ?>&remove=<?php echo $_GET['remove'] ?>&confirmed=true">
+        <form method=post action="manage-lib?cid=<?php echo $cid ?>&remove=<?php echo $remove ?>&confirmed=true">
             <?php AppUtility::t('Are you SURE you want to delete this Library?')?>
             <p>
                 <input type=radio name="delq" value="no" CHECKED><?php AppUtility::t('Move questions in library to Unassigned')?><br>
@@ -103,15 +103,15 @@ $this->params['breadcrumbs'][] = $this->title;
             </p>
             <p>
                 <input type=submit value="Really Delete">
-                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='managelibs.php?cid=<?php echo $cid ?>'">
+                <input type=button value="Nevermind" class="secondarybtn" onclick="window.location='manage-lib?cid=<?php echo $cid ?>'">
             </p>
         </form>
         <?php
         }
-        } else if (isset($_GET['transfer'])) {
-
+        } else if (isset($transfer))
+        {
             ?>
-        <form method=post action="manage-lib?cid=<?php echo $cid ?>&transfer=<?php echo $_GET['transfer'] ?>">
+        <form method=post action="manage-lib?cid=<?php echo $cid ?>&transfer=<?php echo $transfer ?>">
             <input type=hidden name=transfer value="<?php echo $tlist ?>">
             Transfer library ownership to:
             <?php AppUtility::writeHtmlSelect ("newowner",$page_newOwnerListVal,$page_newOwnerListLabel,$selectedVal=null,$defaultLabel=null,$defaultVal=null,$actions=null) ?>
@@ -156,12 +156,12 @@ $this->params['breadcrumbs'][] = $this->title;
         echo $page_AdminModeMsg;
   ?></div><BR class=form><br>
 <form method=post action="manage-lib?cid=<?php echo $cid ?>">
-    <input type=button value="Add New Library" onclick="window.location='manage-lib?modify=new&cid=<?php echo $cid ?>'">
+    <div class="col-lg-12"><input type=button value="Add New Library" onclick="window.location='manage-lib?modify=new&cid=<?php echo $cid ?>'"></div>
 </form>
 
 <form id="qform" method=post action="manage-lib?cid=<?php echo $cid ?>">
 		<div>
-Check: <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
+<div class="col-lg-12"><?php AppUtility::t('Check')?> <a href="#" onclick="return chkAllNone('qform','nchecked[]',true)">All</a> <a href="#" onclick="return chkAllNone('qform','nchecked[]',false)">None</a>
 With Selected: <input type=submit name="transfer" value="Transfer" title="Transfer library ownership">
 <input type=submit name="remove" value="Delete" title="Delete library">
 <input type=submit name="setparent" value="Change Parent" title="Change the parent library">
@@ -169,7 +169,8 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
 <?php echo $page_appliesToMsg ?>
 
 </div>
-<p>
+            </div>
+<div class="col-lg-12">
     Root
 <ul class=base>
     <?php
@@ -180,8 +181,8 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
     }
     ?>
 </ul>
-</p>
-<p>
+</div>
+<div class="col-lg-12">
     <b><?php AppUtility::t('Color Code')?></b><br/>
     <span class=r8><?php AppUtility::t('Open to all')?></span><br/>
     <span class=r4><?php AppUtility::t('Closed')?></span><br/>
@@ -189,9 +190,9 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
     <span class=r2><?php AppUtility::t('Open to group, private to others')?></span><br/>
     <span class=r1><?php AppUtility::t('Closed to group, private to others')?></span><br/>
     <span class=r0><?php AppUtility::t('Private')?></span>
-</p>
+</div>
 
-</form>
+</form><BR class="form"><BR class="form">
 <?php
 }?>
     </div>
@@ -208,6 +209,35 @@ With Selected: <input type=submit name="transfer" value="Transfer" title="Transf
     }
     function setlibnames(libn) {
         document.getElementById("libnames").innerHTML = libn;
+    }
+    function deleteSelected()
+    {
+        var courseId = $('#admin').val();
+        var html ='<p><input type=radio name="delq" value="no" CHECKED>Move questions in library to Unassigned<br><input type=radio name="delq" value="yes" >Also delete questions in library</p>' ;
+        $('<div id="dialog"></div>').appendTo('body').html(html).dialog({
+            modal: true, title: 'Message', zIndex: 10000, autoOpen: true,
+            width: 'auto', resizable: false,
+            closeText: "hide",
+            buttons: {
+                "Cancel": function () {
+                    $(this).dialog('destroy').remove();
+                    return false;
+                },
+                "Confirm": function () {
+                    $(this).dialog("close");
+                    window.location = "manage-lib?cid=admin&confirmed=true";
+                    return true;
+                }
+            },
+            close: function (event, ui) {
+                $(this).remove();
+            },
+            open: function(){
+                jQuery('.ui-widget-overlay').bind('click',function(){
+                    jQuery('#dialog').dialog('close');
+                })
+            }
+        });
     }
 </script>
 
