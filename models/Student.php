@@ -169,40 +169,30 @@ class Student extends BaseImasStudents
 
     public static function findStudentByCourseId($courseId, $limuser, $secfilter, $hidelocked, $timefilter, $lnfilter, $isdiag, $hassection, $usersort)
     {
-        $query = new Query();
-        $query->select(['imas_users.id', 'imas_users.SID', 'imas_users.FirstName', 'imas_users.LastName', 'imas_users.SID', 'imas_users.email', 'imas_students.section', 'imas_students.code', 'imas_students.locked', 'imas_students.timelimitmult', 'imas_students.lastaccess', 'imas_users.hasuserimg', 'imas_students.gbcomment'])
-            ->from('imas_users')
-            ->join('INNER JOIN',
-                'imas_students',
-                'imas_users.id = imas_students.userid'
-            )
-            ->where(['imas_students.courseid' => $courseId]);
-        if ($limuser > AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_users.id' => $limuser]);
-        }
-        if ($secfilter != AppConstant::NUMERIC_NEGATIVE_ONE && $limuser <= AppConstant::NUMERIC_ZERO) {
-            $query->andWhere(['imas_students.section' => $secfilter]);
+        $query = "SELECT imas_users.id,imas_users.SID,imas_users.FirstName,imas_users.LastName,imas_users.SID,imas_users.email,imas_students.section,imas_students.code,imas_students.locked,imas_students.timelimitmult,imas_students.lastaccess,imas_users.hasuserimg,imas_students.gbcomment ";
+        $query .= "FROM imas_users,imas_students WHERE imas_users.id=imas_students.userid AND imas_students.courseid=$courseId ";
+        if ($limuser>0) { $query .= "AND imas_users.id=$limuser ";}
+        if ($secfilter!=-1 && $limuser<=0) {
+            $query .= "AND imas_students.section='$secfilter' ";
         }
         if ($hidelocked) {
-            $query->andWhere(['imas_students.locked' => 0]);
+            $query .= "AND imas_students.locked=0 ";
         }
         if (isset($timefilter)) {
-            $tf = time() - AppConstant::MINUTE * AppConstant::SECONDS * $timefilter;
-            $query->andWhere(['>', 'imas_users.lastaccess', $tf]);
+            $tf = time() - 60*60*$timefilter;
+            $query .= "AND imas_users.lastaccess>$tf ";
         }
-        if (isset($lnfilter) && $lnfilter != '') {
-            $query->andWhere(['LIKE', 'imas_users.LastName', $lnfilter . '%']);
+        if (isset($lnfilter) && $lnfilter!='') {
+            $query .= "AND imas_users.LastName LIKE '$lnfilter%' ";
         }
         if ($isdiag) {
-            $query->orderBy('imas_users.email, imas_users.LastName, imas_users.FirstName');
-        } else if ($hassection && $usersort == AppConstant::NUMERIC_ZERO) {
-            $query->orderBy('imas_students.section, imas_users.LastName, imas_users.FirstName');
+            $query .= "ORDER BY imas_users.email,imas_users.LastName,imas_users.FirstName";
+        } else if ($hassection && $usersort==0) {
+            $query .= "ORDER BY imas_students.section,imas_users.LastName,imas_users.FirstName";
         } else {
-            $query->orderBy('imas_users.LastName, imas_users.FirstName');
+            $query .= "ORDER BY imas_users.LastName,imas_users.FirstName";
         }
-
-        $command = $query->createCommand();
-        $data = $command->queryAll();
+        $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
 

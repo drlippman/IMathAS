@@ -103,6 +103,7 @@ class ContentTrack extends BaseImasContentTrack
         $data = $command->queryAll();
         return $data;
     }
+
     public function createTrack($params){
         $data = AppUtility::removeEmptyAttributes($params);
         if($data){
@@ -111,7 +112,18 @@ class ContentTrack extends BaseImasContentTrack
         }
     }
 
-    public static function getTypeId($courseId, $userId,$type){
+    public static function getTypeId($courseId, $userId,$type)
+    {
         return ContentTrack::find()->select('typeid')->where(['courseid' => $courseId])->andWhere(['userid' => $userId])->andWhere(['type' => $type])->all();
+    }
+
+    public function insertFromGradebook($userId,$courseId,$type,$typeId,$time)
+    {
+        $this->userid = $userId;
+        $this->courseid = $courseId;
+        $this->type = $type;
+        $this->typeid = $typeId;
+        $this->viewtime = $time;
+        $this->save();
     }
 }

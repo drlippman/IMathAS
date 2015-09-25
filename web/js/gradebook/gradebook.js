@@ -377,3 +377,8 @@ function chgtoggle(key)
     }
     window.location = "gradebook?cid="+courseId+"&gbmode="+altgbmode;
 }
+function chgsecfilter() {
+    var sec = document.getElementById("secfiltersel").value;
+    var courseId = $("#course-id").val();
+    window.location = "gradebook?stu=&cid="+courseId+"&secfilter=" + sec;
+}

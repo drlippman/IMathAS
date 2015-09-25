@@ -10,6 +10,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $includeduedate = $defaultValuesArray['includeduedate'];
 $includelastchange = $defaultValuesArray['includelastchange'];
 $lastlogin = $defaultValuesArray['lastlogin'];
+$secfilter = $data['secFilter'];
 ?>
 <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="course-info" id="course-id" name="course-info" value="<?php echo $course->id; ?>"/>
@@ -185,19 +186,23 @@ for ($i = 0; $i < count($gradebook[0][0]); $i++) { //biographical headers
     } else {
         echo '<th><div>';
     }
-    echo $gradebook[0][0][$i];
-    if ($gradebook[0][0][$i] == 'Section') {
-        echo "<br/><select id='sec-filter-sel' class='form-control dropdown-auto'><option value='-1'";
-        if ($data['secFilter'] == -1) {
-            echo "selected = 1";
-        }
-        echo ">" . AppUtility::t('All', false) . "</option>";
-        foreach ($data['sections'] as $section) {
-            echo "<option value=" . $section . ">" . $section . "</option>";
-        }
-        echo "</select>";
+        echo $gradebook[0][0][$i];
+        if (($gradebook[0][0][$i]=='Section' || ($data['isDiagnostic'] && $i==4)) && (!$data['isTutor'] || $data['tutorSection'] == ' ')) { ?>
+        <br/><select id="secfiltersel" style="color: #000000" onchange="chgsecfilter()"><option value="-1"
+            <?php if ($secfilter==-1) {echo  'selected=1';}
+            echo  '>All</option>';
+            foreach($data['sectionQuery'] as $row){
+                if ($row['section']=='') { continue;}
+                echo  "<option value=\"{$row['section']}\" ";
+                if ($row['section']==$secfilter) {
+                    echo  'selected=1';
+                }
+                echo  ">{$row['section']}</option>";
+            }
+            echo  "</select>";
 
-    } else if ($gradebook[0][0][$i] == 'Name') {?>
+
+        } else if ($gradebook[0][0][$i] == 'Name') {?>
         <div class="checkbox pull-left override-hidden">
             <label>
                 <input type="checkbox" name="header-checked" value="">

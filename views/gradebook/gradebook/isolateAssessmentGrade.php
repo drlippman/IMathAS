@@ -73,23 +73,17 @@ if (!$isTeacher && !$isTutor) {
         $timeontask = round(array_sum(explode(',', str_replace('~', ',', $line['timeontask']))) / 60, 1);
 
         if ($line['id'] == null) {
-            /*
-             * pass same parameters when assign hyper link to gb-viewasid page
-             */
             ?>
-<!--            echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid=new&uid={$line['userid']}&from=isolate&aid=$aid\">-</a></td><td>-</td><td></td><td></td><td></td>";-->
+             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid=new&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId); ?>  ">-</a></td><td>-</td><td></td><td></td><td></td>
             <td><a href="#" >-</a></td><td>-</td><td></td><td></td><td></td>
         <? } else {
             if (isset($exceptions[$line['userid']])) {
                 $thisenddate = $exceptions[$line['userid']][0];
             } else {
                 $thisenddate = $enddate;
-            }
-            /*
-             * pass same parameters when assign hyper link to gb-viewasid page
-             */
-//            echo "<td><a href=\"gb-viewasid.php?gbmode=$gbmode&cid=$cid&asid={$line['id']}&uid={$line['userid']}&from=isolate&aid=$aid\">";
-            echo "<td><a href='#'>";
+            } ?>
+             <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?gbmode='.$gbmode.'&cid='.$course->id.'&asid='.$line['id'].'&uid='.$line['userid'].'&from=isolate&aid='.$assessmentId);?>  ">
+          <?php  echo "<td><a href='#'>";
             if ($thisenddate > $now) {
                 echo '<i>' . $total;
             } else {
@@ -132,7 +126,7 @@ if (!$isTeacher && !$isTutor) {
                     echo '<td>Never submitted</td>';
                 }
             } else {
-                echo '<td>' . tzdate("n/j/y g:ia", $line['endtime']) . '</td>';
+                echo '<td>' . AppUtility::tzdate("n/j/y g:ia", $line['endtime']) . '</td>';
             }
             if ($line['endtime'] == 0 || $line['starttime'] == 0) {
                 echo '<td>&nbsp;</td>';
@@ -153,9 +147,9 @@ if (!$isTeacher && !$isTutor) {
     echo '<tr><td>Average</td>';
     if ($hassection) {
         echo '<td></td>';
-    }
-    echo "<td><a href=\"gb-itemanalysis.php?cid=$cid&aid=$aid&from=isolate\">";
-    if ($n > 0) {
+    } ?>
+     <td><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/item-analysis?cid='.$course->id.'&aid='.$assessmentId.'&from=isolate');?>">
+    <?php if ($n > 0) {
         echo round($tot / $n, 1);
     } else {
         echo '-';

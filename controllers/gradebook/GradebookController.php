@@ -52,7 +52,7 @@ class GradebookController extends AppController
 
     public function actionGradebook()
     {
-        global $get;;
+        global $get;
         $this->guestUserHandler();
         $this->layout = "master";
         $user = $this->getAuthenticatedUser();
@@ -73,20 +73,12 @@ class GradebookController extends AppController
 
     public function gbtable($userId, $courseId, $studentId = null)
     {
-        global $get,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport;
+        global $get,$timefilter,$lnfilter,$hidelockedfromexport,$includecomments,$logincnt,$lastloginfromexport;
         $params = $get;
         $teacherid = Teacher::getByUserId($userId, $courseId);
         $tutorid = Tutor::getByUserId($userId, $courseId);
         $tutorsection = trim($tutorid->section);
         $sectionQuery = Student::findDistinctSection($courseId);
-        $sections = array();
-        if ($sectionQuery) {
-            foreach ($sectionQuery as $item) {
-                if ($item->section != "" && $item->section != null) {
-                    array_push($sections, $item->section);
-                }
-            }
-        }
         $istutor = false;
         if (isset($teacherid)) {
             $isteacher = true;
@@ -98,20 +90,18 @@ class GradebookController extends AppController
          * Assign tutor value false temparary
          */
 
-
+        $sessionId = $this->getSessionId();
         if ($isteacher || $istutor) {
             $canviewall = true;
             /*
              * this is for for temparary use will set value of timefilter and lnfilter and secfilter later
              */
-            $timefilter = null;
-            $lnfilter = null;
             $secfilter = null;
         } else {
             $canviewall = false;
         }
         if ($canviewall) {
-            $sessionId = $this->getSessionId();
+
             $sessionData = $this->getSessionData($sessionId);
 
             if (isset($params['gbmode']) && $params['gbmode'] != '') {
@@ -228,6 +218,7 @@ class GradebookController extends AppController
         if (!isset($logincnt)) {
             $logincnt = AppConstant::NUMERIC_ZERO;
         }
+
         $category = array();
         $gradebook = array();
         $ln = AppConstant::NUMERIC_ZERO;
@@ -885,7 +876,6 @@ class GradebookController extends AppController
             $overallptsfuture += $gradebook[0][2][$pos][5];
             $pos++;
         }
-
         //find total possible points
         if ($useweights == 0) { //use points grading method
             $gradebook[0][3][0] = $overallptspast;
@@ -943,7 +933,6 @@ class GradebookController extends AppController
                 $ln++;
             }
         }
-
         //pull logincnt if needed
         if ($logincnt == 1) {
             $query = LoginLog::findLoginCount($courseId);
@@ -1932,7 +1921,6 @@ class GradebookController extends AppController
             }
             $gradebook[$ln][4][0] = -1;
         }
-
         if ($limuser == -1) {
             $gradebook[1] = $gradebook[$ln];
         }
@@ -1952,7 +1940,7 @@ class GradebookController extends AppController
             'studentId' => $stu,
         );
         $gbCatsData = GbCats::getByCourseIdAndOrderByName($courseId);
-        $responseData = array('gradebook' => $gradebook, 'sections' => $sections, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
+        $responseData = array('gradebook' => $gradebook, 'sectionQuery' => $sectionQuery, 'isDiagnostic' => $isdiag, 'isTutor' => $istutor, 'tutorSection' => $tutorsection,
             'secFilter' => $secfilter, 'overrideCollapse' => $overridecollapse, 'availShow' => $availshow, 'totOnLeft' => $totonleft, 'catFilter' => $catfilter,
             'isTeacher' => $isteacher, 'hideNC' => $hidenc, 'includeDueDate' => $includeduedate, 'defaultValuesArray' => $defaultValuesArray, 'colorize' => $colorize, 'gbCatsData' => $gbCatsData);
         return $responseData;
@@ -2010,6 +1998,7 @@ class GradebookController extends AppController
             $assessmentLabel[$key] = $assessment['name'];
             $key++;
         }
+
         if ($params['grades'] == 'all') {
 
             if (!isset($params['isolate'])) {
@@ -2052,6 +2041,8 @@ class GradebookController extends AppController
                     $defaultValuesArray['sdate'] = AppUtility::tzdate("m/d/Y", time() + 60 * 60);
                     $defaultValuesArray['stime'] = AppUtility::tzdate("g:i a", time() + 60 * 60);
                 }
+            }else{
+                $gbItems = GbItems::getById($params['gbitem']);
             }
         } else {
             $gbItems = GbItems::getById($params['gbitem']);
@@ -2330,7 +2321,7 @@ class GradebookController extends AppController
                 return $this->redirect('gradebook?stu=' . $params['stu'] . '&gbmode=' . $params['gbmode'] . '&cid=' . $params['cid']);
             }
         }
-        $this->includeCSS(['dataTables.bootstrap.css', 'course/items.css']);
+        $this->includeCSS(['dataTables.bootstrap.css', 'course/items.css','gradebook.css']);
         $this->includeJS(['jquery.dataTables.min.js', 'tablesorter.js', 'dataTables.bootstrap.js', 'general.js', 'gradebook/addgrades.js', 'gradebook/manageaddgrades.js', 'roster/managelatepasses.js']);
         $responseData = array('studentInformation' => $studentArray, 'course' => $course, 'assessmentData' => $assessmentData, 'assessmentLabel' => $assessmentLabel, 'assessmentId' => $assessmentId
         , 'gradeData' => $gradeData, 'finalStudentArray' => $finalStudentArray, 'gbcatsLabel' => $gbcatsLabel, 'sortorder' => $sortorder, 'hassection' => $hassection, 'defaultValuesArray' => $defaultValuesArray, 'gbcatsId' => $gbcatsId, 'rubricsLabel' => $rubricsLabel, 'rubricsId' => $rubricsId, 'pageOutcomesList' => $pageOutcomesList,
@@ -2427,19 +2418,6 @@ class GradebookController extends AppController
         $this->includeCSS(['gradebook.css']);
         $responseData = array('from' => $from,'body' => $body,'fromstr' => $fromString,'overwriteBody' => $overwriteBody,'savetitle' => $savetitle,'course' => $course,'rubricsName' => $rubricsName,'rubtype' => $rubtype,'rubgrp' => $rubgrp,'params' => $params,'rubric' => $rubric,'rubname' => $rubname,'isTeacher' => $isTeacher);
         return $this->renderWithData('addRubric', $responseData);
-    }
-
-    public function actionEditRubric()
-    {
-        $currentUser = $this->getAuthenticatedUser();
-        $this->layout = 'master';
-        $courseId = $this->getParamVal('cid');
-        $course = Course::getById($courseId);
-        $rubicData = Rubrics::getByUserId($currentUser['id']);
-        $this->includeCSS(['gradebook.css']);
-        $responseData = array('rubicData' => $rubicData, 'course' => $course);
-        return $this->renderWithData('editRubric', $responseData);
-
     }
 
     public function actionQuickSearchAjax()
@@ -3058,16 +3036,16 @@ class GradebookController extends AppController
         }
         $asid = intval($params['asid']);
         if (!isset($params['uid']) && !$isteacher && !$istutor) {
-
             $params['uid'] = $currentUser['id'];
         }
         if ($isteacher || $istutor) {
-//            if (isset($sessiondata[$cid.'gbmode'])) {
-//                $gbmode =  $sessiondata[$cid.'gbmode'];
-//            } else {
-            $gbSchemeData = GbScheme::getByCourseId($courseId);
-            $gbmode = $gbSchemeData['defgbmode'];
-//            }
+            if (isset($sessionData[$courseId.'gbmode'])) {
+                $gbmode =  $sessionData[$courseId.'gbmode'];
+            } else {
+                $gbSchemeData = GbScheme::getByCourseId($courseId);
+                $gbmode = $gbSchemeData['defgbmode'];
+            }
+
             if (isset($params['stu']) && $params['stu'] != '') {
                 $stu = $params['stu'];
             } else {
@@ -3079,6 +3057,7 @@ class GradebookController extends AppController
             } else {
                 $from = 'gb';
             }
+
             //Gbmode : Links NC Dates
             $totonleft = floor($gbmode / 1000) % 10; //0 right, 1 left
             $links = ((floor($gbmode / 100) % 10) & 1); //0: view/edit, 1 q breakdown
@@ -3090,14 +3069,27 @@ class GradebookController extends AppController
             $from = 'gb';
             $now = time();
         }
+
         $assessmentData = Assessments::getByCourseIdJoinWithSessionData($params['asid'], $currentUser['id'], $isteacher, $istutor);
-        $studnts = Student::getByCourseId($courseId, $params['stu']);
-        $studentUserData = User::getById($studnts['userid']);
-        $studntData = array(
+        if (!$isteacher && !$istutor) {
+            $rv = new ContentTrack;
+            $rv->insertFromGradebook($currentUser,$courseId,'gbviewasid',$assessmentData['assessmentid'],time());
+        }
+        $student = Student::getByCourseId($courseId, $params['uid']);
+        $studentUserData = User::getById($student['userid']);
+        $studentData = array(
             '0' => $studentUserData->FirstName,
             '1' => $studentUserData->LastName,
-            '2' => $studnts->timelimitmult,
+            '2' => $student->timelimitmult,
         );
+        if ($isteacher || ($istutor && $assessmentData['tutoredit']==1)) {
+            $canedit = 1;
+        } else {
+            $canedit = 0;
+        }
+        if ($canedit) {
+        $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
+        }
         $exceptionData = Exceptions::getByAssessmentIdAndUserId($params['uid'], $assessmentData['assessmentid']);
         $questions = Questions::getByQuestionsIdAndAssessmentId($assessmentData['assessmentid']);
         $questionsData = array();
@@ -3118,6 +3110,7 @@ class GradebookController extends AppController
         $questionIdArray = explode(',', $assessmentData['questions']);
         $librariesName = array();
         $questionSetData = array();
+
         foreach ($questionIdArray as $questionId) {
             $libraryName = Questions::getByLibrariesIdAndcategory($questionId);
             $questionSet = QuestionSet::getByQuesSetId($questionId);
@@ -3126,8 +3119,11 @@ class GradebookController extends AppController
                 '0' => $libraryName['questionsetid'],
                 '1' => $libraryName['category'],
                 '2' => $libraryName['name'],
+                'questionId' => $questionId,
+
             );
             if ($questionSet[0]['hasimg'] > 0) {
+
                 $questionImages = QuestionImages::getByQuestionSetId($questionId);
             }
             array_push($librariesName, $tempArray);
@@ -3137,32 +3133,32 @@ class GradebookController extends AppController
         $countOfQuestion = Questions::numberOfQuestionByIdAndCategory($assessmentData['assessmentid']);
         if ($assessmentSessionData['agroupid']) {
             $pers = 'group';
-            $studentNameWithAssessmentName = $this->getconfirmheader(true, $isteacher, $istutor, $currentUser, $params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(true,$isteacher,$istutor,$currentUser,$params);
         } else {
             $pers = 'student';
-            $studentNameWithAssessmentName = $this->getconfirmheader(false, $isteacher, $istutor, $currentUser, $params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(false,$isteacher,$istutor,$currentUser,$params);
         }
         if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
 
             if ($params['clearattempt'] == "confirmed") {
-                $assessmentSession = AssessmentSession::getByAssessmentIdAndCourseId($params['asid'], $courseId);
-                if ($assessmentSession) {
+                $assessmentSession = AssessmentSession::getByAssessmentIdAndCourseId($params['asid'],$courseId);
+                if($assessmentSession){
                     $aid = $assessmentSession['assessmentid'];
-                    $ltisourcedid = $assessmentSession['lti_sourcedid'];
+                    $ltisourcedid =  $assessmentSession['lti_sourcedid'];
 
                     if (strlen($ltisourcedid) > 1) {
-                        LtiOutcomesUtility::updateLTIgrade('delete', $ltisourcedid, $aid);
+                        LtiOutcomesUtility::updateLTIgrade('delete',$ltisourcedid,$aid);
                     }
                     $agroupid = $assessmentSessionData['agroupid'];
-                    $aid = $assessmentSessionData['assessmentid'];
-                    if ($agroupid > 0) {
-                        $assessmentArray = array('agroupid', $agroupid, $aid);
+                    $aid= $assessmentSessionData['assessmentid'];
+                    if ($agroupid>0) {
+                        $assessmentArray = array('agroupid',$agroupid,$aid);
                     } else {
-                        $assessmentArray = array('id', $params['asid'], $aid);
+                        $assessmentArray = array('id',$params['asid'],$aid);
                     }
-                    filehandler::deleteasidfilesbyquery2($assessmentArray[0], $assessmentArray[1], $assessmentArray[2], 1);
+                    filehandler::deleteasidfilesbyquery2($assessmentArray[0],$assessmentArray[1],$assessmentArray[2],1);
                     AssessmentSession::deleteByAssessment($assessmentArray);
-                    return $this->redirect('gradebook?cid=' . $courseId);
+                    return $this->redirect('gradebook?cid='.$courseId);
                 }
             }
         }
@@ -3181,22 +3177,21 @@ class GradebookController extends AppController
             'studentNameWithAssessmentName' => $studentNameWithAssessmentName,
             'pers' => $pers
         );
-        $resposeData = array('course' => $course, 'countOfQuestion' => $countOfQuestion, 'questionImages' => $questionImages, 'librariesName' => $librariesName,
-            'questionSetData' => $questionSetData, 'questionsData' => $questionsData, 'exceptionData' => $exceptionData, 'studntData' => $studntData, 'params' => $params,
-            'assessmentData' => $assessmentData, 'defaultValuesArray' => $defaultValuesArray);
+
+        $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion,  'librariesName' => $librariesName,
+            'questionSetData' => $questionSetData, 'questionsData' => $questionsData, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
+            'assessmentData' => $assessmentData,'canedit' => $canedit,'rubricsData' => $rubrics, 'defaultValuesArray' => $defaultValuesArray);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }
-
-    public function getconfirmheader($group, $isteacher, $istutor, $user, $params)
-    {
+    public function getconfirmheader($group,$isteacher,$istutor,$user,$params) {
         if ($group) {
             $studentNameWithAssessmentName = '<h3>Whole Group</h3>';
         } else {
             $studentUserData = User::getById($params['uid']);
             $studentNameWithAssessmentName = "<h3>{$studentUserData['LastName']}, {$studentUserData['FirstName']}</h3>";
         }
-        $assessmentName = AssessmentSession::getByIdAndUserId($params['asid'], $user->id, $isteacher, $istutor);
-        $studentNameWithAssessmentName .= "<h4>" . $assessmentName['name'] . "</h4>";
+        $assessmentName = AssessmentSession::getByIdAndUserId($params['asid'],$user->id,$isteacher,$istutor);
+        $studentNameWithAssessmentName .= "<h4>".$assessmentName['name']."</h4>";
         return $studentNameWithAssessmentName;
     }
 
@@ -3494,6 +3489,7 @@ class GradebookController extends AppController
         }
         $hidelocked = ((floor($gbmode/100)%10&2)); //0: show locked, 1: hide locked
         $query = Student::findByCid($courseId);
+
         if ($query) {
             $countSection = AppConstant::NUMERIC_ZERO;
             foreach ($query as $singleData) {
@@ -3507,7 +3503,6 @@ class GradebookController extends AppController
         } else {
             $hassection = false;
         }
-
         if ($hassection) {
             $gbScheme = GbScheme::getByCourseId($courseId);
             if ($gbScheme['usersort']==0) {
@@ -3526,10 +3521,8 @@ class GradebookController extends AppController
         $name = $assessmentData['name'];
         $defpoints = $assessmentData['defpoints'];
         $itemorder = $assessmentData['itemorder'];
-
         $deffeedback = explode('-',$deffeedback);
         $assessmenttype = $deffeedback[0];
-
         $aitems = explode(',',$itemorder);
         foreach ($aitems as $k=>$v) {
             if (strpos($v,'~')!==FALSE) {
@@ -3548,7 +3541,6 @@ class GradebookController extends AppController
             }
         }
         $questionData = Questions::findQuestionForOuctome($assessmentId);
-
         $totalpossible = 0;
         foreach($questionData as $question) {
             if (($k = array_search($question['id'],$aitems))!==false) { //only use first item from grouped questions for total pts
@@ -3568,15 +3560,14 @@ class GradebookController extends AppController
         $tutorData = Tutor::getByUserId($currentUser['id'],$courseId);
         $tutorsection = trim($tutorData['section']);
         $studentData = User::findUserDataForIsolateAssessmentGrade($isTutor,$tutorsection,$assessmentId,$courseId,$hidelocked,$sortorder,$hassection);
-        $this->includeJS(["general.js"]);
-        $this->includeCSS(['gradebook.css', 'DataTables-1.10.6/media/js/jquery.dataTables.js']);
-        $responseData = array('course' => $course,'gbmode' => $gbmode,'assessmentId' => $assessmentId,'studentData' => $studentData,'exceptions' => $exceptions,'name' => $name,'totalpossible' => $totalpossible,'isTeacher' => $isTeacher,'isTutor' => $isTutor);
+        $this->includeCSS(['gradebook.css']);
+        $this->includeJS(["general.js",'DataTables-1.10.6/media/js/jquery.dataTables.js']);
+        $responseData = array('minscore' => $minscore,'assessmenttype' => $assessmenttype,'enddate' => $enddate,'timelimit' => $timelimit,'course' => $course,'hassection' => $hassection,'gbmode' => $gbmode,'assessmentId' => $assessmentId,'studentData' => $studentData,'exceptions' => $exceptions,'name' => $name,'totalpossible' => $totalpossible,'isTeacher' => $isTeacher,'isTutor' => $isTutor);
         return $this->renderWithData('isolateAssessmentGrade',$responseData);
     }
 
     public function actionAssessmentExport()
     {
-
         $params = $this->getRequestParams();
         $courseId = $params['cid'];
         $course = Course::getById($courseId);
@@ -3591,13 +3582,11 @@ class GradebookController extends AppController
         if (isset($params['options'])) {
             //ready to output
             $outcol = 0;
-
             if (isset($params['pts'])) { $dopts = true; $outcol++;}
             if (isset($params['ptpts'])) { $doptpts = true; $outcol++;}
             if (isset($params['ba'])) { $doba = true; $outcol++;}
             if (isset($params['bca'])) { $dobca = true; $outcol++;}
             if (isset($params['la'])) { $dola = true; $outcol++;}
-
             //get assessment info
             $assessment = Assessments::getByAssessmentId($assessmentId);
             $defpoints = $assessment['defpoints'];
@@ -3605,7 +3594,6 @@ class GradebookController extends AppController
             $itemorder = $assessment['itemorder'];
             $itemarr = array();
             $itemnum = array();
-
             foreach (explode(',',$itemorder) as $k=>$itel) {
                 if (strpos($itel,'~')!==false) {
                     $sub = explode('~',$itel);
@@ -3681,7 +3669,6 @@ class GradebookController extends AppController
                     $offset++;
                 }
             }
-
             //create row headers
             $students = Student::findStudentsToList($courseId);
             $r = 2;
@@ -3692,7 +3679,6 @@ class GradebookController extends AppController
                 $sturow[$student['id']] = $r;
                 $r++;
             }
-
             //pull assessment data
             $assessmentseessions = AssessmentSession::getByCourseIdAndAssessmentId($assessmentId,$courseId);
             foreach($assessmentseessions as $line) {
@@ -3989,9 +3975,12 @@ class GradebookController extends AppController
     }
     public function actionGradebookTesting()
     {
+        global $get,$lnfilter,$timefilter;
         $courseId = $this->getParamVal('cid');
         $course = Course::getById($courseId);
         $params = $this->getRequestParams();
+        $get = $params;
+        $this->layout = "master";
         $currentUser = $this->getAuthenticatedUser();
         $teacherId = $this->isTeacher($currentUser['id'],$courseId);
         $tutorId = $this->isTutor($currentUser['id'],$courseId);
@@ -4009,7 +3998,6 @@ class GradebookController extends AppController
         $sessionId = $this->getSessionId();
         $sessionData = $this->getSessionData($sessionId);
         if ($isTeacher || $isTutor) {
-
             if (isset($params['timefilter'])) {
                 $timefilter = $params['timefilter'];
                 $sessionData[$courseId.'timefilter'] = $timefilter;
@@ -4028,28 +4016,12 @@ class GradebookController extends AppController
             } else {
                 $lnfilter = '';
             }
-            if (isset($tutorsection) && $tutorsection!='') {
-                $secfilter = $tutorsection;
-            } else {
-                if (isset($params['secfilter'])) {
-                    $secfilter = $params['secfilter'];
-                    $sessionData[$courseId.'secfilter'] = $secfilter;
-                    AppUtility::writesessiondata($sessionData,$sessionId);
-                } else if (isset($sessionData[$courseId.'secfilter'])) {
-                    $secfilter = $sessionData[$courseId.'secfilter'];
-                } else {
-                    $secfilter = -1;
-                }
-            }
-            //Gbmode : Links NC Dates
-            $totonleft = 0 ;
-            $links = 0;
-            $hidenc = 2;
-            $availshow = 1;
-            $catfilter = -1;
         }
         $gradebookData = $this->gbtable($currentUser->id, $courseId);
-        $responseData = array('gradebookData' => $gradebookData,'isTeacher' => $isTeacher,'isTutor' => $isTutor,'course' => $course);
+        $studentsDistinctSection = Student::findDistinctSection($courseId);
+        $this->includeCSS(['jquery.dataTables.css','gradebook.css']);
+        $this->includeJS(['general.js','gradebook/gradebookstudentdetail.js','tablesorter.js','jquery.dataTables.min.js','dataTables.bootstrap.js']);
+        $responseData = array('studentsDistinctSection' => $studentsDistinctSection,'lnfilter' => $lnfilter,'timefilter' => $timefilter,'gradebookData' => $gradebookData,'isTeacher' => $isTeacher,'isTutor' => $isTutor,'course' => $course);
         return $this->renderWithData('gradebookTesting',$responseData);
     }
 

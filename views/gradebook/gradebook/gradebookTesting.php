@@ -1,121 +1,86 @@
 <?php
 use app\components\AppUtility;
 use app\components\AssessmentUtility;
-if (!$isTeacher || !$isTutor) {
-    echo "Go away";
-}
+$this->title = AppUtility::t('Diagnostic Grade Book', false); ?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+</div>
+<div class = "title-container">
+    <div class = "row">
+        <div class = "pull-left page-heading">
+            <div class = "vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+    </div>
+</div>
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
+</div>
 
+    <div class="tab-content shadowBox">
+        <div class="offline-grade-header">  <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id);?>">View regular gradebook</a> </div>
+        <div class="inner-content-gradebook">
+         <?php
 //DISPLAY
-$placeinhead = '';
+         ?>        <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
+ <form method=post action="gradebook?cid=<?php echo $course->id?>">
+      <div class="col-md-12">
+        <div class="pull-left padding-left-zero select-text-margin col-md-3">
+          <span class="col-md-12">  <?php echo "Meanings:   NC-no credit"; ?> </span>
+        </div>
+        <div class="col-md-9 pull-right">
+            <span class="col-md-5">
+                   Students starting in:
+                                     <select id="timetoggle" class="form-control-gradebook" onchange="chgtimefilter()">
+                    <option value="1" <?php AssessmentUtility::writeHtmlSelected($timefilter,1); ?> >last 1 hour</option>
+             <option value="2"  <?php  AssessmentUtility::writeHtmlSelected($timefilter,2); ?> >last 2 hours</option>
+             <option value="4"  <?php AssessmentUtility::writeHtmlSelected($timefilter,4); ?>>last 4 hours</option>
+             <option value="24"  <?php AssessmentUtility::writeHtmlSelected($timefilter,24); ?>>last day</option>
+             <option value="168"  <?php AssessmentUtility::writeHtmlSelected($timefilter,168); ?>>last week</option>
+             <option value="720"  <?php AssessmentUtility::writeHtmlSelected($timefilter,720); ?>>last month</option>
+             <option value="8760" <?php  AssessmentUtility::writeHtmlSelected($timefilter,8760); ?>>last year</option>
+             </select>
 
-$placeinhead .= "<script type=\"text/javascript\">";
-$placeinhead .= 'function chgtimefilter() { ';
-$placeinhead .= '       var tm = document.getElementById("timetoggle").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
+           </span>
+            <span class=" pull-right">
+             Last name: <input type=text id="lnfilter" value="<?php echo $lnfilter ?>" />
+             <input type=button value="Filter by name" onclick="chglnfilter()" />
+        </span>
+        </div>
+      </div> <br> <br>
+<?php $gbt = gbinstrdisp($gradebookData,$studentsDistinctSection,$course); ?>
 
-$placeinhead .= "       var toopen = '$address&timefilter=' + tm;\n";
-$placeinhead .= "  	window.location = toopen; \n";
-$placeinhead .= "}\n";
-
-$placeinhead .= 'function chglnfilter() { ';
-$placeinhead .= '       var ln = document.getElementById("lnfilter").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
-
-$placeinhead .= "       var toopen = '$address&lnfilter=' + ln;\n";
-$placeinhead .= "  	window.location = toopen; \n";
-$placeinhead .= "}\n";
-
-$placeinhead .= 'function chgsecfilter() { ';
-$placeinhead .= '       var sec = document.getElementById("secfiltersel").value; ';
-$address = $urlmode . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gb-testing.php?stu=$stu&cid=$cid";
-
-$placeinhead .= "       var toopen = '$address&secfilter=' + sec;\n";
-$placeinhead .= "  	window.location = toopen; \n";
-$placeinhead .= "}\n";
-$placeinhead .= "</script>";
-
-
-
-//show instructor view
-$placeinhead .= "<script type=\"text/javascript\">function lockcol() { \n";
-$placeinhead .= " var cont = document.getElementById(\"tbl-container\");\n";
-$placeinhead .= " if (cont.style.overflow == \"auto\") {\n";
-$placeinhead .= "   cont.style.height = \"auto\"; cont.style.overflow = \"visible\"; cont.style.border = \"0px\";";
-//$placeinhead .= "document.getElementById(\"myTable\").className = \"gb\"; document.cookie = 'gblhdr-$cid=0';";
-$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Lock headers\"; } else {";
-$placeinhead .= " cont.style.height = \"75%\"; cont.style.overflow = \"auto\"; cont.style.border = \"1px solid #000\";\n";
-//$placeinhead .= "document.getElementById(\"myTable\").className = \"gbl\"; document.cookie = 'gblhdr-$cid=1'; ";
-$placeinhead .= "  document.getElementById(\"lockbtn\").value = \"Unlock headers\"; }";
-$placeinhead .= "} ";
-
-$placeinhead .= "</script>\n";
-$placeinhead .= "<style type=\"text/css\"> table.gb { margin: 0px; } </style>";
-
-
-//echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-echo "&gt; Diagnostic Gradebook</div>";
-echo "<form method=post action=\"gradebook.php?cid=$cid\">";
-
-echo '<div id="headergb-testing" class="pagetitle"><h2>Diagnostic Grade Book</h2></div>'; ?>
- <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook'.$course->id);?>">View regular gradebook</a>
-<?php echo "<div class=cpmid>";
-
-echo "Students starting in: <select id=\"timetoggle\" onchange=\"chgtimefilter()\">";
-echo "<option value=1 "; AssessmentUtility::writeHtmlSelected($timefilter,1); echo ">last 1 hour</option>";
-echo "<option value=2 "; AssessmentUtility::writeHtmlSelected($timefilter,2); echo ">last 2 hours</option>";
-echo "<option value=4 "; AssessmentUtility::writeHtmlSelected($timefilter,4); echo ">last 4 hours</option>";
-echo "<option value=24 "; AssessmentUtility::writeHtmlSelected($timefilter,24); echo ">last day</option>";
-echo "<option value=168 "; AssessmentUtility::writeHtmlSelected($timefilter,168); echo ">last week</option>";
-echo "<option value=720 "; AssessmentUtility::writeHtmlSelected($timefilter,720); echo ">last month</option>";
-echo "<option value=8760 "; AssessmentUtility::writeHtmlSelected($timefilter,8760); echo ">last year</option>";
-echo "</select>";
-echo " Last name: <input type=text id=\"lnfilter\" value=\"$lnfilter\" />";
-echo "<input type=button value=\"Filter by name\" onclick=\"chglnfilter()\" />";
-echo "</div>";
-$gbt = gbinstrdisp();
-echo "</form>";
-echo "</div>";
-//echo "Meanings:  IP-In Progress, OT-overtime, PT-practice test, EC-extra credit, NC-no credit<br/><sup>*</sup> Has feedback, <sub>d</sub> Dropped score\n";
-echo "Meanings:   NC-no credit";
-/*if ($isteacher) {
-	echo "<div class=cp>";
-	echo "<a href=\"addgrades.php?cid=$cid&gbitem=new&grades=all\">Add Offline Grade</a><br/>";
-	echo "<a href=\"gradebook.php?stu=$stu&cid=$cid&export=true\">Export Gradebook</a><br/>";
-	echo "Email gradebook to <a href=\"gradebook.php?stu=$stu&cid=$cid&emailgb=me\">Me</a> or <a href=\"gradebook.php?stu=$stu&cid=$cid&emailgb=ask\">to another address</a><br/>";
-	echo "<a href=\"gbsettings.php?cid=$cid\">Gradebook Settings</a>";
-	echo "<div class=clear></div></div>";
-}
-*/
-
-
-
-function gbinstrdisp() {
-    global $isteacher,$istutor,$cid,$stu,$isdiag,$catfilter,$secfilter,$imasroot,$tutorsection;
+ </form>
+ </div>
+ </div>
+<?php
+function gbinstrdisp($gradebookData,$studentsDistinctSection,$course) {
+    $isteacher = $gradebookData['isTeacher'];
+    $catfilter = $gradebookData['catFilter'];
+    $tutorsection = $gradebookData['tutorSection'];
+    $secfilter = $gradebookData['secFilter'];
+    $istutor = $gradebookData['isTutor'];
+    $isdiag = $gradebookData['isDiagnostic'];
+    $stu = $gradebookData['defaultValuesArray']['studentId'];
     $hidenc = 1;
-    $gbt = gbtable();
-    //print_r($gbt);
-    echo "<script type=\"text/javascript\" src=\"$imasroot/javascript/tablesorter.js\"></script>\n";
+    $cid = $course->id;
+    $gbt = $gradebookData['gradebook'];
     echo "<div id=\"tbl-container\">";
-    echo "<table class=gb id=myTable><thead><tr>";
+    echo "<table class=myTable table table-bordered table-striped table-hover data-table id=myTable><thead><tr>";
     $n=0;
-
-
     for ($i=0;$i<count($gbt[0][0]);$i++) { //biographical headers
         if ($i==1 && $gbt[0][0][1]!='ID') { continue;}
         echo '<th>'.$gbt[0][0][$i];
-        if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) {
-            echo "<br/><select id=\"secfiltersel\" onchange=\"chgsecfilter()\"><option value=\"-1\" ";
-            if ($secfilter==-1) {echo  'selected=1';}
+        if (($gbt[0][0][$i]=='Section' || ($isdiag && $i==4)) && (!$istutor || $tutorsection=='')) { ?>
+             <br/><select style="color: #000000" id="secfiltersel" onchange="chgsecfilter()"><option value="-1"
+            <?php if ($secfilter==-1) {echo  'selected=1';}
             echo  '>All</option>';
-            $query = "SELECT DISTINCT section FROM imas_students WHERE courseid='$cid' ORDER BY section";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            while ($row = mysql_fetch_row($result)) {
-                if ($row[0]=='') { continue;}
-                echo  "<option value=\"{$row[0]}\" ";
-                if ($row[0]==$secfilter) {
+            foreach($studentsDistinctSection as $row){
+                if ($row['section']=='') { continue;}
+                echo  "<option value=\"{$row['section']}\" ";
+                if ($row['section']==$secfilter) {
                     echo  'selected=1';
                 }
-                echo  ">{$row[0]}</option>";
+                echo  ">{$row['section']}</option>";
             }
             echo  "</select>";
 
@@ -123,11 +88,8 @@ function gbinstrdisp() {
             echo '<br/><span class="small">N='.(count($gbt)-2).'</span>';
         }
         echo '</th>';
-
         $n++;
     }
-
-
     for ($i=0;$i<count($gbt[0][1]);$i++) { //assessment headers
         if (!$isteacher && $gbt[0][1][$i][4]==0) { //skip if hidden
             continue;
@@ -137,8 +99,6 @@ function gbinstrdisp() {
         } else if ($hidenc==2 && ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3)) {//skip all NC
             continue;
         }
-
-
         //name and points
         echo '<th class="cat'.$gbt[0][1][$i][1].'">'.$gbt[0][1][$i][0].'<br/>';
         if ($gbt[0][1][$i][4]==0 || $gbt[0][1][$i][4]==3) {
@@ -154,17 +114,16 @@ function gbinstrdisp() {
         }
         //links
         if ($isteacher) {
-            if ($gbt[0][1][$i][6]==0) { //online
-                echo "<br/><a class=small href=\"addassessment.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-                echo "<br/><a class=small href=\"isolateassessgrade.php?cid=$cid&aid={$gbt[0][1][$i][7]}\">[Isolate]</a>";
-            } else if ($gbt[0][1][$i][6]==1) { //offline
-                echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}\">[Settings]</a>";
-                echo "<br/><a class=small href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$i][7]}&isolate=true\">[Isolate]</a>";
-            } else if ($gbt[0][1][$i][6]==2) { //discussion
-                echo "<br/><a class=small href=\"addforum.php?id={$gbt[0][1][$i][7]}&cid=$cid&from=gb\">[Settings]</a>";
-            }
+            if ($gbt[0][1][$i][6]==0) { //online ?>
+                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('assessment','assessment/add-assessment?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?> ">[Settings]</a>
+                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/isolate-assessment-grade?cid='.$cid.'&aid='.$gbt[0][1][$i][7]);?> ">[Isolate]</a>
+    <?php   } else if ($gbt[0][1][$i][6]==1) { //offline ?>
+                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7]);?> ">[Settings]</a>
+                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$i][7].'&isolate=true');?> ">[Isolate]</a>
+          <?php  } else if ($gbt[0][1][$i][6]==2) { //discussion ?>
+                 <br><a class=small href="<?php echo AppUtility::getURLFromHome('forum','forum/addforum?id='.$gbt[0][1][$i][7].'&cid='.$cid.'&from=gb');?>">[Settings]</a>";
+           <?php  }
         }
-
         echo '</th>';
         $n++;
     }
@@ -177,18 +136,14 @@ function gbinstrdisp() {
         } else {
             echo "<tr class=odd onMouseOver=\"this.className='highlight'\" onMouseOut=\"this.className='odd'\">";
         }
-        echo '<td class="locked" scope="row">';
-
-        echo "<a href=\"gradebook.php?cid=$cid&stu={$gbt[$i][4][0]}\">";
-        echo $gbt[$i][0][0];
+        echo '<td class="locked" scope="row">'; ?>
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$cid.'&stu='.$gbt[$i][4][0]);?> ">
+        <?php echo $gbt[$i][0][0];
         echo '</a></td>';
-
         for ($j=($gbt[0][0][1]=='ID'?1:2);$j<count($gbt[0][0]);$j++) {
             echo '<td class="c">'.$gbt[$i][0][$j].'</td>';
         }
-
         //assessment values
-
         for ($j=0;$j<count($gbt[0][1]);$j++) {
             if ($gbt[0][1][$j][4]==0) { //skip if hidden
                 continue;
@@ -198,19 +153,17 @@ function gbinstrdisp() {
             } else if ($hidenc==2 && ($gbt[0][1][$j][4]==0 || $gbt[0][1][$j][4]==3)) {//skip all NC
                 continue;
             }
-
-
             echo '<td class="c">';
             if (isset($gbt[$i][1][$j][5])) {
                 echo '<span style="font-style:italic">';
             }
             if ($gbt[0][1][$j][6]==0) {//online
                 if (isset($gbt[$i][1][$j][0])) {
-                    if ($gbt[$i][1][$j][4]=='average') {
-                        echo "<a href=\"gb-itemanalysis.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&aid={$gbt[0][1][$j][7]}\">";
-                    } else {
-                        echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$gbt[$i][1][$j][4]}&uid={$gbt[$i][4][0]}\">";
-                    }
+                    if ($gbt[$i][1][$j][4]=='average') { ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/itemanalysis?stu='.$stu.'&cid='.$cid.'&asid='.$gbt[$i][1][$j][4].'&aid='.$gbt[0][1][$j][7]);?>">
+                  <?php  } else { ?>
+                         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$cid.'&asid='.$gbt[$i][1][$j][4].'&uid='.$gbt[$i][4][0]);?> ">
+                    <?php }
                     echo $gbt[$i][1][$j][0];
                     if ($gbt[$i][1][$j][3]==1) {
                         echo ' (NC)';
@@ -229,17 +182,17 @@ function gbinstrdisp() {
                 } else { //no score
                     if ($gbt[$i][0][0]=='Averages') {
                         echo '-';
-                    } else {
-                        echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid=new&aid={$gbt[0][1][$j][7]}&uid={$gbt[$i][4][0]}\">-</a>";
-                    }
+                    } else { ?>
+                             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$cid.'&asid=new&aid='.$gbt[0][1][$j][7].'&uid='.$gbt[$i][4][0]);?> ">-</a>
+                   <?php }
                 }
             } else if ($gbt[0][1][$j][6]==1) { //offline
                 if ($isteacher) {
-                    if ($gbt[$i][0][0]=='Averages') {
-                        echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades=all&gbitem={$gbt[0][1][$j][7]}\">";
-                    } else {
-                        echo "<a href=\"addgrades.php?stu=$stu&cid=$cid&grades={$gbt[$i][4][0]}&gbitem={$gbt[0][1][$j][7]}\">";
-                    }
+                    if ($gbt[$i][0][0]=='Averages') { ?>
+                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades=all&gbitem='.$gbt[0][1][$j][7]);?>">
+                    <?php } else { ?>
+                        <br><a class=small href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/add-grades?stu='.$stu.'&cid='.$cid.'&grades='.$gbt[$i][4][0].'&gbitem='.$gbt[0][1][$j][7])?>">
+                    <?php }
                 }
                 if (isset($gbt[$i][1][$j][0])) {
                     echo $gbt[$i][1][$j][0];
@@ -279,10 +232,22 @@ function gbinstrdisp() {
 
     $sarr = implode(",",$sarr);
     if (count($gbt)<500) {
-        echo "<script>initSortTable('myTable',Array($sarr),true,false);</script>\n";
+        echo "<script type='javascript'>initSortTable('myTable',Array($sarr),true,false);</script>\n";
     }
+} ?>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charser="utf8" src="//cdn.datatables.net/fixedcolumns/3.0.3/js/dataTables.fixedColumns.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        var table = $('.myTable').DataTable( {
+            scrollY: "300px",
+            scrollX: true,
+            scrollCollapse: true,
+            "paginate": false,
+            "ordering":false,
+            paging: false
+        });
+        new $.fn.dataTable.FixedColumns(table);
+    });
 
-
-}
-
-?>
+</script>
