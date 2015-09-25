@@ -625,6 +625,7 @@
 	$reviewatend = ($testsettings['testtype']=="EndReview");
 	$showhints = ($testsettings['showhints']==1);
 	$showtips = $testsettings['showtips'];
+	$useeqnhelper = $testsettings['eqnhelper'];
 	$regenonreattempt = (($testsettings['shuffle']&8)==8 && !$allowregen);
 	if ($regenonreattempt) {
 		$nocolormark = true;
@@ -881,8 +882,6 @@ if (!isset($_POST['embedpostback'])) {
 		$placeinhead .= '<style type="text/css"> div.question input.btn { margin-left: 10px; } </style>';
 		
 	} 
-
-	$useeqnhelper = $testsettings['eqnhelper'];
 	
 	//IP: eqntips 
 	if ($testsettings['showtips']==2) {
