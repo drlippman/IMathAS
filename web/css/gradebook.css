@@ -177,7 +177,6 @@ tr#quickadd td {
 .upload-mutiple-grade-padding {
     padding: 20px 25px 20px 30px !important;
 }
-
 .form-control-gradebook
 {
     width: 46%;
@@ -196,7 +195,13 @@ tr#quickadd td {
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
-.add-grade-name-left-margin
-{
-    margin-left: 28px;
+.gradebook-export-file-header {
+    background-color: #E0E0E0;
+    height: 60px;
+    padding-top: 21px;
+}
+.gradebook-export-file-padding {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    padding-right: 25px;
 }

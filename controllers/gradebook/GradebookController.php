@@ -4059,7 +4059,7 @@ class GradebookController extends AppController
             $lastloginfromexport = $params['lastlogin'];
             $totalData = $this->gbtable($currentUser['id'], $course['id'], $stu);
         }
-        $this->includeCSS('imascore.css','modern.css');
+        $this->includeCSS(['modern.css','gradebook.css']);
         $responseData = array('studentData' => $studentData,'currentUser' => $currentUser,'totalData' => $totalData,'gbmode' => $gbmode,'stu' => $stu,'params' => $params,'isteacher' => $isTeacher,'course' => $course);
         return $this->renderWithData('gradebookExport',$responseData);
     }

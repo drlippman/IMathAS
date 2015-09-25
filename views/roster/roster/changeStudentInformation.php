@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php echo $form->field($model, 'section')->textInput(); ?>
         <?php echo $form->field($model, 'code')->textInput(); ?>
         <?php echo $form->field($model, 'timelimitmult')->textInput(); ?>
-        <div class="col-sm-offset-2 div-change-student-info" >
+        <div class="col-sm-offset-2 div-change-student-info change-student-information-checkbox" >
             <?php echo $form->field($model, 'locked')->checkbox(); ?>
             <?php echo $form->field($model, 'hidefromcourselist')->checkbox(); ?>
         </div>

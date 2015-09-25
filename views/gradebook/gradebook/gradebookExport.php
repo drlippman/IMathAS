@@ -14,45 +14,141 @@ $this->title = 'Gradebook Export';
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+<div class="item-detail-content">
+    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
+</div>
+<div class="tab-content shadowBox">
     <?php
     if (!$isteacher) {
         echo "This page not available to students";
     }else{
     if (!isset($params['commentloc'])) {
-    echo '<div id="headergb-export" class="pagetitle"><h2>Export Gradebook</h2></div>';
-
     if (isset($params['export'])) {
         $para = 'export=' . $params['export'];
     } else if (isset($params['emailgb'])) {
         $para = 'emailgb=' . $params['emailgb'];
     } ?>
-    <form method=post
-          action="gradebook-export?cid=<?php echo $course->id ?>&stu=<?php echo $stu ?>&gbmode=<?php echo $gbmode ?>&<?php echo $para ?>"
-          class="nolimit">
-        <?php if ($params['emailgb'] == "ask") {
-            echo "<span class=\"form\">Email Gradebook To:</span><span class=\"formright\"> <input type=text name=\"email\" size=\"30\"/></span> <br class=\"form\" />";
-        }
-        echo '<span class="form">Locked students?</span><span class="formright"><input type="radio" name="locked" value="hide" checked="checked"> Hide <input type="radio" name="locked" value="show" > Show </span><br class="form" />';
-        echo '<span class="form">Separate header line for points possible?</span><span class="formright"><input type="radio" name="pointsln" value="0" checked="checked"> No <input type="radio" name="pointsln" value="1"> Yes</span><br class="form" />';
-        echo '<span class="form">Assessment comments:</span><span class="formright"> <input type="radio" name="commentloc" value="-1" checked="checked"> Don\'t include comments <br/>  <input type="radio" name="commentloc" value="1"> Separate set of columns at the end <br/><input type="radio" name="commentloc" value="0"> After each score column</span><br class="form" />';
-        echo '<span class="form">Include last login date?</span><span class="formright"><input type="radio" name="lastlogin" value="0" checked="checked"> No <input type="radio" name="lastlogin" value="1" > Yes </span><br class="form" />';
-        echo '<span class="form">Include total number of logins?</span><span class="formright"><input type="radio" name="logincnt" value="0" checked="checked"> No <input type="radio" name="logincnt" value="1" > Yes </span><br class="form" />';
-        if (isset($params['export'])) {
-        echo '<p><input type=submit name="submit" value="Download Gradebook as CSV" /> <input type=submit name="submit" value="Download Gradebook for Excel" /';
-        ?>
-        <a href=<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid=' . $course->id) ?>'">Return to gradebook</a></p;
+    <form method=post action="gradebook-export?cid=<?php echo $course->id ?>&stu=<?php echo $stu ?>&gbmode=<?php echo $gbmode ?>&<?php echo $para ?>" class="nolimit">
 
-         <?php
-        echo '<p>When you click the <b>Download Gradebook</b> button, your browser will probably ask if you want to save or ';
-        echo 'open the file.  Click <b>Save</b> to save the file to your computer, or <b>Open</b> to open the gradebook in Excel ';
-        echo 'or whatever program your computer has set to open .csv spreadsheet files</p>';
-        echo '<p>A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</p>';
-        echo '<p>Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</p>';
+       <?php if (isset($params['export'])) { ?>
+        <div class="col-md-12 gradebook-export-file-header">
+            <a class="padding-left-fifteen" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/gradebook?cid=' . $course->id); ?> ">
+                Return to gradebook
+            </a>
+        </div>
+        <?php } ?>
+
+        <div class="col-md-12 gradebook-export-file-padding">
+        <?php if ($params['emailgb'] == "ask") {
+            echo "
+            <div class='col-md-12 padding-left-zero padding-bottom-twenty padding-top-five'>
+                <div class=\"col-md-3 select-text-margin\">Email Gradebook To</div>
+                <div class=\"col-md-3 padding-left-zero\">
+                        <input class='form-control' type=text name=\"email\" size=\"30\"/>
+                </div>
+            </div>";
+        } ?>
+        <?php echo '
+                <div class="padding-left-zero col-md-12">
+                <div class="col-md-3">Locked students?</div>
+                <div class="col-md-3 padding-left-three">
+                    <span>
+                        <input type="radio" name="locked" value="hide" checked="checked">
+                        <span class="padding-left-five">Hide</span>
+                    </span>
+                    <span class="padding-left-twenty">
+                        <input type="radio" name="locked" value="show" >
+                        <span class="padding-left-five">Show</span>
+                    </span>
+                </div>
+            </div>
+            <div class="padding-left-zero col-md-12 padding-top-twenty">
+                <div class="col-md-3">Separate header line for points possible?</div>
+                <div class="col-md-3 padding-left-three">
+                   <span>
+                        <input type="radio" name="pointsln" value="0" checked="checked">
+                        <span class="padding-left-five">No</span>
+                    </span>
+                    <span class="padding-left-thirty-one">
+                        <input type="radio" name="pointsln" value="1">
+                        <span class="padding-left-five">Yes</span>
+                    </span>
+                </div>
+            </div>
+            <div class="padding-left-zero col-md-12 padding-top-twenty">
+                <div class="col-md-3">Assessment comments:</div>
+                <div class="col-md-4 padding-left-three">
+                    <span class="col-md-12 padding-left-zero">
+                        <input type="radio" name="commentloc" value="-1" checked="checked">
+                        <span class="padding-left-five">Don\'t include comments</span>
+                    </span>
+                    <span class="col-md-12 padding-left-zero padding-top-ten">
+                        <input type="radio" name="commentloc" value="1">
+                        <span class="padding-left-five">Separate set of columns at the end</span>
+                    </span>
+                    <span class="col-md-12 padding-left-zero padding-top-ten">
+                        <input type="radio" name="commentloc" value="0">
+                        <span class="padding-left-five">After each score column</span>
+                    </span>
+                </div>
+            </div>
+            <div class="padding-left-zero col-md-12 padding-top-twenty">
+                <div class="col-md-3">Include last login date?</div>
+                <div class="col-md-3 padding-left-three">
+                    <span class="">
+                        <input type="radio" name="lastlogin" value="0" checked="checked">
+                        <span class="padding-left-five">No</span>
+                    </span>
+                    <span class="padding-left-thirty-one">
+                        <input type="radio" name="lastlogin" value="1" >
+                        <span class="padding-left-five">Yes</span>
+                    </span>
+                </div>
+            </div>
+            <div class="padding-left-zero col-md-12 padding-top-twenty">
+                <div class="col-md-3">Include total number of logins?</div>
+                <div class="col-md-3 padding-left-three">
+                    <span class="">
+                        <input type="radio" name="logincnt" value="0" checked="checked">
+                        <span class="padding-left-five">No</span>
+                    </span>
+                    <span class="padding-left-thirty-one">
+                        <input type="radio" name="logincnt" value="1" >
+                        <span class="padding-left-five">Yes</span>
+                    </span>
+                </div>
+            </div>';
+            if (isset($params['export'])) { ?>
+            <div class="padding-left-zero col-md-offset-3 col-md-9 padding-top-twenty">
+               <span class="">
+                   <input type=submit name="submit" value="Download Gradebook as CSV" />
+               </span>
+               <span class="margin-left-fifteen">
+                   <input type=submit name="submit" value="Download Gradebook for Excel" />
+               </span>
+            </div>
+
+             <?php echo '
+             <div class="col-md-12 padding-top-twenty">
+                When you click the
+                <b>Download Gradebook</b>
+                button, your browser will probably ask if you want to save or
+                open the file.  Click
+                <b>Save</b> to save the file to your computer, or
+                <b>Open</b> to open the gradebook in Excel
+                or whatever program your computer has set to open .csv spreadsheet files
+             </div>
+
+            <div class="col-md-12 padding-top-twenty">A CSV (comma separated values) file will just contain data, and can be opened in most spreadsheet programs</div>
+
+            <div class="col-md-12 padding-top-twenty">Using the Download for Excel button will generate an HTML file that Excel can open, and will most likely preserve coloring and other formatting</div>
+        ';
         } else {
-            echo '<div class="submit"><input type=submit value="Email Gradebook" /></div>';
+            echo '<div class="padding-left-zero col-md-offset-3 col-md-9 padding-top-twenty padding-bottom-five">
+                    <input type=submit value="Email Gradebook" />
+                  </div>';
         }
-        echo '</form>';
+        echo '</div></form>';
         } else {
             if (isset($params['email'])) {
                 $params['emailgb'] = $params['email'];

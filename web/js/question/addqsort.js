@@ -304,8 +304,8 @@ function generateTable() {
 					html += ms;
 					if (curisgroup) {
 						html += "</td><td colspan='"+(beentaken?3:4)+"'><b>Group</b> ";
-						html += "Select <input type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group of "+curitems.length;
-						html += " <select id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
+						html += "Select <input class='width-ten-per form-control display-inline-block' type='text' size='3' id='grpn"+i+"' value='"+itemarray[i][0]+"' onblur='updateGrpN("+i+")'/> from group of "+curitems.length;
+						html += " <select class='width-thirty-per display-inline-block form-control' id='grptype"+i+"' onchange='updateGrpT("+i+")'><option value=0 ";
 						if (itemarray[i][1]==0) { 
 							html += "selected=1";
 						}
@@ -398,13 +398,13 @@ function generateTable() {
 
             if (beentaken) {
                 html += "<td>" +
-                    "<div style='width: 95% !important;margin-left: -10px;' class='btn btn-primary' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">" +
+                    "<div class='btn btn-primary add-question-preview-btn' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",false,false)\">" +
                      "<img class ='margin-right-ten small-preview-icon' src='../../img/prvAssess.png'>&nbsp;Preview" +
                     "</div>" +
                     "</td>"; //Preview
             } else {
                 html += "<td>" +
-                    "<div style='width: 95% !important;margin-left: -10px;' class='btn btn-primary' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"><img class ='margin-right-ten small-preview-icon' src='../../img/prvAssess.png'>&nbsp;Preview</div>" +
+                    "<div class='btn btn-primary add-question-preview-btn' onClick=\"previewq('curqform','qc"+ln+"',"+curitems[j][1]+",true,false)\"><img class ='margin-right-ten small-preview-icon' src='../../img/prvAssess.png'>&nbsp;Preview</div>" +
                     "</td>"; //Preview
             }
 			html += "</tr>";

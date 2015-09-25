@@ -182,6 +182,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     } else { ?>
                     <form id="selq" method=post action="add-questions?cid=<?php echo $courseId ?>&aid=<?php echo $assessmentId ?>&addset=true">
                         <div class="col-lg-2 right-float left-fifteen margin-bottom-fifteen">
+                            <input type="hidden" name="some_name">
                             <div class="with-selected ">
                                 <ul class="nav nav-tabs nav-justified roster-menu-bar-nav sub-menu">
                                     <li class="dropdown">
@@ -190,19 +191,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                         </a>
                                         <ul class="dropdown-menu with-selected potential-ques-dropdown">
                                             <li type="submit">
-                                                <a style="  margin-left: -3px;" href="javascript: submitSelq()" name="add">
+                                                <a id="add-question" style="  margin-left: -3px;" name="add">
                                                     <i class="fa fa-plus"></i>&nbsp;
                                                     <?php AppUtility::t('Add'); ?>
                                                 </a>
                                             </li>
                                             <li type="submit">
-                                                <a style="margin-left: -4px;" href="javascript: submitSelq()" name="addquick">
+                                                <a id="add-question-default" style="margin-left: -4px;" name="addquick">
                                                     <i class="fa fa-cart-plus"></i>&nbsp;
                                                     <?php AppUtility::t('Add (using defaults)'); ?>
                                                 </a>
                                             </li>
                                             <li type="submit">
-                                                <a style="margin-left: -6px;" href="javascript: previewsel('selq')">
+                                                <a class="potentialques" style="margin-left: -6px;" href="javascript: previewsel('selq')">
                                                     <i class="fa fa-fw"></i>
                                                     <?php AppUtility::t('Preview Selected'); ?>
                                                 </a>

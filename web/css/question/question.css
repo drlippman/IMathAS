@@ -194,3 +194,7 @@ text-align: left;
     background-position: -20px center;
     text-indent: 0;
 }
+.add-question-preview-btn {
+    min-width: 95% !important;
+    margin-left: -10px;
+}

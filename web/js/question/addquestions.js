@@ -156,6 +156,12 @@ function setlib(libs) {
 function setlibnames(libn) {
 	document.getElementById("libnames").innerHTML = libn;
 }
-function submitSelq(){
+
+$("#add-question").click(function() {
+    $("input[name=some_name]").attr("name", "add");
     document.forms["selq"].submit()
-}
+});
+$("#add-question-default").click(function() {
+    $("input[name=some_name]").attr("name", "addquick");
+    document.forms["selq"].submit()
+});

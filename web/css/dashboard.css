@@ -104,3 +104,7 @@ display: inline-block !important;
 padding-top: 2px !important;
 margin-left: 20px !important;
 }
+.change-student-information-checkbox p {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}

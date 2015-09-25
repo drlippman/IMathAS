@@ -341,6 +341,3 @@ if ($myRights >= AppConstant::GROUP_ADMIN_RIGHT) {
 </div>
 </div>
 </div>
-<script type="text/javascript">
-
-</script>

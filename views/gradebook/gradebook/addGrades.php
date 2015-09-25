@@ -256,7 +256,7 @@ if ($params['gbitem'] == 'new') {
                             </div>
                     <?php }
                 } else { ?>
-             <div class="add-grade-name-left-margin"> <h3><?php echo $gbItems['name'];?></h3> </div>
+             <div class="margin-left-twenty-eight"> <h3><?php echo $gbItems['name'];?></h3> </div>
                <?php     $rubric = $gbItems['rubric'];
                     $points = $gbItems['points'];
                 }
