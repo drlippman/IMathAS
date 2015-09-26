@@ -8,26 +8,12 @@ use kartik\date\DatePicker;
 use kartik\time\TimePicker;
 use app\components\AssessmentUtility;
 
-/* @var $this yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model app\models\changeUserInfoForm */
 $this->title = 'Manage Offline Grades';
 ?>
-<div class="item-detail-header" xmlns="http://www.w3.org/1999/html">
+<div class="item-detail-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
     <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name, 'Gradebook'], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id, AppUtility::getHomeURL() . 'gradebook/gradebook/gradebook?cid=' . $course->id], 'page_title' => $this->title]); ?>
 </div>
-
-
-
-<?php $form = ActiveForm::begin([
-        'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
-        'action' => 'manage-offline-grades?cid=' . $course->id,
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-4\">{input}</div>\n<div class=\"col-lg-7 col-lg-offset-2\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-3 select-text-margin'],
-        ],
-    ]); ?>
-
+<form method=post action="manage-offline-grades?cid=<?php echo $course->id ?>">
 <div class="title-container">
     <div class="row margin-bottom-ten">
         <div class="pull-left page-heading">
@@ -44,31 +30,32 @@ $this->title = 'Manage Offline Grades';
         </div>
     </div>
 </div>
-<div class="tab-content shadowBox non-nav-tab-item">
+    <div class="item-detail-content">
+        <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'gradebook']); ?>
+    </div>
+
     <input type="hidden" id="course-id" value="<?php echo $course->id ?>">
     <?php
-
-    $model->ShowGrade = AppUtility::getStringVal(AppConstant::NUMERIC_TWO);
-    $model->Count = AppUtility::getStringVal(AppConstant::NUMERIC_ONE);
-    $model->Gradetype = AppUtility::getStringVal(AppConstant::NUMERIC_ONE);
-
     if($gradeNames){    ?>
-
+    <div class="tab-content shadowBox ">
     <div class="offline-grade-header">
         <a class="margin-left-thirty" href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">Upload multiple offline grades</a>
     </div>
 
 <div class="col-md-12 offline-grade-padding">
-        <div>
-            Check: <a name="check-all-box" class="check-all" href="#">All</a>
-            <a name="uncheck-all-box" class="uncheck-all" href="#">None</a>
-        </div>
 
 
-    <table class="width-fourty-per">
+    <table class="grade-name-table width-fourty-per">
         <thead>
         <tr>
-            <th class="col-md-4">Check</th>
+            <th>
+                <div class="checkbox pull-left override-hidden">
+                    <label class="add-grade-name-left-padding">
+                        <input type="checkbox" name="header-checked" value="">
+                        <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                    </label>
+                </div>
+            </th>
             <th class="col-md-8">Grade Names</th>
         </tr>
         </thead>
@@ -97,15 +84,22 @@ $this->title = 'Manage Offline Grades';
     <div class="col-md-12 padding-left-zero margin-top-ten">
         <h4><strong>Offline Grade Options</strong></h4>
     </div>
-    <table class="col-md-12 margin-top-ten">
+    <table class="col-md-12 margin-top-ten grade-option-table">
         <thead>
             <tr>
-                <th class="col-md-2">Change?</th>
+                <th>
+                    <div class="checkbox pull-left override-hidden">
+                        <label class="add-grade-name-left-padding">
+                            <input type="checkbox" name="header-check-box" value="">
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                        </label>
+                    </div>
+                </th>
                 <th class="col-md-2">Option</th>
                 <th class="col-md-8">Settings</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="grade-option-table-name">
                  <tr>
                     <td>
                         <span class="col-md-12">
@@ -234,13 +228,18 @@ $this->title = 'Manage Offline Grades';
         </tbody>
     </table>
 </div>
-  <?php  }else{ ?>
-        <div class="offline-grade-header">
-            No offline grades.
-            <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id); ?>"> Add one </a> or <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">
-                Upload multiple offline grades
-            </a>
-        </div>
-   <?php } ?>
-<?php ActiveForm::end(); ?>
 </div>
+  <?php  }else{ ?>
+    <div class="tab-content shadowBox ">
+        <div class="offline-grade-header">
+           <div class="add-grade-name-left-margin"> No offline grades.
+            <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/add-grades?cid='.$course->id.'&gbitem=new&grades=all'); ?>"> Add one </a> or
+            <a href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/upload-multiple-grades?cid='.$course->id); ?>">
+            Upload multiple offline grades
+            </a>
+               </div>
+        </div>
+    </div>
+   <?php } ?>
+</form>
+

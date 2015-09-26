@@ -2,18 +2,36 @@
 $(document).ready(function () {
     selectCheckBox();
     deleteGrade();
+    selectCheckBoxForGradeName();
 });
-function selectCheckBox(){
-    $('.check-all').click(function () {
-        $('.grade-name-table-body input:checkbox').each(function () {
-            $(this).prop('checked', true);
-        })
-    });
 
-    $('.uncheck-all').click(function () {
-        $('.grade-name-table-body input:checkbox').each(function () {
-            $(this).prop('checked', false);
-        })
+function selectCheckBoxForGradeName() {
+    $('.grade-name-table input[name = "header-checked"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('.grade-name-table-body input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.grade-name-table-body input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
+    });
+}
+
+function selectCheckBox() {
+    $('.grade-option-table input[name = "header-check-box"]').click(function(){
+        if($(this).prop("checked") == true){
+            $('.grade-option-table-name input:checkbox').each(function () {
+                $(this).prop('checked', true);
+            })
+        }
+        else if($(this).prop("checked") == false){
+            $('.grade-option-table-name input:checkbox').each(function () {
+                $(this).prop('checked', false);
+            })
+        }
     });
 }
 

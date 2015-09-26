@@ -825,6 +825,8 @@ class CourseController extends AppController
         $userId = $user['id'];
         $params = $this->getRequestParams();
         $cid = $params['cid'];
+        $teacherId = $this->isTeacher($user['id'], $cid);
+        $this->noValidRights($teacherId);
         $inlineId = $params['id'];
         $course = Course::getById($cid);
         $inlineText = InlineText::getById($inlineId);
@@ -1146,6 +1148,8 @@ class CourseController extends AppController
         $block = $this->getParamVal('block');
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $model = new ThreadForm();
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $this->noValidRights($teacherId);
         $query = Outcomes::getByCourse($courseId);
         $key = AppConstant::NUMERIC_ONE;
         $pageOutcomes = array();

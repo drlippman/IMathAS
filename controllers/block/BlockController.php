@@ -32,7 +32,7 @@ class BlockController extends AppController
     public function actionAddBlock()
     {
         $this->guestUserHandler();
-        $this->getAuthenticatedUser();
+        $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $courseId = $this->getParamVal('courseId');
         $course = Course::getById($courseId);
@@ -41,6 +41,8 @@ class BlockController extends AppController
         $toTb = $this->getParamVal('tb');
         $block = $this->getParamVal('block');
         $modify = $this->getParamVal('modify');
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $this->noValidRights($teacherId);
         if(isset($toTb))
         {
             $toTb = $toTb;

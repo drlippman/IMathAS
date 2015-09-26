@@ -243,7 +243,7 @@ if ($studentId>0) {
                     <li>
                         <input type="hidden" id="student-id" name="student-data" value=""/>
                         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                        <a href="#" onclick="GB_show('Send Email',' <?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?>',800,'auto')" title="Send Email">
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=email&cid='.$course->id)?> "  >
                             <i class="fa fa-at fa-fw"></i>&nbsp;<?php AppUtility::t('Email'); ?></a>
                     </li>
 
@@ -262,14 +262,11 @@ if ($studentId>0) {
                             </a>
                         </form>
                     </li>
-
-
                     <li>
                         <input type="hidden" id="message-id" name="student-data" value=""/>
                         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>" title="Send Message">
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>" >
                             <i class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
-
                     </li>
                 </ul>
             </li>

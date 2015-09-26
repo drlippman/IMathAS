@@ -8,12 +8,32 @@ $lastname = $receiverInformation['LastName'];
 $email = $receiverInformation['email'];
 $useeditor = "message";
 if ($params['sendtype'] == 'msg') {
-    echo '<h2>New Message</h2>';
+    $this->title = 'New Message';
+    $saveButton = 'Send Message';
     $to = "$lastname, $firstname";
 } else if ($params['sendtype'] == 'email') {
-    echo '<h2>New Email</h2>';
+    $this->title = 'New Email';
+    $saveButton = 'Send Email';
     $to = "$lastname, $firstname ($email)";
 }
+
+?>
+<div class="item-detail-header">
+    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => ['Home', $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id], 'page_title' => $this->title]); ?>
+</div>
+<form method="post" action="send-message-model?cid=<?php echo $course->id; ?>">
+<div class="title-container">
+    <div class="row">
+        <div class="pull-left page-heading">
+            <div class="vertical-align title-page"><?php echo $this->title ?></div>
+        </div>
+        <div class="pull-left header-btn">
+            <button class="btn btn-primary pull-right page-settings" type="submit" id="addNewThread" value="Submit">
+                <i class="fa fa-share header-right-btn"></i><?php echo $saveButton; ?></button>
+        </div>
+    </div>
+</div>
+<?php
 if (isset($_GET['quoteq'])) {
 
     require("../assessment/displayq2.php");
@@ -45,26 +65,62 @@ if (isset($_GET['quoteq'])) {
     $courseid = $course->id;
 }
 ?>
-    <form method="post" action="send-message-model?cid=<?php echo $course->id; ?>">
+  <div class="tab-content shadowBox non-nav-tab-item padding-top-thirty padding-bottom-thirty">
         <input type="hidden" name="sendto" value="<?php echo $params['sendto'] ?>"/>
         <input type="hidden" name="sendtype" value="<?php echo $params['sendtype']; ?>"/>
-        <?php
-        echo "To: $to<br/>\n";
-        echo "Subject: <input type=text size=50 name=subject id=subject value=\"$title\"><br/>\n";
-        echo "Message: <div class=editor><textarea id=message name=message style=\"width: 100%;\" rows=20 cols=70>";
-        echo htmlentities($message);
-        echo "</textarea></div><br/>\n";
-
-        if ($params['sendtype'] == 'msg') {
-            ?>
-            <div class="submit"><input type="submit" value="<?php AppUtility::t('Send Message') ?>"></div>
-        <?php
-        } else if ($params['sendtype'] == 'email') { ?>
-            <div class="submit"><input type="submit" value="<?php AppUtility::t('Send Email') ?>"></div>
-        <?php
-        }
-        ?>
+      <div class="col-sm-12">
+         <span class='col-sm-1'><?php AppUtility::t('To')?></span>
+        <span class='col-sm-4'>
+            <?php echo $to ?>
+            </span>
+            </div>
+      <br><br>
+      <div class="col-sm-12">
+      <span class="col-sm-1"><?php AppUtility::t('Subject')?> </span>
+         <span class="col-sm-4"> <input type=text size=50 class="form-control subject" name=subject id=subject value="<?php echo $title ?>"><br/></span>
+          </div>
+      <br><br>
+      <div class="col-sm-12">
+          <span class="col-sm-1">
+         <?php AppUtility::t('Message') ?>
+              </span>
+          <span class="col-sm-11"><div class=editor><textarea  id=message name=message style="width: 100%;" rows=12 cols=20></span>
+                  <?php echo htmlentities($message); ?>
+         </textarea>
+      </div>
+      </div>
+</div>
     </form>
-<?php
-exit;
-//}
+
+
+<script>
+
+    $(document).ready(function () {
+        $("input").keypress(function(e){
+            var subject = $(".subject").val();
+            $(".subject").css('border-color', '');
+            $('#flash-message').hide();
+            if(subject.length > 60)
+            {
+                $('#flash-message').show();
+                $(".subject").css('border-color', 'red');
+                $('#flash-message').html("<div class='alert alert-danger'>The Subject field cannot contain more than 60 characters!");
+                return false;
+            }else{
+                $(".subject").css('border-color', '');
+                $('#flash-message').hide();
+            }
+        });
+        $("input").keyup(function(e){
+            if(e.keyCode == 8 || e.keyCode == 46)
+            {
+                $(".subject").css('border-color', '');
+                $('#flash-message').hide();
+            }
+        });
+    });
+
+
+
+
+</script>

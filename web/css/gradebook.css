@@ -163,7 +163,7 @@ tr#quickadd td {
     /*min-width: 72% !important;*/
 }
 .offline-grade-header {
-    background-color: #E0E0E0;
+    background-color: #f8f8f8;
     height: 60px;
     padding-top: 21px;
 }
@@ -195,6 +195,7 @@ tr#quickadd td {
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+
 .gradebook-export-file-header {
     background-color: #E0E0E0;
     height: 60px;
@@ -204,4 +205,17 @@ tr#quickadd td {
     padding-top: 25px;
     padding-bottom: 25px;
     padding-right: 25px;
+}
+.add-grade-name-left-margin
+{
+    margin-left: 28px;
+}
+
+.add-grade-name-left-padding
+{
+    padding-left: 14px !important;
+}
+
+.padding-top-thirty{
+    padding-top: 30px;
 }

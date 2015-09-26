@@ -68,6 +68,7 @@ public $oa = array();
         } else {
             $canEdit = false;
             $viewAll = false;
+            $this->noValidRights($isTeacher);
         }
         $msgList = $this->getNotificationDataMessage($courseId,$user);
         $countPost = $this->getNotificationDataForum($courseId,$user);

@@ -742,4 +742,14 @@ function generaterandstring() {
         return strtotime(date('F d, o g:i a'));
 
     }
+
+    public function noValidRights($teacherId)
+    {
+        if(!$teacherId)
+        {
+            $this->setWarningFlash(AppConstant::NO_TEACHER_RIGHTS);
+            return $this->redirect($this->goHome());
+        }
+        return true;
+    }
 }

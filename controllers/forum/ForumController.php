@@ -1228,6 +1228,8 @@ class ForumController extends AppController
         $modifyForumId = $params['id'];
         $groupNames = StuGroupSet::getByCourseId($courseId);
         $key = AppConstant::NUMERIC_ZERO;
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $this->noValidRights($teacherId);
         foreach ($groupNames as $group) {
             $groupNameId[$key] = $group['id'];
             $groupNameLabel[$key] = AppConstant::USE_GROUP_SET . $group['name'];

@@ -115,10 +115,12 @@ class AssessmentController extends AppController
 
     public function actionAddAssessment()
     {
-        $this->getAuthenticatedUser();
+        $user = $this->getAuthenticatedUser();
         $this->layout = 'master';
         $params = $this->getRequestParams();
         $courseId = $this->getParamVal('cid');
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $this->noValidRights($teacherId);
         $block = $this->getParamVal('block');
         $course = Course::getById($courseId);
         $assessmentId = $params['id'];
@@ -635,7 +637,7 @@ class AssessmentController extends AppController
                 }
             }
         }
-        $this->includeCSS(['course/items.css', 'course/course.css']);
+        $this->includeCSS(['course/items.css', 'course/course.css','gradebook.css']);
         $this->includeJS(["editor/tiny_mce.js","assessment/addAssessment.js", "general.js"]);
         return $this->addAssessmentRenderData($course, $assessmentData, $saveTitle, $pageCopyFromSelect, $timeLimit, $assessmentSessionData, $testType, $skipPenalty, $showAnswer, $startDate, $endDate, $pageForumSelect, $pageAllowLateSelect, $pageGradebookCategorySelect, $gradebookCategory, $countInGb, $pointCountInGb, $pageTutorSelect, $minScoreType, $useDefFeedback, $defFeedback, $pageGroupSets, $pageOutcomesList, $pageOutcomes, $showQuestionCategory, $sDate, $sTime, $eDate, $eTime, $reviewDate, $reviewTime, $title, $pageTitle, $block, $body);
     }

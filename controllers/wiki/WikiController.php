@@ -100,7 +100,7 @@ class WikiController extends AppController
     public function actionAddWiki()
     {
         $this->guestUserHandler();
-        $this->getAuthenticatedUser();
+        $user = $this->getAuthenticatedUser();
         $this->layout = "master";
         $courseId = $this->getParamVal('courseId');
         $wikiId = $this->getParamVal('id');
@@ -111,7 +111,8 @@ class WikiController extends AppController
         $params = $this->getRequestParams();
         $wikiid = $params['id'];
         $saveTitle = '';
-
+        $teacherId = $this->isTeacher($user['id'], $courseId);
+        $this->noValidRights($teacherId);
         if ($params['id']) {
             $wiki = Wiki::getById($params['id']);
 
