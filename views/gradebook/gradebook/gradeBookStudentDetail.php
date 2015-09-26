@@ -41,6 +41,7 @@ if($totalData['isTeacher']){
     $canviewall = true;
 }
 $studentId = $defaultValuesArray['studentId'];
+
 $istutor = false;
 if($totalData['isTutor']){
     $istutor = true;
@@ -266,7 +267,7 @@ if ($studentId>0) {
                     <li>
                         <input type="hidden" id="message-id" name="student-data" value=""/>
                         <input type="hidden" id="course-id" name="course-id" value="<?php echo $course->id; ?>"/>
-                        <a href="#" onclick="GB_show('Send Message','<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>',800,'auto')" title="Send Message">
+                        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/send-message-model?sendto='.$studentId.'&sendtype=msg&cid='.$course->id);?>" title="Send Message">
                             <i class="fa fa-envelope-o fa-fw"></i>&nbsp;<?php AppUtility::t('Message'); ?></a>
 
                     </li>

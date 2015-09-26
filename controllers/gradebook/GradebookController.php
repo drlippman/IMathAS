@@ -2888,18 +2888,18 @@ class GradebookController extends AppController
         $currentUser = $this->getAuthenticatedUser();
         $userId = $params['sendto'];
         $sendType = $params['sendtype'];
-        $coueseId = $params['cid'];
-        $course = Course::getById($coueseId);
+        $courseId = $params['cid'];
+        $course = Course::getById($courseId);
         $receiverInformation = User::getById($userId);
         if ($this->isPostMethod()) {
             $htmlawedconfig = array('elements' => '*-script');
-
             $msgto = intval($params['sendto']);
             $error = '';
             if ($params['sendtype'] == 'msg') {
                 $newMessage = new Message();
                 $newMessage->saveNewMessage($params, $currentUser);
-                $success = AppUtility::t('Message sent');
+                $this->setSuccessFlash('Message sent');
+                $this->redirect('grade-book-student-detail?cid=' . $courseId . '&studentId=' . $userId);
             } else if ($params['sendtype'] == 'email') {
                 $receiverData = array(
                     '0' => $receiverInformation['FirstName'],
@@ -2924,21 +2924,20 @@ class GradebookController extends AppController
                     $self = "{$senderInformation[0]} {$senderInformation[1]} <{$senderInformation[2]}>";
                     $headers .= "From: $self\r\n";
                     mail($receiver, $subject, $message, $headers);
-                    $success = AppUtility::t('Email sent');
+                    $this->setSuccessFlash('Email sent');
+                    $this->redirect('grade-book-student-detail?cid'.$courseId.'studentId'.$userId);
                 } else {
                     $error = AppUtility::t('Unable to send: Invalid email address');
                 }
             }
 
-            if ($error == '') {
-                echo $success;
-            } else {
+            if (!$error == '') {
                 echo $error;
             }
-            echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
-
-            exit;
+//            echo '. <input type="button" onclick="top.GB_hide()" value="Done" />';
+//            exit;
         }
+        $this->includeJS(["editor/tiny_mce.js", "course/addlink.js", "general.js"]);
         $responseData = array('receiverInformation' => $receiverInformation, 'params' => $params, 'course' => $course);
         return $this->renderWithData('sendMessageModel', $responseData);
     }
@@ -3040,8 +3039,8 @@ class GradebookController extends AppController
             $params['uid'] = $currentUser['id'];
         }
         if ($isteacher || $istutor) {
-            if (isset($sessionData[$courseId.'gbmode'])) {
-                $gbmode =  $sessionData[$courseId.'gbmode'];
+            if (isset($sessionData[$courseId . 'gbmode'])) {
+                $gbmode = $sessionData[$courseId . 'gbmode'];
             } else {
                 $gbSchemeData = GbScheme::getByCourseId($courseId);
                 $gbmode = $gbSchemeData['defgbmode'];
@@ -3074,7 +3073,7 @@ class GradebookController extends AppController
         $assessmentData = Assessments::getByCourseIdJoinWithSessionData($params['asid'], $currentUser['id'], $isteacher, $istutor);
         if (!$isteacher && !$istutor) {
             $rv = new ContentTrack;
-            $rv->insertFromGradebook($currentUser,$courseId,'gbviewasid',$assessmentData['assessmentid'],time());
+            $rv->insertFromGradebook($currentUser, $courseId, 'gbviewasid', $assessmentData['assessmentid'], time());
         }
         $student = Student::getByCourseId($courseId, $params['uid']);
         $studentUserData = User::getById($student['userid']);
@@ -3083,13 +3082,13 @@ class GradebookController extends AppController
             '1' => $studentUserData->LastName,
             '2' => $student->timelimitmult,
         );
-        if ($isteacher || ($istutor && $assessmentData['tutoredit']==1)) {
+        if ($isteacher || ($istutor && $assessmentData['tutoredit'] == 1)) {
             $canedit = 1;
         } else {
             $canedit = 0;
         }
         if ($canedit) {
-        $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
+            $rubrics = Rubrics::rubricDataByAssessmentId($assessmentData['assessmentid']);
         }
         $exceptionData = Exceptions::getByAssessmentIdAndUserId($params['uid'], $assessmentData['assessmentid']);
         $questions = Questions::getByQuestionsIdAndAssessmentId($assessmentData['assessmentid']);
@@ -3110,12 +3109,10 @@ class GradebookController extends AppController
         }
         $questionIdArray = explode(',', $assessmentData['questions']);
         $librariesName = array();
-        $questionSetData = array();
+
 
         foreach ($questionIdArray as $questionId) {
             $libraryName = Questions::getByLibrariesIdAndcategory($questionId);
-            $questionSet = QuestionSet::getByQuesSetId($questionId);
-
             $tempArray = array(
                 '0' => $libraryName['questionsetid'],
                 '1' => $libraryName['category'],
@@ -3123,46 +3120,92 @@ class GradebookController extends AppController
                 'questionId' => $questionId,
 
             );
-            if ($questionSet[0]['hasimg'] > 0) {
-
-                $questionImages = QuestionImages::getByQuestionSetId($questionId);
-            }
             array_push($librariesName, $tempArray);
-            array_push($questionSetData, $questionSet[0]);
         }
         $assessmentSessionData = AssessmentSession::getById($params['asid']);
         $countOfQuestion = Questions::numberOfQuestionByIdAndCategory($assessmentData['assessmentid']);
         if ($assessmentSessionData['agroupid']) {
             $pers = 'group';
-            $studentNameWithAssessmentName = $this->getconfirmheader(true,$isteacher,$istutor,$currentUser,$params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(true, $isteacher, $istutor, $currentUser, $params);
         } else {
             $pers = 'student';
-            $studentNameWithAssessmentName = $this->getconfirmheader(false,$isteacher,$istutor,$currentUser,$params);
+            $studentNameWithAssessmentName = $this->getconfirmheader(false, $isteacher, $istutor, $currentUser, $params);
         }
+        $sessionId = $this->getSessionId();
+        global $sessionId, $sessionData, $testsettings;
+        $testsettings = Assessments::getByAssessmentId($assessmentSessionData['assessmentid']);
         if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
 
             if ($params['clearattempt'] == "confirmed") {
-                $assessmentSession = AssessmentSession::getByAssessmentIdAndCourseId($params['asid'],$courseId);
-                if($assessmentSession){
+                $assessmentSession = AssessmentSession::getByAssessmentIdAndCourseId($params['asid'], $courseId);
+                if ($assessmentSession) {
                     $aid = $assessmentSession['assessmentid'];
-                    $ltisourcedid =  $assessmentSession['lti_sourcedid'];
+                    $ltisourcedid = $assessmentSession['lti_sourcedid'];
+                    $sessionId = $this->getSessionId();
+                    $sessionData = $this->getSessionData($sessionId);
 
                     if (strlen($ltisourcedid) > 1) {
-                        LtiOutcomesUtility::updateLTIgrade('delete',$ltisourcedid,$aid);
+                        LtiOutcomesUtility::updateLTIgrade('delete', $ltisourcedid, $aid);
                     }
                     $agroupid = $assessmentSessionData['agroupid'];
-                    $aid= $assessmentSessionData['assessmentid'];
-                    if ($agroupid>0) {
-                        $assessmentArray = array('agroupid',$agroupid,$aid);
+                    $aid = $assessmentSessionData['assessmentid'];
+                    if ($agroupid > 0) {
+                        $assessmentArray = array('agroupid', $agroupid, $aid);
                     } else {
-                        $assessmentArray = array('id',$params['asid'],$aid);
+                        $assessmentArray = array('id', $params['asid'], $aid);
                     }
-                    filehandler::deleteasidfilesbyquery2($assessmentArray[0],$assessmentArray[1],$assessmentArray[2],1);
+                    filehandler::deleteasidfilesbyquery2($assessmentArray[0], $assessmentArray[1], $assessmentArray[2], 1);
                     AssessmentSession::deleteByAssessment($assessmentArray);
-                    return $this->redirect('gradebook?cid='.$courseId);
+                    if ($from == 'isolate') {
+                        return $this->redirect('isolate-assessment-grade?stu=' . $stu . '&cid=' . $params['cid'] . '&aid=' . $aid . '&gbmode=' . $gbmode);
+                    } else if ($from == 'gisolate') {
+                        /*
+                         * Redirected on isolateassessbygroup page with following parametera
+                         * isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode
+                         */
+
+                    } else if ($from == 'stugrp') {
+                        return $this->redirect(AppUtility::getURLFromHome('groups', 'groups/manage-student-groups?cid=' . $params['cid'] . '&aid=' . $aid));
+                    } else {
+                        return $this->redirect('gradebook?stu=' . $stu . '&cid=' . $params['cid'] . '&gbmode=' . $gbmode);
+                    }
                 }
             }
         }
+       if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
+        if ($_GET['clearscores'] == "confirmed") {
+
+            $assessmentSessionDataForClearScores = AssessmentSession::getAssessmentIDForClearScores($params['asid'],$courseId);
+            if ($assessmentSessionDataForClearScores) { //check that is the right cid
+                $agroupid =  $assessmentSessionData['agroupid'];
+                $aid= $assessmentSessionData['assessmentid'];
+                if ($agroupid>0) {
+                    $qp =  array('agroupid',$agroupid,$aid);
+                } else {
+                    $qp =  array('id',$asid,$aid);
+                }
+                filehandler::deleteasidfilesbyquery2($qp[0], $qp[1], $qp[2], 1);
+                $ltisourcedIdAndSeed = AssessmentSession::getltisourcedIdAndSeed($qp);
+                $seeds = explode(',', $ltisourcedIdAndSeed['seeds']);
+                $ltisourcedid = $ltisourcedIdAndSeed['lti_sourcedid'];
+                if (strlen($ltisourcedid) > 1) {
+                    LtiOutcomesUtility::updateLTIgrade('update', $ltisourcedid, $aid, 0);
+                }
+                $scores = array_fill(0, count($seeds), -1);
+                $attempts = array_fill(0, count($seeds), 0);
+                $lastanswers = array_fill(0, count($seeds), '');
+                $scorelist = implode(",", $scores);
+                $attemptslist = implode(",", $attempts);
+                $lalist = implode("~", $lastanswers);
+                $bestscorelist = implode(',', $scores);
+                $bestattemptslist = implode(',', $attempts);
+                $bestseedslist = implode(',', $seeds);
+                $bestlalist = implode('~', $lastanswers);
+                AssessmentSession::updateForClearScores($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist);
+            }
+            return $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
+        }
+    }
         $defaultValuesArray = array(
             'isteacher' => $isteacher,
             'gbmode' => $gbmode,
@@ -3178,9 +3221,169 @@ class GradebookController extends AppController
             'studentNameWithAssessmentName' => $studentNameWithAssessmentName,
             'pers' => $pers
         );
+            $oktorec = false;
+            if ($isteacher) {
+                $oktorec = true;
+            } else if ($istutor) {
+                $tutorEdit = Assessments::getByAssessmentId($assessmentSessionData['assessmentid']);
+                if ($tutorEdit['tutoredit'] == 1)
+                {
+                    $oktorec = true;
+                }
+            }
+        if (isset($params['update']) && ($isteacher || $istutor) && $links==0)
+        {
+            if ($oktorec)
+            {
+                $bestscores = $assessmentSessionData['bestscores'];
+                $bsp = explode(';',$bestscores);
+                $scores = array();
+                $i = 0;
+                while (isset($params[$i]) || isset($params["$i-0"])) {
+                    $j=0;
+                    $scpt = array();
+                    if (isset($params["$i-0"])) {
 
+                        while (isset($params["$i-$j"])) {
+                            if ($params["$i-$j"]!='N/A' && $params["$i-$j"]!='NA') {
+                                $scpt[$j] = $params["$i-$j"];
+                            } else {
+                                $scpt[$j] = -1;
+                            }
+                            $j++;
+                        }
+                        $scores[$i] = implode('~',$scpt);
+                    } else {
+                        if ($params[$i]!='N/A' && $params["$i-$j"]!='NA') {
+                            $scores[$i] = $params[$i];
+                        } else {
+                            $scores[$i] = -1;
+                        }
+                    }
+                    $i++;
+                }
+                $scorelist = implode(",",$scores);
+                if (count($bsp)>1) { //tack on rawscores and firstscores
+                    $scorelist .= ';'.$bsp[1].';'.$bsp[2];
+                }
+                $feedback = $params['feedback'];
+
+                if (isset($params['updategroup']))
+                {
+                    $agroupid = $assessmentSessionData['agroupid'];
+                    $aid = $assessmentSessionData['assessmentid'];
+                    if ($agroupid > 0) {
+                        $qp = array('agroupid', $agroupid, $aid);
+                    } else {
+                        $qp = array('id', $params['asid'], $aid);
+                    }
+                    AssessmentSession::setBestScoreAndFeedbackUsingGroup($scorelist,$feedback,$qp);
+                } else {
+                    AssessmentSession::setBestScoreAndFeedback($scorelist,$feedback,$params['asid']);
+                }
+
+                $aid = $assessmentSessionData['assessmentid'];
+                if (strlen($assessmentSessionData['lti_sourcedid'])>1) {
+                    //update LTI score
+                    LtiOutcomesUtility::calcandupdateLTIgrade($assessmentSessionData['lti_sourcedid'],$assessmentSessionData['assessmentid'],$scores);
+                }
+              } else {
+                 $this->setWarningFlash('No authority to change scores');
+                return $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
+              }
+            if ($from=='isolate') {
+                return $this->redirect('isolate-assessment-grade?stu='.$stu.'&cid='.$params['cid'].'&aid='.$aid.'&gbmode='.$gbmode);
+            } else if ($from=='gisolate') {
+                /*
+                * Redirected on isolateassessbygroup page with following parametera
+                * isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode
+                */
+            } else if ($from=='stugrp') {
+                return $this->redirect('manage-student-groups?cid='.$params['cid'].'&aid='.$aid);
+            } else {
+                return $this->redirect('gradebook?stu='.$stu.'&cid='.$params['cid'].'&gbmode='.$gbmode);
+            }
+        }
+        if (isset($params['clearq']) && isset($params['asid']) && $isteacher) {
+            if ($params['confirmed'] == "true")
+            {
+                $agroupid = $assessmentSessionData['agroupid'];
+                $aid= $assessmentSessionData['assessmentid'];
+                if ($agroupid>0) {
+                    $qp = array('agroupid',$agroupid,$aid);
+                    //return (" WHERE agroupid='$agroupid'");
+                } else {
+                    $qp = array('id',$asid,$aid);
+                    //return (" WHERE id='$asid' LIMIT 1");
+                }
+                $line = AssessmentSession::getAssessmentIDAndAsidForClearScores($qp);
+                if (strpos($line['scores'], ';') === false) {
+                    $noraw = true;
+                    $scores = explode(",", $line['scores']);
+                    $bestscores = explode(",", $line['bestscores']);
+                } else {
+                    $sp = explode(';', $line['scores']);
+                    $scores = explode(',', $sp[0]);
+                    $rawscores = explode(',', $sp[1]);
+                    $sp = explode(';', $line['bestscores']);
+                    $bestscores = explode(',', $sp[0]);
+                    $bestrawscores = explode(',', $sp[1]);
+                    $firstrawscores = explode(',', $sp[2]);
+                    $noraw = false;
+                }
+                $attempts = explode(",", $line['attempts']);
+                $lastanswers = explode("~", $line['lastanswers']);
+                $reattempting = explode(',', $line['reattempting']);
+                $bestattempts = explode(",", $line['bestattempts']);
+                $bestlastanswers = explode("~", $line['bestlastanswers']);
+
+                $clearid = $params['clearq'];
+
+                if ($clearid !== '' && is_numeric($clearid) && isset($scores[$clearid])) {
+                    filehandler::deleteasidfilesfromstring2($lastanswers[$clearid] . $bestlastanswers[$clearid], $qp[0], $qp[1], $qp[2]);
+                    $scores[$clearid] = -1;
+                    $attempts[$clearid] = 0;
+                    $lastanswers[$clearid] = '';
+                    $bestscores[$clearid] = -1;
+                    $bestattempts[$clearid] = 0;
+                    $bestlastanswers[$clearid] = '';
+                    if (!$noraw) {
+                        $rawscores[$clearid] = -1;
+                        $bestrawscores[$clearid] = -1;
+                        $firstscores[$clearid] = -1;
+                    }
+                    $loc = array_search($clearid, $reattempting);
+                    if ($loc !== false) {
+                        array_splice($reattempting, $loc, 1);
+                    }
+                    if (!$noraw) {
+                        $scorelist = implode(",", $scores) . ';' . implode(",", $rawscores);
+                        $bestscorelist = implode(',', $bestscores) . ';' . implode(",", $bestrawscores) . ';' . implode(",", $firstscores);
+                    } else {
+                        $scorelist = implode(",", $scores);
+                        $bestscorelist = implode(',', $bestscores);
+                    }
+                    $attemptslist = implode(",", $attempts);
+                    $lalist = addslashes(implode("~", $lastanswers));
+
+                    $bestattemptslist = implode(',', $bestattempts);
+                    $bestlalist = addslashes(implode('~', $bestlastanswers));
+                    $reattemptinglist = implode(',', $reattempting);
+                    AssessmentSession::updateForClearScore($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$reattemptinglist,$bestlalist);
+                    if (strlen($line['lti_sourcedid']) > 1) {
+
+                        LtiOutcomesUtility::calcandupdateLTIgrade($line['lti_sourcedid'], $aid, $bestscores);
+                    }
+                    $this->redirect('gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid']);
+                } else {
+                     $this->setWarningFlash(' Error.  Try again.');
+                }
+                unset($params['clearq']);
+            }
+        }
+        $this->includeJS(['general.js','gradebook/rubric.js']);
         $resposeData = array('course' => $course,'countOfQuestion' => $countOfQuestion,  'librariesName' => $librariesName,
-            'questionSetData' => $questionSetData, 'questionsData' => $questionsData, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
+              'questionsData' => $questionsData, 'exceptionData' => $exceptionData, 'studentData' => $studentData, 'params' => $params,
             'assessmentData' => $assessmentData,'canedit' => $canedit,'rubricsData' => $rubrics, 'defaultValuesArray' => $defaultValuesArray);
         return $this->renderWithData('gradebookViewAssessmentDetails', $resposeData);
     }

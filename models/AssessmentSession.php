@@ -453,6 +453,87 @@ class AssessmentSession extends BaseImasAssessmentSessions
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getAssessmentIDForClearScores($asid,$courseId)
+    {
+        $query = new Query();
+        $query->select(['ias.assessmentid'])
+            ->from('imas_assessment_sessions AS ias')
+            ->join('INNER JOIN',
+                'imas_assessments AS ia',
+                'ias.assessmentid=ia.id'
+            )
+            ->where(['ias.id' => $asid])
+            ->andWhere(['ia.courseid' => $courseId]);
+        $command = $query->createCommand();
+        $items = $command->queryOne();
+        return $items;
+    }
+
+    public static function getltisourcedIdAndSeed($qp)
+    {
+        return  AssessmentSession::find()->select(['seeds','lti_sourcedid'])->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->one();
+    }
+
+    public static function updateForClearScores($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$bestseedslist,$bestlalist)
+    {
+        $query = AssessmentSession::find()->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->one();
+        if($query)
+        {
+            $query->scores = $scorelist.';'.$scorelist;
+            $query->attempts = $attemptslist;
+            $query->lastanswers = $lalist;
+            $query->reattempting = '';
+            $query->bestscores = $bestscorelist;$bestscorelist;$bestscorelist;
+            $query->bestattempts = $bestattemptslist;
+            $query->bestseeds = $bestseedslist;
+            $query->bestlastanswers = $bestlalist;
+            $query->save();
+        }
+
+    }
+
+    public static function setBestScoreAndFeedback($bestScore,$feedback,$id)
+    {
+        $assessmentSessionData = AssessmentSession::getById($id);
+        if ($assessmentSessionData) {
+            $assessmentSessionData->bestscores = $bestScore;
+            $assessmentSessionData->feedback = $feedback;
+            $assessmentSessionData->save();
+        }
+    }
+
+    public static function setBestScoreAndFeedbackUsingGroup($bestScore,$feedback,$qp)
+    {
+        $assessmentSessionData = AssessmentSession::find()->where([$qp[0] = $qp[1]])->andWhere(['assessmentid' => $qp[2]])->one();
+        if ($assessmentSessionData) {
+            $assessmentSessionData->bestscores = $bestScore;
+            $assessmentSessionData->feedback = $feedback;
+            $assessmentSessionData->save();
+        }
+    }
+
+    public static function getAssessmentIDAndAsidForClearScores($qp)
+    {
+        return AssessmentSession::find()->select(['attempts','lastanswers','reattempting','scores','bestscores','bestattempts','bestlastanswers','lti_sourcedid'])
+            ->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->orderBy('id')->one();
+    }
+
+    public static function updateForClearScore($qp,$scorelist,$scorelist,$attemptslist,$lalist,$bestscorelist,$bestattemptslist,$reattemptinglist,$bestlalist)
+    {
+        $query = AssessmentSession::find()->where([$qp[0] => $qp[1]])->andWhere(['assessmentid' => $qp[2]])->one();
+        if($query)
+        {
+            $query->scores = $scorelist;
+            $query->attempts = $attemptslist;
+            $query->lastanswers = $lalist;
+            $query->reattempting = $reattemptinglist;
+            $query->bestscores = $bestscorelist;
+            $query->bestattempts = $bestattemptslist;
+            $query->bestlastanswers = $bestlalist;
+            $query->save();
+        }
+    }
 }
 
 

@@ -3,11 +3,13 @@
 namespace app\components;
 
 
+use app\models\Assessments;
 use app\models\Exceptions;
 use app\models\Questions;
 use app\models\Course;
 use Yii;
 use yii\base\Component;
+use yii\web\User;
 
 class LtiOutcomesUtility extends Component
 {
@@ -112,7 +114,7 @@ function post_socket_xml($endpoint, $data, $moreheaders=false) {
     return false;
 }
 
-function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body)
+public  static function sendOAuthBodyPOST($method, $endpoint, $oauth_consumer_key, $oauth_consumer_secret, $content_type, $body)
 {
     $hash = base64_encode(sha1($body, TRUE));
 
@@ -208,17 +210,13 @@ function sendXmlOverPost($url, $xml, $header) {
     curl_close($ch);
     return $result;
 }
-
-
-public  $aidtotalpossible = array();
 //use this if we don't know the total possible
-public function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
+public static function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
     global $aidtotalpossible;
     if (!isset($aidtotalpossible[$aid])) {
-        $query = "SELECT itemorder,defpoints FROM imas_assessments WHERE id='$aid'";
-        $res= mysql_query($query) or die("Query failed : $query" . mysql_error());
-        $aitems = explode(',',mysql_result($res,0,0));
-        $defpoints = mysql_result($res,0,1);
+        $assessment = Assessments::getByAssessmentId($aid);
+        $aitems = explode(',',$assessment['itemorder']);
+        $defpoints = $assessment['defpoints'];
         foreach ($aitems as $k=>$v) {
             if (strpos($v,'~')!==FALSE) {
                 $sub = explode('~',$v);
@@ -234,16 +232,14 @@ public function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
                 $aitemcnt[$k] = 1;
             }
         }
-
-        $query = "SELECT points,id FROM imas_questions WHERE assessmentid='$aid'";
-        $result2 = mysql_query($query) or die("Query failed : $query: " . mysql_error());
+        $questions = Questions::getByAssessmentId($aid);
         $totalpossible = 0;
-        while ($r = mysql_fetch_row($result2)) {
-            if (($k=array_search($r[1],$aitems))!==false) { //only use first item from grouped questions for total pts
-                if ($r[0]==9999) {
+        foreach($questions as $question){
+            if (($k=array_search($question['id'],$aitems))!==false) { //only use first item from grouped questions for total pts
+                if ($question['points']==9999) {
                     $totalpossible += $aitemcnt[$k]*$defpoints; //use defpoints
                 } else {
-                    $totalpossible += $aitemcnt[$k]*$r[0]; //use points from question
+                    $totalpossible += $aitemcnt[$k]*$question['points']; //use points from question
                 }
             }
         }
@@ -254,62 +250,51 @@ public function calcandupdateLTIgrade($sourcedid,$aid,$scores) {
         if (getpts($scores[$i])>0) { $total += getpts($scores[$i]);}
     }
     $grade = number_format($total/$aidtotalpossible[$aid],4);
-    return updateLTIgrade('update',$sourcedid,$aid,$grade);
+    return LtiOutcomesUtility::updateLTIgrade('update',$sourcedid,$aid,$grade);
 }
 
 //use this if we know the grade, or want to delete
 public static function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
-    global $sessiondata,$testsettings,$cid;
-
+    global $sessionData,$testsettings,$sessionId;
     list($lti_sourcedid,$ltiurl,$ltikey,$keytype) = explode(':|:',$sourcedid);
-
     if (strlen($lti_sourcedid)>1 && strlen($ltiurl)>1 && strlen($ltikey)>1) {
-        if (isset($sessiondata[$ltikey.'-'.$aid.'-secret'])) {
-            $secret = $sessiondata[$ltikey.'-'.$aid.'-secret'];
+        if (isset($sessionData[$ltikey.'-'.$aid.'-secret'])) {
+            $secret = $sessionData[$ltikey.'-'.$aid.'-secret'];
         } else {
             if ($keytype=='a') {
                 if (isset($testsettings) && isset($testsettings['ltisecret'])) {
                     $secret = $testsettings['ltisecret'];
                 } else {
-                    $qr = "SELECT ltisecret FROM imas_assessments WHERE id='$aid'";
-                    $res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-                    if (mysql_num_rows($res)>0) {
-                        $secret = mysql_result($res,0,0);
-                        $sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-                        writesessiondata();
+                    $qr = Assessments::getByAssessmentId($aid);
+                    if ($qr) {
+                        $secret = $qr['ltisecret'];
+                        $sessionData[$ltikey.'-'.$aid.'-secret'] = $secret;
+                        AppUtility::writesessiondata($sessionData,$sessionId);
                     } else {
                         $secret = '';
                     }
                 }
             } else if ($keytype=='c') {
-                /*if (!isset($testsettings)) {
-                    $qr = "SELECT ltisecret FROM imas_courses WHERE id='$cid'"; //if from gb-viewasid
-                } else {
-                    $qr = "SELECT ltisecret FROM imas_courses WHERE id='{$testsettings['courseid']}'";
-                }*/
-                //change to use launched key rather than key from course in case someone uses material
-                //from multiple imathas courses in one LMS course.
                 $keyparts = explode('_',$ltikey);
-                $qr = "SELECT ltisecret FROM imas_courses WHERE id=".intval($keyparts[1]);
-                $res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-                if (mysql_num_rows($res)>0) {
-                    $secret = mysql_result($res,0,0);
-                    $sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-                    writesessiondata();
+                $qr = Course::getById(intval($keyparts[1]));
+                if ($qr) {
+                    $secret = $qr['ltisecret'];
+                    $sessionData[$ltikey.'-'.$aid.'-secret'] = $secret;
+                    AppUtility::writesessiondata($sessionData,$sessionId);
                 } else {
                     $secret = '';
                 }
             } else {
-                if (isset($sessiondata['lti_origkey'])) {
-                    $qr = "SELECT password FROM imas_users WHERE SID='{$sessiondata['lti_origkey']}' AND (rights=11 OR rights=76 OR rights=77)";
+                if (isset($sessionData['lti_origkey'])) {
+                    $qr = \app\models\User::getPasswordFromLtiUser($sessionData['lti_origkey']);
                 } else {
-                    $qr = "SELECT password FROM imas_users WHERE SID='".addslashes($ltikey)."' AND (rights=11 OR rights=76 OR rights=77)";
+                    $qr = \app\models\User::getPasswordFromLtiUser($ltikey);
                 }
                 $res= mysql_query($qr) or die("Query failed : $qr" . mysql_error());
-                if (mysql_num_rows($res)>0) {
-                    $secret = mysql_result($res,0,0);
-                    $sessiondata[$ltikey.'-'.$aid.'-secret'] = $secret;
-                    writesessiondata();
+                if ($qr) {
+                    $secret = $qr['password'];
+                    $sessionData[$ltikey.'-'.$aid.'-secret'] = $secret;
+                    AppUtility::writesessiondata($sessionData,$sessionId);
                 } else {
                     $secret = '';
                 }
@@ -317,9 +302,9 @@ public static function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
         }
         if ($secret != '') {
             if ($action=='update') {
-                return sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
+                return LtiOutcomesUtility::sendLTIOutcome('update',$ltikey,$secret,$ltiurl,$lti_sourcedid,$grade);
             } else if ($action=='delete') {
-                return sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
+                return LtiOutcomesUtility::sendLTIOutcome('delete',$ltikey,$secret,$ltiurl,$lti_sourcedid);
             } else {
                 return false;
             }
@@ -331,7 +316,7 @@ public static function updateLTIgrade($action,$sourcedid,$aid,$grade=0) {
     }
 }
 
-function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
+public static function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
 
     $method="POST";
     $content_type = "application/xml";
@@ -402,7 +387,7 @@ function sendLTIOutcome($action,$key,$secret,$url,$sourcedid,$grade=0) {
         return false;
     }
 
-    $response = sendOAuthBodyPOST($method, $url, $key, $secret, $content_type, $postBody);
+    $response = LtiOutcomesUtility::sendOAuthBodyPOST($method, $url, $key, $secret, $content_type, $postBody);
     return $response;
 }
 

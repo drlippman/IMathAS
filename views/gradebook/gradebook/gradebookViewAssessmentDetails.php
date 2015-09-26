@@ -1,21 +1,24 @@
 <?php
 use app\components\AppUtility;
 use \app\components\interpretUtility;
-use \app\components\displayq2;
 use app\models\Assessments;
 use \app\components\CategoryScoresUtility;
+global $isteacher, $istutor;
+$isteacher = $defaultValuesArray['isteacher'];
+$gbmode =  $defaultValuesArray['gbmode'];
+$istutor = $defaultValuesArray['istutor'];
+$from = $defaultValuesArray['from'];
+$totonleft = $defaultValuesArray['totonleft'];
+$links = $defaultValuesArray['links'];
+$hidenc = $defaultValuesArray['hidenc'];
+$availshow = $defaultValuesArray['availshow'];
+$asid = $defaultValuesArray['asid'];
+$pers = $defaultValuesArray['pers'];
 
-   $isteacher = $defaultValuesArray['isteacher'];
-   $gbmode =  $defaultValuesArray['gbmode'];
-    $stu = $defaultValuesArray['stu'];
-   $istutor = $defaultValuesArray['istutor'];
-   $from = $defaultValuesArray['from'];
-    $totonleft = $defaultValuesArray['totonleft'];
-    $links = $defaultValuesArray['links'];
-    $hidenc = $defaultValuesArray['hidenc'];
-    $availshow = $defaultValuesArray['availshow'];
-    $asid = $defaultValuesArray['asid'];
-    $pers = $defaultValuesArray['pers'];
+
+
+include ("../components/displayQuestion.php");
+
 
 if ($asid=="new" && $isteacher) {
 
@@ -60,20 +63,11 @@ if ($asid=="new" && $isteacher) {
     }
     header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
 }
+
 //PROCESS ANY TODOS
-if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
-    if ($_GET['clearattempt']=="confirmed") {
-        if ($from=='isolate') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
-        } else if ($from=='gisolate') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
-        } else if ($from=='stugrp') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
-        } else {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
-        }
-        exit;
-    } else {
+if (isset($params['clearattempt']) && isset($params['asid']) && $isteacher) {
+
+    if ($params['clearattempt']=="true") {
         $isgroup = $defaultValuesArray['groupId'];
         if ($isgroup) {
             $pers = 'group';
@@ -83,8 +77,8 @@ if (isset($_GET['clearattempt']) && isset($_GET['asid']) && $isteacher) {
             echo $defaultValuesArray['studentNameWithAssessmentName'];
         }
         echo "<p>Are you sure you want to clear this $pers's assessment attempt?  This will make it appear the $pers never tried the assessment, and the $pers will receive a new version of the assessment.</p>"; ?>
-        <p><input type=button  onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&clearattempt=confirmed'.'&asid='.$_GET['asid'])?>"' value="Really Clear"></n>
-        <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&uid='.$_GET['uid'])?>"'></p>
+        <p><input type=button  onclick='window.location.href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&clearattempt=confirmed&asid='.$params['asid'])?>"' value="Really Clear">
+            <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$params['asid'].'&uid='.$params['uid'])?>"'></p>
         <?php exit;
     }
 }
@@ -103,50 +97,12 @@ if (isset($_GET['breakfromgroup']) && isset($_GET['asid']) && $isteacher) {
         echo "<p><input type=button onclick=\"window.location='gb-viewasid.php?stu=$stu&gbmode=$gbmode&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&breakfromgroup=confirmed'\" value=\"Really Separate\">\n"; ?>
         <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&uid='.$_GET['uid'])?>"'></p>
 <?php
-exit;
+        exit;
     }
 }
 
-if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
-    if ($_GET['clearscores']=="confirmed") {
-
-        $query = "SELECT ias.assessmentid FROM imas_assessment_sessions AS ias ";
-        $query .= "JOIN imas_assessments AS ia ON ias.assessmentid=ia.id WHERE ias.id='{$_GET['asid']}' AND ia.courseid='$cid'";
-        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-        if (mysql_num_rows($result)>0) { //check that is the right cid
-            //$whereqry = getasidquery($_GET['asid']);
-            $qp = getasidquery($_GET['asid']);
-            //deleteasidfilesbyquery(array($qp[0]=>$qp[1]),1);
-            deleteasidfilesbyquery2($qp[0],$qp[1],$qp[2],1);
-            $whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-            $query = "SELECT seeds,lti_sourcedid FROM imas_assessment_sessions $whereqry";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            $seeds = explode(',',mysql_result($result,0,0));
-            $ltisourcedid = mysql_result($result,0,1);
-            if (strlen($ltisourcedid)>1) {
-                require_once("../includes/ltioutcomes.php");
-                updateLTIgrade('update',$ltisourcedid,$aid,0);
-            }
-
-
-            $scores = array_fill(0,count($seeds),-1);
-            $attempts = array_fill(0,count($seeds),0);
-            $lastanswers = array_fill(0,count($seeds),'');
-            $scorelist = implode(",",$scores);
-            $attemptslist = implode(",",$attempts);
-            $lalist = implode("~",$lastanswers);
-            $bestscorelist = implode(',',$scores);
-            $bestattemptslist = implode(',',$attempts);
-            $bestseedslist = implode(',',$seeds);
-            $bestlalist = implode('~',$lastanswers);
-
-            $query = "UPDATE imas_assessment_sessions SET scores='$scorelist;$scorelist',attempts='$attemptslist',lastanswers='$lalist',reattempting='',";
-            $query .= "bestscores='$bestscorelist;$bestscorelist;$bestscorelist',bestattempts='$bestattemptslist',bestseeds='$bestseedslist',bestlastanswers='$bestlalist' ";
-            $query .= $whereqry;//"WHERE id='{$_GET['asid']}'";
-            mysql_query($query) or die("Query failed : " . mysql_error());
-        }
-        header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
-    } else {
+if (isset($params['clearscores']) && isset($params['asid']) && $isteacher) {
+    if ($_GET['clearscores']=="true") {
         $isgroup = $defaultValuesArray['groupId'];
         if ($isgroup) {
             $pers = 'group';
@@ -156,94 +112,15 @@ if (isset($_GET['clearscores']) && isset($_GET['asid']) && $isteacher) {
             echo $defaultValuesArray['studentNameWithAssessmentName'];
         }
         echo "<p>Are you sure you want to clear this $pers's scores for this assessment?</p>"; ?>
-            <p><input type=button  onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&uid='.$_GET['uid'].'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&clearscores=confirmed')?>"' value="Really Clear"></n>
-        <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&uid='.$_GET['uid'])?>"'></p>
+        <p><input type=button  onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&uid='.$_GET['uid'].'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&clearscores=confirmed')?>"' value="Really Clear"></n>
+            <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&uid='.$_GET['uid'])?>"'></p>
         <?php
         exit;
     }
 }
-if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
-    if ($_GET['confirmed']=="true") {
-        $qp = getasidquery($_GET['asid']);
-        $whereqry = " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-        //$whereqry = getasidquery($_GET['asid']);
+if (isset($params['clearq']) && isset($params['asid']) && $isteacher) {
 
-        $query = "SELECT attempts,lastanswers,reattempting,scores,bestscores,bestattempts,bestlastanswers,lti_sourcedid FROM imas_assessment_sessions $whereqry ORDER BY id"; //WHERE id='{$_GET['asid']}'";
-        $result = mysql_query($query) or die("Query failed : " . mysql_error());
-        $line = mysql_fetch_array($result, MYSQL_ASSOC);
-        if (strpos($line['scores'],';')===false) {
-            $noraw = true;
-            $scores = explode(",",$line['scores']);
-            $bestscores = explode(",",$line['bestscores']);
-        } else {
-            $sp = explode(';',$line['scores']);
-            $scores = explode(',', $sp[0]);
-            $rawscores = explode(',', $sp[1]);
-            $sp = explode(';',$line['bestscores']);
-            $bestscores = explode(',', $sp[0]);
-            $bestrawscores = explode(',', $sp[1]);
-            $firstrawscores = explode(',', $sp[2]);
-            $noraw = false;
-        }
-
-        $attempts = explode(",",$line['attempts']);
-        $lastanswers = explode("~",$line['lastanswers']);
-        $reattempting = explode(',',$line['reattempting']);
-        $bestattempts = explode(",",$line['bestattempts']);
-        $bestlastanswers = explode("~",$line['bestlastanswers']);
-
-        $clearid = $_GET['clearq'];
-        if ($clearid!=='' && is_numeric($clearid) && isset($scores[$clearid])) {
-            deleteasidfilesfromstring2($lastanswers[$clearid].$bestlastanswers[$clearid],$qp[0],$qp[1],$qp[2]);
-            $scores[$clearid] = -1;
-            $attempts[$clearid] = 0;
-            $lastanswers[$clearid] = '';
-            $bestscores[$clearid] = -1;
-            $bestattempts[$clearid] = 0;
-            $bestlastanswers[$clearid] = '';
-            if (!$noraw) {
-                $rawscores[$clearid] = -1;
-                $bestrawscores[$clearid] = -1;
-                $firstscores[$clearid] = -1;
-            }
-
-            $loc = array_search($clearid,$reattempting);
-            if ($loc!==false) {
-                array_splice($reattempting,$loc,1);
-            }
-
-            if (!$noraw) {
-                $scorelist = implode(",",$scores).';'.implode(",",$rawscores);
-                $bestscorelist = implode(',',$bestscores).';'.implode(",",$bestrawscores).';'.implode(",",$firstscores);
-            } else {
-                $scorelist = implode(",",$scores);
-                $bestscorelist = implode(',',$bestscores);
-            }
-            $attemptslist = implode(",",$attempts);
-            $lalist = addslashes(implode("~",$lastanswers));
-
-            $bestattemptslist = implode(',',$bestattempts);
-            $bestlalist = addslashes(implode('~',$bestlastanswers));
-            $reattemptinglist = implode(',',$reattempting);
-
-            $query = "UPDATE imas_assessment_sessions SET scores='$scorelist',attempts='$attemptslist',lastanswers='$lalist',";
-            $query .= "bestscores='$bestscorelist',bestattempts='$bestattemptslist',bestlastanswers='$bestlalist',reattempting='$reattemptinglist' ";
-            $query .= $whereqry; //"WHERE id='{$_GET['asid']}'";
-            mysql_query($query) or die("Query failed : " . mysql_error());
-
-            if (strlen($line['lti_sourcedid'])>1) {
-                require_once("../includes/ltioutcomes.php");
-                calcandupdateLTIgrade($line['lti_sourcedid'],$aid,$bestscores);
-            }
-
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') ."/gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}");
-        } else {
-            echo "<p>Error.  Try again.</p>";
-        }
-        //unset($_GET['asid']);
-        unset($_GET['clearq']);
-
-    } else {
+    if (!$params['confirmed'] == "true"){
         $isgroup = $defaultValuesArray['groupId'];
         if ($isgroup) {
             $pers = 'group';
@@ -254,269 +131,176 @@ if (isset($_GET['clearq']) && isset($_GET['asid']) && $isteacher) {
         }
         echo "<p>Are you sure you want to clear this $pers's scores for this question?</p>"; ?>
 
-
-
-
-        /*
-         * check value of $clearq
-        */ ?>
-
-
-
-        <p><input type=button  onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&uid='.$_GET['uid'].'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&clearq='.$_GET['clearq'].'&confirmed=true')?>"' value="Really Clear"></n>
-        <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$_GET['asid'].'&uid='.$_GET['uid'])?>"'></p>
+        <p><input type=button  onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&uid='.$params['uid'].'&cid='.$course->id.'&from='.$from.'&asid='.$params['asid'].'&clearq='.$params['clearq'].'&confirmed=true')?>"' value="Really Clear"></n>
+            <input type=button value="Back" class="secondarybtn" onclick='window.location="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&gbmode='.$gbmode.'&cid='.$course->id.'&from='.$from.'&asid='.$params['asid'].'&uid='.$params['uid'])?>"'></p>
         <?php
         exit;
     }
 }
 
-if (isset($_GET['forcegraphimg'])) {
+if (isset($params['forcegraphimg'])) {
     $sessiondata['graphdisp'] = 2;
 }
 
 //OUTPUTS
 if ($links==0) { //View/Edit full assessment
 
-    if (isset($_GET['update']) && ($isteacher || $istutor)) {
-        if (isoktorec()) {
-            $query = "SELECT bestscores FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-            $result = mysql_query($query) or die("Query failed : " . mysql_error());
-            $bestscores = mysql_result($result,0,0);
-            $bsp = explode(';',$bestscores);
 
-            $scores = array();
-            $i = 0;
-            while (isset($_POST[$i]) || isset($_POST["$i-0"])) {
-                $j=0;
-                $scpt = array();
-                if (isset($_POST["$i-0"])) {
+$coursetheme = 'default.css';
+$useeditor='review';
+$sessiondata['coursetheme'] = $coursetheme;
+$sessiondata['isteacher'] = $isteacher;
 
-                    while (isset($_POST["$i-$j"])) {
-                        if ($_POST["$i-$j"]!='N/A' && $_POST["$i-$j"]!='NA') {
-                            $scpt[$j] = $_POST["$i-$j"];
-                        } else {
-                            $scpt[$j] = -1;
-                        }
-                        $j++;
-                    }
-                    $scores[$i] = implode('~',$scpt);
-                } else {
-                    if ($_POST[$i]!='N/A' && $_POST["$i-$j"]!='NA') {
-                        $scores[$i] = $_POST[$i];
-                    } else {
-                        $scores[$i] = -1;
-                    }
-                }
-                $i++;
-            }
-            $scorelist = implode(",",$scores);
-            if (count($bsp)>1) { //tack on rawscores and firstscores
-                $scorelist .= ';'.$bsp[1].';'.$bsp[2];
-            }
-            $feedback = $_POST['feedback'];
-            $query = "UPDATE imas_assessment_sessions SET bestscores='$scorelist',feedback='$feedback'";
-            if (isset($_POST['updategroup'])) {
-                $qp = getasidquery($_GET['asid']);
-                $query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-                //$query .= getasidquery($_GET['asid']);
-            } else {
-                $query .= "WHERE id='{$_GET['asid']}'";
-            }
-            $q2 = "SELECT assessmentid,lti_sourcedid FROM imas_assessment_sessions WHERE id='{$_GET['asid']}'";
-            $res = mysql_query($q2) or die("Query failed : $q2 " . mysql_error());
-            $row = mysql_fetch_row($res);
-            $aid = $row[0];
-            if (strlen($row[1])>1) {
-                //update LTI score
-                require_once("../includes/ltioutcomes.php");
-                calcandupdateLTIgrade($row[1],$row[0],$scores);
-            }
-        } else {
-            echo "No authority to change scores.";
-            exit;
-        }
-        mysql_query($query) or die("Query failed : $query " . mysql_error());
-        if ($from=='isolate') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessgrade.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
-        } else if ($from=='gisolate') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/isolateassessbygroup.php?stu=$stu&cid={$_GET['cid']}&aid=$aid&gbmode=$gbmode");
-        } else if ($from=='stugrp') {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/managestugrps.php?cid={$_GET['cid']}&aid=$aid");
-        } else {
-            header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/gradebook.php?stu=$stu&cid={$_GET['cid']}&gbmode=$gbmode");
-        }
-        exit;
-    }
-    $coursetheme = 'default.css';
-    $useeditor='review';
-    $sessiondata['coursetheme'] = $coursetheme;
-    $sessiondata['isteacher'] = $isteacher;
+if ($isteacher || $istutor) {
+    $placeinhead = '<script type="text/javascript" src="'.AppUtility::getBasePath().'/web/js/gradebook/rubric.js?v=070113"></script>';
 
-    if ($isteacher || $istutor) {
-        $placeinhead = '<script type="text/javascript" src="'.AppUtility::getBasePath().'/web/js/gradebook/rubric.js?v=070113"></script>';
+}
+echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
 
-    }
-    echo "<style type=\"text/css\">p.tips {	display: none;}\n</style>\n";
+if (isset($_GET['starttime']) && $isteacher) {
+    $query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
+    //$query .= getasidquery($_GET['asid']);
+    $qp = getasidquery($_GET['asid']);
+    $query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
+    mysql_query($query) or die("Query failed : $query " . mysql_error());
+}
 
-    if (isset($_GET['starttime']) && $isteacher) {
-        $query = "UPDATE imas_assessment_sessions SET starttime='{$_GET['starttime']}' ";//WHERE id='{$_GET['asid']}'";
-        //$query .= getasidquery($_GET['asid']);
-        $qp = getasidquery($_GET['asid']);
-        $query .=  " WHERE {$qp[0]}='{$qp[1]}' AND assessmentid='{$qp[2]}'";
-        mysql_query($query) or die("Query failed : $query " . mysql_error());
-    }
-    if (!$assessmentData) {
-        echo "uh oh.  Bad assessment id";
-        exit;
-    }
-    $line=$assessmentData;
-    if (!$isteacher && !$istutor) {
-        $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
-        $query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
-        mysql_query($query) or die("Query failed : " . mysql_error());
-    }
+if (!$assessmentData) {
+    echo "uh oh.  Bad assessment id";
+    exit;
+}
+$line=$assessmentData;
+echo "<div class=breadcrumb>$breadcrumbbase ";
+if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
+    echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
 
-    echo "<div class=breadcrumb>$breadcrumbbase ";
-    if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-        echo "<a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> &gt; ";
-
-        if ($stu>0) {
-            echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-            echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
-            $backurl = "gradebook.php?stu=$stu&cid=$cid";
-        } else if ($_GET['from']=="isolate") {
-            echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-            echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
-            $backurl = "isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}";
-        } else if ($_GET['from']=="gisolate") {
-            echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-            echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
-            $backurl = "isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}";
-        } else if ($_GET['from']=='stugrp') {
-            echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
-            $backurl = "managestugrps.php?cid=$cid&aid={$line['assessmentid']}";
-        } else {
-            echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
-            $backurl = "gradebook.php?stu=0&cid=$cid";
-        }
-    }
-    echo "Detail</div>";
-    echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
-
-     echo "<h3>{$studntData[1]}, {$studntData[0]}</h3>\n";
-
-    //do time limit mult
-    $timelimitmult = $studntData[2];
-    $line['timelimit'] *= $timelimitmult;
-    $teacherreview = $params['uid'];
-
-    if ($isteacher || ($istutor && $line['tutoredit']==1)) {
-        $canedit = 1;
+    if ($stu>0) {
+        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> &gt; ";
+        $backurl = "gradebook.php?stu=$stu&cid=$cid";
+    } else if ($_GET['from']=="isolate") {
+        echo " <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}\">View Scores</a> &gt; ";
+        $backurl = "isolateassessgrade.php?cid=$cid&aid={$line['assessmentid']}";
+    } else if ($_GET['from']=="gisolate") {
+        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+        echo "&gt; <a href=\"isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}\">View Group Scores</a> &gt; ";
+        $backurl = "isolateassessbygroup.php?cid=$cid&aid={$line['assessmentid']}";
+    } else if ($_GET['from']=='stugrp') {
+        echo "<a href=\"managestugrps.php?cid=$cid&aid={$line['assessmentid']}\">Student Groups</a> &gt; ";
+        $backurl = "managestugrps.php?cid=$cid&aid={$line['assessmentid']}";
     } else {
-        $canedit = 0;
+        echo "<a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> &gt; ";
+        $backurl = "gradebook.php?stu=0&cid=$cid";
     }
-    if ($canedit) {
+}
+echo "Detail</div>";
+echo '<div id="headergb-viewasid" class="pagetitle"><h2>Grade Book Detail</h2></div>';
 
-//        $query = "SELECT id,rubrictype,rubric FROM imas_rubrics WHERE id IN ";
-//        $query .= "(SELECT DISTINCT rubric FROM imas_questions WHERE assessmentid={$line['assessmentid']} AND rubric>0)";
-//        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-//        if (mysql_num_rows($result)>0) {
-//            $rubrics = array();
-//            while ($row = mysql_fetch_row($result)) {
-//                $rubrics[] = $row;
-//            }
-//            echo printrubrics($rubrics);
-//        }
-//        unset($rubrics);
-    }
+echo "<h3>{$studentData[1]}, {$studentData[0]}</h3>\n";
 
-    list($testtype,$showans) = explode('-',$line['deffeedback']);
-    if ($showans=='N' && !$isteacher && !$istutor) {
-        echo "You shouldn't be here";
-        require("../footer.php");
-        exit;
-    }
-    echo "<h4>{$line['name']}</h4>\n";
-    $aid = $line['assessmentid'];
+//do time limit mult
+$timelimitmult = $studntData[2];
+$line['timelimit'] *= $timelimitmult;
+$teacherreview = $params['uid'];
 
-    if (($isteacher || $istutor) && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
-        if ($line['agroupid']>0) {
-            $q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
-            $q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
-            $result = mysql_query($q2) or die("Query failed : " . mysql_error());
-            echo "<p>Group members: <ul>";
-            while ($row = mysql_fetch_row($result)) {
-                echo "<li>{$row[0]}, {$row[1]}</li>";
+if ($canedit) {
+         if ($rubricsData) {
+            $rubrics = array();
+            $tempRubrics = array();
+            foreach($rubricsData as $rubric){
+                $tempRubrics[0] = $rubric['id'];
+                $tempRubrics[1] = $rubric['rubrictype'];
+                $tempRubrics[2] = $rubric['rubric'];
+                array_push($rubrics,$tempRubrics);
             }
-            echo "</ul></p>";
+            echo printrubrics($rubrics);
         }
-    }
+        unset($rubrics);
+}
 
-    if ($line['starttime']==0) {
-        echo '<p>Started: Not yet started<br/>';
+list($testtype,$showans) = explode('-',$line['deffeedback']);
+if ($showans=='N' && !$isteacher && !$istutor) {
+    echo "You shouldn't be here";
+    exit;
+}
+echo "<h4>{$line['name']}</h4>\n";
+$aid = $line['assessmentid'];
+
+if (($isteacher || $istutor) && !isset($params['lastver']) && !isset($params['reviewver'])) {
+    if ($line['agroupid']>0) {
+        $q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
+        $q2 .= "i_u.id=i_a_s.userid AND i_a_s.assessmentid='$aid' AND i_a_s.agroupid='{$line['agroupid']}' ORDER BY LastName,FirstName";
+        $result = mysql_query($q2) or die("Query failed : " . mysql_error());
+        echo "<p>Group members: <ul>";
+        while ($row = mysql_fetch_row($result)) {
+            echo "<li>{$row[0]}, {$row[1]}</li>";
+        }
+        echo "</ul></p>";
+    }
+}
+
+if ($line['starttime']==0) {
+    echo '<p>Started: Not yet started<br/>';
+} else {
+    echo "<p>Started: " .AppUtility::tzdate("F j, Y, g:i a",$line['starttime']) ."<br/>\n";
+}
+if ($line['endtime']==0) {
+    echo "Not Submitted</p>\n";
+} else {
+    echo "Last change: " . AppUtility::tzdate("F j, Y, g:i a",$line['endtime']) . "<br/>";
+    $timespent = round(($line['endtime']-$line['starttime'])/60);
+    if ($timespent<250) {
+        echo "Time spent: ". $timespent . " minutes<br/>\n";
+    }
+    $timeontask = array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
+    if ($timeontask>0) {
+        echo "Total time questions were on-screen: ". round($timeontask/60,1) . " minutes.\n";
+    }
+    echo '</p>';
+}
+$saenddate = $line['enddate'];
+unset($exped);
+if ($exceptionData['enddate']) {
+    $exped = $exceptionData['enddate'];
+    if ($exped>$saenddate)
+    {
+        $saenddate = $exped;
+    }
+}
+
+if ($isteacher) {
+    if (isset($exped) && $exped!=$line['enddate']) {
+        echo "<p>Has exception, with due date: ".AppUtility::tzdate("F j, Y, g:i a",$exped);
+        echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
+        echo "<br/>Original Due Date: ". AppUtility::tzdate("F j, Y, g:i a",$line['enddate']);
     } else {
-        echo "<p>Started: " .AppUtility::tzdate("F j, Y, g:i a",$line['starttime']) ."<br/>\n";
+        echo "<p>Due Date: ". AppUtility::tzdate("F j, Y, g:i a",$line['enddate']);
+        echo "  <button type=\"button\" onclick=\"window.location.href='exception?cid=$course->id&aid={$line['assessmentid']}&uid={$params['uid']}&asid={$params['asid']}&from=$from&stu=$stu'\">Make Exception</button>";
     }
-    if ($line['endtime']==0) {
-        echo "Not Submitted</p>\n";
-    } else {
-        echo "Last change: " . AppUtility::tzdate("F j, Y, g:i a",$line['endtime']) . "<br/>";
-        $timespent = round(($line['endtime']-$line['starttime'])/60);
-        if ($timespent<250) {
-            echo "Time spent: ". $timespent . " minutes<br/>\n";
-        }
-        $timeontask = array_sum(explode(',',str_replace('~',',',$line['timeontask'])));
-        if ($timeontask>0) {
-            echo "Total time questions were on-screen: ". round($timeontask/60,1) . " minutes.\n";
-        }
-        echo '</p>';
-    }
-    $saenddate = $line['enddate'];
-    unset($exped);
-//    $query = "SELECT enddate FROM imas_exceptions WHERE userid='{$_GET['uid']}' AND assessmentid='{$line['assessmentid']}'";
-//    $r2 = mysql_query($query) or die("Query failed : " . mysql_error());
-    if ($exceptionData['enddate']) {
-        $exped = $exceptionData['enddate'];
+    echo "</p>";
+}
+if ($isteacher) {
+    if ($line['agroupid']>0) {
+        echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. "; ?>
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$course->id.'&asid='.$params['asid'].'&from='.$from.'&uid='.$params['uid'].'&breakfromgroup=true');?> ">Separate from Group</a></p>
+    <?php }
+}
+?>
+ <form id="mainform" method=post action="gradebook-view-assessment-details?stu=<?php echo $stu ?>&cid=<?php echo $course->id ?>&from=<?php echo $from ?>&asid=<?php echo $asid ?>&update=true">
 
-        if ($exped>$saenddate) {
-            $saenddate = $exped;
-        }
-    }
-
-    if ($isteacher) {
-        if (isset($exped) && $exped!=$line['enddate']) {
-            echo "<p>Has exception, with due date: ".AppUtility::tzdate("F j, Y, g:i a",$exped);
-            echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Edit Exception</button>";
-            echo "<br/>Original Due Date: ". AppUtility::tzdate("F j, Y, g:i a",$line['enddate']);
-        } else {
-            echo "<p>Due Date: ". AppUtility::tzdate("F j, Y, g:i a",$line['enddate']);
-            echo "  <button type=\"button\" onclick=\"window.location.href='exception.php?cid=$cid&aid={$line['assessmentid']}&uid={$_GET['uid']}&asid={$_GET['asid']}&from=$from&stu=$stu'\">Make Exception</button>";
-        }
-        echo "</p>";
-    }
-    if ($isteacher) {
-        if ($line['agroupid']>0) {
-            echo "<p>This assignment is linked to a group.  Changes will affect the group unless specified. ";
-            echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&breakfromgroup=true\">Separate from Group</a></p>";
-        }
-    }
-    echo "<form id=\"mainform\" method=post action=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&update=true\">\n";
-
-    if ($isteacher) { ?>
-<!--        echo "<div class=\"cpmid\"><a href=\"--><?php //echo ?><!--gb-viewasid.php?stu=$stu&cid=$course->id&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearattempt=true\" onmouseover=\"tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')\" onmouseout=\"tipout()\">Clear Attempt</a> | ";-->
-    <div class="cpmid"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$course->id.'&asid='.$_GET['asid'].'&from='.$from.'&uid='.$_GET['uid'].'&clearattempt=true'); ?>" onmouseover="tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')" onmouseout="tipout()">Clear Attempt</a> |
-    <?php echo "<a href=\"gb-viewasid.php?stu=$stu&cid=$cid&asid={$_GET['asid']}&from=$from&uid={$_GET['uid']}&clearscores=true\" onmouseover=\"tipshow(this,'Clear scores and attempts, but keep same versions of questions')\" onmouseout=\"tipout()\">Clear Scores</a> | ";
-        echo "<a href=\"#\" onclick=\"markallfullscore();$('#uppersubmit').show();return false;\" onmouseover=\"tipshow(this,'Change all scores to full credit')\" onmouseout=\"tipout()\">All Full Credit</a> ";
-        echo '<input style="display:none;" id="uppersubmit" type="submit" value="Record Changed Grades"> | ';
-        echo "<a href=\"$imasroot/assessment/showtest.php?cid=$cid&id={$line['assessmentid']}&actas={$_GET['uid']}\" onmouseover=\"tipshow(this,'Take on role of this student, bypassing date restrictions, to submit answers')\" onmouseout=\"tipout()\">View as student</a> | ";
-        echo "<a href=\"$imasroot/assessment/printtest.php?cid=$cid&asid={$_GET['asid']}\" target=\"_blank\" onmouseover=\"tipshow(this,'Pull up a print version of this student\'s assessment')\" onmouseout=\"tipout()\">Print Version</a> ";
-
-        echo "</div>\n";
-    }
-
+    <?php if ($isteacher) { ?>
+<div class="cpmid"><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$course->id.'&asid='.$params['asid'].'&from='.$from.'&uid='.$params['uid'].'&clearattempt=true'); ?>" onmouseover="tipshow(this,'Clear everything, resetting things like the student never started.  Student will get new versions of questions.')" onmouseout="tipout()">Clear Attempt</a> |
+ <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$course->id.'&asid='.$params['asid'].'&from='.$from.'&uid='.$params['uid'].'&clearscores=true')?>"  onmouseover="tipshow(this,'Clear scores and attempts, but keep same versions of questions')" onmouseout="tipout()">Clear Scores</a> |
+     <a href="#" onclick="markallfullscore();$('#uppersubmit').show();return false;" onmouseover="tipshow(this,'Change all scores to full credit')" onmouseout="tipout()">All Full Credit</a>
+        <input style="display:none;" id="uppersubmit" type="submit" value="Record Changed Grades"> |
+        <a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/show-test?cid='.$course->id.'&id='.$line['assessmentid'].'&actas='.$params['uid']);?> " onmouseover="tipshow(this,'Take on role of this student, bypassing date restrictions, to submit answers')" onmouseout="tipout()">View as student</a> |
+       <a href="<?php echo AppUtility::getURLFromHome('assessment','assessment/print-test?cid='.$course->id.'&asid='.$params['asid']);?>" target="_blank" onmouseover="tipshow(this,'Pull up a print version of this student\'s assessment')" onmouseout="tipout()">Print Version</a>
+     </div>
+    <?php }
     if (($line['timelimit']>0) && ($line['endtime'] - $line['starttime'] > $line['timelimit'])) {
         $over = $line['endtime']-$line['starttime'] - $line['timelimit'];
-        echo "<p>Time limit exceeded by ";
+        ?> <p> <?php echo " Time limit exceeded by ";
         if ($over > 60) {
             $overmin = floor($over/60);
             echo "$overmin minutes, ";
@@ -524,11 +308,11 @@ if ($links==0) { //View/Edit full assessment
         }
         echo "$over seconds.<BR>\n";
         $reset = $line['endtime']-$line['timelimit'];
-        if ($isteacher) {
-            echo "<a href=\"gb-viewasid.php?stu=$stu&starttime=$reset&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Clear overtime and accept grade</a></p>\n";
+        if ($isteacher) { ?>
+        <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&starttime='.$reset.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid'])?>" > Clear overtime and accept grade </a> </p>
+        <?php
         }
     }
-
     if (strpos($line['questions'],';')===false) {
         $questions = explode(",",$line['questions']);
         $bestquestions = $questions;
@@ -537,50 +321,51 @@ if ($links==0) { //View/Edit full assessment
         $questions = explode(",",$questions);
         $bestquestions = explode(",",$bestquestions);
     }
+
     if ($line['timeontask']=='') {
         $timesontask = array_fill(0,count($questions),'');
     } else {
         $timesontask = explode(',',$line['timeontask']);
     }
-    if (isset($_GET['lastver'])) {
+
+    if (isset($params['lastver'])) {
         $seeds = explode(",",$line['seeds']);
         $sp = explode(";",$line['scores']);
         $scores = explode(",",$sp[0]);
         if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
         $attempts = explode(",",$line['attempts']);
-        $lastanswers = explode("~",$line['lastanswers']);
-        echo "<p>";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
-        echo "<b>Showing Last Attempts</b> | ";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
-        echo "</p>";
-    } else if (isset($_GET['reviewver'])) {
+        $lastanswers = explode("~",$line['lastanswers']); ?>
+         <p>
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid'])?> ">Show Scored Attempts</a> |
+         <b>Showing Last Attempts</b> |
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid'].'&reviewver=1')?> ">Show Review Attempts</a>
+         </p>
+    <?php } else if (isset($params['reviewver'])) {
         $seeds = explode(",",$line['reviewseeds']);
         $sp = explode(";",$line['reviewscores']);
         $scores = explode(",",$sp[0]);
         if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
         $attempts = explode(",",$line['reviewattempts']);
-        $lastanswers = explode("~",$line['reviewlastanswers']);
-        echo "<p>";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}\">Show Scored Attempts</a> | ";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&from=$from&cid=$cid&uid={$_GET['uid']}&lastver=1\">Show Last Graded Attempts</a> | ";
-        echo "<b>Showing Review Attempts</b>";
-        echo "</p>";
-    }else {
-
+        $lastanswers = explode("~",$line['reviewlastanswers']); ?>
+         <p>
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid'] )?> ">Show Scored Attempts</a> |
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&from='.$from.'&cid='.$course->id.'&uid='.$params['uid'].'&lastver=1')?> ">Show Last Graded Attempts</a> |
+         <b>Showing Review Attempts</b>
+         </p>
+    <?php }else {
         $seeds = explode(",",$line['bestseeds']);
         $sp = explode(";",$line['bestscores']);
         $scores = explode(",",$sp[0]);
+
         if (isset($sp[1])) {$rawscores = explode(",",$sp[1]);}
         $attempts = explode(",",$line['bestattempts']);
         $lastanswers = explode("~",$line['bestlastanswers']);
-        $questions = $bestquestions;
-        echo "<p><b>Showing Scored Attempts</b> | ";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&from=$from&uid={$_GET['uid']}&lastver=1\">Show Last Attempts</a> | ";
-        echo "<a href=\"gb-viewasid.php?stu=$stu&asid={$_GET['asid']}&cid=$cid&from=$from&uid={$_GET['uid']}&reviewver=1\">Show Review Attempts</a>";
-        echo "</p>";
-    }
-
+        $questions = $bestquestions; ?>
+         <p><b>Showing Scored Attempts</b> |
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&cid='.$course->id.'&from='.$from.'&uid='.$params['uid'].'&lastver=1');?>  ">Show Last Attempts</a> |
+         <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&asid='.$params['asid'].'&cid='.$course->id.'&from='.$from.'&uid='.$params['uid'].'&reviewver=1');?> ">Show Review Attempts</a>
+         </p>
+   <?php  }
     $totalpossible = 0;
     $pts = array();
     $withdrawn = array();
@@ -597,21 +382,7 @@ if ($links==0) { //View/Edit full assessment
         $withdrawn[$r[0]] = $r[2];
         $rubric[$r[0]] = $r[5];
         if ($r[3]=='multipart') {
-            //if (preg_match('/answeights\s*=\s*("|\')([\d\.\,\s]+)/',$line['control'],$match)) {
-            /*if (($p = strpos($r[4],'answeights'))!==false) {
-                $p = strpos($r[4],"\n",$p);
-                $answeights[$r[0]] = getansweights($r[0],$r[4]);
-            } else {
-                preg_match('/anstypes(.*)/',$r[4],$match);
-                $n = substr_count($match[1],',')+1;
-                if ($n>1) {
-                    $answeights[$r[0]] = array_fill(0,$n-1,round(1/$n,3));
-                    $answeights[$r[0]][] = 1-array_sum($answeights[$r[0]]);
-                } else {
-                    $answeights[$r[0]] = array(1);
-                }
-            }
-            */
+
             $answeights[$r[0]] = getansweights($r[0],$r[4],$questions,$seeds);
             for ($i=0; $i<count($answeights[$r[0]])-1; $i++) {
                 $answeights[$r[0]][$i] = round($answeights[$r[0]][$i]*$pts[$r[0]],2);
@@ -744,13 +515,11 @@ if ($links==0) { //View/Edit full assessment
             echo 'class="iswrong"';
         }
         $totalpossible += $pts[$questions[$i]];
+
         echo '>';
 
-
         foreach($librariesName as $libraryName){
-            if($libraryName[0] == $questions[$i]){
-
-
+            if($libraryName['questionId'] == $questions[$i]){
                 if ($libraryName[2]==null) {
                     list($qsetid,$cat) = array($libraryName[0],$libraryName[1]);
                 } else {
@@ -759,6 +528,7 @@ if ($links==0) { //View/Edit full assessment
 
             }
         }
+
         if ($isteacher || $istutor || ($testtype=="Practice" && $showans!="V") || ($testtype!="Practice" && (($showans=="I"  && !in_array(-1,$scores))|| ($showans!="V" && time()>$saenddate)))) {$showa=true;} else {$showa=false;}
 
         if (isset($answeights[$questions[$i]])) {
@@ -768,7 +538,7 @@ if ($links==0) { //View/Edit full assessment
         }
 
         if (isset($rawscores[$i])) {
-            //$colors = scorestocolors($rawscores[$i],$pts[$questions[$i]],$answeights[$questions[$i]],false);
+
             if (strpos($rawscores[$i],'~')!==false) {
                 $colors = explode('~',$rawscores[$i]);
             } else {
@@ -779,38 +549,8 @@ if ($links==0) { //View/Edit full assessment
         }
         $capturechoices = true;
         $choicesdata = array();
-        $questionSet =array();
-        $finalQuestionImages =array();
-        foreach($questionSetData as $singleQuestionSetData){
-            if($singleQuestionSetData['id'] == $qsetid){
 
-                $tempArray = array(
-                    'qtype' => $singleQuestionSetData['qtype'],
-                'control' => $singleQuestionSetData['control'],
-                'qcontrol' =>$singleQuestionSetData['qcontrol'],
-                    'qtext' => $singleQuestionSetData['qtext'],
-                'answer' => $singleQuestionSetData['answer'],
-                'hasimg' => $singleQuestionSetData['hasimg'],
-                'extref' => $singleQuestionSetData['extref'],
-                'solution' => $singleQuestionSetData['solution'],
-                    'solutionopts' => $singleQuestionSetData['solutionopts']
-                );
-                array_push($questionSet ,$tempArray);
-            }
-            if(count($questionImages) > 0){
-                foreach($questionImages as $questionImage){
-                    if($questionImage['qsetid'] == $qsetid){
-                        $tempArray = array(
-                            'var' => $questionImage['var'],
-                        'filename' => $questionImage['filename'],
-                        'alttext' => $questionImage['alttext']
-                        );
-                        array_push($finalQuestionImages,$tempArray);
-                    }
-                }
-            }
-        }
-        $qtypes = displayq2::displayq($i,$questionSet,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors,$finalQuestionImages);
+        $qtypes = displayq($i,$qsetid,$seeds[$i],$showa,false,$attempts[$i],false,false,false,$colors);
         echo '</div>';
         if ($scores[$i]==-1) { $scores[$i]="N/A";} else {$total+=getpts($scores[$i]);}
         echo "<div class=review>Question ".($i+1).": ";
@@ -955,7 +695,7 @@ if ($links==0) { //View/Edit full assessment
                     }
                 }
             }
-            if ($timesontask[$i]!='' && !isset($_GET['reviewver'])) {
+            if ($timesontask[$i]!='' && !isset($params['reviewver'])) {
                 echo '<br/>Average time per submission: ';
                 $timesarr = explode('~',$timesontask[$i]);
                 $avgtime = array_sum($timesarr)/count($timesarr);
@@ -966,21 +706,16 @@ if ($links==0) { //View/Edit full assessment
                 }
                 echo '<br/>';
             }
-            if ($isteacher) {
-                echo "<br/><a target=\"_blank\" href=\"$imasroot/msgs/msglist.php?cid=$cid&add=new&quoteq=$i-$qsetid-{$seeds[$i]}-{$line['assessmentid']}&to={$_GET['uid']}\">Use in Msg</a>";
-                //having issues with greybox in assessments
-                //echo '<br/>';
-                //echo "<a href=\"#\" onclick=\"GB_show('Send Message','$imasroot/course/sendmsgmodal.php?sendtype=msg&cid=$cid&quoteq=$i-$qsetid-{$seeds[$i]}&to={$_GET['uid']}',800,'auto')\" title=\"Send Message\">", _('Use in Message'), "</a>";
 
+            if ($isteacher) { ?>
 
-                echo " | <a href=\"gb-viewasid.php?stu=$stu&cid=$cid&from=$from&asid={$_GET['asid']}&uid={$_GET['uid']}&clearq=$i\">Clear Score</a> ";
-                echo "(Question ID: <a href=\"$imasroot/course/moddataset.php?id=$qsetid&cid=$cid&qid={$questions[$i]}&aid=$aid\">$qsetid</a>";
-                if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) {
-                    echo ". <a href=\"$imasroot/msgs/msglist.php?add=new&cid={$CFG['GEN']['sendquestionproblemsthroughcourse']}&to={$owners[$questions[$i]]}&title=Problem%20with%20question%20id%20$qsetid\" target=\"_blank\">Message owner</a> to report problems.";
-                }
+                 <br><a target="_blank" href="<?php echo AppUtility::getURLFromHome('message','message/index?cid='.$course->id.'&add=new&quoteq='.$i.'-'.$qsetid.'-'.$seeds[$i].'-'.$line['assessmentid'].'&to='.$params['uid']);?> ">Use in Msg</a>
+                 | <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook-view-assessment-details?stu='.$stu.'&cid='.$course->id.'&from='.$from.'&asid='.$params['asid'].'&uid='.$params['uid'].'&clearq='.$i);?> ">Clear Score</a>
+                  (Question ID: <a href="<?php echo AppUtility::getURLFromHome('question','question/mod-data-set?id='.$qsetid.'&cid='.$cid.'&qid='.$questions[$i].'&aid='.$aid);?>  "><?php echo $qsetid ?></a>
+                <?php  if (isset($CFG['GEN']['sendquestionproblemsthroughcourse'])) { ?>
+                     <a href="<?php echo AppUtility::getURLFromHome('message','message/index?add=new&cid='.$CFG['GEN']['sendquestionproblemsthroughcourse'].'&to='.$owners[$questions[$i]].'&title=Problem%20with%20question%20id%20'.$qsetid);?> " target="_blank">Message owner</a> to report problems.
+               <?php }
                 echo ')';
-
-
                 if (isset($extref[$questions[$i]])) {
                     echo "&nbsp; Had help available: ";
                     foreach ($extref[$questions[$i]] as $v) {
@@ -996,15 +731,15 @@ if ($links==0) { //View/Edit full assessment
     }
 
     echo "<p></p><div class=review>Total: $total/$totalpossible</div>\n";
-    if ($canedit && !isset($_GET['lastver']) && !isset($_GET['reviewver'])) {
+    if ($canedit && !isset($params['lastver']) && !isset($params['reviewver'])) {
         echo "<p>Feedback to student:<br/><textarea cols=60 rows=4 id=\"feedback\" name=\"feedback\">{$line['feedback']}</textarea></p>";
         if ($line['agroupid']>0) {
             echo "<p>Update grade for all group members? <input type=checkbox name=\"updategroup\" checked=\"checked\" /></p>";
         }
         echo "<p><input type=submit value=\"Record Changed Grades\"> ";
-        if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-            echo "<a href=\"$backurl\">Return to GradeBook without saving</a></p>\n";
-        }
+        if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) { ?>
+             <a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?cid='.$course->id);?>">Return to GradeBook without saving</a>
+        <?php }
         /*
         if ($line['agroupid']>0) {
             $q2 = "SELECT i_u.LastName,i_u.FirstName FROM imas_assessment_sessions AS i_a_s,imas_users AS i_u WHERE ";
@@ -1020,306 +755,301 @@ if ($links==0) { //View/Edit full assessment
 
     } else if (trim($line['feedback'])!='') {
         echo "<p>Instructor Feedback:<div class=\"intro\">{$line['feedback']}</div></p>";
-        if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) {
-            echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
-        }
+        if (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0) { ?>
+             <p><a href="<?php echo AppUtility::getURLFromHome('gradebook','gradebook/gradebook?stu='.$stu.'&cid='.$course->id);?> ">Return to GradeBook</a></p>
+       <?php  }
     }
     echo "</form>";
     echo '<p>&nbsp;</p>';
-
-     if ($countOfQuestion > 0) {
-          CategoryScoresUtility::catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
+    if ($countOfQuestion > 0) {
+        CategoryScoresUtility::catscores($questions,$scores,$line['defpoints'], $line['defoutcome'],$cid);
     }
+    } else if ($links==1) { //show grade detail question/category breakdown
+        echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
+        echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
+        if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
+        echo "&gt; Detail</div>";
+        echo "<h2>Grade Book Detail</h2>\n";
+        $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
+        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
+        $row = mysql_fetch_row($result);
+        echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
 
-} else if ($links==1) { //show grade detail question/category breakdown
+        $query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessment_sessions.* ";
+        $query .= "FROM imas_assessments,imas_assessment_sessions ";
+        $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
+        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+        $line=mysql_fetch_array($result, MYSQL_ASSOC);
 
-    echo "<div class=breadcrumb>$breadcrumbbase <a href=\"course.php?cid={$_GET['cid']}\">$coursename</a> ";
-    echo "&gt; <a href=\"gradebook.php?stu=0&cid=$cid\">Gradebook</a> ";
-    if ($stu>0) {echo "&gt; <a href=\"gradebook.php?stu=$stu&cid=$cid\">Student Detail</a> ";}
-    echo "&gt; Detail</div>";
-    echo "<h2>Grade Book Detail</h2>\n";
-    $query = "SELECT FirstName,LastName FROM imas_users WHERE id='{$_GET['uid']}'";
-    $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-    $row = mysql_fetch_row($result);
-    echo "<h3>{$row[1]}, {$row[0]}</h3>\n";
+        if (!$isteacher && !$istutor) {
+            $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
+            $query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
+            mysql_query($query) or die("Query failed : " . mysql_error());
+        }
 
-    $query = "SELECT imas_assessments.name,imas_assessments.defpoints,imas_assessments.defoutcome,imas_assessment_sessions.* ";
-    $query .= "FROM imas_assessments,imas_assessment_sessions ";
-    $query .= "WHERE imas_assessments.id=imas_assessment_sessions.assessmentid AND imas_assessment_sessions.id='{$_GET['asid']}'";
-    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-    $line=mysql_fetch_array($result, MYSQL_ASSOC);
-
-    if (!$isteacher && !$istutor) {
-        $query = "INSERT INTO imas_content_track (userid,courseid,type,typeid,viewtime) VALUES ";
-        $query .= "($userid,'$cid','gbviewasid','{$line['assessmentid']}',$now)";
-        mysql_query($query) or die("Query failed : " . mysql_error());
-    }
-
-    echo "<h4>{$line['name']}</h4>\n";
-    echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
-    if ($line['endtime']==0) {
-        echo "Not Submitted</p>\n";
-    } else {
-        echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "</p>\n";
-    }
+        echo "<h4>{$line['name']}</h4>\n";
+        echo "<p>Started: " . tzdate("F j, Y, g:i a",$line['starttime']) ."<BR>\n";
+        if ($line['endtime']==0) {
+            echo "Not Submitted</p>\n";
+        } else {
+            echo "Last change: " . tzdate("F j, Y, g:i a",$line['endtime']) . "</p>\n";
+        }
 
 
-    $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
-    $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
-    if (mysql_result($result,0,0)>0) {
-        include("../assessment/catscores.php");
+        $query = "SELECT COUNT(id) from imas_questions WHERE assessmentid='{$line['assessmentid']}' AND category<>'0'";
+        $result = mysql_query($query) or die("Query failed : $query;  " . mysql_error());
+        if (mysql_result($result,0,0)>0) {
+            include("../assessment/catscores.php");
+            $sp = explode(';',$line['bestscores']);
+            catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
+        }
+
+        $scores = array();
+        $qs = explode(',',$line['questions']);
         $sp = explode(';',$line['bestscores']);
-        catscores(explode(',',$line['questions']),explode(',',$sp[0]),$line['defpoints'], $line['defoutcome'],$cid);
-    }
-
-    $scores = array();
-    $qs = explode(',',$line['questions']);
-    $sp = explode(';',$line['bestscores']);
-    foreach(explode(',',$sp[0]) as $k=>$score) {
-        $scores[$qs[$k]] = getpts($score);
-    }
-
-    echo "<h4>Question Breakdown</h4>\n";
-    echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
-    $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
-    $query .= " AND imas_questions.id IN ({$line['questions']})";
-    $result = mysql_query($query) or die("Query failed : " . mysql_error());
-    $i=1;
-    $totpt = 0;
-    $totposs = 0;
-    while ($row = mysql_fetch_row($result)) {
-        if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
-        echo '<td>';
-        if ($row[3]==1) {
-            echo '<span class="red">Withdrawn</span> ';
+        foreach(explode(',',$sp[0]) as $k=>$score) {
+            $scores[$qs[$k]] = getpts($score);
         }
-        echo $row[0];
-        echo "</td><td>{$scores[$row[1]]} / ";
-        if ($row[2]==9999) {
-            $poss= $line['defpoints'];
-        } else {
-            $poss = $row[2];
-        }
-        echo $poss;
 
-        echo "</td></tr>\n";
-        $i++;
-        $totpt += $scores[$row[1]];
-        $totposs += $poss;
-    }
-    echo "</table>\n";
-
-    $pc = round(100*$totpt/$totposs,1);
-    echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
-
-    echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
-    require("../footer.php");
-
-}
-
-function getpts($sc) {
-    if (strpos($sc,'~')===false) {
-        if ($sc>0) {
-            return $sc;
-        } else {
-            return 0;
-        }
-    } else {
-        $sc = explode('~',$sc);
-        $tot = 0;
-        foreach ($sc as $s) {
-            if ($s>0) {
-                $tot+=$s;
+        echo "<h4>Question Breakdown</h4>\n";
+        echo "<table cellpadding=5 class=gb><thead><tr><th>Question</th><th>Points / Possible</th></tr></thead><tbody>\n";
+        $query = "SELECT imas_questionset.description,imas_questions.id,imas_questions.points,imas_questions.withdrawn FROM imas_questionset,imas_questions WHERE imas_questionset.id=imas_questions.questionsetid";
+        $query .= " AND imas_questions.id IN ({$line['questions']})";
+        $result = mysql_query($query) or die("Query failed : " . mysql_error());
+        $i=1;
+        $totpt = 0;
+        $totposs = 0;
+        while ($row = mysql_fetch_row($result)) {
+            if ($i%2!=0) {echo "<tr class=even>"; } else {echo "<tr class=odd>";}
+            echo '<td>';
+            if ($row[3]==1) {
+                echo '<span class="red">Withdrawn</span> ';
             }
+            echo $row[0];
+            echo "</td><td>{$scores[$row[1]]} / ";
+            if ($row[2]==9999) {
+                $poss= $line['defpoints'];
+            } else {
+                $poss = $row[2];
+            }
+            echo $poss;
+
+            echo "</td></tr>\n";
+            $i++;
+            $totpt += $scores[$row[1]];
+            $totposs += $poss;
         }
-        return round($tot,1);
+        echo "</table>\n";
+
+        $pc = round(100*$totpt/$totposs,1);
+        echo "<p>Total:  $totpt / $totposs  ($pc %)</p>\n";
+
+        echo "<p><a href=\"gradebook.php?stu=$stu&cid=$cid\">Return to GradeBook</a></p>\n";
+        require("../footer.php");
+
     }
-}
-function isperfect($sc) {
-    if (strpos($sc,'~')===false) {
-        if ($sc==1) {
+
+    function getpts($sc) {
+        if (strpos($sc,'~')===false) {
+            if ($sc>0) {
+                return $sc;
+            } else {
+                return 0;
+            }
+        } else {
+            $sc = explode('~',$sc);
+            $tot = 0;
+            foreach ($sc as $s) {
+                if ($s>0) {
+                    $tot+=$s;
+                }
+            }
+            return round($tot,1);
+        }
+    }
+    function isperfect($sc) {
+        if (strpos($sc,'~')===false) {
+            if ($sc==1) {
+                return true;
+            }
+        } else if (strpos($sc,'.')===false && strpos($sc,'0')===false) {
             return true;
         }
-    } else if (strpos($sc,'.')===false && strpos($sc,'0')===false) {
-        return true;
+        return false;
     }
-    return false;
-}
 
-function printscore($sc) {
-    if (strpos($sc,'~')===false) {
+    function printscore($sc) {
+        if (strpos($sc,'~')===false) {
 
-        return array($sc,'');
-    } else {
-        $pts = getpts($sc);
-        $sc = str_replace('-1','N/A',$sc);
-        $sc = str_replace('~',', ',$sc);
-        return array($pts,$sc);
-    }
-}
-//evals a portion of the control section to extract the $answeights
-//which might be randomizer determined, hence the seed
-function getansweights($qi,$code,$questions,$seeds) {
-
-    if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
-        return array(1);
-    }
-    $i = array_search($qi,$questions);
-
-    return sandboxgetweights($code,$seeds[$i]);
-}
-
-function sandboxgetweights($code,$seed) {
-    srand($seed);
-    $code = interpretUtility::interpret('control','multipart',$code);
-    if (($p=strrpos($code,'answeights'))!==false) {
-        $np = strpos($code,"\n",$p);
-        if ($np !== false) {
-            $code = substr($code,0,$np).';if(isset($answeights)){return;};'.substr($code,$np);
+            return array($sc,'');
         } else {
-            $code .= ';if(isset($answeights)){return;};';
+            $pts = getpts($sc);
+            $sc = str_replace('-1','N/A',$sc);
+            $sc = str_replace('~',', ',$sc);
+            return array($pts,$sc);
         }
-        //$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
-    } else {
-        $p=strrpos($code,'answeights');
-        $np = strpos($code,"\n",$p);
-        if ($np !== false) {
-            $code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
-        } else {
-            $code .= ';if(isset($answeights)){return;};';
+    }
+    //evals a portion of the control section to extract the $answeights
+    //which might be randomizer determined, hence the seed
+    function getansweights($qi,$code,$questions,$seeds) {
+
+        if (preg_match('/scoremethod\s*=\s*"(singlescore|acct|allornothing)"/', $code)) {
+            return array(1);
         }
-        //$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
+        $i = array_search($qi,$questions);
+
+        return sandboxgetweights($code,$seeds[$i]);
     }
 
-    eval($code);
-    if (!isset($answeights)) {
-        if (!is_array($anstypes)) {
-            $anstypes = explode(",",$anstypes);
-        }
-        $n = count($anstypes);
-        if ($n>1) {
-            $answeights = array_fill(0,$n-1,round(1/$n,3));
-            $answeights[] = 1-array_sum($answeights);
-        } else {
-            $answeights = array(1);
-        }
-    } else if (!is_array($answeights)) {
-        $answeights =  explode(',',$answeights);
-    }
-    $sum = array_sum($answeights);
-    if ($sum==0) {$sum = 1;}
-    foreach ($answeights as $k=>$v) {
-        $answeights[$k] = $v/$sum;
-    }
-    return $answeights;
-}
-
-
-function isoktorec() {
-    global $isteacher, $istutor;
-    $oktorec = false;
-    if ($isteacher) {
-        $oktorec = true;
-    } else if ($istutor) {
-        $query = "SELECT ia.tutoredit FROM imas_assessments AS ia JOIN imas_assessment_sessions AS ias ON ia.id=ias.assessmentid ";
-        $query .= "WHERE ias.id='{$_GET['asid']}'";
-        $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
-        if (mysql_result($result,0,0)==1) {
-            $oktorec = true;
-        }
-    }
-    return $oktorec;
-}
-function scorestocolors($sc,$pts,$answ,$noraw) {
-    if (!$noraw) {
-        $pts = 1;
-    }
-    if (trim($sc)=='') {return '';}
-    if (strpos($sc,'~')===false) {
-        if ($pts==0) {
-            $color = 'ansgrn';
-        } else if ($sc<0) {
-            $color = '';
-        } else if ($sc==0) {
-            $color = 'ansred';
-        } else if ($pts-$sc<.011) {
-            $color = 'ansgrn';
-        } else {
-            $color = 'ansyel';
-        }
-        return array($color);
-    } else {
-        $scarr = explode('~',$sc);
-        if ($noraw) {
-            for ($i=0; $i<count($answ)-1; $i++) {
-                $answ[$i] = round($answ[$i]*$pts,2);
+    function sandboxgetweights($code,$seed) {
+        srand($seed);
+        $code = interpretUtility::interpret('control','multipart',$code);
+        if (($p=strrpos($code,'answeights'))!==false) {
+            $np = strpos($code,"\n",$p);
+            if ($np !== false) {
+                $code = substr($code,0,$np).';if(isset($answeights)){return;};'.substr($code,$np);
+            } else {
+                $code .= ';if(isset($answeights)){return;};';
             }
-            //adjust for rounding
-            $diff = $pts - array_sum($answ);
-            $answ[count($answ)-1] += $diff;
+            //$code = str_replace("\n",';if(isset($answeights)){return;};'."\n",$code);
         } else {
-            $answ = array_fill(0,count($scarr),1);
+            $p=strrpos($code,'answeights');
+            $np = strpos($code,"\n",$p);
+            if ($np !== false) {
+                $code = substr($code,0,$np).';if(isset($anstypes)){return;};'.substr($code,$np);
+            } else {
+                $code .= ';if(isset($answeights)){return;};';
+            }
+            //$code = str_replace("\n",';if(isset($anstypes)){return;};'."\n",$code);
         }
 
-        $out = array();
-        foreach ($scarr as $k=>$v) {
-            if ($answ[$k]==0) {
+        eval($code);
+        if (!isset($answeights)) {
+            if (!is_array($anstypes)) {
+                $anstypes = explode(",",$anstypes);
+            }
+            $n = count($anstypes);
+            if ($n>1) {
+                $answeights = array_fill(0,$n-1,round(1/$n,3));
+                $answeights[] = 1-array_sum($answeights);
+            } else {
+                $answeights = array(1);
+            }
+        } else if (!is_array($answeights)) {
+            $answeights =  explode(',',$answeights);
+        }
+        $sum = array_sum($answeights);
+        if ($sum==0) {$sum = 1;}
+        foreach ($answeights as $k=>$v) {
+            $answeights[$k] = $v/$sum;
+        }
+        return $answeights;
+    }
+
+    function scorestocolors($sc,$pts,$answ,$noraw) {
+        if (!$noraw) {
+            $pts = 1;
+        }
+        if (trim($sc)=='') {return '';}
+        if (strpos($sc,'~')===false) {
+            if ($pts==0) {
                 $color = 'ansgrn';
-            } else if ($v < 0) {
+            } else if ($sc<0) {
                 $color = '';
-            } else if ($v==0) {
+            } else if ($sc==0) {
                 $color = 'ansred';
-            } else if ($answ[$k]-$v < .011) {
+            } else if ($pts-$sc<.011) {
                 $color = 'ansgrn';
             } else {
                 $color = 'ansyel';
             }
-            $out[$k] = $color;
+            return array($color);
+        } else {
+            $scarr = explode('~',$sc);
+            if ($noraw) {
+                for ($i=0; $i<count($answ)-1; $i++) {
+                    $answ[$i] = round($answ[$i]*$pts,2);
+                }
+                //adjust for rounding
+                $diff = $pts - array_sum($answ);
+                $answ[count($answ)-1] += $diff;
+            } else {
+                $answ = array_fill(0,count($scarr),1);
+            }
+
+            $out = array();
+            foreach ($scarr as $k=>$v) {
+                if ($answ[$k]==0) {
+                    $color = 'ansgrn';
+                } else if ($v < 0) {
+                    $color = '';
+                } else if ($v==0) {
+                    $color = 'ansred';
+                } else if ($answ[$k]-$v < .011) {
+                    $color = 'ansgrn';
+                } else {
+                    $color = 'ansyel';
+                }
+                $out[$k] = $color;
+            }
+            return $out;
         }
+    }
+
+    function prepchoicedisp($v,$choicesdata) {
+        if ($v=='') {return '';}
+        foreach ($choicesdata[1] as $k=>$c) {
+            $c = str_replace('&','%%',$c);
+            $sh = strip_tags($c);
+            if (trim($sh)=='' || strpos($c,'<table')!==false) {
+                $sh = "[view]";
+            } else if (strlen($sh)>15) {
+                $sh = substr($sh,0,15).'...';
+            }
+            if ($sh!=$c) {
+                $choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.trim(str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401))).'\')" onmouseout="tipout()">'.$sh.'</span>';
+            }
+        }
+        if ($choicesdata[0]=='choices') {
+            return ($choicesdata[1][$v]);
+        } else if ($choicesdata[0]=='multans') {
+            $p = explode('|',$v);
+            $out = array();
+            foreach ($p as $pv) {
+                $out[] = $choicesdata[1][$pv];
+            }
+            return 'Selected: '.implode(', ',$out);
+        } else if ($choicesdata[0]=='matching') {
+            return $v;
+        }
+
+    }
+    function printrubrics($rubricarray)
+    {
+        $out = '<script type="text/javascript">';
+        $out .= 'var imasrubrics = new Array();';
+        foreach ($rubricarray as $info) {
+            $out .= "imasrubrics[{$info[0]}] = {'type':{$info[1]},'data':[";
+            $data = unserialize($info[2]);
+            foreach ($data as $i => $rubline) {
+                if ($i != 0) {
+                    $out .= ',';
+                }
+                $out .= '["' . str_replace('"', '\\"', $rubline[0]) . '",';
+                $out .= '"' . str_replace('"', '\\"', $rubline[1]) . '"';
+                $out .= ',' . $rubline[2];
+                $out .= ']';
+            }
+            $out .= ']};';
+        }
+        $out .= '</script>';
         return $out;
     }
-}
 
-function prepchoicedisp($v,$choicesdata) {
-    if ($v=='') {return '';}
-    foreach ($choicesdata[1] as $k=>$c) {
-        $c = str_replace('&','%%',$c);
-        $sh = strip_tags($c);
-        if (trim($sh)=='' || strpos($c,'<table')!==false) {
-            $sh = "[view]";
-        } else if (strlen($sh)>15) {
-            $sh = substr($sh,0,15).'...';
-        }
-        if ($sh!=$c) {
-            $choicesdata[1][$k] = '<span onmouseover="tipshow(this,\''.trim(str_replace('&','%%',htmlentities($c,ENT_QUOTES|ENT_HTML401))).'\')" onmouseout="tipout()">'.$sh.'</span>';
-        }
+    function printrubriclink($rubricid, $points, $scorebox, $feedbackbox, $qn = 'null', $width = 600)
+    {
+        $out = "<a onclick=\"imasrubric_show($rubricid,$points,'$scorebox','$feedbackbox','$qn',$width); return false;\" href=\"#\">";
+        $out .= "<img border=0 src='../../img/assess.png' alt=\"rubric\"></a>";
+        return $out;
     }
-    if ($choicesdata[0]=='choices') {
-        return ($choicesdata[1][$v]);
-    } else if ($choicesdata[0]=='multans') {
-        $p = explode('|',$v);
-        $out = array();
-        foreach ($p as $pv) {
-            $out[] = $choicesdata[1][$pv];
-        }
-        return 'Selected: '.implode(', ',$out);
-    } else if ($choicesdata[0]=='matching') {
-        return $v;
-    }
-
-}
-
-function rawscoretocolor($sc,$aw) {
-    if ($aw==0) {
-        return '';
-    } else if ($sc<0) {
-        return '';
-    } else if ($sc==0) {
-        return 'ansred';
-    } else if ($sc>.98) {
-        return 'ansgrn';
-    } else {
-        return 'ansyel';
-    }
-}
- ?>
+    ?>

@@ -737,5 +737,10 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
         $data = \Yii::$app->db->createCommand($query)->queryAll();
         return $data;
     }
+
+    public static function getPasswordFromLtiUser($sid)
+    {
+        return User::find()->select('password')->where(['SID' => $sid])->andWhere(['rights' => 11])->andWhere(['rights' => 76])->andWhere(['rights' => 77])->one();
+    }
 }
 

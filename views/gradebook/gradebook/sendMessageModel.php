@@ -15,8 +15,7 @@ if ($params['sendtype'] == 'msg') {
     $to = "$lastname, $firstname ($email)";
 }
 if (isset($_GET['quoteq'])) {
-    print_r('abcd');
-    die;
+
     require("../assessment/displayq2.php");
     $parts = explode('-', $_GET['quoteq']);
     $message = displayq($parts[0], $parts[1], $parts[2], false, false, 0, true);
@@ -36,8 +35,8 @@ if (isset($_GET['quoteq'])) {
     } else {
         $title = '';
     }
-} else if (isset($_GET['title'])) {
-    $title = $_GET['title'];
+} else if (isset($params['title'])) {
+    $title = $params['title'];
     $message = '';
     $courseid = $course->id;
 } else {
