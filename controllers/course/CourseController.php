@@ -1285,7 +1285,7 @@ class CourseController extends AppController
         } else {
             $defaultValues = array(
                 'saveButtonTitle' => AppConstant::CREATE_LINK,
-                'saveTitle' => AppConstant::CREATE_LINK,
+                'saveTitle' => AppConstant::ADD_LINK,
                 'title' => AppConstant::ENTER_TITLE,
                 'summary' => AppConstant::ENTER_SUMMARY,
                 'text' => "Enter text here",

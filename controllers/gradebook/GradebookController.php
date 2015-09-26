@@ -2438,6 +2438,7 @@ class GradebookController extends AppController
     public function actionUploadGrades()
     {
         $this->guestUserHandler();
+        $this->layout = 'master';
         $course = Course::getById($this->getParamVal('cid'));
         $nowTime = time();
         $model = new AddGradesForm();

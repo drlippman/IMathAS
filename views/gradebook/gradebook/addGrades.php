@@ -4,14 +4,6 @@ use app\components\AppConstant;
 use kartik\time\TimePicker;
 use kartik\date\DatePicker;
 use app\components\AssessmentUtility;
-/*
- * Assign proper hyper link when handling breadcrumb
- */
-//if ($params['stu'] > 0) {
-//    echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Student Detail</a> ";
-//} else if ($params['stu'] == -1) {
-//    echo "&gt; <a href=\"gradebook.php?stu={$_GET['stu']}&cid=$cid\">Averages</a> ";
-//}
 if ($params['gbitem'] == 'new') {
     $this->title = AppConstant::ADD_OFFLINE_GRADE;
 } else {

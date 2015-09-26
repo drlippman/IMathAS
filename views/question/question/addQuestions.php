@@ -14,14 +14,16 @@ $this->params['breadcrumbs'][] = $this->title;
 <!--Course name-->
 <div class="title-container">
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12 padding-right-zero">
             <div class=" col-sm-6" style="right: 30px;">
                 <div class="vertical-align title-page">Add/Remove Questions<a href="#" onclick="window.open('<?php echo AppUtility::getHomeURL().'docs/help.php?section=addingquestionstoanassessment' ?>','help','top=0,width=400,height=500,scrollbars=1,left='+(screen.width-420))"><i class="fa fa-question fa-fw help-icon"></i></a></div>
             </div>
-            <div class="col-sm-6" style="left: 35px;">
-                <div class="col-sm-5 col-sm-offset-5"> <a style="margin-left: 20px;" title="Preview this assessment" onclick="window.open('<?php echo AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&amp;id='.$assessmentId) ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="<?php echo AppUtility::getHomeURL().'img/prvAssess.png' ?>">&nbsp;&nbsp;Preview Assessment</a></div>
-                <div class="col-sm-2 pull-right">
-                    <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id) ?>" class="btn btn-primary  page-settings"><img class="small-icon" src="<?php echo AppUtility::getHomeURL().'img/done.png' ?>">&nbsp;Done</a>
+            <div class="col-sm-6 padding-right-zero" style="">
+                <div class="floatright">
+                    <div class="floatleft padding-right-fifteen"> <a style="" title="Preview this assessment" onclick="window.open('<?php echo AppUtility::getURLFromHome('question','question/show-test?cid='.$courseId.'&amp;id='.$assessmentId) ?>','Testing','width='+(.4*screen.width)+',height='+(.8*screen.height)+',scrollbars=1,resizable=1,status=1,top=20,left='+(.6*screen.width-20))" class="btn btn-primary page-settings"><img class="small-preview-icon" src="<?php echo AppUtility::getHomeURL().'img/prvAssess.png' ?>">&nbsp;&nbsp;Preview Assessment</a></div>
+                    <div class="floatleft">
+                        <a style="background-color: #008E71;border-color: #008E71;" title="Exit back to index page" href="<?php echo AppUtility::getURLFromHome('instructor','instructor/index?cid='.$course->id) ?>" class="btn btn-primary  page-settings"><img class="small-icon" src="<?php echo AppUtility::getHomeURL().'img/done.png' ?>">&nbsp;Done</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,17 +40,34 @@ $this->params['breadcrumbs'][] = $this->title;
                     var AHAHsaveurl = "<?php echo AppUtility::getURLFromHome('question','question/add-questions-save?cid='.$courseId.'&aid='.$assessmentId)?>";
                     var curlibs = '<?php echo $searchlibs;?>';
                 </script>
-    <div class="col-md-12">
+    <div class="col-md-12 padding-zero">
         <?php
-            echo '<div style="background-color: #E0E0E0;height: 60px; margin-right: -15px; margin-left: -15px; padding-top: 21px;"><div class="col-md-2"><a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'</a></div>
-            <div class="col-md-2"><a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'</a></div>
-            <div class="col-md-2"><a href="'.AppUtility::getURLFromHome('question','question/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'</a></div>
-            <div class="col-md-2"><a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'</a></div>';
+            echo '<div class="col-md-12 padding-left-zero" style="background-color: #E0E0E0;min-height: 60px;">
+            <div class="padding-left-zero col-md-12 margin-top-twenty">
+            <div class="col-md-2">
+                <a title="Modify assessment settings" href="'.AppUtility::getURLFromHome('assessment','assessment/add-assessment?cid='.$courseId.'&id='.$assessmentId).'">'.AppUtility::t("Assessment Settings",false).'
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a title="Categorize questions by outcome or other groupings" href="'.AppUtility::getURLFromHome('question','question/categorize?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Categorize Questions",false).'
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="'.AppUtility::getURLFromHome('question','question/print-test?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Create Print Version",false).'
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a title="Customize messages to display based on the assessment score" href="'.AppUtility::getURLFromHome('assessment','assessment/assessment-message?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define End Messages",false).'
+                </a>
+            </div>';
         if ($displaymethod=='VideoCue') {
-            echo ' <div class="col-md-2"><a title="Define Video Cues" href="'.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define Video Cues",false).'</a></div></div>';
+            echo ' <div class="col-md-2">
+                        <a title="Define Video Cues" href="'.AppUtility::getURLFromHome('question','question/add-video-times?cid='.$courseId.'&aid='.$assessmentId).'">'.AppUtility::t("Define Video Cues",false).'
+                        </a>
+                   </div>';
         }
+        echo '</div></div>';
          ?>
-    </div>
     <div class="assessment-ques-shadowbox">
         <?php if ($beentaken) { ?>
             <div class="col-md-12">
@@ -60,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <p><input type=button value="Clear Assessment Attempts" onclick="window.location='<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&clearattempts=ask')  ?>'"></p>
             </div>
         <?php } ?>
-        <div class="col-md-8"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
+        <div class="col-md-8 padding-left-zero"><h3 class="margin-top-twenty-two">Questions in Assessment - <?php echo $pageAssessmentName ?></h3></div>
         <?php
             if ($itemorder == '') {
                 echo '<div class="col-md-12 margin-bottom-thirty">';
@@ -139,7 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
     if ($sessiondata['selfrom'.$assessmentId]=='lib') { //selecting from libraries
         if (!$beentaken) { ?>
             <form method=post action="add-questions?aid=<?php echo $assessmentId ?>&cid=<?php echo $courseId ?>">
-                <div class="col-md-12 patential-ques-header search-patential-ques-header">
+                <div class="col-md-12 patential-ques-header">
                     <div class="col-md-2"><span id="libnames"> <?php echo 'In Libraries: '. $lnames ?></span></div>
                     <div class="col-md-2 left-twenty-eight"><a href="javascript:GB_show('Library Select','<?php echo AppUtility::getHomeURL() ?>question/question/library-tree?libtree=popup&libs='+curlibs,500,500)"><?php AppUtility::t("Select Libraries") ?></a></div>
                     <div class="col-md-3"><a  href="<?php echo AppUtility::getURLFromHome('question','question/add-questions?cid='.$courseId.'&aid='.$assessmentId.'&selfrom=assm')  ?>"><?php AppUtility::t("Select From Assessment")?></a></div>
@@ -485,3 +504,4 @@ $this->params['breadcrumbs'][] = $this->title;
             </script>
         <?php } ?>
     </div>
+</div>

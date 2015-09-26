@@ -245,7 +245,7 @@ function generateTable() {
 	var ln = 0;
 	var pttotal = 0;
 	var html = '';
-	html += "<table cellpadding=5 class='floatleft question-table'><thead><tr>";
+	html += "<table cellpadding=5 class='floatleft question-table' id='add-remove-ques-table'><thead><tr>";
 	if (!beentaken) {
 		html += "<th><div class='checkbox override-hidden'><label><input type='checkbox' id='header-checked1' name='header-checked1' value='ignore'>" +
         "<span class='cr'><i class='cr-icon fa fa-check'></i></span></label></div></th>";

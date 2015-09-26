@@ -21,7 +21,7 @@ function selectCheckBox() {
             })
         }
     });
-    $('.question-table input[name = "potentialq-header-checked"]').click(function(){
+    $('#add-remove-ques-table input[name = "potentialq-header-checked"]').click(function(){
         if($(this).prop("checked") == true){
             $('#potential-question-assessment-information-table input:checkbox').each(function () {
                 $(this).prop('checked', true);
@@ -35,7 +35,8 @@ function selectCheckBox() {
     });
 }
 function selectCheckBox1() {
-    $('.question-table input[name = "header-checked1"]').click(function(){
+    $('#add-remove-ques-table input[id = "header-checked1"]').click(function(){
+        alert('click chek all');
         if($(this).prop("checked") == true){
             $('#question-information-table input:checkbox').each(function () {
                 $(this).prop('checked', true);

@@ -258,4 +258,5 @@ class AppConstant
     const SIXTY = 60;
     const MIN_START_DATE = 9999999999;
     const NO_ASSESSEMENT_SELECTED = 'No assessments selected';
+    const ADD_LINK = 'Add Link';
 }
