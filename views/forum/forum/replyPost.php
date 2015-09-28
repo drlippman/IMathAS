@@ -6,7 +6,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <form id="add-thread" enctype="multipart/form-data" action="<?php AppUtility::getURLFromHome('forum','forum/reply-post')?>" method="post">
 <div class="item-detail-header">
-    <?php echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]); ?>
+    <?php if($currentUser['rights'] > 10) {
+    echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'instructor/instructor/index?cid=' . $course->id]]);
+    } elseif($currentUser['rights'] == 10){
+        echo $this->render("../../itemHeader/_indexWithLeftContent", ['link_title' => [AppUtility::t('Home', false), $course->name], 'link_url' => [AppUtility::getHomeURL() . 'site/index', AppUtility::getHomeURL() . 'course/course/index?cid=' . $course->id]]);
+    }
+    ?>
 </div>
 <div class = "title-container">
     <div class="row">
@@ -18,9 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 </div>
-<div class="item-detail-content">
-    <?php echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => '']);?>
-</div>
+    <div class="item-detail-content">
+        <?php if($currentUser['rights'] > 10) {
+            echo $this->render("../../instructor/instructor/_toolbarTeacher", ['course' => $course, 'section' => 'Forums']);
+        } elseif($currentUser['rights'] == 10){
+            echo $this->render("../../course/course/_toolbarStudent", ['course' => $course, 'section' => 'Forums']);
+        }?>
+    </div>
 <input type="hidden" class="forum-id" value="<?php echo $forumId ?>">
 <input type="hidden" class="course-id" value="<?php echo $course->id ?>">
 <input type="hidden" class="thread-id" value="<?php echo $threadId ?>">

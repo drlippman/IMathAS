@@ -1,4 +1,5 @@
 <?php
+use \app\components\AppConstant;
 use app\components\AppUtility;
 $this->title = AppUtility::t('Login Log', false);
 $this->params['breadcrumbs'][] = $this->title;
@@ -24,14 +25,33 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
-    </br>
-    <div class="align-login-view">
-        <h3><strong>View Login Log</strong></h3>
-        <pre><a href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$userId) ;?>">View Activity Log</a></pre>
-        <h4><strong>Login Log for <?php echo $userFullName ?></strong></h4>
+    <div class="login-log-header">
+        <a class="padding-left-thirty" href="<?php echo AppUtility::getURLFromHome('roster','roster/activity-log?cid='.$course->id.'&uid='.$userId) ;?>">View Activity Log</a>
+    </div>
+    <div class="roster-login-log">
+       <div class="col-md-12">
+           <h4 class="padding-top-twenty padding-bottom-fifteen">
+               <strong>Login Log for <?php echo $userFullName ?></strong>
+           </h4>
+       </div>
+        <table class="login-log-table table table-bordered table-striped table-hover data-table">
+            <thead>
+            <tr>
+                <th>Sr. No.</th>
+                <th>Login Log</th>
+            </tr>
+            </thead>
+            <tbody class="user-table-body">
         <?php
-        foreach($lastlogin as $login) { ?>
-            <p><?php echo $login['logDateTime'];?></p>
+        foreach($lastlogin as $key => $login) { ?>
+            <tr>
+                <td><?php echo($key + AppConstant::NUMERIC_ONE); ?></td>
+                <td>
+                    <?php echo $login['logDateTime'];?>
+                </td>
+            </tr>
         <?php } ?>
+            </tbody>
+            </table>
     </div>
 </div>

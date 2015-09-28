@@ -24,12 +24,16 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <div class="item-detail-content"></div>
 <div class="tab-content shadowBox">
-    <br>
-    <div class="align-login-view">
-        <h3><strong>View Activity Log</strong></h3>
-        <pre><a href="<?php echo AppUtility::getURLFromHome('roster', 'roster/login-log?cid=' . $course->id . '&uid=' . $userId) ?>">View Login Log</a></pre>
-        <h4><strong>Activity Log for <?php echo $userFullName ?></strong></h4>
-        <table id="user-table displayCourse" class="display user-table">
+    <div class="activity-log-header">
+        <a class="padding-left-thirty" href="<?php echo AppUtility::getURLFromHome('roster', 'roster/login-log?cid=' . $course->id . '&uid=' . $userId) ?>">View Login Log</a>
+    </div>
+    <div class="roster-activity-log">
+        <div class="col-md-12">
+            <h4 class="padding-top-twenty padding-bottom-ten">
+                <strong>Activity Log for <?php echo $userFullName ?></strong>
+            </h4>
+        </div>
+        <table id="user-table displayCourse" class="display user-table table table-bordered table-striped table-hover data-table">
             <thead>
             <tr>
                 <th>Data</th>

@@ -2701,6 +2701,7 @@ class GradebookController extends AppController
                 }
             }
         }
+        $this->includeCSS(['gradebook.css']);
         $responseData = array('course' => $course, 'commentType' => $commentType, 'model' => $model, 'failures' => $failures, 'successes' => $successes, 'userCol' => $userCol);
         return $this->renderWithData('uploadComments', $responseData);
     }

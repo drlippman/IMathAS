@@ -224,3 +224,11 @@ span.form.select-text-margin{
     padding: 20px 30px 25px 30px;
 
 }
+.login-log-header, .activity-log-header {
+    background-color: #E0E0E0;height: 60px;padding-top: 21px;
+}
+.roster-login-log, .roster-activity-log {
+margin-left: 15px;
+margin-right: 15px;
+margin-bottom: 25px;
+}

@@ -88,7 +88,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
             </div>
         </div>
         <div class="change-assessment">
-            <legend class="margin-top-fifteen"><?php AppUtility::t('Assessment Options') ?></legend>
+            <div class="margin-top-fifteen"><?php AppUtility::t('Assessment Options') ?></div>
             <table class="table table-bordered table-striped table-hover data-table" id="opttable">
                 <thead>
                 <tr>
@@ -196,7 +196,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                         <div class="col-lg-6">
                             <td style="border-bottom: 1px solid #000">
                                 <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from') ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty assessment-copy-from clear-both">
+                                <div class="display-inline-block width-fifty-per margin-left-thirty-five assessment-copy-from clear-both">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("copyendmsg", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
@@ -219,7 +219,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                         <div class="col-lg-6">
                             <td>
                                 <div class="pull-left margin-top-ten"><?php AppUtility::t('Copy from'); ?></div>
-                                <div class="display-inline-block width-fifty-per margin-left-thirty assessment-copy-from clear-both">
+                                <div class="display-inline-block width-fifty-per margin-left-thirty-five assessment-copy-from clear-both">
                                 <?php
                                 AssessmentUtility::writeHtmlSelect("copyopt", $page_assessSelect['val'], $page_assessSelect['label']);
                                 ?>
@@ -599,7 +599,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                             <td>
                                 <input type="checkbox"
                                        name="doposttoforum" <?php AssessmentUtility::writeHtmlChecked($line['posttoforum'], 0, true); ?>
-                                       style="margin-bottom: 4px"/> <span class="margin-left-five"> <?php AppUtility::t('To forum');?></span><div class="display-inline-block margin-left-thirty width-fifty-per"> <?php AssessmentUtility::writeHtmlSelect("posttoforum", $page_forumSelect['val'], $page_forumSelect['label'], $line['posttoforum']); ?></div>
+                                       style="margin-bottom: 4px"/> <span class="margin-left-five"> <?php AppUtility::t('To forum');?></span><div class="display-inline-block margin-left-eighteen width-fifty-per"> <?php AssessmentUtility::writeHtmlSelect("posttoforum", $page_forumSelect['val'], $page_forumSelect['label'], $line['posttoforum']); ?></div>
                             </td>
                         </div>
                     </div>
@@ -658,7 +658,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                                 </span>
                                 <label class="floatleft margin-left-thirty margin-top-eight">
                                     <input type="checkbox" name="latepassafterdue">
-                                    <span class="margin-left-five"> <?php AppUtility::t('Allow LatePasses after due date,within 1 LatePass period') ?></span>
+                                    <span class="margin-left-five"> <?php AppUtility::t('Allow LatePasses after due date, within 1 LatePass period') ?></span>
                                 </label>
                             </td>
                         </div>
@@ -777,7 +777,7 @@ $this->title = AppUtility::t('Mass Change Assessment Settings', false);
                         <div class="col-lg-6">
                             <td>
                                 <?php AppUtility::t('Active') ?> <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagact" type=text size=1
-                                                                         value="<?php echo $line['caltag']; ?>"/>,
+                                                                         value="<?php echo $line['caltag']; ?>"/>&nbsp;,
                                <span class="margin-left-ten"> <?php AppUtility::t('Review') ?></span> <input class="margin-left-five form-control width-ten-per display-inline-block" name="caltagrev" type=text size=1
                                                                          value="<?php echo $line['calrtag']; ?>"/>
                             </td>

@@ -206,16 +206,35 @@ tr#quickadd td {
     padding-bottom: 25px;
     padding-right: 25px;
 }
-.add-grade-name-left-margin
-{
+.add-grade-name-left-margin {
     margin-left: 28px;
 }
 
-.add-grade-name-left-padding
-{
+.add-grade-name-left-padding {
     padding-left: 14px !important;
 }
 
-.padding-top-thirty{
+.padding-top-thirty {
     padding-top: 30px;
+}
+.upload-gradebook-user-identity {
+    display: block;
+    width: 500px;
+    float: left;
+    margin-bottom: 10px;
+    text-align: left;
+    margin-left: 13%;
+}
+.file-has-header-row label {
+    margin-right: 20px;
+}
+.upload-comments-btn {
+    width: 72px;
+    height: 35px;
+}
+.comments-in-columns label {
+    padding-top: 7px;
+}
+.upload-gradebook-comments-padding {
+padding: 15px 10px 30px 0px;
 }

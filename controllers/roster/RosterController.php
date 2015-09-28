@@ -1309,7 +1309,8 @@ class RosterController extends AppController
             );
             array_push($loginLogData, $tempArray);
         }
-        $this->includeCSS(['roster/roster.css']);
+        $this->includeJS(['jquery.dataTables.min.js','dataTables.bootstrap.js','roster/activityLog.js']);
+        $this->includeCSS(['roster/roster.css','dataTables.bootstrap.css']);
         $responseData = array('course' => $course, 'userFullName' => $userFullName, 'lastlogin' => $loginLogData, 'userId' => $userId,'from' => $from);
         return $this->renderWithData('loginLog', $responseData);
     }
@@ -1402,7 +1403,8 @@ class RosterController extends AppController
                 $forumName[$query['id']] = $query['name'];
             }
         }
-        $this->includeCSS(['roster/roster.css']);
+        $this->includeJS(['jquery.dataTables.min.js','dataTables.bootstrap.js','roster/activityLog.js']);
+        $this->includeCSS(['roster/roster.css','dataTables.bootstrap.css']);
         $responseData = array('course' => $course, 'userFullName' => $userFullName, 'userId' => $userId, 'exnames' => $exnames,
             'forumPostName' => $forumPostName, 'actions' => $actions, 'assessmentName' => $assessmentName, 'inlineTextName' => $inlineTextName,
             'linkName' => $linkName, 'wikiName' => $wikiName, 'forumName' => $forumName, 'from' => $from);
