@@ -304,4 +304,9 @@ class Forums extends BaseImasForums {
         $form->name = $val;
         $form->save();
     }
+
+    public static function getByName($typeId)
+    {
+        return Forums::find()->select('name')->where(['id' => $typeId])->one();
+    }
 }

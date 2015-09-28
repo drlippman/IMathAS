@@ -173,5 +173,10 @@ class InlineText extends BaseImasInlinetext
             $updateIdArray->save();
         }
     }
+
+    public static function getByName($typeId)
+    {
+        return InlineText::find()->select('name')->where(['id' => $typeId])->one();
+    }
 }
 

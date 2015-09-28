@@ -9,6 +9,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentTime = AppUtility::parsedatetime(date('m/d/Y'), date('h:i a'));
 $now = $currentTime;
 $imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reorder?cid='.$course->id);
+
 ?>
 <link href='<?php echo AppUtility::getHomeURL(); ?>css/course/course.css?<?php echo time(); ?>' rel='stylesheet' type='text/css'>
 <link href='<?php echo AppUtility::getHomeURL() ?>css/fullcalendar.print.css' rel='stylesheet' media='print'/>
@@ -138,24 +139,24 @@ $imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reor
                     case 'Assessment': ?>
                         <?php  $cnt++;
                        ?>
-                        <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll);?>
+                        <?php CourseItemsUtility::AddAssessment($assessment,$item,$course,$currentTime,$parent,$canEdit,$viewAll,$hasStats);?>
                         <input type="hidden" class="assessment-link" value="<?php echo $assessment->id?>">
                         <?php break; ?>
                         <!-- ///////////////////////////// Forum here /////////////////////// -->,
                     <?php case 'Forum': ?>
                     <?php  $cnt++; ?>
-                    <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent); ?>
+                    <?php CourseItemsUtility::AddForum($item,$course,$currentTime,$parent, $hasStats); ?>
                     <?php break; ?>
                     <!-- ////////////////// Wiki here //////////////////-->
                 <?php case 'Wiki': ?>
                     <?php  $cnt++; ?>
-                    <?php CourseItemsUtility::AddWiki($item,$course,$parent, $currentTime); ?>
+                    <?php CourseItemsUtility::AddWiki($item,$course,$parent, $currentTime,$hasStats); ?>
                     <?php break; ?>
                     <!-- ////////////////// Linked text here //////////////////-->
                 <?php
                     case 'LinkedText': ?>
                         <?php  $cnt++; ?>
-                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent,$course);?>
+                        <?php CourseItemsUtility::AddLink($item,$currentTime,$parent,$course,$hasStats);?>
                         <?php break; ?>
                         <!-- ////////////////// Inline text here //////////////////-->
                     <?php case 'InlineText': ?>
@@ -171,7 +172,7 @@ $imasRoot = AppUtility::getURLFromHome('instructor', 'instructor/save-quick-reor
                 <?php case  'Block': ?>
                     <?php  $cnt++; ?>
                     <?php $displayBlock = new CourseItemsUtility();
-                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll);
+                    $displayBlock->DisplayWholeBlock($item,$currentTime,$assessment,$course,$parent,$cnt,$canEdit,$viewAll,$hasStats);
                     ?>
                     <?php break; ?>
                 <?php endswitch;

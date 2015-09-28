@@ -742,5 +742,21 @@ class User extends BaseImasUsers implements \yii\web\IdentityInterface
     {
         return User::find()->select('password')->where(['SID' => $sid])->andWhere(['rights' => 11])->andWhere(['rights' => 76])->andWhere(['rights' => 77])->one();
     }
+
+    public static function getDataByCourseId($courseId)
+    {
+        $query = new Query();
+        $query->select(['iu.id','iu.LastName','iu.FirstName'])
+            ->from('imas_users AS iu')
+            ->join('JOIN',
+                'imas_students AS istu',
+                'iu.id = istu.userid'
+            )
+            ->where(['istu.courseid' => $courseId]);
+        $query->orderBy('iu.LastName,iu.FirstName');
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
 }
 

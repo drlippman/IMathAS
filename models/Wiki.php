@@ -163,4 +163,9 @@ class Wiki extends BaseImasWikis
         $form->name = $val;
         $form->save();
     }
+
+    public static function getByName($typeId)
+    {
+        return Wiki::find()->select('name')->where(['id' => $typeId])->one();
+    }
 } 

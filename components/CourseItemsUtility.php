@@ -10,11 +10,12 @@ class CourseItemsUtility extends Component
 
     public $cnt = AppConstant::NUMERIC_ZERO;
 
-    public static function AddAssessment($assessment, $item, $course, $currentTime, $parent, $canEdit, $viewAll)
+    public static function AddAssessment($assessment, $item, $course, $currentTime, $parent, $canEdit, $viewAll, $hasStats)
     {
+        $typeId = $item['assessment']['typeid'];
         $assessment = $item[key($item)];
         $notHidden = $item['nothidden'];
-        $hasstats = true;
+
         if (strpos($assessment['summary'], '<p ') !== AppConstant::NUMERIC_ZERO && strpos($assessment['summary'], '<ul') !== AppConstant::NUMERIC_ZERO && strpos($assessment['summary'], '<ol') !== AppConstant::NUMERIC_ZERO) {
             $assessment['summary'] = '<p>' . $assessment['summary'] . '</p>';
             if (preg_match('/^\s*<p[^>]*>\s*<\/p>\s*$/', $assessment['summary'])) {
@@ -37,6 +38,7 @@ class CourseItemsUtility extends Component
             $reviewDate = AppUtility::formatdate($assessment['reviewdate']);
         }
         if ($assessment->avail == AppConstant::NUMERIC_ONE && $assessment->enddate > $currentTime && $assessment->startdate < $currentTime && $notHidden) {
+
             if (substr($assessment->deffeedback, AppConstant::NUMERIC_ZERO, AppConstant::NUMERIC_EIGHT) == 'Practice') {
                 $endName = 'Available until';
             } else {
@@ -90,8 +92,9 @@ class CourseItemsUtility extends Component
                         <li><a id="grades"
                                href="<?php echo AppUtility::getURLFromHome('gradebook', 'gradebook/item-analysis?cid='.$course->id.'&asid=average&aid='.$assessment->id); ?>"><?php AppUtility::t('Grades'); ?></a>
                         </li>
-                        <?php if (isset($hasstats['a' . $assessment->id])) { ?>
-                            <li><a id="stats" href="#"><?php AppUtility::t('Stats'); ?></a></li>
+
+                        <?php if (isset($hasStats['a' . $assessment->id])) { ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=A&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
                         <?php } ?>
                     </ul>
                 </div>
@@ -114,8 +117,9 @@ class CourseItemsUtility extends Component
     /*
      * FORUM
      */
-    public static function AddForum($item, $course, $currentTime, $parent)
+    public static function AddForum($item, $course, $currentTime, $parent, $hasStats)
     {
+        $typeId = $item['forum']['typeid'];
         $forum = $item[key($item)];
         if ($forum->avail == AppConstant::NUMERIC_TWO || $forum->startdate < $currentTime && $forum->enddate > $currentTime && $forum->avail == AppConstant::NUMERIC_ONE) {
             ?>
@@ -145,6 +149,9 @@ class CourseItemsUtility extends Component
                             <li><a id="copy"
                                    href="javascript:copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                             </li>
+                            <?php if (isset($hasStats['f' . $typeId])) { ?>
+                                <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=F&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                            <?php } ?>
                         </ul>
                     </div>
                     <br>
@@ -201,6 +208,9 @@ class CourseItemsUtility extends Component
                             <li><a id="copy"
                                    href="javascript:copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                             </li>
+                            <?php if (isset($hasStats['f' . $typeId])) { ?>
+                                <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=F&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                            <?php } ?>
                         </ul>
                     </div>
                     <br>
@@ -239,6 +249,9 @@ class CourseItemsUtility extends Component
                             <li><a id="copy"
                                    href="javascript:copyItem('<?php echo $item['forum']['id']; ?>','<?php echo AppConstant::FORUM ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                             </li>
+                            <?php if (isset($hasStats['f' . $typeId])) { ?>
+                                <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=F&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                            <?php } ?>
                         </ul>
                     </div>
                     <br>
@@ -260,8 +273,9 @@ class CourseItemsUtility extends Component
     /*
      * WIKI
      */
-    public static function AddWiki($item, $course, $parent, $currentTime)
+    public static function AddWiki($item, $course, $parent, $currentTime, $hasStats)
     {
+        $typeId = $item['wiki']['typeid'];
         $wikis = $item[key($item)]; ?>
         <?php $endDateOfWiki = AppUtility::formatDate($wikis['enddate'], 'm/d/y');
         $startDateOfWiki = AppUtility::formatDate($wikis['startdate'], 'm/d/y');
@@ -290,6 +304,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                        <?php
+                        if (isset($hasStats['w'.$typeId])) {
+                            ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=W&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
                 </div>
 
@@ -303,7 +322,8 @@ class CourseItemsUtility extends Component
             </div>
             <div class="clear"></div>
         </div>
-    <?php } elseif ($wikis->avail == AppConstant::NUMERIC_ONE) { ?>
+    <?php } elseif ($wikis->avail == AppConstant::NUMERIC_ONE) {
+        ?>
         <div class="item">
             <img alt="assess" class="floatleft item-icon-alignment"
                  src="<?php echo AppUtility::getAssetURL() ?>img/iconWiki.png"/>
@@ -311,7 +331,6 @@ class CourseItemsUtility extends Component
             <div class="title">
                 <b><a href="<?php echo AppUtility::getURLFromHome('wiki', 'wiki/show-wiki?courseId=' . $wikis->courseid . '&wikiId=' . $wikis->id) ?>">
                         <?php echo ucfirst($wikis->name) ?></a></b>
-
                 <div class="floatright">
                     <a class="dropdown-toggle grey-color-link select_button1 floatright" data-toggle="dropdown"
                        href="javascript:void(0);"><img alt="setting" class="floatright course-setting-button"
@@ -326,6 +345,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                       <?php
+                        if (isset($hasStats['w'.$typeId])) {
+                             ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=W&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
                 </div>
                 <br>
@@ -376,6 +400,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['wiki']['id']; ?>','<?php echo AppConstant::WIKI ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                        <?php
+                        if (isset($hasStats['w'.$typeId])) {
+                            ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=W&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
                 </div>
                 <br><span>Showing Always</span>
@@ -399,8 +428,9 @@ class CourseItemsUtility extends Component
     /*
      * LINK
      */
-    public static function AddLink($item, $currentTime, $parent, $course)
+    public static function AddLink($item, $currentTime, $parent, $course, $hasStats)
     {
+        $typeId = $item['link']['typeid'];
         $link = $item[key($item)]; ?>
         <?php $text = $link->text; ?>
         <?php $startDateOfLink = AppUtility::formatDate($link->startdate);
@@ -506,6 +536,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                        <?php
+                        if (isset($hasStats['l'.$typeId])) {
+                            ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=L&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
                 </div>
 
@@ -582,6 +617,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                        <?php
+                        if (isset($hasStats['l'.$typeId])) {
+                            ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=L&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
                 </div>
 
@@ -653,6 +693,11 @@ class CourseItemsUtility extends Component
                         <li><a id="copy"
                                href="javascript:copyItem('<?php echo $item['link']['id']; ?>','<?php echo AppConstant::LINK ?>','<?php echo $parent; ?>','<?php echo $course->id; ?>')"><?php AppUtility::t('Copy'); ?></a>
                         </li>
+                        <?php
+                        if (isset($hasStats['l'.$typeId])) {
+                            ?>
+                            <li><a id="stats" href="<?php echo AppUtility::getURLFromHome('instructor', 'instructor/content-stats?cid='.$course->id.'&type=L&id='.$typeId)?>"><?php AppUtility::t('Stats'); ?></a></li>
+                        <?php } ?>
                     </ul>
 
                 </div>
@@ -1067,7 +1112,7 @@ class CourseItemsUtility extends Component
                                 ?>
                                 <div class="inactivewrapper "
                                      onmouseout="this.className='inactivewrapper'">
-                                    <?php $this->AddAssessment($assessment, $item, $course, $currentTime, $parent . '-' . $cnt, $canEdit, $viewAll); ?>
+                                    <?php $this->AddAssessment($assessment, $item, $course, $currentTime, $parent . '-' . $cnt, $canEdit, $viewAll, $hasStats); ?>
                                 </div>
                                 <?php break; ?>
 
@@ -1075,21 +1120,21 @@ class CourseItemsUtility extends Component
                             <?php
                             case 'Forum':
                                 ?>
-                                <?php $this->AddForum($item, $course, $currentTime, $parent . '-' . $cnt); ?>
+                                <?php $this->AddForum($item, $course, $currentTime, $parent . '-' . $cnt,$hasStats); ?>
                                 <?php break; ?>
 
                                 <!-- Wiki here-->
                             <?php
                             case 'Wiki':
                                 ?>
-                                <?php $this->AddWiki($item, $course, $parent . '-' . $cnt, $currentTime); ?>
+                                <?php $this->AddWiki($item, $course, $parent . '-' . $cnt, $currentTime,$hasStats); ?>
                                 <?php break; ?>
 
                                 <!-- Linked text here -->
                             <?php
                             case 'LinkedText':
                                 ?>
-                                <?php $this->AddLink($item, $currentTime, $parent . '-' . $cnt, $course); ?>
+                                <?php $this->AddLink($item, $currentTime, $parent . '-' . $cnt, $course,$hasStats); ?>
                                 <?php break; ?>
                                 <!-- Inline text here -->
                             <?php

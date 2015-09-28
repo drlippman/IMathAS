@@ -6,6 +6,7 @@ use app\components\AppConstant;
 use app\components\AppUtility;
 use app\components\CopyItemsUtility;
 use app\models\CalItem;
+use app\models\ContentTrack;
 use app\models\Course;
 use app\models\ForumPosts;
 use app\models\ForumSubscriptions;
@@ -32,6 +33,7 @@ use app\models\Stugroups;
 use app\models\Teacher;
 use app\models\InlineText;
 use app\models\Thread;
+use app\models\User;
 use app\models\Wiki;
 use app\models\forms\ManageEventForm;
 use app\models\WikiRevision;
@@ -45,7 +47,6 @@ use yii\db\Exception;
 
 class InstructorController extends AppController
 {
-
     public $oa = array();
     public $cn = AppConstant::NUMERIC_ONE;
     public $key = AppConstant::NUMERIC_ZERO;
@@ -66,22 +67,21 @@ class InstructorController extends AppController
         $openblocks = 0;
         $prevloadedblocks = 0;
         $useviewbuttons = false;
-//        setcookie('openblocks-'.$courseId,$openblocks);
-//        setcookie('prevloadedblocks-'.$courseId,$prevloadedblocks);
-//        if (isset($_COOKIE['openblocks-'.$courseId]) && $_COOKIE['openblocks-'.$courseId]!='')
-//        {
-//            $openblocks = explode(',',$_COOKIE['openblocks-'.$courseId]);
-//            $firstload = false;
-//        } else {
-//            $firstload = true;
-//        }
-//
-//        if (isset($_COOKIE['prevloadedblocks-'.$courseId]) && $_COOKIE['prevloadedblocks-'.$courseId]!='')
-//        {
-//            $prevloadedblocks = explode(',',$_COOKIE['prevloadedblocks-'.$courseId]);
-//        }
-//        $plblist = $prevloadedblocks;
-//        $oblist = $openblocks;
+
+        /**
+         * Get items with content views, for enabling stats link
+         */
+        if (isset($isTeacher) || isset($isTutor))
+        {
+            $hasStats = array();
+            $stat = new ContentTrack();
+            $stats = $stat->getStatsData($courseId);
+
+            foreach($stats as $key => $row){
+                $hasStats[$row['(CONCAT(SUBSTRING(type,1,1),typeid))']] = true;
+            }
+        }
+
         $previewShift = -1;
         if ($isTeacher) {
             $canEdit = true;
@@ -336,9 +336,10 @@ class InstructorController extends AppController
         }
         $student = Student::getByCId($courseId);
         $this->includeCSS(['fullcalendar.min.css', 'calendar.css', 'jquery-ui.css','_leftSide.css']);
-        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js', 'mootools.js', 'nested1.js']);
+        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js']);
+//        $this->includeJS(['moment.min.js','fullcalendar.min.js', 'student.js', 'latePass.js','course.js','course/instructor.js','course/addItem.js', 'mootools.js', 'nested1.js']);
         $returnData = array('calendarData' =>$calendarCount,'messageList' => $msgList,'courseDetail' => $responseData,
-        'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll, 'isTeacher' => $isTeacher, 'quickview' => $quickview, 'useviewbuttons' => $useviewbuttons);
+        'course' => $course, 'students' => $student, 'assessmentSession' => $assessmentSession,'canEdit'=> $canEdit, 'viewAll'=> $viewAll, 'isTeacher' => $isTeacher, 'quickview' => $quickview, 'useviewbuttons' => $useviewbuttons, 'item' => $item, 'hasStats' => $hasStats);
         return $this->renderWithData('index', $returnData);
     }
     /**
@@ -1797,5 +1798,111 @@ class InstructorController extends AppController
 
         }
         return $outarr;
+    }
+
+    public function actionContentStats()
+    {
+        $this->guestUserHandler();
+        $user = $this->getAuthenticatedUser();
+        $this->layout = 'master';
+        $courseId = $this->getParamVal('cid');
+        $course = Course::getById($courseId);
+        $overWriteBody = false;
+        $isTeacher = $this->isTeacher($user['id'], $courseId);
+        $isTutor = $this->isTutor($user['id'], $courseId);
+
+        if (!isset($isTeacher) && !isset($isTutor)) {
+            $overWriteBody = true;
+            $body = 'You do not have authorization to view this page';
+        }
+
+        $sType = $this->getParamVal('type');
+        $typeId = intval($this->getParamVal('id'));
+
+        if ($typeId == 0 || !in_array($sType,array('I','L','A','W','F')))
+        {
+            $overWriteBody = true;
+            $body = 'Invalid request';
+        } else {
+            $data = array();
+            $descrips = array();
+            if ($sType == 'I')
+            {
+                $queryResult = ContentTrack::getDataByCourseId($courseId, $typeId);
+                $q2 = InlineText::getByName($typeId);
+            } else if ($sType == 'L') {
+                $query = new ContentTrack();
+                $queryResult = $query->getDataForLink($courseId,$typeId);
+                $q2 = LinkedText::getByName($typeId);
+            } else if ($sType == 'A') {
+                $query = new ContentTrack();
+                $queryResult = $query->getDataForAssessment($courseId,$typeId);
+                $q2 = Assessments::getAssessmentName($typeId);
+            } else if ($sType == 'W') {
+                $query = new ContentTrack();
+                $queryResult = $query->getDataForWiki($courseId,$typeId);
+                $q2 = Wiki::getByName($typeId);
+            } else if ($sType == 'F') {
+                $query = new ContentTrack();
+                $queryResult = $query->getDataForForum($courseId,$typeId);
+                $q2 = Forums::getByName($typeId);
+            }
+
+            foreach($queryResult as $key => $row)
+            {
+                $type = $row['type'];
+                if ($type=='linkedviacal')
+                {
+                    $type = 'linkedlink';
+                }
+                if ($sType == 'F' ||in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext')))
+                {
+                    $ident = $type.'::'.$row['info'];
+                } else {
+                    $ident = $type;
+                }
+                if (!isset($descrips[$ident]))
+                {
+                    if (in_array($type,array('inlinetext','linkedsum','linkedintext','assessintro','assesssum','wikiintext'))) {
+                        $parts = explode('::',$row['info']);
+                        if (count($parts)>1) {
+                            $desc = 'In-item link to <a href="'.$parts[0].'">'.$parts[1].'</a>';
+                        } else {
+                            $desc = 'In-item link to '.$row['info'];
+                        }
+                    } else if (in_array($type,array('linkedlink','linkedviacal','wiki','assess'))) {
+                        $desc = 'Link to item';
+                    } else if ($type=='forumpost') {
+                        $desc = 'Forum post';
+                    } else if ($type=='forumreply') {
+                        $desc = 'Forum reply';
+                    }
+                    $descrips[$ident] = $desc;
+                }
+
+                if (!isset($data[$ident])) {
+                    $data[$ident] = array();
+                }
+                if (!isset($data[$ident][$row['userid']])) {
+                    $data[$ident][$row['userid']] = 1;
+                } else {
+                    $data[$ident][$row['userid']]++;
+                }
+            }
+
+            $row = $q2;
+            $itemName = $row['name'];
+
+            $stus = array();
+
+            $result = User::getDataByCourseId($courseId);
+
+            foreach($result as $key => $row)
+            {
+                $stus[$row['id']] = $row['LastName'].', '.$row['FirstName'];
+            }
+        }
+        $responseData = array('overWriteBody' => $overWriteBody, 'itemName' => $itemName, 'body' => $body, 'descrips' => $descrips, 'stus' => $stus, 'data' => $data, 'course' => $course);
+        return $this->renderWithData('contentStats', $responseData);
     }
 }

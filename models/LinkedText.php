@@ -204,4 +204,15 @@ class LinkedText extends BaseImasLinkedtext
         $linkText->title = $val;
         $linkText->save();
     }
+
+    public static function getByName($typeId)
+    {
+        $query = new Query();
+        $query->select(['imas_linkedtext.title AS name'])
+            ->from('imas_linkedtext')
+            ->where(['imas_linkedtext.id' => $typeId]);
+        $command = $query->createCommand();
+        $data = $command->queryOne();
+        return $data;
+    }
 }

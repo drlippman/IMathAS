@@ -126,4 +126,47 @@ class ContentTrack extends BaseImasContentTrack
         $this->viewtime = $time;
         $this->save();
     }
+
+    public static function getDataByCourseId($courseId, $typeId)
+    {
+        $query = new Query();
+        $query->select(['userid','type','info'])
+            ->from(['imas_content_track'])
+            ->where(['courseid' => $courseId]);
+        $query->andWhere(['type' => 'inlinetext']);
+        $query->andWhere(['typeid' => $typeId]);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        return $data;
+    }
+
+    public function getDataForLink($courseId,$typeId)
+    {
+      $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('linkedsum','linkedlink','linkedintext','linkedvviacal') AND typeid='$typeId'";
+      return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public function getDataForAssessment($courseId,$typeId)
+    {
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('assessintro','assessum','assess') AND typeid='$typeId'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public function getDataForWiki($courseId,$typeId)
+    {
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('wiki','wikiintext') AND typeid='$typeId'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public function getDataForForum($courseId,$typeId)
+    {
+        $query = "SELECT userid,type,info FROM imas_content_track WHERE courseid='$courseId' AND type IN ('forumpost','forumreply') AND info='$typeId'";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
+
+    public static function getStatsData($courseId)
+    {
+        $query = "SELECT DISTINCT(CONCAT(SUBSTRING(type,1,1),typeid)) FROM imas_content_track WHERE courseid='$courseId' AND type IN ('inlinetext','linkedsum','linkedlink','linkedintext','linkedviacal','assessintro','assess','assesssum','wiki','wikiintext') ";
+        return \Yii::$app->db->createCommand($query)->queryAll();
+    }
 }
